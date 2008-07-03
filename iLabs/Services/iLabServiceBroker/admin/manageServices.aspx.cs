@@ -337,8 +337,8 @@ namespace iLabs.ServiceBroker.admin
             trBatchIn.Visible= false;
             trBatchOut.Visible = false;
             
-            lblAdminGroup.Visible = isDisplay;
-            ddlAdminGroup.Visible = isDisplay;
+            //lblAdminGroup.Visible = isDisplay;
+            //ddlAdminGroup.Visible = isDisplay;
             trAdminGroup.Visible = isDisplay;
             btnRegister.Visible = !isDisplay;
             btnAdminURLs.Visible = isDisplay;
@@ -405,11 +405,13 @@ namespace iLabs.ServiceBroker.admin
             txtInfoURL.Text = "";
             txtContactEmail.Text = "";
             txtOutPassKey.Text = "";
-
-            ddlAdminGroup.SelectedIndex = 0;
+            txtBatchPassIn.Text = "";
+            txtBatchPassOut.Text = "";
+            ddlAdminGroup.ClearSelection();
+            trAdminGroup.Visible = false;
             trAssociate.Visible = false;
             trManage.Visible = false;
-            ddlLSS.SelectedIndex = 0;
+            ddlLSS.ClearSelection();
             //ddlLSS.Visible = false;
             //lblAssociate.Visible = false;
            
@@ -457,6 +459,7 @@ namespace iLabs.ServiceBroker.admin
 
                 txtServiceName.Text = agent.agentName;
                 txtServiceType.Text = agent.type;
+                
                 txtServiceGUID.Text = agent.agentGuid;
                 txtWebServiceURL.Text = agent.webServiceUrl;
                 txtApplicationURL.Text = agent.codeBaseUrl;
@@ -498,8 +501,8 @@ namespace iLabs.ServiceBroker.admin
                     txtInfoURL.Text = "";
                     txtContactEmail.Text = "";
                 }
-                if (agent.type.Equals(ProcessAgentType.BATCH_SERVICE_BROKER))
-                {
+                if(agent.type.CompareTo(ProcessAgentType.BATCH_LAB_SERVER) == 0){
+                    cbxDoBatch.Checked = true;
                     ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(agent.agentGuid);
                     txtBatchPassIn.Text = paInfo.identIn.passkey;
                     txtBatchPassOut.Text = paInfo.identOut.passkey;
@@ -538,7 +541,9 @@ namespace iLabs.ServiceBroker.admin
                             }
                             else
                             {
-                                ddlAdminGroup.SelectedIndex = 0;
+                                if(ddlAdminGroup.Items.Count >0)
+                                    ddlAdminGroup.SelectedIndex = 0;
+                                else ddlAdminGroup.ClearSelection();
                             }
 
                             if (grantIDs.Length > 1)
@@ -551,7 +556,9 @@ namespace iLabs.ServiceBroker.admin
                         }
                         else
                         {
-                            ddlAdminGroup.SelectedIndex = 0;
+                            if (ddlAdminGroup.Items.Count > 0)
+                                ddlAdminGroup.SelectedIndex = 0;
+                            else ddlAdminGroup.ClearSelection();
                         }
                     }
 
