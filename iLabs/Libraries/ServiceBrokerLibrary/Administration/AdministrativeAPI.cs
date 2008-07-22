@@ -939,7 +939,7 @@ namespace iLabs.ServiceBroker.Administration
 		{
 			return InternalAdminDB.SelectLabServerIDs ();
 		}
-
+/*
 		/// <summary>
 		/// Generates and installs a new passkey that will be used to authenticate web service calls made by the remote server identified by labServerID.
 		/// The passkey returned must be conveyed out of band to the administrator of the remote server.
@@ -1021,7 +1021,7 @@ namespace iLabs.ServiceBroker.Administration
 			}
 			return outgoingKey;
 		}
-
+*/
 
 		///*********************** LAB CLIENTS **************************///
 		

@@ -316,6 +316,8 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="readOnlySwitch">true if displaying a service, false if not</param>
         private void SetInputMode(bool isDisplay)
         {
+            txtBatchHelp.Visible = false;
+            btnRegister.Text = "Install Domain Credentitials";
             txtWebServiceURL.ReadOnly = isDisplay;
             txtWebServiceURL.BackColor = isDisplay ? disabled : enabled;
             txtServiceGUID.ReadOnly = isDisplay;
@@ -354,6 +356,8 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="isDisplay">true if displaying a service, false if not</param>
         private void SetBatchInputMode(bool isDisplay)
         {
+            txtBatchHelp.Visible = true;
+            btnRegister.Text = "Register LabServer";
             txtWebServiceURL.ReadOnly = isDisplay;
             txtWebServiceURL.BackColor = isDisplay ? disabled : enabled;
             txtServiceGUID.ReadOnly = isDisplay;
@@ -365,7 +369,7 @@ namespace iLabs.ServiceBroker.admin
             txtApplicationURL.BackColor = isDisplay ? disabled : enabled;
             txtServiceName.ReadOnly = isDisplay;
             txtServiceName.BackColor = isDisplay ? disabled : enabled;
-            txtServiceType.Text = ProcessAgentType.BATCH_SERVICE_BROKER;
+            txtServiceType.Text = ProcessAgentType.BATCH_LAB_SERVER;
             txtServiceType.ReadOnly = true;
             txtServiceType.BackColor = disabled;
             txtServiceDescription.ReadOnly = false; //  !isDisplay;
@@ -501,12 +505,36 @@ namespace iLabs.ServiceBroker.admin
                     txtInfoURL.Text = "";
                     txtContactEmail.Text = "";
                 }
-                if(agent.type.CompareTo(ProcessAgentType.BATCH_LAB_SERVER) == 0){
+                if (agent.type.Equals(ProcessAgentType.BATCH_LAB_SERVER))
+                {
                     cbxDoBatch.Checked = true;
                     ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(agent.agentGuid);
-                    txtBatchPassIn.Text = paInfo.identIn.passkey;
-                    txtBatchPassOut.Text = paInfo.identOut.passkey;
                     SetBatchInputMode(true);
+                    if (paInfo.identIn != null)
+                    {
+                        txtBatchPassIn.Text = paInfo.identIn.passkey;
+                        txtBatchPassIn.ReadOnly = true;
+                        txtBatchPassIn.BackColor = disabled;
+                    }
+                    else
+                    {
+                        txtBatchPassIn.Text = "";
+                        txtBatchPassIn.ReadOnly = false;
+                        txtBatchPassIn.BackColor = enabled;
+                    }
+                    if (paInfo.identOut != null)
+                    {
+                        txtBatchPassOut.Text = paInfo.identOut.passkey;
+                        txtBatchPassOut.ReadOnly = true;
+                        txtBatchPassOut.BackColor = disabled;
+                    }
+                    else
+                    {
+                        txtBatchPassOut.Text = "";
+                        txtBatchPassOut.ReadOnly = false;
+                        txtBatchPassOut.BackColor = enabled;
+                    }
+
                 }
                 else
                 {
@@ -541,7 +569,7 @@ namespace iLabs.ServiceBroker.admin
                             }
                             else
                             {
-                                if(ddlAdminGroup.Items.Count >0)
+                                if (ddlAdminGroup.Items.Count > 0)
                                     ddlAdminGroup.SelectedIndex = 0;
                                 else ddlAdminGroup.ClearSelection();
                             }
@@ -571,7 +599,7 @@ namespace iLabs.ServiceBroker.admin
                         //ddlAdminGroup.Visible = false;
                         //lblAdminGroup.Visible = false;
                     }
-                    if (agent.type == ProcessAgentType.LAB_SERVER && agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                    if (agent.type.Equals(ProcessAgentType.LAB_SERVER) && agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                     {
                         trAssociate.Visible = true;
                         trManage.Visible = true;
@@ -594,6 +622,7 @@ namespace iLabs.ServiceBroker.admin
         protected void btnNew_Click(object sender, System.EventArgs e)
         {
             ddlService.SelectedIndex = 0;
+            cbxDoBatch.Checked = false;
             ClearFormFields();
             SetInputMode(false);
         }
@@ -696,14 +725,14 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="e"></param>
         protected void btnSaveChanges_Click(object sender, System.EventArgs e)
         {
-
+            int agentID = -1;
             ///////////////////////////////////////////////////////////////
             /// ADD a new Service                                     //
             ///////////////////////////////////////////////////////////////
             if (txtServiceGUID.ReadOnly == false) // add new record
             {
 
-                long agentID = -1;
+               
                 // Add the iLab Service
                 try
                 {
@@ -790,9 +819,26 @@ namespace iLabs.ServiceBroker.admin
 
                     // Need to add processing for resourceMapping used by form
                     modifyResources(agentId);
-                   
+                    if (txtServiceType.Text.Equals(ProcessAgentType.BATCH_LAB_SERVER))
+                    {
+                        ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(agentId);
+                        if ((info.identIn == null) && (txtBatchPassIn.Text != "") && (txtBatchPassIn.Text.Length >0))
+                        {
+                            // Create the issued coupon
+                            Coupon inCoupon = brokerDB.CreateCoupon(txtBatchPassIn.Text);
+                            // Insert the coupon
+                            brokerDB.InsertCoupon(inCoupon);
+                            brokerDB.SetIdentInCouponID(info.agentGuid, inCoupon.couponId);
+                        }
+                        if ((info.identOut == null) && (txtBatchPassOut.Text != "") && (txtBatchPassOut.Text.Length > 0))
+                        {
+                            Coupon outCoupon = brokerDB.CreateCoupon(txtBatchPassOut.Text);
+                            brokerDB.InsertCoupon(outCoupon);
+                            brokerDB.SetIdentOutCouponID(info.agentGuid, outCoupon.couponId);
+                        }
+                    }
                     // test for administered Service
-                    if (txtServiceType.Text != "SERVICE BROKER" && txtServiceType.Text != "REMOTE SERVICE BROKER")
+                    else if (!txtServiceType.Text.Equals(ProcessAgentType.SERVICE_BROKER) && !txtServiceType.Text.Equals(ProcessAgentType.REMOTE_SERVICE_BROKER))
                     {
                         // Get the current Administer grants
                         int qualifierTypeID = Qualifier.ToTypeID(txtServiceType.Text);
@@ -841,7 +887,7 @@ namespace iLabs.ServiceBroker.admin
                                 wrapper.RemoveGrantsWrapper(grantIDs);
                             }
                         }
-                        if (txtServiceType.Text == ProcessAgentType.LAB_SERVER)
+                        if (txtServiceType.Text.Equals(ProcessAgentType.LAB_SERVER))
                         {
                             trAssociate.Visible = true;
                             trManage.Visible = true;
@@ -869,6 +915,10 @@ namespace iLabs.ServiceBroker.admin
                 }
 
             }
+            if(agentID > 0){
+                displayService(agentID);
+            }
+             
 
         }
 
@@ -906,6 +956,7 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="e"></param>
         protected void btnRegister_Click(object sender, System.EventArgs e)
         {
+            int agentID = 0;
             ProcessAgent service = ProcessAgentDB.ServiceAgent;
             if (service == null)
             {
@@ -915,7 +966,7 @@ namespace iLabs.ServiceBroker.admin
             }
             
 
-            if (txtServiceType.Text.Equals(ProcessAgentType.BATCH_SERVICE_BROKER))
+            if (txtServiceType.Text.Equals(ProcessAgentType.BATCH_LAB_SERVER))
             {
                 bool hasError = false;
                 StringBuilder errorMess = new StringBuilder();
@@ -931,16 +982,16 @@ namespace iLabs.ServiceBroker.admin
                     hasError = true;
                     errorMess.Append('\t' + "Service GUID: Batch Guids should be between 1 and 35 characters");
                 }
-                if (txtBatchPassIn.Text == null || txtBatchPassIn.Text.Length == 0)
-                {
-                    hasError = true;
-                    errorMess.Append('\t' + "Passcode In");
-                }
-                if (txtBatchPassOut.Text == null || txtBatchPassOut.Text.Length == 0)
-                {
-                    hasError = true;
-                    errorMess.Append('\t' + "Passcode Out");
-                }
+                //if (txtBatchPassIn.Text == null || txtBatchPassIn.Text.Length == 0)
+                //{
+                //    hasError = true;
+                //    errorMess.Append('\t' + "Passcode From LabServer");
+                //}
+                //if (txtBatchPassOut.Text == null || txtBatchPassOut.Text.Length == 0)
+                //{
+                //    hasError = true;
+                //    errorMess.Append('\t' + "Passcode To LabServer");
+                //}
                 if (txtApplicationURL.Text == null || txtApplicationURL.Text.Length == 0)
                 {
                     hasError = true;
@@ -971,13 +1022,21 @@ namespace iLabs.ServiceBroker.admin
                     lblErrorMessage.Text = Utilities.FormatErrorMessage("A service with the specified Guid has already been registered.");
                     return;
                 }
-                Coupon inCoupon = brokerDB.CreateCoupon(txtBatchPassIn.Text);
-                Coupon outCoupon = brokerDB.CreateCoupon(txtBatchPassOut.Text);
-                int paID = wrapper.AddProcessAgentWrapper(txtServiceGUID.Text, txtServiceName.Text,
+                Coupon inCoupon = null;
+                if (txtBatchPassIn.Text != null && txtBatchPassIn.Text.Length > 0)
+                {
+                    inCoupon = brokerDB.CreateCoupon(txtBatchPassIn.Text);
+                }
+                Coupon outCoupon = null;
+                if (txtBatchPassOut.Text != null && txtBatchPassOut.Text.Length > 0)
+                {
+                    outCoupon = brokerDB.CreateCoupon(txtBatchPassOut.Text);
+                }
+                agentID = wrapper.AddProcessAgentWrapper(txtServiceGUID.Text, txtServiceName.Text,
                     ProcessAgentType.BATCH_LAB_SERVER, ProcessAgentDB.ServiceGuid, txtApplicationURL.Text,
-                    txtWebServiceURL.Text, outCoupon, inCoupon);
+                    txtWebServiceURL.Text, inCoupon, outCoupon);
 
-                modifyResources(paID);
+                modifyResources(agentID);
             }
 
             else
@@ -1009,9 +1068,9 @@ namespace iLabs.ServiceBroker.admin
                         agent = proxy.InstallDomainCredentials(service, inIdentCoupon, outIdentCoupon);
                         if (agent != null)
                         {
-                            if (agent.type == ProcessAgentType.SERVICE_BROKER)
+                            if (agent.type.Equals(ProcessAgentType.SERVICE_BROKER))
                                 agent.type = ProcessAgentType.REMOTE_SERVICE_BROKER;
-                            int agentId = wrapper.AddProcessAgentWrapper(agent.agentGuid, agent.agentName, agent.type,
+                            agentID = wrapper.AddProcessAgentWrapper(agent.agentGuid, agent.agentName, agent.type,
                                 agent.domainGuid, agent.codeBaseUrl, agent.webServiceUrl,
                                 outIdentCoupon, inIdentCoupon);
 
@@ -1022,17 +1081,17 @@ namespace iLabs.ServiceBroker.admin
                                     //brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_ESS);
                                     break;
                                 case ProcessAgentType.LAB_SCHEDULING_SERVER:
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_LSS);
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/manage.aspx", TicketTypes.MANAGE_LAB);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_LSS);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/manage.aspx", TicketTypes.MANAGE_LAB);
                                     break;
                                 case ProcessAgentType.LAB_SERVER:
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_LS);
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/administer.aspx", TicketTypes.MANAGE_LAB);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_LS);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/administer.aspx", TicketTypes.MANAGE_LAB);
                                     break;
                                 case ProcessAgentType.SCHEDULING_SERVER:
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_USS);
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/manage.aspx", TicketTypes.MANAGE_USS_GROUP);
-                                    brokerDB.InsertAdminURL(agentId, agent.codeBaseUrl + "/Reservation.aspx", TicketTypes.SCHEDULE_SESSION);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/administer.aspx", TicketTypes.ADMINISTER_USS);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/manage.aspx", TicketTypes.MANAGE_USS_GROUP);
+                                    brokerDB.InsertAdminURL(agentID, agent.codeBaseUrl + "/Reservation.aspx", TicketTypes.SCHEDULE_SESSION);
                                     break;
                                 case ProcessAgentType.REMOTE_SERVICE_BROKER:
                                 default:
@@ -1040,10 +1099,7 @@ namespace iLabs.ServiceBroker.admin
                             }
 
 
-                            InitializeDropDown();
-                            ddlService.Items.FindByValue(agentId.ToString()).Selected = true;
-                            //SetInputMode(true);
-                            displayService(agentId);
+                            
 
                             lblErrorMessage.Visible = true;
                             lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Relationship with the service has been created and saved.");
@@ -1058,6 +1114,20 @@ namespace iLabs.ServiceBroker.admin
                         //lblErrorMessage.Text = Utilities.FormatErrorMessage("InstallDomainCredentials Error: " + Utilities.DumpException(ex));
                         lblErrorMessage.Text = Utilities.FormatErrorMessage("InstallDomainCredentials Error: " + ex.Message);
                     }
+                }
+            }
+            InitializeDropDown();
+            if (agentID > 0)
+            {
+                ddlService.Items.FindByValue(agentID.ToString()).Selected = true;
+                //SetInputMode(true);
+                displayService(agentID);
+            }
+            else
+            {
+                if (ddlService.Items.Count > 0)
+                {
+                    ddlService.Items[0].Selected = true;
                 }
             }
         }
@@ -1215,6 +1285,7 @@ namespace iLabs.ServiceBroker.admin
                 SetBatchInputMode(false);
                 trBatchIn.Visible = true;
                 trBatchOut.Visible = true;
+                txtBatchHelp.Visible = true;
             }
             else
             {
@@ -1222,7 +1293,9 @@ namespace iLabs.ServiceBroker.admin
                 SetInputMode(false);
                 trBatchIn.Visible = false;
                 trBatchOut.Visible = false;
+                 txtBatchHelp.Visible = false;
             }
+            
 
         }
 

@@ -34,141 +34,138 @@ Please see license.txt in top level directory for full license.
 						<p><asp:label id="lblErrorMessage" Runat="server" Visible="False"></asp:label></p>
 						<!-- end pageintro div -->
 						<div id="pagecontent">
-							
 							<div class="simpleform">
 							    <form id="modifylab" action="" method="post" name="modifylab">
-									<table style="WIDTH: 630px; HEIGHT: 460px" cellSpacing="0" cellPadding="5" border="0">
+									<table style="WIDTH: 620px; HEIGHT: 460px" cols="3" cellSpacing="0" cellPadding="5" border="0">
 										<TBODY>
-										    <tr><th style="width: 85px"><label for="registerBatch">Register BatchLS</label></th>
-										    <td style="width: 405px"><asp:checkbox ID="cbxDoBatch" runat="server" AutoPostBack="True" OnCheckedChanged="cbxDoBatch_Changed" /></td>
-										    </tr>
+										    <tr><th style="width: 120px"><label for="registerBatch">Register BatchLS</label><asp:checkbox ID="cbxDoBatch" runat="server" AutoPostBack="True" OnCheckedChanged="cbxDoBatch_Changed" /></th>
+											<td colspan="2" style="width: 500px"><asp:textbox ID="txtBatchHelp" runat="server" Columns="70" Rows="3" TextMode="MultiLine" Visible="false" Width="500px">Note: Batch LabServers require that the incoming passcode be specified by the ServiceBroker provider, the outgoing passcode is specified by the LabServer provider.</asp:textbox></td>
+										   </tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="Service">Service</label></th>
-												<td style="width: 405px"><asp:dropdownlist id="ddlService" Runat="server" AutoPostBack="True" Width="360px" onselectedindexchanged="ddlService_SelectedIndexChanged"></asp:dropdownlist></td>
+												<td colspan="2" style="width: 500px"><asp:dropdownlist id="ddlService" Runat="server" AutoPostBack="True" Width="500px" onselectedindexchanged="ddlService_SelectedIndexChanged"></asp:dropdownlist></td>
 											</tr>
 											
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="webserviceurl">Web Service URL</label></th>
-												<td style="width: 405px"><asp:textbox id="txtWebServiceURL" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtWebServiceURL" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr id="trPasskey" runat="server">
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="outpasskey">Initial Passkey </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtOutPassKey" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtOutPassKey" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="Agentguid">Agent GUID </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtServiceGUID" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtServiceGUID" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr id="trBatchIn" runat="server" visible="false">
-											<th style="width: 85px">
-													<label for="Passcode In">Passcode In</label>
+											<th style="width: 120px">
+													<label for="Passcode In">Incoming Passcode From LabServer</label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtBatchPassIn" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtBatchPassIn" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr id="trBatchOut" runat="server" visible="false">
-											<th style="width: 85px">
-													<label for="Passcode Out">PasscodeOut</label>
+											<th style="width: 120px">
+													<label for="Passcode Out">Outgoing Passcode To LabServer</label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtBatchPassOut" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtBatchPassOut" Runat="server" Width="500px"></asp:textbox></td>
 											</tr><tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="AgentType">Agent Type </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtServiceType" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtServiceType" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="codebaseurl">Codebase URL </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtApplicationURL" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtApplicationURL" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="Servicename">Service Name </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtServiceName" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 580px"><asp:textbox id="txtServiceName" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="domainServer">Domain Server </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtDomainServer" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtDomainServer" Runat="server" Width="500px"></asp:textbox></td>
 											</tr><tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="description">Description</label></th>
-												<td style="width: 405px"><asp:textbox id="txtServiceDescription" Runat="server" Columns="20" Rows="5" TextMode="MultiLine"
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtServiceDescription" Runat="server" Columns="20" Rows="5" TextMode="MultiLine"
 														Width="500px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="infourl">Info URL </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtInfoURL" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtInfoURL" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label for="contactemail">Contact Email </label>
 												</th>
-												<td style="width: 405px"><asp:textbox id="txtContactEmail" Runat="server" Width="500px"></asp:textbox></td>
+												<td colspan="2" style="width: 500px"><asp:textbox id="txtContactEmail" Runat="server" Width="500px"></asp:textbox></td>
 											</tr>
 											<tr id="trAdminGroup" runat="server">
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label id="lblAdminGroup" runat="server" for="adminGroup">
                                                         Admin Group</label>&nbsp;</th>
-												<td style="width: 405px">
+												<td colspan="2" style="width: 500px">
                                                     <asp:DropDownList ID="ddlAdminGroup" runat="server" Width="500px">
                                                     </asp:DropDownList>
                                                    </td>
 											</tr>
 											
 											<tr id="trAssociate" runat="server">
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label id="lblAssociate" runat="server"  for="associatedLSS">Associated LSS</label>
                                                     </th>
-												<td style="width: 405px; height: 1px;">
+												<td style="width: 380px; height: 1px;">
                                                     <asp:DropDownList ID="ddlLSS" runat="server" Width="380px"></asp:DropDownList></td>
-                                                    <td rowspan="2">
+                                                <td rowspan="2" style="width: 120px">
                                                     <asp:Button ID="btnAssociateLSS" CssClass="button"  runat="server" Text="Associate" OnClick="btnAssociateLSS_Click" />
-                                                    </td>
+                                                </td>
 											</tr>
 											<tr id="trManage" runat="server">
-												<th style="width: 85px">
+												<th style="width: 120px">
 													<label id="lblManage" runat="server"  for="ManageLSS">Manage on LSS</label>
                                                     </th>
-												<td style="width: 405px; height: 1px;">
-                                                    <asp:DropDownList ID="ddlManageLSS" runat="server" Width="377px"></asp:DropDownList>
+												<td style="width: 380px; height: 1px;">
+                                                    <asp:DropDownList ID="ddlManageLSS" runat="server" Width="380px"></asp:DropDownList>
                                                     </td>
 											</tr>
-                                            <tr align="center" >
+                                            <tr align="right" >
 												<th colspan="2" style="height: 34px">
+												<asp:button id="btnRegister" Runat="server" CssClass="button" Text="Install Domain Credentials" onclick="btnRegister_Click"></asp:button>
 													<asp:button id="btnSaveChanges" Runat="server" CssClass="button" Text="Save Changes" onclick="btnSaveChanges_Click"></asp:button>
 													<asp:button id="btnRemove" Runat="server" CssClass="button" Text="Remove" onclick="btnRemove_Click"></asp:button>
 													<asp:button id="btnNew" runat="server" CssClass="button" Text="New" onclick="btnNew_Click"></asp:button>
+													<asp:Button ID="btnAdminURLs" runat="server" CssClass="button"  Text="Domain URLs" Width="140px" />
 												</th>
+												<td>&nbsp;</td>
 											</tr>
-                                            <tr align="center">
-                                                <th colspan="2" >
-                                                    &nbsp;<asp:button id="btnRegister" Runat="server" CssClass="button" Text="Install Domain Credentials" onclick="btnRegister_Click"></asp:button>
-                                                    &nbsp;<asp:Button ID="btnAdminURLs" runat="server" CssClass="button"  Text="Domain URLs" Width="140px" /></th>
-                                            </tr>
-										</TBODY>
+       									</TBODY>
 									</table>
 								</form>
 								</div>
 							</div>
 						</div>
-					</div>
-					</div>
+		
+				
 				</form>
 				<br clear="all" />
 						<!-- end pagecontent div -->
-						/div>
+						</div>
 					<!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer>
 				
 	</body>

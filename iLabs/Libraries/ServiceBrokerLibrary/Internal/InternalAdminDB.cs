@@ -417,7 +417,7 @@ namespace iLabs.ServiceBroker.Internal
 			}
 			return intLabServerID;
 		}
-
+/*
 		/// <summary>
 		/// to modify the outgoing passkey 
 		/// Method name changed from UpdateSBOutgoingPasskey
@@ -536,7 +536,7 @@ namespace iLabs.ServiceBroker.Internal
 			}
 			return passKey;
 		}
-		
+		*/
 		/* !------------------------------------------------------------------------------!
 		 *							CALLS FOR LAB CLIENTS
 		 * !------------------------------------------------------------------------------!

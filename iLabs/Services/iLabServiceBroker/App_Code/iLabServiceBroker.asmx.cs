@@ -889,18 +889,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		/////////////////////////////////////
 		///    Local Helper Methods       ///
 		////////////////////////////////////
-		
-		/// <summary>
-		/// Sets the values of the soap header that is passed to the lab server.
-		/// </summary>
-		/// <param name="intLabServerID">The integer ID of the labserver.</param>
-		public void SetSoapHeaderValues (int intLabServerID)
-		{
-			// set soap header authentication values
-			batchLS_Proxy.AuthHeaderValue = new AuthHeader();
-			batchLS_Proxy.AuthHeaderValue .identifier = ProcessAgentDB.ServiceGuid;
-            batchLS_Proxy.AuthHeaderValue.passKey = AdministrativeAPI.GetOutgoingServerPasskey(intLabServerID);
-		}
+
 
  
 		/// <summary>

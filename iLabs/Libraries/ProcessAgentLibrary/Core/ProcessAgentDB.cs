@@ -1235,25 +1235,61 @@ namespace iLabs.Core
         }
 
         /// <summary>
-        /// Set the coupon id of the identification coupon in the record of the process agent
+        /// Set the coupon id of the identification in coupon in the record of the process agent
         /// </summary>
-        public void SetIdentificationCoupon(ProcessAgent agent, Coupon coupon)
+        public void SetIdentInCouponID(string guid, long id)
         {
             // create sql connection
             SqlConnection connection = CreateConnection();
 
             // create sql command
             // command executes the "SetIdentificationCouponID" stored procedure
-            SqlCommand cmd = new SqlCommand("SetIdentificationCouponID", connection);
+            SqlCommand cmd = new SqlCommand("SetIdentInCouponID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate GUID param
             SqlParameter processAgentGuidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar, 50);
-            processAgentGuidParam.Value = agent.agentGuid.ToString();
+            processAgentGuidParam.Value = guid;
 
             // populate coupon id param
-            SqlParameter couponIdParam = cmd.Parameters.Add("@IdentOut_ID", SqlDbType.Decimal, 18);
-            couponIdParam.Value = coupon.couponId;
+            SqlParameter couponIdParam = cmd.Parameters.Add("@ID", SqlDbType.BigInt);
+            couponIdParam.Value = id;
+
+            // execute the command
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e);
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
+        /// <summary>
+        /// Set the coupon id of the identification in coupon in the record of the process agent
+        /// </summary>
+        public void SetIdentOutCouponID(string guid, long id)
+        {
+            // create sql connection
+            SqlConnection connection = CreateConnection();
+
+            // create sql command
+            // command executes the "SetIdentificationCouponID" stored procedure
+            SqlCommand cmd = new SqlCommand("SetIdentOutCouponID", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate GUID param
+            SqlParameter processAgentGuidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar, 50);
+            processAgentGuidParam.Value = guid;
+
+            // populate coupon id param
+            SqlParameter couponIdParam = cmd.Parameters.Add("@ID", SqlDbType.BigInt);
+            couponIdParam.Value = id;
 
             // execute the command
             try
@@ -2130,6 +2166,7 @@ namespace iLabs.Core
             {
                 issuerGuid = inCoupon.issuerGuid;
             }
+
 
 			try 
 			{

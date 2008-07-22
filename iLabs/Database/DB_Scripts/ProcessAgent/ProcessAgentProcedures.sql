@@ -75,6 +75,13 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIdentOu
 drop procedure [dbo].[GetIdentOutCoupon]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetIdentInCouponID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetIdentInCouponID]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetIdentOutCouponID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetIdentOutCouponID]
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetProcessAgentID]
 GO
@@ -513,6 +520,40 @@ where Coupon_ID = (Select identOut_ID from ProcessAgent  where agent_Guid = @age
 AND Issuer_Guid = (Select issuer_GUID from ProcessAgent where agent_Guid = @agentGUID)
 
 
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS ON 
+GO
+
+CREATE PROCEDURE SetIdentInCouponID 
+@agentGUID varchar(50),
+@id bigint
+AS
+
+update ProcessAgent set identIn_ID=@id where agent_Guid = @agentGUID
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS ON 
+GO
+
+CREATE PROCEDURE SetIdentOutCouponID 
+@agentGUID varchar(50),
+@id bigint
+AS
+
+update ProcessAgent set identOut_ID=@id where agent_Guid = @agentGUID
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO

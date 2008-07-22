@@ -99,11 +99,13 @@ namespace iLabs.ServiceBroker.Authorization
 
             else if (serviceType.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
                 qualifierTypeID = Qualifier.labSchedulingQualifierTypeID;
+            else if (serviceType.Equals(ProcessAgentType.SERVICE_BROKER)|| serviceType.Equals(ProcessAgentType.REMOTE_SERVICE_BROKER))
+                qualifierTypeID = Qualifier.serviceBrokerQualifierTypeID;
 
             else if (serviceType.Equals(ProcessAgentType.EXPERIMENT_STORAGE_SERVER))
                 qualifierTypeID = Qualifier.storageServerQualifierTypeID;
 
-            else if (serviceType.Equals(ProcessAgentType.LAB_SERVER))
+            else if (serviceType.Equals(ProcessAgentType.LAB_SERVER)|| serviceType.Equals(ProcessAgentType.BATCH_LAB_SERVER))
                 qualifierTypeID = Qualifier.labServerQualifierTypeID;
 
             return qualifierTypeID;
