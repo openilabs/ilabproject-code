@@ -261,7 +261,8 @@ namespace iLabs.ServiceBroker.Authorization
 			bool qualifierReferenceIDValid = false;
 
 			int qualifierID = -1;			
-			
+			ProcessAgentDB db = new ProcessAgentDB();
+            ProcessAgent agent = null;
 			//need to check whether the qualifierReferenceID for a particular qualifierType 
 			//actually exists before it is added to the table
 			switch (type)
@@ -270,92 +271,61 @@ namespace iLabs.ServiceBroker.Authorization
 					// Replace with case for all processAgent types an use exits for the combination of ID & type
 				case Qualifier.labServerQualifierTypeID:
 				{
-                    int[] labServerIDs = new ProcessAgentDB().GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.LAB_SERVER);
-					foreach(int labServerID in labServerIDs)
-					{
-						if(labServerID == qualifierReferenceID)
-						{
+                    agent = db.GetProcessAgent(qualifierReferenceID);
+                    if(agent != null && ((agent.type.Equals(ProcessAgentType.BATCH_LAB_SERVER)) 
+                        ||(agent.type.Equals(ProcessAgentType.LAB_SERVER)))){
 							qualifierReferenceIDValid = true;
-							break;
-						}
 					}
 					break;
 				}
 
 					//LabClient
-				case Qualifier.labClientQualifierTypeID:
-				{
-					int[] labClientIDs = InternalAdminDB.SelectLabClientIDs();
-					foreach(int labClientID in labClientIDs)
-					{
-						if(labClientID == qualifierReferenceID)
-						{
-							qualifierReferenceIDValid = true;
-							break;
-						}
-					}
-					break;
-				}
+				
             case Qualifier.serviceBrokerQualifierTypeID:
                 {
-                    int[] labServerIDs = new ProcessAgentDB().GetProcessAgentIDsByType((int)ProcessAgentType.AgentType.SERVICE_BROKER);
-                    foreach (int labServerID in labServerIDs)
+                    agent = db.GetProcessAgent(qualifierReferenceID);
+                    if (agent != null && ((agent.type.Equals(ProcessAgentType.SERVICE_BROKER)) 
+                          ||(agent.type.Equals(ProcessAgentType.BATCH_SERVICE_BROKER))
+                          || (agent.type.Equals(ProcessAgentType.REMOTE_SERVICE_BROKER))))
                     {
-                        if (labServerID == qualifierReferenceID)
-                        {
-                            qualifierReferenceIDValid = true;
-                            break;
-                        }
+                        qualifierReferenceIDValid = true;
                     }
                     break;
                 }
-            /* REMOTE SERVICE BROKER
-            case Qualifier.serviceBrokerQualifierTypeID:
-                {
-                    int[] labServerIDs = InternalAdminDB.SelectProcessAgentIDsByType(ProcessAgentType.AgentType.REMOTE_SERVICE_BROKER);
-                    foreach (int labServerID in labServerIDs)
-                    {
-                        if (labServerID == qualifierReferenceID)
-                        {
-                            qualifierReferenceIDValid = true;
-                            break;
-                        }
-                    }
-                    break;
-                }
-             * */
+           
             case Qualifier.labSchedulingQualifierTypeID:
                 {
-                    int[] labServerIDs = new ProcessAgentDB().GetProcessAgentIDsByType((int)ProcessAgentType.AgentType.LAB_SCHEDULING_SERVER);
-                    foreach (int labServerID in labServerIDs)
+                    agent = db.GetProcessAgent(qualifierReferenceID);
+                    if (agent != null && agent.type.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
                     {
-                        if (labServerID == qualifierReferenceID)
-                        {
-                            qualifierReferenceIDValid = true;
-                            break;
-                        }
+                        qualifierReferenceIDValid = true;
                     }
                     break;
                 }
             case Qualifier.userSchedulingQualifierTypeID:
                 {
-                    int[] labServerIDs = new ProcessAgentDB().GetProcessAgentIDsByType((int)ProcessAgentType.AgentType.SCHEDULING_SERVER);
-                    foreach (int labServerID in labServerIDs)
+                    agent = db.GetProcessAgent(qualifierReferenceID);
+                    if (agent != null && agent.type.Equals(ProcessAgentType.SCHEDULING_SERVER))
                     {
-                        if (labServerID == qualifierReferenceID)
-                        {
-                            qualifierReferenceIDValid = true;
-                            break;
-                        }
+                        qualifierReferenceIDValid = true;
                     }
                     break;
                 }
             case Qualifier.storageServerQualifierTypeID:
                 {
-                    int[] labServerIDs = new ProcessAgentDB().GetProcessAgentIDsByType((int)ProcessAgentType.AgentType.EXPERIMENT_STORAGE_SERVER);
-                    foreach (int labServerID in labServerIDs)
+                    agent = db.GetProcessAgent(qualifierReferenceID);
+                    if (agent != null && agent.type.Equals(ProcessAgentType.EXPERIMENT_STORAGE_SERVER))
                     {
-                        if (labServerID == qualifierReferenceID)
+                        qualifierReferenceIDValid = true;
+                    }
+                    break;
+                }
+            case Qualifier.labClientQualifierTypeID:
+                {
+                    int[] labClientIDs = InternalAdminDB.SelectLabClientIDs();
+                    foreach (int labClientID in labClientIDs)
+                    {
+                        if (labClientID == qualifierReferenceID)
                         {
                             qualifierReferenceIDValid = true;
                             break;
