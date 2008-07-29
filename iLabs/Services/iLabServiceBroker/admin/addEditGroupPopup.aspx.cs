@@ -57,7 +57,7 @@ namespace iLabs.ServiceBroker.admin
 			if (Session["UserID"]==null)
 				Response.Redirect("../login.aspx");
 
-            groupInfo = (GroupInfo)Session["groupInfo"];
+            groupInfo = (GroupInfo)Session["GroupInfo"];
 			if(groupInfo == null)
 			{
 				groupInfo = new GroupInfo();
@@ -67,7 +67,7 @@ namespace iLabs.ServiceBroker.admin
 			//after clicking button from list groups page.
 			if(!Page.IsPostBack )			// populate controls with the initial group information
 			{	
-				Session.Remove("groupInfo");
+				Session.Remove("GroupInfo");
                 groupInfo = new GroupInfo();
 				if(Request.Params["gid"] != null)
 				{
@@ -111,7 +111,7 @@ namespace iLabs.ServiceBroker.admin
 					loadParentLists();
 					actionCmd = "Add";
 				}
-				Session["groupInfo"] = groupInfo;
+				Session["GroupInfo"] = groupInfo;
 			}
 		}
 
@@ -429,7 +429,7 @@ namespace iLabs.ServiceBroker.admin
 				{
 					saveModified();
 				}
-				//Session.Remove("groupInfo");
+				//Session.Remove("GroupInfo");
 				string jScript;
 				jScript = "<script language=javascript> window.opener.Form1.hiddenPopupOnSave.value='1';";
 				jScript += "window.close();</script>";

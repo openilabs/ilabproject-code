@@ -73,13 +73,13 @@ namespace iLabs.Services
 
                 string returnUrl = Request.QueryString["returnURL"];
                 if (returnUrl != null && returnUrl.Length > 0)
-                    Session["returnURL"] = returnUrl;
+                    Session["ReturnURL"] = returnUrl;
                 txtDomainServer.ReadOnly = true;
                 txtDomainServer.BackColor = disabled;
                 lblServiceType.Text = ConfigurationManager.AppSettings["serviceType"];
                 DisplayForm();
             }
-            String returnURL = (string)Session["returnURL"];
+            String returnURL = (string)Session["ReturnURL"];
             if ((returnURL != null) && (returnURL.Length > 0))
             {
                 lnkBackSB.NavigateUrl = returnURL;

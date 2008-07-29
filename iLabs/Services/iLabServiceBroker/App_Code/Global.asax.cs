@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Web.Security;
 using System.Web;
@@ -57,7 +58,6 @@ namespace iLabs.ServiceBroker.iLabSB
 			AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
 			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
-			//Application["ServerID"] = ConfigurationSettings.AppSettings["sbGID"];
             ticketRemover = new SBTicketRemover();
 		}
  
@@ -75,19 +75,50 @@ namespace iLabs.ServiceBroker.iLabSB
                     SessionInfo info = AdministrativeAPI.GetSessionInfo(sesID);
                     if (info != null)
                     {
+                        AdministrativeAPI.SetSessionKey(sesID, Session.SessionID);
                         Session["SessionID"] = sesID;
                         Session["UserID"] = info.userID;
+                        int[] myGrps = AdministrativeAPI.ListNonRequestGroupsForAgent(info.userID);
+                        if (myGrps != null)
+                            Session["GroupCount"] = myGrps.Length;
                         Session["UserName"] = info.userName;
-                        if (info.groupID > 0)
+                        if (info.clientID != null && info.clientID > 0)
+                        {
+                            Session["ClientID"] = info.clientID;
+                        }
+                        else
+                        {
+                            Session.Remove("ClientID");
+                        }
+                        Session["UserTZ"] = info.tzOffset;
+                        Session["IsAdmin"] = false;
+                        Session["IsServiceAdmin"] = false;
+                        Group []grps = null;
+                        if (info.groupID > 0){
+                            grps = AdministrativeAPI.GetGroups(new int[]{info.groupID});
+                        }
+                        if (grps != null && grps.Length == 1)
                         {
                             Session["GroupID"] = info.groupID;
-                            Session["GroupName"] = info.groupName;
+                            Session["GroupName"] = grps[0].groupName;
+                            if ((grps[0].groupName.Equals(Group.SUPERUSER)) || (grps[0].groupType.Equals(GroupType.COURSE_STAFF)))
+                            {
+                                Session["IsAdmin"] = true;
+                            }
+                            // if the effective group is a service admin group, then redirect to the service admin page.
+                            // the session variable is used in the userNav page to check whether to make the corresponing tab visible
+                            else if (grps[0].groupType.Equals(GroupType.SERVICE_ADMIN))
+                            {
+                                Session["IsServiceAdmin"] = true;
+                            }
                         }
-                        if (info.clientID != null && info.clientID > 0)
-                            Session["ClientID"] = info.clientID;
-                        AdministrativeAPI.SetSessionKey(sesID, Session.SessionID);
+                        else
+                        {
+                            Session.Remove("GroupID");
+                            Session.Remove("GroupName");
+                            Response.Redirect("myGroups.aspx");
+                        }
                     }
-
                 }
             }
 		}
@@ -137,7 +168,40 @@ namespace iLabs.ServiceBroker.iLabSB
                 ticketRemover.Stop();
             Utilities.WriteLog("ISB Application_End:");
 
-		}
+            HttpRuntime runtime = (HttpRuntime)typeof(System.Web.HttpRuntime).InvokeMember("_theRuntime",
+                                                                                            BindingFlags.NonPublic
+                                                                                            | BindingFlags.Static
+                                                                                            | BindingFlags.GetField,
+                                                                                            null,
+                                                                                            null,
+                                                                                            null);
+            if (runtime == null)
+                return;
+            string shutDownMessage = (string)runtime.GetType().InvokeMember("_shutDownMessage",
+                                                                             BindingFlags.NonPublic
+                                                                             | BindingFlags.Instance
+                                                                             | BindingFlags.GetField,
+                                                                             null,
+                                                                             runtime,
+                                                                             null);
+            string shutDownStack = (string)runtime.GetType().InvokeMember("_shutDownStack",
+                                                                          BindingFlags.NonPublic
+                                                                           | BindingFlags.Instance
+                                                                           | BindingFlags.GetField,
+                                                                           null,
+                                                                           runtime,
+                                                                           null);
+            if (!EventLog.SourceExists(".NET Runtime"))
+            {
+                EventLog.CreateEventSource(".NET Runtime", "Application");
+            }
+            EventLog log = new EventLog();
+            log.Source = ".NET Runtime";
+            log.WriteEntry(String.Format("\r\n\r\n_shutDownMessage={0}\r\n\r\n_shutDownStack={1}",
+                                         shutDownMessage,
+                                         shutDownStack),
+                                         EventLogEntryType.Error);
+        }
 
 		public static string FormatRegularURL(HttpRequest r, string relativePath)
 		{

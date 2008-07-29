@@ -47,7 +47,7 @@ namespace iLabs.ServiceBroker.admin
         {
             if (!Page.IsPostBack)
             {
-                Session.Remove("crossRegLSS");
+                Session.Remove("CrossRegLSS");
                 initialDropDownList();
             }
         }
@@ -106,7 +106,7 @@ namespace iLabs.ServiceBroker.admin
         {
             lblLSS.Text = null;
             lblResponse.Visible = false;
-            Session.Remove("crossRegLSS");
+            Session.Remove("CrossRegLSS");
             if (Int32.Parse(ddlLabServer.SelectedValue) > 0)
             {
                 int selectedLabServerID = Int32.Parse(ddlLabServer.SelectedValue);
@@ -149,7 +149,7 @@ namespace iLabs.ServiceBroker.admin
                 }
                 if (Session["crossRegLSS"] != null)
                 {
-                    lssID = (int)Session["crossRegLSS"];
+                    lssID = (int)Session["CrossRegLSS"];
                 }
                 if (!(ddlClient.SelectedIndex > 0))
                 {

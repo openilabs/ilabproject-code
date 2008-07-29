@@ -39,7 +39,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			if(! IsPostBack)
 			{
-				if(Session["Groupname"] != null)
+				if(Session["GroupName"] != null)
 				{
 					string groupName = Session["GroupName"].ToString();
 					lblGroupNameTitle.Text = groupName;

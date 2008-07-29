@@ -40,8 +40,8 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 
 			// get redirect from the session
-			string redirectURL = (string)Session["redirectURL"];
-			Session.Remove("redirectURL");
+			string redirectURL = (string)Session["RedirectURL"];
+			Session.Remove("RedirectURL");
 				
 			string script;
 			script = "<script language=JavaScript>window.top.location.href = '" + redirectURL +"';</script>";

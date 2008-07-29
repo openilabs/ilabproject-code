@@ -71,14 +71,14 @@ Please see license.txt in top level directory for full license.
                             </p>
 							<asp:repeater id="repClientInfos" runat="server"></asp:repeater></div>
 						<!-- This is only displayed if the user came from My Groups -->
-						<% if (Convert.ToInt32(Session["ClientCount"])>1) { %>
-						<p><A href="myClientList.aspx">« Back to Labs in
+						<% if(Session["ClientCount"] != null){if (Convert.ToInt32(Session["ClientCount"])>1) { %>
+						<p><a href="myClientList.aspx">« Back to Labs in
 								'<asp:Label ID="lblBackToLabs" Runat="server"></asp:Label>'
-							</A>
+							</a>
 						</p>
-						<%}%>
+						<%}}%>
 					</div>
-					<br clear="all">
+					<br clear="all" />
 					<!-- end pagecontent div --></div>
 				<!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
 			

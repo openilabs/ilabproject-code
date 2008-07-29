@@ -87,8 +87,8 @@ namespace iLabs.ServiceBroker.iLabSB
                                 startExecution = DateUtil.ParseUtc(payload.GetElementsByTagName("startExecution")[0].InnerText);
                                 duration = Int64.Parse(payload.GetElementsByTagName("duration")[0].InnerText);
 
-                                Session["startExecution"] = DateUtil.ToUtcString(startExecution);
-                                Session["duration"] = duration;
+                                Session["StartExecution"] = DateUtil.ToUtcString(startExecution);
+                                Session["Duration"] = duration;
 
                                 //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
 
@@ -116,7 +116,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		
 			
 
-			if(Session["Groupname"] != null)
+			if(Session["GroupName"] != null)
 			{
 				string groupName = Session["GroupName"].ToString();
 
@@ -166,7 +166,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 			ArrayList messagesList = new ArrayList();
 			SystemMessage[] groupMessages = null;
-			if (Convert.ToInt32(Session["ClientCount"]) ==1)
+			if (Session["ClientCount"] != null && Convert.ToInt32(Session["ClientCount"]) ==1)
 			{
 				groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP,Convert.ToInt32(Session["GroupID"]),0);
 			}
@@ -292,12 +292,12 @@ namespace iLabs.ServiceBroker.iLabSB
                             //The scheduling Ticket should exist and been parsed into the session
                             if (lc.needsScheduling)
                             {
-                                start = DateUtil.ParseUtc(Session["startExecution"].ToString());
-                                duration = Convert.ToInt64(Session["duration"]);
+                                start = DateUtil.ParseUtc(Session["StartExecution"].ToString());
+                                duration = Convert.ToInt64(Session["Duration"]);
                             }
 
                             redirectURL = executor.ExecuteExperimentExecutionRecipe(labServers[0], clients[0],
-                            start,duration, Convert.ToInt32(Session["userTZ"]), Convert.ToInt32(Session["UserID"]), 
+                            start,duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]), 
                             Convert.ToInt32(Session["GroupID"]), (string)Session["GroupName"]);
 
                             // Add the return url to the redirect
@@ -314,7 +314,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     // use the Loader script for Batch experiments
 
                     Session["LoaderScript"] = clients[0].loaderScript;
-                    Session.Remove("redirectURL");
+                    Session.Remove("RedirectURL");
 
                     string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
                         + "applet.aspx" + @"'</script>";
@@ -324,6 +324,8 @@ namespace iLabs.ServiceBroker.iLabSB
                 // Support for Batch 6.1 Lab Clients
                 else if (clients[0].clientType == LabClient.BATCH_HTML_REDIRECT)
                 {
+                    Session["ClientID"] = clients[0].clientID;
+                    AdministrativeAPI.SetSessionClient(Convert.ToInt64(Session["SessionID"]), clients[0].clientID);
                     // use the Loader script for Batch experiments
 
                     //use ticketing & redirect to url in loader script
@@ -352,8 +354,10 @@ namespace iLabs.ServiceBroker.iLabSB
                 // use the Loader script for Batch experiments
                 else if (clients[0].clientType == LabClient.BATCH_APPLET)
                 {
+                    Session["ClientID"] = clients[0].clientID;
+                    AdministrativeAPI.SetSessionClient(Convert.ToInt64(Session["SessionID"]), clients[0].clientID);
                     Session["LoaderScript"] = clients[0].loaderScript;
-                    Session.Remove("redirectURL");
+                    Session.Remove("RedirectURL");
 
                     string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
                         + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/applet.aspx" + @"'</script>";
@@ -426,7 +430,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 RecipeExecutor recipeExec = RecipeExecutor.Instance();
                 string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(ussGuid, lssGuid, username, effectiveGroupName,
                     labServer.agentGuid,lc.clientGuid, labClientName, labClientVersion,
-                    Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["userTZ"]));
+                    Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
 
                 schedulingUrl += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);
                 Response.Redirect(schedulingUrl, false);

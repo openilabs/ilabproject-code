@@ -28,6 +28,7 @@
 			<th>
 				<label for="password">Password</label></th>
 			<td><asp:textbox id="txtPassword" Runat="server" TextMode="Password"></asp:textbox></td>
+		</tr>
 		<tr>
 			<th colSpan="2">
 				<asp:button id="btnLogIn" runat="server" Text="Log in" cssclass="buttonright" onclick="btnLogIn_Click"></asp:button>

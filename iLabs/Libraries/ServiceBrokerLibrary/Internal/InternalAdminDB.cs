@@ -1776,6 +1776,7 @@ namespace iLabs.ServiceBroker.Internal
 
 			myCommand.Parameters.Add(new SqlParameter("@userID", us.userID));
 			myCommand.Parameters.Add(new SqlParameter("@groupID", us.groupID));
+            myCommand.Parameters.Add(new SqlParameter("@tzOffset", us.tzOffset));
 			myCommand.Parameters.Add(new SqlParameter("@sessionKey", us.sessionKey));
 			
 			try
@@ -1796,7 +1797,7 @@ namespace iLabs.ServiceBroker.Internal
         /// <summary>
         /// to insert a user session record. returns a database generated session id.
         /// </summary>
-        public static bool ModifyUserSession(long sessionID,int groupID,int clientID, string sessionKey)
+        public static bool ModifyUserSession(long sessionID,int groupID,int clientID, int tzOffset, string sessionKey)
         {
 
             SqlConnection myConnection = ProcessAgentDB.GetConnection();
@@ -1805,6 +1806,7 @@ namespace iLabs.ServiceBroker.Internal
             myCommand.Parameters.Add(new SqlParameter("@sessionID", sessionID));
             myCommand.Parameters.Add(new SqlParameter("@groupID", groupID));
             myCommand.Parameters.Add(new SqlParameter("@clientID", clientID));
+            myCommand.Parameters.Add(new SqlParameter("@tzOffset", tzOffset));
             myCommand.Parameters.Add(new SqlParameter("@sessionKey", sessionKey));
 
             try
@@ -1956,6 +1958,7 @@ namespace iLabs.ServiceBroker.Internal
                         sessionInfo.clientID = 0;
                     sessionInfo.userName = myReader.GetString(3);
                     sessionInfo.groupName = myReader.GetString(4);
+                    sessionInfo.tzOffset = myReader.GetInt32(5);
                 }
                 myReader.Close();
             }
@@ -2011,6 +2014,8 @@ namespace iLabs.ServiceBroker.Internal
 							us[i].sessionEndTime= (DateTime) myReader["session_end_time"];
 						if(myReader["session_key"] != System.DBNull.Value )
 							us[i].sessionKey= ((string)myReader["session_key"]);
+                        if (myReader["tz_offset"] != System.DBNull.Value)
+                            us[i].tzOffset = Convert.ToInt32(myReader["tz_offset"]);
 					}
 					myReader.Close ();
 				}

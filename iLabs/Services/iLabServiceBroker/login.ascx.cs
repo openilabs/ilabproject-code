@@ -86,11 +86,12 @@ namespace iLabs.ServiceBroker.iLabSB
 					FormsAuthentication.SetAuthCookie (txtUsername.Text , false);
 					Session["UserID"] = userID;
 					Session["UserName"] = user.userName;
-					Session["SessionID"] = AdministrativeAPI.InsertUserSession (userID, 0, Session.SessionID.ToString()).ToString ();
+                    Session["UserTZ"] = Request.Params["userTZ"];
+					Session["SessionID"] = AdministrativeAPI.InsertUserSession (userID, 0, Convert.ToInt32(Request.Params["userTZ"]), Session.SessionID.ToString()).ToString ();
                     HttpCookie cookie = new HttpCookie(ConfigurationManager.AppSettings["isbAuthCookieName"], Session["SessionID"].ToString());
                     Response.AppendCookie(cookie);
 
-                    Session["userTZ"] = Request.Params["userTZ"];
+               
 					Response.Redirect(Global.FormatRegularURL(Request,"myGroups.aspx"));
 				}
 				else

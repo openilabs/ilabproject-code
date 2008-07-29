@@ -245,7 +245,7 @@ namespace iLabs.ServiceBroker.Batch
                                             {
                                                 essProxy.AddRecords(experimentID, recordList.ToArray());
                                             }
-                                            StorageStatus sStatus = essProxy.SetExperimentStatus(experimentID, report.statusCode & StorageStatus.CLOSED);
+                                            StorageStatus sStatus = essProxy.SetExperimentStatus(experimentID, report.statusCode | StorageStatus.CLOSED);
                                             DataStorageAPI.UpdateExperimentStatus(sStatus);
                                         }
                                     }

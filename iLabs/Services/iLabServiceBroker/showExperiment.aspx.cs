@@ -56,7 +56,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-            userTZ = Convert.ToInt32(Session["userTZ"]);
+            userTZ = Convert.ToInt32(Session["UserTZ"]);
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
 
 			if(! IsPostBack )
@@ -160,14 +160,14 @@ namespace iLabs.ServiceBroker.iLabSB
                     //Get the Experiment records from the ESS if one is used
                     if (expInfo[0].essGuid != null)
                     {
-                        Session["essGuid"] = expInfo[0].essGuid;
+                        Session["EssGuid"] = expInfo[0].essGuid;
                         btnDisplayRecords.Visible = true;
                         //displayRecords(experimentID, expInfo[0].essGuid);
 
                     }
                     else
                     {
-                        Session.Remove("essGuid");
+                        Session.Remove("EssGuid");
                     }
                     txtStatus.Text = DataStorageAPI.getStatusString(expInfo[0].status);
 
@@ -317,7 +317,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 txtRecordCount.Text = null;
                 txtAnnotation.Text = null;
                 txtExperimentRecords.Text = null;
-                Session.Remove("essGuid");
+                Session.Remove("EssGuid");
             }
             catch (Exception ex)
             {
@@ -330,11 +330,11 @@ namespace iLabs.ServiceBroker.iLabSB
         protected void btnDisplayRecords_Click(object sender, System.EventArgs e)
         {
             lblResponse.Visible = false;
-            if (Session["essGuid"] != null)
+            if (Session["EssGuid"] != null)
             {
                 try
                 {
-                    displayRecords(Int64.Parse(txtExperimentID.Text), Session["essGuid"].ToString());
+                    displayRecords(Int64.Parse(txtExperimentID.Text), Session["EssGuid"].ToString());
 
 
                 }
@@ -378,12 +378,12 @@ namespace iLabs.ServiceBroker.iLabSB
         protected void On_BlobSelected(object sender, GridViewCommandEventArgs e)
         {
             lblResponse.Visible = false;
-            if (Session["essGuid"] != null)
+            if (Session["EssGuid"] != null)
             {
                 long blobId = Convert.ToInt64(e.CommandArgument);
 
                 BrokerDB brokerDB = new BrokerDB();
-                ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(Session["essGuid"].ToString());
+                ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(Session["EssGuid"].ToString());
                 Coupon opCoupon = brokerDB.GetEssOpCoupon(Convert.ToInt64(txtExperimentID.Text), TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
                 if (opCoupon != null)
                 {

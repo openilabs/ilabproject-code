@@ -68,6 +68,15 @@ namespace iLabs.ServiceBroker.DataStorage
                 case StorageStatus.CLOSED_ERROR:
                     statStr = "Closed Error";
                     break;
+                case StorageStatus.BATCH_CANCELLED | StorageStatus.CLOSED:
+                    statStr = "Cancelled";
+                    break;
+                case StorageStatus.BATCH_TERMINATED_ERROR |StorageStatus.CLOSED:
+                    statStr = "Closed Error";
+                    break;
+                case StorageStatus.BATCH_TERMINATED | StorageStatus.CLOSED_ERROR:
+                    statStr = "Closed -Terminated";
+                    break;
                 case StorageStatus.CLOSED_TIMEOUT:
                     statStr = "Closed Timeout";
                     break;
@@ -75,7 +84,10 @@ namespace iLabs.ServiceBroker.DataStorage
                     statStr = "Closed By User";
                     break;
                 default:
-                    statStr = "StorageStatus Error";
+                    if ((status & StorageStatus.CLOSED) == StorageStatus.CLOSED)
+                        statStr = "Closed";
+                    else
+                        statStr = "StorageStatus Error";
                     break;
             }
             return statStr;
@@ -220,7 +232,7 @@ namespace iLabs.ServiceBroker.DataStorage
 
                 if (showID)
                         {
-                            buf.Append(exp[i].experimentId.ToString("00000000") + " ");
+                            buf.Append(exp[i].experimentId.ToString("0000") + " ");
                         }
                         
                         // User

@@ -64,7 +64,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 txtTime2.ReadOnly = true;
                 txtTime2.BackColor = Color.Lavender;
             }
- 			userTZ = Convert.ToInt32(Session["userTZ"]);
+ 			userTZ = Convert.ToInt32(Session["UserTZ"]);
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             if (Session["UserID"] != null)
             {
@@ -178,7 +178,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 				try
 				{
-                    time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,Convert.ToInt32(Session["userTZ"]));
+                    time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,Convert.ToInt32(Session["UserTZ"]));
                 }
                 catch
 				{	
@@ -190,7 +190,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     ||(ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") ==0))
 					{	
                         try{
-						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["userTZ"]));
+						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["UserTZ"]));
 					    }
                         catch{	
 					        lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid time in the second time field.");
@@ -250,11 +250,14 @@ namespace iLabs.ServiceBroker.iLabSB
 					txtLabServerName.Text = expInfo[0].labServerName;
                     txtClientName.Text = expInfo[0].clientName;
                     //Check if update needed from the ESS if one is used
-                    if( (expInfo[0].essGuid != null) 
-                        && (expInfo[0].status == StorageStatus.UNKNOWN || expInfo[0].status == StorageStatus.INITIALIZED
-                        || expInfo[0].status == StorageStatus.OPEN || expInfo[0].status == StorageStatus.REOPENED
-                        || expInfo[0].status == StorageStatus.RUNNING ))
-                    {
+                    if( expInfo[0].essGuid != null){
+                        int expStatus = expInfo[0].status;
+                        if((expStatus == StorageStatus.UNKNOWN || expStatus == StorageStatus.INITIALIZED
+                        || expStatus == StorageStatus.OPEN || expStatus == StorageStatus.REOPENED
+                        ||expStatus == StorageStatus.RUNNING 
+                        ||expStatus == StorageStatus.BATCH_QUEUED ||expStatus == StorageStatus.BATCH_RUNNING 
+                        ||expStatus == StorageStatus.BATCH_TERMINATED ||expStatus == StorageStatus.BATCH_TERMINATED_ERROR))
+                        {
 
                         // This operation should happen within the Wrapper
                         BrokerDB ticketIssuer = new BrokerDB();
@@ -278,6 +281,8 @@ namespace iLabs.ServiceBroker.iLabSB
                                 expInfo[0].closeTime = curStatus.closeTime;
                             }
                         }
+                        }
+
                     }
                     txtStatus.Text =  DataStorageAPI.getStatusString(expInfo[0].status);
 					txtSubmissionTime.Text = DateUtil.ToUserTime(expInfo[0].creationTime,culture,userTZ);

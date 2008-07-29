@@ -520,6 +520,11 @@ namespace iLabs.ServiceBroker.Administration
         public int clientID;
 
         /// <summary>
+        /// tzOffset offset from GMT in minutes.
+        /// </summary>
+        public int tzOffset;
+
+        /// <summary>
         /// The users name
         /// </summary>
         public string userName;
@@ -557,6 +562,11 @@ namespace iLabs.ServiceBroker.Administration
         /// ClientID of the current UserSession, may be null.
         /// </summary>
         public int clientID;
+
+        /// <summary>
+        /// tzOffset offset from GMT in minutes.
+        /// </summary>
+        public int tzOffset;
 
 		/// <summary>
 		/// Date/Time the session started.
@@ -1996,6 +2006,19 @@ namespace iLabs.ServiceBroker.Administration
 			}
 			return false;
 		}
+
+        /// <summary>
+        /// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
+        /// An explicit member is one directly added to the specified group by the adduser() or addmemberToGroup() methods.
+        /// </summary>
+        /// <param name="agentID">The ID of the agent whose group membership is being enumerated.</param>
+        /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
+        public static int[] ListNonRequestGroupsForAgent(int agentID)
+        {
+            int[] groups = InternalAuthorizationDB.ListAgentParents(agentID);
+            return groups;
+        }
+
 		
 		/// <summary>
 		/// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
@@ -2005,20 +2028,7 @@ namespace iLabs.ServiceBroker.Administration
 		/// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
 		public static int[] ListGroupsForAgent(int agentID)
 		{
-			int [] gps = InternalAuthorizationDB.ListAgentParents (agentID);
-			ArrayList aList = new ArrayList ();
-			
-			for(int i = 0; i<gps.Length ; i++)
-			{
-					aList.Add (gps[i]);
-			}
-			
-			int[] groups = new int[aList.Count ];
-			for(int i =0; i<aList.Count ; i++)
-			{
-				groups[i] = (int) aList[i];
-			}
-
+            int[] groups = InternalAuthorizationDB.ListAgentParents(agentID);
 			return groups;
 		}
 
@@ -2178,19 +2188,20 @@ namespace iLabs.ServiceBroker.Administration
 		/// <param name="effectiveGroupID">The User's current Effective Group.</param>
 		/// <param name="sessionKey">The User's current Session Key.</param>
 		/// <returns>A database generated session ID.</returns>
-		public static long InsertUserSession(int userID, int effectiveGroupID, string sessionKey)
+		public static long InsertUserSession(int userID, int effectiveGroupID, int tzOffset,string sessionKey)
 		{			
 			UserSession us = new UserSession();
 			us.userID = userID;
 			us.groupID = effectiveGroupID;
 			us.sessionKey = sessionKey;
+            us.tzOffset = tzOffset;
 
 			return InternalAdminDB.InsertUserSession (us);
 		}
 
-        public static bool ModifyUserSession(long sessionID, int effectiveGroupID, int clientID, string sessionKey)
+        public static bool ModifyUserSession(long sessionID, int effectiveGroupID, int clientID, int tzOffset,string sessionKey)
         {
-            return InternalAdminDB.ModifyUserSession(sessionID,effectiveGroupID,clientID,sessionKey);
+            return InternalAdminDB.ModifyUserSession(sessionID,effectiveGroupID,clientID,tzOffset,sessionKey);
         }
 
         public static bool SetSessionGroup(long sessionID, int groupID)

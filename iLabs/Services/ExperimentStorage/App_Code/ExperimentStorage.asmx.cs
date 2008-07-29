@@ -188,9 +188,11 @@ namespace iLabs.ExpStorage.ESS
                     throw;
                 }
 
-                if ((statusCode | StorageStatus.CLOSED) == StorageStatus.CLOSED)
+                if ((statusCode & StorageStatus.CLOSED) == StorageStatus.CLOSED)
                     {
-                        experimentsAPI.CloseExperiment(experimentId, opCoupon.issuerGuid, statusCode);
+                        status = experimentsAPI.GetExperimentStatus(experimentId, opCoupon.issuerGuid);
+                        if((status.status & StorageStatus.CLOSED) != StorageStatus.CLOSED)
+                            experimentsAPI.CloseExperiment(experimentId, opCoupon.issuerGuid, statusCode);
                         status = experimentsAPI.GetExperimentStatus(experimentId, opCoupon.issuerGuid);
                     }
                     else

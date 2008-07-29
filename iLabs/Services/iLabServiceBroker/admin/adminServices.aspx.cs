@@ -125,7 +125,7 @@ namespace iLabs.ServiceBroker.admin
             int[] grantIDs = wrapper.ListGrantIDsWrapper();
             Grant[] grants = wrapper.GetGrantsWrapper(grantIDs);
 
-            int effGroupID = Convert.ToInt32(Session["groupID"]);
+            int effGroupID = Convert.ToInt32(Session["GroupID"]);
 
             foreach (Grant grant in grants)
             {
@@ -238,7 +238,7 @@ namespace iLabs.ServiceBroker.admin
             int[] grantIDs = wrapper.ListGrantIDsWrapper();
             Grant[] grants = wrapper.GetGrantsWrapper(grantIDs);
 
-            int effGroupID = Convert.ToInt32(Session["groupID"]);
+            int effGroupID = Convert.ToInt32(Session["GroupID"]);
 
             foreach (Grant grant in grants)
             {
@@ -418,12 +418,12 @@ namespace iLabs.ServiceBroker.admin
                     //TO BE FIXED: this is a special case. I am assuming that a mapping of key type "GROUP" only
                     //corresponds to a USS
                     if (groupName != null)
-                        payload = factory.createManageUSSGroupPayload(groupName, ticketIssuer.GetIssuerGuid(), clientGuid, Convert.ToInt32(Session["userTZ"]));
+                        payload = factory.createManageUSSGroupPayload(groupName, ticketIssuer.GetIssuerGuid(), clientGuid, Convert.ToInt32(Session["UserTZ"]));
 
                     //TO BE FIXED: this is a special case. I am assuming that a mapping of key type "PROCESS_AGENT" only
                     //corresponds to an LSS
                    if (labServer != null)
-                       payload = factory.createManageLabPayload(labServer.agentGuid, labServer.agentName, Convert.ToInt32(Session["userTZ"]));
+                       payload = factory.createManageLabPayload(labServer.agentGuid, labServer.agentName, Convert.ToInt32(Session["UserTZ"]));
                     
                 }
                 processAgent = ticketIssuer.GetProcessAgent(processAgentID);

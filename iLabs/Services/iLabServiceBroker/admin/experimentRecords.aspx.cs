@@ -62,9 +62,9 @@ namespace iLabs.ServiceBroker.admin
 				txtTime2.BackColor=Color.Lavender;
 			}
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
-            string tz = (string) Session["userTZ"];
-            if (tz != null & tz.Length > 0)
-                userTZ = Convert.ToInt32(tz);
+            if(Session["UserTZ"] != null)
+                userTZ = (int )Session["UserTZ"];
+           
 		}
 
 		#region Web Form Designer generated code
@@ -135,7 +135,7 @@ namespace iLabs.ServiceBroker.admin
 
 				try
 				{
-                    time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,Convert.ToInt32(Session["userTZ"]));
+                    time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,Convert.ToInt32(Session["UserTZ"]));
                 }
                 catch
 				{	
@@ -147,7 +147,7 @@ namespace iLabs.ServiceBroker.admin
                     ||(ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") ==0))
 				{	
                         try{
-						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["userTZ"]));
+						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["UserTZ"]));
 					    }
                         catch{	
 					        lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid time in the second time field.");
@@ -177,7 +177,7 @@ namespace iLabs.ServiceBroker.admin
         
 			
 		 long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userId,sessionGroupID, cList.ToArray());
-            LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture,true,true,true,true,false,false,true,false);
+            LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture,true,true,true,false,false,false,true,false);
 
             for (int i = 0; i < expTags.Length; i++)
             {
@@ -210,37 +210,40 @@ namespace iLabs.ServiceBroker.admin
 			
 				if(expInfo[0] != null)
 				{
-                    if ((expInfo[0].essGuid != null)
-                        && (expInfo[0].status == StorageStatus.UNKNOWN || expInfo[0].status == StorageStatus.INITIALIZED
-                        || expInfo[0].status == StorageStatus.OPEN || expInfo[0].status == StorageStatus.REOPENED
-                        || expInfo[0].status == StorageStatus.RUNNING))
-                    {
-
-                        // This operation should happen within the Wrapper
-                        BrokerDB ticketIssuer = new BrokerDB();
-                        ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(expInfo[0].essGuid);
-                        Coupon opCoupon = ticketIssuer.GetEssOpCoupon(expInfo[0].experimentId, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
-                        if (opCoupon != null)
+                    if( expInfo[0].essGuid != null){
+                        int expStatus = expInfo[0].status;
+                        if ((expStatus == StorageStatus.UNKNOWN || expStatus == StorageStatus.INITIALIZED
+                        || expStatus == StorageStatus.OPEN || expStatus == StorageStatus.REOPENED
+                        || expStatus == StorageStatus.RUNNING
+                        || expStatus == StorageStatus.BATCH_QUEUED || expStatus == StorageStatus.BATCH_RUNNING
+                        || expStatus == StorageStatus.BATCH_TERMINATED || expStatus == StorageStatus.BATCH_TERMINATED_ERROR))
                         {
 
-                            ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                            OperationAuthHeader header = new OperationAuthHeader();
-                            header.coupon = opCoupon;
-                            essProxy.Url = ess.webServiceUrl;
-                            essProxy.OperationAuthHeaderValue = header;
-
-                            StorageStatus curStatus = essProxy.GetExperimentStatus(expInfo[0].experimentId);
-                            if (expInfo[0].status != curStatus.status || expInfo[0].recordCount != curStatus.recordCount
-                                || expInfo[0].closeTime != curStatus.closeTime)
+                            // This operation should happen within the Wrapper
+                            BrokerDB ticketIssuer = new BrokerDB();
+                            ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(expInfo[0].essGuid);
+                            Coupon opCoupon = ticketIssuer.GetEssOpCoupon(expInfo[0].experimentId, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
+                            if (opCoupon != null)
                             {
-                                DataStorageAPI.UpdateExperimentStatus(curStatus);
-                                expInfo[0].status = curStatus.status;
-                                expInfo[0].recordCount = curStatus.recordCount;
-                                expInfo[0].closeTime = curStatus.closeTime;
 
+                                ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                                OperationAuthHeader header = new OperationAuthHeader();
+                                header.coupon = opCoupon;
+                                essProxy.Url = ess.webServiceUrl;
+                                essProxy.OperationAuthHeaderValue = header;
+
+                                StorageStatus curStatus = essProxy.GetExperimentStatus(expInfo[0].experimentId);
+                                if (expInfo[0].status != curStatus.status || expInfo[0].recordCount != curStatus.recordCount
+                                    || expInfo[0].closeTime != curStatus.closeTime)
+                                {
+                                    DataStorageAPI.UpdateExperimentStatus(curStatus);
+                                    expInfo[0].status = curStatus.status;
+                                    expInfo[0].recordCount = curStatus.recordCount;
+                                    expInfo[0].closeTime = curStatus.closeTime;
+
+                                }
                             }
                         }
-
 
                     }
 					txtExperimentID.Text = expInfo[0].experimentId.ToString () ;

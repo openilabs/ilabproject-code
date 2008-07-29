@@ -60,26 +60,29 @@ namespace iLabs.ServiceBroker.iLabSB
 			{
 				lblNoGroups.Text = "<p>You currently do not have access to any group. It can take upto 48 hours for a group administrator to give you permission to the groups you've requested.</p>";
 				lblNoGroups.Visible = true;
-				Session["LabCount"] = 0;
+				Session["GroupCount"] = 0;
 			}
 			else
 			{
 				//Redirect to single lab single group page?
-				if(nonRequestGroups.Count == 1)
-				{
-					if(nonRequestGroups[0] != null)
-					{
+                if (nonRequestGroups.Count == 1)
+                {
+                    if (nonRequestGroups[0] != null)
+                    {
 
-						if(nonRequestGroups[0] != null)
-						{
-							Session["GroupID"] = ((Group)nonRequestGroups[0]).groupID;
-							Session["GroupName"] = ((Group)nonRequestGroups[0]).groupName;
-							Session["LabCount"] = 1;
-							PageRedirect ((Group)nonRequestGroups[0]);
-						}
-					}
-				}
-					
+                        if (nonRequestGroups[0] != null)
+                        {
+                            Session["GroupID"] = ((Group)nonRequestGroups[0]).groupID;
+                            Session["GroupName"] = ((Group)nonRequestGroups[0]).groupName;
+                            Session["GroupCount"] = 1;
+                            PageRedirect((Group)nonRequestGroups[0]);
+                        }
+                    }
+                }
+                else
+                {
+                    Session["GroupCount"] = nonRequestGroups.Count;
+                }
 				repGroups.DataSource = nonRequestGroups;
 				repGroups.DataBind();
 			}
@@ -148,12 +151,12 @@ namespace iLabs.ServiceBroker.iLabSB
 		private void PageRedirect(Group effectiveGroup)
 		{
             // initialize boolean session variables that indicate what type of effective group this is
-            Session["isAdmin"] = false;
-            Session["isServiceAdmin"] = false;
+            Session["IsAdmin"] = false;
+            Session["IsServiceAdmin"] = false;
             
             if((effectiveGroup.groupName.Equals(Group.SUPERUSER))||(effectiveGroup.groupType.Equals(GroupType.COURSE_STAFF)))
 			{
-				Session["isAdmin"] = true;
+				Session["IsAdmin"] = true;
 				Response.Redirect ("admin/manageUsers.aspx");
 			}
 
@@ -161,14 +164,14 @@ namespace iLabs.ServiceBroker.iLabSB
             // the session variable is used in the userNav page to check whether to make the corresponing tab visible
             else if (effectiveGroup.groupType.Equals(GroupType.SERVICE_ADMIN))
             {
-                Session["isServiceAdmin"] = true;
+                Session["IsServiceAdmin"] = true;
                 Response.Redirect ("admin/adminServices.aspx");
             }          
             
             else
 			{
-				Session["isAdmin"] = false;
-                Session["isServiceAdmin"] = false;
+				Session["IsAdmin"] = false;
+                Session["IsServiceAdmin"] = false;
 				Response.Redirect ("myLabs.aspx");
 			}
 		}

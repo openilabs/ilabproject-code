@@ -97,8 +97,8 @@ namespace iLabs.ServiceBroker.admin
 
 			if(!Page.IsPostBack )
 			{
-                Session.Remove("clientUssMappingID");
-                Session.Remove("clientEssMappingID");
+                Session.Remove("ClientUssMappingID");
+                Session.Remove("ClientEssMappingID");
 	
 				// Load Lab Client dropdown
                 ddlLabClient.Items.Add(new ListItem(" --- select Lab Client --- ", "0"));
@@ -263,7 +263,7 @@ namespace iLabs.ServiceBroker.admin
                         for(int i=0; i<rm.values.Length;i++){
                             if(rm.values[i].Type == ResourceMappingTypes.PROCESS_AGENT){
                                 ussId = (int) rm.values[i].Entry;
-                                Session["clientUssMappingID"] = rm.MappingID;
+                                Session["ClientUssMappingID"] = rm.MappingID;
                                 break;
                             }
                         }
@@ -298,14 +298,14 @@ namespace iLabs.ServiceBroker.admin
                     btnRegisterUSS.Visible = true && client.labServerIDs.Length > 0;
                     btnDissociateUSS.Visible = false;
                     ddlAssociatedUSS.Enabled = true && client.labServerIDs.Length > 0;
-                    Session.Remove("clientUssMappingID");
+                    Session.Remove("ClientUssMappingID");
                 }
             }
             else{
                 btnRegisterUSS.Visible = false;
                 btnDissociateUSS.Visible = false;
                 ddlAssociatedUSS.Enabled = false;
-                Session.Remove("clientUssMappingID");
+                Session.Remove("ClientUssMappingID");
 
             }
             if(client.needsESS){
@@ -322,7 +322,7 @@ namespace iLabs.ServiceBroker.admin
                         for(int j=0; j<rm.values.Length;j++){
                             if(rm.values[j].Type == ResourceMappingTypes.PROCESS_AGENT){
                                 essId = (int) rm.values[j].Entry;
-                                Session["clientEssMappingID"] = rm.MappingID;
+                                Session["ClientEssMappingID"] = rm.MappingID;
                                 break;
                             }
                         }
@@ -343,7 +343,7 @@ namespace iLabs.ServiceBroker.admin
                     btnRegisterESS.Visible = true;
                     btnDissociateESS.Visible = false;
                     ddlAssociatedESS.Enabled = true;
-                    Session.Remove("clientEssMappingID");
+                    Session.Remove("ClientEssMappingID");
                 }
             }
 
@@ -354,7 +354,7 @@ namespace iLabs.ServiceBroker.admin
                 btnDissociateESS.Visible = false;
                 ddlAssociatedESS.Enabled = false;
                 
-                Session.Remove("clientEssMappingID");
+                Session.Remove("ClientEssMappingID");
 
             }
 
@@ -811,7 +811,7 @@ namespace iLabs.ServiceBroker.admin
                     //int grantID = wrapper.AddGrantWrapper(agentID, function, qualifierID);
 
 
-                    Session["clientUssMappingID"] = newMapping.MappingID;
+                    Session["ClientUssMappingID"] = newMapping.MappingID;
 
                     btnRegisterUSS.Visible = false;
                     btnDissociateUSS.Visible = true;
@@ -857,7 +857,7 @@ namespace iLabs.ServiceBroker.admin
                                     //Add USS on LSS
 
 
-                                    //string lssPayload = factory.createAdministerLSSPayload(Convert.ToInt32(Session["userTZ"]));
+                                    //string lssPayload = factory.createAdministerLSSPayload(Convert.ToInt32(Session["UserTZ"]));
                                     //long duration = 60; //seconds for the LSS to redeem the ticket of this coupon and Add LSS Info
                                     //ticketing.AddTicket(lssCoupon, TicketTypes.ADMINISTER_LSS, lss.agentGuid,
                                     //    ticketing.ServiceGuid(), duration, lssPayload);
@@ -881,7 +881,7 @@ namespace iLabs.ServiceBroker.admin
                                    
                                 }
                                 //ADD LSS on USS
-                                string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["userTZ"]));
+                                string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["UserTZ"]));
                                 //ticketing.AddTicket(ussCoupon,TicketTypes.ADMINISTER_USS, uss.agentGuid,
                                 //    ticketing.GetIssuerGuid(), duration, ussPayload);
 
@@ -996,7 +996,7 @@ namespace iLabs.ServiceBroker.admin
 
                 // No Grant required for ESS
 
-                Session["clientEssMappingID"] = newMapping.MappingID;
+                Session["ClientEssMappingID"] = newMapping.MappingID;
 
                 btnRegisterESS.Visible = false;
                 btnDissociateESS.Visible = true;
@@ -1043,10 +1043,10 @@ namespace iLabs.ServiceBroker.admin
                 LabClient lc = new LabClient();
                 lc = labClients[ddlLabClient.SelectedIndex - 1];
 
-                ticketing.DeleteResourceMapping((int) Session["clientUssMappingID"]);
+                ticketing.DeleteResourceMapping((int) Session["ClientUssMappingID"]);
                 btnRegisterUSS.Visible = true;
                 btnDissociateUSS.Visible = false;
-                Session.Remove("clientUssMappingID");
+                Session.Remove("ClientUssMappingID");
 
                 lblResponse.Visible = true;
                 lblResponse.Text = Utilities.FormatConfirmationMessage("User-side Scheduling Server \"" + ddlAssociatedUSS.SelectedItem.Text + "\" succesfully "
@@ -1094,10 +1094,10 @@ namespace iLabs.ServiceBroker.admin
                 lc = labClients[ddlLabClient.SelectedIndex - 1];
 
 
-                ticketing.DeleteResourceMapping((int) Session["clientEssMappingID"]);
+                ticketing.DeleteResourceMapping((int) Session["ClientEssMappingID"]);
                 btnRegisterESS.Visible = true;
                 btnDissociateESS.Visible = false;
-                Session.Remove("clientEssMappingID");
+                Session.Remove("ClientEssMappingID");
                 lblResponse.Visible = true;
                 lblResponse.Text = Utilities.FormatConfirmationMessage("Experiment Storage Server \"" + ddlAssociatedESS.SelectedItem.Text + "\" succesfully "
                     + "dissociated from client \"" + ddlLabClient.SelectedItem.Text + "\".");

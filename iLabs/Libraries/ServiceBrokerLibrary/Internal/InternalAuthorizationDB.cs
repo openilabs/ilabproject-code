@@ -10,6 +10,7 @@ using System.Data ;
 using System.Data.SqlClient ;
 using System.Configuration ;
 using System.Collections ;
+using System.Collections.Generic;
 using System.Text;
 
 using iLabs.Core;
@@ -762,6 +763,40 @@ namespace iLabs.ServiceBroker.Internal
 			
 			return a;
 		}
+
+        /// <summary>
+        /// to find all the parent groups of an agent
+        /// </summary>
+        public static int[] ListNonRequestGroups(int agentID)
+        {
+            List<Int32> aList = new List<Int32>();
+
+            SqlConnection myConnection = ProcessAgentDB.GetConnection();
+            SqlCommand myCommand = new SqlCommand("RetrieveUserGroups", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(new SqlParameter("@userID", agentID));
+
+            try
+            {
+                myConnection.Open();
+                SqlDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    if (!myReader.IsDBNull(0))
+                        aList.Add(myReader.GetInt32(0));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in finding parent groups of agent", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return aList.ToArray();
+        }
 
 		/// <summary>
 		/// to find all the parent groups of an agent

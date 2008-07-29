@@ -532,8 +532,12 @@ namespace iLabs.ServiceBroker.iLabSB
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
 				CheckAndSetLSAuthorization(intLabServerID);
-			
-				return batchLS_Proxy.Cancel(experimentID);
+                bool status = batchLS_Proxy.Cancel(experimentID);
+                if (status)
+                {
+                    DataStorageAPI.CloseExperiment(experimentID, StorageStatus.BATCH_CANCELLED);
+                }
+                return status;
 			}
 			catch
 			{

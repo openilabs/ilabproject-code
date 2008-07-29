@@ -1338,6 +1338,15 @@ namespace iLabs.ServiceBroker.Authorization
 		{
 			return Administration.AdministrativeAPI.ListGroupsForAgent (agentID);
 		}
+        /// <summary>
+        /// anyone access
+        /// </summary>
+        /// <param name="agentID"></param>
+        /// <returns></returns>
+        public int[] ListNonRequestGroupsForAgentWrapper(int agentID)
+        {
+            return Administration.AdministrativeAPI.ListGroupsForAgent(agentID);
+        }
 
 		/// <summary>
 		/// anyone access

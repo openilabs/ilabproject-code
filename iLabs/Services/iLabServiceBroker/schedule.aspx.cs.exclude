@@ -52,7 +52,7 @@ namespace iLabs.ServiceBroker
             long duration = 36000;
 
             RecipeExecutor recipeExec = RecipeExecutor.Instance();
-            string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss.agentGuid, lss.agentGuid, username, groupName, ProcessAgentDB.ServiceGuid, todClientGuid, labClientName, labClientVersion, Convert.ToInt32(Session["userTZ"]));
+            string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss.agentGuid, lss.agentGuid, username, groupName, ProcessAgentDB.ServiceGuid, todClientGuid, labClientName, labClientVersion, Convert.ToInt32(Session["UserTZ"]));
             Response.Redirect(schedulingUrl, false);
         }
     }

@@ -86,11 +86,11 @@ namespace iLabs.ServiceBroker.iLabSB
 		private void SetNavList()
 		{
             // check that this user has admin privilidges, in which case, the manageUsers page should be sent to it.
-			object adminState = Session["isAdmin"];
+			object adminState = Session["IsAdmin"];
 			liNavlistAdmin.Visible = ((adminState != null) && Convert.ToBoolean(adminState));
 
             // check that this user has service admin privilidges, in which case, the adminServices page should be sent to it.
-            object serviceAdminState = Session["isServiceAdmin"];
+            object serviceAdminState = Session["IsServiceAdmin"];
             liNavlistServiceAdmin.Visible = ((serviceAdminState != null) && Convert.ToBoolean(serviceAdminState));
 
 			// Do not show Labs or Experiments if Effective Group has not been specified
@@ -117,7 +117,8 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 
 			// Only show the groups page if the user has more than one lab
-			if (Convert.ToInt32(Session["LabCount"]) != 1)
+            if(Session["GroupCount"] != null)
+			if (Convert.ToInt32(Session["GroupCount"]) > 1)
 			{
 				liNavlistMyGroups.Visible = true;
 			}
@@ -177,6 +178,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			AdministrativeAPI.SaveUserSessionEndTime (Convert.ToInt64 (Session["SessionID"]));
 			FormsAuthentication.SignOut();
+            Session.Clear();
 			Session.Abandon();
 			Response.Redirect("login.aspx");
 		}

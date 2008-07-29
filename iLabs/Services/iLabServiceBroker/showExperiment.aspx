@@ -131,8 +131,8 @@ Please see license.txt in top level directory for full license.
                                         <ItemStyle HorizontalAlign="Left" />  
                                     </asp:BoundField>                    
                                     <asp:BoundField DataField="Contents" HeaderText="Data" ReadOnly="True" >
-                                        <HeaderStyle Font-Bold="True" HorizontalAlign="left" Width="420px" Wrap="True" />
-                                        <ItemStyle HorizontalAlign="Left" />                                       
+                                        <HeaderStyle Font-Bold="True" HorizontalAlign="left"  Width="420px" Wrap="True" />
+                                        <ItemStyle HorizontalAlign="Left"  Width="420px" Wrap="True"  />                                       
                                     </asp:BoundField>                    
                                 </Columns>     
                             </asp:GridView>

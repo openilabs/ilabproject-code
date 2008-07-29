@@ -99,8 +99,8 @@ namespace iLabs.ServiceBroker.admin
                 //lblAssociate.Visible = false;
                 //ddlLSS.Visible = false;
                 //btnAssociateLSS.Visible = false;
-                Session.Remove("LS_LSSmapId");
-                Session.Remove("domainGuid");
+                Session.Remove("LS_LSSmapID");
+                Session.Remove("DomainGuid");
                
             }
             //else // Do any stuff that needs to be done on Postback PageOpen calls
@@ -239,7 +239,7 @@ namespace iLabs.ServiceBroker.admin
                             ddlLSS.BackColor = disabled;
                             btnAssociateLSS.Text = "Disassociate";
                             btnAssociateLSS.CommandName = "disassociate";
-                            Session["LS_LSSmapId"] = rm.MappingID;
+                            Session["LS_LSSmapID"] = rm.MappingID;
 
 
                             // Find any manageLab grants
@@ -268,7 +268,7 @@ namespace iLabs.ServiceBroker.admin
                 ddlLSS.Enabled = true;
                 ddlLSS.SelectedIndex = 0;
                 ddlLSS.BackColor = enabled;
-                Session.Remove("LS_LSSmapId");
+                Session.Remove("LS_LSSmapID");
                 btnAssociateLSS.Text = "Associate";
                 btnAssociateLSS.CommandName = "associate";
                 ddlManageLSS.Enabled = true;
@@ -479,7 +479,7 @@ namespace iLabs.ServiceBroker.admin
                         txtDomainServer.Text = remote.agentName;
                     }
                 }
-                Session["domainGuid"] = agent.domainGuid;
+                Session["DomainGuid"] = agent.domainGuid;
 
                 Hashtable resources = brokerDB.GetResourceStringTags(agentId, ResourceMappingTypes.PROCESS_AGENT);
                 if (resources != null)
@@ -808,9 +808,9 @@ namespace iLabs.ServiceBroker.admin
                 try
                 {
                     string dGuid = null;
-                    if (Session["domainGuid"] != null)
+                    if (Session["DomainGuid"] != null)
                     {
-                        dGuid = Session["domainGuid"].ToString();
+                        dGuid = Session["DomainGuid"].ToString();
                     }
                    
                     // Modify the ProcessAgent record -- this should never really change anything
@@ -1037,6 +1037,12 @@ namespace iLabs.ServiceBroker.admin
                     txtWebServiceURL.Text, inCoupon, outCoupon);
 
                 modifyResources(agentID);
+                if (agentID > 0)
+                {
+                    lblErrorMessage.Visible = true;
+                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Relationship with the service has been created and saved.");
+                }
+
             }
 
             else
@@ -1252,8 +1258,8 @@ namespace iLabs.ServiceBroker.admin
             else if(btnAssociateLSS.CommandName.CompareTo("disassociate") == 0){
                 try
             {
-                brokerDB.DeleteResourceMapping( (int) Session["LS_LSSmapId"]);
-                Session.Remove("LS_LSSmapId");
+                brokerDB.DeleteResourceMapping( (int) Session["LS_LSSmapID"]);
+                Session.Remove("LS_LSSmapID");
 
                 lblErrorMessage.Visible = true;
                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Lab-side Scheduling Server \"" + ddlLSS.SelectedItem.Text + "\" succesfully "
