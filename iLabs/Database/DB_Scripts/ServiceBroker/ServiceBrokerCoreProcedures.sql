@@ -114,6 +114,10 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetSessionKey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[SetSessionKey]
 GO
+/****** Object:  Stored Procedure dbo.AddUserSession    Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetSessionTzOffset]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetSessionTzOffset]
+GO
 
 /****** Object:  Stored Procedure dbo.CloseExperiment    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[CloseExperiment]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
@@ -541,6 +545,9 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveGr
 drop procedure [dbo].[RetrieveGroup]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveUserGroups]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveUserGroups]
+GO
 /****** Object:  Stored Procedure dbo.RetrieveGroupAdminGroupID    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveGroupAdminGroupID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveGroupAdminGroupID]
@@ -1404,10 +1411,11 @@ GO
 CREATE PROCEDURE AddUserSession
 	@userID int,
 	@groupID int,
+	@tzOffset int,
 	@sessionKey varchar(512)
 AS 
-	insert into user_sessions (modify_time,user_id, effective_group_id, session_key)
-		values (getutcdate(), @userID, @groupID,@sessionKey )
+	insert into user_sessions (modify_time,user_id, effective_group_id,TZ_Offset, session_key)
+		values (getutcdate(), @userID, @groupID, @tzOffset, @sessionKey )
 	
 	select ident_current('user_sessions')
 return
@@ -1423,10 +1431,11 @@ CREATE PROCEDURE ModifyUserSession
 	@userID int,
 	@groupID int,
 	@clientID int,
+	@tzOffset int,
 	@sessionKey varchar(512)
 AS 
 	update user_sessions set modify_time =getutcdate(), effective_group_id = @groupID,
- 		client_ID=@clientID,session_Key=@sessionKey WHERE session_ID = @sessionID
+ 		client_ID=@clientID,TZ_Offset=@tzOffset,session_Key=@sessionKey WHERE session_ID = @sessionID
 	
 	
 return @@rowcount
@@ -1465,11 +1474,30 @@ SET ANSI_NULLS OFF
 GO
 
 CREATE PROCEDURE SetSessionKey
-	@sessionid bigint,
-	@sessionKey varchar (512)
+	@sessionID bigint,
+	@sessionKey varchar(512)
 AS 
 	update user_sessions set modify_time =getutcdate(),
  		session_key=@sessionKey WHERE session_ID = @sessionID
+return @@rowcount
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE SetSessionTZOffset
+	@sessionid bigint,
+	@tzOffset int
+AS 
+	update user_sessions set modify_time =getutcdate(),
+ 		TZ_Offset=@tzOffset WHERE session_ID = @sessionID
 return @@rowcount
 GO
 
@@ -2483,7 +2511,20 @@ GO
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS OFF 
+
 GO
+
+CREATE PROCEDURE RetrieveUserGroups
+	@userID int
+AS
+	select parent_group_ID 
+	from   agent_hierarchy
+	where agent_ID = @userID and parent_group_id NOT 
+	in (select group_id from groups where  group_type_id = 2 or group_name='ROOT' or group_name='Group not assigned'
+	or group_name='NewUserGroup' or group_name='OrphanedUserGroup')
+
+GO
+
 
 /****** Object:  Stored Procedure dbo.RetrieveAgentGroup    Script Date: 5/18/2005 4:17:56 PM ******/
 
@@ -3500,7 +3541,7 @@ CREATE PROCEDURE SaveUserSessionEndTime
 	@sessionID BigInt
 
 AS 
-	update user_sessions set session_end_time = getutcdate()
+	update user_sessions set session_end_time = getdate()
 	where session_id=@sessionID
 	
 	select session_end_time from user_sessions where session_ID = @sessionID
@@ -3521,7 +3562,7 @@ CREATE PROCEDURE SelectAllUserSessions
 	@TimeAfter DateTime
 
 AS 
-	select session_ID, session_start_time, session_end_time, effective_group_ID, session_key
+	select session_ID, session_start_time, session_end_time, effective_group_ID, tz_Offset,session_key
 	from user_sessions 
 	where user_ID=@userID
 return
@@ -3570,13 +3611,14 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+-- Only return user sessions that have not been closed
 CREATE PROCEDURE SelectSessionInfo
 	@sessionID BigInt
 AS 
 	
-	select s.user_id, s.effective_group_id, s.client_ID, u.user_Name, g.group_Name
+	select s.user_id, s.effective_group_id, s.client_ID, u.user_Name, g.group_Name,s.TZ_Offset
 	 from user_sessions s,users u, groups g where session_ID = @sessionID
-	AND s.Session_End_Time = null
+	AND s.Session_End_Time = NULL
 	AND s.user_id = u.user_id and s.effective_group_ID=g.group_ID 
 return
 GO
@@ -3592,10 +3634,11 @@ CREATE PROCEDURE SelectUserSession
 	@sessionID BigInt
 AS 
 	
-	select user_id, effective_group_id, client_ID, session_start_time, session_end_time, session_key
+	select user_id, effective_group_id, client_ID, tz_Offset, session_start_time, session_end_time, session_key
 	 from user_sessions where session_ID = @sessionID
 return
 GO
+
 
 SET QUOTED_IDENTIFIER OFF 
 GO

@@ -649,6 +649,7 @@ CREATE TABLE [dbo].[User_Sessions] (
 	[User_ID] [int] NOT NULL ,
 	[Effective_Group_ID] [int] NOT NULL ,
 	[Client_ID] [int] NULL ,
+	[TZ_Offset] [int] NOT NULL CONSTRAINT [DF_User_Sessions_tz_Offset] DEFAULT (0),
 	[Session_Key] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
