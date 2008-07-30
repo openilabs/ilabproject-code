@@ -32,8 +32,6 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class manageUser : System.Web.UI.Page
 	{
-		protected System.Web.UI.WebControls.CheckBox cbxLockAccountAccount;
-
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 		
 		protected void Page_Load(object sender, System.EventArgs e)

@@ -36,16 +36,6 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class reportBug : System.Web.UI.Page
 	{
-        //protected System.Web.UI.WebControls.Button btnReportBug;
-		protected System.Web.UI.HtmlControls.HtmlAnchor navLogout;
-        //protected System.Web.UI.WebControls.DropDownList ddlArea;
-        //protected System.Web.UI.WebControls.Label lblResponse;
-        //protected System.Web.UI.WebControls.TextBox txtBugReport;
-        //protected System.Web.UI.WebControls.TextBox txtUserName;
-        //protected System.Web.UI.WebControls.Label lblUserName;
-        //protected System.Web.UI.WebControls.TextBox txtEmail;
-        //protected System.Web.UI.WebControls.Label lblEmail;
-	
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 		int userID = -1;
 		User currentUser;

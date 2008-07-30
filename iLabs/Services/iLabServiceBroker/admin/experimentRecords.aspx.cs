@@ -63,7 +63,7 @@ namespace iLabs.ServiceBroker.admin
 			}
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             if(Session["UserTZ"] != null)
-                userTZ = (int )Session["UserTZ"];
+                userTZ = Convert.ToInt32(Session["UserTZ"]);
            
 		}
 

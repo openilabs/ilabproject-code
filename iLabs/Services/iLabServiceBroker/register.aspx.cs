@@ -41,19 +41,6 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class register : System.Web.UI.Page
 	{
-        //protected System.Web.UI.WebControls.Label lblResponse;
-        //protected System.Web.UI.WebControls.TextBox txtUsername;
-        //protected System.Web.UI.WebControls.TextBox txtFirstName;
-        //protected System.Web.UI.WebControls.TextBox txtLastName;
-        //protected System.Web.UI.WebControls.TextBox txtEmail;
-        //protected System.Web.UI.WebControls.DropDownList ddlAffiliation;
-        //protected System.Web.UI.WebControls.TextBox txtAffiliation;
-        //protected System.Web.UI.WebControls.DropDownList ddlGroup;
-        //protected System.Web.UI.WebControls.TextBox txtPassword;
-        //protected System.Web.UI.WebControls.TextBox txtConfirmPassword;
-        //protected System.Web.UI.WebControls.TextBox txtReason;
-        //protected System.Web.UI.WebControls.Button btnSubmit;
-
 		string registrationMailAddress = ConfigurationSettings.AppSettings["registrationMailAddress"];
 		string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
         bool chooseGroup = true;

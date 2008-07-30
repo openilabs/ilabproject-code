@@ -39,9 +39,6 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.UtilLib;
 
-
-
-
 namespace iLabs.ServiceBroker.admin
 {
     /// <summary>
@@ -49,11 +46,6 @@ namespace iLabs.ServiceBroker.admin
     /// </summary>
     public partial class manageServices : System.Web.UI.Page
     {
-        protected System.Web.UI.WebControls.Label lblUserNameBanner;
-        protected System.Web.UI.WebControls.Label lblGroupNameBanner;
-
-        //protected System.Web.UI.WebControls.RequiredFieldValidator rfvServiceGUID;
-
         protected bool isNew = false;
         protected bool hasAdminGroups = true;
         protected bool hasManageLSSGroups = false;

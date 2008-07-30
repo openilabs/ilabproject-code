@@ -3,28 +3,28 @@
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Page language="c#" Inherits="iLabs.ServiceBroker.iLabSB.myAccount" CodeFile="myAccount.aspx.cs" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
-<HTML>
+<html>
 <!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
 <!-- $Id: myAccount.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
-	<HEAD>
+	<head>
 		<title>MIT iLab Service Broker - My Account</title>
-		<meta name="GENERATOR" Content="Microsoft Visual Studio .NET 7.1">
-		<meta name="CODE_LANGUAGE" Content="C#">
-		<meta name="vs_defaultClientScript" content="JavaScript">
-		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1" />
+		<meta name="CODE_LANGUAGE" content="C#" />
+		<meta name="vs_defaultClientScript" content="JavaScript" />
+		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5" />
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<style type="text/css"> @import url( css/main.css );  </style>
-	</HEAD>
+	</head>
 	<body>
 		<form id="register" method="post" runat="server">
 			<a name="top"></a>
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
 				<uc1:userNav id="UserNav1" runat="server"></uc1:userNav>
-				<br clear="all">
+				<br clear="all" />
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>My Account
@@ -101,10 +101,10 @@ Please see license.txt in top level directory for full license.
 							<!--/form-->
 						</div>
 					</div>
-					<br clear="all"> <!-- end pagecontent div -->
+					<br clear="all" /> <!-- end pagecontent div -->
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>
 			</div>
 		</form>
 	</body>
-</HTML>
+</html>

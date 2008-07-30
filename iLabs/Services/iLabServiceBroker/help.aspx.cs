@@ -38,20 +38,6 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class help : System.Web.UI.Page
 	{
-        //protected System.Web.UI.WebControls.TextBox txtProblem;
-        //protected System.Web.UI.WebControls.Button btnRequestHelp;
-		protected System.Web.UI.HtmlControls.HtmlAnchor navLogout;
-        protected System.Web.UI.WebControls.DropDownList ddlWhichLab;
-        //protected System.Web.UI.WebControls.Label lblResponse;
-		//protected System.Web.UI.WebControls.TextBox txtBugReport;
-        //protected System.Web.UI.WebControls.Button btnReportBug;
-	
-        //protected System.Web.UI.WebControls.Label lblUserName;
-        //protected System.Web.UI.WebControls.Label lblEmail;
-        //protected System.Web.UI.WebControls.TextBox txtUserName;
-        //protected System.Web.UI.WebControls.TextBox txtEmail;
-        //protected System.Web.UI.WebControls.DropDownList ddlHelpType;
-
 		string bugReportMailAddress = ConfigurationSettings.AppSettings["bugReportMailAddress"];
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 

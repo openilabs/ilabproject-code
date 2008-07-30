@@ -26,11 +26,6 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class adminNav : System.Web.UI.UserControl
 	{
-
-		
-		
-		
-
 		protected string currentPage;
 		protected string helpURL = "../help.aspx";
 

@@ -42,7 +42,6 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class manageLabGroups : System.Web.UI.Page
 	{
-		protected System.Web.UI.HtmlControls.HtmlGenericControl divErrorMessage;
         protected ArrayList adminGroupUserList = new ArrayList();
 
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
@@ -51,8 +50,6 @@ namespace iLabs.ServiceBroker.admin
         LabClient[] labClients;
         LabClient theClient;
         int labClientID;
-
-     
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

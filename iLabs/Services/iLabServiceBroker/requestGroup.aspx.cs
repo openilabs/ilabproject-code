@@ -30,10 +30,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class requestGroup : System.Web.UI.Page
 	{
-		protected System.Web.UI.HtmlControls.HtmlAnchor navLogout;
-
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-
 		ArrayList nonRequestGroups = new ArrayList();
 		ArrayList requestGroups = new ArrayList();
 		ArrayList canRequestGroupIDs = new ArrayList();

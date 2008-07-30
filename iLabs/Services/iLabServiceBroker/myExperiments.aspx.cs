@@ -46,8 +46,6 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class myExperiments : System.Web.UI.Page
 	{
-		//protected System.Web.UI.WebControls.TextBox txttxtLabServerName;
-		//protected System.Web.UI.WebControls.TextBox txtTextfield;
         CultureInfo culture;
         int userTZ;
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();

@@ -31,15 +31,7 @@ namespace iLabs.ServiceBroker.admin
 	public partial class addEditGroupPopup : System.Web.UI.Page
 	{
 		Boolean displaySubgroups = false;
-
-
-		protected System.Web.UI.WebControls.TextBox txtNotassociated;
-		protected System.Web.UI.WebControls.TextBox txtAssociated;
-		
-		protected System.Web.UI.WebControls.Label lblExpGrants;
-		protected System.Web.UI.WebControls.Label lblExp;
-		protected System.Web.UI.WebControls.Repeater repSubGroups;
-		
+        protected System.Web.UI.WebControls.Repeater repSubGroups;
 		protected Group [] allGroups;
 		int [] parentIDs;
 		protected string actionCmd = "Edit";

@@ -26,9 +26,6 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class myGroups : System.Web.UI.Page
 	{
-		protected System.Web.UI.WebControls.Repeater repGroupLabs;
-		protected System.Web.UI.WebControls.Label lblGroupLabs;
-
 		protected ArrayList nonRequestGroups = new ArrayList();
 		protected ArrayList requestGroups = new ArrayList();
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();

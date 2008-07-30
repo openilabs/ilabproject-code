@@ -29,8 +29,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class home : System.Web.UI.Page
 	{
-		protected System.Web.UI.WebControls.Label Label1;
-	
+			
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			if (Session["UserID"] == null)

@@ -28,11 +28,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class myClientList : System.Web.UI.Page
 	{
-		protected System.Web.UI.HtmlControls.HtmlAnchor navLogout;
-		protected System.Web.UI.WebControls.Label lblUserNameBanner;
-		protected System.Web.UI.WebControls.Label lblGroupNameBanner;
-
-		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+        AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 		protected LabClient[] lcList = null;
 	
 		protected void Page_Load(object sender, System.EventArgs e)

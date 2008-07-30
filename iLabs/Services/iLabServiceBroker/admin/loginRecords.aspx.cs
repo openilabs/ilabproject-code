@@ -30,8 +30,6 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class loginRecords : System.Web.UI.Page
 	{
-		protected System.Web.UI.HtmlControls.HtmlAnchor navLogout;
-
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 	
 		protected void Page_Load(object sender, System.EventArgs e)

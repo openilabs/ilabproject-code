@@ -45,8 +45,6 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class showExperiment : System.Web.UI.Page
 	{
-		protected System.Web.UI.WebControls.TextBox txttxtLabServerName;
-		protected System.Web.UI.WebControls.TextBox txtTextfield;
         protected System.Data.DataTable dtRecords;
         protected System.Data.DataTable dtBlobs;
         
