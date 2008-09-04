@@ -4216,7 +4216,7 @@ Create Procedure ModifyResourceMap
 as
 
 update ResourceMap set keyType=@keyType,keyValue=@keyValue,
-type_0=@type_0,value_0=@value_0,type_1=@type_1,value_0=@value_1,
+type_0=@type_0,value_0=@value_0,type_1=@type_1,value_1=@value_1,
 type_2=@type_2,value_2=@value_2
 where mapID = @mapID
 
