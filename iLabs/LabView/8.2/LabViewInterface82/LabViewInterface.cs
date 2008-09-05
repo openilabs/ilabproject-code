@@ -408,12 +408,23 @@ namespace iLabs.LabView.LV82
                 }
                 catch (Exception e)
                 {
+                    Exception stopEx = new Exception("Control NotFound: stop", e);
                     Utilities.WriteLog("stop control not found: " + e.Message);
+                    throw stopEx;
                 }
                 if (found)
                 {
-                    vi.SetControlValue("stop", true);
-                    status = (int)GetVIStatus(vi);
+                    try
+                    {
+                        vi.SetControlValue("stop", true);
+                        status = (int)GetVIStatus(vi);
+                    }
+                    catch (Exception ex)
+                    {
+                        Exception setControl = new Exception("setControl: stop", ex);
+                        Utilities.WriteLog("Error: setControl stop: " + ex.Message);
+                        throw setControl;
+                    }
                 }
             }
             return status;
@@ -522,8 +533,9 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
+                Exception notFound = new Exception("VI NotFound: " + path + @"\" + name, e);
                 Utilities.WriteLog("VI not Found: " + " Path: " + path + " Name: " + name + " Exception: " + e.Message);
-                throw;
+                throw notFound;
             }
             return vi;
         }
@@ -551,7 +563,9 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
+                Exception notFound = new Exception("VI Not Found GetVI: " + viName,e);
                 Utilities.WriteLog("VI Not Found GetVI: " + viName + " Exception: " + e.Message);
+                throw notFound;
             }
             return vi;
         }
@@ -606,10 +620,18 @@ namespace iLabs.LabView.LV82
         public VirtualInstrument loadVI(string path, string name, bool resvForCall,int options)
         {
             VirtualInstrument vi = null;
-            if (!IsLoaded(name))
+            try
             {
-                vi = (VirtualInstrument)viServer.GetVIReference(path + @"\" + name, "", resvForCall, options);
-                //vi.OpenFrontPanel(true, FPStateEnum.eVisible);
+                if (!IsLoaded(name))
+                {
+                    vi = (VirtualInstrument)viServer.GetVIReference(path + @"\" + name, "", resvForCall, options);
+                    //vi.OpenFrontPanel(true, FPStateEnum.eVisible);
+                }
+            }
+            catch (Exception e)
+            {
+                Exception notFound = new Exception("loadVI FileStyleUriParser notFound: " + path + @"\" + name, e);
+                throw notFound;
             }
             return vi;
         }

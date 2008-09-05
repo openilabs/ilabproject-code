@@ -35,6 +35,8 @@ namespace iLabs.LabServer.LabView
     //[SoapDocumentService(RoutingStyle=SoapServiceRoutingStyle.RequestElement)]
     [WebService(Name = "InteractiveLabView", Namespace = "http://ilab.mit.edu/iLabs/Services", Description = "LabVIEW Lab Server"),
     WebServiceBindingAttribute(Name = "LabViewLS", Namespace = "http://ilab.mit.edu/iLabs/Services")]
+    [WebServiceBinding(Name = "I_ILS", Namespace = "http://ilab.mit.edu/iLabs/Services")]
+    [WebServiceBinding(Name = "IProcessAgent", Namespace = "http://ilab.mit.edu/iLabs/Services")]
     public class InteractiveLabView : InteractiveLabServer
     {
 
@@ -91,7 +93,7 @@ namespace iLabs.LabServer.LabView
         {
             return new LabViewInterface().SubmitAction(actionStr, dataStr);
         }
-
+/*
         /// <summary>
         /// Checks on the status of the lab server.  
         /// </summary>
@@ -101,6 +103,20 @@ namespace iLabs.LabServer.LabView
         public string SubmitCommandRemote(string actionStr, string dataStr, string host, int port)
         {
             return new LabViewRemote(host,port).SubmitAction(actionStr, dataStr);
+        }
+ */
+
+        /// <summary>
+        /// Reports the status of the lab server.  
+        /// </summary>
+        [WebMethod(Description = "Lab Server Method: Returns the current status of the VIServer connection. "
+        + "Members of struct LabStatus are 'online' (boolean) and 'labStatusMessage' (string)."),
+       SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
+        SoapDocumentMethod(Binding = "LabViewLS")]
+        public string GetLabViewStatus()
+        {
+            return new LabViewInterface().GetViServerStatus();
+
         }
 
 /*
@@ -142,16 +158,35 @@ namespace iLabs.LabServer.LabView
 
         }
 */
-        [WebMethod(Description = @"Test the remote  SetLockState"),
+        [WebMethod(Description = @"GetLockState"),
+            //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
+SoapDocumentMethod(Binding = "LabViewLS")]
+        public int GetLockState(string viName)
+        {
+            I_LabViewInterface lvi = new LabViewInterface();
+            return lvi.GetLockState(viName);
+
+        }
+        [WebMethod(Description = @"SetLockState"),
             //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
       SoapDocumentMethod(Binding = "LabViewLS")]
-        public void TestLockState(String host, int port, string viName, bool state)
+        public int SetLockState(string viName, bool state)
         {
-            I_LabViewInterface lvi = new LabViewRemote(host, port);
-            lvi.SetLockState(viName, state);
+            I_LabViewInterface lvi = new LabViewInterface();
+            return lvi.SetLockState(viName, state);
             
         }
+/*
+        [WebMethod(Description = @"QuitLabView"),
+            //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
+SoapDocumentMethod(Binding = "LabViewLS")]
+        public string QuitLabView()
+        {
+            I_LabViewInterface lvi = new LabViewInterface();
+            return lvi.QuitLabView();
 
+        }
+*/
 
         protected string getConfiguration(string group)
         {

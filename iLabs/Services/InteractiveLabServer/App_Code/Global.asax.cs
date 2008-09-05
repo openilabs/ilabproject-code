@@ -44,12 +44,16 @@ namespace iLabs.LabServer.LabView
 
 		static Global()
 		{
-            if(ConfigurationManager.AppSettings["logPath"] != null && ConfigurationManager.AppSettings["logPath"].Length > 0)
+            if (ConfigurationManager.AppSettings["logPath"] != null
+                && ConfigurationManager.AppSettings["logPath"].Length > 0)
+            {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("Global Static started");
+            }
 			//threadLV = new Thread(new ThreadStart(ThreadProc));
 			//threadLV.Start();
           
-			Utilities.WriteLog("Global Static started");
+			
             taskTable = new Hashtable();
             tasks = new TaskProcessor();
             Utilities.WriteLog("Global Static ended");
