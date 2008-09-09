@@ -37,6 +37,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\iLabGlobal.cs" />
     <Compile Include="Core\ProcessAgentDB.cs" />
     <Compile Include="Core\ProcessAgentInfo.cs" />
     <Compile Include="Core\ProcessAgentType.cs" />
