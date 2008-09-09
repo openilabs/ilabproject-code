@@ -96,9 +96,9 @@ namespace iLabs.LabServer.LabView
                     //Server takes control of RemotePanel, connection not broken
                     lvi.SubmitAction("lockvi", lvi.qualifiedName(vi));
                     int stopStatus = lvi.StopVI(vi);
-                    if (stopStatus = 0)
+                    if (stopStatus == 0)
                     { //VI found but no stop control
-                        lvi.AbortVI();
+                        vi.Abort();
                         Utilities.WriteLog("Expire: AbortVI() called because no stop control");
                     }
                     
