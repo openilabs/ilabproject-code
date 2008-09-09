@@ -92,16 +92,19 @@ namespace iLabs.LabServer.LabView
 
                     //Get the VI and send version specfic call to get control of the VI
                     VirtualInstrument vi = lvi.GetVI(viName);
-                    lvi.StopVI(vi);
                     // LV 8.2.1
                     //Server takes control of RemotePanel, connection not broken
                     lvi.SubmitAction("lockvi", lvi.qualifiedName(vi));
-                    // Also required for LV 8.2.0, force disconnection og RemotePanel
+                    int stopStatus = lvi.StopVI(vi);
+                    if (stopStatus = 0)
+                    { //VI found but no stop control
+                        lvi.AbortVI();
+                        Utilities.WriteLog("Expire: AbortVI() called because no stop control");
+                    }
+                    
+                    // Also required for LV 8.2.0 and 7.1, force disconnection of RemotePanel
                     //lvi.SubmitAction("closevi", lvi.qualifiedName(vi));
 
-                    // These two are required for  LV 7.1.f2
-                    //lvi.SubmitAction("lockvi", viName);
-                    //lvi.SubmitAction("closevi", viName);
                     vi = null;
 
                 }
@@ -139,6 +142,7 @@ namespace iLabs.LabServer.LabView
                     // currently RequestTicketCancellation always returns false
                     // Create ticketing service interface connection to TicketService
                     TicketIssuerProxy ticketingInterface = new TicketIssuerProxy();
+                    ticketingInterface.AgentAuthHeaderValue = new AgentAuthHeader();
                     ticketingInterface.Url = sbs[0].webServiceUrl;
                     ticketingInterface.AgentAuthHeaderValue.coupon = sbs[0].identOut;
                     ticketingInterface.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;

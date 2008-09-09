@@ -38,10 +38,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\ServiceBrokerLibrary\ServiceBrokerLibrary.csproj">
-      <Project>{8C295C05-959B-483C-9F31-62E45FE46543}</Project>
-      <Name>ServiceBrokerLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\DataTypes\iLabsDataTypes.csproj">
       <Project>{ADDE40F3-E299-400B-A842-15ACD58BBF19}</Project>
       <Name>iLabsDataTypes</Name>

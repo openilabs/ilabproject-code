@@ -395,6 +395,7 @@ namespace iLabs.LabView.LV82
             int status = -1;
             if (vi != null)
             {
+                status = 0;
                 object state = null;
                 bool found = false;
                 try
@@ -402,7 +403,7 @@ namespace iLabs.LabView.LV82
                     state = vi.GetControlValue("stop");
                     if (state != null)
                     {
-                        status = 0;
+                        status = 1;
                         found = true;
                     }
                 }
@@ -417,7 +418,8 @@ namespace iLabs.LabView.LV82
                     try
                     {
                         vi.SetControlValue("stop", true);
-                        status = (int)GetVIStatus(vi);
+                        //status = (int)GetVIStatus(vi);
+                        status = 2;
                     }
                     catch (Exception ex)
                     {
