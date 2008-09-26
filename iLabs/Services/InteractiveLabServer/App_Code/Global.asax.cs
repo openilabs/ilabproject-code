@@ -6,6 +6,8 @@ using System.Web;
 using System.Web.SessionState;
 using System.Runtime.InteropServices;
 using System.Threading;
+
+using iLabs.Core;
 using iLabs.Ticketing;
 
 using iLabs.UtilLib;
@@ -48,7 +50,7 @@ namespace iLabs.LabServer.LabView
                 && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
-                Utilities.WriteLog("Global Static started");
+                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
 			//threadLV = new Thread(new ThreadStart(ThreadProc));
 			//threadLV.Start();

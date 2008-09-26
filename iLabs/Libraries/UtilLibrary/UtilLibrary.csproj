@@ -43,6 +43,7 @@
     <Compile Include="CRC_1952.cs" />
     <Compile Include="ChecksumUtil.cs" />
     <Compile Include="DateUtil.cs" />
+    <Compile Include="iLabGlobal.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="XmlQueryDoc.cs" />
   </ItemGroup>

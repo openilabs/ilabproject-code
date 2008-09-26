@@ -20,6 +20,17 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		private System.ComponentModel.IContainer components = null;
         private TicketRemover ticketRemover;
+
+        static Global()
+        {
+            if (ConfigurationManager.AppSettings["logPath"] != null
+               && ConfigurationManager.AppSettings["logPath"].Length > 0)
+            {
+                Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
+            }
+        }
+
 		public Global()
 		{
 			InitializeComponent();
@@ -27,12 +38,7 @@ namespace iLabs.Scheduling.UserSide
 		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
-            string path = ConfigurationSettings.AppSettings["logPath"];
-            if (path != null && path.Length > 0)
-            {
-                Utilities.LogPath = path;
-                Utilities.WriteLog("USS Application_Start: starting");
-            }
+            Utilities.WriteLog("USS Application_Start: starting");
             //Create the ticketRemover thread
             ticketRemover = new TicketRemover();
 

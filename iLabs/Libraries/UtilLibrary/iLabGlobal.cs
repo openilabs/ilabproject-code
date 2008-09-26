@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace iLabs.UtilLib
+{
+    /// <summary>
+    /// static class to provide release tags
+    /// </summary>
+    public class iLabGlobal
+    {
+        static private string date = "$Date$";
+        static private string revision = "$Revision$";
+        static private string release = "$ilab:Release$";
+        static private string buildDate = "$ilab:BuildDate$";
+        /// <summary>
+        /// Returns the date and svn revision last set
+        /// </summary>
+        public static string Revision
+        {
+            get
+            {
+                return date + revision;
+            }
+        }
+        /// <summary>
+        /// returns a relase string specified in iLabGloal
+        /// </summary>
+        public static string Release
+        {
+            get
+            {
+                return release + " " + revision;
+            }
+        }
+
+        /// <summary>
+        /// returns the build date of the release, this currently is not set automaticly.
+        /// </summary>
+        public static string BuildDate
+        {
+            get
+            {
+                return buildDate;
+            }
+        }
+    }
+}

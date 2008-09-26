@@ -37,8 +37,14 @@ namespace iLabs.ServiceBroker.iLabSB
 
         static Global()
         {
-            Utilities.WriteLog("ISB: Global Static started");
+            if (ConfigurationManager.AppSettings["logPath"] != null
+               && ConfigurationManager.AppSettings["logPath"].Length > 0)
+            {
+                Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
+            }
         }
+
 		public Global()
 		{
 			InitializeComponent();
