@@ -11,7 +11,8 @@ namespace iLabs.UtilLib
     {
         static private string date = "$Date$";
         static private string revision = "$Revision$";
-        static private string release = "$ilab:Release$";
+        //static private string release = "$ilab:Release$";
+	static private string release = "2.2";
         static private string buildDate = "$ilab:BuildDate$";
         /// <summary>
         /// Returns the date and svn revision last set
@@ -20,11 +21,11 @@ namespace iLabs.UtilLib
         {
             get
             {
-                return date + revision;
+                return revision + " " + date;
             }
         }
         /// <summary>
-        /// returns a relase string specified in iLabGloal
+        /// returns a release string specified in iLabGlobal
         /// </summary>
         public static string Release
         {
