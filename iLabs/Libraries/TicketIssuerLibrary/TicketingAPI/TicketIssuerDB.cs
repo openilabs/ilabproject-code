@@ -941,7 +941,24 @@ namespace iLabs.TicketIssuer
 
         public bool RequestTicketCancellation(Coupon coupon, string type, string redeemerGuid)
         {
-            return false;
+            SqlCommand cmd = new SqlCommand("CancelIssuedTicket", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate the parameters
+            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
+            couponIdParam.Value = coupon.couponId;
+            SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
+            typeParam.Value = type;
+            SqlParameter redeemerParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
+            redeemerParam.Value = redeemer;
+            Object status = cmd.ExecuteScalar();
+            if (status != null)
+            {
+                return Convert.ToInt32(status) == 1;
+            }
+            else
+                return false;
+
         }
 
         public List<Ticket> GetExpiredIssuedTickets()
