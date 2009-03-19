@@ -20,8 +20,8 @@ using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
+using iLabs.Proxies.ESS;
 
-using iLabs.Services;
 
 namespace iLabs.ServiceBroker.Internal
 {
@@ -995,6 +995,31 @@ namespace iLabs.ServiceBroker.Internal
                 myConnection.Close();
             }
             return exp;
+        }
+
+        public static bool UpdateExperimentStatus(long experimentID, int statusCode)
+        {
+            bool ok = false;
+            SqlConnection myConnection = FactoryDB.GetConnection();
+            SqlCommand myCommand = new SqlCommand("UpdateExperimentStatusCode", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(new SqlParameter("@experimentID", experimentID));
+            myCommand.Parameters.Add(new SqlParameter("@status", statusCode));
+            try{
+                myConnection.Open();
+                object obj = myCommand.ExecuteScalar();
+                if(obj != null){
+                    int i = Convert.ToInt32(obj);
+                    ok = i > 0;
+                }
+            }
+            catch{
+                throw;
+            }
+            finally{
+                myConnection.Close();
+            }
+            return ok;
         }
 
         public static bool UpdateExperimentStatus(StorageStatus status)

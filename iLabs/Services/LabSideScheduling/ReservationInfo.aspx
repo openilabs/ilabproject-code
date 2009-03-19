@@ -76,7 +76,7 @@
 			<div class="simpleform">
 							<br>
 							<asp:textbox id="txtDisplay" 
-				runat="server" Width="720px" Height="288px" TextMode="MultiLine"></asp:textbox></div>
+				runat="server" Width="860px" Height="288px" TextMode="MultiLine"></asp:textbox></div>
 				
 			</div>
 			

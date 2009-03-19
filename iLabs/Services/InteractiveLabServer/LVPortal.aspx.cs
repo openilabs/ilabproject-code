@@ -24,12 +24,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
-using iLabs.Services;
-using iLabs.LabView;
-using iLabs.LabView.LV82;
 using iLabs.LabServer.Interactive;
-
-
 
 namespace iLabs.LabServer.LabView
 {
@@ -133,7 +128,7 @@ namespace iLabs.LabServer.LabView
                 }
                 else
                 {
-                    task = (LabViewTask)Global.tasks.GetTask(expID);
+                    task = (LabTask)Global.tasks.GetTask(expID);
 
                 }
                 //Useful for debugging overloads the use of a field in the banner

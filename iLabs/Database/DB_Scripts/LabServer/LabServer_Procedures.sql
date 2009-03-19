@@ -41,6 +41,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyLabA
 drop procedure [dbo].[ModifyLabApp]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyLabPaths]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ModifyLabPaths]
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RemoveLabApp]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RemoveLabApp]
 GO
@@ -221,6 +225,30 @@ AS
 	cgiURL=@cgi, Page=@Page, Title=@title, Description=@description,
 	contact=@contact, ExtraInfo=@extra, comment=@comment
 where LabApp_ID = @appId
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+CREATE PROCEDURE ModifyLabPaths
+@oldPath varchar(256),
+@newPath varchar(256)
+
+ AS
+
+update Lab_App set DataSource=REPLACE(DataSource,@oldPath,@newPath), Path=REPLACE(Path,@oldPath,@newPath),
+	 Application=REPLACE(Application,@oldPath,@newPath), Server=REPLACE(Server,@oldPath,@newPath),
+	 Page=REPLACE(Page,@oldPath,@newPath), CgiURL=REPLACE(CgiURL,@oldPath,@newPath)
+
+select @@rowcount
+
+RETURN
 GO
 
 SET QUOTED_IDENTIFIER OFF 

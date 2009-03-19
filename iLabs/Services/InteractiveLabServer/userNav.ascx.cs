@@ -35,24 +35,7 @@ namespace iLabs.LabServer
 			// Get the current page name w/o path name or slashes
 			currentPage = Request.Url.Segments[Request.Url.Segments.Length -1];
 			aHelp.HRef = helpURL;
-			
-			// Only show the link to Home if not logged in
-            //if (Session["UserID"] == null)
-            //{	
-            //    aHome.Attributes.Add("class", "only");
-            //    liNavlistMyGroups.Visible = false;
-            //    liNavlistMyLabs.Visible = false;
-            //    liNavlistExperiments.Visible = false;
-            //    liNavlistMyAccount.Visible = false;
-            //    liNavlistAdmin.Visible = false;
-            //    lbtnLogout.Visible = false;
-            //}
-            //else
-            //{
-				lbtnLogout.Visible = true;
-				SetNavList();
-			//}
-
+			SetNavList();
 		}
 
 		#region Web Form Designer generated code
@@ -80,98 +63,49 @@ namespace iLabs.LabServer
 		/// </summary>
 		private void SetNavList()
 		{
-			//object adminState = Session["isAdmin"];
-			//liNavlistAdmin.Visible = ((adminState != null) && Convert.ToBoolean(adminState));
-
-			// Do not show Labs or Experiments if Effective Group has not been specified
-			//if (Session["GroupID"] !=null)
-			//{
-				//if (!((bool)adminState))
-				//{
-                    liNavlistAdmin.Visible = true;
-					liNavlistMyLabs.Visible = true;
-					liNavlistExperiments.Visible = true;
-            //    }
-            //    else
-            //    {
-            //        liNavlistMyLabs.Visible = false;
-            //        liNavlistExperiments.Visible = false;
-            //    }
-            //}
-            //else
-            //{
-            //    liNavlistMyLabs.Visible = false;
-            //    liNavlistExperiments.Visible = false;
-            //}
-
-			// Only show the groups page if the user has more than one lab
-			//if (Convert.ToInt32(Session["LabCount"]) != 1)
-			//{
-				liNavlistMyGroups.Visible = true;
-			//}
-			//else
-			//{
-			//	liNavlistMyGroups.Visible = false;
-			//}
-			
-			//Logout Button
-			lbtnLogout.CausesValidation = false;
-
+            aHome.Attributes.Add("class", "first");
+            aTasks.Attributes.Add("class", "last");
 			switch(currentPage)
 			{
 				case "home.aspx":
 					aHome.Attributes.Add("class", "topactive");
-					aMyAccount.Attributes.Add("class", "last");
 					break;
-                case "selfRegistration.aspx":
-                    aHome.Attributes.Add("class", "first");
-                    aSelfRegistration.Attributes.Add("class", "topactive");
-                    aMyAccount.Attributes.Add("class", "last");
+                case "administer.aspx": aHome.Attributes.Add("class", "first");
+                    aAdminister.Attributes.Add("class", "topactive");
                     break;
-				case "localGroups.aspx":
-					aHome.Attributes.Add("class", "first");
-					aMyGroups.Attributes.Add("class", "topactive");
-					aMyAccount.Attributes.Add("class", "last");
+                case "selfRegistration.aspx":aHome.Attributes.Add("class", "first");
+                    aSelfRegistration.Attributes.Add("class", "topactive");
+                    break;
+				case "localGroups.aspx":aHome.Attributes.Add("class", "first");
+					aGroups.Attributes.Add("class", "topactive");
 					break;
 				case "groupPermissions.aspx":
 					//Note: the myLabs page determines which clients a user/group can access,
 					// then redirects to myClient.aspx. So myLabs.aspx is never displayed, though
 					// it looks as though it is the page to be linked to.
-					aHome.Attributes.Add("class", "first");
-					aMyLabs.Attributes.Add("class", "topactive");
-					aMyAccount.Attributes.Add("class", "last");
+                    aGroupPermissions.Attributes.Add("class", "topactive");
 					break;
 				case "labExperiments.aspx":
-					aHome.Attributes.Add("class", "first");
-					aMyExperiments.Attributes.Add("class", "topactive");
-					aMyAccount.Attributes.Add("class", "last");
+                    aExperiments.Attributes.Add("class", "topactive");
 					break;
 				case "manageTasks.aspx":
-					aHome.Attributes.Add("class", "first");
-					aMyAccount.Attributes.Add("class", "last");
+                    aTasks.Attributes.Add("class", "topactive");
 					break;
 				case "help.aspx":
-					aHome.Attributes.Add("class", "first");
 					aHelp.Attributes.Add("class", "topactive");
-					aMyAccount.Attributes.Add("class", "last");
-					break;
-				case "myAccount.aspx":
-					aHome.Attributes.Add("class", "first");
-					aMyAccount.Attributes.Add("class", "topactive");
 					break;
 				default:
-					aHome.Attributes.Add("class", "first");
-					aMyAccount.Attributes.Add("class", "last");
 					break;
 			}
-		}
-		
-		protected void lbtnLogout_Click(object sender, System.EventArgs e)
-		{
-			//AdministrativeAPI.SaveUserSessionEndTime (Convert.ToInt64 (Session["SessionID"]));
-			FormsAuthentication.SignOut();
-			Session.Abandon();
-			Response.Redirect("login.aspx");
+            if (Session["sbUrl"] != null)
+            {
+                liBackToSB.Visible = true;
+                aBackToSB.HRef = Session["sbUrl"].ToString();
+            }
+            else
+            {
+                liBackToSB.Visible = false;
+            }
 		}
 	}
 }

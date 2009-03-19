@@ -24,14 +24,28 @@ namespace iLabs.Scheduling.LabSide
         LssCredentialSet[] credentialSets;
         CultureInfo culture = null;
         int userTZ = 0;
+        //double localTZ = 0;
         TimeSpan tzOffset = TimeSpan.MinValue;
         StringBuilder buf = null;
+
+        public double LocalTZ
+        {
+            get
+            {
+                if (tzOffset.CompareTo(TimeSpan.MinValue) == 0)
+                {
+                    TimeZone localTZ = TimeZone.CurrentTimeZone;
+                    tzOffset = localTZ.GetUtcOffset(DateTime.Now);
+                }
+                return tzOffset.TotalHours;
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             userTZ = (int)Session["userTZ"];
-            tzOffset = TimeSpan.FromMinutes(-userTZ);
+            
 
             txtStartDate.Attributes.Add("OnKeyPress", "return false;");
             txtEndDate.Attributes.Add("OnKeyPress", "return false;");
@@ -98,6 +112,7 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="e"></param>
         protected void btnSave_Click(object sender, EventArgs e)
         {
+            
             DateTime startDate = DateTime.MinValue;
             TimeSpan startTime = TimeSpan.MinValue;
             int startHours = -1;
@@ -107,6 +122,8 @@ namespace iLabs.Scheduling.LabSide
             TimeSpan endTime = TimeSpan.MinValue;
             int endHours = -1;
             int endMinutes = -1;
+            int recurType = 0;
+            int quan = 0;
 
             // input error check
             try
@@ -141,18 +158,14 @@ namespace iLabs.Scheduling.LabSide
                     return;
                 }
                 endDate = DateTime.SpecifyKind(DateTime.Parse(txtEndDate.Text, culture), DateTimeKind.Utc);
-
-                if (endDate < startDate)
+                endDate = endDate.Add(TimeSpan.FromDays(1.0));
+                if (endDate <= startDate)
                 {
                     lblErrorMessage.Text = iLabs.UtilLib.Utilities.FormatWarningMessage("The start date must be less than or equal to the end date.");
                     lblErrorMessage.Visible = true;
                     return;
                 }
-                // Add a day to end date  force to midnight
-                endDate = endDate.AddDays(1.0);
-
-                // Time of day in local time, used as an offset from startDate
-
+               
                 startHours = ddlStartHour.SelectedIndex;
                 if (ddlStartAM.Text.CompareTo("PM") == 0)
                 {
@@ -165,6 +178,7 @@ namespace iLabs.Scheduling.LabSide
                     string msg = "Please input minutes ( 0 - 59 ) in the start time ";
                     lblErrorMessage.Text = iLabs.UtilLib.Utilities.FormatWarningMessage(msg);
                     lblErrorMessage.Visible = true;
+                    return;
                 }
 
                 endHours = ddlEndHour.SelectedIndex;
@@ -181,17 +195,20 @@ namespace iLabs.Scheduling.LabSide
                     string msg = "Please input minutes ( 0 - 59 ) in the end time ";
                     lblErrorMessage.Text = iLabs.UtilLib.Utilities.FormatWarningMessage(msg);
                     lblErrorMessage.Visible = true;
+                    return;
                 }
 
                 startTime = new TimeSpan(startHours, startMinutes, 0);
                 endTime = new TimeSpan(endHours, endMinutes, 0);
+                if (endHours == 0 && endMinutes == 0)
+                    endTime = endTime.Add(TimeSpan.FromHours(24));
 
 
                 if (startTime >= endTime)
                 {
                     // If confirm see JavaScript
                     if(endDate.Subtract(startDate) > TimeSpan.FromDays(1.0)){
-                        endTime.Add(TimeSpan.FromDays(1.0));
+                        endTime = endTime.Add(TimeSpan.FromDays(1.0));
                     }
                     if (startTime >= endTime)
                     {
@@ -206,19 +223,94 @@ namespace iLabs.Scheduling.LabSide
                 string msg = ex.Message;
                 lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
                 lblErrorMessage.Visible = true;
+                return;
+            }
+            if (txtQuantum.Text.CompareTo("") == 0)
+            {
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("You must enter the Quantum of the Recurrence.");
+                lblErrorMessage.Visible = true;
+                return;
+            }
+            try
+            {
+                quan = Int32.Parse(txtQuantum.Text);
+
+
+            }
+            catch (Exception ex)
+            {
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter a positive integer in the Quantum text box.");
+                lblErrorMessage.Visible = true;
+                return;
+            }
+            if (quan <= 0)
+            {
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer value greater than Zero in the Quantum text box.");
+                lblErrorMessage.Visible = true;
+                return;
             }
 
             //If all the input error checks are cleared
-            //if adding a new Recurrence and time blocks accordingly
+            //add a new Recurrence
             try
             {
+                Recurrence recur = new Recurrence();
+                recur.resourceId = int.Parse(ddlLabServers.SelectedValue);
+                recur.recurrenceType = (Recurrence.RecurrenceType) int.Parse(ddlRecurrence.SelectedValue);
+                TimeSpan numDays = endDate - startDate;
+                numDays.Add(TimeSpan.FromDays(1));
+                recur.numDays = (int)numDays.TotalDays;
+                recur.startDate = startDate.AddMinutes(-userTZ);
+                recur.startOffset = startTime;
+                recur.endOffset = endTime;
+                recur.dayMask = 0;
+                recur.quantum = quan;
+                if(recur.recurrenceType == Recurrence.RecurrenceType.Weekly){
+                    foreach (ListItem it in cbxRecurWeekly.Items)
+                        {
+                            if (it.Selected)
+                            {
+                                switch (it.Text)
+                                {
+                                    case "Sunday":
+                                        recur.dayMask |= DateUtil.SunBit;
+                                        break;
+                                    case "Monday":
+                                        recur.dayMask |= DateUtil.MonBit;
+                                        break;
+                                    case "Tuesday":
+                                        recur.dayMask |= DateUtil.TuesBit;
+                                        break;
+                                    case "Wednesday":
+                                        recur.dayMask |= DateUtil.WedBit;
+                                        break;
+                                    case "Thursday":
+                                        recur.dayMask |= DateUtil.ThursBit;
+                                        break;
+                                    case "Friday":
+                                        recur.dayMask |= DateUtil.FriBit;
+                                        break;
+                                    case "Saturday":
+                                        recur.dayMask |= DateUtil.SatBit;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                //repeatDays.Add(it.Text);
+                            }
+                    }
+                }
+                //CheckValid is not written
+                //string message = recur.CheckValid();
+                //if( message != null){
+                //    lblErrorMessage.Text = iLabs.UtilLib.Utilities.FormatWarningMessage(message);
+                //    lblErrorMessage.Visible = true;
+                //    return;
+                //}
 
                 //Create UTC copies of the the startTime and EndTime, to check Recurrence
-                DateTime uStartTime = startDate.Add(startTime).AddMinutes(-userTZ);
-                DateTime uEndTime = endDate.Add(endTime).AddMinutes(-userTZ);
-
-                DateTime uStartDate = startDate.AddMinutes(-userTZ);
-                DateTime uEndDate = endDate.AddMinutes(-userTZ);
+                DateTime uStartTime = recur.Start;
+                DateTime uEndTime = recur.End;
 
                 // the database will also throw an exception if the combination of start time,
                 // end time,lab server id, resource_id exists, or there are some 
@@ -227,101 +319,20 @@ namespace iLabs.Scheduling.LabSide
                 // be be overlapped
                 // this is just another check to throw a meaningful exception
 
-                Recurrence[] recurs = LSSSchedulingAPI.GetRecurrence(LSSSchedulingAPI.ListRecurrenceIDsByResourceID(uStartTime, uEndTime, int.Parse(ddlLabServers.SelectedValue)));
+                // should only get & check recurrences on this resource
+                Recurrence[] recurs = LSSSchedulingAPI.GetRecurrence(LSSSchedulingAPI.ListRecurrenceIDsByResourceID(uStartTime, uEndTime,recur.resourceId));
+   
                 if (recurs != null && recurs.Length > 0)
                 {
-                    Recurrence testRecur = new Recurrence();
-                    testRecur.recurrenceStartDate = uStartDate;
-                    testRecur.recurrenceEndDate = uEndDate;
-                    testRecur.recurrenceStartTime = startTime;
-                    testRecur.recurrenceEndTime = endTime;
-                    testRecur.recurrenceType = ddlRecurrence.SelectedItem.Text;
-                    testRecur.resourceId = int.Parse(ddlLabServers.SelectedValue);
-                    // should only get & check recurrences on this resource
-                    //int resourceTest = int.Parse(ddlLabServers.SelectedValue);
-                    // tell whether the recurrence recur is overlapping with the input recurrence
-                    // bool lap = (DateTime.Parse(DateUtil.ToUserTime(recur.recurrenceEndDate, culture, userTZ)) >= startDate) && (DateTime.Parse(DateUtil.ToUserTime(recur.recurrenceStartDate, culture, userTZ)) <= endDate);
-                    //if ((recur.labServerGuid == Session["labServerGuid"].ToString()) && (recur.credentialSetId.ToString() == ddlGroup.SelectedValue) && lap)
-
-
                     buf = new StringBuilder();
                     bool conflict = false;
                     foreach (Recurrence r in recurs){
-                        if(testRecur.HasConflict(r))
+                        if(recur.HasConflict(r))
                         {
                             conflict = true;
                             report(r);
                         }
                     }
-
-                    //switch (ddlRecurrence.SelectedIndex)
-                    //{
-                    //    case 1: // Single block always overlaps
-
-                    //        foreach (Recurrence r in recurs)
-                    //        { 
-                    //                conflict = true;
-                    //                report(r);
-                    //        }
-                    //        break;
-                    //    case 2: //Daily block
-                    //        TimeSpan start = uStartDate.TimeOfDay;
-                    //        start.Add(startTime);
-                    //        TimeSpan end = uEndDate.TimeOfDay;
-                    //        end.Add(endTime);
-                    //        foreach (Recurrence r in recurs)
-                    //        {
-                                
-                    //                if (r.recurrenceType.CompareTo(Recurrence.NoRecurrence) == 0)
-                    //                {
-                    //                    report(r);
-                    //                    conflict = true;
-                    //                }
-
-                    //                else if (r.recurrenceType.CompareTo(Recurrence.Daily) == 0)
-                    //                {
-                    //                    TimeSpan rStart = r.recurrenceStartDate.TimeOfDay;
-                    //                    rStart.Add(r.recurrenceStartTime);
-                    //                    TimeSpan rEnd = r.recurrenceEndDate.TimeOfDay;
-                    //                    rEnd.Add(r.recurrenceEndTime);
-                    //                    if (start < rEnd && end > rStart)
-                    //                    {
-                    //                        conflict = true;
-                    //                        report(r);
-                    //                    }
-                    //                }
-                    //                else if (r.recurrenceType.CompareTo(Recurrence.Weekly) == 0)
-                    //                {
-                    //                    // Not enough information to check
-                    //                }
-                                
-                    //        }
-                    //        break;
-                    //    case 3: // Weekly block, currently not supported
-
-                    //        foreach (Recurrence r in recurs)
-                    //        {
-                                
-                    //                if (r.recurrenceType.CompareTo(Recurrence.NoRecurrence) == 0)
-                    //                {
-                    //                    conflict = true;
-                    //                    report(r);
-                    //                }
-                    //                else if (r.recurrenceType.CompareTo(Recurrence.Daily) == 0)
-                    //                {
-                    //                }
-                    //                else if (r.recurrenceType.CompareTo(Recurrence.Weekly) == 0)
-                    //                {
-                    //                    // Not enough information to check
-                    //                }
-                                
-                    //        }
-                    //        break;
-                    //    default:
-                    //        break;
-                    //}
-
-
 
                     if (conflict)
                     {
@@ -330,101 +341,13 @@ namespace iLabs.Scheduling.LabSide
                         return;
                     }
                 }
-                //Add recurrence and time blocks accordingly
+                //Add recurrence accordingly
                 // if no recurrence is selected
-                if (ddlRecurrence.SelectedIndex == 1)
-                {
+                int recurID = LSSSchedulingAPI.AddRecurrence(recur);
+                Session["newOccurrenceID"] = recurID;
 
-
-                    int recurID = LSSSchedulingAPI.AddRecurrence(uStartDate, uEndDate, ddlRecurrence.SelectedItem.Text, startTime, endTime, Session["labServerGuid"].ToString(), Int32.Parse(ddlLabServers.SelectedValue), 0);
-                    Session["newOccurrenceID"] = recurID;
-                    int timeBlockID = LSSSchedulingAPI.AddTimeBlock(Session["labServerGuid"].ToString(), Int32.Parse(ddlLabServers.SelectedValue), uStartTime, uEndTime, recurID);
-
-                }
-                // if recurrence pattern is daily
-                if (ddlRecurrence.SelectedIndex == 2)
-                {
-
-                    int recurID = LSSSchedulingAPI.AddRecurrence(uStartDate, uEndDate, Recurrence.Daily, startTime, endTime, Session["labServerGuid"].ToString(), Int32.Parse(ddlLabServers.SelectedValue), 0);
-                    Session["newOccurrenceID"] = recurID;
-                    DateTime dt = uStartDate;
-                    while (dt <= uEndDate)
-                    {
-                        //the start date time for each time block in UTC
-                        DateTime startTimeForTB = dt.Add(startTime);
-                        DateTime endTimeForTB = dt.Add(endTime);
-                        LSSSchedulingAPI.AddTimeBlock(Session["labServerGuid"].ToString(), Int32.Parse(ddlLabServers.SelectedValue), startTimeForTB, endTimeForTB, recurID);
-                        dt = dt.AddDays(1);
-
-                    }
-                }
-                // if recurrence pattern is weekly
-                if (ddlRecurrence.SelectedIndex == 3)
-                {
-                    byte days = DateUtil.NoDays;
-                    ArrayList repeatDays = new ArrayList();
-                    if (cbxRecurWeekly.SelectedIndex == -1)
-                    {
-                        string msg = "Please check the days to repeat weekly.";
-                        lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
-                        lblErrorMessage.Visible = true;
-                        return;
-
-                    }
-                    foreach (ListItem it in cbxRecurWeekly.Items)
-                    {
-                        if (it.Selected)
-                        {
-                            switch (it.Text)
-                            {
-                                case "Sunday":
-                                    days |= DateUtil.SunBit;
-                                    break;
-                                case "Monday":
-                                    days |= DateUtil.MonBit;
-                                    break;
-                                case "Tuesday":
-                                    days |= DateUtil.TuesBit;
-                                    break;
-                                case "Wendesday":
-                                    days |= DateUtil.WedBit;
-                                    break;
-                                case "Thursday":
-                                    days |= DateUtil.ThursBit;
-                                    break;
-                                case "Friday":
-                                    days |= DateUtil.FriBit;
-                                    break;
-                                case "Saturday":
-                                    days |= DateUtil.SatBit;
-                                    break;
-                                default:
-                                    break;
-                            }
-                            repeatDays.Add(it.Text);
-                        }
-                    }
-                    int recurID = LSSSchedulingAPI.AddRecurrence(uStartDate, uEndDate, Recurrence.Weekly, startTime, endTime, Session["labServerGuid"].ToString(), Int32.Parse(ddlLabServers.SelectedValue), days);
-                    Session["newOccurrenceID"] = recurID;
-                    DateTime dt = uStartDate;
-
-
-
-                    while (dt <= uEndDate)
-                    {
-                        if (repeatDays.Contains(dt.DayOfWeek.ToString()))
-                        {
-
-                            DateTime startTimeForTB = dt.Add(startTime);
-                            DateTime endTimeForTB = dt.Add(endTime);
-                            LSSSchedulingAPI.AddTimeBlock(Session["labServerGuid"].ToString(), Int32.Parse(ddlLabServers.SelectedValue), startTimeForTB, endTimeForTB, recurID);
-                        }
-                        dt = dt.AddDays(1);
-
-                    }
-                }
-
-
+                //No longer creating TimeBlocks
+             
                 string jScript;
                 jScript = "<script language=javascript> window.opener.Form1.hiddenPopupOnNewTB.value='1';";
                 jScript += "window.close();</script>";
@@ -437,7 +360,6 @@ namespace iLabs.Scheduling.LabSide
                 lblErrorMessage.Text = iLabs.UtilLib.Utilities.FormatErrorMessage(msg);
                 lblErrorMessage.Visible = true;
             }
-
         }
 
         private void report(Recurrence recur)
@@ -445,9 +367,10 @@ namespace iLabs.Scheduling.LabSide
             // tell whether the recurrence recur is overlapping with the input recurrence
             buf.Append("Conflict with recurrence ");
             buf.Append(recur.recurrenceId + ": " + recur.recurrenceType + " ");
-            buf.Append(DateUtil.ToUserDate(recur.recurrenceStartDate, culture, userTZ) + "->");
-            buf.Append(DateUtil.ToUserDate(recur.recurrenceEndDate, culture, userTZ) + " ");
-            buf.Append(recur.recurrenceStartTime.Add(tzOffset) + " -- " + recur.recurrenceEndTime.Add(tzOffset));
+            buf.Append(DateUtil.ToUserDate(recur.startDate, culture, userTZ) + "->");
+            buf.Append(DateUtil.ToUserDate(recur.startDate.AddDays(recur.numDays -1), culture, userTZ) + " ");
+            TimeSpan offset = TimeSpan.FromHours(LocalTZ);
+            buf.Append(recur.startOffset.Add(offset) + " -- " + recur.endOffset.Add(offset));
             buf.AppendLine("<br />");
         }
 

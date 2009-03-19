@@ -27,8 +27,7 @@ using iLabs.DataTypes.SchedulingTypes;
         public AgentAuthHeader agentAuthHeader = new AgentAuthHeader();
 
         /// <summary>
-        /// remove all the reservation for certain lab server being 
-        /// covered by the revocation time 
+        /// List all the reservations for certain lab server for the specified time 
         /// </summary>
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
@@ -39,25 +38,29 @@ using iLabs.DataTypes.SchedulingTypes;
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public abstract Reservation[] ListReservations(string userName, string serviceBrokerGuid,
-            string labClientGuid, string labServerGuid,
-            DateTime startTime, DateTime endTime);
+        public abstract Reservation[] ListReservations(string serviceBrokerGuid, string userName,
+            string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime);
         
 		/// <summary>
-		/// remove all the reservation for certain lab server being 
+		/// remove all the reservation for certain lab server
         /// covered by the revocation time 
 		/// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="groupName"></param>
 		/// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
+        /// <param name="labClientGuid"></param>
 		/// <param name="startTime">UTC</param>
 		/// <param name="endTime">UTC</param>
+        /// <param name="message"></param>
         /// <returns>true if all the reservations have been 
         /// removed successfully</returns>
 		[WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-		public abstract bool RevokeReservation(string labClientGuid, string labServerGuid, 
-            DateTime startTime, DateTime endTime);
+        public abstract int RevokeReservation(string serviceBrokerGuid, string groupName,
+            string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime,
+            string message);
 		
 		/// <summary>
 		/// Returns an Boolean indicating whether it the right time for 
@@ -72,8 +75,8 @@ using iLabs.DataTypes.SchedulingTypes;
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public abstract Reservation RedeemReservation(string userName, 
-            String serviceBrokerGuid, String clientGuid, String labServerGuid);
+        public abstract Reservation RedeemReservation(string serviceBrokerGuid, string userName, 
+            string labServerGuid, string clientGuid);
 		
 		
 		/// <summary>
@@ -86,8 +89,21 @@ using iLabs.DataTypes.SchedulingTypes;
 		[WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-		public abstract bool AddCredentialSet(string serviceBrokerGuid,
+		public abstract int AddCredentialSet(string serviceBrokerGuid,
             string serviceBrokerName,string groupName);
+
+        /// <summary>
+        ///  Modify a credential set
+        /// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="groupName"></param>
+        /// <returns></returns>true the credential set has been added 
+        /// successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public abstract int ModifyCredentialSet(string serviceBrokerGuid,
+            string serviceBrokerName, string groupName);
 		
 		///  Remove a credential set
 		/// </summary>
@@ -98,26 +114,59 @@ using iLabs.DataTypes.SchedulingTypes;
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public abstract bool RemoveCredentialSet(string serviceBrokerGuid,
-            string serviceBrokerName, string groupName);
+        public abstract int RemoveCredentialSet(string serviceBrokerGuid, string groupName);
         
 		/// <summary>
 		/// add information of a particular experiment
 		/// </summary>
         /// <param name="labServerGuid"></param>
 		/// <param name="labServerName"></param>
-		/// <param name="labClientVersion"></param>
-		/// <param name="labClientName"></param>
+        /// <param name="labClientGuid"></param>
+        /// <param name="labClientName"></param>
+		/// <param name="labClientVersion"></param>		
 		/// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
-		/// <returns></returns>true, the experimentInfo is removed 
+		/// <returns></returns>true, the experimentInfo is added 
         /// successfully, false otherwise
 		[WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-		public abstract bool AddExperimentInfo(string labServerGuid, string labServerName,
+		public abstract int AddExperimentInfo(string labServerGuid, string labServerName,
             string labClientGuid, string labClientName, string labClientVersion,
             string providerName, string lssGuid);
+
+
+        /// <summary>
+        /// add information of a particular experiment
+        /// </summary>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labServerName"></param>
+        /// <param name="labClientGuid"></param>
+        /// <param name="labClientName"></param>
+        /// <param name="labClientVersion"></param>		
+        /// <param name="providerName"></param>
+        /// <param name="lssGuid"></param>
+        /// <returns></returns>true, the experimentInfo is added 
+        /// successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public abstract int ModifyExperimentInfo(string labServerGuid, string labServerName,
+            string labClientGuid, string labClientName, string labClientVersion,
+            string providerName, string lssGuid);
+        
+        /// <summary>
+        /// remove a particular experiment
+        /// </summary>
+        /// <param name="labServerGuid"></param>      
+        /// <param name="labClientGuid"></param>
+        /// <param name="lssGuid"></param>
+        /// <returns></returns>true, the experimentInfo is removed 
+        /// successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public abstract int RemoveExperimentInfo(string labServerGuid, string labClientGuid,string lssGuid);
 		
 		/// <summary>
 		/// add information of a particular lab side scheduling server identified by lssID
@@ -129,7 +178,32 @@ using iLabs.DataTypes.SchedulingTypes;
 		[WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public abstract bool AddLSSInfo(string lssGuid, string lssName, string lssUrl);
+        public abstract int AddLSSInfo(string lssGuid, string lssName, string lssUrl);
+        
+        /// <summary>
+        /// add information of a particular lab side scheduling server identified by lssID
+        /// </summary>
+        /// <param name="lssGuid"></param>
+        /// <param name="lssName"></param>
+        /// <param name="lssUrl"></param>
+        /// <returns></returns>true, the LSSInfo is removed successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public abstract int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl);
+        
+        /// <summary>
+        /// add information of a particular lab side scheduling server identified by lssID
+        /// </summary>
+        /// <param name="lssGuid"></param>
+        /// <param name="lssName"></param>
+        /// <param name="lssUrl"></param>
+        /// <returns></returns>true, the LSSInfo is removed successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public abstract int RemoveLSSInfo(string lssGuid);
+
 
 	}
 

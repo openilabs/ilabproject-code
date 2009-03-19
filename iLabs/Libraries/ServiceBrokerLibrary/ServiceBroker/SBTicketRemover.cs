@@ -12,13 +12,14 @@ using System.Configuration;
 using System.Threading;
 
 using iLabs.Core;
-using iLabs.Ticketing;
+
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.PAgent;
 using iLabs.ServiceBroker.DataStorage;
-
-using iLabs.Services;
+using iLabs.Ticketing;
 using iLabs.UtilLib;
 
 
@@ -52,7 +53,7 @@ namespace iLabs.ServiceBroker
 
         public SBTicketRemover(int delay){
             waitTime = delay;
-            Utilities.WriteLog("IsssuedTicketRemover created");
+            Utilities.WriteLog("SBTicketRemover created");
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -178,12 +179,15 @@ namespace iLabs.ServiceBroker
                     if (ticket.redeemerGuid != brokerDb.GetIssuerGuid())
                     {
                         ProcessAgentInfo redeemer = brokerDb.GetProcessAgentInfo(ticket.redeemerGuid);
-                        ProcessAgentProxy paProxy = new ProcessAgentProxy();
-                        paProxy.AgentAuthHeaderValue = new AgentAuthHeader();
-                        paProxy.Url = redeemer.webServiceUrl;
-                        paProxy.AgentAuthHeaderValue.coupon = redeemer.identOut;
-                        paProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                        statusR = paProxy.CancelTicket(coupon, ticket.type, ticket.redeemerGuid);
+                        if ((redeemer != null) && !redeemer.retired)
+                        {
+                            ProcessAgentProxy paProxy = new ProcessAgentProxy();
+                            paProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                            paProxy.Url = redeemer.webServiceUrl;
+                            paProxy.AgentAuthHeaderValue.coupon = redeemer.identOut;
+                            paProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                            statusR = paProxy.CancelTicket(coupon, ticket.type, ticket.redeemerGuid);
+                        }
                     }
                     if (ticket.issuerGuid == brokerDb.GetIssuerGuid())
                     {

@@ -19,6 +19,7 @@
     <add key="codebaseURL" value="http://localhost/UserSideScheduling"/>
     <add key="serviceURL" value="http://localhost/UserSideScheduling/UserScheduling.asmx"/>
     <add key="defaultPasskey" value="USS"/>
+    <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
 
     <!-- the database connection information 
     NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->  

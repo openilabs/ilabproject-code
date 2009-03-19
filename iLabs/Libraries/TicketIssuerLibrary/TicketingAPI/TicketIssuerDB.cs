@@ -94,9 +94,10 @@ namespace iLabs.TicketIssuer
         public bool AuthenticateIssuedCoupon(long couponID, string passkey)
         {
             bool status = false;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             try
             {
+                connection.Open();
                 status = AuthenticateIssuedCoupon(connection, couponID, passkey);
             }
             finally
@@ -186,10 +187,11 @@ namespace iLabs.TicketIssuer
        
         public Coupon CreateCoupon()
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 Coupon coupon = CreateCoupon(connection);
                 return coupon;
 
@@ -210,10 +212,11 @@ namespace iLabs.TicketIssuer
 
         public Coupon CreateCoupon(string passcode)
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 Coupon coupon = CreateCoupon(connection,passcode);
                 return coupon;
 
@@ -303,7 +306,7 @@ namespace iLabs.TicketIssuer
         public void CancelIssuedCoupon(long couponID)
         {
             bool status = false;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             SqlCommand cmd = new SqlCommand("CancelIssuedCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -313,6 +316,7 @@ namespace iLabs.TicketIssuer
 
             try
             {
+                connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
             catch (SqlException e)
@@ -329,7 +333,7 @@ namespace iLabs.TicketIssuer
         public void DeleteIssuedCoupon(long couponID)
         {
             bool status = false;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             SqlCommand cmd = new SqlCommand("DeleteIssuedCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -339,6 +343,7 @@ namespace iLabs.TicketIssuer
 
             try
             {
+                connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
             catch (SqlException e)
@@ -363,11 +368,11 @@ namespace iLabs.TicketIssuer
         {
 
             Coupon coupon = null;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             try
             {
                 
-                //connection.Open();
+                connection.Open();
                 coupon = GetIssuedCoupon(connection, couponID);
             }
             catch (Exception ex)
@@ -431,9 +436,10 @@ namespace iLabs.TicketIssuer
         public int GetIssuedCouponCollectionCount(long couponID)
         {
             int count = -1;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             try
             {
+                connection.Open();
                 count = GetIssuedCouponCollectionCount(connection, couponID);
             }
             catch (Exception e)
@@ -525,10 +531,11 @@ namespace iLabs.TicketIssuer
         {
             Ticket ticket = null;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 if (AuthenticateIssuedCoupon(connection, coupon))
                 {
                     ticket = InsertIssuedTicket(connection, coupon.couponId, redeemerGuid, sponsorGuid,
@@ -554,11 +561,12 @@ namespace iLabs.TicketIssuer
         public Coupon CreateTicket(string ticketType, string redeemerID, string sponsorID,
              long duration, string payload)
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             try
             {
                 // create a new coupon
+                connection.Open();
                 Coupon newCoupon = CreateCoupon(connection);
 
                 Ticket ticket = InsertIssuedTicket(connection, newCoupon.couponId, redeemerID, sponsorID, ticketType, duration, payload);
@@ -584,7 +592,7 @@ namespace iLabs.TicketIssuer
         {
             bool status = false;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
@@ -603,6 +611,7 @@ namespace iLabs.TicketIssuer
             //SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
             catch (SqlException e)
@@ -621,7 +630,7 @@ namespace iLabs.TicketIssuer
         public void DeleteIssuedTicket(long ticketID)
         {
             bool status = false;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             SqlCommand cmd = new SqlCommand("DeleteIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -631,6 +640,7 @@ namespace iLabs.TicketIssuer
 
             try
             {
+                connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
             catch (SqlException e)
@@ -645,7 +655,6 @@ namespace iLabs.TicketIssuer
             }
         }
 
-
         /// <summary>
         /// Retrieve a ticket coupon from the database.
         /// The triple (type,redeemerGuid,sponsorGuid) identifies the ticket.
@@ -658,7 +667,7 @@ namespace iLabs.TicketIssuer
         {
             List<Coupon> results = new List<Coupon>(); ;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveTicket" stored procedure
@@ -679,6 +688,7 @@ namespace iLabs.TicketIssuer
             SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
 
                 while (dataReader.Read())
@@ -752,7 +762,7 @@ namespace iLabs.TicketIssuer
         {
             Ticket result = null;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveTicket" stored procedure
@@ -772,6 +782,7 @@ namespace iLabs.TicketIssuer
             SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
 
                 while (dataReader.Read())
@@ -828,7 +839,7 @@ namespace iLabs.TicketIssuer
             Ticket results = null;
 
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
@@ -844,6 +855,7 @@ namespace iLabs.TicketIssuer
             SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
@@ -885,7 +897,7 @@ namespace iLabs.TicketIssuer
             Ticket results = null;
 
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
@@ -903,6 +915,7 @@ namespace iLabs.TicketIssuer
             SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
@@ -941,6 +954,8 @@ namespace iLabs.TicketIssuer
 
         public bool RequestTicketCancellation(Coupon coupon, string type, string redeemerGuid)
         {
+            // create sql connection
+            SqlConnection connection = FactoryDB.GetConnection();
             SqlCommand cmd = new SqlCommand("CancelIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -950,14 +965,23 @@ namespace iLabs.TicketIssuer
             SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
             typeParam.Value = type;
             SqlParameter redeemerParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerParam.Value = redeemer;
-            Object status = cmd.ExecuteScalar();
-            if (status != null)
-            {
-                return Convert.ToInt32(status) == 1;
+            redeemerParam.Value = redeemerGuid;
+            try{
+                connection.Open();
+                Object status = cmd.ExecuteScalar();
+                if (status != null)
+                {
+                    return Convert.ToInt32(status) == 1;
+                }
+                else
+                    return false;
             }
-            else
-                return false;
+            catch(Exception e){
+                throw;
+            }
+            finally{
+                connection.Close();
+            }
 
         }
 
@@ -966,7 +990,7 @@ namespace iLabs.TicketIssuer
             List<Ticket> tickets = new List<Ticket>();
 
               // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
@@ -976,8 +1000,8 @@ namespace iLabs.TicketIssuer
          
 
             SqlDataReader dataReader = null;
-            try
-            {
+            try{
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {

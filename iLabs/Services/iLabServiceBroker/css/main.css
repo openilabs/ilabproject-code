@@ -998,12 +998,17 @@ li
 select.itemlist {
 	width: 250px;
 }
-	
+input.buttoncenter {
+	float: none;
+}
+input.buttonleft {
+	float: left;
+}	
 input.buttonright {
 	float: right;
 }
 	
-input.button, input.buttonright, input.buttongray{
+input.button, input.buttoncenter, input.buttonleft, input.buttonright, input.buttongray{
 	border-bottom: 1px solid #666;
 	border-right: 1px solid #666;
 	border-top: 1px solid #ccc;

@@ -13,7 +13,8 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
-using iLabs.Services;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.ISB;
 
 //using iLabs.LabServer.LabView;
 
@@ -82,7 +83,7 @@ namespace iLabs.LabServer.Interactive
             
         {
             int id = -1;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
@@ -165,7 +166,7 @@ namespace iLabs.LabServer.Interactive
                 Param = cmd.Parameters.Add("@type", SqlDbType.Int);
                 Param.Value = type;
 
-
+                connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
                     id = Convert.ToInt32(obj);
@@ -199,7 +200,7 @@ namespace iLabs.LabServer.Interactive
             string rev, int type)
         {
             int count = -1;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
@@ -284,6 +285,7 @@ namespace iLabs.LabServer.Interactive
                 Param = cmd.Parameters.Add("@type", SqlDbType.Int);
                 Param.Value = type;
 
+                connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
                     count = Convert.ToInt32(obj);
@@ -301,10 +303,41 @@ namespace iLabs.LabServer.Interactive
             return count;
         }
 
+        public int ModifyLabPaths(string oldPath, string newPath)
+        {
+            int count = -1;
+            SqlConnection connection = FactoryDB.GetConnection();
+            try
+            {
+                // create sql command
+                SqlCommand cmd = new SqlCommand("ModifyLabPaths", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlParameter oldParam = cmd.Parameters.Add("@oldPath", SqlDbType.VarChar, 256);
+                oldParam.Value = oldPath;
+                SqlParameter newParam = cmd.Parameters.Add("@newPath", SqlDbType.VarChar, 256);
+                newParam.Value =newPath;
+
+                connection.Open();
+                Object obj = cmd.ExecuteScalar();
+                if (obj != null)
+                    count = Convert.ToInt32(obj);
+
+             }
+            catch (Exception ex)
+            {
+                Utilities.WriteLog(ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return count;
+        }
+
         public int DeleteLabApp(int appId)
         {
             int count = -1;
-              SqlConnection connection = CreateConnection();
+              SqlConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
@@ -313,6 +346,7 @@ namespace iLabs.LabServer.Interactive
                 SqlParameter Param = cmd.Parameters.Add("@appId", SqlDbType.Int);
                 Param.Value = appId;
 
+                connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
                     count = Convert.ToInt32(obj);
@@ -331,7 +365,8 @@ namespace iLabs.LabServer.Interactive
 
         public LabAppInfo GetLabApp(int appId)
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
+            connection.Open();
             LabAppInfo info = GetLabApp(connection, appId);
             connection.Close();
             return info;
@@ -339,7 +374,8 @@ namespace iLabs.LabServer.Interactive
 
         public LabAppInfo GetLabApp(string appKey)
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
+            connection.Open();
             LabAppInfo info = GetLabApp(connection, appKey);
             connection.Close();
             return info;
@@ -348,7 +384,7 @@ namespace iLabs.LabServer.Interactive
         public IntTag [] GetLabAppTags()
         {
             ArrayList list = new ArrayList();
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
            // create sql command
 			SqlCommand cmd = new SqlCommand("GetLabAppTags", connection);
@@ -356,6 +392,7 @@ namespace iLabs.LabServer.Interactive
 			SqlDataReader dataReader = null;
 			try 
 			{
+                connection.Open();
 				dataReader = cmd.ExecuteReader();
                 while (dataReader.Read()) 
 			    {
@@ -381,7 +418,7 @@ namespace iLabs.LabServer.Interactive
         public IntTag GetLabAppTag(int appId)
         {
             IntTag tag = null;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             // create sql command
 			// command executes the "GetVI" stored procedure
 			SqlCommand cmd = new SqlCommand("GetLabAppTag", connection);
@@ -394,6 +431,7 @@ namespace iLabs.LabServer.Interactive
 			SqlDataReader dataReader = null;
 			try 
 			{
+                connection.Open();
 				dataReader = cmd.ExecuteReader();
                 // id of created coupon
 			
@@ -419,7 +457,7 @@ namespace iLabs.LabServer.Interactive
         public IntTag GetLabAppTag(string appKey)
         {
             IntTag tag = null;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
            // create sql command
 			// command executes the "GetVI" stored procedure
 			SqlCommand cmd = new SqlCommand("GetLabAppTagByKey", connection);
@@ -432,6 +470,7 @@ namespace iLabs.LabServer.Interactive
 			SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
@@ -586,7 +625,8 @@ namespace iLabs.LabServer.Interactive
 
         public LabAppInfo[] GetLabApps()
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
+            connection.Open();
             LabAppInfo[] labs = GetLabApps(connection);
             connection.Close();
             return labs;
@@ -662,7 +702,7 @@ namespace iLabs.LabServer.Interactive
  
         public LabAppInfo GetLabAppForGroup(string groupName, string serviceGUID)
 		{
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
             SqlCommand cmd = new SqlCommand("GetLabAppByGroup", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -677,6 +717,7 @@ namespace iLabs.LabServer.Interactive
 			SqlDataReader dataReader = null;
 			try 
 			{
+                connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
 			catch (SqlException e) 
@@ -734,7 +775,7 @@ namespace iLabs.LabServer.Interactive
 		{
             LabTask task = new LabTask();
 
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			SqlCommand cmd = new SqlCommand("InsertTask", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -770,17 +811,22 @@ namespace iLabs.LabServer.Interactive
 				dataParam.Value = data;
            
             // id of created task
-            long itemID = -1;	
-			
-			try 
-			{
-				itemID = Convert.ToInt64(cmd.ExecuteScalar());
-			} 
-			catch (SqlException e) 
-			{
-				writeEx(e);
-				throw e;
-			}
+            long itemID = -1;
+
+            try
+            {
+                connection.Open();
+                itemID = Convert.ToInt64(cmd.ExecuteScalar());
+            }
+            catch (SqlException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
             task.taskID = itemID;
             task.labAppID = app_id;
             task.experimentID = exp_id;
@@ -801,7 +847,7 @@ namespace iLabs.LabServer.Interactive
 
 		public LabTask GetTask(long task_id)
 		{
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			SqlCommand cmd = new SqlCommand("GetTask", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -811,45 +857,49 @@ namespace iLabs.LabServer.Interactive
 			Param.Value = task_id;
 			
 			SqlDataReader dataReader = null;
-			try 
-			{
-				dataReader = cmd.ExecuteReader();
-			} 
-			catch (SqlException e) 
-			{
-				writeEx(e);
-				throw e;
-			}
-
-			// id of created coupon
+            // id of created coupon
             LabTask taskInfo = new LabTask();
-			taskInfo.taskID = task_id;
-			while (dataReader.Read()) 
-			{
-				taskInfo.labAppID = dataReader.GetInt32(0);
-                if (!dataReader.IsDBNull(1))
-                taskInfo.experimentID = dataReader.GetInt64(1);
-				taskInfo.groupName = dataReader.GetString(2);
-				taskInfo.startTime= dataReader.GetDateTime(3);
-				taskInfo.endTime = dataReader.GetDateTime(4);				
-				taskInfo.Status= (LabTask.eStatus) dataReader.GetInt32(5);
-				if(!DBNull.Value.Equals(dataReader.GetValue(6)))
-				    taskInfo.couponID= dataReader.GetInt64(6);
-				if(!DBNull.Value.Equals(dataReader.GetValue(7)))
-				    taskInfo.issuerGUID= dataReader.GetString(7);
-				if(!dataReader.IsDBNull(8))
-				    taskInfo.data= dataReader.GetString(8);
-			}
+            try
+            {
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
 
-			// close the sql connection
-			connection.Close();
-			
+
+              
+                taskInfo.taskID = task_id;
+                while (dataReader.Read())
+                {
+                    taskInfo.labAppID = dataReader.GetInt32(0);
+                    if (!dataReader.IsDBNull(1))
+                        taskInfo.experimentID = dataReader.GetInt64(1);
+                    taskInfo.groupName = dataReader.GetString(2);
+                    taskInfo.startTime = dataReader.GetDateTime(3);
+                    taskInfo.endTime = dataReader.GetDateTime(4);
+                    taskInfo.Status = (LabTask.eStatus)dataReader.GetInt32(5);
+                    if (!DBNull.Value.Equals(dataReader.GetValue(6)))
+                        taskInfo.couponID = dataReader.GetInt64(6);
+                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
+                        taskInfo.issuerGUID = dataReader.GetString(7);
+                    if (!dataReader.IsDBNull(8))
+                        taskInfo.data = dataReader.GetString(8);
+                }
+            }
+            catch (SqlException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
 			return taskInfo;
 		}
 
         public LabTask GetTask(long experiment_id, string sbGUID)
         {
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             // create sql command
             SqlCommand cmd = new SqlCommand("GetTaskByExperiment", connection);
             cmd.CommandType = CommandType.StoredProcedure;
@@ -863,6 +913,7 @@ namespace iLabs.LabServer.Interactive
             SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
             }
             catch (SqlException e)
@@ -906,7 +957,7 @@ select taskID,Status
 */
 		public LabTask [] GetActiveTasks()
 		{
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			SqlCommand cmd = new SqlCommand("GetActiveTasks", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -914,6 +965,7 @@ select taskID,Status
 			SqlDataReader dataReader = null;
 			try 
 			{
+                connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
 			catch (SqlException e) 
@@ -961,7 +1013,7 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 */
 		public LabTask [] GetExpiredTasks(DateTime targetTime)
 		{
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			SqlCommand cmd = new SqlCommand("GetExpiredTasks", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -973,6 +1025,7 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 			SqlDataReader dataReader = null;
 			try 
 			{
+                connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
 			catch (SqlException e) 
@@ -1012,7 +1065,7 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 
 		public void SetTaskData(long task_id,string data)
 		{
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			SqlCommand cmd = new SqlCommand("SetTaskData", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -1025,17 +1078,22 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 				dataParam.Value = DBNull.Value;
 			else
 				dataParam.Value = data;
-				
-			try 
-			{
-				cmd.ExecuteNonQuery();
-			
-			} 
-			catch (SqlException e) 
-			{
-				writeEx(e);
-				throw e;
-			}
+
+            try
+            {
+                connection.Open();
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (SqlException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
 		}
 
 
@@ -1048,7 +1106,7 @@ update task set status = @status where taskID = @taskID
 */
 		public void SetTaskStatus(long task_id, int status)
 		{
-			SqlConnection connection =  CreateConnection();
+			SqlConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			SqlCommand cmd = new SqlCommand("SetTaskStatus", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
@@ -1060,15 +1118,20 @@ update task set status = @status where taskID = @taskID
 			statusParam.Value = status;
 			
 			SqlDataReader dataReader = null;
-			try 
-			{
-				dataReader = cmd.ExecuteReader();
-			} 
-			catch (SqlException e) 
-			{
-				writeEx(e);
-				throw e;
-			}
+            try
+            {
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+            }
+            catch (SqlException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
 		}
         /*
         // Should move this into the TaskProcessor and have LabVIEW specific methods 
@@ -1185,7 +1248,7 @@ update task set status = @status where taskID = @taskID
         {
             LabTask.eStatus status = LabTask.eStatus.NotFound;
             int result = -10;
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             // create sql command
             // command executes the "GetExperimentStatus" stored procedure
             SqlCommand cmd = new SqlCommand("GetTaskStatusByExperiment", connection);
@@ -1200,20 +1263,26 @@ update task set status = @status where taskID = @taskID
             SqlDataReader dataReader = null;
             try
             {
+                connection.Open();
                 dataReader = cmd.ExecuteReader();
+
+                int count = 0;
+                while (dataReader.Read())
+                {
+                    status = (LabTask.eStatus)dataReader.GetInt32(0);
+                    count++;
+                }
+                Utilities.WriteLog("ExperimentStatus count: " + count);
             }
             catch (SqlException e)
             {
                 writeEx(e);
                 throw;
             }
-            int count = 0;
-            while (dataReader.Read())
+            finally
             {
-                status = (LabTask.eStatus)dataReader.GetInt32(0);
-                count++;
+                connection.Close();
             }
-            Utilities.WriteLog("ExperimentStatus count: " + count);
             
             return status;
         }

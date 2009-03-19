@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -27,6 +28,7 @@ namespace iLabs.Scheduling.UserSide
 	{
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         CultureInfo culture;
+        string dateF = null;
         int userTZ;
 	
 		#region Web Form Designer generated code
@@ -50,6 +52,8 @@ namespace iLabs.Scheduling.UserSide
 		#endregion
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+             dateF = DateUtil.DateTime24(culture);
             // Load the Group list box
             if (!IsPostBack)
             {
@@ -113,6 +117,8 @@ namespace iLabs.Scheduling.UserSide
 
                 if (!unauthorized)
                 {
+                    lblDescription.Text = "Select criteria for the reservations to be displayed."
+                           + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
                     LoadGroupListBox();
                     LoadExperimentListBox();
                 }
@@ -146,7 +152,7 @@ namespace iLabs.Scheduling.UserSide
 			try
 			{
 				txtDisplay.Text=null;
-				ReservationInfo[] reservations = USSSchedulingAPI.SelectReservation(userName, ExperimentInfoID, credentialSetId,  time1,  time2);						
+				ReservationInfo[] reservations = USSSchedulingAPI.GetReservations(userName, ExperimentInfoID, credentialSetId,  time1,  time2);						
 				if (reservations.Length==0)
 				{
 					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been made.");
@@ -154,14 +160,15 @@ namespace iLabs.Scheduling.UserSide
 				}
 				else
 				{
-					
+                    StringBuilder buf = new StringBuilder();
 					for(int j = reservations.Length-1; j > -1  ; j--)
 					{
 						string uName = reservations[j].userName;
 						UssExperimentInfo exinfo = USSSchedulingAPI.GetExperimentInfos(new int[]{reservations[j].experimentInfoId})[0];
 						string experimentName = exinfo.labClientName + "  " + exinfo.labClientVersion;
-						txtDisplay.Text += uName + ", " + experimentName + ", "+"Start time:  " + DateUtil.ToUserTime(reservations[j].startTime, culture, userTZ) + "   " + "End time:  " + DateUtil.ToUserTime(reservations[j].endTime, culture, userTZ)+"\n";
+						buf.AppendLine(DateUtil.ToUserTime(reservations[j].startTime, culture, userTZ,dateF) + " <-> " + DateUtil.ToUserTime(reservations[j].endTime, culture, userTZ,dateF) + " " + uName + ", " + experimentName);
 					}
+                    txtDisplay.Text = buf.ToString();
 				}
 			}
 			catch(Exception ex)
@@ -205,7 +212,7 @@ namespace iLabs.Scheduling.UserSide
 					DateTime time1;
 					try
 					{
-						time1 = DateTime.Parse (txtTime1.Text).ToUniversalTime();
+                        time1 = DateUtil.ParseUserToUtc(txtTime1.Text, culture, userTZ);
 					}
 					catch
 					{	
@@ -233,7 +240,7 @@ namespace iLabs.Scheduling.UserSide
 						DateTime time2;
 						try
 						{
-							time2 = DateTime.Parse (txtTime2.Text).ToUniversalTime();
+                            time2 = DateUtil.ParseUserToUtc(txtTime2.Text, culture, userTZ);
 						}
 						catch
 						{	

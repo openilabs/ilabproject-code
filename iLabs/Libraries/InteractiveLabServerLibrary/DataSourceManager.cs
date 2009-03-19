@@ -14,7 +14,8 @@ using System.Web;
 using System.Web.Services;
 
 using iLabs.DataTypes.StorageTypes;
-using iLabs.Services;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.ISB;
 
 namespace iLabs.LabServer.Interactive
 {

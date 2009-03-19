@@ -13,7 +13,7 @@ using iLabs.Core;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
-using iLabs.Services;
+using iLabs.Proxies.PAgent;
 using System.Xml;
 using System.IO;
 using iLabs.Ticketing;

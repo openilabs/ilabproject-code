@@ -13,6 +13,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.SessionState;
 
 using iLabs.Core;
+using iLabs.Proxies.ESS;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
@@ -27,7 +28,8 @@ using iLabs.Ticketing;
 
 
 
-using iLabs.Services;
+//using iLabs.Proxies.ESS;
+//using iLabs.Proxies.ISB;
 
 namespace iLabs.ServiceBroker
 {
@@ -118,7 +120,7 @@ namespace iLabs.ServiceBroker
                 //3.A create ESS administer experiment ticket, Add 10 minutes to duration
                 // This must be created before the ESS experiment records may be created
                 essAgent = brokerDB.GetProcessAgentInfo(essId);
-                if (essAgent != null)
+                if ((essAgent != null) && !essAgent.retired)
                 {
                     brokerDB.AddTicket(coupon,
                            TicketTypes.ADMINISTER_EXPERIMENT, essAgent.AgentGuid, brokerDB.GetIssuerGuid(), ticketDuration, factory.createAdministerExperimentPayload(experimentID, essAgent.webServiceUrl));

@@ -6,7 +6,8 @@ using System.Threading;
 using iLabs.Ticketing;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
-using iLabs.Services;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.ISB;
 using iLabs.UtilLib;
 
 

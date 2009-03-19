@@ -87,10 +87,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 foreach (ProcessAgentInfo l in ls)
                 {
-                    if (l.agentId > 0)
-                    {
-                        ddlHelpType.Items.Add(new ListItem(l.AgentName));                     
-                    }
+                        ddlHelpType.Items.Add(new ListItem(l.agentName));                     
                 }
 			
 			}

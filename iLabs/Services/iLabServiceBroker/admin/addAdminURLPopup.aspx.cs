@@ -18,6 +18,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using iLabs.Core;
+using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.ServiceBroker;
@@ -36,7 +37,7 @@ namespace iLabs.ServiceBroker.admin
 	public partial class addAdminURLPopup : System.Web.UI.Page
 	{
 
-        protected ProcessAgentInfo paInfo;
+        protected IntTag paTag;
         protected ArrayList adminUrlList;
         protected AdminUrl curAdminURL; 
 
@@ -47,7 +48,7 @@ namespace iLabs.ServiceBroker.admin
             {
                 string paGuid = Request.Params["paguid"];
                 ProcessAgentDB ticketing = new ProcessAgentDB();
-                paInfo = ticketing.GetProcessAgentInfo(paGuid);
+                paTag = ticketing.GetProcessAgentTag(paGuid);
             }
 
             if (!Page.IsPostBack)			// populate with all the group IDs
@@ -104,7 +105,7 @@ namespace iLabs.ServiceBroker.admin
             try
             {
                 BrokerDB ticketIssuer = new BrokerDB();
-                AdminUrl[] adminUrls = ticketIssuer.RetrieveAdminURLs(paInfo.AgentId);
+                AdminUrl[] adminUrls = ticketIssuer.RetrieveAdminURLs(paTag.id);
                 adminUrlList = new ArrayList();
                 foreach (AdminUrl url in adminUrls)
                 {
@@ -154,7 +155,7 @@ namespace iLabs.ServiceBroker.admin
 
             // create new Admin URL
             BrokerDB issuer = new BrokerDB();
-            issuer.InsertAdminURL(paInfo, txtURL.Text, ttDropDownList.SelectedItem.Value);
+            issuer.InsertAdminURL(paTag.id, txtURL.Text, ttDropDownList.SelectedItem.Value);
 
             // refresh repeater
             refreshUrlRepeater();

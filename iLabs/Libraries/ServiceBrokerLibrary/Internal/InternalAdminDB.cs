@@ -53,7 +53,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int[] DeleteProcessAgents ( int[] agentIDs )
 		{
 			
-			SqlConnection myConnection = new SqlConnection (ConfigurationSettings.AppSettings ["sqlConnection"]);
+			SqlConnection myConnection = FactoryDB.GetConnection();
 			SqlCommand myCommand = new SqlCommand ("DeleteProcessAgents", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 			myCommand.Parameters.Add (new SqlParameter("@agentID",null));

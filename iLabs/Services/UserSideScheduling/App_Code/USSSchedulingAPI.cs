@@ -318,6 +318,23 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="userName"></param>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="clientGuid"
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>the unique id which identifies the reservation added by the user,>0 successfully added, ==-1 otherwise
+        public static int AddReservation(string userName, string serviceBrokerGuid, string groupName, 
+            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
+        {
+            return DBManager.AddReservation(userName, serviceBrokerGuid, groupName,
+                labServerGuid, clientGuid, startTime, endTime);
+        }
+        /// <summary>
+        /// add reservation by user
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="groupName"></param>
         /// <param name="experimentInfoId"></param>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
@@ -391,12 +408,29 @@ namespace iLabs.Scheduling.UserSide
         {
             return DBManager.GetReservations(reservationIDs);
         }
+
+        /// <summary>
+        /// returns an array of the immutable reservation objects that correspond to the supplied reservation IDs
+        /// </summary>
+        /// <param name="sbGuid"></param>
+        /// <param name="userName"></param>
+        /// <param name="groupName"></param>
+        /// <param name="lsGuid"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public static ReservationInfo[] GetReservations(string sbGuid, string userName, string groupName,
+            string lsGuid, string clientGuid, DateTime start, DateTime end)
+        {
+            return DBManager.GetReservations(sbGuid, userName, groupName,lsGuid, clientGuid, start, end);
+        }
         /// <summary>
         /// to select reservation accorrding to given criterion
         /// </summary>
-        public static ReservationInfo[] SelectReservation(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
+        public static ReservationInfo[] GetReservations(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
         {
-            return DBManager.SelectReservation(userName, experimentInfoId, credentialSetId, timeAfter, timeBefore);
+            return DBManager.SelectReservations(userName, experimentInfoId, credentialSetId, timeAfter, timeBefore);
         }
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information
@@ -467,12 +501,12 @@ namespace iLabs.Scheduling.UserSide
 		/// <summary>
 		/// enumerates the ID of the information of a particular experiment specified by labClientName and labClientVersion
 		/// </summary>
-		/// <param name="clientGuid"></param>
 		/// <param name="labServerGuid"></param>
+		/// <param name="clientGuid"></param>
 		/// <returns></returns>the ID of the information of a particular experiment, -1 if such a experiment info can not be retrieved
-		public static int ListExperimentInfoIDByExperiment(string clientGuid,string labServerGuid)
+		public static int ListExperimentInfoIDByExperiment(string labServerGuid, string clientGuid)
 		{
-		    return DBManager.ListExperimentInfoIDByExperiment(clientGuid, labServerGuid);
+		    return DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
 		}
 
 		/// <summary>
@@ -486,7 +520,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
 		/// <returns></returns>true modified successfully, false otherwise
-        public static bool ModifyExperimentInfo(int experimentInfoId, string labServerGuid, string labClientGuid, string labServerName, string labClientName, string labClientVersion, string providerName, string lssGuid)
+        public static int ModifyExperimentInfo(int experimentInfoId, string labServerGuid, string labClientGuid, string labServerName, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
             return DBManager.ModifyExperimentInfo(experimentInfoId, labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion, providerName, lssGuid);
 		}
@@ -536,7 +570,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="lssName"></param>
 		/// <param name="lssUrl"></param>
 		/// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
-		public static bool ModifyLSSInfo(int lssInfoId, string lssGuid,string lssName, string lssUrl)
+		public static int ModifyLSSInfo(int lssInfoId, string lssGuid,string lssName, string lssUrl)
 		{
             return DBManager.ModifyLSSInfo(lssInfoId, lssGuid, lssName, lssUrl);
 		}
@@ -549,6 +583,15 @@ namespace iLabs.Scheduling.UserSide
 		{
 			return DBManager.RemoveLSSInfo(lssInfoIds);			
 		}
+        /// <summary>
+        /// delete the information of lab side scheduling server identified by GUID
+        /// </summary>
+        /// <param name="lssInfoIds"></param>
+        /// <returns></returns>the number of records deleted.
+        public static int RemoveLSSInfoByGuid(string lssGuid)
+        {
+            return DBManager.RemoveLSSInfoByGuid(lssGuid);
+        }
 		/// <summary>
 		/// Enumerates IDs of all the lssInfos 
 		/// </summary>
@@ -629,7 +672,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
 		/// <returns></returns>true, the credentialset is removed successfully, false otherwise
-        public static bool RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
+        public static int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
             return DBManager.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
 		}
@@ -671,8 +714,9 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="startTime"></param>the local time of USS
 		/// <param name="endTime"></param>the local time of USS
 		/// <returns></returns>true if all the reservations have been removed successfully
-        public static bool RevokeReservation(string labServerGuid,
-            DateTime startTime, DateTime endTime)
+        public static bool RevokeReservation(string serviceBrokerGuid, string groupName,
+            string labServerGuid, string labClientGuid,
+            DateTime startTime, DateTime endTime, string message)
 		{
 			try
 			{   
@@ -723,9 +767,9 @@ namespace iLabs.Scheduling.UserSide
         /// <summary>
         /// Return the time span the user should wait till the start time of the reservation
         /// </summary>
-        /// <param name="reservationID"></param>the reservation ID to be redeemed
+        /// <param name="reservationID"></param>the reservation ID to be checked
         /// <returns></returns>
-        public static TimeSpan RedeemReservation(int reservationID)
+        public static TimeSpan GetReservationWaitTime(int reservationID)
         {
             ReservationInfo redeemedRes = new ReservationInfo();
             TimeSpan ts = new TimeSpan();

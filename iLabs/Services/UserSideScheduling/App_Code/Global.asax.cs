@@ -27,6 +27,9 @@ namespace iLabs.Scheduling.UserSide
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
@@ -38,6 +41,9 @@ namespace iLabs.Scheduling.UserSide
 		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
+            Utilities.WriteLog("");
+            Utilities.WriteLog("#############################################################################");
+            Utilities.WriteLog("");
             Utilities.WriteLog("USS Application_Start: starting");
             //Create the ticketRemover thread
             ticketRemover = new TicketRemover();

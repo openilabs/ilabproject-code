@@ -658,6 +658,18 @@ namespace iLabs.ServiceBroker.Authorization
              return InternalAuthorizationDB.GetQualifierFromDS(qualifierID);
 		}
 
+        /// <summary>
+        /// method returns the number of qualifier instances where the name is changed
+        /// </summary>
+        /// <param name="qualifierTypeId"></param>
+        /// <param name="referenceId"></param>
+        /// <param name="name"></param>
+        /// <returns>a qualifier instance pertaining to the supplied qualifier ID; otherwise an empty qualifier instance</returns>
+        public static int ModifyQualifierName(int qualifierTypeId,int referenceId,string name)
+        {
+            return InternalAuthorizationDB.ModifyQualifierName(qualifierTypeId, referenceId, name);
+        }
+
 		/// <summary>
 		/// methods returns the qualifier parents associated with the supplied argument
 		/// </summary>

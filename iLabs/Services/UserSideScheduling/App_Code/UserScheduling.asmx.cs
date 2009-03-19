@@ -10,10 +10,14 @@ using System.Web.Services.Protocols;
 
 using iLabs.Core;
 using iLabs.Ticketing;
+using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
-using iLabs.Services;
+
+using iLabs.Proxies.ISB;
+
+
 
 
 
@@ -62,11 +66,60 @@ namespace iLabs.Scheduling.UserSide
 		
 		#endregion
 
-		// WEB SERVICE EXAMPLE
-		// The HelloWorld() example service returns the string Hello World
-		// To build, uncomment the following lines then save and build the project
-		// To test this web service, press F5
+        /// <summary>
+        /// Modifies the information related to the specified service the service's Guid must exist and the typ of service may not be modified,
+        /// in and out coupons may be changed.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="inIdentCoupon"></param>
+        /// <param name="outIdentCoupon"></param>
+        /// <returns></returns>
+        [WebMethod,
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, string extra, 
+            Coupon inCoupon, Coupon outCoupon)
+        {
+              int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                DBManager dbManager = new DBManager();
+            try
+            {
+                status = dbManager.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("USS: ", ex);
+            }
 
+           
+            }
+            return status;
+
+        }
+
+        /// <summary>
+        /// Informs this processAgent that it should modify all references to a specific processAent. 
+        /// This is used to propagate modifications, The agentGuid must remain the same.
+        /// </summary>
+        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+        /// <param name="serviceGuid">The guid of the service</param>
+        /// <param name="state">The retired state to be set</param>
+        /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        [WebMethod,
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                DBManager dbManager = new DBManager();
+                status = dbManager.ModifyProcessAgent(originalGuid, agent, extra);
+            }
+            return status;
+        }
 
         /// <summary>
         /// List all the reservations for the user for the specified time, any intersection.
@@ -80,9 +133,8 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public Reservation[] ListReservations(string userName, string serviceBrokerGuid,
-            string labClientGuid, string labServerGuid,
-            DateTime startTime, DateTime endTime)
+        public Reservation[] ListReservations(string serviceBrokerGuid, string userName, 
+            string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime)
         {
             return new Reservation[] { new Reservation() };
         }
@@ -98,9 +150,11 @@ namespace iLabs.Scheduling.UserSide
 		[WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-		public bool RevokeReservation(string labClientGuid,string labServerGuid, 
-            DateTime startTime, DateTime endTime)
+        public int RevokeReservation(string serviceBrokerGuid, string groupName,
+            string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime, string message)
 		{
+            bool status = false;
+            int count = 0;
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -108,14 +162,34 @@ namespace iLabs.Scheduling.UserSide
             string type = TicketTypes.REVOKE_RESERVATION;
             try
             {
-
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
-                return USSSchedulingAPI.RevokeReservation(labServerGuid, startTime, endTime);
+                ReservationInfo[]ri = USSSchedulingAPI.GetReservations(serviceBrokerGuid, null, groupName,
+                    labServerGuid, labClientGuid, startTime, endTime);
+                if (ri != null && ri.Length > 0)
+                {
+
+                    InteractiveSBProxy sbProxy = new InteractiveSBProxy();
+                    ProcessAgentInfo sbInfo = dbTicketing.GetProcessAgentInfo(ProcessAgentDB.ServiceAgent.domainGuid);
+                    AgentAuthHeader header = new AgentAuthHeader();
+                    header.coupon = sbInfo.identOut;
+                    header.agentGuid = ProcessAgentDB.ServiceGuid;
+                    sbProxy.AgentAuthHeaderValue = header;
+                    sbProxy.Url = sbInfo.webServiceUrl;
+                    status = sbProxy.RevokeReservation(serviceBrokerGuid, ri[0].userName, groupName, labServerGuid,
+                        labClientGuid, startTime, endTime, message);
+                    if (status)
+                    {
+                        count++;
+                        USSSchedulingAPI.RevokeReservation(serviceBrokerGuid, groupName, labServerGuid, labClientGuid,
+                              startTime, endTime, message);
+                    }
+                }
             }
-            catch 
+            catch (Exception e)
             {
-                throw;
+                throw new Exception("USS: RevokeReservation -> ",e);
             }
+            return count;
 			
 		}
 		/// <summary>
@@ -129,7 +203,8 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public ReservationInfo RedeemReservation(String userName, String serviceBrokerGuid, String clientGuid, String labServerGuid)
+        public ReservationInfo RedeemReservations(string serviceBrokerGuid, String userName,  
+            String labServerGuid, string clientGuid)
 		{
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
@@ -159,25 +234,24 @@ namespace iLabs.Scheduling.UserSide
 		[WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
+        public int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
+            string groupName)
 		{
-            bool add = false;
+           int add = 0;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
                     int test = USSSchedulingAPI.GetCredentialSetID(serviceBrokerGuid,groupName);
-                    if (test > 0)
+                    if(test > 0)
                     {
-                      
-                        add = true;
+
+                        add = 1; ;
                     }
                     else{
                         int i = USSSchedulingAPI.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
-                        if (i != -1)
-                        {
-                            add = true;
-                        }
+                        add = (i != -1) ? 1 : 0;
+                       
                     }
                 }
                 catch
@@ -187,6 +261,28 @@ namespace iLabs.Scheduling.UserSide
             }
             return add;
 		}
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+       SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int ModifyCredentialSet(string originalGuid, string serviceBrokerGuid, string serviceBrokerName,
+            string groupName)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                try
+                {
+                    status = DBManager.ModifyCredentialSetServiceBroker(originalGuid, serviceBrokerGuid, serviceBrokerName);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            return status;
+        }
+
 		///  Remove a credential set
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
@@ -195,9 +291,10 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
+        public int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
+            string groupName)
         {
-            bool removed = false;
+            int removed = 0;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -225,16 +322,17 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool AddExperimentInfo(string labServerGuid, string labServerName, string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
+        public int AddExperimentInfo(string labServerGuid, string labServerName, 
+            string labClientGuid, string labClientName, string labClientVersion, 
+            string providerName, string lssGuid)
         {
-            bool added = false;
+           int added = 0;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
                     int eID = USSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName,labClientGuid,  labClientName, labClientVersion, providerName, lssGuid);
-                    if (eID != -1)
-                        added = true;
+                    added = (eID != -1) ? 1 : 0;
                 }
                 catch
                 {
@@ -242,6 +340,43 @@ namespace iLabs.Scheduling.UserSide
                 }
             }
             return added;
+        }
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int ModifyExperimentInfo(string labServerGuid, string labServerName,
+            string labClientGuid, string labClientName, string labClientVersion,
+            string providerName, string lssGuid)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                try
+                {
+                    status = DBManager.ModifyExperimentInfo(labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion, providerName, lssGuid);
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            return status;
+        }
+         /// <summary>
+        /// remove a particular experiment
+        /// </summary>
+        /// <param name="labServerGuid"></param>      
+        /// <param name="labClientGuid"></param>
+        /// <param name="lssGuid"></param>
+        /// <returns></returns>true, the experimentInfo is removed 
+        /// successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int RemoveExperimentInfo(string labServerGuid,
+            string labClientGuid,string lssGuid){
+            return 0;
         }
 
 		/// <summary>
@@ -253,16 +388,15 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool AddLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
         {
-            bool added = false;
+            int added = 0;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
-                {                 
+                {
                     int lID = USSSchedulingAPI.AddLSSInfo(lssGuid, lssName, lssUrl);
-                    if (lID != -1)
-                        added = true;
+                    added = (lID != -1) ? 1 : 0;
                 }
                 catch
                 {
@@ -271,6 +405,51 @@ namespace iLabs.Scheduling.UserSide
             }
             return added;
         }
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                try
+                {
+                    status = DBManager.ModifyLSSInfo(lssGuid, lssName, lssUrl);
+                    
+                   
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            return status;
+        }
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int RemoveLSSInfo(string lssGuid)
+        {
+            int added = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                try
+                {
+                    added = USSSchedulingAPI.RemoveLSSInfoByGuid(lssGuid);
+                  
+                }
+                catch
+                {
+                    throw;
+                }
+            }
+            return added;
+        }
+
+      
   
 	}
 }

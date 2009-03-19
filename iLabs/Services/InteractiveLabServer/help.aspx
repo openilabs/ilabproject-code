@@ -3,22 +3,22 @@
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Page language="c#" Inherits="iLabs.LabServer.help" CodeFile="help.aspx.cs" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
 <!-- $Id: help.aspx,v 1.4 2006/12/27 23:15:32 pbailey Exp $ -->
-	<HEAD>
+	<head>
 		<title>MIT iLab Lab Server - Help</title>
-		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
-		<meta content="C#" name="CODE_LANGUAGE">
-		<meta content="JavaScript" name="vs_defaultClientScript">
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
+		<meta content="C#" name="CODE_LANGUAGE"/>
+		<meta content="JavaScript" name="vs_defaultClientScript"/>
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="/vs_targetSchema"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<style type="text/css">@import url( css/main.css ); 
 		</style>
-	</HEAD>
+	</head>
 	<body>
 		<form id="helpForm" method="post" runat="server">
 			<a name="top"></a>
@@ -34,13 +34,13 @@ Please see license.txt in top level directory for full license.
 						<!--/div--> <!--End error message -->
 					</div> <!-- end pageintro div -->
 					<div id="pagecontent">
-						<p><B>IMPORTANT:</B> To be able to run the Labs you must have requested access from your Service Broker</p>
+						<p><b>IMPORTANT:</b> To be able to run the Labs you must have requested access from your Service Broker</p>
 						<p></p>
 						<div id="faq">
 							<h2><a id="faqs" name="faqs"></a>FAQ's</h2>
 							<ul>
 								<li>
-									<A href="#q1">Create a Service Broker Account</A></li>
+									<a href="#q1">Create a Service Broker Account</a></li>
 								
 								
 								
@@ -60,14 +60,12 @@ Please see license.txt in top level directory for full license.
 									the lab you may need to schedual a time to run the Lab.
 								</p>
 							</div>
-							
 							<!-- <div class="qa"><a id="q2" name="q3"></a>
 								<p class="question">Report a Bug</p>
 								<p class="answer">To <a href="reportBug.aspx">report a bug, use this link</a> or 
 									the button at the bottom of this page and fill out the form. Please select the 
 									general type of problem and enter a detailed description of the problem.</p>
 							</div> -->
-							
 							<div id="requesthelp">
 								<h2><a id="help" name="help"></a>Request Help with a Lab</h2>
 								<p>Fill out the form below to request help with a lab. Someone will respond to you 
@@ -95,17 +93,14 @@ Please see license.txt in top level directory for full license.
 											<td><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine"></asp:textbox>
 												<!--textarea name="problem" cols="50" rows="6" id="problem"></textarea--></td>
 										</tr>
-                                        
 										<tr>
-											<th colSpan="2">
+											<th colspan="2">
 												<asp:button id="btnRequestHelp" Runat="server" CssClass="buttonright" Text="Request Help" onclick="btnRequestHelp_Click"></asp:button>
 											</th>
 										</tr>
-										
-
 									</table>
 								</div> <!-- end div class simpleform -->
-								<p><A href="#top">Top of Page</A></p>
+								<p><a href="#top">Top of Page</a></p>
 							</div> <!-- end div request help -->
 						</div> <!-- end div faq --><br clear="all">
 					</div> <!-- end pagecontent div -->
@@ -114,4 +109,4 @@ Please see license.txt in top level directory for full license.
 			</div> <!-- end outterwrapper div -->
 		</form>
 	</body>
-</HTML>
+</html>

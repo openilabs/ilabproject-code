@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ * 
+ * $Id$
+ */
+
+#define LabVIEW_82
+
 using System;
 using System.Data;
 using System.Configuration;
@@ -12,13 +21,18 @@ using System.Web.UI.HtmlControls;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.Proxies.ESS;
 using iLabs.LabServer.Interactive;
-using iLabs.Services;
 using iLabs.UtilLib;
 
-using LabVIEW;
-using iLabs.LabView;
+#if LabVIEW_82
+using LabVIEW.lv821;
 using iLabs.LabView.LV82;
+#endif
+#if LabVIEW_86
+using LabVIEW.lv86;
+using iLabs.LabView.LV86;
+#endif
 
 
 
@@ -96,7 +110,7 @@ namespace iLabs.LabServer.LabView
 
 
 
-            if ((appInfo.server != null) && (appInfo.port != null) && (appInfo.server.Length > 0) && (appInfo.port > 0))
+            if ((appInfo.server != null) && (appInfo.server.Length > 0) && (appInfo.port > 0))
             {
                 lvi = new LabViewRemote(appInfo.server, appInfo.port);
             }
@@ -127,7 +141,7 @@ namespace iLabs.LabServer.LabView
             
             status = lvi.GetVIStatus(vi);
 
-            Utilities.WriteLog("CreateLabTask - VIstatus: " + status);
+            Utilities.WriteLog("CreateLabTask - " + qualName +": VIstatus: " + status);
             switch (status)
             {
                 case -10:
@@ -170,6 +184,7 @@ namespace iLabs.LabServer.LabView
                 Utilities.WriteLog("SetBounds exception: " + Utilities.DumpException(sbe));
             }
             lvi.SubmitAction("unlockvi", lvi.qualifiedName(vi));
+            Utilities.WriteLog("unlockvi Called: ");
            
 
             // Set up in-memory and database task control structures
@@ -221,7 +236,7 @@ namespace iLabs.LabServer.LabView
                     dsManager.essProxy = ess;
                     dsManager.ExperimentID = experimentID;
                     dsManager.AppKey = qualName;
-                     string[] sockets = appInfo.dataSources.Split(';');
+                     string[] sockets = appInfo.dataSources.Split(',');
                     // Use the experimentID as the storage parameter
                     foreach (string s in sockets)
                     {
@@ -257,4 +272,10 @@ namespace iLabs.LabServer.LabView
 
        
     }
+#if LabVIEW_82
 }
+#endif
+#if LabVIEW_86
+}
+#endif
+

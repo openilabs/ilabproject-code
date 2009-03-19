@@ -1,6 +1,7 @@
 <%@ Page language="c#" Inherits="iLabs.Scheduling.UserSide.Reservation" CodeFile="Reservation.aspx.cs" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
+<%@ Register TagPrefix="uc1" TagName="NavBarReg" Src="NavBarReg.ascx" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
@@ -11,13 +12,13 @@
 		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />	
 		<style type="text/css">@import url( css/main.css );
 		</style>
-	<script language="javascript">
+	<script  type="text/javascript" language="javascript">
     function PopupReserve(startTime, endTime, w,h)
     {
         var PopupWindow=null;    
         //settings='width='+ w + ',height='+ h + ',location=no, left=270, top=10, directories=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=no,dependent=no,modal =yes';
-        settings='width='+ w + ',height='+ h + ',location=no, left=270, top=10, directories=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=no';
-        PopupWindow=window.open('SelectTimeSlots.aspx?StartTime=' + startTime + '&EndTime='+ endTime,'SelectTimeSlots', settings);
+        settings='width='+ w + ',height='+ h + ',location=no, left=270, top=10, directories=no,menubar=no,toolbar=no,status=no,scrollbars=yes,resizable=yes';
+        PopupWindow=window.open('SelectTimePeriods.aspx?start=' + startTime + '&end='+ endTime,'SelectTimePeriods', settings);
         PopupWindow.focus();
     }
 	</script>
@@ -26,13 +27,13 @@
 	<form id="Form1" method="post" runat="server">
 	<div id="outerwrapper">
 	<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
-	<br clear="all">
+	<uc1:NavBarReg id="NavBar1" runat="server"></uc1:NavBarReg>
+	<br clear="all"/>
 	<div id="innerwrapper">
 	<div id="pageintro">
 						<h1><asp:label id="lblTitleofSchedule" runat="server"></asp:label>
 						</h1>
-						<p>Add, remove, or edit a Reservation
-						</p>
+						<asp:Label ID="lblDescription" runat="server" />
 						<!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
 						<asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label>
 					</div>
@@ -41,16 +42,16 @@
 		<table>
 		<tr><th>Select the day you would like to reserve time.</th></tr>
 		<tr><td>
-		    <asp:Calendar ID="calDate" OnClientClick="calDateClicked"  OnSelectionChanged="calDayChanged"    Runat="server" 
+		    <asp:Calendar ID="calDate"   OnSelectionChanged="calDayChanged"  Runat="server" 
 		    TodayDayStyle-BackColor="Aquamarine" TodayDayStyle-BorderColor="Black" TodayDayStyle-BorderStyle="Solid"  TodayDayStyle-BorderWidth="1" />
 		</td></tr>
 		</table>
 		</div>
 		<div class="simpleform">
-			<br>
+			<br/>
 			<table>
 				<tr>
-					<th class="colspan"  colSpan="2">The reservations you have made for this experiment:
+					<th class="colspan"  colspan="2">The reservations you have made for this experiment:
 					</th>				
 				</tr>
 				<tr>
@@ -70,8 +71,9 @@
 							
 						<asp:button ID="btnBackToSB" runat="server" CssClass="button" OnClick="btnBackToSB_Click"
                                 Text="Back To Service Broker" ></asp:button>
-                                <input id="hiddenPopupOnMakeRev" type="hidden" name="hiddenPopupOnMakeRev" value = "0" runat="server" />
-                                <asp:button id="btnReserve" style="VISIBILITY: hidden" runat="server" CssClass="button" Text="Make Reservation" onclick="btnReserve_Click"></asp:button>	
+                                <input id="hiddenPopupOnMakeRev" type="hidden" name="hiddenPopupOnMakeRev"  onclick="OnMakeReservation_Click"
+                                value = "0" runat="server" />
+                                <asp:button id="btnReserve" style="VISIBILITY: hidden" runat="server" CssClass="button" Text="Make Reservation" ></asp:button>	
 					</th>
 				</tr>				
 			</table>

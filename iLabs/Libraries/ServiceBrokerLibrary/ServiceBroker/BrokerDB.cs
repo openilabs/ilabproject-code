@@ -22,7 +22,8 @@ using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Mapping;
-using iLabs.Services;
+using iLabs.Proxies.PAgent;
+using iLabs.Proxies.ESS;
 
 namespace iLabs.ServiceBroker
 {
@@ -230,33 +231,34 @@ namespace iLabs.ServiceBroker
             }
         }
 
-        public int InsertAdminURL(ProcessAgentInfo processAgentInfo, string url, string ticketType)
-        {
-            if (!TicketTypes.TicketTypeExists(ticketType))
-                throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
-            // create sql connection
-            SqlConnection connection = CreateConnection();
+        //public int InsertAdminURL(ProcessAgentInfo processAgentInfo, string url, string ticketType)
+        //{
+        //    if (!TicketTypes.TicketTypeExists(ticketType))
+        //        throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
+        //    // create sql connection
+        //    SqlConnection connection = CreateConnection();
 
-            try
-            {
-                return InsertAdminURL(connection, processAgentInfo.agentId, url, ticketType);
-            }
+        //    try
+        //    {
+        //        return InsertAdminURL(connection, processAgentInfo.agentId, url, ticketType);
+        //    }
 
-            finally
-            {
-                connection.Close();
-            }
-        }
+        //    finally
+        //    {
+        //        connection.Close();
+        //    }
+        //}
 
         public int InsertAdminURL(int id, string url, string ticketType)
         {
             if (!TicketTypes.TicketTypeExists(ticketType))
                 throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 return InsertAdminURL(connection, id, url, ticketType);
             }
 
@@ -389,6 +391,99 @@ namespace iLabs.ServiceBroker
             }
         }
 
+        public int ModifyAdminUrls(int agentID, string oldCodebase, string newCodebase)
+        {
+
+            int status = 0;
+            // create sql connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            // command executes the "InsertAdminURL" stored procedure
+            SqlCommand cmd = new SqlCommand("ModifyAdminUrlCodebase", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate parameter
+            // 1. type
+            SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
+            idParam.Value = agentID;
+            // 2. admin URL
+            SqlParameter oldParam = cmd.Parameters.Add("@old", SqlDbType.VarChar, 256);
+            oldParam.Value = oldCodebase;
+            // 3. ticket type
+            SqlParameter newParam = cmd.Parameters.Add("@new", SqlDbType.VarChar, 256);
+            newParam.Value = newCodebase;
+            try{
+             // execute the command
+                connection.Open();
+                object obj = cmd.ExecuteScalar();
+                if(obj != null)
+                    status = Convert.ToInt32(obj);
+            }
+             catch (Exception ex)
+             {
+                 throw;
+             }
+             finally
+             {
+                 connection.Close();
+             }
+            return status;
+        }
+
+        public int ModifyClientScripts(int agentID, string oldCodebase, string newCodebase)
+        {
+             int status = 0;
+             // create sql connection
+             SqlConnection connection = FactoryDB.GetConnection();
+            
+             SqlCommand cmd = new SqlCommand("ModifyClientCodebase", connection);
+             cmd.CommandType = CommandType.StoredProcedure;
+
+             // populate parameter
+             // 1. type
+             SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
+             idParam.Value = agentID;
+             // 2. admin URL
+             SqlParameter oldParam = cmd.Parameters.Add("@old", SqlDbType.VarChar, 256);
+             oldParam.Value = oldCodebase;
+             // 3. ticket type
+             SqlParameter newParam = cmd.Parameters.Add("@new", SqlDbType.VarChar, 256);
+             newParam.Value = newCodebase;
+             try
+             {
+                 // execute the command
+                 connection.Open();
+                 return Convert.ToInt32(cmd.ExecuteScalar());
+             }
+             catch (Exception ex)
+             {
+                 throw;
+             }
+             finally
+             {
+                 connection.Close();
+             }
+             return status;
+         }
+
+        public int ModifyResourceInfoURL(int agentID, string oldCodebase, string newCodebase)
+        {
+            int status = 0;
+            Hashtable resources = GetResourceStringTags(agentID, ResourceMappingTypes.PROCESS_AGENT);
+            if (resources != null) // Check the current resources
+            {
+                IntTag resourceTag = null;
+               
+                if (resources.ContainsKey("Info URL"))
+                {
+                    resourceTag = (IntTag)resources["Info URL"];
+                    string value = resourceTag.tag.Replace(oldCodebase, newCodebase); 
+                    status = UpdateResourceMappingString(resourceTag.id, value);
+                }  
+            }
+            return status;
+        }
+
+
 
         public AdminUrl[] RetrieveAdminURLs(int processAgentID)
         {
@@ -427,7 +522,11 @@ namespace iLabs.ServiceBroker
 
         public AdminUrl RetrieveAdminURL(string processAgentGuid, string function)
         {
-            return RetrieveAdminURL(GetProcessAgentInfo(processAgentGuid).AgentId, function);
+            int id = GetProcessAgentID(processAgentGuid);
+            if( id > 0)
+                return RetrieveAdminURL(id, function);
+            else 
+                return null;
         }
 
         public AdminUrl[] RetrieveAdminURLs(SqlConnection connection, int processAgentID)
@@ -473,6 +572,118 @@ namespace iLabs.ServiceBroker
             AdminUrl[] urls = (AdminUrl[])list.ToArray(dummy.GetType());
             return urls;
         }
+
+        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent,Coupon inCoupon, Coupon outCoupon, string extra)
+        {
+            int status = 0;
+            ProcessAgentInfo paiOld = GetProcessAgentInfo(agent.agentGuid);
+            try
+            {
+                status = base.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon,extra);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("ISB: ", ex);
+            }
+            if (paiOld != null)
+            {
+                if (agent.codeBaseUrl.CompareTo(paiOld.codeBaseUrl) != 0)
+                {
+                    ModifyAdminUrls(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
+                    ModifyResourceInfoURL(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
+                    if (paiOld.agentType == ProcessAgentType.AgentType.LAB_SERVER)
+                    {
+                        ModifyClientScripts(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
+                    }
+                }
+            }
+            //Notify all ProcessAgents about the change
+            ProcessAgentInfo[] domainServices = GetProcessAgentInfos();
+            ProcessAgentProxy proxy = null;
+            foreach (ProcessAgentInfo pi in domainServices)
+            {
+                // Do not send if retired this service or the service being modified since this is
+                if (!pi.retired && (pi.agentGuid.CompareTo(ProcessAgentDB.ServiceGuid) != 0) 
+                    && (pi.agentGuid.CompareTo(agent.agentGuid) != 0))
+                {
+                    proxy = new ProcessAgentProxy();
+                    proxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                    proxy.AgentAuthHeaderValue.coupon = pi.identOut;
+                    proxy.Url = pi.webServiceUrl;
+
+                    proxy.ModifyDomainCredentials(originalGuid, agent, extra, inCoupon, outCoupon);
+                }
+            }
+            return status;
+        }
+
+        public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            ProcessAgentInfo paiOld = GetProcessAgentInfo(originalGuid);
+
+            if (paiOld != null)
+            {
+
+                try
+                {
+                    status = UpdateProcessAgent(paiOld.agentId, agent.agentGuid, agent.agentName, agent.type,
+                        agent.domainGuid, agent.codeBaseUrl, agent.webServiceUrl);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("ISB: ", ex);
+                }
+
+                if (agent.codeBaseUrl.CompareTo(paiOld.codeBaseUrl) != 0)
+                {
+                    status += ModifyAdminUrls(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
+                    status += ModifyResourceInfoURL(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
+                    if (paiOld.agentType == ProcessAgentType.AgentType.LAB_SERVER)
+                    {
+                        status += ModifyClientScripts(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
+                    }
+                }
+                if(agent.agentName.CompareTo(paiOld.agentName) !=0){
+                    // need to update Qualifier Names
+                    AuthorizationAPI.ModifyQualifierName(Qualifier.ToTypeID(agent.type),paiOld.agentId,agent.agentName);
+                    int[] resourceMapIds = GetResourceMappingIdsByValue(ResourceMappingTypes.PROCESS_AGENT,paiOld.agentId);
+                    foreach(int id in resourceMapIds){
+                        ResourceMapping map =ResourceMapManager.GetMap(id);
+                        AuthorizationAPI.ModifyQualifierName(Qualifier.resourceMappingQualifierTypeID,id,ResourceMappingToString(map));
+                    }
+                }
+                //Notify all ProcessAgents about the change
+                ProcessAgentInfo[] domainServices = GetProcessAgentInfos();
+                ProcessAgentProxy proxy = null;
+                foreach (ProcessAgentInfo pi in domainServices)
+                {
+                    // Do not send if retired this service or the service being modified since this is
+                    if (!pi.retired && (pi.agentType != ProcessAgentType.AgentType.BATCH_LAB_SERVER)
+                        && (pi.agentGuid.CompareTo(ProcessAgentDB.ServiceGuid) != 0)
+                        && (pi.agentGuid.CompareTo(agent.agentGuid) != 0))
+                    {
+                        proxy = new ProcessAgentProxy();
+                        proxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                        proxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                        proxy.AgentAuthHeaderValue.coupon = pi.identOut;
+                        proxy.Url = pi.webServiceUrl;
+                        try
+                        {
+                            status += proxy.ModifyProcessAgent(originalGuid, agent, extra);
+                        }
+                        catch (Exception ex)
+                        {
+                            Exception ex2 = new Exception("ModifyProcessAgent: " + pi.webServiceUrl, ex);
+                            throw ex2;
+                        }
+                    }
+                }
+            }
+
+            return status;
+        }
+
 
         /* START OF RESOURCE MAPPING */
      
@@ -932,7 +1143,43 @@ namespace iLabs.ServiceBroker
         public ResourceMapping GetResourceMapping(int mappingID)
         {
             return ResourceMapManager.GetMap(mappingID);
-        }               
+        }
+
+        public int[] GetResourceMappingIdsByValue(string type, int value)
+        {
+            List<int> list = new List<int>();
+            SqlConnection connection = FactoryDB.GetConnection();
+            SqlCommand cmd = new SqlCommand("GetResourceMapIDsByValue", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate parameters
+            SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
+            typeParam.Value = type;
+            SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
+            idParam.Value = value;
+
+            // execute the command
+            try
+            {
+                SqlDataReader dataReader = null;
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    if (!DBNull.Value.Equals(dataReader.GetValue(0)))
+                        list.Add(dataReader.GetInt32(0));
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return list.ToArray();
+        }
 
         /// <summary>
         /// Reads a resource mapping from the database
@@ -1759,7 +2006,7 @@ namespace iLabs.ServiceBroker
            public string ResourceMappingToString(ResourceMapping mapping)
         {
             StringBuilder s = new StringBuilder();
-            s.Append(mapping.MappingID + " ");
+            //s.Append(mapping.MappingID + " ");
              s.Append(GetMappingEntryString(mapping.key,true) + "-> ");
 
             //if (mapping.values.Length > 1)
@@ -1799,9 +2046,9 @@ namespace iLabs.ServiceBroker
             else if (entry.Type.Equals(ResourceMappingTypes.PROCESS_AGENT))
             {
                 string name = null;
-                if (showType)
-                    name = GetProcessAgentNameWithType((int)o);
-                else
+                //if (showType)
+                //    name = GetProcessAgentNameWithType((int)o);
+                //else
                     name = GetProcessAgentName((int)o);
                 if (name != null)
                     buf.Append(name);
@@ -1840,7 +2087,18 @@ namespace iLabs.ServiceBroker
             {
                 if (showType)
                     buf.Append("RT: ");
-                buf.Append((string)o);
+                string type = (string)o;
+                if(type.Equals(ProcessAgentType.EXPERIMENT_STORAGE_SERVER))
+                    buf.Append("ESS");
+                else if(type.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
+                     buf.Append("LSS");
+                 else if(type.Equals(ProcessAgentType.SCHEDULING_SERVER))
+                     buf.Append("USS");
+                else if(type.Equals(ProcessAgentType.LAB_SERVER))
+                     buf.Append("LS");
+                else{
+                    buf.Append(type);
+                }
             }
             else if (entry.Type.Equals(ResourceMappingTypes.TICKET_TYPE))
             {

@@ -25,8 +25,6 @@ using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 
 using iLabs.Ticketing;
-
-using iLabs.Services;
 using iLabs.UtilLib;
 
 namespace iLabs.ServiceBroker.admin
@@ -128,7 +126,7 @@ namespace iLabs.ServiceBroker.admin
 
 			foreach(ProcessAgentInfo si in AvailLabServers)
 			{
-				if (si.agentId == 0)
+				if ((si.agentId == 0) || si.retired)
 					continue;
 			
 				associated = false;
@@ -161,7 +159,8 @@ namespace iLabs.ServiceBroker.admin
 				else
 				{
 					//Write to Available Listbox if not associated
-					lbxAvailable.Items.Add(new ListItem(si.webServiceUrl, si.agentId.ToString()));
+                    if(!si.retired)
+					    lbxAvailable.Items.Add(new ListItem(si.webServiceUrl, si.agentId.ToString()));
 				}
 
 			}

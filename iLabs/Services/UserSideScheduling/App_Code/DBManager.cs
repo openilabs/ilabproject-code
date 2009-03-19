@@ -3,7 +3,12 @@ using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
+using System.Text;
+
+using iLabs.Core;
+using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SchedulingTypes;
+using iLabs.DataTypes.TicketingTypes;
 using iLabs.UtilLib;
 
 namespace iLabs.Scheduling.UserSide
@@ -11,34 +16,95 @@ namespace iLabs.Scheduling.UserSide
 	/// <summary>
 	/// Summary description for DBManager.
 	/// </summary>
-	public class DBManager
+	public class DBManager : ProcessAgentDB
 	{
-		 static string connectionStr;
+		
 
 		public DBManager()
 		{
 		}
-/// <summary>
-/// create the connection to the database
-/// </summary>
-/// <returns></returns>
-		protected static SqlConnection CreateConnection()
-		{
-			try
-			{
-				if (connectionStr==null || connectionStr.Equals(""))
-				{
-					connectionStr=System.Configuration.ConfigurationSettings.AppSettings["sqlConnection"];
-				}
-			}
-			catch (Exception e) 
-			{
-				throw new Exception(e.Message + "\n" + e.StackTrace);
-			}
-			// create an SqlConnection
-			SqlConnection connection = new SqlConnection(connectionStr);
-			return connection;
-		}
+
+        /// <summary>
+        /// Modifies the information related to the specified service the service's Guid must exist and the typ of service may not be modified,
+        /// in and out coupons may be changed.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="inIdentCoupon"></param>
+        /// <param name="outIdentCoupon"></param>
+        /// <returns></returns>
+        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent,
+            Coupon inCoupon, Coupon outCoupon, string extra)
+        {
+            int status = 0;
+            try
+            {
+                status = base.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("USS: ", ex);
+            }
+
+            if (agent.type == ProcessAgentType.SERVICE_BROKER || agent.type == ProcessAgentType.REMOTE_SERVICE_BROKER)
+            {
+                //Check for SB names in credential sets
+                ModifyCredentialSetServiceBroker(originalGuid, agent.agentGuid, agent.agentName);
+            }
+            if (agent.type == ProcessAgentType.LAB_SERVER)
+            {
+                // Labserver Names in Experiment info's
+                ModifyExperimentLabServer(agent.agentGuid, agent.agentName);
+            }
+            if (agent.type == ProcessAgentType.LAB_SCHEDULING_SERVER)
+            {
+                // LSS path, & name in LSS_Info
+                DBManager.ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl);
+            }
+            return status;
+
+        }
+
+        /// <summary>
+        /// Modifies the information related to the specified service the service's Guid must exist and the typ of service may not be modified,
+        /// in and out coupons may be changed.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="inIdentCoupon"></param>
+        /// <param name="outIdentCoupon"></param>
+        /// <returns></returns>
+        public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            try
+            {
+                status = base.ModifyProcessAgent(originalGuid, agent, extra);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("USS: ", ex);
+            }
+
+            if (agent.type == ProcessAgentType.SERVICE_BROKER || agent.type == ProcessAgentType.REMOTE_SERVICE_BROKER)
+            {
+                //Check for SB names in credential sets
+                ModifyCredentialSetServiceBroker(originalGuid, agent.agentGuid, agent.agentName);
+            }
+            if (agent.type == ProcessAgentType.LAB_SERVER)
+            {
+                // Labserver Names in Experiment info's
+                ModifyExperimentLabServer(agent.agentGuid, agent.agentName);
+            }
+            if (agent.type == ProcessAgentType.LAB_SCHEDULING_SERVER)
+            {
+                // LSS path, & name in LSS_Info
+                ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl);
+            }
+            return status;
+
+        }
+
+ 
+
         /* !------------------------------------------------------------------------------!
          *							CALLS FOR USSPolicy
          * !------------------------------------------------------------------------------!
@@ -54,7 +120,7 @@ namespace iLabs.Scheduling.UserSide
         public static int AddUSSPolicy(string groupName, string serviceBrokerGuid, int experimentInfoId, string rule)
         {
             //create a connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "addUSSPolicy" store procedure
             SqlCommand cmd = new SqlCommand("AddUSSPolicy", connection);
@@ -101,7 +167,7 @@ namespace iLabs.Scheduling.UserSide
         {
             ArrayList arrayList = new ArrayList();
             //create a connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "deleteUSSPolicy" store procedure
             SqlCommand cmd = new SqlCommand("DeleteUSSPolicy", connection);
@@ -143,7 +209,7 @@ namespace iLabs.Scheduling.UserSide
         public static bool ModifyUSSPolicy(int ussPolicyId, int experimentInfoId, string rule, int credentialSetId)
         {
             //create a connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "modifyUSSPolicy" store procedure
             SqlCommand cmd = new SqlCommand("ModifyUSSPolicy", connection);
@@ -194,7 +260,7 @@ namespace iLabs.Scheduling.UserSide
         {
             int[] ussPolicyIds;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyIDsByGroup" stored procedure
@@ -238,7 +304,7 @@ namespace iLabs.Scheduling.UserSide
         {
             int[] ussPolicyIds;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyIDsByGroup" stored procedure
@@ -290,7 +356,7 @@ namespace iLabs.Scheduling.UserSide
         {
             int[] ussPolicyIds;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyIDsByGroupandExp" stored procedure
@@ -348,7 +414,7 @@ namespace iLabs.Scheduling.UserSide
                 ussPolicies[i] = new USSPolicy();
             }
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyByID" stored procedure
@@ -393,6 +459,27 @@ namespace iLabs.Scheduling.UserSide
 			 *							CALLS FOR ReservationInfo
 			 * !------------------------------------------------------------------------------!
 			 */
+        /// <summary>
+		/// add reservation by user
+		/// </summary>
+		/// <param name="userName"></param>
+        /// <param name="serviceBrokerGuid"></param>
+		/// <param name="groupName"></param>
+		/// <param name="experimentInfoId"></param>
+		/// <param name="startTime"></param>
+		/// <param name="endTime"></param>
+		/// <returns></returns>the unique id which identifies the reservation added by the user,>0 successfully added, ==-1 otherwise
+        public static int AddReservation(string userName, string serviceBrokerGuid, string groupName,
+            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
+        {
+            int experId = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+            if (experId > 0)
+            {
+                return DBManager.AddReservation(userName, serviceBrokerGuid, groupName,
+                   experId, startTime, endTime);
+            }
+            else return 0;
+        }
 		/// <summary>
 		/// add reservation by user
 		/// </summary>
@@ -406,7 +493,7 @@ namespace iLabs.Scheduling.UserSide
         public static int AddReservation(string userName, string serviceBrokerGuid, string groupName, int experimentInfoId, DateTime startTime, DateTime endTime)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddReservation" store procedure
 			SqlCommand cmd=new SqlCommand("AddReservation",connection);
@@ -455,7 +542,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteReservation" store procedure
 			SqlCommand cmd=new SqlCommand("DeleteReservation",connection);
@@ -497,7 +584,7 @@ namespace iLabs.Scheduling.UserSide
 		public static bool ModifyReservation(int reservationID,int experimentInfoId,DateTime startTime,DateTime endTime)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyReservation" store procedure
 			SqlCommand cmd=new SqlCommand("ModifyReservation",connection);
@@ -550,7 +637,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] reservationIDs;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDsByUser" stored procedure
@@ -602,7 +689,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] reservationIDs;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDsByGroup" stored procedure
@@ -655,11 +742,11 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] reservationIDs;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
-			// command executes the "RetrieveReservationIDsByGroup" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveReservationIDsByUser", connection);
+			// command executes the "RetrieveReservationIDsByLabServer" stored procedure
+			SqlCommand cmd = new SqlCommand("RetrieveReservationIDsByLabServer", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
@@ -712,7 +799,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int i= 0;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDByUser" stored procedure
@@ -770,7 +857,7 @@ namespace iLabs.Scheduling.UserSide
 				reservations[i]=new  ReservationInfo();
 			}
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationByID" stored procedure
@@ -816,47 +903,61 @@ namespace iLabs.Scheduling.UserSide
 			return reservations;
 		}
 
+        public static ReservationInfo[] GetReservations(string sbGuid, string userName, string groupName,
+            string lsGuid, string clientGuid, DateTime start, DateTime end)
+        {
+            int experimentId = DBManager.ListExperimentInfoIDByExperiment(lsGuid, clientGuid);
+            int credId = DBManager.GetCredentialSetID(sbGuid, groupName);
+            return DBManager.SelectReservations(userName, experimentId, credId, start, end);
+        }
+
 		/// <summary>
 		/// to select reservation accorrding to given criterion
 		/// </summary>
-		public static ReservationInfo[] SelectReservation(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
+		public static ReservationInfo[] SelectReservations(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
 		{
+            StringBuilder sqlQuery = new StringBuilder();
 			ReservationInfo[] reservations = null;
 			ArrayList reInfos = new ArrayList();
-			string sqlQuery = "";
-			sqlQuery = "select Reservation_ID, User_Name, Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID from Reservations where Credential_Set_ID =" + credentialSetId.ToString() ;
+			
+			sqlQuery.Append("select Reservation_ID, User_Name, Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID from Reservations where Credential_Set_ID =" + credentialSetId.ToString() );
 			if(userName != null && userName != "")
 			{
-				sqlQuery += " and [User_Name] = " +"'"+ userName+"'";
+				sqlQuery.Append(" and [User_Name] = " +"'"+ userName+"'");
 
 			}
 			if (experimentInfoId!=-1)
 			{
 				
-					sqlQuery += " and Experiment_Info_ID = " + experimentInfoId;
+					sqlQuery.Append(" and Experiment_Info_ID = " + experimentInfoId);
 				
 			}
 			
-
-			if (timeBefore.CompareTo(DateTime.MinValue)!=0)
+            
+			if( (timeBefore.CompareTo(DateTime.MinValue)!=0) & (timeAfter.CompareTo(DateTime.MinValue)!=0))
 			{
 				
-				sqlQuery +=" and Start_Time <= '"+timeBefore+"'";;
+				sqlQuery.Append(" and ( '" + timeBefore + "' > Start_Time and '" + timeAfter + "' < End_Time )");
 			}
-
-			if (timeAfter.CompareTo(DateTime.MinValue)!=0)
+			else if( timeBefore.CompareTo(DateTime.MinValue)!=0)
 			{
 				
-				sqlQuery +=" and Start_Time >= '"+timeAfter+"'";
+				sqlQuery.Append(" and Start_Time <= '"+timeBefore+"'");;
 			}
 
-			sqlQuery += " ORDER BY Start_Time asc";
+			else if (timeAfter.CompareTo(DateTime.MinValue)!=0)
+			{
+				
+				sqlQuery.Append(" and Start_Time >= '"+timeAfter+"'");
+			}
 
-			SqlConnection myConnection = CreateConnection();
+			sqlQuery.Append(" ORDER BY Start_Time asc");
+
+			SqlConnection myConnection = FactoryDB.GetConnection();
 			SqlCommand myCommand = new SqlCommand ();
 			myCommand.Connection = myConnection;
 			myCommand.CommandType = CommandType.Text;
-			myCommand.CommandText = sqlQuery;
+			myCommand.CommandText = sqlQuery.ToString();;
 
 			try 
 			{
@@ -920,7 +1021,7 @@ namespace iLabs.Scheduling.UserSide
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddExperimentInfo" store procedure
 			SqlCommand cmd=new SqlCommand("AddExperimentInfo",connection);
@@ -971,7 +1072,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteExperimentInfo" store procedure
 			SqlCommand cmd=new SqlCommand("DeleteExperimentInfo",connection);
@@ -1010,7 +1111,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] experimentInfoIds;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveExperimentIDs" stored procedure
@@ -1058,7 +1159,7 @@ namespace iLabs.Scheduling.UserSide
 				experimentInfos[i]=new  UssExperimentInfo();
 			}
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveExperimentInfoByID" stored procedure
@@ -1113,11 +1214,11 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="labClientName"></param>
 		/// <param name="labClientVersion"></param>
 		/// <returns></returns>the ID of the information of a particular experiment, -1 if such a experiment info can not be retrieved
-		public static int ListExperimentInfoIDByExperiment(string clientGuid,string labServerGuid)
+		public static int ListExperimentInfoIDByExperiment(string labServerGuid, string clientGuid)
 		{
 			int experimentInfoId=-1;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveExperimentInfoIDByExperiment" stored procedure
@@ -1163,7 +1264,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			string url = null;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveLSSURLbyExperiment" stored procedure
@@ -1209,7 +1310,7 @@ namespace iLabs.Scheduling.UserSide
         {
             string lssID = null;
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveLSSURLbyExperiment" stored procedure
@@ -1256,11 +1357,11 @@ namespace iLabs.Scheduling.UserSide
 /// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
 /// <returns></returns>true modified successfully, false otherwise
-        public static bool ModifyExperimentInfo(int experimentInfoId, string labServerGuid, string labServerName, 
+        public static int ModifyExperimentInfo(int experimentInfoId, string labServerGuid, string labServerName, 
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyExperimentInfo" store procedure
 			SqlCommand cmd=new SqlCommand("ModifyExperimentInfo",connection);
@@ -1282,21 +1383,17 @@ namespace iLabs.Scheduling.UserSide
 			providerNameParam.Value = providerName;
 			SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar,50);
             lssIDParam.Value = lssGuid;
-			bool i=false;
+			int i=0;
 
 			// execute the command
 			try
 			{
 				connection.Open();
 				Object ob=cmd.ExecuteScalar();
-				int m=0;
+		
                 if (ob != null && ob != System.DBNull.Value)
 				{
-					m = Int32.Parse(ob.ToString());
-				}
-				if (m!=0)
-				{
-					i=true;
+					i = Int32.Parse(ob.ToString());
 				}
 			}
 			catch (Exception ex)
@@ -1310,6 +1407,118 @@ namespace iLabs.Scheduling.UserSide
 			return i;
              
 		}
+
+        /// <summary>
+        /// modify the experimentInfo
+        /// </summary>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labServerName"></param>
+        /// <param name="labClientVersion"></param>
+        /// <param name="labClientName"></param>
+        /// <param name="providerName"></param>
+        /// <param name="lssGuid"></param>
+        /// <returns></returns>true modified successfully, false otherwise
+        public static int ModifyExperimentInfo(string labServerGuid, string labServerName,
+            string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
+        {
+            //create a connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            //create a command
+            //command executes the "ModifyExperimentInfo" store procedure
+            SqlCommand cmd = new SqlCommand("ModifyExperimentInfoByGuid", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+            
+            SqlParameter labClientIDParam = cmd.Parameters.Add("@labClientGUID", SqlDbType.VarChar, 50);
+            labClientIDParam.Value = labClientGuid;
+            SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar, 50);
+            labServerIDParam.Value = labServerGuid;
+            SqlParameter labServerNameParam = cmd.Parameters.Add("@labServerName", SqlDbType.VarChar, 256);
+            labServerNameParam.Value = labServerName;
+            SqlParameter labClientVersionParam = cmd.Parameters.Add("@labClientVersion", SqlDbType.VarChar, 50);
+            labClientVersionParam.Value = labClientVersion;
+            SqlParameter labClientNameParam = cmd.Parameters.Add("@labClientName", SqlDbType.VarChar, 256);
+            labClientNameParam.Value = labClientName;
+            SqlParameter providerNameParam = cmd.Parameters.Add("@providerName", SqlDbType.VarChar, 256);
+            providerNameParam.Value = providerName;
+            SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar, 50);
+            lssIDParam.Value = lssGuid;
+            int i = 0;
+
+            // execute the command
+            try
+            {
+                connection.Open();
+                Object ob = cmd.ExecuteScalar();
+                
+                if (ob != null && ob != System.DBNull.Value)
+                {
+                   i = Int32.Parse(ob.ToString());
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add ModifyExperimentInfo", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return i;
+
+        }
+
+
+        /// <summary>
+        /// modify the experimentInfo
+        /// </summary>
+        /// <param name="experimentInfoId"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labServerName"></param>
+        /// <param name="labClientVersion"></param>
+        /// <param name="labClientName"></param>
+        /// <param name="providerName"></param>
+        /// <param name="lssGuid"></param>
+        /// <returns></returns>true modified successfully, false otherwise
+        public static int ModifyExperimentLabServer(string labServerGuid, string labServerName)
+        {
+            //create a connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            //create a command
+            //command executes the "ModifyExperimentInfo" store procedure
+            SqlCommand cmd = new SqlCommand("ModifyExperimentLabServer", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+           
+            SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar, 50);
+            labServerIDParam.Value = labServerGuid;
+            SqlParameter labServerNameParam = cmd.Parameters.Add("@labServerName", SqlDbType.VarChar, 256);
+            labServerNameParam.Value = labServerName;
+            int count = -1;
+
+            // execute the command
+            try
+            {
+                connection.Open();
+                Object ob = cmd.ExecuteScalar();
+               
+                if (ob != null && ob != System.DBNull.Value)
+                {
+                   count = Convert.ToInt32(ob);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add ModifyExperimentLabServer", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return count;
+
+        }
         
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR LSSInfo
@@ -1324,7 +1533,7 @@ namespace iLabs.Scheduling.UserSide
         public static int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddLSSInfo" store procedure
 			SqlCommand cmd=new SqlCommand("AddLSSInfo",connection);
@@ -1367,10 +1576,10 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
         /// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
-        public static bool ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl)
+        public static int ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyLSSInfo" store procedure
 			SqlCommand cmd=new SqlCommand("ModifyLssInfo",connection);
@@ -1384,22 +1593,19 @@ namespace iLabs.Scheduling.UserSide
 			lssNameParam.Value = lssName;
 			SqlParameter lssURLParam = cmd.Parameters.Add("@lssURL", SqlDbType.VarChar,256);
 			lssURLParam.Value = lssUrl;
-			bool i=false;
+            int count = -1;
 
 			// execute the command
 			try
 			{
 				connection.Open();
 				Object ob=cmd.ExecuteScalar();
-				int m=0;
+			
                 if (ob != null && ob != System.DBNull.Value)
 				{
-					m = Int32.Parse(ob.ToString());
+					count = Convert.ToInt32(ob);
 				}
-				if (m!=0)
-				{
-					i=true;
-				}
+			
 			}
 			catch (Exception ex)
 			{
@@ -1409,9 +1615,57 @@ namespace iLabs.Scheduling.UserSide
 			{
 				connection.Close();
 			}		
-			return i;
+			return count;
              
 		}
+        /// <summary>
+        /// Updates the data fields for the LSSInfo specified by the lssInfoId; note lssInfoId may not be changed
+        /// </summary>
+        /// <param name="lssInfoId"></param>
+        /// <param name="lssGuid"></param>
+        /// <param name="lssName"></param>
+        /// <param name="lssUrl"></param>
+        /// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
+        public static int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
+        {
+            //create a connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            //create a command
+            //command executes the "ModifyLSSInfo" store procedure
+            SqlCommand cmd = new SqlCommand("ModifyLssInfoByGuid", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+          
+            SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar, 50);
+            lssIDParam.Value = lssGuid;
+            SqlParameter lssNameParam = cmd.Parameters.Add("@lssName", SqlDbType.VarChar, 256);
+            lssNameParam.Value = lssName;
+            SqlParameter lssURLParam = cmd.Parameters.Add("@lssURL", SqlDbType.VarChar, 256);
+            lssURLParam.Value = lssUrl;
+            int count = -1;
+
+            // execute the command
+            try
+            {
+                connection.Open();
+                Object ob = cmd.ExecuteScalar();
+                if (ob != null && ob != System.DBNull.Value)
+                {
+                    count = Convert.ToInt32(ob);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add ModifyLSSInfo", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return count;
+
+        }
+
 		/// <summary>
 		/// delete the information of lab side scheduling servers identified by lssInfoIds
 		/// </summary>
@@ -1421,7 +1675,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeletLSSInfo" store procedure
 			SqlCommand cmd=new SqlCommand("DeletLSSInfo",connection);
@@ -1452,6 +1706,41 @@ namespace iLabs.Scheduling.UserSide
 			int[] uIDs = Utilities.ArrayListToIntArray(arrayList);
 			return uIDs;			
 		}
+
+        /// <summary>
+        /// delete the information of lab side scheduling servers identified by lssInfoIds
+        /// </summary>
+        /// <param name="lssInfoIds"></param>
+        /// <returns></returns>An array of ints containing the IDs of all LSS whose informations not successfully removed, i.e., those for which the operation failed. 
+        public static int RemoveLSSInfoByGuid(string lssGuid)
+        {
+            int status;
+            //create a connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            //create a command
+            //command executes the "DeletLSSInfoByGuid" store procedure
+            SqlCommand cmd = new SqlCommand("DeletLSSInfoByGuid", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlParameter guidParam = cmd.Parameters.Add(new SqlParameter("@guid", SqlDbType.VarChar, 50));
+            guidParam.Value = lssGuid;
+            // execute the command
+            try
+            {
+                connection.Open();
+               status = cmd.ExecuteNonQuery();
+               
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in remove LSS infomation", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            
+            return status;
+        }
 		/// <summary>
 		/// Enumerates IDs of all the lssInfos 
 		/// </summary>
@@ -1460,7 +1749,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] lssInfoIds;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveRetrieveLssInfoIDs" stored procedure
@@ -1508,7 +1797,7 @@ namespace iLabs.Scheduling.UserSide
 				lssInfos[i]=new LSSInfo();
 			}
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveLSSInfoByID" stored procedure
@@ -1560,7 +1849,7 @@ namespace iLabs.Scheduling.UserSide
             LSSInfo lssInfo = new LSSInfo();
 
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             SqlCommand cmd = new SqlCommand("RetrieveLSSInfoByGUID", connection);
@@ -1611,7 +1900,7 @@ namespace iLabs.Scheduling.UserSide
         public static int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddCredentialSet" store procedure
 			SqlCommand cmd=new SqlCommand("AddCredentialSet",connection);
@@ -1656,7 +1945,7 @@ namespace iLabs.Scheduling.UserSide
         public static bool ModifyCredentialSet(int credentialSetId, string groupName, string serviceBrokerGuid, string serviceBrokerName)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyCredentialSet" store procedure
 			SqlCommand cmd=new SqlCommand("ModifyCredentialSet",connection);
@@ -1698,6 +1987,54 @@ namespace iLabs.Scheduling.UserSide
 			return i;
              
 		}
+        /// <summary>
+        /// Updates the data fields for the credential set specified by the credentialSetId; note credentialSetId may not be changed
+        /// </summary>
+        /// <param name="credentialSetId"></param>
+        /// <param name="groupName"></param>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="serviceBrokerName"></param>
+        /// <returns></returns>true if reservation was successfully modified, ==false otherwise
+        public static int ModifyCredentialSetServiceBroker(string originalGuid, string serviceBrokerGuid, string serviceBrokerName)
+        {
+            //create a connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            //create a command
+            //command executes the "ModifyCredentialSet" store procedure
+            SqlCommand cmd = new SqlCommand("ModifyCredentialSetServiceBroker", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+            SqlParameter originalParam = cmd.Parameters.Add("@originalGUID", SqlDbType.VarChar, 50);
+            originalParam.Value = originalGuid;
+            SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar, 50);
+            serviceBrokerIDParam.Value = serviceBrokerGuid;
+            SqlParameter serviceBrokerNameParam = cmd.Parameters.Add("@serviceBrokerName", SqlDbType.VarChar, 256);
+            serviceBrokerNameParam.Value = serviceBrokerName;
+            int count = -1;
+
+            // execute the command
+            try
+            {
+                connection.Open();
+                Object ob = cmd.ExecuteScalar();
+            
+                if (ob != null && ob != System.DBNull.Value)
+                {
+                    count = Convert.ToInt32(ob);
+                }
+             
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add ModifyCredentialSet", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return count;
+
+        }
 		/// <summary>
 		/// delete the credential sets specified by the credentialSetIds
 		/// </summary>
@@ -1707,7 +2044,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteCredentialSet" store procedure
 			SqlCommand cmd=new SqlCommand("DeleteCredentialSetByID",connection);
@@ -1745,10 +2082,10 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
 		/// <returns></returns>true, the credentialset is removed successfully, false otherwise
-        public static bool RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
+        public static int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
 			//create a connection
-			SqlConnection connection= CreateConnection();
+			SqlConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteCredentialSet" store procedure
 			SqlCommand cmd=new SqlCommand("DeleteCredentialSet",connection);
@@ -1760,14 +2097,13 @@ namespace iLabs.Scheduling.UserSide
 			serviceBrokerNameParam.Value = serviceBrokerName;
 			SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,50);
 			groupNameParam.Value = groupName;
-			bool removed = false;
+			int removed = 0;
 
 			// execute the command
 			try
 			{
 				connection.Open();
-                if (cmd.ExecuteNonQuery() > 0)
-                    removed = true;
+                removed = cmd.ExecuteNonQuery();
 			}
 			catch (Exception ex)
 			{
@@ -1788,7 +2124,7 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] credentialSetIds;
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCredentialSetIDs" stored procedure
@@ -1836,7 +2172,7 @@ namespace iLabs.Scheduling.UserSide
 				credentialSets[i]=new UssCredentialSet();
 			}
 			// create sql connection
-			SqlConnection connection = CreateConnection();
+			SqlConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCredentialSetByID" stored procedure
@@ -1888,7 +2224,7 @@ namespace iLabs.Scheduling.UserSide
         public static int GetCredentialSetID(string serviceBrokerGuid, string groupName)
         {
             //create a connection
-            SqlConnection connection = CreateConnection();
+            SqlConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "AddCredentialSet" store procedure
             SqlCommand cmd = new SqlCommand("GetCredentialSetID", connection);

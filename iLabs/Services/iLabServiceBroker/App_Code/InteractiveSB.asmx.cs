@@ -34,13 +34,18 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.Proxies.PAgent;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.ISB;
+using iLabs.Proxies.LSS;
+using iLabs.Proxies.Ticketing;
+using iLabs.Proxies.USS;
 
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker.Internal;
-using iLabs.Services;
 using iLabs.Ticketing;
 using iLabs.TicketIssuer;
 
@@ -111,7 +116,93 @@ namespace iLabs.ServiceBroker.iLabSB
 
         #endregion
 
+        /// <summary>
+        /// Modify the specified services Domain credentials on this static process agent. 
+        /// Agent_guid is key to the service to be modified. The agentAuthorizationHeader must use the old values.
+        /// </summary>
+        /// <param name="credentials" Description="Used to provide information for the service to be modified, the agent guid must remain the same as the original for the specified service"></param>
+        /// <returns>A DomainCredentials with the results of the requested change, depending on he service type these results may be used or ignored as needed.</returns>
+        [WebMethod(Description = "Modify the specified services Domain credentials on this static process agent. "
+            + "Agent_guid is key to the service to be modified and may not be modiied. The agentAuthorizationHeader must use the old values."),
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, string extra, 
+            Coupon inCoupon, Coupon outCoupon)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                BrokerDB brokerDB = new BrokerDB();
+                status = brokerDB.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
 
+                //Notify all ProcessAgents about the change
+                ProcessAgentInfo[] domainServices = dbTicketing.GetProcessAgentInfos();
+                ProcessAgentProxy proxy = null;
+                foreach (ProcessAgentInfo pi in domainServices)
+                {
+                    // Do not send if retired this service or the service being modified since this is
+                    if (!pi.retired && (pi.agentGuid.CompareTo(ProcessAgentDB.ServiceGuid) != 0)
+                        && (pi.agentGuid.CompareTo(agent.agentGuid) != 0))
+                    {
+                        proxy = new ProcessAgentProxy();
+                        proxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                        proxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                        proxy.AgentAuthHeaderValue.coupon = pi.identOut;
+                        proxy.Url = pi.webServiceUrl;
+
+                        status += proxy.ModifyDomainCredentials(originalGuid, agent, extra, inCoupon, outCoupon);
+                    }
+                }
+            }
+            return status;
+        }
+        
+
+        /// <summary>
+        /// Informs this processAgent that it should modify all references to a specific processAent. 
+        /// This is used to propagate modifications, The agentGuid must remain the same.
+        /// </summary>
+        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+        /// <param name="serviceGuid">The guid of the service</param>
+        /// <param name="state">The retired state to be set</param>
+        /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        [WebMethod,
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                BrokerDB brokerDB = new BrokerDB();
+                status = brokerDB.ModifyProcessAgent(originalGuid, agent, extra);
+
+             
+            }
+            return status;
+        }
+
+        /// <summary>
+        /// Informs a processAgent that it should retire/un-retire all references to a specific processAent. 
+        /// This may be used to propigate retire calls.
+        /// </summary>
+        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+        /// <param name="serviceGuid">The guid of the service</param>
+        /// <param name="state">The retired state to be set, true sets retired.</param>
+        /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        [WebMethod(Description = "Informs a processAgent that it should retire/un-retire all references to a specific processAent."
+        + " This may be used to propigate retire calls."),
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public override int RetireProcessAgent(string domainGuid, string serviceGuid, bool state)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                status = retireProcessAgent(domainGuid, serviceGuid, state);
+            }
+            return status;
+        }
 
         /// <summary>
         /// Install the Domain credentials on this static process agent
@@ -121,19 +212,31 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="agentIdentCoupon" Description="For messages from the PA_Service"></param>
         /// <param name="serviceBroker" Description="service information stored on PA_Service"></param>
         /// <param name="sbIdentCoupon" Description="For messages from the SB"></param>
-        [WebMethod,
-        SoapDocumentMethod(Binding = "IProcessAgent"),
-        SoapHeader("initAuthHeader", Direction = SoapHeaderDirection.In)]
-        public override ProcessAgent InstallDomainCredentials(ProcessAgent service,
+       
+        protected override ProcessAgent installDomainCredentials(ProcessAgent service,
             Coupon inIdentCoupon, Coupon outIdentCoupon)
         {
             // if the remote process agent is a Service Broker, register it as a remote service broker
             if (service.type.Equals(ProcessAgentType.SERVICE_BROKER))
                 service.type = ProcessAgentType.REMOTE_SERVICE_BROKER;
-            return InstallDomainCredentials(initAuthHeader, service, inIdentCoupon, outIdentCoupon);
+            return base.installDomainCredentials(service, inIdentCoupon, outIdentCoupon);
 
         }
+/*
+        protected override int modifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            BrokerDB brokerDB = new BrokerDB();
+            int id = dbTicketing.GetProcessAgentID(originalGuid);
+            if(id > 1){
+                status = brokerDB.ModifyProcessAgent(originalGuid, agent, extra);
+            }
+          
 
+            return status;
+        }
+
+*/
 
         [WebMethod(Description = "CancelTicket -- Try to cancel a cached ticket, should return true if cancelled or not found."
           + " The serviceBroker version - If not the redeemer the call needs to be repackaged and forwarded to the redeemer."),
@@ -156,7 +259,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     ProcessAgentInfo target = agentDB.GetProcessAgentInfo(redeemer);
                     if (target != null)
                     {
-
+                        if (target.retired)
+                        {
+                            throw new Exception("The ProcessAgent is retired");
+                        }
                         if (ProcessAgentDB.ServiceGuid.Equals(target.domainGuid))
                         {
                             // Its a local domain processAgent
@@ -173,6 +279,10 @@ namespace iLabs.ServiceBroker.iLabSB
                             ProcessAgentInfo remoteSB = agentDB.GetProcessAgentInfo(target.domainGuid);
                             if (remoteSB != null)
                             {
+                                if (remoteSB.retired)
+                                {
+                                    throw new Exception("The ProcessAgent is retired");
+                                }
                                 // Its from a known domain
                                 ProcessAgentProxy sbProxy = new ProcessAgentProxy();
                                 sbProxy.AgentAuthHeaderValue = new AgentAuthHeader();
@@ -184,16 +294,15 @@ namespace iLabs.ServiceBroker.iLabSB
                             }
                         }
                     }
-
                 }
             }
             return status;
         }
 
-        [WebMethod(Description = "Register"),
- SoapDocumentMethod(Binding = "IProcessAgent"),
- SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public override void Register(string registerId, ServiceDescription[] info)
+      
+
+
+        protected override void register(string registerGuid, ServiceDescription[] info)
         {
             bool hasProvider = false;
             bool hasConsumer = false;
@@ -208,245 +317,237 @@ namespace iLabs.ServiceBroker.iLabSB
             LabClient labClient;
             GroupCredential credential = null;
 
-            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
+            try
             {
-                try
+                ResourceDescriptorFactory rFactory = ResourceDescriptorFactory.Instance();
+                string jobGuid = registerGuid;
+                message.AppendLine(" Register called at " + DateTime.UtcNow + " UTC \t registerGUID: " + registerGuid);
+                ProcessAgent sourceAgent = brokerDB.GetProcessAgent(agentAuthHeader.agentGuid);
+                message.AppendLine("Source Agent: " + sourceAgent.agentName);
+
+                if (info == null)
                 {
-                    ResourceDescriptorFactory rFactory = ResourceDescriptorFactory.Instance();
-                    string jobGuid = registerId;
-                    message.AppendLine(" Register called at " + DateTime.UtcNow + " UTC \t registerGUID: " + registerId);
-                    ProcessAgent sourceAgent = brokerDB.GetProcessAgent(agentAuthHeader.agentGuid);
-                    message.AppendLine("Source Agent: " + sourceAgent.agentName);
+                    message.AppendLine("Register called without any ServiceDescriptions");
+                    throw new ArgumentNullException("Register called without any ServiceDescriptions");
+                }
 
-                    if (info == null)
+                for (int i = 0; i < info.Length; i++)
+                {
+
+                    Coupon coupon = null;
+                    if (info[i].coupon != null)
                     {
-                        message.AppendLine("Register called without any ServiceDescriptions");
-                        throw new ArgumentNullException("Register called without any ServiceDescriptions");
+                        coupon = info[i].coupon;
                     }
-
-                    for (int i = 0; i < info.Length; i++)
+                    if (info[i].serviceProviderInfo != null && info[i].serviceProviderInfo.Length > 0)
                     {
-                        
-                        Coupon coupon = null;
-                        if (info[i].coupon != null)
+                        // ProviderInfo is simple add to database and create qualifier
+                        if (!hasProvider)
                         {
-                            coupon = info[i].coupon;
+                            message.AppendLine("Provider Info:");
+                            hasProvider = true;
                         }
-                        if (info[i].serviceProviderInfo != null && info[i].serviceProviderInfo.Length > 0)
+                        XmlQueryDoc xdoc = new XmlQueryDoc(info[i].serviceProviderInfo);
+                        string descriptorType = xdoc.GetTopName();
+                        if (descriptorType.Equals("processAgentDescriptor"))
                         {
-                            // ProviderInfo is simple add to database and create qualifier
-                            if (!hasProvider)
+                            string paGuid = xdoc.Query("/processAgentDescriptor/agentGuid");
+                            string paType = xdoc.Query("/processAgentDescriptor/type");
+                            if (paType.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
                             {
-                                message.AppendLine("Provider Info:");
-                                hasProvider = true;
-                            }
-                            XmlQueryDoc xdoc = new XmlQueryDoc(info[i].serviceProviderInfo);
-                            string descriptorType = xdoc.GetTopName();
-                            if (descriptorType.Equals("processAgentDescriptor"))
-                            {
-                                string paGuid = xdoc.Query("/processAgentDescriptor/agentGuid");
-                                string paType = xdoc.Query("/processAgentDescriptor/type");
-                                if (paType.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
-                                {
-                                    lssID = brokerDB.GetProcessAgentID(paGuid);
-                                    if (lssID > 0)
-                                    {
-                                        // Already in database
-                                        message.AppendLine("Reference to existing LSS: " + lssID + " GUID: " + paGuid);
-                                        
-                                    }
-                                    else
-                                    {
-                                        lss = rFactory.LoadProcessAgent(xdoc, ref message);
-                                        lssID = lss.agentId;
-                                    }
-                                }
-                                else if (paType.Equals(ProcessAgentType.LAB_SERVER))
-                                {
-                                    lsID = brokerDB.GetProcessAgentID(paGuid);
-                                    if (lsID > 0)
-                                    {
-                                        // Already in database
-                                        message.AppendLine("Reference to existing LS: " + lsID + " GUID: " + paGuid);
-                                        //ls = brokerDB.GetProcessAgentInfo(paId);
-                                    }
-                                    else
-                                    {
-                                        ls = rFactory.LoadProcessAgent(xdoc, ref message);
-                                        lsID = ls.agentId;
-                                    }
-                                    int myLssID = brokerDB.FindProcessAgentIdForAgent(lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
-                                    if ((lssID > 0) && (myLssID <= 0) && (lssID != myLssID))
-                                    {
-                                        brokerDB.AssociateLSS(lsID, lssID);
-                                    }
-                                }
-                            }
-                            else if (descriptorType.Equals("clientDescriptor"))
-                            {
-                                int clientId = -1;
-                                string clientGuid = xdoc.Query("/clientDescriptor/clientGuid");
-                                clientId = AdministrativeAPI.GetLabClientID(clientGuid);
-                                if (clientId > 0)
+                                lssID = brokerDB.GetProcessAgentID(paGuid);
+                                if (lssID > 0)
                                 {
                                     // Already in database
-                                    message.Append(" Attempt to Register a LabClient that is already in the database. ");
-                                    message.AppendLine(" GUID: " + clientGuid);
+                                    message.AppendLine("Reference to existing LSS: " + lssID + " GUID: " + paGuid);
+
                                 }
                                 else
                                 {
-                                    // LabServer should already be in the Database, once multiple LS supported may need work
-                                    // LS is specified in clientDescriptor
-                                    int clientID = rFactory.LoadLabClient(xdoc, ref message);
+                                    lss = rFactory.LoadProcessAgent(xdoc, ref message);
+                                    lssID = lss.agentId;
                                 }
                             }
-                            // Add Relationships: LSS, LS Client
-                        } // end of ServiceProvider
-                        if (info[i].consumerInfo != null && info[i].consumerInfo.Length > 0)
-                        {
-                            if (!hasConsumer)
-                                message.AppendLine("Consumer Info:");
-                            hasConsumer = true;
-                            XmlQueryDoc xdoc = new XmlQueryDoc(info[i].consumerInfo);
-                            string descriptorType = xdoc.GetTopName();
-                            if (descriptorType.Equals("processAgentDescriptor"))
+                            else if (paType.Equals(ProcessAgentType.LAB_SERVER))
                             {
-                                string paGuid = xdoc.Query("/processAgentDescriptor/agentGuid");
-                                ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(paGuid);
-                                if (paInfo == null)
-                                {
-                                    // Not in database
-                                    paInfo = rFactory.LoadProcessAgent(xdoc, ref message);
-                                    message.Append("Loaded new ");
-                                }
-                                else
-                                {
-                                    message.Append("Reference to existing ");
-                                }
-                                if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SCHEDULING_SERVER)
-                                {
-                                    lss = paInfo;
-                                    message.AppendLine("LSS: " + paGuid);
-                                }
-                                else if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SERVER)
-                                {
-                                    ls = paInfo;
-                                    message.AppendLine("LS: " + paGuid);
-                                }
-                                else if (paInfo.agentType == ProcessAgentType.AgentType.SCHEDULING_SERVER)
-                                {
-                                    uss = paInfo;
-                                    message.AppendLine("USS: " + paGuid);
-                                    if (lss != null)
-                                    {
-                                        if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
-                                        {
-                                            message.AppendLine("Registering USSinfo on LSS: " + lss.agentName);
-                                            LabSchedulingProxy lssProxy = new LabSchedulingProxy();
-                                            lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
-                                            lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
-                                            lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                            lssProxy.Url = lss.webServiceUrl;
-                                            lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, coupon);
-                                        }
-                                        else
-                                        {
-                                            message.AppendLine("LSS is not from this domain");
-                                        }
-
-
-                                    }
-                                }
-
-                            }
-                            else if (descriptorType.Equals("clientDescriptor"))
-                            {
-                                int newClientId = -1;
-                                string clientGuid = xdoc.Query("/clientDescriptor/clientGuid");
-                                int clientId = AdministrativeAPI.GetLabClientID(clientGuid);
-                                if (clientId > 0)
+                                lsID = brokerDB.GetProcessAgentID(paGuid);
+                                if (lsID > 0)
                                 {
                                     // Already in database
-                                    message.Append(" Attempt to Register a LabClient that is already in the database. ");
-                                    message.AppendLine(" GUID: " + clientGuid);
-
+                                    message.AppendLine("Reference to existing LS: " + lsID + " GUID: " + paGuid);
+                                    
                                 }
                                 else
                                 {
-                                    clientId = rFactory.LoadLabClient(xdoc, ref message);
+                                    ls = rFactory.LoadProcessAgent(xdoc, ref message);
+                                    lsID = ls.agentId;
+                                }
+                                int myLssID = brokerDB.FindProcessAgentIdForAgent(lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                                if ((lssID > 0) && (myLssID <= 0) && (lssID != myLssID))
+                                {
+                                    brokerDB.AssociateLSS(lsID, lssID);
                                 }
                             }
-                            else if (descriptorType.Equals("credentialDescriptor"))
+                        }
+                        else if (descriptorType.Equals("clientDescriptor"))
+                        {
+                            int clientId = -1;
+                            string clientGuid = xdoc.Query("/clientDescriptor/clientGuid");
+                            clientId = AdministrativeAPI.GetLabClientID(clientGuid);
+                            if (clientId > 0)
                             {
+                                // Already in database
+                                message.Append(" Attempt to Register a LabClient that is already in the database. ");
+                                message.AppendLine(" GUID: " + clientGuid);
+                            }
+                            else
+                            {
+                                // LabServer should already be in the Database, once multiple LS supported may need work
+                                // LS is specified in clientDescriptor
+                                int clientID = rFactory.LoadLabClient(xdoc, ref message);
+                            }
+                        }
+                        // Add Relationships: LSS, LS Client
+                    } // end of ServiceProvider
+                    if (info[i].consumerInfo != null && info[i].consumerInfo.Length > 0)
+                    {
+                        if (!hasConsumer)
+                            message.AppendLine("Consumer Info:");
+                        hasConsumer = true;
+                        XmlQueryDoc xdoc = new XmlQueryDoc(info[i].consumerInfo);
+                        string descriptorType = xdoc.GetTopName();
+                        if (descriptorType.Equals("processAgentDescriptor"))
+                        {
+                            string paGuid = xdoc.Query("/processAgentDescriptor/agentGuid");
+                            ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(paGuid);
+                            if (paInfo == null)
+                            {
+                                // Not in database
+                                paInfo = rFactory.LoadProcessAgent(xdoc, ref message);
+                                message.Append("Loaded new ");
+                            }
+                            else
+                            {
+                                message.Append("Reference to existing ");
+                                if (paInfo.retired)
+                                {
+                                    throw new Exception("The ProcessAgent is retired");
+                                }
+                            }
 
-                                credential = rFactory.ParseCredential(xdoc, ref message);
+                            if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SCHEDULING_SERVER)
+                            {
+                                lss = paInfo;
+                                message.AppendLine("LSS: " + paGuid);
+                            }
+                            else if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SERVER)
+                            {
+                                ls = paInfo;
+                                message.AppendLine("LS: " + paGuid);
+                            }
+                            else if (paInfo.agentType == ProcessAgentType.AgentType.SCHEDULING_SERVER)
+                            {
+                                uss = paInfo;
+                                message.AppendLine("USS: " + paGuid);
                                 if (lss != null)
                                 {
                                     if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                                     {
-                                        message.AppendLine("Registering Group Credentials on LSS: " + lss.agentName);
-                                        message.AppendLine("Group:  " + credential.groupName + " DomainServer: " + credential.domainServerName);
+                                        message.AppendLine("Registering USSinfo on LSS: " + lss.agentName);
                                         LabSchedulingProxy lssProxy = new LabSchedulingProxy();
                                         lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                                         lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
                                         lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
                                         lssProxy.Url = lss.webServiceUrl;
-                                        lssProxy.AddCredentialSet(credential.domainGuid, credential.domainServerName, credential.groupName, credential.ussGuid);
+                                        lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, coupon);
                                     }
                                     else
                                     {
                                         message.AppendLine("LSS is not from this domain");
                                     }
-
-
                                 }
+                            }
 
+                        }
+                        else if (descriptorType.Equals("clientDescriptor"))
+                        {
+                            int newClientId = -1;
+                            string clientGuid = xdoc.Query("/clientDescriptor/clientGuid");
+                            int clientId = AdministrativeAPI.GetLabClientID(clientGuid);
+                            if (clientId > 0)
+                            {
+                                // Already in database
+                                message.Append(" Attempt to Register a LabClient that is already in the database. ");
+                                message.AppendLine(" GUID: " + clientGuid);
+                            }
+                            else
+                            {
+                                clientId = rFactory.LoadLabClient(xdoc, ref message);
                             }
                         }
+                        else if (descriptorType.Equals("credentialDescriptor"))
+                        {
+                            credential = rFactory.ParseCredential(xdoc, ref message);
+                            if (lss != null)
+                            {
+                                if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                                {
+                                    message.AppendLine("Registering Group Credentials on LSS: " + lss.agentName);
+                                    message.AppendLine("Group:  " + credential.groupName + " DomainServer: " + credential.domainServerName);
+                                    LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                                    lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                    lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
+                                    lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                    lssProxy.Url = lss.webServiceUrl;
+                                    lssProxy.AddCredentialSet(credential.domainGuid, credential.domainServerName, credential.groupName, credential.ussGuid);
+                                }
+                                else
+                                {
+                                    message.AppendLine("LSS is not from this domain");
+                                }
+                            }
+                        }
+                    }
+                } // End of info loop
+            } // End of Try
+            catch (Exception ex)
+            {
+                message.Append("Exception in Register: " + Utilities.DumpException(ex));
+                throw;
+            }
+            finally
+            {
+                // Send a mail Message
+                StringBuilder sb = new StringBuilder();
 
-                    } // End of info loop
+                MailMessage mail = new MailMessage();
+                mail.To = ConfigurationSettings.AppSettings["supportMailAddress"];
+                //mail.To = "pbailey@mit.edu";
+                mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
+                mail.Subject = ProcessAgentDB.ServiceAgent.agentName + " new Service Registration: " + registerGuid;
+                mail.Body = message.ToString();
+                SmtpMail.SmtpServer = "127.0.0.1";
 
-                } // End of Try
+                try
+                {
+                    SmtpMail.Send(mail);
+                }
                 catch (Exception ex)
                 {
-                    message.Append("Exception in Register: " + Utilities.DumpException(ex));
-                    throw;
-                }
-                finally
-                {
-                    // Send a mail Message
-                    StringBuilder sb = new StringBuilder();
-
-                    MailMessage mail = new MailMessage();
-                    mail.To = ConfigurationSettings.AppSettings["supportMailAddress"];
-                    //mail.To = "pbailey@mit.edu";
-                    mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
-                    mail.Subject = ProcessAgentDB.ServiceAgent.agentName + " new Service Registration: " + registerId;
-                    mail.Body = message.ToString();
-                    SmtpMail.SmtpServer = "127.0.0.1";
-
-                    try
+                    // Report detailed SMTP Errors
+                    StringBuilder smtpErrorMsg = new StringBuilder();
+                    smtpErrorMsg.Append("Exception: " + ex.Message);
+                    //check the InnerException
+                    if (ex.InnerException != null)
+                        smtpErrorMsg.Append("<br>Inner Exceptions:");
+                    while (ex.InnerException != null)
                     {
-                        SmtpMail.Send(mail);
+                        smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                        ex = ex.InnerException;
                     }
-                    catch (Exception ex)
-                    {
-                        // Report detailed SMTP Errors
-                        StringBuilder smtpErrorMsg = new StringBuilder();
-                        smtpErrorMsg.Append("Exception: " + ex.Message);
-                        //check the InnerException
-                        if (ex.InnerException != null)
-                            smtpErrorMsg.Append("<br>Inner Exceptions:");
-                        while (ex.InnerException != null)
-                        {
-                            smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
-                            ex = ex.InnerException;
-                        }
-                        Utilities.WriteLog(smtpErrorMsg.ToString());
-                    }
+                    Utilities.WriteLog(smtpErrorMsg.ToString());
                 }
-
-            } //End of if AthenticateHeader
+            }
         }
 
 
@@ -547,6 +648,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(coupon.issuerGuid);
                     if (paInfo != null)
                     {
+                        if (paInfo.retired)
+                        {
+                            throw new Exception("The ProcessAgent is retired");
+                        }
                         TicketIssuerProxy ticketProxy = new TicketIssuerProxy();
                         AgentAuthHeader authHeader = new AgentAuthHeader();
                         authHeader.coupon = paInfo.identOut;
@@ -594,6 +699,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(coupon.issuerGuid);
                     if (paInfo != null)
                     {
+                        if (paInfo.retired)
+                        {
+                            throw new Exception("The ProcessAgent is retired");
+                        }
                         TicketIssuerProxy ticketProxy = new TicketIssuerProxy();
                         AgentAuthHeader authHeader = new AgentAuthHeader();
                         authHeader.coupon = paInfo.identOut;
@@ -761,7 +870,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     {
                         // Retrieve the ESS Status info and update as needed
                         ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(summary.essGuid);
-
+                        if (ess.retired)
+                        {
+                            throw new Exception("The ESS is retired");
+                        }
                         ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
                         essProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                         essProxy.AgentAuthHeaderValue.coupon = ess.identOut;
@@ -813,6 +925,10 @@ namespace iLabs.ServiceBroker.iLabSB
                         ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(essTicket.redeemerGuid);
                         if (ess != null)
                         {
+                            if (ess.retired)
+                            {
+                                throw new Exception("The ProcessAgent is retired");
+                            }
                             ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
                             essProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                             essProxy.AgentAuthHeaderValue.coupon = ess.identOut;
@@ -838,6 +954,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(coupon.issuerGuid);
                     if (paInfo != null)
                     {
+                        if (paInfo.retired)
+                        {
+                            throw new Exception("The ProcessAgent is retired");
+                        }
                         InteractiveSBProxy ticketProxy = new InteractiveSBProxy();
                         AgentAuthHeader authHeader = new AgentAuthHeader();
                         authHeader.coupon = paInfo.identOut;
@@ -889,7 +1009,10 @@ namespace iLabs.ServiceBroker.iLabSB
                         ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(essTicket.redeemerGuid);
                         if (ess != null)
                         {
-
+                            if (ess.retired)
+                            {
+                                throw new Exception("The ProcessAgent is retired");
+                            }
                             ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
                             essProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                             essProxy.AgentAuthHeaderValue.coupon = ess.identOut;
@@ -1217,6 +1340,104 @@ EnableSession = true)]
             }
             else
                 return null;
+        }
+
+        /// <summary>
+        /// Revokes reservations that intersect the specifications, may be called from the USS or a RemoteServiceBroker
+    /// </summary>
+/// <param name="userName"></param>
+/// <param name="groupName"></param>
+/// <param name="labServerGuid"></param>
+/// <param name="clientCuid"></param>
+/// <param name="startTime"></param>
+/// <param name="endTime"></param>
+/// <param name="message"></param>
+/// <returns></returns>
+        [WebMethod(Description = "Revokes reservations that intersect the specifications, may be called from the USS or a Remote ServiceBroker", EnableSession = true)]
+        [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        [SoapDocumentMethod(Binding = "IServiceBroker")]
+        public bool RevokeReservation(string serviceBrokerGuid, string userName, string groupName, string labServerGuid, string labClientGuid,
+            DateTime startTime, DateTime endTime, string message)
+        {
+            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
+            bool status = false;
+            if (ticketIssuer.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                if (agentAuthHeader.coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
+                {
+                    try
+                    {
+                        int userId = AdministrativeAPI.GetUserID(userName);
+                        if (userId > 0)
+                        {
+                            User[] users = AdministrativeAPI.GetUsers(new int[] { userId });
+                            if (users != null && users.Length > 0)
+                            {
+                                SmtpMail.SmtpServer = "127.0.0.1";
+                                if (users[0].email != null)
+                                {
+                                    MailMessage uMail = new MailMessage();
+                                    uMail.To = users[0].email;
+                                    uMail.From = ConfigurationSettings.AppSettings["supportMailAddress"];
+                                    uMail.Subject = "[iLabs] A Reservation has been revoked!";
+                                    StringBuilder buf = new StringBuilder();
+                                    buf.Append("Your scheduled reservation for ");
+                                    buf.Append(AdministrativeAPI.GetLabClientName(AdministrativeAPI.GetLabClientID(labClientGuid)));
+                                    buf.Append(", from " + DateUtil.ToUtcString(startTime) + " to " + DateUtil.ToUtcString(endTime));
+                                    buf.AppendLine(" has been removed by an external service for the following reason: ");
+                                    buf.AppendLine(message);
+                                    buf.AppendLine("Please make a new reservation.");
+
+                                    uMail.Body = buf.ToString(); ;
+                                    SmtpMail.Send(uMail);
+                                }
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        // Report detailed SMTP Errors
+                        StringBuilder smtpErrorMsg = new StringBuilder();
+                        smtpErrorMsg.Append("Exception: SMTP in InterativeSB:" + ex.Message);
+                        //check the InnerException
+                        if (ex.InnerException != null)
+                            smtpErrorMsg.Append("<br>Inner Exceptions:");
+                        while (ex.InnerException != null)
+                        {
+                            smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                            ex = ex.InnerException;
+                        }
+                        Utilities.WriteLog(smtpErrorMsg.ToString());
+                       
+                    }
+                    status = true;
+                }
+            }
+            else
+            {
+                ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(agentAuthHeader.coupon.issuerGuid);
+                if (paInfo != null)
+                {
+                    if (paInfo.retired)
+                    {
+                        throw new Exception("The ProcessAgent is retired");
+                    }
+                    InteractiveSBProxy proxy = new InteractiveSBProxy();
+                    AgentAuthHeader authHeader = new AgentAuthHeader();
+                    authHeader.coupon = paInfo.identOut;
+                    authHeader.agentGuid = ProcessAgentDB.ServiceGuid;
+                    proxy.AgentAuthHeaderValue = authHeader;
+                    proxy.Url = paInfo.webServiceUrl;
+                    status = proxy.RevokeReservation(serviceBrokerGuid, userName, groupName, labServerGuid, labClientGuid,
+                        startTime, endTime, message);
+                }
+                else
+                {
+                    throw new Exception("Unknown TicketIssuerDB in RedeemTicket Request");
+                }
+            }
+            return status;
         }
 
     }

@@ -42,9 +42,10 @@ namespace iLabs.Scheduling.LabSide
 			credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
 			credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this recurring time block?')== false) return false;");
+           
             btnNew.Attributes.Add("onclick","javascript:window.open('NewTimeBlockPopUp.aspx','NewTimeBlockPopUp','width=910,height=600,left=270,top=180,modal=yes,resizable=yes').focus()");
             hiddenPopupOnNewTB.Attributes.Add("onpropertychange", Page.GetPostBackEventReference(btnSaveChanges));
-
+           
             if (!IsPostBack)
             {
 
@@ -78,7 +79,7 @@ namespace iLabs.Scheduling.LabSide
                         ProcessAgentDB dbTicketing = new ProcessAgentDB();
                         Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.MANAGE_LAB);
 
-                        if (ticket.IsExpired() || ticket.isCancelled)
+                        if ( ticket == null || ticket.IsExpired() || ticket.isCancelled)
                         {
                             unauthorized = true;
                             Response.Redirect("Unauthorized.aspx", false);
@@ -128,6 +129,8 @@ namespace iLabs.Scheduling.LabSide
                 labServerName = (string) Session["labServerName"];
 
             }
+            lblDescription.Text = "Create, modify or delete recurring time blocks."
+                         + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
 
 		}
 		
@@ -163,7 +166,8 @@ namespace iLabs.Scheduling.LabSide
             lbxSelectTimeBlock.Items.Clear();
             lbxPermittedExperiments.Items.Clear();
             lbxSelectExperiment.Items.Clear();
-            int[] recurrenceIDs = LSSSchedulingAPI.ListRecurrenceIDsByLabServer(Session["labServerGuid"].ToString());
+            LSResource resource = LSSSchedulingAPI.GetLSResource(Session["labServerGuid"].ToString());
+            int[] recurrenceIDs = LSSSchedulingAPI.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resource.resourceID);
             Recurrence[] recurs = LSSSchedulingAPI.GetRecurrence(recurrenceIDs);
 			//if related recurrence have been found
 			if (recurs.Length > 0)
@@ -188,7 +192,7 @@ namespace iLabs.Scheduling.LabSide
 		{
             StringBuilder buf = null;
 			lbxSelectTimeBlock.Items .Clear ();
-			
+			btnEdit.Visible = false;
 			foreach (Recurrence recur in recurs) 
 			{
                 buf = new StringBuilder();
@@ -198,15 +202,15 @@ namespace iLabs.Scheduling.LabSide
                // string labServerName = LSSSchedulingAPI.RetrieveLabServerName(recur.labServerGuid);
                 buf.Append(String.Format("{0,-30}",Session["labServerName"].ToString() + ": "));
                
-                buf.Append(String.Format("{0,-10}",DateUtil.ToUserDate(recur.recurrenceStartDate, culture, userTZ)));
+                buf.Append(String.Format("{0,-10}",DateUtil.ToUserDate(recur.startDate, culture, userTZ)));
                 buf.Append(" -- " );
-                buf.Append(String.Format("{0,10}",DateUtil.ToUserDate(recur.recurrenceEndDate.AddDays(-1), culture, userTZ)));
+                buf.Append(String.Format("{0,10}", DateUtil.ToUserDate(recur.startDate.AddDays(recur.numDays -1), culture, userTZ)));
                 
                 buf.Append(String.Format(" {0,-15}",recur.recurrenceType + ":"));
                 TimeSpan tzOffset = TimeSpan.FromMinutes(userTZ);
 
-                buf.Append(recur.recurrenceStartTime + " -- " + recur.recurrenceEndTime);
-                if(recur.recurrenceType.CompareTo(Recurrence.Weekly) == 0){
+                buf.Append(recur.startOffset + " -- " + recur.endOffset);
+                if(recur.recurrenceType == Recurrence.RecurrenceType.Weekly){
                     buf.Append(" Days: ");
                    buf.Append(DateUtil.ListDays(recur.dayMask,culture));
                 }
@@ -218,50 +222,54 @@ namespace iLabs.Scheduling.LabSide
 		}
 
         private void DisplayPermittedExperiments(int recurrenceID)
-		{
-			lbxSelectExperiment.Items.Clear();
-			lbxPermittedExperiments.Items.Clear();
-			int[] permittedExperimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByRecurrence(recurrenceID);
-			LssExperimentInfo[] permittedExperimentInfos = LSSSchedulingAPI.GetExperimentInfos(permittedExperimentInfoIDs);
-			// the experiments available in the lab server which the recurrence belongs to
-			//String labServerID = LSSSchedulingAPI.GetRecurrence(new int[]{recurrenceID})[0].labServerGuid;
+        {
+            lbxSelectExperiment.Items.Clear();
+            lbxPermittedExperiments.Items.Clear();
+            int[] permittedExperimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByRecurrence(recurrenceID);
+            LssExperimentInfo[] permittedExperimentInfos = LSSSchedulingAPI.GetExperimentInfos(permittedExperimentInfoIDs);
+            // the experiments available in the lab server which the recurrence belongs to
+            //String labServerID = LSSSchedulingAPI.GetRecurrence(new int[]{recurrenceID})[0].labServerGuid;
             int[] availableExperimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
-			ArrayList unPermittedExperimentIDs = new ArrayList();
-			foreach(int aeID in availableExperimentInfoIDs)
-			{
-				bool isIn = false;
-				for(int i=0; i<permittedExperimentInfoIDs.Length; i++)
-				{
-					if (permittedExperimentInfoIDs[i] == aeID)
-					{
-						isIn = true;
-						break;
-					}
-				}
-				if(!isIn)
-				{
-					unPermittedExperimentIDs.Add(aeID);
-				}
-			}
-			int[] unPEIDs= Utilities.ArrayListToIntArray(unPermittedExperimentIDs);
-			LssExperimentInfo[] unPermittedExperimentInfos = LSSSchedulingAPI.GetExperimentInfos(unPEIDs);
-			
-			foreach (LssExperimentInfo pep in permittedExperimentInfos) 
-			{
-				ListItem permittedExperimentItem = new ListItem();
-				permittedExperimentItem.Text = pep.labClientName + ", " + pep.labClientVersion;
-				permittedExperimentItem.Value = pep.experimentInfoId.ToString();
-				lbxPermittedExperiments.Items .Add (permittedExperimentItem);
-			}
-
-			foreach (LssExperimentInfo upep in unPermittedExperimentInfos) 
-			{
-				ListItem unPermittedExperimentItem = new ListItem();
-				unPermittedExperimentItem.Text = upep.labClientName + ", " + upep.labClientVersion;
-				unPermittedExperimentItem.Value = upep.experimentInfoId.ToString();
-				lbxSelectExperiment.Items .Add (unPermittedExperimentItem);
-			}
-		}
+            ArrayList unPermittedExperimentIDs = new ArrayList();
+            foreach (int aeID in availableExperimentInfoIDs)
+            {
+                bool isIn = false;
+                for (int i = 0; i < permittedExperimentInfoIDs.Length; i++)
+                {
+                    if (permittedExperimentInfoIDs[i] == aeID)
+                    {
+                        isIn = true;
+                        break;
+                    }
+                }
+                if (!isIn)
+                {
+                    unPermittedExperimentIDs.Add(aeID);
+                }
+            }
+            int[] unPEIDs = Utilities.ArrayListToIntArray(unPermittedExperimentIDs);
+            LssExperimentInfo[] unPermittedExperimentInfos = LSSSchedulingAPI.GetExperimentInfos(unPEIDs);
+            if (permittedExperimentInfos != null && permittedExperimentInfos.Length > 0)
+            {
+                foreach (LssExperimentInfo pep in permittedExperimentInfos)
+                {
+                    ListItem permittedExperimentItem = new ListItem();
+                    permittedExperimentItem.Text = pep.labClientName + ", " + pep.labClientVersion;
+                    permittedExperimentItem.Value = pep.experimentInfoId.ToString();
+                    lbxPermittedExperiments.Items.Add(permittedExperimentItem);
+                }
+            }
+            if (unPermittedExperimentInfos != null && unPermittedExperimentInfos.Length > 0)
+            {
+                foreach (LssExperimentInfo upep in unPermittedExperimentInfos)
+                {
+                    ListItem unPermittedExperimentItem = new ListItem();
+                    unPermittedExperimentItem.Text = upep.labClientName + ", " + upep.labClientVersion;
+                    unPermittedExperimentItem.Value = upep.experimentInfoId.ToString();
+                    lbxSelectExperiment.Items.Add(unPermittedExperimentItem);
+                }
+            }
+        }
 
         private void DisplayPermittedGroups(int recurrenceID)
         {
@@ -319,6 +327,10 @@ namespace iLabs.Scheduling.LabSide
 			{
 				try
 				{
+                    string script = "javascript:window.open('NewTimeBlockPopUp.aspx?rid=" + Int32.Parse(lbxSelectTimeBlock.SelectedValue)
+                    + " ','NewTimeBlockPopUp','width=910,height=600,left=270,top=180,modal=yes,resizable=yes').focus()";
+                   // btnEdit.Attributes.Add("onclick",script);
+                   // btnEdit.Visible = true;
                     DisplayPermittedExperiments(Int32.Parse(lbxSelectTimeBlock.SelectedValue));
                     DisplayPermittedGroups(Int32.Parse(lbxSelectTimeBlock.SelectedValue));
 				}
@@ -357,6 +369,10 @@ namespace iLabs.Scheduling.LabSide
 		
 		}
 
+        protected void btnEdit_Click(object sender, System.EventArgs e)
+        {
+        }
+
 		protected void btnRemove_Click(object sender, System.EventArgs e)
 		{
 			if (lbxSelectTimeBlock.SelectedIndex<0)
@@ -367,7 +383,7 @@ namespace iLabs.Scheduling.LabSide
 			}
 			try
 			{
-				if(LSSSchedulingAPI.RemoveRecurrence(new int[]{Int32.Parse(lbxSelectTimeBlock.SelectedValue)}).Length > 0)
+				if(LSSSchedulingAPI.RemoveRecurrence(Int32.Parse(lbxSelectTimeBlock.SelectedValue)) <= 0)
 				{
 					string msg = "The time block '"+ lbxSelectTimeBlock.SelectedItem.Text + "' was not deleted.";
                     lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);

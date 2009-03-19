@@ -639,6 +639,44 @@ namespace iLabs.ServiceBroker.Internal
 			return Utilities.ArrayListToIntArray(directChildrenList);
 		}
 
+        /// <summary>
+        /// method returns the number of qualifier instances where the name is changed
+        /// </summary>
+        /// <param name="qualifierTypeId"></param>
+        /// <param name="referenceId"></param>
+        /// <param name="name"></param>
+        /// <returns>a qualifier instance pertaining to the supplied qualifier ID; otherwise an empty qualifier instance</returns>
+        public static int ModifyQualifierName(int qualifierTypeId, int referenceId, string name)
+        {
+            int status = 0;
+            SqlConnection myConnection = FactoryDB.GetConnection();
+            SqlCommand myCommand = new SqlCommand("ModifyQualifierName", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(new SqlParameter("@qualifierTypeId", qualifierTypeId));
+            myCommand.Parameters.Add(new SqlParameter("@refid", referenceId));
+            myCommand.Parameters.Add(new SqlParameter("@newName", name));
+
+            try
+            {
+                myConnection.Open();
+                status = Convert.ToInt32(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in ModifyQualifierName. " + ex.Message, ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            if (status > 0)
+            {
+                //Update cache
+                AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
+            }
+            return status;
+        }
 
 		/* !------------------------------------------------------------------------------!
 	     *							CALLS FOR AGENTS

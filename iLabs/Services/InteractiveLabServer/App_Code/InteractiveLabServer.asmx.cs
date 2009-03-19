@@ -1,4 +1,9 @@
-/* $Id: InteractiveLabServer.asmx.cs,v 1.13 2008/03/14 16:17:20 pbailey Exp $ */
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ * 
+ * $Id:$
+ */
 
 using System;
 using System.Collections;
@@ -18,7 +23,7 @@ using iLabs.Core;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
-using iLabs.Services;
+
 
 
 namespace iLabs.LabServer.LabView

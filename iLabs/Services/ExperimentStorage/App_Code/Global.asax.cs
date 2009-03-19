@@ -26,6 +26,9 @@ namespace iLabs.ExpStorage.ESS
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
@@ -41,6 +44,9 @@ namespace iLabs.ExpStorage.ESS
             if (path != null && path.Length > 0)
             {
                 Utilities.LogPath = path;
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("ESS Application_Start: starting");
             }
             ticketRemover = new TicketRemover();

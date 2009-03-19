@@ -150,8 +150,8 @@ namespace iLabs.DataTypes.TicketingTypes
         /// <param name="issuerGuid"></param>
         /// <param name="sponsorGuid"></param>
         /// <param name="redeemerGuid"></param>
-        /// <param name="creationTime"></param>
-        /// <param name="expirationTime"></param>
+        /// <param name="createTime"></param>
+        /// <param name="duration"></param>
         /// <param name="isCancelled"></param>
         /// <param name="payload"></param>
         public Ticket(long ticketId, string type, long couponId, string issuerGuid, string sponsorGuid,

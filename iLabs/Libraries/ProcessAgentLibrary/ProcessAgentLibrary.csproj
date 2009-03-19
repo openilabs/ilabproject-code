@@ -29,17 +29,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Accessibility" />
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Div.cs" />
+    <Compile Include="Core\Div.Designer.cs">
+      <DependentUpon>Div.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Core\FactoryDB.cs" />
     <Compile Include="Core\ProcessAgentDB.cs" />
-    <Compile Include="Core\ProcessAgentInfo.cs" />
+    <Compile Include="Core\ProcessAgentInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Core\ProcessAgentType.cs" />
+    <Compile Include="Core\RegisterSelf.cs" />
+    <Compile Include="Core\SystemSupport.cs" />
     <Compile Include="Core\WS_ILabCore.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -59,6 +70,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Proxies\ProcessAgentProxy\ProcessAgentProxy.csproj">
+      <Project>{34C8F4C5-900D-4221-B833-94D01F7E93B7}</Project>
+      <Name>ProcessAgentProxy</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Proxies\TicketIssuerProxy\TicketIssuerProxy.csproj">
       <Project>{9A2772DF-71D6-44E1-BAA9-87669A9FA942}</Project>
       <Name>TicketIssuerProxy</Name>

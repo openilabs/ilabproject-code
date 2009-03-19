@@ -29,7 +29,7 @@ Please see license.txt in top level directory for full license.
                         Add/Delete Domain URLs
                     </h1>
    					<h2>
-                        &nbsp;<% = paInfo.agentName %>&nbsp;
+                        &nbsp;<% = paTag.tag %>&nbsp;
                     </h2>
 
 					<asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label></div>

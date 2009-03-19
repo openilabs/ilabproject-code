@@ -28,13 +28,14 @@ using iLabs.ServiceBroker;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
-using iLabs.Services;
+//using iLabs.Services;
 using iLabs.DataTypes;
 using iLabs.Core;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.Proxies.ESS;
 
 namespace iLabs.ServiceBroker.admin
 {
@@ -96,16 +97,16 @@ namespace iLabs.ServiceBroker.admin
             txtClientName.Text = null;
             txtGroupName1.Text = null;
             txtStatus.Text = null;
-            txtSubTime.Text = null;
-            txtComtime.Text = null;
+            txtSubmissionTime.Text = null;
+            txtCompletionTime.Text = null;
             txtRecordCount.Text = null;
             txtAnnotation.Text = null;
             txtAnnotation.ReadOnly = true;
             lblResponse.Text = null;
 
-            btnShowExperiment.Visible = false;
-            btnSaveAnnotation.Visible = false;
-            btnDeleteExperiment.Visible = false;
+            trSaveAnnotation.Visible = false;
+            trShowExperiment.Visible = false;
+            trDeleteExperiment.Visible = false;
         }
 
         protected void  selectExperiments(){
@@ -222,6 +223,10 @@ namespace iLabs.ServiceBroker.admin
                             // This operation should happen within the Wrapper
                             BrokerDB ticketIssuer = new BrokerDB();
                             ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(expInfo[0].essGuid);
+                            if (ess.retired)
+                            {
+                                throw new Exception("The experiments ESS has been retired");
+                            }
                             Coupon opCoupon = ticketIssuer.GetEssOpCoupon(expInfo[0].experimentId, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
                             if (opCoupon != null)
                             {
@@ -253,20 +258,19 @@ namespace iLabs.ServiceBroker.admin
 					txtGroupName1.Text = expInfo[0].groupName;
 
                     txtStatus.Text = DataStorageAPI.getStatusString(expInfo[0].status);
-					txtSubTime.Text = DateUtil.ToUserTime(expInfo[0].creationTime,culture,userTZ);
+					txtSubmissionTime.Text = DateUtil.ToUserTime(expInfo[0].creationTime,culture,userTZ);
                     if ((expInfo[0].closeTime != null) && (expInfo[0].closeTime != DateTime.MinValue))
-                        txtComtime.Text = DateUtil.ToUserTime(expInfo[0].closeTime, culture, userTZ);
+                        txtCompletionTime.Text = DateUtil.ToUserTime(expInfo[0].closeTime, culture, userTZ);
                     else
-                        txtComtime.Text = "Not Closed!";
+                        txtCompletionTime.Text = "Not Closed!";
                     txtRecordCount.Text = expInfo[0].recordCount.ToString();
 			
 					txtAnnotation.Text = expInfo[0].annotation;
                     txtAnnotation.ReadOnly = false;
 
-                    btnShowExperiment.Visible = true;
-                    btnShowExperiment.Enabled = true;
-                    btnSaveAnnotation.Visible = true;
-                    btnDeleteExperiment.Visible = true;
+                    trShowExperiment.Visible = (expInfo[0].recordCount >0);
+                    trSaveAnnotation.Visible = true;
+                    trDeleteExperiment.Visible = true;
 
 				}
 			
@@ -313,7 +317,7 @@ namespace iLabs.ServiceBroker.admin
 
         protected void btnShowExperiment_Click(object sender, System.EventArgs e)
         {
-            Response.Redirect("~/showExperiment.aspx?expid=" + txtExperimentID.Text, true);
+            Response.Redirect("showAdminExperiment.aspx?expid=" + txtExperimentID.Text, true);
         }
 
         protected void btnDeleteExperiment_Click(object sender, System.EventArgs e)

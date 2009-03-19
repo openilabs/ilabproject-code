@@ -15,7 +15,7 @@ namespace iLabs.UtilLib
 	static private string release = "2.2";
         static private string buildDate = "$ilab:BuildDate$";
         /// <summary>
-        /// Returns the date and svn revision last set
+        /// Returns the date and svn revision last set, still not auto setting....
         /// </summary>
         public static string Revision
         {
@@ -31,7 +31,7 @@ namespace iLabs.UtilLib
         {
             get
             {
-                return release + " " + revision;
+                return release + " ( " + revision.Replace("$", "") + " ) " + date.Replace("$", "");
             }
         }
 

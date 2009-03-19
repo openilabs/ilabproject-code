@@ -15,7 +15,6 @@ using System.Web.Security;
 using System.Configuration;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.iLabSB;
-using iLabs.Services;
 
 namespace iLabs.ServiceBroker.admin
 {
@@ -85,15 +84,6 @@ namespace iLabs.ServiceBroker.admin
 					aNav3ManageServices.Attributes.Add("class", "nav3active");
 					aNav3ManageLabs.Attributes.Add("class", "last");
 					break;
-                    /*
-				case "manageLabServers.aspx":
-					aManageServices.Attributes.Add("class", "topactive");
-					ulNav3Labs.Visible = true;
-					aNav3ManageServices.Attributes.Add("class", "first");
-					//aNav3ManageLabServers.Attributes.Add("class", "nav3active");
-					aNav3ManageLabs.Attributes.Add("class", "last");
-					break;
-				*/
 				case "manageLabClients.aspx":
 					aManageServices.Attributes.Add("class", "topactive");
 					ulNav3Labs.Visible = true;
@@ -152,6 +142,16 @@ namespace iLabs.ServiceBroker.admin
 					aNav3ExperimentRecords.Attributes.Add("class", "nav3active");
 					aNav3LoginRecords.Attributes.Add("class", "last");
 					break;
+                case "showAdminExperiment.aspx":
+
+                    ulNav3Records.Visible = true;
+                    //AdminNav1_aExperimentRecords.visible = true;
+                    aExperimentRecords.Attributes.Add("class", "topactive");
+                    //ulNav3Records.Visible = true;
+                    //ulNav3Records.Visible = true;
+                    //aNav3ExperimentRecords.Attributes.Add("class", "nav3active");
+                    aNav3LoginRecords.Attributes.Add("class", "last");
+                    break;
 
 					//  Nav3 level
 				case "loginRecords.aspx":

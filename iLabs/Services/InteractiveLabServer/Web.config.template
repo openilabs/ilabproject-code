@@ -11,19 +11,21 @@
     <!-- They are used by the SelfRegistration page to generate the ProcessAgent's
          Bootstrap ProcessAgent Record, which must be created before installing domain credientials -->
 
+    <!-- the database connection information 
+    NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
+    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_ILS;Integrated Security=SSPI"/>
+    
     <add key="serviceType" value="LAB SERVER"/>
     <add key="serviceName" value="Default LabServer"/>
     <add key="serviceGUID" value=""/>
     <add key="codebaseURL" value="http://localhost/InteractiveLabServer"/>
     <add key="serviceURL" value="http://localhost/InteractiveLabServer/InteractiveLabServer.asmx"/>
     <add key="defaultPasskey" value="ILS"/>
-
-    <!-- the database connection information 
-    NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->  
-    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_ILS;Integrated Security=SSPI"/>
-
+    <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
+    
     <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
     <add key="logPath" value=""/>
+  
 
   </appSettings>
   <system.diagnostics>

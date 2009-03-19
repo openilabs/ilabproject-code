@@ -1,4 +1,5 @@
 <%@ Page language="c#" Inherits="iLabs.Services.SelfRegistration" CodeFile="SelfRegistration.aspx.cs" EnableEventValidation="false" %>
+<%@ Register TagPrefix="uc1" TagName="register" Src="SelfRegistration.ascx" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
@@ -19,79 +20,10 @@ Please see license.txt in top level directory for full license.
 		<form method="post" runat="server">
 			<a name="top"></a>
 				<div id="innerwrapper">
-					<div id="pageintro">
-						<h1><asp:label id="lblTitle" Runat="server"></asp:label></h1>
-						<asp:label id="lblDescription" Runat="server"></asp:Label>
-						<p><asp:label id="lblResponse" Runat="server" Visible="False"></asp:label></p>
-					</div>
-					<div id="Div1"  runat="server">
-					<asp:CustomValidator ID="valGuid" ControlToValidate="txtServiceGuid" OnServerValidate="checkGuid" 
-                    Text="A Guid must be unique and no longer than 50 characters" runat="server"/>
-					
-					</div>
-					<!-- end pageintro div -->
-					<div id="pagecontent">
-						<p><asp:HyperLink id="lnkBackSB" Text="Back to InteractiveSB" runat="server" ></asp:HyperLink></p>
-						
-						<div class="simpleform">
-						    <form id="serviceInfo" action="" method="post" name="serviceInfo">
-									<table style="WIDTH: 564px; HEIGHT: 460px" cellSpacing="0" cellPadding="5" border="0">
-										<TBODY>
-											<tr>
-												<th style="width: 480px">
-													<label for="serviceType">Service Type</label></th>
-													<% // Change this to the type of ProcessAgent %>
-												<td style="width: 484px"><asp:label id="lblServiceType" Runat="server" Width="360px"></asp:label></td>
-											</tr>
-											<tr>
-												<th style="width: 480px">
-													<label for="serviceName">Service Name</label></th>
-												<td style="width: 484px"><asp:textbox id="txtServiceName" Runat="server" Width="360px"></asp:textbox></td>
-											</tr>
-											<tr>
-												<th style="width: 480px">
-													<label for="agentGuid">Service GUID</label></th>
-												<td style="width: 484px"><asp:textbox id="txtServiceGUID" Runat="server" Width="360px"></asp:textbox></td>
-											</tr>
-											<tr>
-												<th style="width: 480px">
-													<label for="codebaseUrl">Codebase URL</label></th>
-												<td style="width: 484px"><asp:textbox id="txtCodebaseUrl" Runat="server" Width="360px"></asp:textbox></td>
-											</tr>
-											<tr>
-												<th style="width: 480px">
-													<label for="webServiceUrl">Web Service URL</label></th>
-												<td style="width: 484px"><asp:textbox id="txtWebServiceUrl" Runat="server" Width="360px"></asp:textbox></td>
-											</tr>
-											<tr id="trPasskey" runat="server">
-												<th style="width: 480px">
-													<label for="outpasskey">Initial Passkey </label></th>
-												<td style="width: 484px"><asp:textbox id="txtOutPassKey" Runat="server" Width="360px"></asp:textbox></td>
-											</tr>
-                                            <tr id=trDomainSB runat="server">
-												<th style="width: 480px">
-													<label for="DomainServer">Domain ServiceBroker </label></th>
-												<td style="width: 484px"><asp:textbox id="txtDomainServer" Runat="server" Width="360px" ReadOnly="true"></asp:textbox></td>
-											</tr>
-											<tr>
-												<th colSpan="2">
-												<asp:button id="btnGuid" Runat="server" CssClass="button" Text="Create GUID" onclick="btnGuid_Click"></asp:button>
-                                                    &nbsp;&nbsp;<asp:button id="btnSaveChanges" Runat="server" CssClass="button" Text="Save Changes" onclick="btnSaveChanges_Click"></asp:button>
-                                                    &nbsp;&nbsp;<asp:button id="btnRefresh" Runat="server" CssClass="button" Text="Refresh" onclick="btnRefresh_Click"></asp:button>
-                                                    &nbsp;&nbsp;<asp:button id="btnNew" Runat="server" CssClass="button" Text="Clear" onclick="btnNew_Click"></asp:button>
-                                                 </th>
-                                            </tr>
-											<tr>
-												<th colSpan="2"></th>
-											</tr>
-										</TBODY>
-									</table>
-								</form>
-						 </div>
-					<!-- end pagecontent div --></div>
+				<uc1:register ID="selfReg" runat="server" AgentType="LAB SERVER" />	
 				<!-- end innerwrapper div -->
 				</div>
-				<br clear="all">
+				<br clear="all" />
 				</form>
 				
 	</body>

@@ -3,18 +3,23 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using System.Xml;
 
 using iLabs.Core;
+using iLabs.DataTypes;
 using iLabs.DataTypes.SchedulingTypes;
-using iLabs.Ticketing;
 using iLabs.DataTypes.TicketingTypes;
-using System.Xml;
-using System.Globalization;
+
+using iLabs.Ticketing;
+
+
 using iLabs.UtilLib;
 
 
@@ -56,6 +61,7 @@ namespace iLabs.Scheduling.LabSide
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+           
             if (!IsPostBack)
             {
                 lblDateTimeFormat.Text = culture.DateTimeFormat.ShortDatePattern;
@@ -131,10 +137,8 @@ namespace iLabs.Scheduling.LabSide
 
                 if (!unauthorized)
                 {
-                    //labServerGuid = Session["labServerGuid"].ToString();
+                    // Load the Group list box
                     LoadGroupListBox();
-                    //lblLabServerName.Text = Session["labServerName"].ToString();
-                    //lblLabServerName.Text = Session["labServerName"].ToString();
                     // Load the Experiment list box
                     LoadExperimentListBox(Session["labServerGuid"].ToString());
                     // load the reservation List box.
@@ -147,10 +151,6 @@ namespace iLabs.Scheduling.LabSide
 				txtTime2.ReadOnly=true;
 				txtTime2.BackColor=Color.Lavender;
 			}
-			
-			
-			// Load the Group list box
-			
 		}
 
 	
@@ -168,61 +168,55 @@ namespace iLabs.Scheduling.LabSide
 		//list the reservation information according to the labserverGuid
 		private void BuildReservationListBox(string labServerGuid)
 		{
+           
 			txtDisplay.Text=null;
 			try
 			{
-				int[] reIDs = LSSSchedulingAPI.ListReservationInfoIDsByLabServer(labServerGuid, DateTime.Parse("1/1/1753 12:00:00 AM"), DateTime.MaxValue);						
-				if (reIDs.Length==0)
+                IntTag[] reservations = LSSSchedulingAPI.ListReservations(labServerGuid, DateTime.MinValue, DateTime.MinValue, culture, userTZ);
+                if (reservations == null || reservations.Length == 0)
 				{
-					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been made.");
+					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been found.");
 					lblErrorMessage.Visible=true;
 				}
 				else
-				{
-					ReservationInfo[] reservationInfos = LSSSchedulingAPI.GetReservationInfos(reIDs);
-					for(int j = reservationInfos.Length-1; j > -1  ; j--)
-					{
-						LssExperimentInfo exinfo = LSSSchedulingAPI.GetExperimentInfos(new int[]{reservationInfos[j].experimentInfoId})[0];
-						string experimentName = exinfo.labClientName + "  " + exinfo.labClientVersion;
-						LssCredentialSet cre = LSSSchedulingAPI.GetCredentialSets(new int[]{reservationInfos[j].credentialSetId})[0];
-						string ussName = LSSSchedulingAPI.GetUSSInfos(new int[]{LSSSchedulingAPI.ListUSSInfoID(cre.ussGuid)})[0].ussName;
-						string credentialSetName = cre.groupName + "  " +cre.serviceBrokerName + "  " +ussName;
-						txtDisplay.Text += experimentName + " , " + credentialSetName + ", "+"Start time:  " + DateUtil.ToUserTime(reservationInfos[j].startTime, culture,userTZ) + "   " + "End time:  " + DateUtil.ToUserTime(reservationInfos[j].endTime, culture, userTZ) +"\n";
-					}
+				{   
+                    StringBuilder buf = new StringBuilder();
+                    foreach (IntTag t in reservations)
+                    {
+                        buf.AppendLine(t.tag);
+                    }
+                    txtDisplay.Text = buf.ToString();
+
 				}
 			}
 			catch(Exception ex)
 			{
-				lblErrorMessage.Text =Utilities.FormatErrorMessage("can not retrieve reservationInfos  "+ex.Message);
+				lblErrorMessage.Text =Utilities.FormatErrorMessage("can not retrieve reservations  "+ex.Message);
 				lblErrorMessage.Visible=true;
 			}
 		}
 		//list the reservation information according to the selected criterion
-		private void BuildReservatoinListBox(string labServerID, int ExperimentInfoID, int CredentialSetID, DateTime time1, DateTime time2)
+		private void BuildReservatoinListBox(int ExperimentInfoID, int CredentialSetID, DateTime time1, DateTime time2)
 		{
 			
 			try
 			{
 				txtDisplay.Text=null;
-				ReservationInfo[] reservationInfos = LSSSchedulingAPI.SelectReservationInfo(labServerID, ExperimentInfoID, CredentialSetID,  time1,  time2);						
-				if (reservationInfos.Length==0)
-				{
-					lblErrorMessage.Text =Utilities.FormatWarningMessage("no reservations have been made.");
-					lblErrorMessage.Visible=true;
-				}
-				else
-				{
-					
-					for(int j = reservationInfos.Length-1; j > -1  ; j--)
-					{
-						LssExperimentInfo exinfo = LSSSchedulingAPI.GetExperimentInfos(new int[]{reservationInfos[j].experimentInfoId})[0];
-						string experimentName = exinfo.labClientName + "  " + exinfo.labClientVersion;
-						LssCredentialSet cre = LSSSchedulingAPI.GetCredentialSets(new int[]{reservationInfos[j].credentialSetId})[0];
-						string ussName = LSSSchedulingAPI.GetUSSInfos(new int[]{LSSSchedulingAPI.ListUSSInfoID(cre.ussGuid)})[0].ussName;
-						string credentialSetName = cre.groupName + "  " +cre.serviceBrokerName + "  " +ussName;
-						txtDisplay.Text += experimentName + " , " + credentialSetName + ", "+"Start time:  " + DateUtil.ToUserTime(reservationInfos[j].startTime, culture, userTZ) + "   " + "End time:  " + DateUtil.ToUserTime(reservationInfos[j].endTime,culture,userTZ)+"\n";
-					}
-				}
+                IntTag[] reservations = LSSSchedulingAPI.ListReservations(ExperimentInfoID, CredentialSetID, time1, time2, culture, userTZ);
+                if (reservations == null || reservations.Length == 0)
+                {
+                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage("no reservations have been found.");
+                    lblErrorMessage.Visible = true;
+                }
+                else
+                {
+                    StringBuilder buf = new StringBuilder();
+                    foreach (IntTag t in reservations)
+                    {
+                        buf.AppendLine(t.tag);
+                    }
+                    txtDisplay.Text = buf.ToString();
+                }
 			}
 			catch(Exception ex)
 			{
@@ -235,47 +229,31 @@ namespace iLabs.Scheduling.LabSide
 			lblErrorMessage.Text ="";
 			lblErrorMessage.Visible=false;
 			
-			
 			if(ddlGroup.SelectedIndex <= 0 && ddlExperiment.SelectedIndex <=0 && txtTime1.Text==null && txtTime2.Text==null)
 			{
-                BuildReservationListBox(Session["labServerName"].ToString());		
+                BuildReservationListBox(Session["labServerGuid"].ToString());		
 			}
 			else
 			{
 				int experimentInfoID = -1;
 				int credentialSetID = -1;
+                DateTime start = DateTime.MinValue;
+                DateTime end = DateTime.MinValue;
+
                 if (ddlGroup.SelectedIndex >= 1)
                 {
                     credentialSetID = Int32.Parse(ddlGroup.SelectedValue);
-                }
-                else
-                {
-                    lblErrorMessage.Text = Utilities.FormatWarningMessage("Please select a group");
-                    lblErrorMessage.Visible = true;
-                    return;
                 }
 				if (ddlExperiment.SelectedIndex >= 1)
 				{
                       experimentInfoID = Int32.Parse(ddlExperiment.SelectedValue);
 				}
-                else
-                {
-                    lblErrorMessage.Text = Utilities.FormatWarningMessage("Please select a experiment");
-                    lblErrorMessage.Visible = true;
-                    return;
-                }
-				
-				if (ddlTimeIs.SelectedIndex<1)
-				{
-                    BuildReservatoinListBox(Session["labServerName"].ToString(), experimentInfoID, credentialSetID, DateTime.MinValue, DateTime.MinValue);
-
-				}
-				else 
+				if (ddlTimeIs.SelectedIndex >0)
 				{
 					DateTime time1;
 					try
 					{
-						time1 = DateTime.Parse (txtTime1.Text).ToUniversalTime();
+						time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,userTZ);
 					}
 					catch
 					{	
@@ -283,27 +261,31 @@ namespace iLabs.Scheduling.LabSide
 						lblErrorMessage.Visible=true;
 						return;
 					}
-					if(ddlTimeIs.SelectedIndex==1)
+					if(ddlTimeIs.SelectedIndex==1) //Equal To
 					{
-                        BuildReservatoinListBox(Session["labServerName"].ToString(), experimentInfoID, credentialSetID, time1, time1);
+                        start = time1;
+                        end = time1;
+                      
 
 					}
-					else if(ddlTimeIs.SelectedIndex==2)
+					else if(ddlTimeIs.SelectedIndex==2) // Before
 					{
-                        BuildReservatoinListBox(Session["labServerName"].ToString(), experimentInfoID, credentialSetID, DateTime.MinValue, time1);
-
+                        end = time1;
+                       
 					}				
-					else if(ddlTimeIs.SelectedIndex==3)
+					else if(ddlTimeIs.SelectedIndex==3) // After
 					{
-                        BuildReservatoinListBox(Session["labServerName"].ToString(), experimentInfoID, credentialSetID, time1, DateTime.MinValue);
-
+                        start = time1;
+                       
 					}
-					else if(ddlTimeIs.SelectedIndex==4)
+					else if(ddlTimeIs.SelectedIndex==4) //Between
 					{
 						DateTime time2;
 						try
 						{
-							time2 = DateTime.Parse (txtTime2.Text).ToUniversalTime();
+                            time2 = DateUtil.ParseUserToUtc(txtTime2.Text, culture, userTZ);
+                            start = time1;
+                            end = time2;
 						}
 						catch
 						{	
@@ -311,12 +293,12 @@ namespace iLabs.Scheduling.LabSide
 							lblErrorMessage.Visible=true;
 							return;
 						}
-                        BuildReservatoinListBox(Session["labServerName"].ToString(), experimentInfoID, credentialSetID, time1, time2);
-
 					}
 				}
+                BuildReservatoinListBox(experimentInfoID, credentialSetID, start, end);
 			}		
 		}
+
 		private void LoadGroupListBox()
 		{
 			ddlGroup.Items.Clear();

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ * 
+ * $Id$
+ */
+
+#define LabVIEW_82
+
 using System;
 using System.Data;
 using System.Configuration;
@@ -14,13 +23,21 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.ISB;
+using iLabs.Proxies.Ticketing;
 using iLabs.UtilLib;
-using iLabs.Services;
 using iLabs.Ticketing;
 using iLabs.LabServer.Interactive;
-using iLabs.LabView;
+
+#if LabVIEW_82
+using LabVIEW.lv821;
 using iLabs.LabView.LV82;
-using LabVIEW;
+#endif
+#if LabVIEW_86
+using LabVIEW.lv86;
+using iLabs.LabView.LV86;
+#endif
 
 namespace iLabs.LabServer.LabView
 {
@@ -88,7 +105,7 @@ namespace iLabs.LabServer.LabView
                             Utilities.WriteLog("Trying StatusVI: " + ce.Message);
                         }
                     }
-                    
+
 
                     //Get the VI and send version specfic call to get control of the VI
                     VirtualInstrument vi = lvi.GetVI(viName);
@@ -101,7 +118,7 @@ namespace iLabs.LabServer.LabView
                         vi.Abort();
                         Utilities.WriteLog("Expire: AbortVI() called because no stop control");
                     }
-                    
+
                     // Also required for LV 8.2.0 and 7.1, force disconnection of RemotePanel
                     //lvi.SubmitAction("closevi", lvi.qualifiedName(vi));
 
@@ -125,8 +142,22 @@ namespace iLabs.LabServer.LabView
                     // Only use the domain ServiceBroker, do we need a test
                     // Should only be one
                     ProcessAgentInfo[] sbs = dbService.GetProcessAgentInfos(ProcessAgentType.SERVICE_BROKER);
-                
+
                     if ((sbs == null) || (sbs.Length < 1))
+                    {
+                        Utilities.WriteLog("Can not retrieve ServiceBroker!");
+                        throw new Exception("Can not retrieve ServiceBroker!");
+                    }
+                    ProcessAgentInfo domainSB = null;
+                    foreach (ProcessAgentInfo dsb in sbs)
+                    {
+                        if (!dsb.retired)
+                        {
+                            domainSB = dsb;
+                            break;
+                        }
+                    }
+                    if (domainSB == null)
                     {
                         Utilities.WriteLog("Can not retrieve ServiceBroker!");
                         throw new Exception("Can not retrieve ServiceBroker!");
@@ -136,7 +167,8 @@ namespace iLabs.LabServer.LabView
                     iuProxy.AgentAuthHeaderValue.coupon = sbs[0].identOut;
                     iuProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
                     iuProxy.Url = sbs[0].webServiceUrl;
-                    StorageStatus storageStatus = iuProxy.AgentCloseExperiment(expCoupon,experimentID);
+                    StorageStatus storageStatus = iuProxy.AgentCloseExperiment(expCoupon, experimentID);
+                    Utilities.WriteLog("AgentCloseExperiment status: " + storageStatus.status + " records: " + storageStatus.recordCount);
 
 
                     // currently RequestTicketCancellation always returns false
@@ -165,14 +197,14 @@ namespace iLabs.LabServer.LabView
             {
                 lvi = null;
             }
-        
+
             return status;
         }
 
 
         public override eStatus HeartBeat()
         {
-            
+
             try
             {
                 if (status == eStatus.Running)
@@ -182,7 +214,7 @@ namespace iLabs.LabServer.LabView
                         XmlQueryDoc taskDoc = new XmlQueryDoc(data);
                         string vi = taskDoc.Query("task/application");
                         string statusVI = taskDoc.Query("task/status");
-                        
+
                         if ((statusVI != null) && (statusVI.Length > 0))
                         {
                             I_LabViewInterface lvi = null;
@@ -190,7 +222,7 @@ namespace iLabs.LabServer.LabView
                             {
                                 string server = taskDoc.Query("task/server");
                                 string portStr = taskDoc.Query("task/serverPort");
-                                
+
                                 if (((server != null) && (server.Length > 0)) && ((portStr != null) && (portStr.Length > 0)))
                                 {
                                     lvi = new LabViewRemote(server, Convert.ToInt32(portStr));
@@ -201,7 +233,7 @@ namespace iLabs.LabServer.LabView
                                 }
                                 long ticks = endTime.Ticks - DateTime.UtcNow.Ticks;
                                 TimeSpan val = new TimeSpan(ticks);
-                                lvi.DisplayStatus(statusVI, "TaskID: " + taskID , val.Minutes + ":" + val.Seconds);
+                                lvi.DisplayStatus(statusVI, "TaskID: " + taskID, val.Minutes + ":" + val.Seconds);
                             }
                             catch (Exception ce2)
                             {
@@ -224,4 +256,9 @@ namespace iLabs.LabServer.LabView
         }
 
     }
+#if LabVIEW_82
 }
+#endif
+#if LabVIEW_86
+}
+#endif

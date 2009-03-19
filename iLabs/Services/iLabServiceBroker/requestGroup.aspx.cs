@@ -221,7 +221,7 @@ namespace iLabs.ServiceBroker.iLabSB
 					{
                         int origGroupID = AdministrativeAPI.GetAssociatedGroupID(((Group)canRequestGroups[i]).groupID);
                         string origGroupName = AdministrativeAPI.GetGroups(new int[] { origGroupID })[0].groupName;
-						((Group)canRequestGroups[i]).groupName = origGroupName;
+						canRequestGroups[i].groupName = origGroupName;
 					}
 					repAvailableGroups.DataSource = canRequestGroups;
 					repAvailableGroups.DataBind();

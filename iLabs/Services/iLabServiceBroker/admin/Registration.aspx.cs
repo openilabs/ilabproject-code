@@ -27,7 +27,7 @@ using iLabs.ServiceBroker.iLabSB;
 
 using iLabs.UtilLib;
 using iLabs.Ticketing;
-using iLabs.Services;
+//using iLabs.Services;
 
 namespace iLabs.ServiceBroker.admin 
 {
@@ -94,7 +94,7 @@ namespace iLabs.ServiceBroker.admin
                 ProcessAgentInfo[] pais = wrapper.GetProcessAgentInfosWrapper(labServerIDs);
                 foreach (ProcessAgentInfo pai in pais)
                 {
-                    if (pai.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                    if (!pai.retired && pai.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                     {
                         ddlLabServer.Items.Add(new ListItem(pai.AgentName, pai.AgentId.ToString()));
                     }

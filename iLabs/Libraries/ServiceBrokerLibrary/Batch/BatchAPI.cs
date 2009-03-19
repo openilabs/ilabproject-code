@@ -17,9 +17,9 @@ using iLabs.DataTypes.BatchTypes;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.Proxies.BatchLS;
+using iLabs.Proxies.ESS;
 using iLabs.Ticketing;
-
-using iLabs.Services;
 
 namespace iLabs.ServiceBroker.Batch
 {
@@ -156,6 +156,9 @@ namespace iLabs.ServiceBroker.Batch
                 else
                 {
                     ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(expInfo.essID);
+                    if(ess.retired){
+                        throw new Exception("The requested ESS has been retired");
+                    }
                     ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
                     essProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                     essProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
@@ -171,6 +174,9 @@ namespace iLabs.ServiceBroker.Batch
                         ProcessAgentInfo lsInfo = brokerDB.GetProcessAgentInfo(expInfo.agentID);
                         if (lsInfo != null)
                         {
+                            if(lsInfo.retired){
+                                throw new Exception("The requested batch LabServer has ben retired.");
+                            }
                             BatchLSProxy batchLS_Proxy = new BatchLSProxy();
                             batchLS_Proxy.AuthHeaderValue = new AuthHeader();
                             batchLS_Proxy.AuthHeaderValue.identifier = ProcessAgentDB.ServiceGuid;
@@ -183,9 +189,7 @@ namespace iLabs.ServiceBroker.Batch
                             {
                                 if ((expStatus.statusReport.statusCode >= 3) && (expStatus.statusReport.statusCode != 6))
                                 {
-                                    if (expStatus.statusReport.statusCode != (expInfo.status & StorageStatus.BATCH_MASK))
-                                    {
-                                        report = batchLS_Proxy.RetrieveResult(experimentID);
+                                    report = batchLS_Proxy.RetrieveResult(experimentID);
                                         if (report != null)
                                         {
                                             ExperimentRecord theRecord = null;
@@ -250,15 +254,15 @@ namespace iLabs.ServiceBroker.Batch
                                         }
                                     }
                                 }
-                            }
+                            
                         }
                     }
                     else
                     {
+                        report = new ResultReport();
                         ExperimentRecord[] records = essProxy.GetRecords(experimentID, null);
                         if (records != null)
                         {
-                            report = new ResultReport();
                             List<String> execWarnings = new List<String>();
                             foreach (ExperimentRecord rec in records)
                             {
@@ -290,6 +294,7 @@ namespace iLabs.ServiceBroker.Batch
                                 report.warningMessages = execWarnings.ToArray();
                             }
                         }
+                        report.statusCode = expInfo.status & StorageStatus.BATCH_MASK;
                     }
                 }
             }

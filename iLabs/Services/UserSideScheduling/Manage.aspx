@@ -6,7 +6,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>RegisterExperimentInfo</title>
+		<title>Policy Management</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR" />
 		<meta content="C#" name="CODE_LANGUAGE" />
 		<meta content="JavaScript" name="vs_defaultClientScript" />
@@ -19,7 +19,7 @@
 	<div id="outerwrapper">
 		<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
 		<uc1:NavBar id="NavBar1" runat="server"></uc1:NavBar>
-		<br clear="all">
+		<br clear="all" />
 		<div id="innerwrapper">
 		<div id="pageintro">
 						<h1>Policy Management
@@ -52,18 +52,19 @@
 									</tr>
 									<tr>
 										<th style="width: 151px">
-											<asp:label  ID="lblfield2" runat="server" Font-Size="Smaller">Maximum number of reservable Time Slots</asp:label>
-											</th>
-										<td style="width: 454px"><asp:textbox id="txtMaxReservableTimeSlots" Runat="server" Width="100%"></asp:textbox>
-											</td>
-									</tr>
-									<tr>
-										<th style="width: 151px">
-										<asp:label  ID="lblfield3" runat="server" Font-Size="Smaller">Minimun number of reservable Time Slots</asp:label>
+										<asp:label  ID="lblfield3" runat="server" Font-Size="Smaller">Minimun time required</asp:label></th>
 											
 										<td style="width: 454px"><asp:textbox id="txtMinReservableTimeSlots" Runat="server" Width="100%"></asp:textbox>
 											</td>
 									</tr>
+									<tr>
+										<th style="width: 151px">
+											<asp:label  ID="lblfield2" runat="server" Font-Size="Smaller">Maximum reservable time</asp:label>
+											</th>
+										<td style="width: 454px"><asp:textbox id="txtMaxReservableTimeSlots" Runat="server" Width="100%"></asp:textbox>
+											</td>
+									</tr>
+									
 									<tr>
 										<th colspan="2">
 											<asp:button id="btnSaveChanges" Runat="server" Text="Save Changes" CssClass="button" onclick="btnSaveChanges_Click"></asp:button>

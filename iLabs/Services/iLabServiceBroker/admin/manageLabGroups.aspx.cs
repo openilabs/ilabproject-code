@@ -24,13 +24,15 @@ using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.Proxies.PAgent;
+using iLabs.Proxies.LSS;
+using iLabs.Proxies.USS;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.Mapping;
 using iLabs.Ticketing;
-using iLabs.Services;
 using iLabs.UtilLib;
 
 
@@ -257,8 +259,8 @@ namespace iLabs.ServiceBroker.admin
                         //}
                         foreach (ProcessAgentInfo ls in labServers)
                         {
-                            labServersList.Add(ls);
-                            //ddlLabServer.Items.Add(new ListItem(ls.agentName, ls.agentId.ToString()));
+                            if(!ls.retired)
+                                labServersList.Add(ls);
                         }
                         repLabServers.DataSource = labServersList;
                         repLabServers.DataBind();
@@ -802,7 +804,15 @@ namespace iLabs.ServiceBroker.admin
                     {
 
                         uss = issuer.GetProcessAgentInfo(ussId);
+                        if (uss.retired)
+                        {
+                            throw new Exception("The USS is retired");
+                        }
                         lss = issuer.GetProcessAgentInfo(lssId);
+                        if (lss.retired)
+                        {
+                            throw new Exception("The LSS is retired");
+                        }
 
 
                         //Object keyObj = groupID;
@@ -885,13 +895,15 @@ namespace iLabs.ServiceBroker.admin
                             lssProxy.AgentAuthHeaderValue.agentGuid = domainGuid;
                             // Add the USS to the LSS, this may be called multiple times with duplicate data
                             lssProxy.AddUSSInfo(uss.AgentGuid, uss.agentName, uss.webServiceUrl, revokeCoupon);
-                            bool credentialSetAdded = lssProxy.AddCredentialSet(domainGuid,
+                            int credentialSetAdded = lssProxy.AddCredentialSet(domainGuid,
                                 sbName, userGroupName, uss.agentGuid);
                         }
                         else
                         { // Cross-Domain Registration needed
                             ProcessAgentInfo remoteSB = issuer.GetProcessAgentInfo(lss.domainGuid);
-
+                            if(remoteSB.retired){
+                                throw new Exception("The remote service broker is retired");
+                            }
                             ResourceDescriptorFactory resourceFactory = ResourceDescriptorFactory.Instance();
                             string ussDescriptor = resourceFactory.CreateProcessAgentDescriptor(ussId);
                             string lssDescriptor = resourceFactory.CreateProcessAgentDescriptor(lssId);

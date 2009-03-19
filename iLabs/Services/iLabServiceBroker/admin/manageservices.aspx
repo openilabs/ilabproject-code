@@ -39,7 +39,7 @@ Please see license.txt in top level directory for full license.
 									<table style="WIDTH: 620px; HEIGHT: 460px" cols="3" cellSpacing="0" cellPadding="5" border="0">
 										<TBODY>
 										    <tr><th style="width: 120px"><label for="registerBatch">Register BatchLS</label><asp:checkbox ID="cbxDoBatch" runat="server" AutoPostBack="True" OnCheckedChanged="cbxDoBatch_Changed" /></th>
-											<td colspan="2" style="width: 500px"><asp:textbox ID="txtBatchHelp" runat="server" Columns="70" Rows="3" TextMode="MultiLine" Visible="false" Width="500px">Note: Batch LabServers require that the incoming passcode be specified by the ServiceBroker provider, the outgoing passcode is specified by the LabServer provider.</asp:textbox></td>
+											<td colspan="2" style="width: 500px"><asp:textbox ID="txtBatchHelp" runat="server" Columns="70" Rows="4" TextMode="MultiLine" Visible="false" Width="500px">Note: Batch LabServers require that the LabServer GUID be less than 36 characters,  the incoming passcode be specified by the ServiceBroker provider, and the outgoing passcode is specified by the LabServer provider.</asp:textbox></td>
 										   </tr>
 											<tr>
 												<th style="width: 120px">

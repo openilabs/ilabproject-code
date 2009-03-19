@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ * 
+ * $Id$
+ */
+
 using System;
 using System.Collections;
 using System.ComponentModel;
@@ -11,7 +18,7 @@ using iLabs.Core;
 using iLabs.Ticketing;
 
 using iLabs.UtilLib;
-using iLabs.Services;
+
 using iLabs.LabServer.Interactive;
 using iLabs.LabServer.LabView; 
 
@@ -50,6 +57,9 @@ namespace iLabs.LabServer.LabView
                 && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
 			//threadLV = new Thread(new ThreadStart(ThreadProc));
@@ -79,6 +89,9 @@ namespace iLabs.LabServer.LabView
             if (path != null && path.Length > 0)
             {
                 Utilities.LogPath = path;
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Application_Start: starting");
             }
             
@@ -95,7 +108,10 @@ namespace iLabs.LabServer.LabView
  
 		protected void Session_Start(Object sender, EventArgs e)
 		{
-            Utilities.WriteLog("Session_Start:");
+            Utilities.WriteLog("Session_Start: " + sender.ToString() + " \t : " + e.ToString());
+            Exception ex = new Exception("Session_Start:");
+            string tmp = Utilities.DumpException(ex);
+            Utilities.WriteLog(Utilities.DumpException(ex));
 
 		}
 
@@ -118,13 +134,21 @@ namespace iLabs.LabServer.LabView
 
 		protected void Application_Error(Object sender, EventArgs e)
 		{
-
+            Utilities.WriteLog("Application_Error: " + sender.ToString() + " \t : " + e.ToString());
+            Exception ex = new Exception("Application_Error: ");
+            string tmp = Utilities.DumpException(ex);
+            Utilities.WriteLog(Utilities.DumpException(ex));
 		}
 
 		protected void Session_End(Object sender, EventArgs e)
 		{
+            Utilities.WriteLog("Session_End: " + sender.ToString() + " \t : " + e.ToString());
+            Exception ex = new Exception("Session_End:");
+            string tmp = Utilities.DumpException(ex);
+            Utilities.WriteLog(Utilities.DumpException(ex));
 
 		}
+		
 
 		protected void Application_End(Object sender, EventArgs e)
 		{

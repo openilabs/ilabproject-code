@@ -11,6 +11,7 @@ namespace iLabs.DataTypes.ProcessAgentTypes
     /// Minimum information about a processAgent. Once in a domain this data should be immutable.
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class ProcessAgent
     {
 
@@ -79,9 +80,46 @@ namespace iLabs.DataTypes.ProcessAgentTypes
     }
 
     /// <summary>
+    /// Provides a class to contain all parts of a domainCredential set, used to return any changes on a ModifyCredentialSet call.
+    /// </summary>
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    public class DomainCredentials
+    {
+        /// <summary>
+        /// The ProcessAgent
+        /// </summary>
+        public ProcessAgent agent;
+        /// <summary>
+        /// The coupon that will be used on all incoming messages from the domain server, it may be null.
+        /// </summary>
+        public Coupon inCoupon;
+        /// <summary>
+        /// The coupon that will be used on all outgoing messages to the domain server, it may be null.
+        /// </summary>
+        public Coupon outCoupon;
+
+        public DomainCredentials()
+        {
+            agent = null;
+            inCoupon = null;
+            outCoupon = null;
+        }
+
+        public DomainCredentials(ProcessAgent processAgent,Coupon inCoupon, Coupon outCoupon)
+        {
+            agent = processAgent;
+            this.inCoupon = inCoupon;
+            this.outCoupon = outCoupon;
+        }
+    }
+
+
+    /// <summary>
     /// Information about available services.
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class ServiceDescription
     {
         /// <summary>
@@ -124,6 +162,7 @@ namespace iLabs.DataTypes.ProcessAgentTypes
     /// Report returned after a call to a processAgent's GetStatus method.
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class StatusReport
     {
         public bool online;
@@ -136,6 +175,7 @@ namespace iLabs.DataTypes.ProcessAgentTypes
     /// Currently processing of the notification is not specified. 
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class StatusNotificationReport
     {
         public int alertCode;

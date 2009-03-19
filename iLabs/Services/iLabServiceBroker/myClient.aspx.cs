@@ -35,18 +35,18 @@ using iLabs.DataTypes.TicketingTypes;
 
 namespace iLabs.ServiceBroker.iLabSB
 {
-	/// <summary>
-	/// iLab Client Launch Page.
-	/// </summary>
-	public partial class myClient : System.Web.UI.Page
-	{
-		//protected System.Web.UI.WebControls.Label lblDebug;
-		protected System.Web.UI.HtmlControls.HtmlAnchor urlEmail;
-		protected System.Web.UI.HtmlControls.HtmlAnchor urlDocumentation;
+    /// <summary>
+    /// iLab Client Launch Page.
+    /// </summary>
+    public partial class myClient : System.Web.UI.Page
+    {
+        //protected System.Web.UI.WebControls.Label lblDebug;
+        protected System.Web.UI.HtmlControls.HtmlAnchor urlEmail;
+        protected System.Web.UI.HtmlControls.HtmlAnchor urlDocumentation;
 
-		protected LabClient lc;
-	
-		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+        protected LabClient lc;
+
+        AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
         public string couponId = null;
         public string passkey = null;
@@ -57,13 +57,13 @@ namespace iLabs.ServiceBroker.iLabSB
         DateTime startExecution;
         long duration = -1;
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
             lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
 
             if (!IsPostBack)
             {
-               
+
                 if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                 {
                     // retrieve parameters from URL
@@ -71,11 +71,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     passkey = Request.QueryString["passkey"];
                     issuerGuid = Request.QueryString["issuer_guid"];
 
-                    if (couponId != null && passkey != null && issuerGuid != null)
+                    if (lc.needsScheduling)
                     {
-                        if (lc.needsScheduling)
+                        if (couponId != null && passkey != null && issuerGuid != null)
                         {
-                          
                             Ticket allowExperimentExecutionTicket = issuer.RetrieveTicket(
                                 new Coupon(issuerGuid, Int64.Parse(couponId), passkey),
                                 TicketTypes.ALLOW_EXPERIMENT_EXECUTION);
@@ -93,19 +92,16 @@ namespace iLabs.ServiceBroker.iLabSB
                                 //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
 
                                 btnLaunchLab.Visible = true;
-
                             }
                             else
                             {
                                 btnLaunchLab.Visible = false;
                             }
                         }
-                        else
-                        {
-                            btnLaunchLab.Visible = true;
-                            
-                        }
-
+                    }
+                    else
+                    {
+                        btnLaunchLab.Visible = true;
                     }
                 }
                 else if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
@@ -113,166 +109,164 @@ namespace iLabs.ServiceBroker.iLabSB
                     btnLaunchLab.Visible = true;
                 }
             }
-		
-			
 
-			if(Session["GroupName"] != null)
-			{
-				string groupName = Session["GroupName"].ToString();
 
-				lblGroupNameTitle.Text = groupName;
-				lblBackToLabs.Text=groupName;
+
+            if (Session["GroupName"] != null)
+            {
+                string groupName = Session["GroupName"].ToString();
+
+                lblGroupNameTitle.Text = groupName;
+                lblBackToLabs.Text = groupName;
 
                 if (Convert.ToInt32(Session["ClientCount"]) == 1)
-					lblGroupNameSystemMessage.Text = "Messages for "+groupName;
-				else
-					lblGroupNameSystemMessage.Text = "Messages for "+ lc.clientName;
-			}
-            
+                    lblGroupNameSystemMessage.Text = "Messages for " + groupName;
+                else
+                    lblGroupNameSystemMessage.Text = "Messages for " + lc.clientName;
+            }
+
             btnSchedule.Visible = lc.needsScheduling;
-			//Session["LoaderScript"] = lc.loaderScript;
-			lblClientName.Text = lc.clientName;
-			lblVersion.Text = lc.version;
-			lblLongDescription.Text = lc.clientLongDescription;
-			lblNotes.Text = lc.notes;
-			string emailCmd = "mailto:"+lc.contactEmail;
-			lblEmail.Text = "<a href="+emailCmd+">"+lc.contactEmail+"</a>";
+            //Session["LoaderScript"] = lc.loaderScript;
+            lblClientName.Text = lc.clientName;
+            lblVersion.Text = lc.version;
+            lblLongDescription.Text = lc.clientLongDescription;
+            lblNotes.Text = lc.notes;
+            string emailCmd = "mailto:" + lc.contactEmail;
+            lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
 
-			btnLaunchLab.Command +=new CommandEventHandler(this.btnLaunchLab_Click);
-			btnLaunchLab.CommandArgument = lc.clientID.ToString();
-			
-			int count =0;
-				
-			if (lc.clientInfos!=null) 
-			{
-				foreach (ClientInfo ci in lc.clientInfos) 
-				{
-					if (ci.infoURLName.CompareTo("Documentation") !=0 )
-					{
-						System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
-						b.Visible = true;
-						b.CssClass = "button";
-						b.Text = ci.infoURLName;
-						b.CommandArgument = ci.infoURL;
-						b.CommandName = ci.infoURLName;
-						b.ToolTip = ci.description;
-						b.Command +=new CommandEventHandler(this.HelpButton_Click);
-						repClientInfos.Controls.AddAt(count,b);
-						repClientInfos.Controls.AddAt(count+1,new LiteralControl("&nbsp;&nbsp;"));
-						count+=2;
-					}
-				}
-			}
+            btnLaunchLab.Command += new CommandEventHandler(this.btnLaunchLab_Click);
+            btnLaunchLab.CommandArgument = lc.clientID.ToString();
 
-			ArrayList messagesList = new ArrayList();
-			SystemMessage[] groupMessages = null;
-			if (Session["ClientCount"] != null && Convert.ToInt32(Session["ClientCount"]) ==1)
-			{
-				groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP,Convert.ToInt32(Session["GroupID"]),0);
-			}
-	
-			foreach (int labServerID in lc.labServerIDs)
-			{
-				SystemMessage[] labMessages =wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, labServerID);
-				if (labMessages !=null)
-					foreach(SystemMessage message in labMessages)
-					{
-						messagesList.Add(message);
-					}
-			}
+            int count = 0;
 
-			if (groupMessages !=null)
-			{
-				foreach(SystemMessage message in groupMessages)
-				{
-					messagesList.Add(message);
-				}
-			}
-				
-			if (messagesList != null)
-			{
-				messagesList.Sort(new DateComparer());
-				messagesList.Reverse();
+            if (lc.clientInfos != null)
+            {
+                foreach (ClientInfo ci in lc.clientInfos)
+                {
+                    if (ci.infoURLName.CompareTo("Documentation") != 0)
+                    {
+                        System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
+                        b.Visible = true;
+                        b.CssClass = "button";
+                        b.Text = ci.infoURLName;
+                        b.CommandArgument = ci.infoURL;
+                        b.CommandName = ci.infoURLName;
+                        b.ToolTip = ci.description;
+                        b.Command += new CommandEventHandler(this.HelpButton_Click);
+                        repClientInfos.Controls.AddAt(count, b);
+                        repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
+                        count += 2;
+                    }
+                }
+            }
 
-				repSystemMessage.DataSource = messagesList;
-				repSystemMessage.DataBind();
-			}
+            ArrayList messagesList = new ArrayList();
+            SystemMessage[] groupMessages = null;
+            if (Session["ClientCount"] != null && Convert.ToInt32(Session["ClientCount"]) == 1)
+            {
+                groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP, Convert.ToInt32(Session["GroupID"]), 0);
+            }
 
-			if (messagesList==null)
-				lblGroupNameSystemMessage.Text +="No Messages at this time";
-			//}
-		}
+            foreach (int labServerID in lc.labServerIDs)
+            {
+                SystemMessage[] labMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, labServerID);
+                if (labMessages != null)
+                    foreach (SystemMessage message in labMessages)
+                    {
+                        messagesList.Add(message);
+                    }
+            }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
+            if (groupMessages != null)
+            {
+                foreach (SystemMessage message in groupMessages)
+                {
+                    messagesList.Add(message);
+                }
+            }
 
-		}
-		#endregion
+            if (messagesList != null)
+            {
+                messagesList.Sort(new DateComparer());
+                messagesList.Reverse();
 
-        //protected void btnLaunchLab_Click(object sender, CommandEventArgs e)
-        //{
-        //}
+                repSystemMessage.DataSource = messagesList;
+                repSystemMessage.DataBind();
+            }
 
-		private void urlEmail_Click(object sender, System.EventArgs e)
-		{
-			string email = wrapper.GetLabClientsWrapper(new int[] {Convert.ToInt32(Session["ClientID"])})[0].contactEmail;
-			Response.Redirect ("emailTo:"+ email);
-		}
+            if (messagesList == null)
+            {
+                lblGroupNameSystemMessage.Text += "No Messages at this time";
+            }
+        }
 
-		protected void HelpButton_Click(object sender, CommandEventArgs e)
-		{
-			string jScript = @"<script language='javascript'> window.open ('" + e.CommandArgument.ToString() + "')</script>";
-			Page.RegisterStartupScript("DocsPopup",jScript);				
-		}
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+        }
 
-		protected void urlDocumentation_Click(object sender, System.EventArgs e)
-		{
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
 
-			LabClient lc = wrapper.GetLabClientsWrapper(new int[] {Convert.ToInt32(Session["ClientID"])})[0];
-			string docURL = null;
-			if (lc.clientInfos!=null)
-			{
-				foreach (ClientInfo ci in lc.clientInfos)
-				{
-					if (ci.infoURLName.CompareTo("Documentation")==0)
-					{
-						docURL = ci.infoURL;
-						break;
-					}
-				}
-			}
-			string jScript = @"<script language='javascript'> window.open ('" + docURL + "')</script>";
-			Page.RegisterStartupScript("DocsPopup", jScript);
-		}
+        }
+        #endregion
+
+
+        private void urlEmail_Click(object sender, System.EventArgs e)
+        {
+            string email = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0].contactEmail;
+            Response.Redirect("emailTo:" + email);
+        }
+
+        protected void HelpButton_Click(object sender, CommandEventArgs e)
+        {
+            string jScript = @"<script language='javascript'> window.open ('" + e.CommandArgument.ToString() + "')</script>";
+            Page.RegisterStartupScript("DocsPopup", jScript);
+        }
+
+        protected void urlDocumentation_Click(object sender, System.EventArgs e)
+        {
+
+            LabClient lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
+            string docURL = null;
+            if (lc.clientInfos != null)
+            {
+                foreach (ClientInfo ci in lc.clientInfos)
+                {
+                    if (ci.infoURLName.CompareTo("Documentation") == 0)
+                    {
+                        docURL = ci.infoURL;
+                        break;
+                    }
+                }
+            }
+            string jScript = @"<script language='javascript'> window.open ('" + docURL + "')</script>";
+            Page.RegisterStartupScript("DocsPopup", jScript);
+        }
 
         protected void btnLaunchLab_Click(object sender, System.EventArgs e)
-		{
-			if (Session["UserID"]==null)
-			{
-				Response.Redirect("login.aspx");
-			}
-			
-			StringBuilder message = new StringBuilder("Message: clientID = ");
-			int [] labIds = new int[1];
-			message.Append(btnLaunchLab.CommandArgument + " ");
-			labIds[0] = Convert.ToInt32(btnLaunchLab.CommandArgument);
-			LabClient []clients = AdministrativeAPI.GetLabClients(labIds);
-			if(clients.Length >0)
-			{
+        {
+            if (Session["UserID"] == null)
+            {
+                Response.Redirect("login.aspx");
+            }
+
+            StringBuilder message = new StringBuilder("Message: clientID = ");
+            int[] labIds = new int[1];
+            message.Append(btnLaunchLab.CommandArgument + " ");
+            labIds[0] = Convert.ToInt32(btnLaunchLab.CommandArgument);
+            LabClient[] clients = AdministrativeAPI.GetLabClients(labIds);
+            if (clients.Length > 0)
+            {
                 if (clients[0].clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                 {
                     // [GeneralTicketing] get lab servers metadata from lab server ids
@@ -297,12 +291,12 @@ namespace iLabs.ServiceBroker.iLabSB
                             }
 
                             redirectURL = executor.ExecuteExperimentExecutionRecipe(labServers[0], clients[0],
-                            start,duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]), 
+                            start, duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]),
                             Convert.ToInt32(Session["GroupID"]), (string)Session["GroupName"]);
 
                             // Add the return url to the redirect
                             redirectURL += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);
-                            
+
                             // Now open the lab within the current Window/frame
                             Response.Redirect(redirectURL, true);
                         }
@@ -332,7 +326,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                     // [GeneralTicketing] retrieve static process agent corresponding to the first
                     // association lab server */
-                  
+
 
                     // New comments: The HTML Client is not a static process agent, so we don't search for that at the moment.
                     // Presumably when the interactive SB is merged with the batched, this should check for a static process agent.
@@ -364,16 +358,16 @@ namespace iLabs.ServiceBroker.iLabSB
                     ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
                     //Page.RegisterStartupScript("ReloadFrame", jScript);
                 }
-			}
-			else
-			{
-				message.Append(" LabServer = null");
-			}
-			//lblDebug.Text = message.ToString();
-			Utilities.WriteLog(message.ToString());
-		}
+            }
+            else
+            {
+                message.Append(" LabServer = null");
+            }
+            //lblDebug.Text = message.ToString();
+            Utilities.WriteLog(message.ToString());
+        }
 
-     
+
         protected void btnSchedule_Click(object sender, EventArgs e)
         {
             string username = Session["UserName"].ToString();
@@ -382,36 +376,20 @@ namespace iLabs.ServiceBroker.iLabSB
             string labClientVersion = lc.version;
 
             ProcessAgent labServer = issuer.GetProcessAgent(lc.labServerIDs[0]);
-            
-            //Hashtable mappingsTable = issuer.GetResourceMappingsForKey(lc.clientID, ResourceMappingTypes.CLIENT);
-            //ResourceMappingValue[][] values = issuer.GetResourceMappingValues(mappingsTable);
-
-            int ussId = issuer.FindProcessAgentIdForClient(lc.clientID,  ProcessAgentType.SCHEDULING_SERVER);            
+            int ussId = issuer.FindProcessAgentIdForClient(lc.clientID, ProcessAgentType.SCHEDULING_SERVER);
 
             if (ussId > 0)
             {
-                
-                string  ussGuid = issuer.GetProcessAgent(ussId).agentGuid;
-            
-                //mappingsTable = issuer.GetResourceMappingsForKey(lc.labServerIDs[0], ResourceMappingTypes.PROCESS_AGENT);
-                //values = issuer.GetResourceMappingValues(mappingsTable);
 
+                string ussGuid = issuer.GetProcessAgent(ussId).agentGuid;
                 int lssId = issuer.FindProcessAgentIdForAgent(lc.labServerIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
-                
-                string  lssGuid = issuer.GetProcessAgent(lssId).agentGuid;
 
-                //// Should test for the correct scheduling server not just one
-                ////ProcessAgent[] ussProcessAgents = issuer.GetProcessAgentsByType(ProcessAgentType.SCHEDULING_SERVER);
-                //ProcessAgent[] lssProcessAgents = issuer.GetProcessAgentsByType(ProcessAgentType.LAB_SCHEDULING_SERVER);
-
-                ////the uss is the redeemer of the scheduling ticket
-                ////ProcessAgent uss = ussProcessAgents[0];
-                //ProcessAgent lss = lssProcessAgents[0];
+                string lssGuid = issuer.GetProcessAgent(lssId).agentGuid;
 
                 // Find efective group
-                 string effectiveGroupName=null;
+                string effectiveGroupName = null;
                 int currentGroup = Convert.ToInt32(Session["GroupID"]);
-                int effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(currentGroup,lc.clientID,
+                int effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(currentGroup, lc.clientID,
                     Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
                 if (effectiveGroupID == currentGroup)
                 {
@@ -422,14 +400,13 @@ namespace iLabs.ServiceBroker.iLabSB
                     Group[] effGroup = AdministrativeAPI.GetGroups(new int[] { effectiveGroupID });
                     effectiveGroupName = effGroup[0].groupName;
                 }
-                
+
                 //Default duration ????
                 long duration = 36000;
 
-
                 RecipeExecutor recipeExec = RecipeExecutor.Instance();
                 string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(ussGuid, lssGuid, username, effectiveGroupName,
-                    labServer.agentGuid,lc.clientGuid, labClientName, labClientVersion,
+                    labServer.agentGuid, lc.clientGuid, labClientName, labClientVersion,
                     Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
 
                 schedulingUrl += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);
@@ -437,5 +414,5 @@ namespace iLabs.ServiceBroker.iLabSB
             }
         }
 
-}
+    }
 }

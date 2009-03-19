@@ -1,5 +1,4 @@
 <%@ Page language="c#" Inherits="iLabs.LabServer.LabView.labExperiments" CodeFile="labExperiments.aspx.cs" EnableEventValidation="false" %>
-
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
@@ -26,7 +25,7 @@ Please see license.txt in top level directory for full license.
 			<uc1:userNav id="UserNav1" runat="server"></uc1:userNav><br clear="all">
 				<div id="innerwrapper">
 					<div id="pageintro">
-						<h1><asp:label id="lblTitle" Runat="server"></asp:label></h1>
+						<h1><asp:label id="lblTitle" Runat="server">Configure Lab Experiments</asp:label></h1>
 						<asp:label id="lblDescription" Runat="server"></asp:label>
 						<p><asp:label id="lblErrorMessage" Runat="server" Visible="False"></asp:label></p>
 					    <div id="Div1"  runat="server">

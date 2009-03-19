@@ -1,4 +1,4 @@
-<%@ Page language="c#" Inherits="iLabs.LabServer.LabView.RunExperiment" CodeFile="RunExperiment.aspx.cs" %>
+<%@ Page language="c#" Inherits="iLabs.LabServer.LabView.RunExperiment" CodeFile="RunExperiment.aspx.cs"  EnableSessionState="true"%>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="lvpanel" Src="LVRemotePanel.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>

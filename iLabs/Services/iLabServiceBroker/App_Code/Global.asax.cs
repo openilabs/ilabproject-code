@@ -41,6 +41,9 @@ namespace iLabs.ServiceBroker.iLabSB
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
@@ -56,6 +59,9 @@ namespace iLabs.ServiceBroker.iLabSB
             if (path != null && path.Length > 0)
             {
                 Utilities.LogPath = path;
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("ISB Application_Start: starting");
             }
 			// The AuthCache class is defined in the Authorization
@@ -88,7 +94,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         if (myGrps != null)
                             Session["GroupCount"] = myGrps.Length;
                         Session["UserName"] = info.userName;
-                        if (info.clientID != null && info.clientID > 0)
+                        if (info.clientID > 0)
                         {
                             Session["ClientID"] = info.clientID;
                         }

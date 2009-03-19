@@ -1,4 +1,7 @@
-
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ */ 
 	using System;
 	using System.Data;
 	using System.Drawing;
@@ -13,38 +16,57 @@ namespace iLabs.Scheduling.LabSide
 	/// </summary>
 	public partial class NavBar : System.Web.UI.UserControl
 	{
-        protected string currentPage;
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
+    protected string currentPage;
+	protected string helpURL = "help.aspx";
+
+	public string HelpURL
+	{
+		get {return helpURL;}
+		set {helpURL = value; }
+	}
+
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
             // Get the current page name w/o path name or slashes
             currentPage = Request.Url.Segments[Request.Url.Segments.Length - 1];
-			// Put user code to initialize the page here
+            aHelp.HRef = helpURL;
+            aHelp.Attributes.Add("class", "last");
+            aTimeBlockManage.Attributes.Add("class", "last");
+            aAdminister.Attributes.Add("class", "first");
+           
+            // Put user code to initialize the page here
             switch (currentPage)
             {
                 case "Administer.aspx":
-                    HLRegisterUSS.ForeColor = Color.White;
+                    aAdminister.Attributes.Add("class", "topactive");
                     break;
                 case "Manage.aspx":
-                    HLexpInfoManagement.ForeColor = Color.White;
+                    aManage.Attributes.Add("class", "topactive");
                     break;
                 case "RegisterGroup.aspx":
-                    HLRegisterGroup.ForeColor = Color.White;
+                    aRegisterGroup.Attributes.Add("class", "topactive");
                     break;
                 case "ReservationInfo.aspx":
-                    HLReservationInfo.ForeColor = Color.White;
+                    aReservationInfo.Attributes.Add("class", "topactive");
                     break;
                 case "RevokeReservation.aspx":
-                    HLRevokeReservation.ForeColor = Color.White;
+                    aRevokeReservation.Attributes.Add("class", "topactive");
                     break;
                 case "TimeBlockManagement.aspx":
-                    HLTimeBlockManage.ForeColor = Color.White;
+                    aTimeBlockManage.Attributes.Add("class", "topactive");
                     break;
-                
             }
-            if(Session["sbUrl"] != null)
-                HLBackToSB.NavigateUrl = Session["sbUrl"].ToString();
-		}
+            if (Session["sbUrl"] != null)
+            {
+                liBackToSB.Visible = true;
+                aBackToSB.HRef = Session["sbUrl"].ToString();
+            }
+            else
+            {
+                liBackToSB.Visible = false;
+            }
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

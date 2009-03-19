@@ -11,6 +11,7 @@ using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 using System.Web;
 using System.Web.Services;
 using System.Runtime.Serialization;
@@ -170,97 +171,209 @@ namespace iLabs.Core
             }
             return status;
         }
+
         /// <summary>
-        /// Install the calling services credentials on this processAgent
+        /// Install the calling services credentials on this processAgent.
         /// </summary>
         /// <param name="service">The calling processAgents immutable information</param>
         /// <param name="inIdentCoupon">The coupon that will authorize messages from the service</param>
         /// <param name="outIdentCoupon">The coupon to be used when contacting the service</param>
-        [WebMethod,
+        [WebMethod(Description = "Install the calling services credentials on this processAgent."),
         SoapDocumentMethod(Binding = "IProcessAgent"),
         SoapHeader("initAuthHeader", Direction = SoapHeaderDirection.In)]
-        public virtual ProcessAgent InstallDomainCredentials(ProcessAgent service,
+        public ProcessAgent InstallDomainCredentials(ProcessAgent service,
             Coupon inIdentCoupon, Coupon outIdentCoupon)
         {
-             ProcessAgent agent = null;
-            if (service.type.Equals(ProcessAgentType.SERVICE_BROKER))
+            if (!initAuthHeader.initPasskey.Equals(ConfigurationManager.AppSettings["defaultPasskey"]))
             {
+                throw new Exception("The proper authorization to install the domain credentials, has not been provided.");
+            }
+            return installDomainCredentials(service, inIdentCoupon, outIdentCoupon);
+        }
 
-                int[] ids = dbTicketing.GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.SERVICE_BROKER);
-                if (ids != null && ids.Length > 0)
+
+        /// <summary>
+        /// Modify the specified services Domain credentials on this static process agent. 
+        /// Agent_guid is key to the service to be modified. The agentAuthorizationHeader must use the old values.
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod(Description = "Modify the specified services Domain credentials on this static process agent. "
+            + "Agent_guid is key to the service to be modified and may not be modiied. The agentAuthorizationHeader must use the old values."),
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public virtual int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, string extra, 
+            Coupon inCoupon, Coupon outCoupon)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                status = dbTicketing.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
+            }
+            return status;
+        }
+        
+
+        [WebMethod(Description = "Modify the specified services Domain credentials on this static process agent. "
+            + "Agent_guid is key to the service to be modified and may not be modiied. The agentAuthorizationHeader must use the old values."),
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int RemoveDomainCredentials(string domainGuid, string serviceGuid)
+        {
+            int status = -1;
+            DomainCredentials returnCred = null;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                status = removeDomainCredentials(domainGuid, serviceGuid);
+            }
+            return status;
+        }
+      
+        
+    /// <summary>
+    /// Informs this processAgent that it should modify all references to a specific processAent. 
+    /// This is used to propagate modifications, The agentGuid must remain the same.
+    /// </summary>
+    /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+    /// <param name="serviceGuid">The guid of the service</param>
+    /// <param name="state">The retired state to be set</param>
+    /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        [WebMethod,
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public virtual int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                status = dbTicketing.ModifyProcessAgent(originalGuid, agent, extra);
+            }
+            return status;
+        }
+     
+
+        /// <summary>
+        /// Informs a processAgent that it should retire/un-retire all references to a specific processAent. 
+        /// This may be used to propigate retire calls.
+        /// </summary>
+        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+        /// <param name="serviceGuid">The guid of the service</param>
+        /// <param name="state">The retired state to be set, true sets retired.</param>
+        /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        [WebMethod(Description = "Informs a processAgent that it should retire/un-retire all references to a specific processAent."
+        + " This may be used to propigate retire calls."),
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public virtual int RetireProcessAgent(string domainGuid, string serviceGuid, bool state)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                status = retireProcessAgent(domainGuid, serviceGuid, state);
+            }
+            return status;
+        }
+    
+        [WebMethod(Description = "Register, an optional method, default virtual method is a no-op."),
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public void Register(string registerGuid, ServiceDescription[] info)
+        {
+              if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+            // This is an optional method, the base method is a no-op.
+                  register(registerGuid,info);
+              }
+        }
+
+        protected virtual ProcessAgent installDomainCredentials(ProcessAgent service,
+            Coupon inIdentCoupon, Coupon outIdentCoupon)
+        {
+            ProcessAgent agent = null;
+            try
+            {
+                if (ProcessAgentDB.ServiceAgent == null)
                 {
-                    throw new Exception("There is already a domain ServiceBroker assigned to this Service!");
+                    throw new Exception("The specified ProcessAgent has not been configured, please contact the administrator.");
+                }
+                
+                if (service.type.Equals(ProcessAgentType.SERVICE_BROKER))
+                {
+
+                    int[] ids = dbTicketing.GetProcessAgentIDsByType((int)ProcessAgentType.AgentType.SERVICE_BROKER);
+                    if (ids != null && ids.Length > 0)
+                    {
+                        throw new Exception("There is already a domain ServiceBroker assigned to this Service!");
+                    }
+                    else
+                    {
+                        int id = dbTicketing.InsertProcessAgent(service, inIdentCoupon, outIdentCoupon);
+
+                        if (id > 0)
+                        {
+                            dbTicketing.SetDomainGuid(service.agentGuid);
+                            ProcessAgentDB.RefreshServiceAgent();
+                            Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
+                            agent = ProcessAgentDB.ServiceAgent;
+                        }
+                        else
+                        {
+                            Utilities.WriteLog("Error InstallDomainCredentials: " + service.codeBaseUrl);
+                            throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                        }
+                    }
                 }
                 else
                 {
-                    agent = InstallDomainCredentials(initAuthHeader, service, inIdentCoupon, outIdentCoupon);
-                    
-                    
+                    int[] ids = dbTicketing.GetProcessAgentIDsByType((int)ProcessAgentType.AgentType.SERVICE_BROKER);
+                    if (ids == null || ids.Length == 0)
+                    {
+                        throw new Exception("This Service is not part of a domain and may not be accessed");
+                    }
+                    else
+                    {
+                        int pid = dbTicketing.InsertProcessAgent(service, inIdentCoupon, outIdentCoupon);
+
+                        if (pid > 0)
+                        {
+                            Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
+                            agent = ProcessAgentDB.ServiceAgent;
+                        }
+                        else
+                        {
+                            Utilities.WriteLog("Error InstallDomainCredentials: " + service.codeBaseUrl);
+                            throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                        }
+                    }
                 }
             }
-            else if (service.type.Equals(ProcessAgentType.REMOTE_SERVICE_BROKER))
+            catch (Exception e)
             {
-                throw new Exception("You may not register a Remote ServiceBroker with this Service!");
-            }
-            else
-            {
-                int[] ids = dbTicketing.GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.SERVICE_BROKER);
-                if (ids == null || ids.Length == 0)
-                {
-                    throw new Exception("This Service is not part of a domain and may not be accessed");
-                }
-                else
-                {
-                    agent = InstallDomainCredentials(initAuthHeader, service, inIdentCoupon, outIdentCoupon);
-                }
+                Utilities.WriteLog("Error on InstallDomainCredentials: " + Utilities.DumpException(e));
+                throw;
             }
             return agent;
         }
 
-        protected ProcessAgent InstallDomainCredentials(InitAuthHeader initHeader, ProcessAgent service,
-            Coupon inIdentCoupon, Coupon outIdentCoupon)
+   
+
+        protected virtual int removeDomainCredentials(string domainGuid, string agentGuid)
         {
-            if (ProcessAgentDB.ServiceAgent == null)
-            {
-                throw new Exception("The specified ProcessAgent has not been configured, please contact the administrator.");
-            }
-            if (!initHeader.initPasskey.Equals(ConfigurationManager.AppSettings["defaultPasskey"]))
-            {
-                throw new Exception("The proper authorization to install the domain credentials, has not been provided.");          
-            }
-            try
-            {
-                int id = dbTicketing.InsertProcessAgent(service, inIdentCoupon, outIdentCoupon);
-                if (service.type.Equals(ProcessAgentType.SERVICE_BROKER))
-                {
-                    dbTicketing.SetDomainGuid(service.agentGuid);
-                    ProcessAgentDB.RefreshServiceAgent();
-                }
-                if (id > 0)
-                {
-                    Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
-                    return ProcessAgentDB.ServiceAgent;
-                }
-                else
-                {
-                    Utilities.WriteLog("Error InstallDomainCredentials: " + service.codeBaseUrl);
-                    throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
-                }
-            }
-            catch(Exception e){
-                Utilities.WriteLog("Error on InstallDomainCredentials: " + Utilities.DumpException(e));
-                throw;
-            }
-            
+            int status = 0;
+            status = dbTicketing.RemoveDomainCredentials(domainGuid, agentGuid);
+            return status;
         }
 
-        [WebMethod(Description = "Register, an optional method, default virtual method is a no-op."),
-        SoapDocumentMethod(Binding = "IProcessAgent"),
-        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public virtual void Register(string registerId, ServiceDescription[] info)
-        {
-            // This is an optional method, the base method is a no-op.
-        }
+       
 
+        protected virtual int retireProcessAgent(string domainGuid, string serviceGuid, bool state)
+        {
+            int status = 0;
+            status = dbTicketing.RetireProcessAgent(domainGuid, serviceGuid, state);
+            return status;
+        }
+    
+
+         protected virtual void register(string registerId, ServiceDescription[] info){
+         }
 }
 }

@@ -117,7 +117,7 @@ namespace iLabs.DataTypes.BatchTypes
 		public int effectiveQueueLength;
         
 		/// <summary>
-		/// [OPTIONAL, < 0 if not supported]. Estimated wait (in seconds) until the hypothetical new experiment would begin, based on the other experiments currently in the execution queue.
+		/// [OPTIONAL, less than zero if not supported]. Estimated wait (in seconds) until the hypothetical new experiment would begin, based on the other experiments currently in the execution queue.
 		/// </summary>
 		public double estWait;
 	}
@@ -257,7 +257,7 @@ namespace iLabs.DataTypes.BatchTypes
 		public string errorMessage;
         
 		/// <summary>
-		/// [OPTIONAL, < 0 if not supported]. Estimated runtime (in seconds of this experiment.
+		/// [OPTIONAL, less than zero if not supported]. Estimated runtime (in seconds of this experiment.
 		/// </summary>
 		public double estRuntime;
 	}
@@ -369,12 +369,12 @@ namespace iLabs.DataTypes.BatchTypes
 		public WaitEstimate wait;
         
 		/// <summary>
-		/// [OPTIONAL <0 if not used]. Estimated runtime (in seconds) of this experiment.
+		/// [OPTIONAL les than zero if not used]. Estimated runtime (in seconds) of this experiment.
 		/// </summary>
 		public double estRuntime;
         
 		/// <summary>
-		/// [OPTIONAL <0 if not used]. Estimated remaining runtime (in seconds) of this experiment, if the experiment is currently running.
+		/// [OPTIONAL less than zero if not used]. Estimated remaining runtime (in seconds) of this experiment, if the experiment is currently running.
 		/// </summary>
 		public double estRemainingRuntime;
 	}

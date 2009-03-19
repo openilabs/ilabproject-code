@@ -1,7 +1,7 @@
 -- $Id: ProcessAgentProcedures.sql,v 1.20 2008/03/11 19:10:40 pbailey Exp $
 --
 --
--- Ticketing support these procedures implement the common Ticketing database methods.
+-- These procedures implement the common ProcessAgent database methods.
 -- The entries in the Coupon and Ticket table only contain data from an external ServiceBroker or Agent.
 -- This is also the case when these tables are part of a ServiceBroker database.
 -- Use of the ProcessAgent table should be the same for ServiceBrokers and ProcessAgents.
@@ -31,6 +31,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteCoup
 drop procedure [dbo].[DeleteCoupon]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteCoupons]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[DeleteCoupons]
+GO
+
+
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[CancelTicket]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[CancelTicket]
@@ -39,7 +44,12 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteTicket]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[DeleteTicket]
 GO
-
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteTickets]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[DeleteTickets]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteIssuerTickets]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[DeleteIssuerTickets]
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[CancelTicketByID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[CancelTicketByID]
 GO
@@ -58,7 +68,9 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[UpdateProcessAgent]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[UpdateProcessAgent]
 GO
-
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[UpdateProcessAgentByID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[UpdateProcessAgentByID]
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetCoupon]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetCoupon]
 GO
@@ -73,6 +85,10 @@ drop procedure [dbo].[GetIdentInCoupon]
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIdentOutCoupon]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetIdentOutCoupon]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetIdentCoupons]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetIdentCoupons]
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetIdentInCouponID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
@@ -96,6 +112,10 @@ GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentsInfo]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetProcessAgentsInfo]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentInfosForDomain]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetProcessAgentInfosForDomain]
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentIDs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
@@ -169,12 +189,27 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentInfoByOutCoupon]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetProcessAgentInfoByOutCoupon]
 GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[InsertCoupon]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[InsertCoupon]
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[InsertProcessAgent]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[InsertProcessAgent]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetSelfState]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetSelfState]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetSelfState]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetSelfState]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetSelfProcessAgentID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetSelfProcessAgentID]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ReadSelfProcessAgent]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ReadSelfProcessAgent]
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[WriteSelfProcessAgent]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
@@ -212,6 +247,15 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentURLbyID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetProcessAgentURLbyID]
 GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[IsProcessAgentRetired]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[IsProcessAgentRetired]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[IsProcessAgentIDRetired]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[IsProcessAgentIDRetired]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetProcessAgentRetired]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetProcessAgentRetired]
+GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetTicket]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetTicket]
@@ -245,6 +289,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetTickets
 drop procedure [dbo].[GetTicketsByType]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RemoveDomainCredentials]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RemoveDomainCredentials]
+GO
+
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveTicketTypes]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveTicketTypes]
 GO
@@ -253,6 +302,19 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[UpdateDoma
 drop procedure [dbo].[UpdateDomainGuid]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveSystemSupport]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveSystemSupport]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveSystemSupportByID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveSystemSupportByID]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SaveSystemSupport]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SaveSystemSupport]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SaveSystemSupportByID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SaveSystemSupportByID]
+GO
 SET QUOTED_IDENTIFIER ON 
 GO
 SET ANSI_NULLS OFF 
@@ -401,6 +463,39 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+CREATE PROCEDURE DeleteCoupons
+@issuerGUID varchar (50)
+ AS
+declare @ticketCount int
+
+select @ticketCount = COUNT(ticket_ID) from Ticket where Issuer_GUID = @issuerGUID
+if (@ticketCount > 0)
+GOTO hasTickets
+
+delete from coupon where Issuer_GUID = @issuerGUID
+if (@@rowcount = 0)
+goto on_error
+if (@@error>0)
+goto on_error
+
+return 1
+
+on_error:
+return 0
+
+hasTickets:
+return -1
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
 -- Inserts a coupon
 CREATE PROCEDURE InsertCoupon
 @couponID bigint,
@@ -531,6 +626,30 @@ GO
 SET ANSI_NULLS ON 
 GO
 
+CREATE PROCEDURE SetIdentCoupons 
+@agentGUID varchar(50),
+@inId bigint,
+@outId bigint,
+@issuerGUID varchar(50)
+AS
+
+update ProcessAgent set identIn_ID=@inId,identOut_ID=@outId,issuer_Guid= @issuerGuid
+where agent_Guid = @agentGUID
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS ON 
+GO
+
+
+
 CREATE PROCEDURE SetIdentInCouponID 
 @agentGUID varchar(50),
 @id bigint
@@ -569,7 +688,7 @@ CREATE PROCEDURE GetProcessAgentName
 @agentID int
  AS
 select Agent_Name from ProcessAgent
-where agent_ID = @agentID
+where agent_ID = @agentID AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -584,7 +703,7 @@ select ProcessAgent_Type.Short_Name, Agent_Name
 
 from ProcessAgent join ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
 
-where agent_ID = @agentID
+where agent_ID = @agentID AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -597,7 +716,7 @@ CREATE PROCEDURE GetProcessAgentTagByGuid
 @guid varchar(50)
  AS
 select agent_ID, Agent_Name from ProcessAgent
-where agent_Guid = @guid
+where agent_Guid = @guid AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -610,7 +729,7 @@ CREATE PROCEDURE GetProcessAgentTagByGuidWithType
  AS
 select agent_ID, ProcessAgent_Type.Short_Name, Agent_Name
 from ProcessAgent join ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-where agent_Guid = @guid
+where agent_Guid = @guid AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -626,7 +745,7 @@ GO
 CREATE PROCEDURE GetProcessAgentTags
  AS
 select agent_ID, Agent_Name from ProcessAgent
-
+where retired = 0
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -643,7 +762,7 @@ CREATE PROCEDURE GetProcessAgentTagsWithType
 select agent_ID, ProcessAgent_Type.Short_Name, Agent_Name
 
 from ProcessAgent join ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-
+where retired = 0
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -661,7 +780,7 @@ CREATE PROCEDURE GetProcessAgentTagsWithTypeById
 select agent_ID, ProcessAgent_Type.Short_Name, Agent_Name
 
 from ProcessAgent join ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-where agent_ID = @agentID
+where agent_ID = @agentID  AND retired = 0
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -680,7 +799,7 @@ CREATE PROCEDURE GetProcessAgentTagsByTypeID
  AS
 
 select agent_ID, Agent_Name from ProcessAgent
- where ProcessAgent_Type_id = @typeID
+ where ProcessAgent_Type_id = @typeID  AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -701,7 +820,7 @@ CREATE PROCEDURE GetProcessAgentTagsByType
  AS
 
 select agent_ID, Agent_Name from ProcessAgent
- where ProcessAgent_type_id = ( select ProcessAgent_Type_ID  from ProcessAgent_Type where (upper( Description) = upper(@type )))
+ where retired = 0 AND ProcessAgent_type_id = ( select ProcessAgent_Type_ID  from ProcessAgent_Type where (upper( Description) = upper(@type )))
 
 
 GO
@@ -719,7 +838,7 @@ CREATE PROCEDURE GetDomainProcessAgentTags
 @domain varchar(50)
  AS
 select agent_ID, Agent_Name from ProcessAgent
-where domain_guid = @domain
+where domain_guid = @domain  AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -738,7 +857,7 @@ CREATE PROCEDURE GetDomainProcessAgentTagsWithType
 select agent_ID, ProcessAgent_Type.Short_Name, Agent_Name
 
 from ProcessAgent join ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-where domain_guid = @domain
+where domain_guid = @domain  AND retired = 0
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -758,7 +877,7 @@ CREATE PROCEDURE GetDomainProcessAgentTagsByType
  AS
 
 select agent_ID, Agent_Name from ProcessAgent
- where ProcessAgent_type_id = ( select ProcessAgent_Type_ID  from ProcessAgent_Type where (upper( Description) = upper(@type )))
+ where retired = 0 AND ProcessAgent_type_id = ( select ProcessAgent_Type_ID  from ProcessAgent_Type where (upper( Description) = upper(@type )))
 and domain_Guid=@domain
 
 
@@ -837,6 +956,58 @@ GO
 SET ANSI_NULLS ON 
 GO
 
+Create Procedure GetSelfState
+@guid varchar(50)
+as
+select self from ProcesAgent  where Agent_Guid =@guid
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+Create Procedure SetSelfState
+@guid varchar(50),
+@state bit
+as
+update ProcessAgent set self=@state where Agent_Guid =@guid
+select @@rowcount
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+Create Procedure GetSelfProcessAgentID
+as
+select agent_id from ProcessAgent
+where self = 1 and retired = 0;
+go
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+Create PROCEDURE ReadSelfProcessAgent 
+
+AS
+Declare @processAgentTypeID int 
+declare @selfID int
+
+
+SELECT Agent_ID, Agent_GUID, Agent_Name, ProcessAgent_Type.Description,
+ Domain_Guid, Codebase_URL, WebService_URL
+FROM ProcessAgent JOIN ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
+WHERE self = 1 AND retired = 0
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
 Create PROCEDURE WriteSelfProcessAgent 
 @processAgentType varchar(100),
 @guid varchar(50),
@@ -849,23 +1020,22 @@ AS
 Declare @processAgentTypeID int 
 declare @selfID int
 
-select @selfID=Agent_id from ProcessAgent where EXISTS ( select * from processAgent where agent_id = 1)
+select @selfID=Agent_id from ProcessAgent where self = 1
 
-if @selfID = 1
+if @selfID > 0
   begin
     update ProcessAgent set Agent_GUID=@guid, Agent_Name=@name, Codebase_URL=@codeBaseURL, WebService_URL=@webServiceURL,
       Domain_GUID = @domain
-    where agent_id = 1
-    select @@rowcount
+    where agent_id = @selfID
+    select  @selfID
   end
 else
   begin
     select @processAgentTypeID = ( select ProcessAgent_Type_ID  from ProcessAgent_Type where (upper( Description) = upper(@processAgentType )))
-    SET IDENTITY_INSERT ProcessAgent ON
-    insert into ProcessAgent(agent_id, Agent_GUID, Agent_Name,ProcessAgent_Type_ID, Codebase_URL, WebService_URL, Domain_GUID)
+    insert into ProcessAgent( self, Agent_GUID, Agent_Name,ProcessAgent_Type_ID, Codebase_URL, WebService_URL, Domain_GUID)
     values (1, @guid, @name, @processAgentTypeID,  @codeBaseURL, @webServiceURL, @domain )
-    select 1
-    SET IDENTITY_INSERT ProcessAgent OFF
+    select ident_current('ProcessAgent')
+    
 end
 
 GO
@@ -880,10 +1050,10 @@ Create procedure UpdateDomainGuid
 as
 declare @found int
 
-select @found = count(agent_ID) from ProcessAgent where agent_id = 1
+select @found = count(agent_ID) from ProcessAgent where self = 1
 if @found > 0
   BEGIN
-    Update ProcessAgent set Domain_GUID = @guid where agent_id = 1
+    Update ProcessAgent set Domain_GUID = @guid where self = 1
     return 1
   END
 ELSE
@@ -897,8 +1067,8 @@ SET QUOTED_IDENTIFIER OFF
 GO
 SET ANSI_NULLS ON 
 GO
+
 CREATE PROCEDURE UpdateProcessAgent
-@id int,
 @guid varchar(50),
 @domain varchar (50), 
 @name varchar(100),
@@ -906,7 +1076,34 @@ CREATE PROCEDURE UpdateProcessAgent
 @codeBaseURL varchar(256) = null,
 @webServiceURL varchar(256)
 
+AS
+Declare @processAgentTypeID int 
 
+select @processAgentTypeID = ( select ProcessAgent_Type_ID  from ProcessAgent_Type where (upper( Description) = upper(@type )))
+update ProcessAgent set ProcessAgent_Type_ID = @processAgentTypeID,
+ Agent_name = @name, Codebase_URL = @codeBaseURL, WebService_URL = @webServiceURL, Domain_Guid = @domain
+where Agent_GUID = @guid
+select @@rowcount
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+CREATE PROCEDURE UpdateProcessAgentByID
+@id int,
+@guid varchar(50),
+@domain varchar (50), 
+@name varchar(100),
+@type varchar(100),
+@codeBaseURL varchar(256) = null,
+@webServiceURL varchar(256)
 
 AS
 Declare @processAgentTypeID int 
@@ -929,14 +1126,13 @@ SET ANSI_NULLS ON
 GO
 
 
-
 CREATE PROCEDURE GetProcessAgents 
  AS
 
 select Agent_ID, Agent_GUID, Agent_Name, ProcessAgent_Type.Description,
 Domain_guid, Codebase_URL, WebService_URL
 from ProcessAgent join ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-
+where retired = 0
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -957,7 +1153,7 @@ CREATE PROCEDURE GetProcessAgent
 SELECT Agent_ID, Agent_GUID, Agent_Name, ProcessAgent_Type.Description,
  Domain_Guid, Codebase_URL, WebService_URL
 FROM ProcessAgent JOIN ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-WHERE Agent_GUID= @agentGUID
+WHERE Agent_GUID= @agentGUID AND retired = 0
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -979,7 +1175,8 @@ CREATE PROCEDURE GetProcessAgentByID
 SELECT Agent_ID, Agent_GUID, Agent_Name, ProcessAgent_Type.Description,
 Domain_Guid, Codebase_URL, WebService_URL
 FROM ProcessAgent JOIN ProcessAgent_Type on (ProcessAgent.ProcessAgent_Type_ID= ProcessAgent_Type.ProcessAgent_Type_ID)
-WHERE Agent_ID= @ID
+WHERE Agent_ID= @ID  AND retired = 0
+
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -1006,7 +1203,8 @@ where ProcessAgent_Type.Description = upper(@agentType))
 
 select Agent_ID, Agent_GUID, Agent_Name, upper(@agentType),
 Domain_Guid, Codebase_URL, WebService_URL
-from ProcessAgent where ProcessAgent_Type_ID= @agentTypeID
+from ProcessAgent where ProcessAgent_Type_ID= @agentTypeID  AND retired = 0
+
 
 
 GO
@@ -1031,8 +1229,30 @@ CREATE PROCEDURE GetProcessAgentsInfo
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID, Codebase_URL, WebService_URL, Domain_Guid,
 issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where ProcessAgent.Issuer_GUID != null AND coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_GUID != null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_GUID != null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+CREATE PROCEDURE GetProcessAgentInfosForDomain 
+@guid varchar(50)
+ AS
+
+select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID, Codebase_URL, WebService_URL, Domain_Guid,
+issuer_GUID, 
+IdentIn_ID, (Select passkey from coupon where ProcessAgent.Issuer_GUID != null AND coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_GUID != null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
+from ProcessAgent where Domain_Guid = @guid
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -1051,9 +1271,7 @@ CREATE PROCEDURE GetProcessAgentID
  AS
 
 select Agent_ID from ProcessAgent
-where Agent_GUID = @guid
-
-
+where Agent_GUID = @guid  AND retired = 0
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -1065,30 +1283,15 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-CREATE PROCEDURE GetProcessAgentIDs
-@guid varchar (50)
- AS
-
-select Agent_ID from ProcessAgent
-where Agent_GUID = @guid
-
-
-GO
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
 CREATE PROCEDURE GetProcessAgentIDsByType
 @type varchar (100)
  AS
 declare @typeID int
 select @typeID= processAgent_type_id from ProcessAgent_type where description = @type
 select Agent_ID from ProcessAgent
-where ProcessAgent_type_id= @typeid
-
-
+where ProcessAgent_type_id= @typeid  AND retired = 0
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -1104,7 +1307,8 @@ CREATE PROCEDURE GetProcessAgentIDsByTypeID
  AS
 
 select Agent_ID from ProcessAgent
-where ProcessAgent_type_id = @typeid
+where ProcessAgent_type_id = @typeid AND retired = 0
+
 
 
 GO
@@ -1126,9 +1330,11 @@ CREATE PROCEDURE GetProcessAgentInfo
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID, Codebase_URL, WebService_URL, Domain_Guid,
 issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
 where Agent_GUID = @guid
+
 
 
 GO
@@ -1149,9 +1355,11 @@ CREATE PROCEDURE GetProcessAgentInfoByID
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID,
 Codebase_URL, WebService_URL,  Domain_Guid, issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where ProcessAgent.Issuer_Guid != Null AND  coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
 where Agent_ID = @id
+
 
 
 GO
@@ -1174,9 +1382,11 @@ select @typeID = ProcessAgent_Type_ID from  ProcessAgent_Type where ProcessAgent
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID,
 Codebase_URL,  WebService_URL,  Domain_Guid, issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
 where ProcessAgent_Type_ID = @typeID
+
 
 
 GO
@@ -1198,9 +1408,11 @@ CREATE PROCEDURE GetProcessAgentInfoByInCoupon
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID,
 Codebase_URL, WebService_URL,  Domain_Guid, issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
 where IdentIn_ID = @couponID AND issuer_GUID = @issuer
+
 
 
 GO
@@ -1222,9 +1434,11 @@ CREATE PROCEDURE GetProcessAgentInfoByOutCoupon
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID,
 Codebase_URL, WebService_URL,  Domain_Guid, issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
 where IdentOut_ID = @couponID AND issuer_GUID = @issuer
+
 
 
 GO
@@ -1247,7 +1461,8 @@ CREATE PROCEDURE GetProcessAgentURL
 
 select WebService_URL
  from ProcessAgent
- where  Agent_GUID = @guid
+ where  Agent_GUID = @guid AND retired = 0
+
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -1269,7 +1484,8 @@ CREATE PROCEDURE GetProcessAgentURLbyID
 
 select WebService_URL
  from ProcessAgent
- where  Agent_ID = @agent_id
+ where  Agent_ID = @agent_id AND retired = 0
+
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -1282,6 +1498,63 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+CREATE PROCEDURE IsProcessAgentRetired
+@guid varchar (50)
+AS
+declare @status int
+Set @status = -1
+if Exists (select* from processAgent where Agent_Guid = @guid)
+BEGIN
+	select @status=retired from processAgent where Agent_Guid = @guid
+END
+select @status
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+CREATE PROCEDURE IsProcessAgentIDRetired
+@id int
+AS
+declare @status int
+Set @status = -1
+if Exists (select* from processAgent where Agent_ID = @id)
+BEGIN
+	select @status=retired from processAgent where Agent_id = @id
+END
+select @status
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE SetProcessAgentRetired
+@guid varchar (50),
+@state bit
+AS
+update ProcessAgent Set retired=@state where Agent_Guid = @guid
+select @@rowcount
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
 --
 -- Note: Ticket use in the ProcessAgent may be optional, 
 -- Tickets are created by an external ServiceBroker.
@@ -1345,6 +1618,49 @@ return
 
 
 GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE DeleteTickets
+@guid  varchar(50)
+
+AS
+
+DELETE from Ticket
+where redeemer_GUID=@guid or sponsor_GUID = @guid
+select @@rowcount
+return
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE DeleteIssuerTickets
+@guid  varchar(50)
+
+AS
+
+DELETE from Ticket
+where Issuer_GUID=@guid
+select @@rowcount
+return
+GO
+
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -1598,13 +1914,113 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+CREATE PROCEDURE RemoveDomainCredentials
+    @domainGuid varchar(50),
+    @agentGuid varchar (50)
+ AS
+ 	
+update ProcessAgent set IdentIn_ID= null, IdentOut_ID= null,Issuer_Guid= null,Domain_Guid = null
+where Domain_Guid = @domainGuid and Agent_Guid = @agentGuid
+select @@rowcount
 
-CREATE PROCEDURE RetrieveTicketTypes
-  AS
-        select Ticket_Type_ID, Name, Short_Description, Abstract  from Ticket_Type
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
 GO
 
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE RetrieveTicketTypes
+  AS
+        select Ticket_Type_ID, Name, Short_Description, Abstract  from Ticket_Type
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE RetrieveSystemSupport
+@guid varchar(50)
+AS
+select Contact_Email, Info_URL, description 
+from ProcesAgent where Agent_Guid=@guid
+go
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE RetrieveSystemSupportById
+@id int
+AS
+select Contact_Email, Info_URL, description 
+from ProcesAgent where Agent_id=@id
+go
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+
+CREATE PROCEDURE SaveSystemSupport
+@guid varchar(50),
+@email varchar(50),
+@info varchar(256),
+@desc text
+AS
+
+UPDATE PRocessAgent set Contact_Email=@email,Info_Url=@info,Description=@desc
+WHERE Agent_GUID =@guid
+select @@rowcount
+go
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE SaveSystemSupportById
+@id int,
+@email varchar(50),
+@info varchar(256),
+@desc text
+AS
+
+UPDATE PRocessAgent set Contact_Email=@email,Info_Url=@info,Description=@desc
+WHERE Agent_ID =@id
+select @@rowcount
+go

@@ -199,7 +199,6 @@ namespace iLabs.Scheduling.LabSide
             txtMinimumTime.Text = "";
             txtPrepareTime.Text = "";
             txtProviderName.Text = "";
-            txtQuantum.Text = "";
             txtRecoverTime.Text = "";
             txtEarlyArriveTime.Text = "";
         }
@@ -224,7 +223,6 @@ namespace iLabs.Scheduling.LabSide
             txtMinimumTime.Text = experimentInfo.minimumTime.ToString();
             txtPrepareTime.Text = experimentInfo.prepareTime.ToString();
             txtProviderName.Text = experimentInfo.providerName;
-            txtQuantum.Text = experimentInfo.quantum.ToString();
             txtRecoverTime.Text = experimentInfo.recoverTime.ToString();
             txtEarlyArriveTime.Text = experimentInfo.earlyArriveTime.ToString();
         }
@@ -278,30 +276,14 @@ namespace iLabs.Scheduling.LabSide
                 lblErrorMessage.Visible = true;
                 return;
             }
-            if (txtQuantum.Text.CompareTo("") == 0)
-            {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("You must enter the Quantum of the experiment.");
-                lblErrorMessage.Visible = true;
-                return;
-            }
-            try
-            {
-                quan = Int32.Parse(txtQuantum.Text);
 
-
-            }
-            catch (Exception ex)
+            if (txtClientGuid.Text.CompareTo("") == 0)
             {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter a positive integer in the Quantum text box.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("You must enter the lab Clinet's GUID.");
                 lblErrorMessage.Visible = true;
                 return;
             }
-            if (quan <= 0)
-            {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer value greater than Zero in the Quantum text box.");
-                lblErrorMessage.Visible = true;
-                return;
-            }
+            
 
             if (txtMinimumTime.Text.CompareTo("") == 0)
             {
@@ -399,7 +381,7 @@ namespace iLabs.Scheduling.LabSide
                     // the database will also throw an exception if the combination of LabClientName and LabClientVersion exists
                     // since combination of LabClientName and LabClientVersion must be unique .
                     // this is just another check to throw a meaningful exception
-                    int eID = LSSSchedulingAPI.ListExperimentInfoIDByExperiment(txtClientGuid.Text, labServerGuid);
+                    int eID = LSSSchedulingAPI.ListExperimentInfoIDByExperiment( labServerGuid, txtClientGuid.Text);
                     if (eID >= 0) // then the experiment already exists in database
                     {
                         string msg = "The experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' already exists. Choose another lab client name or lab client version.";
@@ -415,7 +397,7 @@ namespace iLabs.Scheduling.LabSide
                         int experimentInfoID = LSSSchedulingAPI.AddExperimentInfo(Session["labServerGuid"].ToString(),
                             Session["labServerName"].ToString(),txtClientGuid.Text, txtLabClientName.Text,
                             txtLabClientVersion.Text, txtProviderName.Text,
-                            quan, pt, rt, min, et);
+                            pt, rt, min, et);
                         string msg = "The record for the experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' has been created successfully.";
                         lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
                         lblErrorMessage.Visible = true;
@@ -441,9 +423,10 @@ namespace iLabs.Scheduling.LabSide
                 try
                 {
                     //Update Experiment information
-                    LSSSchedulingAPI.ModifyExperimentInfo(LSSSchedulingAPI.ListExperimentInfoIDByExperiment(txtClientGuid.Text, Session["labServerGuid"].ToString()), Session["labServerGuid"].ToString(), Session["labServerName"].ToString(),
+                    LSSSchedulingAPI.ModifyExperimentInfo(LSSSchedulingAPI.ListExperimentInfoIDByExperiment( Session["labServerGuid"].ToString(), txtClientGuid.Text),
+                        Session["labServerGuid"].ToString(), Session["labServerName"].ToString(),
                         txtClientGuid.Text, txtLabClientName.Text, txtLabClientVersion.Text,
-                        txtProviderName.Text, quan, pt, rt, min, et);
+                        txtProviderName.Text, pt, rt, min, et);
                     string msg = "The record for the experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' has been updated.";
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
                     lblErrorMessage.Visible = true;
@@ -468,7 +451,7 @@ namespace iLabs.Scheduling.LabSide
             }
             try
             {
-                if (LSSSchedulingAPI.RemoveExperimentInfo(new int[] { LSSSchedulingAPI.ListExperimentInfoIDByExperiment(txtLabClientName.Text, txtLabClientVersion.Text) }).Length > 0)
+                if (LSSSchedulingAPI.RemoveExperimentInfo(new int[] { LSSSchedulingAPI.ListExperimentInfoIDByExperiment(Session["labServerGuid"].ToString(), txtClientGuid.Text) }).Length > 0)
                 {
                     string msg = "The experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' was not deleted.";
                     lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);

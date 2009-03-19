@@ -22,6 +22,8 @@ using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.Proxies.LSS;
+using iLabs.Proxies.USS;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
@@ -31,11 +33,7 @@ using iLabs.ServiceBroker.Mapping;
 using iLabs.Ticketing;
 
 using iLabs.UtilLib;
-using iLabs.Services;
-
-
-
-
+//using iLabs.Services;
 
 namespace iLabs.ServiceBroker.admin
 {
@@ -43,11 +41,7 @@ namespace iLabs.ServiceBroker.admin
 	/// Summary description for manageLabClients.
 	/// </summary>
 	public partial class manageLabClients : System.Web.UI.Page
-	{
-
-		//The error message div tab
-		
-
+    {
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
 		int labClientID;
@@ -659,7 +653,8 @@ namespace iLabs.ServiceBroker.admin
 			labServers  = wrapper.GetProcessAgentInfosWrapper(labServerIDs);
 			foreach(ProcessAgentInfo ls in labServers)
 			{
-				labServersList.Add(ls);
+                if(!ls.retired)
+				    labServersList.Add(ls);
 			}
 			repLabServers.DataSource = labServersList;
 			repLabServers.DataBind();
@@ -829,22 +824,30 @@ namespace iLabs.ServiceBroker.admin
 
                     TicketLoadFactory factory = TicketLoadFactory.Instance();
                     ProcessAgentInfo uss = ticketing.GetProcessAgentInfo(ussId);
-
+                    if (uss.retired)
+                    {
+                        throw new Exception("The specified USS is retired");
+                    }
                     //this should be in a loop
                     for(int i = 0;i<lc.labServerIDs.Length;i++){
                        
                         if (lc.labServerIDs[i] > 0)
                         {
                             ProcessAgentInfo labServer = ticketing.GetProcessAgentInfo(lc.labServerIDs[i]);
-
-                            //Hashtable mappingsTable = ticketing.GetResourceMappingsForKey(lc.labServerIDs[i], ResourceMappingTypes.PROCESS_AGENT);
-                            //ResourceMappingValue[][] rsrcValues = ticketing.GetResourceMappingValues(mappingsTable);
+                            if (labServer.retired)
+                            {
+                                throw new Exception("The lab server is retired");
+                            }
                             int lssId = ticketing.FindProcessAgentIdForAgent(lc.labServerIDs[i], ProcessAgentType.LAB_SCHEDULING_SERVER);
 
                             if (lssId > 0)
                             {
 
                                 ProcessAgentInfo lss = ticketing.GetProcessAgentInfo(lssId);
+                                if (lss.retired)
+                                {
+                                    throw new Exception("The LSS is retired");
+                                }
                                 // The REVOKE_RESERVATION ticket
                                 string revokePayload = factory.createRevokeReservationPayload();
                                 Coupon ussCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, uss.agentGuid,
@@ -867,7 +870,7 @@ namespace iLabs.ServiceBroker.admin
                                     lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                                     lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
                                     lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                    bool ussAdded = lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, ussCoupon);
+                                    int ussAdded = lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, ussCoupon);
                                     lssProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName, lc.clientGuid, lc.clientName, lc.version, lc.contactEmail);
                                 }
                                 else
@@ -882,58 +885,24 @@ namespace iLabs.ServiceBroker.admin
                                 }
                                 //ADD LSS on USS
                                 string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["UserTZ"]));
-                                //ticketing.AddTicket(ussCoupon,TicketTypes.ADMINISTER_USS, uss.agentGuid,
-                                //    ticketing.GetIssuerGuid(), duration, ussPayload);
-
+                                
                                 UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                                 ussProxy.Url = uss.webServiceUrl;
                                 ussProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                                 ussProxy.AgentAuthHeaderValue.coupon = uss.identOut;
                                 ussProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                bool lssAdded = ussProxy.AddLSSInfo(lss.agentGuid, lss.agentName, lss.webServiceUrl);
+                                int lssAdded = ussProxy.AddLSSInfo(lss.agentGuid, lss.agentName, lss.webServiceUrl);
 
                                 //Add Experiment Information on USS
-                                bool expInfoAdded = ussProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName,
+                                int expInfoAdded = ussProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName,
                                     lc.clientGuid, lc.clientName, lc.version, lc.contactEmail, lss.agentGuid);
 
-
                                 // Group Credentials MOVED TO THE MANAGE LAB GROUPS PAGE
-                                //Add Credential Set Info on LSS
-                                //int[] grantIDs = wrapper.ListGrantIDsWrapper();
-                                //Grant[] grants = wrapper.GetGrantsWrapper(grantIDs);
-                                //int groupID = -1;
-
-                                //foreach(Grant g in grants)
-                                //{
-                                //    if (g.function.Equals(Function.useLabClientFunctionType) &&
-                                //        g.qualifierID.Equals(AuthorizationAPI.GetQualifierID(lc.clientID, Qualifier.labClientQualifierTypeID)))
-                                //    {
-                                //        groupID = g.agentID;
-                                //        break;
-                                //    }
-                                //}
-
-                                //if (groupID != -1)
-                                //{
-                                //    opHeader.coupon = lssCoupon;
-                                //    lssProxy.OperationAuthHeaderValue = opHeader;
-
-                                //    bool credentialSetAdded = lssProxy.AddCredentialSet(ticketing.GetIssuerGuid(),
-                                //        ticketing.GetServiceBrokerInfo().AgentName, 
-                                //        wrapper.GetGroupsWrapper(new int[] { groupID })[0].groupName, uss.agentGuid);
-                                //}
-
                             }
                         }
                     }
-
                 }
-
-
-                    //Hashtable mappingsTable = ticketing.GetResourceMappingsForKey(
-
             }
-
             catch
             {
                 throw;
@@ -1055,15 +1024,7 @@ namespace iLabs.ServiceBroker.admin
                 ddlAssociatedUSS.Enabled = true;
                 ddlAssociatedUSS.SelectedIndex = 0;
 
-                //wrapper.ModifyLabClientWrapper(lc.clientID, lc.clientName, lc.version, lc.clientShortDescription,
-                //    lc.clientLongDescription, lc.notes, lc.loaderScript, lc.clientType,
-                //    lc.labServerIDs, lc.contactEmail, lc.contactFirstName, lc.contactLastName,
-                //    lc.needsScheduling, lc.needsESS, lc.IsReentrant, lc.clientInfos);
-
-
-
             }
-
             catch
             {
                 throw;
@@ -1104,15 +1065,7 @@ namespace iLabs.ServiceBroker.admin
 
                 ddlAssociatedESS.Enabled = true;
                 ddlAssociatedESS.SelectedIndex = 0;
-
-                //wrapper.ModifyLabClientWrapper(lc.clientID, lc.clientName, lc.version, lc.clientShortDescription,
-                //    lc.clientLongDescription, lc.notes, lc.loaderScript, lc.clientType,
-                //    lc.labServerIDs, lc.contactEmail, lc.contactFirstName, lc.contactLastName,
-                //    lc.needsScheduling, false, lc.IsReentrant, lc.clientInfos);
-
-
             }
-
             catch
             {
                 throw;

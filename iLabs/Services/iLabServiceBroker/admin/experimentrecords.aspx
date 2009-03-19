@@ -33,29 +33,34 @@ Please see license.txt in top level directory for full license.
 						<!-- Error message here --><asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label></div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
-						<table cols="2">
-						<tr>
-						<td valign="top">
+					<table style="width: 960px" >
+                            <tr>
+                                <th style="width: 430px; height: 20px;">Search Experiments</th>
+                                <th style="width: 530px; height: 20px;">Experiment Summary</th>
+                            </tr>
+                            <tr>
+                                <td valign="top">
+                                    <table>
+                                        <tr>
+                                            <td>
 						<div class="simpleform">
-							<table cols="4">
+							<table cols="3" width="430px">
+								<tbody>
 								<tr>
-									<th>
-										<label for="timeis">Username</label></th>
-									<td colspan="3"><asp:textbox id="txtUsername" Runat="server"></asp:textbox>
-									</td>
-										
+									<th style="width: 100px"><label for="useris">Username</label></th>
+									<td colspan="2"><asp:textbox id="txtUsername" Runat="server" Width="330px"></asp:textbox></td>
 								</tr>
-									<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
+								<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
+								<tr>
+									<th><label for="groupis">Groupname</label></th>
+									<td colspan="2"><asp:textbox id="txtGroupname" Runat="server" Width="330px"></asp:textbox></td>
+								</tr>
+								<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
 								<tr>
 									<th>
-										<label for="timeis">Groupname</label></th>
-									<td colspan="3"><asp:textbox id="txtGroupname" Runat="server"></asp:textbox></td>
-									<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list --></tr>
-								<tr>
-									<th style="HEIGHT: 11px">
 										<label for="timeis">Time </label>
 									</th>
-									<td style="HEIGHT: 11px" colspan="3"><asp:dropdownlist id="ddlTimeAttribute" Runat="server" Width="112px" AutoPostBack="True" onselectedindexchanged="ddlTimeAttribute_SelectedIndexChanged">
+									<td colspan="2"><asp:dropdownlist id="ddlTimeAttribute" Runat="server" Width="200px" AutoPostBack="True" onselectedindexchanged="ddlTimeAttribute_SelectedIndexChanged">
 											<asp:ListItem Value="-- Select one --">-- Select one --</asp:ListItem>
 											<asp:ListItem Value="equal to">equal to</asp:ListItem>
 											<asp:ListItem Value="before">before</asp:ListItem>
@@ -63,126 +68,153 @@ Please see license.txt in top level directory for full license.
 											<asp:ListItem Value="between">between</asp:ListItem>
 											<asp:ListItem Value="on date">on date</asp:ListItem>
 										</asp:dropdownlist></td>
-									<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list --></tr>
+								</tr>
+								<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
 								<tr>
-									<th>
-										&nbsp;</th>
-									<td style="WIDTH: 78px"><asp:textbox id="txtTime1" Runat="server" Width="96px"></asp:textbox>
-									</td>
-									<td style="WIDTH: 78px"><asp:textbox id="txtTime2" Runat="server" ReadOnly="true" Width="96px" BackColor="Lavender"></asp:textbox>
-									</td>
-									<td>&nbsp;
-									</td>
+									<th>&nbsp;</th>
+									<td style="width: 165px"><asp:textbox id="txtTime1" Runat="server" Width="153px"></asp:textbox></td>					
+									<td style="width: 165px"><asp:textbox id="txtTime2" Runat="server" ReadOnly="true" Width="149px" BackColor="Lavender"></asp:textbox></td>
 								</tr>
 								<tr>
-								<th>
-										&nbsp;</th>
-									<td colspan="3"><asp:button id="btnGo" Runat="server" CssClass="button" Text="Search Experiments" onclick="btnGo_Click"></asp:button>
-									</td>
+								    <th>&nbsp;</th>
+								    <td colspan="2"><asp:button id="btnGo" Runat="server" CssClass="button" Text="Search Experiments" onclick="btnGo_Click"></asp:button>
+								    </td>
 								</tr>
+							</tbody>
 							</table>
 						</div>
-						<div class="simpleform"><label for="selectexperiment">Select experiment</label>
-							<br />
-							<asp:listbox id="lbxSelectExperiment" Runat="server" Rows="20" Width="312px" AutoPostBack="True"
-								Height="354px" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged"></asp:listbox>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="simpleform">
+							<label for="selectexperiment">Select experiment</label><br />
+							<asp:listbox id="lbxSelectExperiment" Runat="server" Rows="20" Width="430px" AutoPostBack="True"
+								Height="354px" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged">
+							</asp:listbox>
 						</div>
-						</td>
-						<td valign="top">
-						<div id="itemdisplay">
-							<h4>Selected Experiment</h4>
-							<div class="simpleform">
-								<table>
-									<tr>
-										<th>
-											<label for="experimentid">Experiment ID</label></th>
-										<td><asp:textbox id="txtExperimentID" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th style="HEIGHT: 24px">
-											<label for="username">User Name </label>
-										</th>
-										<td style="HEIGHT: 24px"><asp:textbox id="txtUserName1" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="groupname">Effective Group Name </label>
-										</th>
-										<td><asp:textbox id="txtGroupName1" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="clientname">Client Name</label></th>
-										<td><asp:textbox id="txtClientName" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="labservername">Lab Server Name</label></th>
-										<td><asp:textbox id="txtLabServerName" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="status">Status</label></th>
-										<td><asp:textbox id="txtStatus" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="subtime">Submission Time </label>
-										</th>
-										<td><asp:textbox id="txtSubTime" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="comtime">Completion Time </label>
-										</th>
-										<td><asp:textbox id="txtComtime" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="recordCount">Total Records </label>
-										</th>
-										<td><asp:textbox id="txtRecordCount" Runat="server" ReadOnly="true"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th>
-											<label for="annotation">Annotation</label></th>
-										<td><asp:textbox id="txtAnnotation" Runat="server" ReadOnly="true" Columns="20" Rows="3" TextMode="MultiLine"></asp:textbox>
-										</td>
-									</tr>
-									<tr>
-										<th colspan="2">
-											<asp:button id="btnSaveAnnotation" Runat="server" Text="Save Annotation" CssClass="buttonright" onclick="btnSaveAnnotation_Click"></asp:button>
-										</th>
-									</tr>							
-									<tr>
-										<th colspan="2">
-											<asp:button id="btnDeleteExperiment" Runat="server" Text="Delete Experiment" CssClass="buttonright" onclick="btnDeleteExperiment_Click"></asp:button>
-										</th>
-									</tr>
-									<tr id="showExperiment">
-										<th colspan="2">
-											<asp:button id="btnShowExperiment" Runat="server" Text="Display Experiment Records" Enabled="false" CssClass="buttonright" onclick="btnShowExperiment_Click"></asp:button>
-										</th>
-									</tr>
-								</table>
-							</div>
-						</div>
-						</td>
-						</tr>
-						</table>
-						<p>&nbsp;</p>
+					</td>
+				</tr>
+			</table>
+			</td>
+			<td valign="top">
+				<div class="simpleform">
+						<table style="width: 530px;">
+                                                    <tr id="trExperimentID" runat="server" visible="true">
+                                                        <th style="width: 160px">
+                                                            <label for="experimentid">
+                                                                Experiment ID</label></th>
+                                                        <td style="width: 370px">&nbsp;<asp:TextBox ID="txtExperimentID" runat="server" ReadOnly="True" Width="200px"></asp:TextBox></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="labclientname">
+                                                                Lab Client Name</label></th>
+                                                        <td>
+                                                            &nbsp;<asp:TextBox ID="txtClientName" runat="server" ReadOnly="True" Width="360px"></asp:TextBox></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="labservername">
+                                                                Lab Server Name</label></th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtLabServerName" runat="server" ReadOnly="True" Width="360px"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="username">
+                                                                User Name
+                                                            </label>
+                                                        </th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtUserName1" runat="server" ReadOnly="True" Width="360px"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th style="height: 23px">
+                                                            <label for="groupname">
+                                                                Effective Group Name
+                                                            </label>
+                                                        </th>
+                                                        <td style="height: 23px;">
+                                                            <asp:TextBox ID="txtGroupName1" runat="server" ReadOnly="True" Width="360px"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="status">
+                                                                Status</label></th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtStatus" runat="server" ReadOnly="True" Width="360px"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="subtime">
+                                                                Submission Time
+                                                            </label>
+                                                        </th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtSubmissionTime" runat="server" ReadOnly="True"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="comtime">
+                                                                Completion Time
+                                                            </label>
+                                                        </th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtCompletionTime" runat="server" ReadOnly="True"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="recordCount">
+                                                                Total Records
+                                                            </label>
+                                                        </th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtRecordCount" runat="server" ReadOnly="True"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>
+                                                            <label for="annotation">
+                                                                Annotation</label></th>
+                                                        <td>
+                                                            <asp:TextBox ID="txtAnnotation" runat="server" Columns="20" Rows="5" TextMode="MultiLine" Width="360px"></asp:TextBox>
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="trSaveAnnotation" runat="server" visible="false">
+                                                        <th colspan="2">
+                                                            <asp:Button ID="btnSaveAnnotation" runat="server" Text="Save Annotation" CssClass="buttonright"
+                                                                OnClick="btnSaveAnnotation_Click"></asp:Button>
+                                                        </th>
+                                                    </tr>
+                                                    <tr id="trShowExperiment" runat="server" visible="false">
+                                                        <th colspan="2">
+                                                            <asp:Button ID="btnShowExperiment" runat="server" Text="Display Experiment Data"
+                                                                Enabled="true" CssClass="buttonright" OnClick="btnShowExperiment_Click"></asp:Button>
+                                                        </th>
+                                                    </tr>
+                                                    <tr id="trDeleteExperiment" runat="server" visible="false">
+                                                        <th colspan="2">
+                                                            <asp:Button ID="btnDeleteExperiment" runat="server" Text="Delete Experiment" CssClass="buttonright"
+                                                                OnClick="btnDeleteExperiment_Click"></asp:Button>
+                                                        </th>
+                                                    </tr>
+                                            </table>
 					</div>
-					<br clear="all" />
-					<!-- end pagecontent div --></div> <!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
-		</form>
+				</td>
+			</tr>
+		</table>	
+		<p>&nbsp;</p>
+	</div><!-- end pagecontent div -->
+	<br clear="all" />
+	</div> <!-- end innerwrapper div -->
+	<uc1:footer id="Footer1" runat="server"></uc1:footer></div>
+	</form>
 	</body>
 </html>

@@ -18,7 +18,7 @@
 	<div id="outerwrapper">
 		<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
 		<uc1:NavBar id="NavBar1" runat="server"></uc1:NavBar>
-		<br clear="all">
+		<br clear="all" />
 		<div id="innerwrapper">
 		<div id="pageintro">
 						<h1>Register Experiment

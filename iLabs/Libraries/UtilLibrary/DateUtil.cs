@@ -28,6 +28,46 @@ namespace iLabs.UtilLib
         // Create an Invariant Culture for general formating 
         private static IFormatProvider ivCulture = new CultureInfo("");
 
+
+        public static bool CheckDayMask(DayOfWeek day, int mask)
+        {
+            bool status = false;
+            switch (day)
+            {
+                case DayOfWeek.Sunday:
+                    if ((mask & SunBit) > 0)
+                        status = true;
+                    break;
+                case DayOfWeek.Monday:
+                    if ((mask & MonBit) > 0)
+                        status = true;
+                    break;
+                case DayOfWeek.Tuesday:
+                    if ((mask & TuesBit) > 0)
+                        status = true;
+                    break;
+                case DayOfWeek.Wednesday:
+                    if ((mask & WedBit) > 0)
+                        status = true;
+                    break;
+                case DayOfWeek.Thursday:
+                    if ((mask & ThursBit) > 0)
+                        status = true;
+                    break;
+                case DayOfWeek.Friday:
+                    if ((mask & FriBit) > 0)
+                        status = true;
+                    break;
+                case DayOfWeek.Saturday:
+                    if ((mask & SatBit) > 0)
+                        status = true;
+                    break;
+                default:
+                    break;
+            }
+            return status;
+        }
+
         /// <summary>
         /// Parses a local format DateTime String and converts it to a UTC DaterTime object.
         /// </summary>
@@ -80,6 +120,16 @@ namespace iLabs.UtilLib
             else value = dt;
             value = value.AddMinutes(tz);
             return value.ToString(culture);
+        }
+
+        public static string ToUserTime(DateTime dt, CultureInfo culture, int tz, string format)
+        {
+            DateTime value;
+            if (dt.Kind != DateTimeKind.Utc)
+                value = dt.ToUniversalTime();
+            else value = dt;
+            value = value.AddMinutes(tz);
+            return value.ToString(format, culture);
         }
 
         /// <summary>
@@ -140,6 +190,16 @@ namespace iLabs.UtilLib
                 culture = new CultureInfo("en-us");
             }
             return culture;
+        }
+
+        public static string DateTime24(CultureInfo culture)
+        {
+             string temp = culture.DateTimeFormat.ShortDatePattern;
+             if (!temp.Contains("MM"))
+                 temp = temp.Replace("M", "MM");
+             if (!temp.Contains("dd"))
+                 temp = temp.Replace("d", "dd");
+            return temp + " HH" + culture.DateTimeFormat.TimeSeparator + "mm";
         }
 
         /// <summary>
@@ -268,5 +328,21 @@ namespace iLabs.UtilLib
             }
             return buf.ToString();
         }
+
+        public static string TimeSpanTrunc(TimeSpan time){
+            StringBuilder buf = new StringBuilder();
+            if(time < TimeSpan.Zero)
+                buf.Append("-");
+            if(time.Days != 0){
+                buf.Append(time.Days);
+                buf.Append(".");
+            }
+            buf.Append(time.Hours.ToString("D2"));
+            buf.Append(":");
+            buf.Append(time.Minutes.ToString("D2"));
+
+           return buf.ToString();
+        }
+
     }
 }

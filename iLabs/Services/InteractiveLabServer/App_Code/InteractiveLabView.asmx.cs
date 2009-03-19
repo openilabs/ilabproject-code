@@ -1,4 +1,11 @@
-/* $Id: InteractiveLabView.asmx.cs,v 1.13 2008/03/17 18:50:42 pbailey Exp $ */
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ * 
+ * $Id$
+ */
+
+#define LabVIEW_82
 
 using System;
 using System.Collections;
@@ -18,9 +25,12 @@ using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 
-
-using iLabs.LabView;
+#if LabVIEW_82
 using iLabs.LabView.LV82;
+#endif
+#if LabVIEW_86
+using iLabs.LabView.LV86;
+#endif
 
 namespace iLabs.LabServer.LabView
 {
@@ -196,6 +206,12 @@ SoapDocumentMethod(Binding = "LabViewLS")]
 
     } // END OF LabViewLS Class
 
+#if LabVIEW_82
 }
+#endif
+#if LabVIEW_86
+}
+#endif
+
 
 

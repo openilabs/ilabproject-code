@@ -249,10 +249,10 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="contactEmail"></param>
 		/// <param name="contactFirstName"></param>
 		/// <param name="contactLastName"></param>
-		public void ModifyProcessAgentWrapper (int agentID, string GUID, string name, string type, string domain, string applicationURL, string webServiceURL )
+		public void ModifyProcessAgentWrapper ( string GUID, string name, string type, string domain, string applicationURL, string webServiceURL )
 		{
 			AuthenticateSuperuser("Access denied modifying processAgent.");
-			new ProcessAgentDB().UpdateProcessAgent (agentID, GUID, name, type, domain, applicationURL,  webServiceURL);
+			new ProcessAgentDB().UpdateProcessAgent ( GUID, name, type, domain, applicationURL,  webServiceURL);
 		}
 /*
 		/// <summary>
@@ -2297,7 +2297,7 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 		
 			//if successfully out of loop.
-            return InternalDataDB.SelectExperimentSummaries(experimentIDs);
+            return DataStorageAPI.RetrieveExperimentSummaries(experimentIDs);
 		}
 
 		/// <summary>

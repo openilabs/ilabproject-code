@@ -11,19 +11,19 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 
 using iLabs.Core;
-using iLabs.Services;
 using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.Ticketing;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.Proxies.ESS;
 
 namespace iLabs.LabServer.TimeOfDay
 {
 
     public partial class Redirect : System.Web.UI.Page
     {
-        public static iLabs.Services.ExperimentStorageProxy essInterface = new iLabs.Services.ExperimentStorageProxy();
+        public static ExperimentStorageProxy essInterface = new ExperimentStorageProxy();
         public static TodInterface todInterface = new TodInterface();
 
         OperationAuthHeader essOpHeader = new OperationAuthHeader();

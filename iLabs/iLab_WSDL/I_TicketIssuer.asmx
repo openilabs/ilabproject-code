@@ -15,9 +15,6 @@ using System.Xml;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 
-//using iLabs.Architecture.TicketingAPI;
-
-
 	/// <summary>
 	/// Summary description for Ticketing Issuer.
 	/// </summary>

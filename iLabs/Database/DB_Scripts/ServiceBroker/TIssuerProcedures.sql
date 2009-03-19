@@ -75,13 +75,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[InsertAdmi
 drop procedure [dbo].[InsertAdminURL]
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteAdminURLbyID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[DeleteAdminURLbyID]
-GO
-
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveAdminURLs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[RetrieveAdminURLs]
-GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetIdentificationCouponID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[SetIdentificationCouponID]

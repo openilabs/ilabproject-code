@@ -54,9 +54,9 @@ namespace iLabs.Ticketing
             string rootElemt = "RedeemSessionPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
             keyValueDictionary.Add("userID", userID.ToString());
-            if (groupID != null && groupID > 0)
+            if (groupID > 0)
             keyValueDictionary.Add("groupID", groupID.ToString());
-            if(clientID != null && clientID > 0)
+            if(clientID > 0)
                 keyValueDictionary.Add("clientID", clientID.ToString());
             return writeTicketLoad(rootElemt, TicketTypes.REDEEM_SESSION, keyValueDictionary);
         }

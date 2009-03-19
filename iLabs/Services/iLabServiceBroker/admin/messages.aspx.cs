@@ -26,7 +26,7 @@ using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authentication;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.Ticketing;
-using iLabs.Services;
+//using iLabs.Services;
 using iLabs.DataTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.UtilLib;
@@ -332,7 +332,8 @@ namespace iLabs.ServiceBroker.admin
 					txtTargetGroups.Text=ddlMessageTarget.SelectedItem.Text;	
 					ProcessAgentInfo[] labServers=wrapper.GetProcessAgentInfosWrapper(AdministrativeUtilities.GetGroupLabServers(Int32.Parse(ddlMessageTarget.SelectedValue)));
 					foreach (ProcessAgentInfo ls in labServers)
-						txtTargetLabs.Text+=ls.agentName+"\n";
+                        if(!ls.retired)
+						    txtTargetLabs.Text+=ls.agentName+"\n";
 				}
 			}
 			else
@@ -359,7 +360,8 @@ namespace iLabs.ServiceBroker.admin
 								txtTargetGroups.Text=ddlMessageTarget.SelectedItem.Text;	
 								ProcessAgentInfo[] labServers=wrapper.GetProcessAgentInfosWrapper(AdministrativeUtilities.GetGroupLabServers(Int32.Parse(ddlMessageTarget.SelectedValue)));
 								foreach (ProcessAgentInfo ls in labServers)
-									txtTargetLabs.Text+=ls.agentName+"\n";
+                                    if(!ls.retired)
+									    txtTargetLabs.Text+=ls.agentName+"\n";
 							}
 							break;
 

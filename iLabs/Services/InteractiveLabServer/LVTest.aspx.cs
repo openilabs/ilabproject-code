@@ -2,8 +2,10 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: LVTest.aspx.cs,v 1.9 2007/06/21 21:13:53 pbailey Exp $
+ * $Id:$
  */
+
+#define LabVIEW_82
 
 using System;
 using System.Collections;
@@ -24,13 +26,17 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
-using iLabs.Services;
-using iLabs.LabView;
-using iLabs.LabView.LV82;
-using LabVIEW;
 using iLabs.LabServer.Interactive;
+using iLabs.LabView;
 
-
+#if LabVIEW_82
+using LabVIEW.lv821;
+using iLabs.LabView.LV82;
+#endif
+#if LabVIEW_86
+using LabVIEW.lv86;
+using iLabs.LabView.LV86;
+#endif
 
 namespace iLabs.LabServer.LabView
 {

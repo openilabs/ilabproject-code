@@ -18,7 +18,8 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
-using iLabs.Services;
+using iLabs.Proxies.LSS;
+using iLabs.Proxies.Ticketing;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
@@ -49,7 +50,7 @@ namespace iLabs.Scheduling.UserSide
         string passKey = null;
         string issuerID = null;
         CultureInfo culture = null;
-        string tzOff = null;
+        //string tzOff = null;
 
 
          long expirationTime;
@@ -59,97 +60,109 @@ namespace iLabs.Scheduling.UserSide
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+            bool needsBuildList = false;
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            
+            Page.ClientScript.RegisterStartupScript( this.GetType(), "onClose", 
+            "function ReloadPage(){" + Page.ClientScript.GetPostBackEventReference(this.hiddenPopupOnMakeRev, hiddenPopupOnMakeRev.ID.ToString()) + "}", true);
+
+
+
             //txtStartTimePeriod.Attributes.Add("OnKeyPress", "return false;");
             //txtEndTimePeriod.Attributes.Add("OnKeyPress", "return false;");
             btnRemoveReservation.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this reservation?')== false) return false;");
             hiddenPopupOnMakeRev.Attributes.Add("onpropertychange", Page.GetPostBackEventReference(btnReserve));
-       
+
+            lblDescription.Text = "Select the date that you would like to schedule a reservation."
+                          + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
+            calDate.SelectionMode = CalendarSelectionMode.DayWeek;
             if (!IsPostBack)
             {
-                couponID = long.Parse(Request.QueryString["coupon_id"]);
-                passKey = Request.QueryString["passkey"];
-                issuerID = Request.QueryString["issuer_guid"];
-
-                //Url of the client-execution page on the Service Broker
-                string sbUrl = Request.QueryString["sb_url"];
-                Session["sbUrl"] = sbUrl;
-
-                coupon = new Coupon(issuerID, couponID, passKey);
-                Session["coupon"] = coupon;
-              
-                Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.SCHEDULE_SESSION);
-                if (ticket.IsExpired())
+                if (Request.QueryString["refresh"] != null && Session["coupon"] != null)
                 {
-                    string msg = "The reservation ticket has expired, Please re-login.";
-                    lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
-                    lblErrorMessage.Visible = true;
-                    this.btnRemoveReservation.Enabled = false;
-                    //this.btnReserve.Enabled = false;
-                    //this.btnShowAvailableTimePeriod.Enabled = false;
-                    return;
+                    needsBuildList = true;
                 }
-                XmlDocument payload = new XmlDocument();
-                payload.LoadXml(ticket.payload);
-                //Session["couponID"] = couponID;
-                //Session["passKey"] = passKey;
-                //Session["issuerID"] = issuerID;
-
-                Session["serviceBrokerGuid"] = payload.GetElementsByTagName("sbGuid")[0].InnerText;
-                Session["groupName"] = payload.GetElementsByTagName("groupName")[0].InnerText;
-                Session["clientGuid"] = payload.GetElementsByTagName("clientGuid")[0].InnerText;
-                Session["labServerGuid"] = payload.GetElementsByTagName("labServerGuid")[0].InnerText;
-                Session["labClientName"] = payload.GetElementsByTagName("labClientName")[0].InnerText;
-                Session["labClientVersion"] = payload.GetElementsByTagName("labClientVersion")[0].InnerText;
-                Session["userName"] = payload.GetElementsByTagName("userName")[0].InnerText;
-                Session["userTZ"] = payload.GetElementsByTagName("userTZ")[0].InnerText;
-
-                serviceBrokerGuid = Session["serviceBrokerGuid"].ToString();
-                groupName = Session["groupName"].ToString();
-                clientGuid = Session["clientGuid"].ToString();
-                labServerGuid = Session["labServerGuid"].ToString();
-                labClientName = Session["labClientName"].ToString();
-                labClientVersion = Session["labClientVersion"].ToString();
-                userName = Session["userName"].ToString();
-                if (Session["userTZ"] != null)
+                else
                 {
-                    userTZ = Convert.ToInt32(Session["userTZ"]);
+                    if (Request.QueryString["coupon_id"] != null)
+                        couponID = long.Parse(Request.QueryString["coupon_id"]);
+                    passKey = Request.QueryString["passkey"];
+                    issuerID = Request.QueryString["issuer_guid"];
+
+                    //Url of the client-execution page on the Service Broker
+                    string sbUrl = Request.QueryString["sb_url"];
+                    if(sbUrl != null)
+                        Session["sbUrl"] = sbUrl;
+                    if (couponID <= 0 || passKey == null || issuerID == null)
+                    {
+                        Response.Redirect("UnauthorizedReg.aspx", true);
+                    }
+
+                    coupon = new Coupon(issuerID, couponID, passKey);
+                    Session["coupon"] = coupon;
+
+                    Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.SCHEDULE_SESSION);
+                    if (ticket.IsExpired())
+                    {
+                        string msg = "The reservation ticket has expired, Please re-login.";
+                        lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
+                        lblErrorMessage.Visible = true;
+                        this.btnRemoveReservation.Enabled = false;
+                        //this.btnReserve.Enabled = false;
+                        //this.btnShowAvailableTimePeriod.Enabled = false;
+                        return;
+                    }
+                    XmlDocument payload = new XmlDocument();
+                    payload.LoadXml(ticket.payload);
+                    //Session["couponID"] = couponID;
+                    //Session["passKey"] = passKey;
+                    //Session["issuerID"] = issuerID;
+
+                    Session["serviceBrokerGuid"] = payload.GetElementsByTagName("sbGuid")[0].InnerText;
+                    Session["groupName"] = payload.GetElementsByTagName("groupName")[0].InnerText;
+                    clientGuid = payload.GetElementsByTagName("clientGuid")[0].InnerText;
+                    Session["clientGuid"] = clientGuid;
+                    labServerGuid = payload.GetElementsByTagName("labServerGuid")[0].InnerText;
+                    Session["labServerGuid"] = labServerGuid;
+                    Session["labClientName"] = payload.GetElementsByTagName("labClientName")[0].InnerText;
+                    Session["labClientVersion"] = payload.GetElementsByTagName("labClientVersion")[0].InnerText;
+                    Session["lssURL"] = USSSchedulingAPI.ListLSSURLbyExperiment(clientGuid, labServerGuid);
+                    Session["lssGuid"] = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
+                    Session["userName"] = payload.GetElementsByTagName("userName")[0].InnerText;
+                    Session["userTZ"] = payload.GetElementsByTagName("userTZ")[0].InnerText;
+
+                    //lblTimeSlotsInfo.Visible = false;
+                    this.lblTitleofSchedule.Text = "Scheduling for " + Session["labClientName"];
+                    needsBuildList = true;
+                    //this.lblUserName.Text ="User: " + Session["userName"].ToString() + "   ";
+                    //showDefaultAvailableTime();
+                    //lbldatetimeformat1.Text = culture.DateTimeFormat.ShortDatePattern;
+                    //lbldatetimeformat2.Text = culture.DateTimeFormat.ShortDatePattern;
                 }
-            
-
-                Session["lssURL"] = USSSchedulingAPI.ListLSSURLbyExperiment(clientGuid, labServerGuid);
-                Session["lssGuid"] = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
-
-                lssURL = Session["lssURL"].ToString();
-                lssGuid = Session["lssGuid"].ToString();
-                buildReservationListBox();
-                //lblTimeSlotsInfo.Visible = false;
-                this.lblTitleofSchedule.Text =  "Scheduling for " + labClientName;
-                //this.lblUserName.Text ="User: " + Session["userName"].ToString() + "   ";
-                //showDefaultAvailableTime();
-                //lbldatetimeformat1.Text = culture.DateTimeFormat.ShortDatePattern;
-                //lbldatetimeformat2.Text = culture.DateTimeFormat.ShortDatePattern;
             }
-            else
+            coupon = (Coupon)Session["coupon"];
+            lssURL = Session["lssURL"].ToString();
+            lssGuid = Session["lssGuid"].ToString();
+            serviceBrokerGuid = Session["serviceBrokerGuid"].ToString();
+            groupName = Session["groupName"].ToString();
+            clientGuid = Session["clientGuid"].ToString();
+            labServerGuid = Session["labServerGuid"].ToString();
+            labClientName = Session["labClientName"].ToString();
+            labClientVersion = Session["labClientVersion"].ToString();
+            lssURL = Session["lssURL"].ToString();
+            lssGuid = Session["lssGuid"].ToString();
+            userName = Session["userName"].ToString();
+            if (Session["userTZ"] != null)
             {
-
-                serviceBrokerGuid = Session["serviceBrokerGuid"].ToString();
-                groupName = Session["groupName"].ToString();
-                clientGuid = Session["clientGuid"].ToString();
-                labServerGuid = Session["labServerGuid"].ToString();
-                labClientName = Session["labClientName"].ToString();
-                labClientVersion = Session["labClientVersion"].ToString();
-                userName = Session["userName"].ToString();
                 userTZ = Convert.ToInt32(Session["userTZ"]);
-                lssURL = Session["lssURL"].ToString();
-                lssGuid = Session["lssGuid"].ToString();
-                //lblTimeSlotsInfo.Visible = false;
-                lblErrorMessage.Visible = false;
-                //showDefaultAvailableTime();
-
             }
-            coupon =(Coupon)Session["coupon"];
-           // buildReservationListBox();
+         
+            //lblTimeSlotsInfo.Visible = false;
+            lblErrorMessage.Visible = false;
+            //showDefaultAvailableTime();
+
+            if (needsBuildList)
+                buildReservationListBox();
         }
 
         #region Web Form Designer generated code
@@ -196,38 +209,30 @@ namespace iLabs.Scheduling.UserSide
                 //this.btnReserve.Enabled = false;
                 //this.btnShowAvailableTimePeriod.Enabled = false;
                 return;
-
             }
-
-
         }
+
         private void buildReservationListBox()
         {
             lbxReservation.Items.Clear();
             try
             {
-                int experimentInfoId = USSSchedulingAPI.ListExperimentInfoIDByExperiment(clientGuid, labServerGuid);
-                int[] resIDs = USSSchedulingAPI.ListReservationIDsByUser(userName, serviceBrokerGuid, experimentInfoId);
-                if (resIDs.Length == 0)
+                ReservationInfo[] res = DBManager.GetReservations(serviceBrokerGuid, userName, groupName,
+                    labServerGuid, clientGuid, DateTime.UtcNow,DateTime.MaxValue);
+                if (res != null)
                 {
-                    return;
-                }
-
-                ReservationInfo[] ress = DBManager.GetReservations(resIDs);
-                for (int i = 0; i < ress.Length; i++)
-                {
-                    if (ress[i].endTime > DateTime.UtcNow)
+                    for (int i = 0; i < res.Length; i++)
                     {
                         ListItem reservationItem = new ListItem();
-                        reservationItem.Text = DateUtil.ToUserTime(ress[i].startTime, culture, userTZ) + "---- " + DateUtil.ToUserTime(ress[i].endTime, culture, userTZ);
-                        reservationItem.Value = ress[i].reservationId.ToString();
+                        reservationItem.Text = DateUtil.ToUserTime(res[i].startTime, culture, userTZ) + " <---> " + DateUtil.ToUserTime(res[i].endTime, culture, userTZ);
+                        reservationItem.Value = res[i].reservationId.ToString();
                         lbxReservation.Items.Add(reservationItem);
                     }
                 }
             }
             catch (Exception ex)
             {
-                string msg = "Exception: Cannot retrive the reserved time by you. " + ex.GetBaseException() + ".";
+                string msg = "Exception: Cannot retrieve the reserved time for you. " + ex.GetBaseException() + ".";
                 lblErrorMessage.Text = msg;
                 lblErrorMessage.Visible = true;
             }
@@ -408,7 +413,6 @@ namespace iLabs.Scheduling.UserSide
 
         protected void btnRemoveReservation_Click(object sender, System.EventArgs e)
         {
-            ReservationInfo removeReservation = new ReservationInfo();
             DateTime startTime = DateTime.MinValue;
             DateTime endTime = DateTime.MinValue;
             DateTime startTimeUTC = startTime.ToUniversalTime();
@@ -425,11 +429,45 @@ namespace iLabs.Scheduling.UserSide
 
             try
             {
-                removeReservation = USSSchedulingAPI.GetReservations(new int[] { Int32.Parse(lbxReservation.SelectedValue) })[0];
-                startTimeUTC = removeReservation.startTime;
-                endTimeUTC = removeReservation.endTime;
-                experimentInfoId = removeReservation.experimentInfoId;
-                USSSchedulingAPI.RemoveReservation(new int[] { Int32.Parse(lbxReservation.SelectedValue) });
+                int[] resIDs = new int[] { Int32.Parse(lbxReservation.SelectedValue) };
+                if (resIDs != null && resIDs.Length > 0)
+                {
+                    ReservationInfo[] remove = USSSchedulingAPI.GetReservations(resIDs);
+                    if (remove != null && remove.Length > 0)
+                    {
+                        startTimeUTC = remove[0].startTime;
+                        endTimeUTC = remove[0].endTime;
+                        experimentInfoId = remove[0].experimentInfoId;
+                        UssExperimentInfo[] exp = USSSchedulingAPI.GetExperimentInfos(new int[] { remove[0].experimentInfoId });
+                        UssCredentialSet[] cSet = USSSchedulingAPI.GetCredentialSets(new int[] { remove[0].credentialSetId });
+                        LSSInfo lss = USSSchedulingAPI.GetLSSInfo(exp[0].lssGuid);
+                        if (exp != null && exp.Length > 0 && cSet != null && cSet.Length > 0 && lss.lssUrl != null)
+                        {
+                            OperationAuthHeader opHeader = new OperationAuthHeader();
+                            opHeader.coupon = coupon;
+                            LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                            lssProxy.OperationAuthHeaderValue = opHeader;
+                            lssProxy.Url = lss.lssUrl;
+
+                            int count = lssProxy.RemoveReservation(cSet[0].serviceBrokerGuid, cSet[0].groupName, ProcessAgentDB.ServiceGuid,
+                                exp[0].labServerGuid, exp[0].labClientGuid, startTimeUTC, endTimeUTC);
+                            if (count > 0)
+                            {
+                                USSSchedulingAPI.RemoveReservation(resIDs);
+                                string msg = "The reservation has been removed successfully! ";
+                                lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
+                                lblErrorMessage.Visible = true;
+                            }
+                            else
+                            {
+                                string msg = "The reservation has not been removed successfully.";
+                                lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
+                                lblErrorMessage.Visible = true;
+                            }
+                        }
+                        buildReservationListBox();
+                    }
+                }
             }
 
             catch (Exception ex)
@@ -438,43 +476,7 @@ namespace iLabs.Scheduling.UserSide
                 lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
                 lblErrorMessage.Visible = true;
             }
-            try
-            {
-               
-                iLabs.DataTypes.TicketingTypes.Coupon authCoupon = coupon;
-                //assign the coupon from ticket to the soap header;
-                OperationAuthHeader opHeader = new OperationAuthHeader();
-                opHeader.coupon = authCoupon;
-                LabSchedulingProxy lssProxy = new LabSchedulingProxy();
-                lssProxy.Url = lssURL;
-                lssProxy.OperationAuthHeaderValue = opHeader;
-
-
-                if (lssProxy.RemoveReservation(serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid, clientGuid, labServerGuid, startTimeUTC, endTimeUTC))
-                {
-                    string msg = "The reservation has been removed successfully! ";
-                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
-                    lblErrorMessage.Visible = true;
-                    buildReservationListBox();
-                    //showDefaultAvailableTime();
-                }
-                else
-                {
-                    USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid, groupName, experimentInfoId, startTimeUTC, endTimeUTC);
-                    string msg = "The reservation has not been removed successfully.";
-                    lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
-                    lblErrorMessage.Visible = true;
-                    buildReservationListBox();
-                    //showDefaultAvailableTime();
-                }
-            }
-            catch (Exception ex)
-            {
-                string msg = "Exception: reservation can not be removed. " + ex.GetBaseException() + ".";
-                lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
-                lblErrorMessage.Visible = true;
-                USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid, groupName, experimentInfoId, startTimeUTC, endTimeUTC);
-            }
+           
         }
 
         protected void calDayChanged(object sender, System.EventArgs e)
@@ -502,32 +504,31 @@ namespace iLabs.Scheduling.UserSide
                 startTime = targetDay;
                 endTime = startTime.AddDays(1);
             }
-
-
-            string js = 
-            "PopupReserve('" + DateUtil.ToUtcString(startTime) + "', '" + DateUtil.ToUtcString(endTime) + "', 450,700);";
-            //lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
-            //lblErrorMessage.Visible = true;
-            //buildReservationListBox();
-            //showDefaultAvailableTime();
+            calDate.SelectedDates.Clear();
             ClientScriptManager cs = Page.ClientScript;
-            cs.RegisterStartupScript(this.GetType(),"daySelect",js,true);
-            return;
-        }
-
-        protected void calDayClicked(object sender, System.EventArgs e)
-        {
-            DateTime targetDay = calDate.SelectedDate;
+            //   
             string js =
-            "PopupReserve('" + DateUtil.ToUtcString(targetDay) + "', '" + DateUtil.ToUtcString(targetDay.AddDays(1.0)) + "', 450,700);";
-            //lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
-            //lblErrorMessage.Visible = true;
-            //buildReservationListBox();
-            //showDefaultAvailableTime();
-            ClientScriptManager cs = Page.ClientScript;
+            "PopupReserve('" + DateUtil.ToUtcString(startTime) + "', '" + DateUtil.ToUtcString(endTime) + "', 630,700);";
             cs.RegisterStartupScript(this.GetType(), "dayClick", js, true);
             return;
+            //string url = "SelectTimePeriods.aspx?start=" + DateUtil.ToUtcString(startTime) + "&end=" + DateUtil.ToUtcString(endTime);
+            //Response.Redirect(url, false);
+
         }
+
+        //protected void calDayClicked(object sender, System.EventArgs e)
+        //{
+        //    DateTime targetDay = calDate.SelectedDate;
+        //    string js =
+        //    "PopupReserve('" + DateUtil.ToUtcString(targetDay) + "', '" + DateUtil.ToUtcString(targetDay.AddDays(1.0)) + "', 450,700);";
+        //    //lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
+        //    //lblErrorMessage.Visible = true;
+        //    //buildReservationListBox();
+        //    //showDefaultAvailableTime();
+        //    ClientScriptManager cs = Page.ClientScript;
+        //    cs.RegisterStartupScript(this.GetType(), "dayClick", js, true);
+        //    return;
+        //}
         
 
         protected void btnBackToSB_Click(object sender, EventArgs e)
@@ -552,7 +553,7 @@ namespace iLabs.Scheduling.UserSide
             }
             try
             {
-                TimeSpan ts = USSSchedulingAPI.RedeemReservation(Int32.Parse(lbxReservation.SelectedValue));
+                TimeSpan ts = USSSchedulingAPI.GetReservationWaitTime(Int32.Parse(lbxReservation.SelectedValue));
 
                 string msg = null;
                 if (ts.Ticks > 0)
@@ -591,9 +592,9 @@ namespace iLabs.Scheduling.UserSide
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
                     lblErrorMessage.Visible = true;
 
-                    long duration = (res[0].endTime.Ticks - res[0].startTime.Ticks) / TimeSpan.TicksPerSecond;
+                    
 
-                    RedirectBackToSB(res[0].startTime, duration);
+                    redeemReservation(res[0]);
                 }
 
                 //RedirectBackToSB();
@@ -607,19 +608,20 @@ namespace iLabs.Scheduling.UserSide
             }
         }
 
-        private void RedirectBackToSB(DateTime startExecution, long duration)
+        private void redeemReservation(ReservationInfo res)
         {
+            long duration = (res.endTime.Ticks - res.startTime.Ticks) / TimeSpan.TicksPerSecond;
             TicketLoadFactory factory = TicketLoadFactory.Instance();
             ProcessAgentDB ticketing = new ProcessAgentDB();
             
 
             string payload = factory.createAllowExperimentExecutionPayload(
-                startExecution, duration, Session["groupName"].ToString());
-            DateTime tmpTime = startExecution.AddTicks(duration * TimeSpan.TicksPerSecond);
+                res.startTime, duration, Session["groupName"].ToString());
+            DateTime tmpTime = res.startTime.AddTicks(duration * TimeSpan.TicksPerSecond);
             DateTime utcNow = DateTime.UtcNow;
             long ticketDuration = (tmpTime.Ticks - utcNow.Ticks) / TimeSpan.TicksPerSecond;
             
-            iLabs.Services.TicketIssuerProxy ticketIssuer = new iLabs.Services.TicketIssuerProxy();
+            TicketIssuerProxy ticketIssuer = new TicketIssuerProxy();
 
             //get the SB web service URL, and set the proxy's URL accordingly
             ProcessAgentInfo sbInfo = ticketing.GetServiceBrokerInfo();
@@ -639,12 +641,6 @@ namespace iLabs.Scheduling.UserSide
             Coupon allowExecutionCoupon = ticketIssuer.CreateTicket(TicketTypes.ALLOW_EXPERIMENT_EXECUTION, 
                 sbInfo.agentGuid, ticketDuration, payload);
             
-            // Removed this class & method rep0laced with code above
-            //Coupon allowExecutionCoupon = ticketManagement.CreateTicket(sbGuid,
-            //    TicketTypes.ALLOW_EXPERIMENT_EXECUTION,
-            //    //Convert.ToInt32(ConfigurationManager.AppSettings["allowExecutionTicketDefaultDuration"]),
-            //    ticketDuration,
-            //    payload, ProcessAgentType.SCHEDULING_SERVER);
             if (allowExecutionCoupon != null)
             {
                 string couponId = allowExecutionCoupon.couponId.ToString();
@@ -664,6 +660,11 @@ namespace iLabs.Scheduling.UserSide
                 lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
                 lblErrorMessage.Visible = true;
             }
+        }
+
+        protected void OnMakeReservation_Click(object sender, EventArgs e)
+        {
+            buildReservationListBox();
         }
     }
 }

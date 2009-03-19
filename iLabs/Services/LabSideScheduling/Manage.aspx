@@ -24,15 +24,12 @@
 		<br clear="all">
 		<div id="innerwrapper">
 		<div id="pageintro">
-						<h1>Manage Experiment Information
-						</h1>
-						<p>Add, remove, or edit a Experiment below.
-						</p>
-						<!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
-						<p><asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label></p>
-					</div>
-					
-					<div id="pagecontent">
+		    <!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
+			<p><asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label></p>
+			<h1>Manage Experiment Information</h1>
+			<p>Add, remove, or edit a Experiment below.</p>		
+		</div>
+		<div id="pagecontent">
 						<div id="itemdisplay">
 							<h4>Selected Experiment</h4>
 							<div class="simpleform">
@@ -61,8 +58,10 @@
 									</tr>
 									<tr>
 										<th>
-											<label for="minQuantum">Quantum(min)</label></th>
-										<td style="width: 232px"><asp:textbox id="txtQuantum" Width="100%" Runat="server"></asp:textbox></td>
+											<label for="minimumTime">Minimum Time(min)</label>
+										</th>
+										
+										<td style="width: 232px"><asp:textbox id="txtMinimumTime" Width="100%" Runat="server"></asp:textbox></td>
 									</tr>
 									<tr>
 										<th>
@@ -78,13 +77,6 @@
 									</tr>
 									<tr>
 										<th>
-											<label for="minimumTime">Minimum Time(min)</label>
-										</th>
-										
-										<td style="width: 232px"><asp:textbox id="txtMinimumTime" Width="100%" Runat="server"></asp:textbox></td>
-									</tr>
-									<tr>
-										<th>
 											<label for="earlyArriveTime">Early Arrive Time(min)</label>
 										</th>
 										
@@ -97,7 +89,7 @@
 							</div>
 						</div>
 						<div class="simpleform"><label for="selectexperiment">Select an experiment</label><br>
-							<asp:listbox id="lbxSelectExperiment" Runat="server" Width="256px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged"></asp:listbox></div>
+							<asp:listbox id="lbxSelectExperiment" Runat="server" Width="360px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged"></asp:listbox></div>
 					</div>
 					</div>
 	<uc1:footer id="Footer1" runat="server"></uc1:footer>

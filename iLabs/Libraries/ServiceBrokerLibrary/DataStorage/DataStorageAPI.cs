@@ -16,7 +16,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.Ticketing;
-using iLabs.Services;
+using iLabs.Proxies.ESS;
 using iLabs.UtilLib;
 
 namespace iLabs.ServiceBroker.DataStorage
@@ -126,90 +126,98 @@ namespace iLabs.ServiceBroker.DataStorage
                 // Retrieve the ESS Status info and update as needed
                 //This uses a generic ReadRecords ticket created for the ESS
                 ProcessAgentInfo ess = ticketing.GetProcessAgentInfo(summary.essGuid);
-                ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                essProxy.Url = ess.webServiceUrl;
-                essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
-                essProxy.OperationAuthHeaderValue.coupon = ess.identOut;
-                StorageStatus status = essProxy.GetExperimentStatus(experimentID);
-                bool needsUpdate = false;
-                if (status != null)
+                if ((ess != null) && !ess.retired)
                 {
-                    if (summary.closeTime != status.closeTime)
+                    ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                    essProxy.Url = ess.webServiceUrl;
+                    essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                    essProxy.OperationAuthHeaderValue.coupon = ess.identOut;
+                    StorageStatus status = essProxy.GetExperimentStatus(experimentID);
+                    bool needsUpdate = false;
+                    if (status != null)
                     {
+                        if (summary.closeTime != status.closeTime)
+                        {
+                            summary.closeTime = status.closeTime;
+                            needsUpdate = true;
+                        }
+                        if (summary.recordCount != status.recordCount)
+                        {
+                            summary.recordCount = status.recordCount;
+                            needsUpdate = true;
+                        }
+                        if (summary.status != status.status)
+                        {
+                            summary.status = status.status;
+                            needsUpdate = true;
+                        }
                     }
-                    if (summary.recordCount != status.recordCount)
+                    if (needsUpdate)
                     {
-                        summary.recordCount = status.recordCount;
-                        needsUpdate = true;
+                        InternalDataDB.UpdateExperimentStatus(status);
                     }
-                    if (summary.status != status.status)
-                    {
-                        status.status = summary.status;
-                        needsUpdate = true;
-                    }
-                } 
+                }
             }
             return summary;
         }
 
         public static ExperimentSummary [] RetrieveExperimentSummaries(long []experimentIDs)
         {
-            return InternalDataDB.SelectExperimentSummaries(experimentIDs);
+             ExperimentSummary[] summaries = InternalDataDB.SelectExperimentSummaries(experimentIDs);
+             for (int i = 0; i < summaries.Length; i++)
+             {
+                 if (summaries[i].HasEss && ((summaries[i].status | StorageStatus.CLOSED) == 0))
+                 {
+                     ProcessAgentDB ticketing = new ProcessAgentDB();
+                     // Retrieve the ESS Status info and update as needed
+                     //This uses a generic ReadRecords ticket created for the ESS
+                     ProcessAgentInfo ess = ticketing.GetProcessAgentInfo(summaries[i].essGuid);
+                     if ((ess != null) && !ess.retired)
+                     {
+                         ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                         essProxy.Url = ess.webServiceUrl;
+                         essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                         essProxy.OperationAuthHeaderValue.coupon = ess.identOut;
+                         StorageStatus status = essProxy.GetExperimentStatus(summaries[i].experimentId);
+                         bool needsUpdate = false;
+                         if (status != null)
+                         {
+                             if (summaries[i].closeTime != status.closeTime)
+                             {
+                                 summaries[i].closeTime = status.closeTime;
+                                 needsUpdate = true;
+                             }
+                             if (summaries[i].recordCount != status.recordCount)
+                             {
+                                 summaries[i].recordCount = status.recordCount;
+                                 needsUpdate = true;
+                             }
+                             if (summaries[i].status != status.status)
+                             {
+                                 summaries[i].status = status.status;
+                                 needsUpdate = true;
+                             }
+                         }
+                         if (needsUpdate)
+                         {
+                             InternalDataDB.UpdateExperimentStatus(status);
+                         }
+                     }
+                 }
+             }
+             return summaries;
+        }
+
+        public static bool UpdateExperimentStatus(long experimentID, int statusCode)
+        {
+            return InternalDataDB.UpdateExperimentStatus(experimentID, statusCode);
         }
 
         public static bool UpdateExperimentStatus(StorageStatus status)
         {
             return InternalDataDB.UpdateExperimentStatus(status);
         }
-        /* Commented out as this is a Batch SB method
-       public static ExperimentInformation RetrieveExperimentInformation(long experimentID)
-        {
-
-            ExperimentInformation ei = null;
-           
-            //ExperimentInformation ei = InternalDataDB.RetrieveExperimentInformation(experimentID);
-            
-            if (ei != null)
-            {
-                //ei.experimentID =expInfo.experimentID;
-                //ei.userID = expInfo.userID;
-                //ei.effectiveGroupID = expInfo.groupID;
-                
-                //ei.statusCode = expInfo.status;
-                //ei.labServerID = expInfo.labServerID;
-                //ei.annotation = expInfo.annotation;
-                //ei.submissionTime = expInfo.creationTime;
-                //ei.completionTime = expInfo.creationTime.AddSeconds(expInfo.duration);
-
-                // Try & get the ESS Records
-                TicketIssuerDB ticketIssuer = new TicketIssuerDB();
-                Coupon expCoupon = ticketIssuer.GetIssuedCoupon(ei.couponID);
-                if(expCoupon != null){
-                    Ticket essTicket = ticketIssuer.RedeemTicket(expCoupon,TicketTypes.RETRIEVE_RECORDS);
-                    if(essTicket != null){
-
-                        XmlDocument payload = new XmlDocument();
-                        payload.LoadXml(essTicket.payload);
-                        long expID = Int64.Parse(payload.GetElementsByTagName("experimentID")[0].InnerText);
-                        string essUrl  = payload.GetElementsByTagName("essURL")[0].InnerText;
-
-                        
-                        ExperimentStorageProxy proxy = new ExperimentStorageProxy();
-                        proxy.OperationAuthHeaderValue = new OperationAuthHeader();
-                        proxy.OperationAuthHeaderValue.coupon = expCoupon;
-                        proxy.Url = essUrl;
-                        Experiment experiment = proxy.GetExperiment(expID);
-                        if(experiment != null){
-                        }
-                    }
-                }
-
-
-            }
-           
-            return ei;
-        }
-    */
+   
         public static LongTag[] RetrieveExperimentTags(long[] experimentIDs, int userTZ, CultureInfo culture)
         {
             return RetrieveExperimentTags(experimentIDs, userTZ, culture, false, false, true, true, true, false, true, true);
@@ -427,18 +435,21 @@ namespace iLabs.ServiceBroker.DataStorage
                                 int essId = Convert.ToInt32(obj);
 
                                 ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(essId);
-                                ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                                AgentAuthHeader authHeader = new AgentAuthHeader();
-                                authHeader.agentGuid = ProcessAgentDB.ServiceGuid;
-                                authHeader.coupon = info.identOut;
-                                essProxy.AgentAuthHeaderValue = authHeader;
-                                essProxy.Url = info.webServiceUrl;
-                                long[] essExpids = essProxy.GetExperimentIDs(essExps.ToArray(), essList.ToArray());
-                                if (essExpids != null && essExpids.Length > 0)
+                                if ((info != null) && !info.retired)
                                 {
-                                    foreach (long e in essExpids)
+                                    ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                                    AgentAuthHeader authHeader = new AgentAuthHeader();
+                                    authHeader.agentGuid = ProcessAgentDB.ServiceGuid;
+                                    authHeader.coupon = info.identOut;
+                                    essProxy.AgentAuthHeaderValue = authHeader;
+                                    essProxy.Url = info.webServiceUrl;
+                                    long[] essExpids = essProxy.GetExperimentIDs(essExps.ToArray(), essList.ToArray());
+                                    if (essExpids != null && essExpids.Length > 0)
                                     {
-                                        essHits.Add(e);
+                                        foreach (long e in essExpids)
+                                        {
+                                            essHits.Add(e);
+                                        }
                                     }
                                 }
                             }

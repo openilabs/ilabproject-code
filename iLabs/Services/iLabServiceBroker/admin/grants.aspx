@@ -3,8 +3,8 @@
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
-	<HEAD>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
 		<title>MIT iLab Service Broker - Grants</title> 
 		<!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
@@ -32,7 +32,7 @@ Please see license.txt in top level directory for full license.
 
 		//-->
 		</script>
-	</HEAD>
+	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
 			<a name="top"></a>
@@ -53,17 +53,21 @@ Please see license.txt in top level directory for full license.
 							<h4>Qualifier Types</h4>
 							<ul class="inline">
 								<li>
-									<IMG height="16" alt="group qualifier" src="../img/GrantImages/Folder.gif" width="16">
+									<img height="16" alt="group qualifier" src="../img/GrantImages/Folder.gif" width="16">
 								- Group
+								</li>
 								<li>
-									<IMG height="16" alt="lab client qualifier" src="../img/GrantImages/client.gif" width="16">
+									<img height="16" alt="lab client qualifier" src="../img/GrantImages/client.gif" width="16">
 								- Lab Client
+								</li>
 								<li>
-									<IMG height="16" alt="lab server qualifier" src="../img/GrantImages/server.gif" width="16">
+									<img height="16" alt="lab server qualifier" src="../img/GrantImages/server.gif" width="16">
 								- Lab Server
+								</li>
 								<li>
 									<img src="../img/GrantImages/expt.gif" alt="experiment qualifier" width="16" height="20">
 								- Experiment
+								</li>
 								<li>
 									<img src="../img/GrantImages/exptcol.gif" alt="experiment collection qualifier" width="16"
 										height="20"> - Experiment Collection
@@ -91,7 +95,7 @@ Please see license.txt in top level directory for full license.
 												<div>
 													<!-- Check to see if default style can be set from the css -->
 													<asp:TreeView id="userTreeView" PopulateNodesFromClient="true" OnTreeNodePopulate="PopulateAgentNode"
-cssClass="treeView" runat="server"  SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor=BlueViolet ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
+cssClass="treeView" runat="server"  SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet" ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
 												</div>
 												<!--textarea name="usersgroups" cols="30" rows="15" id="usersgroups"></textarea--></td>
 											<td style="HEIGHT: 350px" valign="top">
@@ -105,7 +109,7 @@ cssClass="treeView" runat="server"  SelectedNodeStyle-ForeColor="White" Selected
 											</select--></td>
 											<td style="HEIGHT: 264px">
 												<div>
-													<asp:TreeView id="qualifierTreeView" PopulateNodesFromClient="true" OnTreeNodePopulate="PopulateQualifierNode" runat="server"  SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor=BlueViolet ForeColor="black" cssClass="treeView"  style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
+													<asp:TreeView id="qualifierTreeView" PopulateNodesFromClient="true" OnTreeNodePopulate="PopulateQualifierNode" runat="server"  SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet" ForeColor="black" cssClass="treeView"  style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
 												</div>
 												<!--textarea name="qualifiers" cols="30" rows="15" id="qualifiers"></textarea--></td>
 										</tr>
@@ -130,4 +134,4 @@ cssClass="treeView" runat="server"  SelectedNodeStyle-ForeColor="White" Selected
 				<uc1:footer id="Footer1" runat="server"></uc1:footer></div>
 		</form>
 	</body>
-</HTML>
+</html>

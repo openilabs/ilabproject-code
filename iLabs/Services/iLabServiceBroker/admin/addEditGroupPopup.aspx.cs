@@ -445,12 +445,12 @@ namespace iLabs.ServiceBroker.admin
 					throw new Exception("Group Name can not be empty.");
 				}
 			
-				if(wrapper.GetGroupIDWrapper(txtName.Text) > 0) // group record exists, choose another name
+				if(AdministrativeAPI.GetGroupID(txtName.Text) > 0) // group record exists, choose another name
 				{
 					throw new Exception("Group: " + txtName.Text + " exists, choose another name.");
 				}
 
-				if(wrapper.GetUserIDWrapper(txtName.Text) > 0) // user record exists, choose another name
+                if (AdministrativeAPI.GetUserID(txtName.Text) > 0) // user record exists, choose another name
 				{
 					throw new Exception("The name '" + txtName.Text + "' is not available, choose another name.");
 				}

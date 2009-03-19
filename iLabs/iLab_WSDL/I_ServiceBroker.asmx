@@ -174,5 +174,22 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public abstract string GetAnnotation(int experimentId);
+
+/// <summary>
+        /// Revokes reservations that intersect the specifications, may be called from the LSS or ServiceBroker
+/// </summary>
+/// <param name="userName"></param>
+/// <param name="groupName"></param>
+/// <param name="labServerGuid"></param>
+/// <param name="clientCuid"></param>
+/// <param name="startTime"></param>
+/// <param name="endTime"></param>
+/// <param name="message"></param>
+/// <returns></returns>
+    [WebMethod(Description = "Revokes reservations that intersect the specifications, may be called from the LSS or ServiceBroker", EnableSession = true)]
+    [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+    [SoapDocumentMethod(Binding = "IServiceBroker")]
+    public abstract bool RevokeReservation(string serviceBrokerGuid, string userName,string groupName,string labServerGuid, string labClientGuid,
+        DateTime startTime, DateTime endTime, string message);
     }
 

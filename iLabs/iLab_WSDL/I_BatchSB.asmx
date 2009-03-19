@@ -272,7 +272,7 @@ namespace iLabs.Services{
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string RetrieveSpecification (int experimentID);
 		
-
+/*
 		/// <summary>
 		/// Retrieves the result from a previously executed experiment.
 		/// </summary>
@@ -283,7 +283,7 @@ namespace iLabs.Services{
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string RetrieveExperimentResult (int experimentID);
-
+*/
 		/// <summary>
 		/// Retrieves a previously saved lab configuration for a particular experiment.
 		/// </summary>

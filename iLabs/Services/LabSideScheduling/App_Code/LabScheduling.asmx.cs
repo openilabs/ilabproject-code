@@ -13,10 +13,10 @@ using System.Xml.Serialization;
 using System.Threading;
 
 using iLabs.Core;
+using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
-using iLabs.Services;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
@@ -69,6 +69,61 @@ namespace iLabs.Scheduling.LabSide
 		
 		#endregion
 
+        /// <summary>
+        /// Modifies the information related to the specified service the service's Guid must exist and the typ of service may not be modified,
+        /// in and out coupons may be changed.
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="inIdentCoupon"></param>
+        /// <param name="outIdentCoupon"></param>
+        /// <returns></returns>
+        [WebMethod,
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, string extra, 
+            Coupon inCoupon, Coupon outCoupon)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                DBManager dbManager = new DBManager();
+                try
+                {
+                    status = dbManager.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("USS: ", ex);
+                }
+
+
+            }
+            return status;
+
+        }
+
+        /// <summary>
+        /// Informs this processAgent that it should modify all references to a specific processAent. 
+        /// This is used to propagate modifications, The agentGuid must remain the same.
+        /// </summary>
+        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+        /// <param name="serviceGuid">The guid of the service</param>
+        /// <param name="state">The retired state to be set</param>
+        /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        [WebMethod,
+        SoapDocumentMethod(Binding = "IProcessAgent"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public virtual int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
+        {
+            int status = 0;
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                DBManager dbManager = new DBManager();
+                status = dbManager.ModifyProcessAgent(originalGuid, agent, extra);
+            }
+            return status;
+        }
+     
 		
 		/// <summary>
 		/// retrieve available time periods(local time of LSS) overlaps with a time chrunk for a particular group and particular experiment,
@@ -84,8 +139,9 @@ namespace iLabs.Scheduling.LabSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public TimePeriod[] RetrieveAvailableTimePeriods(string serviceBrokerGuid, string groupName, string ussGuid,
-            string clientGuid, string labServerGuid, DateTime startTime, DateTime endTime)
+        public TimePeriod[] RetrieveAvailableTimePeriods(string serviceBrokerGuid, 
+            string groupName, string ussGuid,
+            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
 		{
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
@@ -93,57 +149,18 @@ namespace iLabs.Scheduling.LabSide
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             try
             {
-               
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
-                TimePeriod[] array = LSSSchedulingAPI.RetrieveAvailableTimePeriods(serviceBrokerGuid, groupName, ussGuid, 
-                    clientGuid, labServerGuid, startTime, endTime);
+                TimePeriod[] array = LSSSchedulingAPI.RetrieveAvailableTimePeriods(serviceBrokerGuid, groupName, ussGuid,
+                    labServerGuid, clientGuid, startTime, endTime);
                 return array;
             }
             catch
             {
                 throw;
             }
-			
-			
 		}
-        /// <summary>
-        /// retrieve available time blocks overlaps with a time chrunk for a particular group and particular experiment,
-        /// </summary>
-        /// <param name="serviceBrokerGuid"></param>
-        /// <param name="groupName"></param>
-        /// <param name="ussGuid"></param>
-        /// <param name="clientGuid"></param>
-        /// <param name="labServerGuid"></param>
-       /// <param name="startTime"></param>
-        /// <param name="endTime"></param>
-        /// <returns></returns>return an array of time blocks, each of the time blocks is longer than the experiment's minimum time 
-        [WebMethod]
-        [SoapDocumentMethod(Binding = "ILSS"),
-        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public TimeBlock[] RetrieveAvailableTimeBlocks(string serviceBrokerGuid, string groupName, string ussGuid,
-            string clientGuid, string labServerGuid, DateTime startTime, DateTime endTime)
-        {
-            Coupon opCoupon = new Coupon();
-            opCoupon.couponId = opHeader.coupon.couponId;
-            opCoupon.passkey = opHeader.coupon.passkey;
-            opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
-            string type = TicketTypes.REQUEST_RESERVATION;
-            try
-            {
 
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
-                TimeBlock[] array = LSSSchedulingAPI.RetrieveAvailableTimeBlocks(serviceBrokerGuid, groupName, ussGuid, clientGuid, labServerGuid, startTime, endTime);
-                return array;
-            }
-            catch(Exception e)
-            {
-                iLabs.UtilLib.Utilities.WriteLog("LSS: RetrieveAvailableTimeBlocks: " + e.Message);
-                throw;
-            }
-
-
-        }
-
+ 
 		/// <summary>
 		/// Returns an Boolean indicating whether a particular reservation from a USS is confirmed and added to the database in LSS successfully. If it fails, exception will be throw out indicating
 		///	the reason for rejection.
@@ -156,23 +173,24 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="startTime"></param>
 		/// <param name="endTime"></param>
 		/// <returns></returns>the notification whether the reservation is confirmed. If not, notification will give a reason
-        [WebMethod]
+        [WebMethod(Description = "Returns an Boolean indicating whether a particular reservation from a USS is confirmed and added to the database in LSS successfully."
+        + "If it fails, a exception will be throw indicating the reason for rejection.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public string ConfirmReservation(string serviceBrokerGuid, string groupName, string ussGuid, 
-            string clientGuid, string labServerGuid, DateTime startTime, DateTime endTime)
+        public string ConfirmReservation(string serviceBrokerGuid, string groupName, 
+            string ussGuid, string labServerGuid, string clientGuid, 
+            DateTime startTime, DateTime endTime)
 		{
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
-            string type = TicketTypes.REQUEST_RESERVATION;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
+                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
 
-                return LSSSchedulingAPI.ConfirmReservation(serviceBrokerGuid, groupName, ussGuid, 
-                    clientGuid, labServerGuid, startTime, endTime);
+                return LSSSchedulingAPI.ConfirmReservation(serviceBrokerGuid, groupName, ussGuid,
+                    labServerGuid, clientGuid, startTime, endTime);
             }
             catch
             {
@@ -180,6 +198,28 @@ namespace iLabs.Scheduling.LabSide
             }
 			
 		}
+
+        /// <summary>
+        /// Update the reservation status
+        /// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="groupName"></param>
+        /// <param name="ussGuid"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="startTime">UTC start time</param>
+        /// <param name="endTime">UTC end time</param>
+        /// <returns>true updated successfully, false otherwise</returns>
+        [WebMethod(Description = "Used to update reservation status on LSS")]
+        [SoapDocumentMethod(Binding = "ILSS"),
+        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+        public bool RedeemReservation(string serviceBrokerGuid, string groupName,
+            string ussGuid, string labServerGuid, string clientGuid,
+            DateTime startTime, DateTime endTime)
+        {
+            return false;
+        }
+
 		/// <summary>
 		/// remove the reservation information
 		/// </summary>
@@ -194,49 +234,11 @@ namespace iLabs.Scheduling.LabSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public bool RemoveReservation(string serviceBrokerGuid, string groupName, string ussGuid,
-            string clientGuid, string labServerGuid, DateTime startTime, DateTime endTime)
+        public int RemoveReservation(string serviceBrokerGuid, string groupName,
+            string ussGuid, string labServerGuid, string clientGuid, 
+            DateTime startTime, DateTime endTime)
 		{
-            Coupon opCoupon = new Coupon();
-            opCoupon.couponId = opHeader.coupon.couponId;
-            opCoupon.passkey = opHeader.coupon.passkey;
-            opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
-            string type = TicketTypes.REQUEST_RESERVATION;
-            try
-            {
-                //                Ticket retrievedTicket = ticketRetrieval.RetrieveAndVerify(opCoupon, type, "LAB SCHEDULING SERVER");
-
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
-
-                DateTime startTimeUTC = startTime.ToUniversalTime();
-                DateTime endTimeUTC = endTime.ToUniversalTime();
-                bool removed = LSSSchedulingAPI.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
-                    clientGuid, labServerGuid, startTimeUTC, endTimeUTC);
-                return removed;
-            }
-            catch
-            {
-                throw;
-            }
-			
-		}
-
-        /// <summary>
-        /// given a time period defined by the start time and the end tiime, return the time slots defined by the quatum of the experiment during this time period
-        /// </summary>
-        /// <param name="serviceBrokerGuid"></param>
-        /// <param name="groupName"></param>
-        /// <param name="clientGuid"></param>
-        /// <param name="labServerGuid"></param>
-        /// <param name="startTime"></param>
-        /// <param name="endTime"></param>
-        /// <returns></returns>
-        [WebMethod]
-        [SoapDocumentMethod(Binding = "ILSS"),
-        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public TimePeriod[] RetrieveTimeSlots(string serviceBrokerGuid, string groupName, 
-            string clientGuid, string labServerGuid, DateTime startTime, DateTime endTime)
-        {
+            bool removed = false;
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -244,17 +246,22 @@ namespace iLabs.Scheduling.LabSide
             
             try
             {
+                // Ticket retrievedTicket = ticketRetrieval.RetrieveAndVerify(opCoupon, type, "LAB SCHEDULING SERVER");
+
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
-                TimePeriod[] array = LSSSchedulingAPI.RetrieveTimeSlots(serviceBrokerGuid, groupName, 
-                    clientGuid, labServerGuid,startTime, endTime);
-                return array;
+
+                DateTime startTimeUTC = startTime.ToUniversalTime();
+                DateTime endTimeUTC = endTime.ToUniversalTime();
+                 removed = LSSSchedulingAPI.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
+                    labServerGuid, clientGuid, startTimeUTC, endTimeUTC);
+                
             }
             catch
             {
                 throw;
             }
-
-        }
+            return removed ? 1 : 0;
+		}
 
 		/// <summary>
 		/// Add information of a particular user side scheduling server identified by ussGuid. 
@@ -270,9 +277,9 @@ namespace iLabs.Scheduling.LabSide
 		[WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool AddUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
+        public int AddUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
 		{
-            bool found = false;
+            int status = 0;
             try
             {
                 if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
@@ -289,21 +296,21 @@ namespace iLabs.Scheduling.LabSide
                                     // Add it to the database & update USSinfo
                                     if (!dbTicketing.AuthenticateCoupon(coupon))
                                         dbTicketing.InsertCoupon(coupon);
-                                    LSSSchedulingAPI.ModifyUSSInfo(ussId, ussGuid,ussName,ussUrl,
+                                    status = LSSSchedulingAPI.ModifyUSSInfo(ussId, ussGuid,ussName,ussUrl,
                                         coupon.couponId,coupon.issuerGuid);
                                 }
-                                found = true;
+                                
                             }
                         }
 
                     }
-                    if(!found)
+                    if(status <= 0)
                     {
                         if( !dbTicketing.AuthenticateCoupon(coupon))
                             dbTicketing.InsertCoupon(coupon);
                         int uID = LSSSchedulingAPI.AddUSSInfo(ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
                         if (uID > 0)
-                            found = true;
+                            status = 1;
                     }
 
                 }
@@ -312,8 +319,38 @@ namespace iLabs.Scheduling.LabSide
             {
                 throw;
             }
-            return found;
+            return status;
 		}
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "ILSS"),
+       SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int ModifyUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
+        {
+            int status = 0;
+           
+                if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+                {
+                    int id = DBManager.ListUSSInfoID(ussGuid);
+                    if(id > 0)
+            status = DBManager.ModifyUSSInfo(id,ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
+                }
+            return status;
+        }
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "ILSS"),
+       SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int RemoveUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
+        {
+            int status = 0;
+
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+            }
+            return status;
+        }
+
 		/// <summary>
 		/// Add a credential set of a particular group, may be called multiple times with same data. 
 		/// </summary>
@@ -324,25 +361,41 @@ namespace iLabs.Scheduling.LabSide
 		[WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName, string ussGuid)
+        public int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, 
+            string groupName, string ussGuid)
 		{
-            bool added = false;
+            int status = 0;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 int test = LSSSchedulingAPI.GetCredentialSetID(serviceBrokerGuid, groupName, ussGuid);
                 if (test > 0)
                 {
-                    added = true;
+                    status = 1;
                 }
                 else
                 {
                     int cID = LSSSchedulingAPI.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
                     if (cID != -1)
-                        added = true;
+                        status = 1;
                 }
             }
-			return added;
+			return status;
 		}
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "ILSS"),
+       SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int ModifyCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
+            string groupName, string ussGuid)
+        {
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                int id = DBManager.GetCredentialSetID(serviceBrokerGuid, groupName, ussGuid);
+                return LSSSchedulingAPI.ModifyCredentialSet(id, serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
+            }
+            else
+                return 0;
+        }
 
         /// <summary>
         /// remove a credential set of a particular group
@@ -354,14 +407,15 @@ namespace iLabs.Scheduling.LabSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName, string ussGuid)
+        public int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
+            string groupName, string ussGuid)
         {
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 return LSSSchedulingAPI.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
             }
             else 
-                return false;
+                return 0;
         }
 		
           /// <summary>
@@ -378,20 +432,117 @@ namespace iLabs.Scheduling.LabSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public bool AddExperimentInfo(string labServerGuid, string labServerName,
+        public int AddExperimentInfo(string labServerGuid, string labServerName,
             string clientGuid, string clientName, string clientVersion,
             string providerName)
         {
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 int id = LSSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
-                    clientVersion, providerName, 0, 0, 0, 0, 0);
+                    clientVersion, providerName, 0, 0, 0, 0);
                 int ok = LSSSchedulingAPI.CheckForLSResource(labServerGuid, labServerName);
-                return id > 0;
+                return (id > 0)? 1:0;
             }
             else
-                return false;
+                return 0;
         }
+
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "ILSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int ModifyExperimentInfo(string labServerGuid, string labServerName,
+            string clientGuid, string clientName, string clientVersion,
+            string providerName)
+        {
+            int status = 0;
+            int id = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+            if (id > 0)
+            {
+                LssExperimentInfo[] exps = DBManager.GetExperimentInfos(new int[] { id });
+                if (exps != null && exps.Length > 0)
+                {
+                    if (DBManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName,
+                        exps[0].prepareTime, exps[0].recoverTime, exps[0].minimumTime, exps[0].earlyArriveTime))
+                        status++;
+                }
+            }
+            return status;
+        }
+
+        /// <summary>
+        /// Remove a particular experiment
+        /// </summary>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labServerName"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="clientVersion"></param>
+        /// <param name="clientName"></param>
+        /// <param name="providerName"></param>
+        /// <returns></returns>true, the experimentInfo is removed 
+        /// successfully, false otherwise
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "ILSS"),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public int RemoveExperimentInfo(string labServerGuid, string labServerName,
+            string clientGuid, string clientName, string clientVersion,
+            string providerName)
+        {
+            int status = 0;
+            return status;
+        }
+
+ 
+
+    /*    
+        /// <summary>
+        /// Modifies the information related to the specified service the service's Guid must exist and the typ of service may not be modified,
+        /// in and out coupons may be changed.
+        /// </summary>
+        /// <param name="newCredentials"></param>
+       /// <returns></returns>
+        protected override int modifyDomainCredentials(string originalGuid, ProcessAgent agent,
+            Coupon inCoupon,Coupon outCoupon, string extra)
+        {
+            int status = 0;
+            try
+            {
+               status = modifyProcessAgent(originalGuid, agent,extra);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("LSS: ", ex);
+            }
+            if (agent.type == ProcessAgentType.SERVICE_BROKER || agent.type == ProcessAgentType.REMOTE_SERVICE_BROKER)
+            {
+                //Check for SB names in credential sets
+                DBManager.ModifyCredentialSetServiceBroker(agent.agentGuid, agent.agentName);
+            }
+            if (agent.type == ProcessAgentType.LAB_SERVER)
+            {
+                // Labserver Names in Experiment info's
+                // Labserver Names in LS_Resource
+                DBManager.ModifyExperimentLabServer(originalGuid,agent.agentGuid, agent.agentName);
+            }
+            if (agent.type == ProcessAgentType.SCHEDULING_SERVER)
+            {
+                // USS path, & name in USS_Info
+                int ussId = DBManager.ListUSSInfoID(agent.agentGuid);
+                if (ussId > 0)
+                {
+                    if (inCoupon == null)
+                    {
+                        dbTicketing.InsertCoupon(inCoupon);
+                    }
+                   status = DBManager.ModifyUSSInfo(ussId, agent.agentGuid,agent.agentName, agent.webServiceUrl,
+                        inCoupon.couponId, inCoupon.issuerGuid);
+                }
+            }
+            //return dbTicketing.GetProcessAgent(credentials.agent.agentGuid);
+            return status;
+
+        }
+        
+        */
   
 	}
 }

@@ -16,9 +16,8 @@ using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using iLabs.Ticketing;
 
-using iLabs.Services;
+using iLabs.Ticketing;
 using iLabs.UtilLib;
 using iLabs.LabServer.Interactive;
 

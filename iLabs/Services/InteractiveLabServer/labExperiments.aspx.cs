@@ -91,6 +91,7 @@ namespace iLabs.LabServer.LabView
                 {
                     lnkBackSB.Visible = false;
                 }
+                lblErrorMessage.Visible = false;
             }
             
 		}
@@ -125,8 +126,6 @@ namespace iLabs.LabServer.LabView
             txtTitle.Text = "";
             txtVersion.Text = "";
             txtWidth.Text = "";
-            
-
         }
 
         void DisplayApplication(int appId)
@@ -138,7 +137,6 @@ namespace iLabs.LabServer.LabView
             }
             else
             {
-
                 txtAppKey.Text = app.appKey;
                 txtApplication.Text = app.application;
                 txtApplicationPath.Text = app.path;
@@ -216,6 +214,9 @@ namespace iLabs.LabServer.LabView
                 LoadLabList();
                 btnDelete.Visible = false;
                 ddlApplications.SelectedIndex = 0;
+                lblErrorMessage.Text=Utilities.FormatConfirmationMessage("Experiment was deleted!");
+                lblErrorMessage.Visible = true;
+
             }
 
         }
@@ -260,6 +261,8 @@ namespace iLabs.LabServer.LabView
                 {
                     ddlApplications.SelectedValue = appId.ToString();
                     btnDelete.Visible = true;
+                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Experiment was created!");
+                    lblErrorMessage.Visible = true;
                 }
             }
             else
@@ -286,6 +289,8 @@ namespace iLabs.LabServer.LabView
                     txtURL.Text, width, height, txtDataSources.Text,
                     txtServer.Text, port, txtContactEmail.Text,
                     txtDescription.Text, txtComment.Text, Server.HtmlEncode(txtExtra.Text), txtRev.Text, 0);
+                lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Experiment was modified!");
+                lblErrorMessage.Visible = true;
                 DisplayApplication(appId);
             }
             return;

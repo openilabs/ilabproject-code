@@ -102,32 +102,68 @@ CREATE TABLE [dbo].[Coupon] (
 	[Coupon_ID] [bigint] NOT NULL ,
 	[Cancelled] [bit] NOT NULL,
 	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Passkey] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+	[Passkey] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	CONSTRAINT [IX_Coupon] UNIQUE  NONCLUSTERED 
+	(
+		[Coupon_ID],
+		[Issuer_GUID]
+	)  ON [PRIMARY] 
 ) ON [PRIMARY]
 GO
 
 CREATE TABLE [dbo].[ProcessAgent_Type] (
 	[ProcessAgent_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Short_Name] [char](4) NOT NULL,
-	[Description] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Description] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	CONSTRAINT [PK_ProcessAgent_Type] PRIMARY KEY  CLUSTERED 
+	(
+		[ProcessAgent_Type_ID]
+	)  ON [PRIMARY]
 ) ON [PRIMARY]
 GO
 
-CREATE TABLE [dbo].[ProcessAgent] (
+CREATE TABLE [ProcessAgent] (
 	[Agent_ID] [int] IDENTITY (10, 1) NOT NULL ,
+	[Retired] [bit] NOT NULL CONSTRAINT [DF_ProcessAgent_Retired] DEFAULT (0),
+	[Self] [bit] NOT NULL CONSTRAINT [DF_ProcessAgent_Self] DEFAULT (0),
 	[ProcessAgent_Type_ID] [int] NOT NULL ,
-	[Description] [text]  COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[IdentIn_ID] [bigint] NULL ,
 	[IdentOut_ID] [bigint] NULL ,
-	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL , 
-	[Domain_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL , 
+	[Description] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Domain_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Agent_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Agent_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[WebService_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Codebase_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Info_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Contact_Email] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
-	
+	[Contact_Email] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	CONSTRAINT [PK_ProcessAgent] PRIMARY KEY  CLUSTERED 
+	(
+		[Agent_ID]
+	)  ON [PRIMARY] ,
+	CONSTRAINT [IX_ProcessAgent] UNIQUE  NONCLUSTERED 
+	(
+		[Agent_GUID]
+	)  ON [PRIMARY] ,
+	CONSTRAINT [FK_ProcessAgent_ProcessAgent_Type] FOREIGN KEY 
+	(
+		[ProcessAgent_Type_ID]
+	) REFERENCES [ProcessAgent_Type] (
+		[ProcessAgent_Type_ID]
+	) ON DELETE NO ACTION  ON UPDATE NO ACTION 
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[Ticket_Type] (
+	[Ticket_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
+	[Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Short_Description] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	[Abstract] [bit] NOT NULL,
+CONSTRAINT [PK_Ticket_Type] PRIMARY KEY  CLUSTERED 
+	(
+		[Ticket_Type_ID]
+	)  ON [PRIMARY] 
 ) ON [PRIMARY]
 GO
 
@@ -141,58 +177,7 @@ CREATE TABLE [dbo].[Ticket] (
 	[Coupon_ID] [bigint] NOT NULL ,
 	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Redeemer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Sponsor_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
-
-) ON [PRIMARY]
-GO
-
-
-CREATE TABLE [dbo].[Ticket_Type] (
-	[Ticket_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Short_Description] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Abstract] [bit] NOT NULL 
-) ON [PRIMARY]
-GO
-
-ALTER TABLE [dbo].[Coupon] ADD 
-	CONSTRAINT [IX_Coupon] UNIQUE  NONCLUSTERED 
-	(
-		[Coupon_ID],
-		[Issuer_GUID]
-	)  ON [PRIMARY] 
-GO
-
-ALTER TABLE [dbo].[ProcessAgent_Type] WITH NOCHECK ADD 
-	CONSTRAINT [PK_ProcessAgent_Type] PRIMARY KEY  CLUSTERED 
-	(
-		[ProcessAgent_Type_ID]
-	)  ON [PRIMARY] 
-GO
-
-ALTER TABLE [dbo].[ProcessAgent] WITH NOCHECK ADD 
-	CONSTRAINT [PK_ProcessAgent] PRIMARY KEY  CLUSTERED 
-	(
-		[Agent_ID]
-	)  ON [PRIMARY] 
-GO
-
-ALTER TABLE [dbo].[Ticket_Type] WITH NOCHECK ADD 
-	CONSTRAINT [PK_Ticket_Type] PRIMARY KEY  CLUSTERED 
-	(
-		[Ticket_Type_ID]
-	)  ON [PRIMARY] 
-GO
-
-
-ALTER TABLE [dbo].[ProcessAgent] ADD 
-	CONSTRAINT [IX_ProcessAgent] UNIQUE  NONCLUSTERED 
-	(
-		[Agent_GUID]
-	)  ON [PRIMARY] 
-GO
-
-ALTER TABLE [dbo].[Ticket] ADD 
+	[Sponsor_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	CONSTRAINT [IX_Ticket] UNIQUE NONCLUSTERED 
 	(
 		[Ticket_ID],
@@ -206,19 +191,10 @@ ALTER TABLE [dbo].[Ticket] ADD
 		[Coupon_ID]
 	)
 	 ON [PRIMARY] 
+
+) ON [PRIMARY]
 GO
 
-
-
-ALTER TABLE [dbo].[ProcessAgent] ADD 
-	
-	CONSTRAINT [FK_ProcessAgent_ProcessAgent_Type] FOREIGN KEY 
-	(
-		[ProcessAgent_Type_ID]
-	) REFERENCES [dbo].[ProcessAgent_Type] (
-		[ProcessAgent_Type_ID]
-	) ON DELETE CASCADE  ON UPDATE CASCADE 
-GO
 
 ALTER TABLE [dbo].[Ticket] ADD 
 	CONSTRAINT [FK_Ticket_Coupon] FOREIGN KEY 

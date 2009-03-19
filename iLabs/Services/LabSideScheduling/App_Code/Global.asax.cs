@@ -27,6 +27,9 @@ namespace iLabs.Scheduling.LabSide
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
@@ -42,6 +45,9 @@ namespace iLabs.Scheduling.LabSide
             if (path != null && path.Length > 0)
             {
                 Utilities.LogPath = path;
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("LSS Application_Start: starting");
             }
             ticketRemover = new TicketRemover();

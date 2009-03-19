@@ -19,7 +19,9 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.UtilLib;
 using iLabs.Ticketing;
-using iLabs.Services;
+using iLabs.Proxies.PAgent;
+using iLabs.Proxies.ESS;
+
 
 namespace iLabs.LabServer.TimeOfDay
 {

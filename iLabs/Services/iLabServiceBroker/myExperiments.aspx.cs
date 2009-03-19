@@ -22,6 +22,7 @@ using iLabs.Core;
 using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.StorageTypes;
+using iLabs.Proxies.ESS;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
@@ -37,7 +38,7 @@ using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.UtilLib;
-using iLabs.Services;
+
 
 namespace iLabs.ServiceBroker.iLabSB
 {
@@ -150,6 +151,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			txtCompletionTime.Text = null;
             txtRecordCount.Text = null;
 			txtAnnotation.Text = null;
+            trSaveAnnotation.Visible = false;
             trShowExperiment.Visible = false;
             trDeleteExperiment.Visible = false;
         }
@@ -260,6 +262,10 @@ namespace iLabs.ServiceBroker.iLabSB
                         // This operation should happen within the Wrapper
                         BrokerDB ticketIssuer = new BrokerDB();
                         ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(expInfo[0].essGuid);
+                        if (ess == null || ess.retired)
+                        {
+                            throw new Exception("The ESS is not registered or is retired");
+                        }
                         Coupon opCoupon = ticketIssuer.GetEssOpCoupon(expInfo[0].experimentId, TicketTypes.RETRIEVE_RECORDS,60,ess.agentGuid);
                         if (opCoupon != null)
                         {
@@ -292,9 +298,10 @@ namespace iLabs.ServiceBroker.iLabSB
                         txtCompletionTime.Text = "Experiment Not Closed!";
                     }
                     txtRecordCount.Text = expInfo[0].recordCount.ToString("    0");
-                    trShowExperiment.Visible = (expInfo[0].recordCount > 0);
-                    btnShowExperiment.Enabled = (expInfo[0].recordCount > 0);
                     txtAnnotation.Text = expInfo[0].annotation;
+                    trSaveAnnotation.Visible = true;
+                    trDeleteExperiment.Visible = true;
+                    trShowExperiment.Visible = (expInfo[0].recordCount > 0);
 				}			
 			}
 			catch(Exception ex)

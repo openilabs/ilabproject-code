@@ -27,6 +27,9 @@ namespace iLabs.LabServer.TimeOfDay
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
                 Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Utilities.WriteLog("");
+                Utilities.WriteLog("#############################################################################");
+                Utilities.WriteLog("");
                 Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
@@ -38,6 +41,9 @@ namespace iLabs.LabServer.TimeOfDay
 		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
+            Utilities.WriteLog("");
+            Utilities.WriteLog("#############################################################################");
+            Utilities.WriteLog("");
             Utilities.WriteLog("TOD Application_Start: starting");
             ticketRemover = new TicketRemover();
 		}

@@ -22,9 +22,9 @@ using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.Proxies.PAgent;
 using iLabs.UtilLib;
 using iLabs.Ticketing;
-using iLabs.Services;
 
 namespace iLabs.ServiceBroker.iLabSB
 {
@@ -81,6 +81,10 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 // get the remote sb Proxy
                 remoteSB = db.GetProcessAgentInfo(sbId);
+                if (remoteSB == null || remoteSB.retired)
+                {
+                    throw new Exception("The remote service broker is not registered or is retired");
+                }
                 ProcessAgentProxy sbProxy = new ProcessAgentProxy();
                 sbProxy.Url = remoteSB.webServiceUrl;
                 sbProxy.AgentAuthHeaderValue = new AgentAuthHeader();
@@ -151,6 +155,10 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 // get the remote sb Proxy
                 remoteSB = db.GetProcessAgentInfo(sbId);
+                if (remoteSB == null || remoteSB.retired)
+                {
+                    throw new Exception("The remote service broker is not registered or is retired");
+                }
                 ProcessAgentProxy sbProxy = new ProcessAgentProxy();
                 sbProxy.Url = remoteSB.webServiceUrl;
                 sbProxy.AgentAuthHeaderValue = new AgentAuthHeader();
@@ -181,6 +189,10 @@ namespace iLabs.ServiceBroker.iLabSB
             ServiceDescription[] values = null;
             // get the remote sb Proxy
             remoteSB = db.GetProcessAgentInfo(sbId);
+            if (remoteSB == null || remoteSB.retired)
+            {
+                throw new Exception("The remote service broker is not registered or is retired");
+            }
             ProcessAgentProxy sbProxy = new ProcessAgentProxy();
             sbProxy.Url = remoteSB.webServiceUrl;
             sbProxy.AgentAuthHeaderValue = new AgentAuthHeader();

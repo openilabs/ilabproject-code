@@ -22,9 +22,9 @@
 		<br clear="all">
 		<div id="innerwrapper">
 		<div id="pageintro">
-						<h1>Manage Time Block
+						<h1>Manage Time Blocks
 						</h1>
-						<p>Add, remove, or edit a time block below.
+						<asp:Label ID="lblDescription" runat="server" />
 						</p>
 						<!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
 						<p><asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label></p>
@@ -44,6 +44,7 @@
 		<tr>
 			<th colspan="2">
 				<asp:button id="btnSaveChanges" Runat="server" Text="Save Changes" CssClass="button" onclick="btnSaveChanges_Click" Visible= "false"></asp:button>
+				<asp:button id="btnEdit" Runat="server" Text="Edit" CssClass="button" onclick="btnEdit_Click" Visible= "false"></asp:button>
 				<asp:button id="btnRemove" Runat="server" Text="Remove" CssClass="button" onclick="btnRemove_Click"></asp:button>
 		        <!-- <a href="javascript:;" onclick="window.open('NewTimeBlockPopUp.aspx','NewTimeBlockPopUp','width=900,height=1000,left=270,top=180,resizable=yes,modal=yes').focus()"> -->
 		        <asp:button id="btnNew" Runat="server" Text="New" CssClass="button" onclick="btnNew_Click"></asp:button>

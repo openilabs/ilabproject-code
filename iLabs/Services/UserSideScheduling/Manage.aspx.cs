@@ -16,7 +16,6 @@ using iLabs.Core;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
-using iLabs.Services;
 
 using iLabs.Ticketing;
 
@@ -299,7 +298,7 @@ namespace iLabs.Scheduling.UserSide
             int min = 0;
             if (txtMaxReservableTimeSlots.Text.CompareTo("") == 0)
             {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter the maximum number of reservable time slots.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter the maximum amount of time that may be reserved.");
                 lblErrorMessage.Visible = true;
                 return;
             }
@@ -310,13 +309,13 @@ namespace iLabs.Scheduling.UserSide
             }
             catch (Exception ex)
             {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer in the MaxReservableTimeSlots text box.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer in the maximum time text box.");
                 lblErrorMessage.Visible = true;
                 return;
             }
             if (txtMinReservableTimeSlots.Text.CompareTo("") == 0)
             {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter the minimum number of reservable time slots.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter the minimum required experiment time.");
                 lblErrorMessage.Visible = true;
                 return;
             }
@@ -328,12 +327,12 @@ namespace iLabs.Scheduling.UserSide
             }
             catch (Exception ex)
             {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer in the MinReservableTimeSlots text box.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer in the Minimun Reservable Time text box.");
                 lblErrorMessage.Visible = true;
                 return;
             }
             if(!(min > 0 && max >= min)){
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("The minimum number of time slots must be greater than zero and the maximum number of slots must be greater than or equal to the minimum.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("The minimum amount of time must be greater than zero and the maximum must be greater than or equal to the minimum.");
                 lblErrorMessage.Visible = true;
                 return;
             }

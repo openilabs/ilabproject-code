@@ -31,6 +31,11 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.Proxies.BatchLS;
+using iLabs.Proxies.PAgent;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.LSS;
+using iLabs.Proxies.USS;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.DataStorage ;
 using iLabs.ServiceBroker.Administration;
@@ -40,8 +45,6 @@ using iLabs.ServiceBroker.Batch;
 using iLabs.ServiceBroker.Services;
 
 using iLabs.Ticketing;
-
-using iLabs.Services;
 using iLabs.UtilLib;
 
 
@@ -127,14 +130,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try
 			{
-               
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
-              
-			
+      
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
@@ -164,13 +160,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try
 			{
-                
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }  
-			
+ 
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
@@ -197,12 +187,6 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try 
 			{
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
-				
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
@@ -228,13 +212,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try
 			{   
-                //first try to recreate session if using an html client
-              
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    int test = 0;
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
+
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
@@ -272,14 +250,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try 
 			{
-                
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
-               
-				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
+                // Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
 
@@ -316,12 +287,6 @@ namespace iLabs.ServiceBroker.iLabSB
             ClientSubmissionReport clientSReport = null;
             try{
                
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
-            
                 // Checking if user has permission to use the lab server. The method will set headers for lab server calls
                 //if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
@@ -335,6 +300,10 @@ namespace iLabs.ServiceBroker.iLabSB
                 string effectiveGroup = Session["GroupName"].ToString();
 
                 ProcessAgentInfo infoLS = dbTicketing.GetProcessAgentInfo(labServerID);
+                if (infoLS.retired)
+                {
+                    throw new Exception("The Batch Lab Server is retired");
+                }
                 // get qualifier ID of labServer
                 int qualifierID = AuthorizationAPI.GetQualifierID(infoLS.agentId, Qualifier.labServerQualifierTypeID);
 
@@ -375,6 +344,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     //3.A create ESS administer experiment ticket, Add 10 minutes to duration
                     // This must be created before the ESS experiment records may be created
                     ProcessAgentInfo essAgent = brokerDB.GetProcessAgentInfo(essID);
+                    if (essAgent.retired)
+                    {
+                        throw new Exception("The Batch Lab Server is retired");
+                    }
                     TicketLoadFactory factory = TicketLoadFactory.Instance();
 
                     brokerDB.AddTicket(coupon,
@@ -474,39 +447,43 @@ namespace iLabs.ServiceBroker.iLabSB
 		/// <seealso cref="LabExperimentStatus">LabExperimentStatus Class</seealso>
 		/// <seealso cref="ExperimentStatus">ExperimentStatus Class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod (Description="Checks on the status of a previously submitted experiment", EnableSession = true)]
-		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
+        [WebMethod(Description = "Checks on the status of a previously submitted experiment", EnableSession = true)]
+        [SoapHeader("sbHeader", Direction = SoapHeaderDirection.In)]
         [SoapDocumentMethod(Action = "http://ilab.mit.edu/GetExperimentStatus", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
-		public LabExperimentStatus GetExperimentStatus(int experimentID)
-		{
-			try
-			{
-                
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
-
+        public LabExperimentStatus GetExperimentStatus(int experimentID)
+        {
+            LabExperimentStatus status = null;
+            try
+            {
                 int intLabServerID = AdministrativeAPI.GetLabServerID(experimentID);
-				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
-				//if authorization is successful.
-				CheckAndSetLSAuthorization(intLabServerID);
-			
-				//ExperimentInformation [] expInfo = wrapper.GetExperimentInformationWrapper (new int[] {experimentID});
-			
-				LabExperimentStatus status = batchLS_Proxy.GetExperimentStatus(experimentID);
-                
-				//ESSAPI.ModifyExperimentStatus(experimentID, status.statusReport.statusCode);
-
-				return status;
-				
-			}
-			catch
-			{
-				throw;
-			}
-		}
+                // Checking if user has permission to use the lab server. The method will set headers for lab server calls
+                //if authorization is successful.
+                CheckAndSetLSAuthorization(intLabServerID);
+             
+                ExperimentSummary summary = DataStorageAPI.RetrieveExperimentSummary(experimentID);
+                if ((summary != null) && ((summary.status & StorageStatus.CLOSED) == StorageStatus.CLOSED))
+                {
+                    status = new LabExperimentStatus();
+                    status.minTimetoLive = 0;
+                    ExperimentStatus report2 = new ExperimentStatus();
+                    report2.estRemainingRuntime = 0;
+                    report2.estRuntime = 0;
+                    report2.statusCode = summary.status & StorageStatus.BATCH_MASK;
+                    report2.wait = new WaitEstimate();
+                    status.statusReport = report2;
+                }
+                else
+                {
+                    status = batchLS_Proxy.GetExperimentStatus(experimentID);
+                    DataStorageAPI.UpdateExperimentStatus((long)experimentID, status.statusReport.statusCode);
+                }
+            }
+            catch
+            {
+                throw;
+            }
+            return status;
+        }
 
 		/// <summary>
 		/// Cancels a previously submitted experiment. If the experiment is already running, makes best efforts to abort execution, but there is no guarantee that the experiment will not run to completion. 
@@ -522,21 +499,17 @@ namespace iLabs.ServiceBroker.iLabSB
 			try
 			{
                 
-                //first try to recreate session if using an html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                }
                 int intLabServerID = AdministrativeAPI.GetLabServerID(experimentID);
 
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
 				CheckAndSetLSAuthorization(intLabServerID);
                 bool status = batchLS_Proxy.Cancel(experimentID);
-                if (status)
-                {
-                    DataStorageAPI.CloseExperiment(experimentID, StorageStatus.BATCH_CANCELLED);
-                }
+                //if (status)
+                //{
+                DataStorageAPI.RetrieveExperimentSummary(experimentID);
+                DataStorageAPI.CloseExperiment(experimentID, StorageStatus.BATCH_CANCELLED);
+                //}
                 return status;
 			}
 			catch
@@ -558,7 +531,16 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Action = "http://ilab.mit.edu/RetrieveResult", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
 		public ResultReport RetrieveResult (int experimentID)
 		{
-            ResultReport report = null;
+            /* Status Code key: 
+			1: if waiting in the execution queue
+			2: if currently running
+			3: if terminated normally
+			4: if terminated with errors (this includes cancellation by user in mid-execution)
+			5: if cancelled by user before execution had begun
+			6: if unknown labExperimentID. 
+			7: Assigned by Service Broker if experiment is not valid (done in submit call)
+			*/
+            ResultReport sbReport = null;
             try
 			{
                 long expID = (long) experimentID;
@@ -566,19 +548,25 @@ namespace iLabs.ServiceBroker.iLabSB
                 //first try to recreate session if using an html client
                 if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
                 {
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                    if (sbHeader.couponID > 0)
+                    {
+                        wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                    }
                 }
+                // Checking if user has permission to use the lab server. The method will set headers for lab server calls
+                //if authorization is successful.
+                
 				int roles = wrapper.GetExperimentAuthorizationWrapper(expID);
                 if((roles & 1) != 1){
                     throw new AccessDeniedException("The experiment does not exist or you do not have read permission.");
                 }
-                report = BatchAPI.GetResultReport(experimentID);
+                sbReport = BatchAPI.GetResultReport(experimentID);
             }
 			catch(Exception ex)
 			{
 				throw new SoapException(ex.Message+". "+ex.GetBaseException(), SoapException.ServerFaultCode,ex);
 			}
-            return report;
+            return sbReport;
 		}
 
 		/// <summary>
@@ -595,19 +583,17 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Action = "http://ilab.mit.edu/Notify", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
 		public void Notify(int experimentID)
 		{
-
-			ResultReport report = null;
 			try 
 			{
-                BrokerDB brokerDB = new BrokerDB();
-                // No session state for this call, must process header information
+                //BrokerDB brokerDB = new BrokerDB();
+                //// No session state for this call, must process header information
                 
-                if(sbHeader.couponID != null && sbHeader.couponPassKey != null){
+                //if(sbHeader.couponID > 0 && sbHeader.couponPassKey != null){
              
-                    if(brokerDB.AuthenticateIssuedCoupon(sbHeader.couponID,sbHeader.couponPassKey)){
-                       
-                    }
-                }
+                //    if(brokerDB.AuthenticateIssuedCoupon(sbHeader.couponID,sbHeader.couponPassKey)){
+                        ResultReport report = BatchAPI.GetResultReport(experimentID);
+                //    }
+                //}
             }
 			catch
 			{
@@ -639,6 +625,7 @@ namespace iLabs.ServiceBroker.iLabSB
             //first try to recreate session if using an html client
             if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
             {
+                if(sbHeader != null)
                 wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
             }
             int userID = Convert.ToInt32(Session["UserID"]);
@@ -662,6 +649,7 @@ namespace iLabs.ServiceBroker.iLabSB
             //first try to recreate session if using an html client
             if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
             {
+                if (sbHeader != null)
                 wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
             }
             int userID = Convert.ToInt32(Session["UserID"]);
@@ -685,6 +673,7 @@ namespace iLabs.ServiceBroker.iLabSB
             //first try to recreate session if using an html client
             if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
             {
+                if (sbHeader != null)
                 wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
             }
             int userID = Convert.ToInt32(Session["UserID"]);
@@ -708,6 +697,7 @@ namespace iLabs.ServiceBroker.iLabSB
         { //first try to recreate session if using an html client
             if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
             {
+                if (sbHeader != null)
                 wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
             }
             int userID = Convert.ToInt32(Session["UserID"]);
@@ -735,9 +725,11 @@ namespace iLabs.ServiceBroker.iLabSB
 			try
 			{
 				//first try to recreate session if using a html client
-				if (Session==null||(Session["UserID"]==null)||(Session["UserID"].ToString()==""))
-					wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID,sbHeader.couponPassKey));
-
+                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
+                {
+                    if (sbHeader != null)
+                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                }
 				Criterion[] carray = new Criterion[] {new Criterion("type", "=", BatchRecordType.SPECIFICATION) };
                 ExperimentRecord[] records = RetrieveExperimentRecords(experimentID, carray);
                 if(records.Length  >=1)
@@ -752,38 +744,40 @@ namespace iLabs.ServiceBroker.iLabSB
 				throw;
 			}
 		}
-
-		/// <summary>
-		/// Retrieves the result from a previously executed experiment.
-		/// </summary>
-		/// <param name="experimentID">A token which identifies the experiment.</param>
-		/// <returns> The experimentResult, an opaque string generated by the Lab Server to describe the result of a previously executed experiment.</returns>
-		/// <remarks>Web Method</remarks>
-        [WebMethod(Description = "Retrieves the result from a previously executed experiment", EnableSession = true)]
-        [SoapHeader("sbHeader", Direction = SoapHeaderDirection.In)]
-        [SoapDocumentMethod(Action = "http://ilab.mit.edu/RetrieveExperimentResult", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
-        public string RetrieveExperimentResult(int experimentID)
-        {
-            try
-            {
-                //first try to recreate session if using a html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                 //Criterion result = new Criterion("type", "=", BatchRecordType.RESULT);
-                Criterion[] carray = new Criterion[] {new Criterion("type", "=", BatchRecordType.RESULT) };
-                ExperimentRecord[] records = RetrieveExperimentRecords(experimentID, carray);
-                if (records.Length >= 1)
-                    return records[0].contents;
-                else 
-                    return null;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-		/// <summary>
+        /*
+                /// <summary>
+                /// Retrieves the result from a previously executed experiment.
+                /// </summary>
+                /// <param name="experimentID">A token which identifies the experiment.</param>
+                /// <returns> The experimentResult, an opaque string generated by the Lab Server to describe the result of a previously executed experiment.</returns>
+                /// <remarks>Web Method</remarks>
+                [WebMethod(Description = "Retrieves the result from a previously executed experiment", EnableSession = true)]
+                [SoapHeader("sbHeader", Direction = SoapHeaderDirection.In)]
+                [SoapDocumentMethod(Action = "http://ilab.mit.edu/RetrieveExperimentResult", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
+                public string RetrieveExperimentResult(int experimentID)
+                {
+                    try
+                    {
+                        //first try to recreate session if using a html client
+                        if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == "")){
+                            if(sbHeader != null)
+                            wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                        }
+                         //Criterion result = new Criterion("type", "=", BatchRecordType.RESULT);
+                        Criterion[] carray = new Criterion[] {new Criterion("type", "=", BatchRecordType.RESULT) };
+                        ExperimentRecord[] records = RetrieveExperimentRecords(experimentID, carray);
+                        if (records != null && records.Length >= 1)
+                            return records[0].contents;
+                        else 
+                            return null;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
+                }
+        */
+        /// <summary>
 		/// Retrieves a previously saved lab configuration for a particular experiment.
 		/// </summary>
 		/// <param name="experimentID">A token which identifies the experiment.</param>
@@ -797,8 +791,11 @@ namespace iLabs.ServiceBroker.iLabSB
 			try
 			{
 				//first try to recreate session if using a html client
-				if (Session==null||(Session["UserID"]==null)||(Session["UserID"].ToString()==""))
-					wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID,sbHeader.couponPassKey));
+                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
+                {
+                    if (sbHeader != null)
+                        wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                }
 
 				Criterion[] carray = new Criterion[] {new Criterion("type", "=", BatchRecordType.LAB_CONFIGURATION) };
                 ExperimentRecord[] records = RetrieveExperimentRecords(experimentID, carray);
@@ -834,8 +831,12 @@ namespace iLabs.ServiceBroker.iLabSB
 			try
 			{
 				//first try to recreate session if using a html client
-				if (Session==null||(Session["UserID"]==null)||(Session["UserID"].ToString()==""))
-					wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID,sbHeader.couponPassKey));
+                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
+                {
+                    if (sbHeader != null)
+                        wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                }
+
 
 				return wrapper.SaveExperimentAnnotationWrapper(experimentID, annotation);
 			}
@@ -859,9 +860,10 @@ namespace iLabs.ServiceBroker.iLabSB
 			try
 			{
 				//first try to recreate session if using a html client
-				if (Session==null||(Session["UserID"]==null)||(Session["UserID"].ToString()==""))
-					wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID,sbHeader.couponPassKey));
-
+				if (Session==null||(Session["UserID"]==null)||(Session["UserID"].ToString()=="")){
+                    if(sbHeader != null)
+					    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID,sbHeader.couponPassKey));
+                }
 				return wrapper.SelectExperimentAnnotationWrapper(experimentID);
 			}
 			catch
@@ -881,13 +883,13 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Action = "http://ilab.mit.edu/GetExperimentInformation", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
         public ExperimentInformation[] GetExperimentInformation(int[] experimentIDs)
         {
-            
-          
                 //first try to recreate session if using a html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
+            if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
+            {
+                if (sbHeader != null)
                     wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-
-                return BatchAPI.GetExperimentInformation(experimentIDs);
+            }
+            return BatchAPI.GetExperimentInformation(experimentIDs);
         }
 
 		/////////////////////////////////////
@@ -909,13 +911,22 @@ namespace iLabs.ServiceBroker.iLabSB
 				/* Collecting information to check for authorization */
 
 				//first try to recreate session if using a html client
-				if (Session==null||(Session["UserID"]==null)||(Session["UserID"].ToString()==""))
-					wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID,sbHeader.couponPassKey));
+                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
+                {
+                    if (sbHeader != null)
+                    {
+                        wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                    }
+                }
 
 				//retrieve userID from the session
 				int userID = Convert.ToInt32(Session["UserID"]);
 
                 ProcessAgentInfo info = dbTicketing.GetProcessAgentInfo(labServerGuid);
+                if (info.retired)
+                {
+                    throw new Exception("The Batch Lab Server is retired");
+                }
 				// get qualifier ID of labServer
 				int qualifierID = AuthorizationAPI.GetQualifierID (info.agentId, Qualifier .labServerQualifierTypeID );
 			
@@ -956,12 +967,21 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 //first try to recreate session if using a html client
                 if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                    wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                {
+                    if (sbHeader != null)
+                    {
+                        wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                    }
+                }
 
                 //retrieve userID from the session
                 int userID = Convert.ToInt32(Session["UserID"]);
 
                 ProcessAgentInfo info = dbTicketing.GetProcessAgentInfo(labServerID);
+                if (info.retired)
+                {
+                    throw new Exception("The ProcessAgent is retired");
+                }
                 // get qualifier ID of labServer
                 int qualifierID = AuthorizationAPI.GetQualifierID(info.agentId, Qualifier.labServerQualifierTypeID);
 

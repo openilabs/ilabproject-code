@@ -37,11 +37,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AddLabClie
 drop procedure [dbo].[AddLabClient]
 GO
 
-/****** Object:  Stored Procedure dbo.AddLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AddLabServer]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[AddLabServer]
-GO
-
 /****** Object:  Stored Procedure dbo.AddLabServerClient    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AddLabServerClient]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[AddLabServerClient]
@@ -60,6 +55,11 @@ GO
 /****** Object:  Stored Procedure dbo.AddQualifierHierarchy    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AddQualifierHierarchy]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[AddQualifierHierarchy]
+GO
+
+/****** Object:  Stored Procedure dbo.AddQualifier    Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyQualifierName]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ModifyQualifierName]
 GO
 
 /****** Object:  Stored Procedure dbo.AddRecordAttribute    Script Date: 5/18/2005 4:17:55 PM ******/
@@ -173,6 +173,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[UpdateExpe
 drop procedure [dbo].[UpdateExperimentStatus]
 GO
 
+/****** Object:  Stored Procedure dbo.InsertExperimentCoupon    Script Date: 12/12/2006 ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[UpdateExperimentStatusCode]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[UpdateExperimentStatusCode]
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetExperimentStatusCode]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetExperimentStatusCode]
 GO
@@ -224,11 +229,6 @@ GO
 /****** Object:  Stored Procedure dbo.DeleteLabClient    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteLabClient]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[DeleteLabClient]
-GO
-
-/****** Object:  Stored Procedure dbo.DeleteLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteLabServer]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[DeleteLabServer]
 GO
 
 /****** Object:  Stored Procedure dbo.DeleteLabServerClient    Script Date: 5/18/2005 4:17:55 PM ******/
@@ -341,24 +341,9 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyGrou
 drop procedure [dbo].[ModifyGroup]
 GO
 
-/****** Object:  Stored Procedure dbo.ModifyInPasskey    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyInPasskey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[ModifyInPasskey]
-GO
-
 /****** Object:  Stored Procedure dbo.ModifyLabClient    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyLabClient]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[ModifyLabClient]
-GO
-
-/****** Object:  Stored Procedure dbo.ModifyLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyLabServer]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[ModifyLabServer]
-GO
-
-/****** Object:  Stored Procedure dbo.ModifyOutPasskey    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyOutPasskey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[ModifyOutPasskey]
 GO
 
 /****** Object:  Stored Procedure dbo.ModifySystemMessage    Script Date: 5/18/2005 4:17:55 PM ******/
@@ -377,11 +362,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ResetAgent
 drop procedure [dbo].[ResetAgentHierarchy]
 GO
 
-/*Old: Drop this procedure - do not create again*/
-/****** Object:  Stored Procedure dbo.ResetDatabase    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ResetDatabase]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[ResetDatabase]
-GO
 
 /****** Object:  Stored Procedure dbo.RetrieveAgent    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveAgent]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
@@ -603,26 +583,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLa
 drop procedure [dbo].[RetrieveLabClientTypes]
 GO
 
-/****** Object:  Stored Procedure dbo.RetrieveLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabServer]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[RetrieveLabServer]
-GO
-
-/****** Object:  Stored Procedure dbo.RetrieveLabServerIDs    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabServerIDs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[RetrieveLabServerIDs]
-GO
-
-/****** Object:  Stored Procedure dbo.RetrieveLabServerID    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabServerID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[RetrieveLabServerID]
-GO
-
-/****** Object:  Stored Procedure dbo.RetrieveLabServerName    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabServerName]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[RetrieveLabServerName]
-GO
-
 /****** Object:  Stored Procedure dbo.RetrieveNativePassword    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveNativePassword]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveNativePassword]
@@ -755,12 +715,6 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SaveLabClient]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[SaveLabClient]
 GO
-
-/****** Object:  Stored Procedure dbo.SaveLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SaveLabServer]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[SaveLabServer]
-GO
-
 /****** Object:  Stored Procedure dbo.SaveNativePassword    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SaveNativePassword]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[SaveNativePassword]
@@ -789,16 +743,6 @@ GO
 /****** Object:  Stored Procedure dbo.SelectAllUserSessions    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SelectAllUserSessions]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[SelectAllUserSessions]
-GO
-
-/****** Object:  Stored Procedure dbo.SelectInPasskey    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SelectInPasskey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[SelectInPasskey]
-GO
-
-/****** Object:  Stored Procedure dbo.SelectOutPasskey    Script Date: 5/18/2005 4:17:55 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SelectOutPasskey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[SelectOutPasskey]
 GO
 
 /****** Object:  Stored Procedure dbo.SelectUserSession    Script Date: 5/18/2005 4:17:55 PM ******/
@@ -840,6 +784,18 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[InsertAdminURL]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[InsertAdminURL]
 GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyAdminURL]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ModifyAdminURL]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyAdminUrlCodebase]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ModifyAdminUrlCodebase]
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyClientCodebase]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ModifyClientCodebase]
+GO
+
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveAdminURLs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveAdminURLs]
@@ -896,6 +852,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetMapping
 drop procedure [dbo].[GetMappingIdByKeyValue]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetResourceMapIdsByValue]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetResourceMapIdsByValue]
+GO
+
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetResourceTypeNames]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetResourceTypeNames]
 GO
@@ -915,27 +876,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteReso
 drop procedure [dbo].[DeleteResourceMapping]
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[InsertResourceMap]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[InsertResourceMap]
-GO
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ModifyResourceMap]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[ModifyResourceMap]
-GO
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetResourceMaps]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[GetResourceMaps]
-GO
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetResourceMap]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[GetResourceMap]
-GO
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetResourceMapByKey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[GetResourceMapByKey]
-GO
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteResourceMap]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[DeleteResourceMap]
-GO
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DeleteResourceMapByKey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
-drop procedure [dbo].[DeleteResourceMapByKey]
-GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[InsertRegistration]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[InsertRegistration]
 GO
@@ -1129,31 +1069,6 @@ AS
 RETURN
 GO
 
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-/****** Object:  Stored Procedure dbo.AddLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-
-CREATE PROCEDURE AddLabServer
-	@labServerName varchar(256),
-	@labServerGUID varchar(50),
-	@webServiceURL varchar (256),
-	@labServerDescription varchar(4000),
-	@labInfoURL varchar(256),
-	@contactFirstName varchar(256),
-	@contactLastName varchar(256),
-	@contactEmail varchar(50)
-AS
-	insert into Lab_Servers (lab_server_name, GUID, web_service_URL,description,info_URL,
-			 contact_first_name, contact_last_name, contact_email)
-		values ( @labServerName, @labServerGUID, @webServiceURL, @labServerDescription, 
-			@labInfoURL, @contactFirstName, @contactLastName, @contactEmail)
-	
-	select ident_current('lab_servers')
-return
-GO
 
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -1313,6 +1228,24 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+CREATE PROCEDURE ModifyQualifierName
+@qualifierTypeID int,
+@refID int,
+@newName varchar(256)
+
+AS
+
+UPDATE Qualifiers SET Qualifier_name = @newName
+where Qualifier_Type_ID =@qualifierTypeID and Qualifier_Reference_ID = @refID
+select @@rowcount
+
+GO
+
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
 
 /****** Object:  Stored Procedure dbo.AddSystemMessage    Script Date: 5/18/2005 4:17:55 PM ******/
 
@@ -1617,6 +1550,22 @@ SET ANSI_NULLS OFF
 GO
 
 
+CREATE PROCEDURE UpdateExperimentStatusCode
+	@experimentID bigint,
+	@status int
+AS
+
+update experiments set status=@status
+where Experiment_ID=@experimentID
+select @@rowcount
+return
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+
 /****** Object:  Stored Procedure dbo.CreateNativePrincipal    Script Date: 5/18/2005 4:17:55 PM ******/
 
 CREATE PROCEDURE CreateNativePrincipal
@@ -1843,36 +1792,6 @@ BEGIN TRANSACTION
 				where description = 'Lab Client');
 	if (@@error > 0)
 		goto on_error
-COMMIT TRANSACTION	
-return
-	on_error: 
-	ROLLBACK TRANSACTION
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-/****** Object:  Stored Procedure dbo.DeleteLabServer    Script Date: 5/18/2005 4:17:55 PM ******/
-
-CREATE PROCEDURE DeleteLabServer
-	@labServerID int
-AS
-BEGIN TRANSACTION
-
-	delete from Lab_Servers
-	where Lab_Server_ID = @labServerID;
-	if (@@error > 0)
-		goto on_error
-
-	delete from Qualifiers
-	where qualifier_reference_ID = @labServerID and 
-	qualifier_type_ID = (select qualifier_type_ID from qualifier_Types 
-				where description = 'Lab Server');
-	if (@@error > 0)
-		goto on_error
-
 COMMIT TRANSACTION	
 return
 	on_error: 
@@ -2295,25 +2214,7 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-/****** Object:  Stored Procedure dbo.ModifyInPasskey    Script Date: 5/18/2005 4:17:56 PM ******/
 
-CREATE PROCEDURE ModifyInPasskey
-	@lsID int,
-	@passKey varchar(256)
-AS
-	begin
-		update lab_servers
-		set incoming_passkey = @passKey
-		where lab_server_id = @lsID
-	end
-	
-return
-GO
-
-SET QUOTED_IDENTIFIER ON 
-GO
-SET ANSI_NULLS OFF 
-GO
 
 /****** Object:  Stored Procedure dbo.ModifyLabClient    Script Date: 5/18/2005 4:17:56 PM ******/
 
@@ -2348,57 +2249,12 @@ AS
 RETURN
 GO
 
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-/****** Object:  Stored Procedure dbo.ModifyLabServer    Script Date: 5/18/2005 4:17:56 PM ******/
-
-CREATE PROCEDURE ModifyLabServer
-	@labServerID int,
-	@labServerName varchar(256),
-	@labServerGUID varchar(50),
-	@webServiceURL varchar (256),
-	@labServerDescription varchar(4000),
-	@labInfoURL varchar(256),
-	@contactFirstName varchar(256),
-	@contactLastName varchar(256),
-	@contactEmail varchar(50)
-AS
-		update Lab_Servers
-		set lab_server_name = @labServerName, GUID=@labServerGUID, 
-		web_service_URL = @webServiceURL, description=@labServerDescription, 
-		info_URL = @labInfoURL, contact_first_name=@contactFirstName, 	
-		contact_last_name=@contactLastName, contact_email = @contactEmail
-		where lab_server_ID = @labServerID;
-return
-GO
 
 SET QUOTED_IDENTIFIER ON 
 GO
 SET ANSI_NULLS OFF 
 GO
 
-/****** Object:  Stored Procedure dbo.ModifyOutPasskey    Script Date: 5/18/2005 4:17:56 PM ******/
-
-CREATE PROCEDURE ModifyOutPasskey
-	@lsID int,
-	@passKey varchar(256)
-AS
-	begin
-		update lab_servers
-		set outgoing_passkey = @passKey
-		where lab_server_id = @lsID
-	end
-	
-return
-GO
-
-SET QUOTED_IDENTIFIER ON 
-GO
-SET ANSI_NULLS OFF 
-GO
 
 /****** Object:  Stored Procedure dbo.ModifySystemMessage    Script Date: 5/18/2005 4:17:56 PM ******/
 
@@ -3152,50 +3008,6 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-/****** Object:  Stored Procedure dbo.RetrieveLabServer    Script Date: 5/18/2005 4:17:56 PM ******/
-
-CREATE PROCEDURE RetrieveLabServer
-	@labServerID int
-AS
-	select lab_server_name, GUID, web_service_URL, description, info_URL, 
-	contact_first_name, contact_last_name, contact_email, date_created
-	from lab_servers
-	where lab_server_id = @labServerID
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-/****** Object:  Stored Procedure dbo.RetrieveUserID    Script Date: 5/18/2005 4:17:56 PM ******/
-
-CREATE PROCEDURE RetrieveLabServerID
-	@GUID varchar(50)
-AS
-	select lab_server_ID
-	from lab_servers
-	where GUID = @GUID
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-
-/****** Object:  Stored Procedure dbo.RetrieveLabServerIDs    Script Date: 5/18/2005 4:17:56 PM ******/
-
-CREATE PROCEDURE RetrieveLabServerIDs
-AS
-	select lab_server_id
-	from lab_servers
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
 
 /****** Object:  Stored Procedure dbo.RetrieveNativePassword    Script Date: 5/18/2005 4:17:56 PM ******/
 
@@ -3573,43 +3385,6 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-/****** Object:  Stored Procedure dbo.SelectInPasskey    Script Date: 5/18/2005 4:17:57 PM ******/
-
-CREATE PROCEDURE SelectInPasskey
-	@lsID int
-AS
-	begin
-		select incoming_passkey
-		from  lab_servers
-		where lab_server_id = @lsID
-	end
-	
-return
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-/****** Object:  Stored Procedure dbo.SelectOutPasskey    Script Date: 5/18/2005 4:17:57 PM ******/
-
-CREATE PROCEDURE SelectOutPasskey
-	@lsID int
-AS
-	begin
-		select outgoing_passkey
-		from  lab_servers
-		where lab_server_id = @lsID
-	end
-	
-return
-GO
-
-SET QUOTED_IDENTIFIER ON 
-GO
-SET ANSI_NULLS OFF 
-GO
 
 -- Only return user sessions that have not been closed
 CREATE PROCEDURE SelectSessionInfo
@@ -3742,9 +3517,14 @@ AS
         where id= @adminURLID
 return
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
 GO
 
 
@@ -3761,6 +3541,63 @@ select @Ticket_Type_ID = (select Ticket_Type_ID  from Ticket_Type where (upper(N
 insert into AdminURLs(ProcessAgentID, AdminURL, Ticket_Type_ID) values (@processAgentID, @adminURL, @ticket_Type_ID)
 select ident_current('AdminURLs')
 GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE ModifyAdminURL
+@id int,
+@url varchar(256),
+@typeID int
+AS
+update AdminURLs set AdminURL=@url where ProcessAgentID=@id and Ticket_Type_ID = @typeID
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE ModifyAdminUrlCodebase
+@id int,
+@old varchar(256),
+@new varchar(256)
+AS
+update AdminURLs set AdminURL=REPLACE(AdminURL,@old,@new) where ProcessAgentID=@id
+select @@rowcount
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+CREATE PROCEDURE ModifyClientCodebase
+@id int,
+@old varchar(256),
+@new varchar(256)
+AS
+update Client_Info set Info_Url=REPLACE(Info_Url,@old,@new)
+where client_ID in (select client_id from Lab_Server_To_Client_MAP where agent_ID=@id)
+update Lab_Clients set Loader_Script=REPLACE(Loader_Script,@old,@new) 
+where client_ID in (select client_id from Lab_Server_To_Client_MAP where agent_ID=@id)
+select @@rowcount
+GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -4149,6 +3986,8 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+
+
 Create Procedure GetMappingIdByKeyValue
 @keyId int,
 @keyType int,
@@ -4164,33 +4003,6 @@ in ( select mapping_id from ResourceMappingKeys
 AND MappingValue = @valueId AND MappingValue_Type = @valueType
 
 GO
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-
-Create Procedure InsertResourceMap
-@keyType int,
-@keyValue int,
-@type_0 int,
-@value_0 int,
-@type_1 int,
-@value_1 int,
-@type_2 int,
-@value_2 int
-
-as
-
-INSERT into ResourceMap (keyType,keyValue,type_0,value_0,type_1,value_1,type_2,value_2)
-values (@keyType,@keyValue,@type_0,@value_0,@type_1,@value_1,@type_2,@value_2)
-select ident_current('ResourceMap')
-go
 
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -4202,121 +4014,17 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-Create Procedure ModifyResourceMap
-@mapID int,
-@keyType int,
-@keyValue int,
-@type_0 int,
-@value_0 int,
-@type_1 int,
-@value_1 int,
-@type_2 int,
-@value_2 int
 
-as
+Create PROCEDURE GetResourceMapIdsByValue
+@type varchar(100),
+@id int
 
-update ResourceMap set keyType=@keyType,keyValue=@keyValue,
-type_0=@type_0,value_0=@value_0,type_1=@type_1,value_1=@value_1,
-type_2=@type_2,value_2=@value_2
-where mapID = @mapID
+AS
 
-go
+select distinct Mapping_ID from ResourceMappingVAlues
+where mappingValue =@id and MappingValue_Type = (select type_id FROM ResourceMappingTypes where Type_Name =@type)
 
-SET QUOTED_IDENTIFIER OFF 
 GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-Create Procedure GetResourceMaps
-
-as
-
-select mapId,  keyType,keyValue,type_0,value_0,type_1,value_1,type_2,value_2
-from ResourceMap
-
-go
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-Create Procedure GetResourceMap
-@mapID int
-as
-
-select mapId,  keyType, keyValue, type_0, value_0, type_1, value_1, type_2, value_2
-from ResourceMap where mapID = @mapID;
-
-go
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-Create Procedure GetResourceMapByKey
-@keyType int,
-@keyValue int
-as
-
-select mapId,  keyType,keyValue,type_0,value_0,type_1,value_1,type_2,value_2
-from ResourceMap where keyType = @keyType and keyValue = @keyValue
-
-go
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-Create Procedure DeleteResourceMap
-@mapID int
-as
-
-delete from ResourceMap where mapID= @mapID
-
-go
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
-Create Procedure DeleteResourceMapByKey
-@keyType int,
-@keyValue int
-as
-
-delete from ResourceMap where keyType = @keyType and keyValue = @keyValue
-
-go
-
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
