@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 using System.Runtime.InteropServices;
@@ -406,6 +407,10 @@ namespace iLabs.LabView.LV82
                         status = 1;
                         found = true;
                     }
+                    else
+                    {
+                        Utilities.WriteLog("stop control not found: null returned");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -418,7 +423,9 @@ namespace iLabs.LabView.LV82
                     try
                     {
                         vi.SetControlValue("stop", true);
-                        //status = (int)GetVIStatus(vi);
+                        Thread.Sleep(10);
+                        vi.SetControlValue("stop", false);
+                        Utilities.WriteLog("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
                         status = 2;
                     }
                     catch (Exception ex)

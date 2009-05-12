@@ -430,7 +430,7 @@ namespace iLabs.Scheduling.UserSide
         /// </summary>
         public static ReservationInfo[] GetReservations(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
         {
-            return DBManager.SelectReservations(userName, experimentInfoId, credentialSetId, timeAfter, timeBefore);
+            return DBManager.GetReservations(userName, experimentInfoId, credentialSetId, timeAfter, timeBefore);
         }
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information

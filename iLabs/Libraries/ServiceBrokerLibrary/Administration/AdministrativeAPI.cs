@@ -2263,13 +2263,16 @@ namespace iLabs.ServiceBroker.Administration
                 }
                 // Get Session info	
                 XmlQueryDoc expDoc = new XmlQueryDoc(sessionTicket.payload);
-                long sessionID = -1;
-                string sessionStr = expDoc.Query("RedeemSessionPayload/sessionID");
-                if (sessionStr != null && sessionStr.Length > 0)
-                {
-                    sessionID = Convert.ToInt64(sessionStr);
-                    sessionInfo = InternalAdminDB.SelectSessionInfo(sessionID);
-                }
+                sessionInfo = new SessionInfo();
+                string STR_RedeemSessionPayload = "RedeemSessionPayload/";
+                string userID = expDoc.Query(STR_RedeemSessionPayload + "userID");
+                sessionInfo.userID = Convert.ToInt32(userID);
+                string groupID = expDoc.Query(STR_RedeemSessionPayload + "groupID");
+                sessionInfo.groupID = Convert.ToInt32(groupID);
+                string clientID = expDoc.Query(STR_RedeemSessionPayload + "clientID");
+                sessionInfo.clientID = Convert.ToInt32(clientID);
+                sessionInfo.userName = expDoc.Query(STR_RedeemSessionPayload + "userName");
+                sessionInfo.groupName = expDoc.Query(STR_RedeemSessionPayload + "groupName");
             }
             return sessionInfo;
         }

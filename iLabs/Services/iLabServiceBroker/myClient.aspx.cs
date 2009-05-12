@@ -333,13 +333,18 @@ namespace iLabs.ServiceBroker.iLabSB
                     // - CV, 7/22/05
                     {
                         Session.Remove("LoaderScript");
+
                         //payload includes username and effective group name & client id.
                         //ideally this should be encoded in xml  - CV, 7/27/2005
-                        string payload = Session["UserID"].ToString() + ";" + Session["GroupID"].ToString() + ";" + Session["ClientID"].ToString() + ";" + Session["UserName"].ToString() + ";" + Session["GroupName"].ToString();
+                         TicketLoadFactory factory = TicketLoadFactory.Instance();
+                        string userName = (string)Session["UserName"];
+                        string groupName = (string)Session["GroupName"];
 
+                        string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]),
+                           Convert.ToInt32(Session["GroupID"]), Convert.ToInt32(Session["ClientID"]), userName, groupName);
                         // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
                         Coupon coupon = issuer.CreateTicket(TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
-                             ProcessAgentDB.ServiceGuid, -1, payload);
+                             ProcessAgentDB.ServiceGuid, -1, sessionPayload);
 
                         string jScript = @"<script language='javascript'> window.open ('" + lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey + "')</script>";
                         Page.RegisterStartupScript("HTML Client", jScript);

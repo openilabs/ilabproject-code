@@ -49,7 +49,12 @@ namespace iLabs.Ticketing
         /**
          * service broker tickets
          * */
-        public string createRedeemSessionPayload(int userID,int groupID,int clientID)
+        public string createRedeemSessionPayload(int userID, int groupID, int clientID)
+        {
+            return createRedeemSessionPayload(userID, groupID, clientID, null, null);
+        }
+
+        public string createRedeemSessionPayload(int userID,int groupID,int clientID,string userName,string groupName)
         {
             string rootElemt = "RedeemSessionPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
@@ -58,6 +63,14 @@ namespace iLabs.Ticketing
             keyValueDictionary.Add("groupID", groupID.ToString());
             if(clientID > 0)
                 keyValueDictionary.Add("clientID", clientID.ToString());
+            if (userName != null && userName.Length > 0)
+            {
+                keyValueDictionary.Add("userName", userName);
+            }
+            if (groupName != null && groupName.Length > 0)
+            {
+                keyValueDictionary.Add("groupName", groupName);
+            }
             return writeTicketLoad(rootElemt, TicketTypes.REDEEM_SESSION, keyValueDictionary);
         }
 

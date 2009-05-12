@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
@@ -908,100 +909,136 @@ namespace iLabs.Scheduling.UserSide
         {
             int experimentId = DBManager.ListExperimentInfoIDByExperiment(lsGuid, clientGuid);
             int credId = DBManager.GetCredentialSetID(sbGuid, groupName);
-            return DBManager.SelectReservations(userName, experimentId, credId, start, end);
+            return DBManager.GetReservations(userName, experimentId, credId, start, end);
         }
 
 		/// <summary>
 		/// to select reservation accorrding to given criterion
 		/// </summary>
-		public static ReservationInfo[] SelectReservations(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
-		{
-            StringBuilder sqlQuery = new StringBuilder();
-			ReservationInfo[] reservations = null;
-			ArrayList reInfos = new ArrayList();
-			
-			sqlQuery.Append("select Reservation_ID, User_Name, Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID from Reservations where Credential_Set_ID =" + credentialSetId.ToString() );
-			if(userName != null && userName != "")
-			{
-				sqlQuery.Append(" and [User_Name] = " +"'"+ userName+"'");
+        public static ReservationInfo[] GetReservations(string userName, int experimentInfoId, int credentialSetId, DateTime start, DateTime end)
+        {
+            List<ReservationInfo> reservations = new List<ReservationInfo>();
+            int action = 0;
+            if (experimentInfoId > 0)
+                action |= 1;
+            if (credentialSetId > 0)
+                action |= 2;
+            if (userName != null && userName.Length > 0)
+                action |= 4;
 
-			}
-			if (experimentInfoId!=-1)
-			{
-				
-					sqlQuery.Append(" and Experiment_Info_ID = " + experimentInfoId);
-				
-			}
-			
-            
-			if( (timeBefore.CompareTo(DateTime.MinValue)!=0) & (timeAfter.CompareTo(DateTime.MinValue)!=0))
-			{
-				
-				sqlQuery.Append(" and ( '" + timeBefore + "' > Start_Time and '" + timeAfter + "' < End_Time )");
-			}
-			else if( timeBefore.CompareTo(DateTime.MinValue)!=0)
-			{
-				
-				sqlQuery.Append(" and Start_Time <= '"+timeBefore+"'");;
-			}
-
-			else if (timeAfter.CompareTo(DateTime.MinValue)!=0)
-			{
-				
-				sqlQuery.Append(" and Start_Time >= '"+timeAfter+"'");
-			}
-
-			sqlQuery.Append(" ORDER BY Start_Time asc");
-
-			SqlConnection myConnection = FactoryDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand ();
-			myCommand.Connection = myConnection;
-			myCommand.CommandType = CommandType.Text;
-			myCommand.CommandText = sqlQuery.ToString();;
-
-			try 
-			{
-				myConnection.Open ();
-				
-				// get ReservationInfo info from table reservation
-				SqlDataReader myReader = myCommand.ExecuteReader ();
-				while(myReader.Read ())
-				{	
-					ReservationInfo res = new ReservationInfo();
-					res.reservationId = Convert.ToInt32( myReader["Reservation_ID"]); //casting to (long) didn't work
-					if(myReader["Start_Time"] != System.DBNull.Value )
-						res.startTime = DateUtil.SpecifyUTC((DateTime) myReader["Start_Time"]);
-					if(myReader["End_Time"] != System.DBNull.Value )
-						res.endTime= DateUtil.SpecifyUTC((DateTime) myReader["End_Time"]);
-					if(myReader["Experiment_Info_ID"]!=System.DBNull.Value)
-						res.experimentInfoId=Convert.ToInt32(myReader["Experiment_Info_ID"]);
-					if(myReader["Credential_Set_ID"] != System.DBNull.Value )
-						res.credentialSetId = Convert.ToInt32(myReader["Credential_Set_ID"]);
-					if(myReader["User_Name"] != System.DBNull.Value )
-						res.userName = Convert.ToString(myReader["User_Name"]);
-							
-					reInfos.Add(res);
-
-				}
-				myReader.Close ();
-				
-				reservations = new ReservationInfo[reInfos.Count];
-				for (int i=0;i <reInfos.Count ; i++) 
-				{
-					reservations[i] = (ReservationInfo)reInfos[i];
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in selecting reservation",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-
-			return reservations;
-		}
+            // create sql connection
+            SqlConnection connection = FactoryDB.GetConnection();
+            SqlCommand cmd = null;
+            SqlParameter expParam = null;
+            SqlParameter credParam = null;
+            SqlParameter userParam = null;
+            // create sql command
+            switch (action)
+            {
+                case 0:
+                    cmd = new SqlCommand("RetrieveReservations", connection);
+                    break;
+                case 1:
+                    cmd = new SqlCommand("RetrieveReservationsByExperiment", connection);
+                    break;
+                case 2:
+                    cmd = new SqlCommand("RetrieveReservationsByGroup", connection);
+                    break;
+                case 3:
+                    cmd = new SqlCommand("RetrieveReservationsByGroupAndExperiment", connection);
+                    break;
+                case 4:
+                    throw new Exception("Wrong combination of arguments in selectReservations 4");
+                    break;
+                case 5:
+                    throw new Exception("Wrong combination of arguments in selectReservations 5");
+                    break;
+                case 6:
+                    cmd = new SqlCommand("RetrieveReservationsByUser", connection);
+                    break;
+                case 7:
+                    cmd = new SqlCommand("RetrieveReservationsByAll", connection);
+                    break;
+                default:
+                    throw new Exception("Wrong combination of arguments in selectReservations");
+                    break;
+            }
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlParameter startParam = cmd.Parameters.Add(new SqlParameter("@start", SqlDbType.DateTime));
+            startParam.Value = start;
+            SqlParameter endParam = cmd.Parameters.Add(new SqlParameter("@end", SqlDbType.DateTime));
+            endParam.Value = end;
+            switch (action)
+            {
+                case 0:
+                    break;
+                case 1:
+                    expParam = cmd.Parameters.Add(new SqlParameter("@experInfoID", SqlDbType.Int));
+                    expParam.Value = experimentInfoId;
+                    break;
+                case 2:
+                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
+                    credParam.Value = credentialSetId;
+                    break;
+                case 3:
+                    expParam = cmd.Parameters.Add(new SqlParameter("@experInfoID", SqlDbType.Int));
+                    expParam.Value = experimentInfoId;
+                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
+                    credParam.Value = credentialSetId;
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
+                    credParam.Value = credentialSetId;
+                    userParam = cmd.Parameters.Add(new SqlParameter("@userName", SqlDbType.VarChar, 256));
+                    userParam.Value = userName;
+                    break;
+                case 7:
+                    expParam = cmd.Parameters.Add(new SqlParameter("@experInfoID", SqlDbType.Int));
+                    expParam.Value = experimentInfoId;
+                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
+                    credParam.Value = credentialSetId;
+                    userParam = cmd.Parameters.Add(new SqlParameter("@userName", SqlDbType.VarChar, 256));
+                    userParam.Value = userName;
+                    break;
+                default:
+                    break;
+            }
+            SqlDataReader dataReader = null;
+            try
+            {
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    ReservationInfo reservation = new ReservationInfo();
+                    reservation.reservationId = dataReader.GetInt32(0); ;
+                    if (dataReader[1] != System.DBNull.Value)
+                        reservation.userName = dataReader.GetString(1);
+                    if (dataReader[2] != System.DBNull.Value)
+                        reservation.startTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
+                    if (dataReader[3] != System.DBNull.Value)
+                        reservation.endTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(3));
+                    if (dataReader[4] != System.DBNull.Value)
+                        reservation.credentialSetId = (int)dataReader.GetInt32(4);
+                    if (dataReader[5] != System.DBNull.Value)
+                        reservation.experimentInfoId = (int)dataReader.GetInt32(5);
+                    reservations.Add(reservation);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return reservations.ToArray();
+        }
 
 		    /* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information
