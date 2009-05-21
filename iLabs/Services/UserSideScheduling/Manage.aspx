@@ -52,7 +52,7 @@
 									</tr>
 									<tr>
 										<th style="width: 151px">
-										<asp:label  ID="lblfield3" runat="server" Font-Size="Smaller">Minimun time required</asp:label></th>
+										<asp:label  ID="lblfield3" runat="server" Font-Size="Smaller">Minimum time required</asp:label></th>
 											
 										<td style="width: 454px"><asp:textbox id="txtMinReservableTimeSlots" Runat="server" Width="100%"></asp:textbox>
 											</td>

@@ -23,13 +23,12 @@ namespace iLabs.Controls.Scheduling
    
     public class SchedulingControl : DataBoundControl, IPostBackEventHandler
     {
-
-
         DateTime startTime;
         DateTime endTime;
         TimeSpan maxTOD;
         TimeSpan minTOD;
         TimeSpan minDuration;
+        TimeSpan tzSpan;
     
         int numCols;
         CultureInfo culture;
@@ -47,27 +46,18 @@ namespace iLabs.Controls.Scheduling
         bool bindReservations = false;
         bool hours24 = false;
 
-
         int columnWidth = 120;
         int headerHeight = 25;
         int hourHeight = 40;
         int hourWidth = 40; 
         int defaultCellDuration = 30;
         int userTZ;
-
-        
-        
-        
-        
         Unit scheduleWidth = new Unit("100%");
         
         Color availableColor = ColorTranslator.FromHtml("#55ff55");
         Color scheduledColor = ColorTranslator.FromHtml("#aaaaaa");
         Color timeBorderColor = ColorTranslator.FromHtml("#000000");
         Color voidColor = ColorTranslator.FromHtml("#ff0000");
-
-
-
 
         public DateTime StartTime
         {
@@ -118,6 +108,7 @@ namespace iLabs.Controls.Scheduling
             set
             {
                 userTZ = value;
+                tzSpan = TimeSpan.FromMinutes(userTZ);
             }
         }
         public CultureInfo Culture
@@ -242,10 +233,6 @@ namespace iLabs.Controls.Scheduling
                 hourWidth = value;
             }
         }
-
-        
-       
-        
         
         public Unit ScheduleWidth
         {
@@ -311,9 +298,10 @@ namespace iLabs.Controls.Scheduling
         /// <param name="output"></param>
         protected override void Render(HtmlTextWriter output)
         {
+           
             Type bType = Page.Request.Browser.TagWriter;
             output.WriteLine();
-            output.Write("<!- Scheduling Table -->");
+            output.WriteLine("<!- Scheduling Table -->");
             // <table>
             output.AddAttribute("id", ID);
             output.AddAttribute("class", scheduleTableClass);
@@ -358,7 +346,7 @@ namespace iLabs.Controls.Scheduling
             //output.AddStyleAttribute("left", offset.ToString() + "px");
             output.RenderBeginTag("td");
             output.WriteLine();
-            output.Write("<!- Hour Table -->");
+            output.WriteLine("<!- Hour Table -->");
             output.AddAttribute("class", hourTableClass);         
             output.AddAttribute("width", hourWidth + "px");
             output.AddAttribute("cellpadding", "0");
@@ -440,7 +428,12 @@ namespace iLabs.Controls.Scheduling
             output.WriteLine();
             return HourHeight;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="day">UTC corrected TZ start of day</param>
+        /// <param name="offset"></param>
         private void renderDay(HtmlTextWriter output, DateTime day, int offset)
         {
             output.WriteLine();
@@ -496,7 +489,7 @@ namespace iLabs.Controls.Scheduling
         private void renderTimePeriods(HtmlTextWriter output, DateTime date, IEnumerable periods)
         {
           
-            TimeBlock validTime = new TimeBlock(date.Date.AddHours((int)minTOD.Hours).AddMinutes(-userTZ), date.Date.AddHours((int)maxTOD.TotalHours).AddMinutes(-userTZ));
+            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.AddHours((int)maxTOD.TotalHours));
             if (periods != null)
             {
                 IEnumerator enumTP = null;
@@ -587,11 +580,12 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("cursor", "hand");
             output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
             output.AddStyleAttribute("height", height + "px");
+            output.AddAttribute("title", tb.Start.AddMinutes(userTZ).TimeOfDay.ToString() + " - " + tb.End.AddMinutes(userTZ).TimeOfDay.ToString());
             output.RenderBeginTag("td");
-            if(height > 24)
-                output.Write(tb.Start.AddMinutes(userTZ).TimeOfDay );
-            if(height > 48)
-                output.Write(" - " + tb.End.AddMinutes(userTZ).TimeOfDay);
+            //if(height > 24)
+            //    output.Write(tb.Start.AddMinutes(userTZ).TimeOfDay );
+            //if(height > 48)
+            //    output.Write(" - " + tb.End.AddMinutes(userTZ).TimeOfDay);
             output.RenderEndTag();
             output.RenderEndTag();
             return height;
@@ -738,7 +732,7 @@ namespace iLabs.Controls.Scheduling
 
                 TimeSpan tmpTS;
                 TimeSpan oneDay = TimeSpan.FromDays(1);
-                maxTOD = TimeSpan.Zero;
+                maxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
                 minTOD = oneDay;
 
                 foreach (ITimeBlock tb in schedulingData)

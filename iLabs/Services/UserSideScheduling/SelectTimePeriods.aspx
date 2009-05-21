@@ -36,6 +36,7 @@
 			<div id="pageintro">
                     <h3><asp:label id="lblTitleofSchedule"  Runat="server" 
 						text="Please select the general starting time of the reservation."></asp:label></h3>
+					 <p><asp:Label ID="lblTimezone" runat="server" ></asp:Label></p>
                      <p><asp:Label ID="lblUssPolicy" runat="server" ></asp:Label></p>
 					 <p><asp:label id="lblErrorMessage" EnableViewState="False" Visible="False" Runat="server"></asp:label></p>
 			</div>
@@ -43,7 +44,8 @@
 			<table>
 			<tr><th>Available Times</th><th>Reservation Details</th></tr>
 			<tr>
-			    <td><iLab:SchedulingControl id="cntrScheduling"  runat="server" Hours24="false" BorderColor="black"  OnAvailableClick="TimePeriod_Click"></iLab:SchedulingControl></td>
+			    <td><iLab:SchedulingControl id="cntrScheduling" runat="server" Hours24="false" BorderColor="black"  
+			    OnAvailableClick="TimePeriod_Click"></iLab:SchedulingControl></td>
 			    <td style="vertical-align:top">
 			        <table style="vertical-align:top">
 			            <tr style="vertical-align:top">
@@ -60,7 +62,7 @@
 				        </tr>
 				        <tr style="vertical-align:top">
 					        <th>Duration</th>
-					        <td><asp:DropDownList ID="ddlDuration" runat="server" Width="120px"></asp:DropDownList></td>
+					        <td><asp:DropDownList ID="ddlDuration" runat="server" Width="120px"></asp:DropDownList>&nbsp;&nbsp;(hh:mm)</td>
 				        </tr>
 				        <tr style="vertical-align:top">
 					        <td style="height: 15px"></td>

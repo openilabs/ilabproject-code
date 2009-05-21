@@ -327,7 +327,7 @@ namespace iLabs.Scheduling.UserSide
             }
             catch (Exception ex)
             {
-                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer in the Minimun Reservable Time text box.");
+                lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter an integer in the Minimum Reservable Time text box.");
                 lblErrorMessage.Visible = true;
                 return;
             }

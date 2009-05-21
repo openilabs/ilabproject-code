@@ -75,7 +75,7 @@ namespace iLabs.Scheduling.UserSide
 
             lblDescription.Text = "Select the date that you would like to schedule a reservation."
                           + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
-            calDate.SelectionMode = CalendarSelectionMode.DayWeek;
+            calDate.SelectionMode = CalendarSelectionMode.Day;
             if (!IsPostBack)
             {
                 if (Request.QueryString["refresh"] != null && Session["coupon"] != null)
@@ -138,6 +138,9 @@ namespace iLabs.Scheduling.UserSide
                     //showDefaultAvailableTime();
                     //lbldatetimeformat1.Text = culture.DateTimeFormat.ShortDatePattern;
                     //lbldatetimeformat2.Text = culture.DateTimeFormat.ShortDatePattern;
+                }
+                if(Session["userTZ"] != null){
+                    calDate.TodaysDate = DateTime.UtcNow.AddMinutes(Convert.ToInt32(Session["userTZ"])).Date;
                 }
             }
             coupon = (Coupon)Session["coupon"];
@@ -483,7 +486,7 @@ namespace iLabs.Scheduling.UserSide
         {
             lblErrorMessage.Visible = false;
 
-            DateTime targetDay = calDate.SelectedDate.ToUniversalTime();
+            DateTime targetDay = DateUtil.SpecifyUTC(calDate.SelectedDate).AddMinutes(-userTZ);
             DateTime current = DateTime.UtcNow; 
             DateTime startTime;
             DateTime endTime;

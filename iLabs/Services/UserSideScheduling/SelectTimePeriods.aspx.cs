@@ -55,8 +55,43 @@ namespace iLabs.Scheduling.UserSide
         ProcessAgentDB dbTicketing = new ProcessAgentDB();
         List<TimePeriod> periods = null;
         int defaultRange = 30;
+        int quantum;
+        DateTime endTimePeriod;
         TimeSpan maxAllowTime;
         TimeSpan minRequiredTime;
+        TimeSpan minTime;
+
+        protected override void LoadViewState(object savedState)
+        {
+            if (savedState == null)
+                return;
+
+            object[] vs = (object[])savedState;
+
+            if (vs.Length != 3)
+                throw new ArgumentException("Wrong savedState object.");
+
+            if (vs[0] != null)
+                base.LoadViewState(vs[0]);
+
+            if (vs[1] != null)
+                quantum = (int)vs[1];
+            if (vs[2] != null)
+                endTimePeriod = (DateTime)vs[2];
+        }
+
+        /// <summary>
+        /// Saves ViewState.
+        /// </summary>
+        /// <returns></returns>
+        protected override object SaveViewState()
+        {
+            object[] vs = new object[3];
+            vs[0] = base.SaveViewState();
+            vs[1] = quantum;
+            vs[2] = endTimePeriod;
+            return vs;
+        }
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -121,6 +156,7 @@ namespace iLabs.Scheduling.UserSide
                     }
                     lblUssPolicy.Text = "Minimum time required: " + minRequiredTime + "<br />Maximum time allowed: " + maxAllowTime;
                 }
+                lblTimezone.Text = "Times are GMT " + userTZ / 60.0;
             }
             getTimePeriods();
 		}
@@ -166,6 +202,11 @@ namespace iLabs.Scheduling.UserSide
                 cntrScheduling.Visible=false;
             }
             else{
+                if (availablePeriods.Length > 0)
+                {
+                    minTime = availablePeriods[0].quantum > minRequiredTime.TotalMinutes
+                        ? TimeSpan.FromMinutes(availablePeriods[0].quantum) : minRequiredTime;
+                }
                 cntrScheduling.Visible = true;
                 cntrScheduling.StartTime = startTime;
                 cntrScheduling.EndTime = endTime;
@@ -180,10 +221,12 @@ namespace iLabs.Scheduling.UserSide
         protected void TimePeriod_Click(object sender, System.EventArgs e)
         {
             AvailableClickEventArgs args = (AvailableClickEventArgs)e;
-            int quantum = args.Quantum;
+            quantum = args.Quantum;
             TimeSpan quantTS = TimeSpan.FromMinutes(quantum);
             TimeSpan duration = TimeSpan.FromSeconds(args.Duration);
+            endTimePeriod = args.Start.Add(duration);
             DateTime endTime = args.Start.Add(duration).Subtract(minRequiredTime);
+            TimeSpan span;
             StringBuilder buf = new StringBuilder();
             //buf.Append("StartTime: " + args.Start.ToString("o") + "<br />&nbsp;&nbsp;Duration: " + duration.ToString() + " Quant: " + quantum + "<br />");
             buf.Append("The minimum time required for this experiment is: " + minRequiredTime.ToString() + ".<br />");
@@ -192,16 +235,44 @@ namespace iLabs.Scheduling.UserSide
 
             ddlSelectTime.Items.Clear();
             ddlDuration.Items.Clear();
-            DateTime wrkTime = args.Start.AddMinutes((args.Start.Minute % args.Quantum));
+            DateTime wrkTime = args.Start;
             int count = 0;
-           
+            int qOff = wrkTime.Minute % quantum;
+            int quantOffset = 0; 
+            if (qOff != 0)
+            {
+                quantOffset = quantum - qOff;
+                ddlSelectTime.Items.Add(new ListItem(DateUtil.ToUserTime(wrkTime, culture, userTZ)));
+                wrkTime = wrkTime.AddMinutes(quantOffset);
+                //count += quantOffset;
+            }
             while ((count <= defaultRange) && (wrkTime <= endTime))
             {
                 ddlSelectTime.Items.Add(new ListItem(DateUtil.ToUserTime(wrkTime, culture, userTZ)));
                 wrkTime = wrkTime.AddMinutes(quantum);
                 count += quantum;
             }
-            TimeSpan span = minRequiredTime;
+            if(quantOffset != 0){
+               
+                if (minRequiredTime.TotalMinutes <= quantOffset)
+                {
+                    span = TimeSpan.FromMinutes(quantOffset);
+                }
+                else
+                {
+                    int off = (Convert.ToInt32(minRequiredTime.TotalMinutes) + qOff) % quantum;
+                    span = TimeSpan.FromMinutes(minRequiredTime.TotalMinutes + off);
+                }
+            }
+            else{
+                if(minRequiredTime <= quantTS){
+                    span = quantTS;
+                }
+                else{
+                    int offset = quantum - (Convert.ToInt32(minRequiredTime.TotalMinutes) % quantum);
+                    span = minRequiredTime.Add(TimeSpan.FromMinutes(offset));
+                }
+            }
             ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), Convert.ToInt32(span.TotalSeconds).ToString()));
             span = span.Add(quantTS);
             span = span.Subtract(TimeSpan.FromMinutes((double)(span.Minutes % quantum)));
@@ -210,8 +281,10 @@ namespace iLabs.Scheduling.UserSide
                 ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), Convert.ToInt32(span.TotalSeconds).ToString()));
                 span = span.Add(quantTS);
             }
-            if( (span <= maxAllowTime) && (endTime >= args.Start.Add(span)))
-                ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(maxAllowTime), Convert.ToInt32(maxAllowTime.TotalSeconds).ToString()));
+            //if( (span < maxAllowTime) && (endTime >= args.Start.Add(span)))
+                //ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(maxAllowTime), Convert.ToInt32(maxAllowTime.TotalSeconds).ToString()));
+            if( (span < maxAllowTime) && (maxAllowTime >= duration))
+                ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(duration), Convert.ToInt32(duration.TotalSeconds).ToString()));
         }
 
 
@@ -220,6 +293,18 @@ namespace iLabs.Scheduling.UserSide
             // ToDo: Add error checking
             DateTime startReserveTime = DateUtil.ParseUserToUtc(ddlSelectTime.SelectedItem.Text, culture, userTZ);
             DateTime endReserveTime = startReserveTime.AddSeconds(Double.Parse(ddlDuration.SelectedValue));
+            if ((endReserveTime.Minute % quantum) != 0)
+            {
+                DateTime dt = endReserveTime.AddMinutes(quantum - (endReserveTime.Minute % quantum));
+                if (dt <= endTimePeriod)
+                {
+                    endReserveTime = dt;
+                }
+                else
+                {
+                    endReserveTime = endTimePeriod;
+                }
+            }
             lblErrorMessage.Text = ddlSelectTime.SelectedItem.Text + " " + DateUtil.ToUserTime(endReserveTime, culture, -userTZ);
             lblErrorMessage.Visible = true;
             string notification = null;
@@ -246,7 +331,9 @@ namespace iLabs.Scheduling.UserSide
                     {
                         int status = USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid, groupName, labServerGuid, clientGuid, 
                             startReserveTime, endReserveTime);
-                        lblErrorMessage.Text = Utilities.FormatConfirmationMessage(notification);
+                        string confirm = "The reservation from<br />" + DateUtil.ToUserTime(startReserveTime,culture,userTZ)
+                            + " to " + DateUtil.ToUserTime(endReserveTime, culture, userTZ) + "<br />is confirmed.";
+                        lblErrorMessage.Text = Utilities.FormatConfirmationMessage(confirm);
                     }
                     catch(Exception insertEx){
                         lblErrorMessage.Text = Utilities.FormatErrorMessage(notification);
