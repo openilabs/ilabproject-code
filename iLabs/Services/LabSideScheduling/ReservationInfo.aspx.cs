@@ -35,6 +35,7 @@ namespace iLabs.Scheduling.LabSide
         string labServerName = null;
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         int userTZ = 0;
+        int localTzOffset;
         
 
 
@@ -61,7 +62,7 @@ namespace iLabs.Scheduling.LabSide
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
-           
+            localTzOffset = DateUtil.LocalTzOffset;
             if (!IsPostBack)
             {
                 lblDateTimeFormat.Text = culture.DateTimeFormat.ShortDatePattern;
@@ -117,8 +118,12 @@ namespace iLabs.Scheduling.LabSide
                         userTZ = Convert.ToInt32(payload.GetElementsByTagName("userTZ")[0].InnerText);
                         Session["userTZ"] = userTZ;
 
-                        lblDescription.Text = "Select criteria for the reservations displayed."
-                           + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
+                        StringBuilder buf = new StringBuilder("Select criteria for the reservations displayed.<br/><br/>Times shown are LSS local time GMT:&nbsp;&nbsp;&nbsp;");
+                        if(localTzOffset > 0)
+                            buf.Append("+");
+                        buf.Append(localTzOffset / 60.0);
+                        buf.Append(".");
+                        lblDescription.Text =  buf.ToString();
 
                     }
 
@@ -172,7 +177,7 @@ namespace iLabs.Scheduling.LabSide
 			txtDisplay.Text=null;
 			try
 			{
-                IntTag[] reservations = LSSSchedulingAPI.ListReservations(labServerGuid, DateTime.MinValue, DateTime.MinValue, culture, userTZ);
+                IntTag[] reservations = LSSSchedulingAPI.ListReservations(labServerGuid, DateTime.MinValue, DateTime.MinValue, culture, localTzOffset);
                 if (reservations == null || reservations.Length == 0)
 				{
 					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been found.");
@@ -202,7 +207,7 @@ namespace iLabs.Scheduling.LabSide
 			try
 			{
 				txtDisplay.Text=null;
-                IntTag[] reservations = LSSSchedulingAPI.ListReservations(ExperimentInfoID, CredentialSetID, time1, time2, culture, userTZ);
+                IntTag[] reservations = LSSSchedulingAPI.ListReservations(ExperimentInfoID, CredentialSetID, time1, time2, culture, localTzOffset);
                 if (reservations == null || reservations.Length == 0)
                 {
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("no reservations have been found.");
@@ -253,7 +258,7 @@ namespace iLabs.Scheduling.LabSide
 					DateTime time1;
 					try
 					{
-						time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,userTZ);
+						time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,localTzOffset);
 					}
 					catch
 					{	
@@ -283,7 +288,7 @@ namespace iLabs.Scheduling.LabSide
 						DateTime time2;
 						try
 						{
-                            time2 = DateUtil.ParseUserToUtc(txtTime2.Text, culture, userTZ);
+                            time2 = DateUtil.ParseUserToUtc(txtTime2.Text, culture, localTzOffset);
                             start = time1;
                             end = time2;
 						}

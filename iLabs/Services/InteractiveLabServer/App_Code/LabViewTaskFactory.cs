@@ -73,6 +73,7 @@ namespace iLabs.LabServer.LabView
             if (appInfo.extraInfo != null)
             {
                 // Note should have either statusVI or template pair
+                // Add Option for VNCserver access
                 XmlQueryDoc viDoc = new XmlQueryDoc(appInfo.extraInfo);
                 statusViName = viDoc.Query("extra/status");
                 statusTemplate = viDoc.Query("extra/statusTemplate");
@@ -212,19 +213,6 @@ namespace iLabs.LabServer.LabView
                 
                 if (((essService != null) && (essService.Length > 0)) && ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0)))
                 {
-                    /* currently not working
-                    // Try & see if the new CreateESSproxy exists and initialize it
-                    VirtualInstrument essCreateVi = null;
-                    essCreateVi = lvi.GetSubVI(vi, "CreateESSproxy.vi");
-                    if (essCreateVi != null)
-                    {
-                        essCreateVi.SetControlValue("couponId", expCoupon.couponId);
-                        essCreateVi.SetControlValue("issuerGuid", expCoupon.issuerGuid);
-                        essCreateVi.SetControlValue("passket", expCoupon.passkey);
-                        vi.SetControlValue("experimentID", experimentID);
-                    }
-                    */
-
                     // Create DataSourceManager to manage dataSocket connections
                     dsManager = new DataSourceManager();
                  

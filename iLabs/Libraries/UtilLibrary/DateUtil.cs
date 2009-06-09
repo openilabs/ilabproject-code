@@ -68,6 +68,21 @@ namespace iLabs.UtilLib
             return status;
         }
 
+      
+
+        /// <summary>
+        /// Returns the local UTC timezone offset in minutes
+        /// </summary>
+        public static int LocalTzOffset
+        {
+            get
+            {
+                TimeZone localTZ = TimeZone.CurrentTimeZone;
+                TimeSpan tzLocalOffset = localTZ.GetUtcOffset(DateTime.Now);
+                return Convert.ToInt32(tzLocalOffset.TotalHours * 60);
+            }
+        }
+
         /// <summary>
         /// Parses a local format DateTime String and converts it to a UTC DaterTime object.
         /// </summary>

@@ -33,12 +33,15 @@ namespace iLabs.Scheduling.LabSide
         string labServerGuid = null;
         string labServerName = null;
         int userTZ = 0;
+        int localTzOffset = 0;
         CultureInfo culture;
+        
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            localTzOffset = DateUtil.LocalTzOffset;
 			credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
 			credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this recurring time block?')== false) return false;");
@@ -129,9 +132,11 @@ namespace iLabs.Scheduling.LabSide
                 labServerName = (string) Session["labServerName"];
 
             }
-            lblDescription.Text = "Create, modify or delete recurring time blocks."
-                         + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
-
+            StringBuilder buf = new StringBuilder("Create, modify or delete recurring time blocks.<br/><br/>Times shown are Local LSS time UTC&nbsp;&nbsp;&nbsp;");
+            if (localTzOffset > 0)
+                buf.Append("+");
+            buf.Append(localTzOffset / 60.0);
+            lblDescription.Text = buf.ToString();
 		}
 		
 
@@ -202,14 +207,15 @@ namespace iLabs.Scheduling.LabSide
                // string labServerName = LSSSchedulingAPI.RetrieveLabServerName(recur.labServerGuid);
                 buf.Append(String.Format("{0,-30}",Session["labServerName"].ToString() + ": "));
                
-                buf.Append(String.Format("{0,-10}",DateUtil.ToUserDate(recur.startDate, culture, userTZ)));
+                buf.Append(String.Format("{0,-10}",DateUtil.ToUserTime(recur.startDate, culture, localTzOffset)));
                 buf.Append(" -- " );
-                buf.Append(String.Format("{0,10}", DateUtil.ToUserDate(recur.startDate.AddDays(recur.numDays -1), culture, userTZ)));
+                buf.Append(String.Format("{0,10}", DateUtil.ToUserTime(recur.startDate.AddDays(recur.numDays), culture, localTzOffset)));
                 
                 buf.Append(String.Format(" {0,-15}",recur.recurrenceType + ":"));
-                TimeSpan tzOffset = TimeSpan.FromMinutes(userTZ);
-
-                buf.Append(recur.startOffset + " -- " + recur.endOffset);
+                TimeSpan tzOffset = TimeSpan.FromMinutes(localTzOffset);
+                DateTime localStart = recur.startDate.AddMinutes(localTzOffset);
+                buf.Append(localStart.Add(recur.startOffset).TimeOfDay + " -- " + localStart.Add(recur.endOffset).TimeOfDay);
+                //buf.Append(recur.startOffset + " -- " + recur.endOffset);
                 if(recur.recurrenceType == Recurrence.RecurrenceType.Weekly){
                     buf.Append(" Days: ");
                    buf.Append(DateUtil.ListDays(recur.dayMask,culture));

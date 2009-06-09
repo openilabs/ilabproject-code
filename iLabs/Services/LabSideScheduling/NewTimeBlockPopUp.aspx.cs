@@ -24,26 +24,22 @@ namespace iLabs.Scheduling.LabSide
         LssCredentialSet[] credentialSets;
         CultureInfo culture = null;
         int userTZ = 0;
-        //double localTZ = 0;
-        TimeSpan tzOffset = TimeSpan.MinValue;
+        int localTzOffset = 0;
         StringBuilder buf = null;
+        //TimeSpan tzOffset = TimeSpan.MinValue;
 
         public double LocalTZ
         {
             get
             {
-                if (tzOffset.CompareTo(TimeSpan.MinValue) == 0)
-                {
-                    TimeZone localTZ = TimeZone.CurrentTimeZone;
-                    tzOffset = localTZ.GetUtcOffset(DateTime.Now);
-                }
-                return tzOffset.TotalHours;
+                return localTzOffset/60.0;
             }
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            localTzOffset = DateUtil.LocalTzOffset;
             userTZ = (int)Session["userTZ"];
             
 
@@ -260,7 +256,7 @@ namespace iLabs.Scheduling.LabSide
                 TimeSpan numDays = endDate - startDate;
                 numDays.Add(TimeSpan.FromDays(1));
                 recur.numDays = (int)numDays.TotalDays;
-                recur.startDate = startDate.AddMinutes(-userTZ);
+                recur.startDate = startDate.AddMinutes(-localTzOffset);
                 recur.startOffset = startTime;
                 recur.endOffset = endTime;
                 recur.dayMask = 0;
@@ -367,9 +363,9 @@ namespace iLabs.Scheduling.LabSide
             // tell whether the recurrence recur is overlapping with the input recurrence
             buf.Append("Conflict with recurrence ");
             buf.Append(recur.recurrenceId + ": " + recur.recurrenceType + " ");
-            buf.Append(DateUtil.ToUserDate(recur.startDate, culture, userTZ) + "->");
-            buf.Append(DateUtil.ToUserDate(recur.startDate.AddDays(recur.numDays -1), culture, userTZ) + " ");
-            TimeSpan offset = TimeSpan.FromHours(LocalTZ);
+            buf.Append(DateUtil.ToUserDate(recur.startDate, culture, localTzOffset) + "->");
+            buf.Append(DateUtil.ToUserDate(recur.startDate.AddDays(recur.numDays -1), culture, localTzOffset) + " ");
+            TimeSpan offset = TimeSpan.FromMinutes(localTzOffset);
             buf.Append(recur.startOffset.Add(offset) + " -- " + recur.endOffset.Add(offset));
             buf.AppendLine("<br />");
         }

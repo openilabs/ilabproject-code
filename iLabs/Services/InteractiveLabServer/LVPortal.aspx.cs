@@ -104,7 +104,7 @@ namespace iLabs.LabServer.LabView
                     appInfo = dbManager.GetLabApp(appKey);
                 }
                 else // Have to use groupName & Servicebroker THIS REQUIRES groups & permissions are set in database
-                {
+                {    // This is no longer the case as the USS handles groups and permissions
                     appInfo = dbManager.GetLabAppForGroup(groupName, sbStr);
                 }
                 if (appInfo == null)
