@@ -30,30 +30,30 @@
                                 User Name
                             </label>
                         </th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtUsername" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 335px">
+                            <asp:TextBox ID="txtUsername" runat="server" ReadOnly="True" Width="330px"></asp:TextBox>
                         </td>
                         <th style="height: 23px">
                             <label for="groupname">
                                 Effective Group Name
                             </label>
                         </th>
-                        <td style="height: 23px; style="width: 206px">
-                            <asp:TextBox ID="txtGroupName" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="height: 23px; width: 272px">
+                            <asp:TextBox ID="txtGroupName" runat="server" ReadOnly="True" Width="270px"></asp:TextBox>
                         </td>
                     </tr>
                     <tr>
                         <th>
                             <label for="labservername">
                                 Lab Server Name</label></th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtLabServerName" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 335px">
+                            <asp:TextBox ID="txtLabServerName" runat="server" ReadOnly="True" Width="330px"></asp:TextBox>
                         </td>
                         <th>
                             <label for="labclientname">
                                 Lab Client Name</label></th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtClientName" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 272px">
+                            <asp:TextBox ID="txtClientName" runat="server" ReadOnly="True" Width="270px"></asp:TextBox>
                         </td>
                     </tr>
                     <tr>
@@ -62,16 +62,16 @@
                                 Submission Time
                             </label>
                         </th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtSubmissionTime" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 335px">
+                            <asp:TextBox ID="txtSubmissionTime" runat="server" ReadOnly="True" Width="330px"></asp:TextBox>
                         </td>
                         <th>
                             <label for="comtime">
                                 Completion Time
                             </label>
                         </th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtCompletionTime" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 272px">
+                            <asp:TextBox ID="txtCompletionTime" runat="server" ReadOnly="True" Width="270px"></asp:TextBox>
                         </td>
                     </tr>
                     <tr>
@@ -80,15 +80,15 @@
                                 Total Records
                             </label>
                         </th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtRecordCount" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 335px">
+                            <asp:TextBox ID="txtRecordCount" runat="server" ReadOnly="True" Width="330px"></asp:TextBox>
                         </td>
                         <th>
                             <label for="status">
                                 Status</label>
                         </th>
-                        <td style="width: 206px">
-                            <asp:TextBox ID="txtStatus" runat="server" ReadOnly="True" Width="200px"></asp:TextBox>
+                        <td style="width: 272px">
+                            <asp:TextBox ID="txtStatus" runat="server" ReadOnly="True" Width="270px"></asp:TextBox>
                         </td>
                     </tr>
                     <tr>
@@ -103,13 +103,20 @@
                         <th>
                             &nbsp;
                         </th>
-                        <th style="text-align:left">
+                        <th style="text-align:left; width: 335px;">
                             <asp:Button ID="btnSaveAnnotation" runat="server" Text="Save Annotation" CssClass="button"
                                 OnClick="btnSaveAnnotation_Click" ></asp:Button>
+                            <asp:Button ID="btnBack" runat="server" Text="Back to Experiments" CssClass="button"
+                                OnClick="btnBack_Click" ></asp:Button>
                          </th>
                          <th colspan="2" style="text-align:right">
                             <asp:Button ID="btnDeleteExperiment" runat="server" Text="Delete Experiment" CssClass="button"
                                 OnClick="btnDeleteExperiment_Click"></asp:Button>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="4">
+                            &nbsp;
                         </th>
                     </tr>
                     <tr>
@@ -127,7 +134,7 @@
             </table>
         </div>
        
-        <div id="divRecords" runat="server">
+        <div id="divRecords" runat="server" >
             <p>
                 &nbsp;</p>
             <h4>
@@ -135,7 +142,7 @@
             <asp:TextBox ID="txtExperimentRecords" runat="server" Width="700px" Height="156px"
                 TextMode="MultiLine"></asp:TextBox>
             <asp:GridView ID="grvExperimentRecords" runat="server" Width="700px" CellPadding="5"
-                AutoGenerateColumns="False" HeaderStyle-Font-Bold="true">
+                AutoGenerateColumns="False" HeaderStyle-Font-Bold="true" BorderColor="black">
                 <Columns>
                     <asp:BoundField DataField="Seq_Num" HeaderText="Seq_Num" ReadOnly="True">
                         <HeaderStyle Font-Bold="True" HorizontalAlign="center" Width="80px" Wrap="False" />
@@ -159,7 +166,7 @@
                 Experiment BLOBS</h4>
             <asp:GridView ID="grvBlobs" runat="server" CellPadding="5" Width="700px" AutoGenerateColumns="False"
                 HeaderStyle-Font-Bold="True" OnRowDataBound="On_BindBlobRow" OnRowCommand="On_BlobSelected"
-                HeaderStyle-HorizontalAlign="Center">
+                HeaderStyle-HorizontalAlign="Center" BorderColor="black">
                 <Columns>
                     <asp:TemplateField HeaderText="Select" HeaderStyle-HorizontalAlign="Center">
                         <HeaderStyle Font-Bold="True" HorizontalAlign="Center" Width="80px" Wrap="False" />

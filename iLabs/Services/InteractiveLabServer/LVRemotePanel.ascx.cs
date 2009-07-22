@@ -1,4 +1,4 @@
-#define LabVIEW_82
+#define LabVIEW_86
 
 namespace iLabs.LabServer.LabView
 {
@@ -22,7 +22,7 @@ namespace iLabs.LabServer.LabView
         public string version = "8.2";
 #endif
 #if LabVIEW_86
-        public string version= = "8.6";
+        public string version= "8.6";
 #endif
         public string viName = null;
         public string serverURL = null;

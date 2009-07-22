@@ -840,6 +840,53 @@ namespace iLabs.ServiceBroker.Internal
 			return lcIDs;
 		}
 
+        public static int DeleteLabClient(int clientID)
+        {
+            int count = -1;
+            SqlConnection myConnection = new SqlConnection(ConfigurationSettings.AppSettings["sqlConnection"]);
+            SqlCommand myCommand = new SqlCommand("DeleteLabClient", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(new SqlParameter("@labClientID", null));
+
+            /*
+             * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
+             * extremely inefficient and hence this method was chosen
+             */
+
+            try
+            {
+                myConnection.Open();
+
+                // Deleting from table LabClients
+                /*	IMPORTANT ! - The database if currently set to Cascade delete, where deleting an experiment will automatically
+                 *  delete the relevant Lab_Server_to_Client_Map records. If Cascade Delete is not to be used, then the code to delete the extra records
+                 *  in the map table when a lab client is deleted should be added in the stored procedure
+                 *  
+                 * Also, the qualifiers pertaining to the lab client are automatically
+                 * deleted in the 'DeleteLabClient' stored procedure. This preserves consistency
+                 * and gets rid of unnecessary rollback mechanisms that would otherwise have 
+                 * to be implemented. - CV, 4/29/05
+                 */
+                myCommand.Parameters["@labClientID"].Value = clientID;
+                count = myCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in DeleteLabClients", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            if (count > 0)
+            {
+                // refresh in memory Q & Q-H cache - since the lab server qualifiers are automatically deleted
+                AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
+                AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
+            }
+            return count;
+        }
+
         public static int SelectLabClientId(string guid)
         {
             int id = -1;
@@ -2009,9 +2056,9 @@ namespace iLabs.ServiceBroker.Internal
                         if (myReader["client_id"] != System.DBNull.Value)
                             us[i].groupID = Convert.ToInt32(myReader["client_id"]);
 						if(myReader["session_start_time"] != System.DBNull.Value )
-							us[i].sessionStartTime = (DateTime) myReader["session_start_time"];
+							us[i].sessionStartTime = DateUtil.SpecifyUTC((DateTime) myReader["session_start_time"]);
 						if(myReader["session_end_time"] != System.DBNull.Value )
-							us[i].sessionEndTime= (DateTime) myReader["session_end_time"];
+							us[i].sessionEndTime= DateUtil.SpecifyUTC((DateTime) myReader["session_end_time"]);
 						if(myReader["session_key"] != System.DBNull.Value )
 							us[i].sessionKey= ((string)myReader["session_key"]);
                         if (myReader["tz_offset"] != System.DBNull.Value)
@@ -2097,9 +2144,9 @@ namespace iLabs.ServiceBroker.Internal
 						UserSession us = new UserSession();
 						us.sessionID = Convert.ToInt64( myReader["session_id"]); //casting to (long) didn't work
 						if(myReader["session_start_time"] != System.DBNull.Value )
-							us.sessionStartTime = (DateTime) myReader["session_start_time"];
+							us.sessionStartTime = DateUtil.SpecifyUTC((DateTime) myReader["session_start_time"]);
 						if(myReader["session_end_time"] != System.DBNull.Value )
-							us.sessionEndTime= (DateTime) myReader["session_end_time"];
+							us.sessionEndTime= DateUtil.SpecifyUTC((DateTime) myReader["session_end_time"]);
 						if(myReader["user_id"]!=System.DBNull.Value)
 							us.userID=Convert.ToInt32(myReader["user_id"]);
 						if(myReader["effective_group_id"] != System.DBNull.Value )

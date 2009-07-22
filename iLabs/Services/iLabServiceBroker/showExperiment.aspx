@@ -29,7 +29,7 @@ Please see license.txt in top level directory for full license.
 				<br clear="all" />
 				<div id="innerwrapper">
 					
-							<uc1:displayExperiment id="showExperiment1" runat="server"></uc1:displayExperiment>
+							<uc1:displayExperiment id="showExperiment1" runat="server" backUrl="~/myExperiments.aspx"></uc1:displayExperiment>
 						
 					</div><!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>

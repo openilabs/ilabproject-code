@@ -65,6 +65,8 @@ namespace iLabs.ServiceBroker.admin
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             if(Session["UserTZ"] != null)
                 userTZ = Convert.ToInt32(Session["UserTZ"]);
+            // "Are you sure" javascript for DeleteExperiment button
+            btnDeleteExperiment.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to delete this experiment?')== false) return false;");
            
 		}
 

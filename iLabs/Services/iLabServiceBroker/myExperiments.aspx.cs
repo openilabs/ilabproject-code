@@ -104,6 +104,8 @@ namespace iLabs.ServiceBroker.iLabSB
 					lblResponse.Text = Utilities.FormatErrorMessage(msg);
 					lblResponse.Visible = true;
 				}
+                // "Are you sure" javascript for DeleteExperiment button
+                btnDeleteExperiment.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to delete this experiment?')== false) return false;");
 			}
 		}
 
@@ -348,7 +350,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 				if(Session["GroupID"] != null)
 				{
-					aList.Add (new Criterion ("Effective_Group_ID", "=", Session["GroupID"].ToString()));
+					aList.Add (new Criterion ("Group_ID", "=", Session["GroupID"].ToString()));
 				}
 
 				Criterion[] carray = new Criterion [aList.Count];

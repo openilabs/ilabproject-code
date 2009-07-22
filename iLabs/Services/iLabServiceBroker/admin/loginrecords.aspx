@@ -29,6 +29,7 @@ Please see license.txt in top level directory for full license.
 						</h1>
 						<p>View log-in records below.
 						</p>
+						<p><asp:Label ID="lblTimezone" runat="server"></asp:Label></p>
 						<asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label></div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
@@ -72,10 +73,9 @@ Please see license.txt in top level directory for full license.
 						<asp:textbox id="txtLoginDisplay" Runat="server" Width="488px" Height="162px" TextMode="MultiLine"
 							Columns="50" Rows="20"></asp:textbox>
 						<!--textarea name="logindisplay" cols="50" rows="20" id="logindisplay"--> 
-						</TEXTAREA></div>
-					<br clear="all">
+						</div>
+					<br clear="all"/>
 					<!-- end pagecontent div --></div> <!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
-			</TR></TBODY>
 			<DIV></DIV>
 			<DIV></DIV>
 			<DIV></DIV>

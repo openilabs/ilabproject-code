@@ -44,6 +44,20 @@ public partial class displayExperiment : System.Web.UI.UserControl
     CultureInfo culture;
     int userTZ;
     AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+    protected string back_Url;
+
+    public string backUrl
+    {
+        get
+        {
+            return back_Url;
+        }
+        set
+        {
+            back_Url = value;
+        }
+    }
+
     protected void Page_Load(object sender, EventArgs e)
     {
         userTZ = Convert.ToInt32(Session["UserTZ"]);
@@ -87,6 +101,8 @@ public partial class displayExperiment : System.Web.UI.UserControl
                 lblResponse.Visible = true;
 
             }
+            // "Are you sure" javascript for DeleteExperiment button
+            btnDeleteExperiment.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to delete this experiment?')== false) return false;");
 
         }
     }
@@ -248,7 +264,6 @@ public partial class displayExperiment : System.Web.UI.UserControl
             }
         }
                         
-
 		protected void btnSaveAnnotation_Click(object sender, System.EventArgs e)
 		{
 			lblResponse.Visible=false;
@@ -267,11 +282,18 @@ public partial class displayExperiment : System.Web.UI.UserControl
 			}
 		}
 
+        protected void btnBack_Click(object sender, System.EventArgs e)
+        {
+            Response.Redirect(backUrl);
+        }
+
 		protected void btnDeleteExperiment_Click(object sender, System.EventArgs e)
 		{
             lblResponse.Visible = false;
-
-            
+            StringBuilder buf = new StringBuilder();
+            buf.Append("Experiment ");
+            buf.Append(txtExperimentID.Text + " ");
+            buf.Append(txtClientName.Text);
 
             try
             {
@@ -290,11 +312,13 @@ public partial class displayExperiment : System.Web.UI.UserControl
                 txtAnnotation.Text = null;
                 txtExperimentRecords.Text = null;
                 Session.Remove("EssGuid");
+                Response.Redirect(backUrl + "?message=Deleted " + buf.ToString());
+
             }
             catch (Exception ex)
             {
 
-                lblResponse.Text = Utilities.FormatErrorMessage("Error deleting experiment. " + ex.Message);
+                lblResponse.Text = Utilities.FormatErrorMessage("Error deleting " + buf.ToString() + ". - " + ex.Message);
                 lblResponse.Visible = true;
             }
 		}

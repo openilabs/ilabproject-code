@@ -14,6 +14,7 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 
 using iLabs.ServiceBroker;
+using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.Internal;
 using iLabs.Ticketing;
 using iLabs.Proxies.ESS;
@@ -302,6 +303,38 @@ namespace iLabs.ServiceBroker.DataStorage
                     
                 
             return tags;
+        }
+        /// <summary>
+        /// Deletes a single experiment, checks for ESS, deletes from the ESS if needed, deletes Qualifier and the experiment administrative info.
+        /// This does not check for authorization the experiment ID should be authorized for deletion before this is called.
+        /// </summary>
+        /// <param name="experimentID"></param>
+        /// <returns></returns>
+        public static bool DeleteExperiment(long experimentID)
+        {
+            bool deleted = false;
+             ExperimentSummary summary = InternalDataDB.SelectExperimentSummary(experimentID);
+             if (summary.HasEss)
+             {
+                 ProcessAgentDB ticketing = new ProcessAgentDB();
+                 // Retrieve the ESS Status info and update as needed
+                 //This uses a generic ReadRecords ticket created for the ESS
+                 ProcessAgentInfo ess = ticketing.GetProcessAgentInfo(summary.essGuid);
+                 if ((ess != null) && !ess.retired)
+                 {
+                     ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                     essProxy.Url = ess.webServiceUrl;
+                     essProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                     essProxy.AgentAuthHeaderValue.coupon = ess.identOut;
+                     essProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                     essProxy.DeleteExperiment(experimentID);
+                 }
+             }
+            int qualID = Authorization.AuthorizationAPI.GetQualifierID((int)experimentID, Qualifier.experimentQualifierTypeID);
+            if (qualID > 0)
+                Authorization.AuthorizationAPI.RemoveQualifiers(new int[] { qualID });
+            deleted = InternalDataDB.DeleteExperiment(experimentID);
+            return deleted;
         }
 
         public static int DeleteExperimentCoupon(long experimentID, long couponID)

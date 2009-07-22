@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -2134,63 +2135,29 @@ namespace iLabs.ServiceBroker.Authorization
 		/// superUser, owner and writeExperiment privilege
 		/// </summary>
 		/// <param name="experimentIDs"></param>
-		/// <returns></returns>
+		/// <returns>An array of experimentIDs that were not removed</returns>
 		public long[] RemoveExperimentsWrapper ( long[] experimentIDs )
 		{
 			ArrayList aList = new ArrayList ();
 
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-
-			bool haveAccess = true;
-
-			//superUser check
-			if (sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-				haveAccess = true;
-			}
-
-			for (int i=0; i<experimentIDs.Length ; i++)
-			{
-				if (!haveAccess)
-				{
-					//owner check
-                    int userID = InternalDataDB.SelectExperimentOwner(experimentIDs[i]);
-					if (loginUserID==userID)
-					{
-						haveAccess = true;
-					}
-					else
-					{
-						// get qualifier ID of experimentID
-						int qualifierID = Authorization.AuthorizationAPI .GetQualifierID ((int) experimentIDs[i], Qualifier .experimentQualifierTypeID );
-
-						//writeExperiment check
-						if (Authorization.AuthorizationAPI .CheckAuthorization (loginUserID, Function .writeExperimentFunctionType , qualifierID))
-						{
-							haveAccess= true;
-						}
-					}
-				}
-
-				//Throw exception if no access to one of the experiments
-				if (!haveAccess)
-				{
-					throw new AccessDeniedException ("Access denied deleting experiments. Insufficient permission to remove experiment "+i+".");
-				}
-
-				//reset haveAccess to false if not superUser
-				if (sessionGroupName.CompareTo(Group.SUPERUSER)!=0)
-				{
-					haveAccess = false;
-				}
-			}
-
-			//successfully out of loop with no exception.
-            long[] unremovedExpIDs = InternalDataDB.DeleteExperiments(experimentIDs);
-				
-			return unremovedExpIDs;
+            List<long> expIDs = FilterExperimentIDs(loginUserID, sessionGroupID, Function.writeExperimentFunctionType, experimentIDs);
+            
+            List<long> unremovedExpIDs = new List<long>();
+            foreach (long exp in experimentIDs)
+            {
+                if(!expIDs.Contains(exp))
+                    unremovedExpIDs.Add(exp);
+            }
+            foreach (long expID in expIDs)
+            {
+                if (!DataStorageAPI.DeleteExperiment(expID))
+                {
+                    unremovedExpIDs.Add(expID);
+                }
+            }	
+			return unremovedExpIDs.ToArray();
 		}
         /*
         public Coupon GetExperimentCouponWrapper(long experimentID)
@@ -2253,121 +2220,24 @@ namespace iLabs.ServiceBroker.Authorization
 			//first check permisson
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-
-			bool haveAccess = true;
-
-			//superUser check
-			if (sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-				haveAccess = true;
-			}
-
-			for (long i=0; i<experimentIDs.Length ; i++)
-			{
-                int userID = InternalDataDB.SelectExperimentOwner(experimentIDs[i]);
-				
-				//owner check
-				if (loginUserID==userID)
-				{
-					haveAccess = true;
-				}
-				else
-				{
-					// get qualifier ID of experimentID
-					int qualifierID = Authorization.AuthorizationAPI .GetQualifierID ((int) experimentIDs[i], Qualifier .experimentQualifierTypeID );
-
-					//readExperiment check
-					if (Authorization.AuthorizationAPI .CheckAuthorization (loginUserID, Function .readExperimentFunctionType , qualifierID))
-					{
-						haveAccess = true;
-					}
-				}
-			
-				if (!haveAccess)
-				{
-					throw new AccessDeniedException ("Access denied retrieving experiment information. Insufficient permission to access experiment "+i+".");
-				}
-
-				//reset haveAccess to false if not superUser
-				if (sessionGroupName.CompareTo(Group.SUPERUSER)!=0)
-				{
-					haveAccess = false;
-				}
-			}
-		
+            List<long> allowedExpIDs = FilterExperimentIDs(loginUserID, sessionGroupID, Function.readExperimentFunctionType, experimentIDs);
 			//if successfully out of loop.
-            return DataStorageAPI.RetrieveExperimentSummaries(experimentIDs);
+            return DataStorageAPI.RetrieveExperimentSummaries(allowedExpIDs.ToArray());
 		}
 
-		/// <summary>
-		/// owner, readExperiment and superUser privilege
-		/// </summary>
-		/// <param name="criteria"></param>
-		public long[] FindExperimentIDsWrapper(Criterion [] criteria)
-		{
-			// first, retrieve all experiment IDs which satisfy criteria
-            long[] expIDs = InternalDataDB.SelectExperimentIDs(criteria);
-
-			//then check permissons
-			int loginUserID = Convert.ToInt32(Session["UserID"]);
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-
-			//superUser check
-			if (sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-				return expIDs;
-			}
-			else
-			{
-				ArrayList allowedExpIDs = new ArrayList();
-				for (int i=0; i<expIDs.Length ; i++)
-				{
-					//owner check
-                    int userID = InternalDataDB.SelectExperimentOwner(expIDs[i]);
-					if (loginUserID == userID)
-					{
-						allowedExpIDs.Add(expIDs[i]);
-					}
-					else
-					{
-						// get qualifier ID of experimentID
-						int qualifierID = Authorization.AuthorizationAPI .GetQualifierID ((int) expIDs[i], Qualifier .experimentQualifierTypeID );
-
-						//readExperiment check
-						//need to check for session Group instead of login user. Otherwise it'll show experiments from other groups too.
-						if (Authorization.AuthorizationAPI .CheckAuthorization (sessionGroupID, Function .readExperimentFunctionType , qualifierID))
-						{
-							allowedExpIDs.Add(expIDs[i]);
-						}			
-					}
-				}
-				long[] experimentIDs = Utilities.ArrayListToLongArray(allowedExpIDs);
-			
-				return experimentIDs;
-			}
-			
-		}
-
-
-        /// <summary>
-        /// owner, readExperiment and superUser privilege
-        /// </summary>
-        /// <param name="criteria"></param>
-        public long[] FindExperimentIDsWrapper(int loginUserID, int sessionGroupID, Criterion[] criteria)
+        public List<long> FilterExperimentIDs(int loginUserID, int sessionGroupID, string function, long[] expIDs)
         {
-            // first, retrieve all experiment IDs which satisfy criteria
-            long[] expIDs = InternalDataDB.SelectExperimentIDs(criteria);
-          
-            //superUser check
+            List<long> allowedExpIDs = new List<long>();
+            //check permissons
+			//superUser check
             if (IsSuperuserGroup(sessionGroupID))
             {
-                return expIDs;
+                List<long> ids = new List<long>();
+                ids.AddRange(expIDs);
+                return ids;
             }
             else
             {
-                ArrayList allowedExpIDs = new ArrayList();
                 for (int i = 0; i < expIDs.Length; i++)
                 {
                     //owner check
@@ -2383,17 +2253,41 @@ namespace iLabs.ServiceBroker.Authorization
 
                         //readExperiment check
                         //need to check for session Group instead of login user. Otherwise it'll show experiments from other groups too.
-                        if (Authorization.AuthorizationAPI.CheckAuthorization(sessionGroupID, Function.readExperimentFunctionType, qualifierID))
+                        if (Authorization.AuthorizationAPI.CheckAuthorization(sessionGroupID, function, qualifierID))
                         {
                             allowedExpIDs.Add(expIDs[i]);
                         }
                     }
                 }
-                long[] experimentIDs = Utilities.ArrayListToLongArray(allowedExpIDs);
-
-                return experimentIDs;
             }
+			return allowedExpIDs;
+        }
 
+		/// <summary>
+		/// owner, readExperiment and superUser privilege
+		/// </summary>
+		/// <param name="criteria"></param>
+		public long[] FindExperimentIDsWrapper(Criterion [] criteria)
+		{
+			// first, retrieve all experiment IDs which satisfy criteria
+            //long[] expIDs = InternalDataDB.SelectExperimentIDs(criteria);
+
+			//then check permissons
+			int loginUserID = Convert.ToInt32(Session["UserID"]);
+			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            return FindExperimentIDsWrapper(loginUserID, sessionGroupID, criteria);
+		}
+
+
+        /// <summary>
+        /// owner, readExperiment and superUser privilege
+        /// </summary>
+        /// <param name="criteria"></param>
+        public long[] FindExperimentIDsWrapper(int loginUserID, int sessionGroupID, Criterion[] criteria)
+        {
+            // first, retrieve all experiment IDs which satisfy criteria
+            long[] expIDs = InternalDataDB.SelectExperimentIDs(criteria);
+            return FilterExperimentIDs(loginUserID, sessionGroupID,Function.readExperimentFunctionType, expIDs).ToArray();
         }
 
 
