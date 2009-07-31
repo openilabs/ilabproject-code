@@ -5,7 +5,7 @@
  * $Id$
  */
 
-#define LabVIEW_86
+#define LabVIEW_82
 
 using System;
 using System.Data;
