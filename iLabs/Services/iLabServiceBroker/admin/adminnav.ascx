@@ -17,8 +17,7 @@
 			<li>
 				<A id="aMappings" runat="server" href="adminResourceMappings.aspx">Resource Mappings</A>
 			<li>
-				<A id="aExperimentRecords" runat="server" href="experimentRecords.aspx">Exp/Log-in 
-					Records</A>
+				<A id="aExperimentRecords" runat="server" href="experimentRecords.aspx">Records</A>
 			<li>
 				<A id="aMessages" class="last" runat="server" href="messages.aspx">Messages</A></li>
 		</ul>
@@ -38,7 +37,7 @@
 		<ul id="ulNav3Labs" runat="server" class="navlist3">
 			<!-- Lab Servers, Lab Clients, and Labs navigation -->
 			<li>
-				<A id="aNav3ServiceBrokerInfo" runat="server" href="SelfRegistration.aspx">Service Broker Information</A></li>
+				<A id="aNav3ServiceBrokerInfo" runat="server" href="SelfRegistration.aspx">Self Registration</A></li>
 			<li>
 				<A id="aNav3ManageServices" runat="server" href="manageServices.aspx">Manage Process Agents</A></li>
 			<li>
@@ -60,6 +59,10 @@
 			</li>
 		</ul>
 		<ul id="ulNav3Records" runat="server" class="navlist3">
+			<li>
+				<a id="aNav3SBinfo" runat="server" href="sbStats.aspx">Service Broker Information</a></li>
+			<li>
+				<a id="aNav3Reports" runat="server" href="sbReport.aspx">Reports</a></li>
 			<li>
 				<A id="aNav3ExperimentRecords" runat="server" href="experimentRecords.aspx">Experiment 
 					Records</A></li>
