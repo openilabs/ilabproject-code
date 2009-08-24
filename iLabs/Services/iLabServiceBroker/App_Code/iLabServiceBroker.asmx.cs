@@ -155,7 +155,8 @@ namespace iLabs.ServiceBroker.iLabSB
 		/// <remarks>Web Method</remarks>
 		[WebMethod(Description="Checks on the effective queue length of the Lab Server", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
-        [SoapDocumentMethod(Action = "http://ilab.mit.edu/WaitEstimate", Binding = "IBatchSB", RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
+        [SoapDocumentMethod(Action = "http://ilab.mit.edu/GetEffectiveQueueLength", Binding = "IBatchSB", 
+		RequestNamespace = "http://ilab.mit.edu", ResponseNamespace = "http://ilab.mit.edu")]
 		public WaitEstimate GetEffectiveQueueLength(string labServerID, int priorityHint)
 		{
 			try
