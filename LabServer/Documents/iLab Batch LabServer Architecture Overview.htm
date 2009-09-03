@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>iLab Batch LabServer Architecture Overview</title>
+</head>
+<body>
+    <h1>
+        iLab Batch LabServer Architecture Overview</h1>
+    <p>
+        &nbsp;</p>
+    <p>
+        Draft Revision 0.1 - 3 Sep 2009 - LJP</p>
+    <p>
+        The architecture consists of two parts:
+    </p>
+    <ol type="1">
+        <li><b>LabServer</b> – This contains the mechanisms for receiving an experiment specification,
+            scheduling and running an experiment according to that specification. Communication
+            with the LabServer is through a web service which implements the iLab ServiceBroker-to-LabServer
+            API.
+            <br />
+            <br />
+        </li>
+        <li><b>LabEquipment</b> – This implements the control of the physical equipment or hardware
+            for the experiment. This may or may not exist depending on the type of experiment.
+            <br />
+            <br />
+        </li>
+    </ol>
+    <center>
+        <img src="LabServer-LabEquipment.png" width="909" height="229" /><p />
+        <b>Figure 1. </b>
+    </center>
+    <h3>
+        LabServer</h3>
+    <p>
+        The LabServer is a computer running a web service. The computer may be real or virtual.
+        The operating system installed may be Microsoft Windows, Linux or Apple Macintosh
+        (just to name a few). The LabServer source code may be written in any programming
+        language that supports web services.
+    </p>
+    <center>
+        <img src="LabServer.png" width="909" height="678" /><p />
+        <b>Figure 2. </b>
+    </center>
+    <p>
+        The LabServer consists of a number of parts:
+    </p>
+    <ol type="1">
+        <li><b>Web Service</b> - When a web service method is called by a ServiceBroker, an
+            authorisation check is carried out. The SOAP header contains the ServiceBroker’s
+            GUID and a passkey which are checked against entries in the LabServer’s configuration
+            file. If the ServiceBroker has authorisation, the web service method passes the
+            call onto the Experiment Manager for processing.<br />
+            <br />
+        </li>
+        <li><b>Experiment Manager</b> – Responsible for processing web service method calls.
+            It determines the configuration of the LabServer. It provides the status of the
+            LabServer, validation results of an experiment specification, and takes a submitted
+            experiment specification and places it on a queue ready for processing by an Experiment
+            Engine.<br />
+            <br />
+        </li>
+        <li><b>Experiment Engine</b> – Processes and runs an experiment specification. It validates
+            an experiment specification by calling upon Setup Drivers, provides the status of
+            the currently running experiment, and saves the experiment results for retrieval
+            by a ServiceBroker.<br />
+            <br />
+        </li>
+        <li><b>Setup Drivers</b> – Determine the way in which the experiment specification will
+            be run on the Experiment Engine. They also provide an estimate of the time required
+            to run the experiment. Typically, there are multiple setup drivers, e.g., measurements
+            over time and measurements over distance. The setup drivers call upon Equipment
+            Drivers to operate the equipment and to get an estimate of the time required to
+            carry out those operations.<br />
+            <br />
+        </li>
+        <li><b>Equipment Drivers</b> – Provide the interface to the LabEquipment. Operations
+            required by the setup drivers are converted to commands by the equipment drivers
+            and sent to the LabEquipment for processing. The commands may be either be sent
+            to a LabEquipment’s web service or by a TCP/IP connection to the equipment.<br />
+            <br />
+        </li>
+    </ol>
+    <h3>
+        LabEquipment</h3>
+    <p>
+        The LabEquipment is a computer running a web service. It has experiment specific
+        hardware attached and is connected to a private network. The operating system installed
+        on the computer will depend on the hardware being used.
+    </p>
+    <center>
+        <img src="LabEquipment.png" width="607" height="323" /><p />
+        <b>Figure 3. </b>
+    </center>
+    <p>
+        The LabEquipment consists of the following:
+    </p>
+    <ol type="1">
+        <li><b>Web Service</b> - Receives commands from the LabServer and processes them. The
+            commands may control the equipment or request an estimate of the time required to
+            control the equipment.<br />
+            <br />
+        </li>
+        <li><b>Hardware Drivers</b> – These are manufacturer specific.<br />
+            <br />
+        </li>
+    </ol>
+</body>
+</html>

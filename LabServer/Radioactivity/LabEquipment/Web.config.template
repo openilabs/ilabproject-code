@@ -1,0 +1,90 @@
+﻿<?xml version="1.0"?>
+
+<configuration>
+
+  <appSettings>
+
+    <!-- File path to LabEquipment virtual web folder -->
+    <add key="RootFilePath" value="" />
+
+    <!-- Path for log files, filename format is the current date of the form YYYYMMDD.log -->
+    <add key="LogFilesPath" value="LogFiles" />
+
+    <!-- An allowed caller entry is a CSV string containing the following items:
+      LabServer's Name - string
+      LabServer's Guid - string, containing up to 32 hexadecimal characters which can be represented as a 128-bit number
+      LabServer's OutgoingPassKey - string, is a guid
+      Unused - set to 'unused'
+      Unused - set to 'unused'
+      Enable Caller Entry - boolean, set to 'true' to enabled Allowed Caller checking
+      -->
+    <add key="AllowedCaller" value=" , , , unused, unused, true"/>
+
+    <!-- LabServer checking flag - Set to false to disable LabServer authentication -->
+    <add key="AuthenticateCaller" value="true"/>
+
+    <!-- Log LabServer Id and Passkey - Set to false or remove to not log Id and Passkey -->
+    <add key="LogCallerIdPasskey" value="false"/>
+
+    <!-- Delay in seconds to wait after powering-up the equipment, leave empty to disable -->
+    <add key="PowerupDelay" value="10" />
+
+    <!-- Delay in seconds for the equipment to initialise, leave empty to disable -->
+    <add key="InitialiseDelay" value="30" />
+
+    <!-- Timeout in seconds for powering-down the equipment, leave empty to disable -->
+    <add key="PowerdownTimeout" value="1800" />
+
+    <!-- LabEquipment service title for display -->
+    <add key="LabEquipmentTitle" value="Radioactivity" />
+
+    <!-- Board ID of this NI FlexMotion controller card  -->
+    <add key="FlexMotionBoardID" value="2" />
+
+    <!-- Serial port settings -->
+    <add key="SerialPort" value="COM1" />
+    <add key="BaudRate" value="19200" />
+
+    <add key="TubeOffsetDistance" value="14" />
+    <add key="TubeHomeDistance" value="25" />
+
+    <!-- Initialise Geiger tube motor axis - Used for debugging only -->
+    <add key="InitTubeAxis" value="true" />
+
+  </appSettings>
+
+  <connectionStrings/>
+  
+    <system.web>
+        <!-- 
+            Set compilation debug="true" to insert debugging 
+            symbols into the compiled page. Because this 
+            affects performance, set this value to true only 
+            during development.
+        -->
+        <compilation debug="true">
+
+        </compilation>
+        <!--
+            The <authentication> section enables configuration 
+            of the security authentication mode used by 
+            ASP.NET to identify an incoming user. 
+        -->
+        <authentication mode="Windows" />
+        <!--
+            The <customErrors> section enables configuration 
+            of what to do if/when an unhandled error occurs 
+            during the execution of a request. Specifically, 
+            it enables developers to configure html error pages 
+            to be displayed in place of a error stack trace.
+
+        <customErrors mode="RemoteOnly" defaultRedirect="GenericErrorPage.htm">
+            <error statusCode="403" redirect="NoAccess.htm" />
+            <error statusCode="404" redirect="FileNotFound.htm" />
+        </customErrors>
+        -->
+
+
+    </system.web>
+
+</configuration>

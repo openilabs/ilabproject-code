@@ -1,0 +1,35 @@
+<publishData>
+  <publishTarget publishUrl="C:\Visual Studio 2008\Batch\ACMachine\Published\LabClientHtml\">
+    <file relUrl="Controls/Feedback.ascx" publishTime="03/29/2009 07:39:08" />
+    <file relUrl="Controls/Status.ascx" publishTime="03/29/2009 06:36:04" />
+    <file relUrl="bin/LabClientHtml.pdb" publishTime="08/25/2009 15:56:45" />
+    <file relUrl="LabClient.aspx" publishTime="03/29/2009 07:21:20" />
+    <file relUrl="images/acmachine.jpg" publishTime="09/30/2008 10:02:50" />
+    <file relUrl="styles/Controls.css" publishTime="04/29/2009 12:38:06" />
+    <file relUrl="Status.aspx" publishTime="08/23/2009 09:11:12" />
+    <file relUrl="Web.config" publishTime="08/18/2009 15:20:02" />
+    <file relUrl="images/gradient.gif" publishTime="03/12/2009 10:08:20" />
+    <file relUrl="Controls/Navmenu.ascx" publishTime="03/29/2009 11:06:16" />
+    <file relUrl="Controls/Header.ascx" publishTime="03/29/2009 06:42:22" />
+    <file relUrl="bin/LibraryLabClient.pdb" publishTime="08/25/2009 15:56:45" />
+    <file relUrl="bin/LibraryLabClient.dll" publishTime="08/25/2009 15:56:45" />
+    <file relUrl="styles/LabClient.css" publishTime="08/19/2009 08:40:40" />
+    <file relUrl="Global.asax" publishTime="10/07/2008 14:51:26" />
+    <file relUrl="Controls/Footer.ascx" publishTime="03/29/2009 06:40:28" />
+    <file relUrl="bin/LabClientHtml.dll" publishTime="08/25/2009 15:56:45" />
+    <file relUrl="images/mit-blackred-footer1.gif" publishTime="02/16/2008 12:56:14" />
+    <file relUrl="images/feedback-gradient.gif" publishTime="03/12/2009 07:40:50" />
+    <file relUrl="images/level2-underline.gif" publishTime="05/11/2008 11:26:26" />
+    <file relUrl="Controls/Banner.ascx" publishTime="03/30/2009 10:29:10" />
+    <file relUrl="LabControls/LabResults.ascx" publishTime="04/17/2009 16:32:54" />
+    <file relUrl="bin/LibraryLab.pdb" publishTime="08/25/2009 15:56:42" />
+    <file relUrl="bin/LibraryLab.dll" publishTime="08/25/2009 15:56:42" />
+    <file relUrl="images/level2-arrow.gif" publishTime="05/11/2008 11:26:26" />
+    <file relUrl="styles/LabControls.css" publishTime="08/18/2009 14:41:56" />
+    <file relUrl="Setup.aspx" publishTime="08/19/2009 08:40:30" />
+    <file relUrl="LabClient.Master" publishTime="05/02/2009 13:49:16" />
+    <file relUrl="LabControls/LabSetup.ascx" publishTime="08/03/2009 08:51:18" />
+    <file relUrl="images/uq-logo.gif" publishTime="02/16/2008 12:56:14" />
+    <file relUrl="Results.aspx" publishTime="08/23/2009 09:34:27" />
+  </publishTarget>
+</publishData>

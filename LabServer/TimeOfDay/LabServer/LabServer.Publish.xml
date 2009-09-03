@@ -1,0 +1,16 @@
+<publishData>
+  <publishTarget publishUrl="C:\Visual Studio 2008\Batch\TimeOfDay\Published\LabServer\">
+    <file relUrl="Global.asax" publishTime="03/13/2009 09:09:22" />
+    <file relUrl="bin/LabServer.dll" publishTime="08/27/2009 08:19:16" />
+    <file relUrl="bin/LabServer.pdb" publishTime="08/27/2009 08:19:16" />
+    <file relUrl="Web.config" publishTime="08/19/2009 16:13:31" />
+    <file relUrl="bin/LibraryLabServer.pdb" publishTime="08/27/2009 08:19:15" />
+    <file relUrl="LabServerWebService.asmx" publishTime="12/08/2007 15:38:54" />
+    <file relUrl="bin/LibraryLabServerEngine.pdb" publishTime="08/27/2009 08:19:15" />
+    <file relUrl="bin/LibraryLab.pdb" publishTime="08/27/2009 08:19:15" />
+    <file relUrl="bin/LibraryLabServer.dll" publishTime="08/27/2009 08:19:15" />
+    <file relUrl="Xml/LabConfiguration.xml" publishTime="08/04/2009 10:08:52" />
+    <file relUrl="bin/LibraryLab.dll" publishTime="08/27/2009 08:19:15" />
+    <file relUrl="bin/LibraryLabServerEngine.dll" publishTime="08/27/2009 08:19:15" />
+  </publishTarget>
+</publishData>
