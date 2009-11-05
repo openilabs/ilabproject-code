@@ -1516,7 +1516,8 @@ BEGIN
 select Agent_ID, Agent_GUID,  Agent_Name, ProcessAgent_Type_ID,
 Codebase_URL, WebService_URL,  Domain_Guid, issuer_GUID, 
 IdentIn_ID, (Select passkey from coupon where ProcessAgent.Issuer_Guid != Null AND  coupon_id = IdentIn_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID), 
-IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID)
+IdentOut_ID, (Select passkey from coupon where  ProcessAgent.Issuer_Guid != Null AND coupon_id = IdentOut_ID AND ProcessAgent.Issuer_GUID = Coupon.Issuer_GUID),
+retired
 from ProcessAgent
 where Agent_ID = @essID
 return 0
