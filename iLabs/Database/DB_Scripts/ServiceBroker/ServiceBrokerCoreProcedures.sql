@@ -567,7 +567,10 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabClient]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveLabClient]
 GO
-
+/****** Object:  Stored Procedure dbo.RetrieveLabClient    Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabClientByGuid]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveLabClientByGuid]
+GO
 /****** Object:  Stored Procedure dbo.RetrieveLabClientIDs    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveLabClientID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveLabClientID]
@@ -2967,6 +2970,17 @@ GO
 SET QUOTED_IDENTIFIER ON 
 GO
 SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE RetrieveLabClientByGuid
+	@clientGuid varchar(50)
+AS
+	select client_id,client_guid, lab_client_name, short_description, long_description, version, loader_script, 
+		contact_email, contact_first_name, contact_last_name, notes, date_created,
+		client_types.description,NeedsScheduling,NeedsESS,IsReentrant
+	from lab_clients, client_types
+	where client_guid = @clientGuid and lab_clients.client_type_id = client_types.client_type_id
+
 GO
 
 /****** Object:  Stored Procedure dbo.RetrieveLabClientID    Script Date: 5/18/2005 4:17:56 PM ******/
