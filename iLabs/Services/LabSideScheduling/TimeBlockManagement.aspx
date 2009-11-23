@@ -38,7 +38,7 @@
 	<tr>
 	<th></th>
 	<td style="width: 793px">
-		 <asp:listbox id="lbxSelectTimeBlock" runat="server" Width="790px" Height="221px" AutoPostBack="True" onselectedindexchanged="lbxSelectTimeBlock_SelectedIndexChanged"></asp:listbox>
+		 <asp:listbox cssClass="i18n" id="lbxSelectTimeBlock" runat="server" Width="790px" Height="221px" AutoPostBack="True" onselectedindexchanged="lbxSelectTimeBlock_SelectedIndexChanged"></asp:listbox>
 		</td>
 		</tr>
 		<tr>
@@ -67,14 +67,14 @@
 		</tr>
 		<tr>
 			<td style="WIDTH: 285px">
-				<asp:listbox id="lbxSelectExperiment" runat="server" Height="132px" Width="280px" ></asp:listbox>
+				<asp:listbox cssClass="i18n" id="lbxSelectExperiment" runat="server" Height="132px" Width="280px" ></asp:listbox>
 			</td>
 			<td class="buttonstyle" style="width: 59px">
 				<asp:button CssClass="button" id="btnPermit" runat="server" Width="72px" Text= "Permit" onclick="btnPermit_Click" ></asp:button>
 				<asp:button CssClass="button" id="btnUnPermit" runat="server" Width="72px" Text="UnPermit" onclick="btnUnPermit_Click" ></asp:button>
 			</td>
 			<td style="WIDTH: 300px">
-				<asp:listbox id="lbxPermittedExperiments" runat="server" Height="132px" Width="280px" ></asp:listbox>
+				<asp:listbox cssClass="i18n" id="lbxPermittedExperiments" runat="server" Height="132px" Width="280px" ></asp:listbox>
 			</td>
 		</tr>
 	    <tr>
@@ -90,14 +90,14 @@
 		</tr>
 		<tr>
 		    <td style="WIDTH: 285px">
-				<asp:listbox id="lbxSelectGroup" runat="server" Height="132px" Width="280px" ></asp:listbox>
+				<asp:listbox cssClass="i18n" id="lbxSelectGroup" runat="server" Height="132px" Width="280px" ></asp:listbox>
 			</td>
 			<td class="buttonstyle" style="width: 59px">
 				<asp:button CssClass="button" id="btnPermitGroup" runat="server" Width="72px" Text= "Permit" onclick="btnPermitGroup_Click" ></asp:button>
 				<asp:button CssClass="button" id="btnUnPermitGroup" runat="server" Width="72px" Text="UnPermit" onclick="btnUnPermitGroup_Click" ></asp:button>
 			</td>
 			<td style="WIDTH: 300px">
-				<asp:listbox id="lbxPermittedGroups" runat="server" Height="132px" Width="280px" ></asp:listbox>					
+				<asp:listbox cssClass="i18n" id="lbxPermittedGroups" runat="server" Height="132px" Width="280px" ></asp:listbox>					
 			</td>
 		</tr>        	
 	</table>

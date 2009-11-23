@@ -34,7 +34,7 @@
 		<tr>
 										<th>
 											<label for="experiment">Experiment</label></th>
-										<td style="width: 454px"><asp:dropdownlist id="ddlExperiment" runat="server" AutoPostBack="True" onselectedindexchanged="ddlExperiment_SelectedIndexChanged" Width="100%"></asp:dropdownlist>
+										<td style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlExperiment" runat="server" AutoPostBack="True" onselectedindexchanged="ddlExperiment_SelectedIndexChanged" Width="100%"></asp:dropdownlist>
 											</td>
 									</tr>
 		<tr>
@@ -76,7 +76,7 @@
 									<tr>
 										<th>
 											<label for="lss">Lab Side Scheduling Server</label></th>
-										<td style="width: 454px"><asp:dropdownlist id="ddlLSS"  Runat="server" Width="100%"></asp:dropdownlist>
+										<td style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlLSS"  Runat="server" Width="100%"></asp:dropdownlist>
 											</td>
 									</tr>
 									<tr>

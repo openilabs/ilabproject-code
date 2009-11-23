@@ -36,6 +36,7 @@ namespace iLabs.Ticketing
         public const string ADMINISTER_USS = "ADMINISTER USS";
         public const string MANAGE_USS_GROUP = "MANAGE USS GROUP";
         public const string SCHEDULE_SESSION = "SCHEDULE SESSION";
+        public const string REDEEM_RESERVATION = "REDEEM RESERVATION";
         public const string REVOKE_RESERVATION = "REVOKE RESERVATION"; //Permanent ticket, issuesd by LSS domainServer
         public const string ALLOW_EXPERIMENT_EXECUTION = "ALLOW EXPERIMENT EXECUTION";
 

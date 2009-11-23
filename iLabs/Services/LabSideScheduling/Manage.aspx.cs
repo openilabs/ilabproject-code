@@ -146,10 +146,12 @@ namespace iLabs.Scheduling.LabSide
 		 */
         private void BuildExperimentInfoListBox()
         {
+            LssExperimentInfo[] experimentInfos = null;
             int[] experimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
-            LssExperimentInfo[] experimentInfos = LSSSchedulingAPI.GetExperimentInfos(experimentInfoIDs);
+            if(experimentInfoIDs != null && experimentInfoIDs.Length > 0)
+                experimentInfos = LSSSchedulingAPI.GetExperimentInfos(experimentInfoIDs);
             //if related experiment experiments have been found
-            if (experimentInfos.Length > 0)
+            if (experimentInfos != null && experimentInfos.Length > 0)
             {
                 BuildExperimentInfoListBox(experimentInfos);
             }
@@ -223,6 +225,7 @@ namespace iLabs.Scheduling.LabSide
             txtMinimumTime.Text = experimentInfo.minimumTime.ToString();
             txtPrepareTime.Text = experimentInfo.prepareTime.ToString();
             txtProviderName.Text = experimentInfo.providerName;
+            txtContactEmail.Text = experimentInfo.contactEmail;
             txtRecoverTime.Text = experimentInfo.recoverTime.ToString();
             txtEarlyArriveTime.Text = experimentInfo.earlyArriveTime.ToString();
         }
@@ -396,7 +399,7 @@ namespace iLabs.Scheduling.LabSide
                         //Add ExperimentInfo
                         int experimentInfoID = LSSSchedulingAPI.AddExperimentInfo(Session["labServerGuid"].ToString(),
                             Session["labServerName"].ToString(),txtClientGuid.Text, txtLabClientName.Text,
-                            txtLabClientVersion.Text, txtProviderName.Text,
+                            txtLabClientVersion.Text, txtProviderName.Text,txtContactEmail.Text,
                             pt, rt, min, et);
                         string msg = "The record for the experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' has been created successfully.";
                         lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
@@ -426,7 +429,7 @@ namespace iLabs.Scheduling.LabSide
                     LSSSchedulingAPI.ModifyExperimentInfo(LSSSchedulingAPI.ListExperimentInfoIDByExperiment( Session["labServerGuid"].ToString(), txtClientGuid.Text),
                         Session["labServerGuid"].ToString(), Session["labServerName"].ToString(),
                         txtClientGuid.Text, txtLabClientName.Text, txtLabClientVersion.Text,
-                        txtProviderName.Text, pt, rt, min, et);
+                        txtProviderName.Text, txtContactEmail.Text, pt, rt, min, et);
                     string msg = "The record for the experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' has been updated.";
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
                     lblErrorMessage.Visible = true;

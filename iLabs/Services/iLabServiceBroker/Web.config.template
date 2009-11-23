@@ -12,6 +12,11 @@
     <!-- They are used by the SelfRegistration page to generate the ProcessAgent's
          Bootstrap ProcessAgent Record, which must be created before installing domain credientials -->
 
+    <!-- the database connection information 
+    NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
+    <add key="sqlConnection"  value="data source=(local);initial catalog=iLab_SB;Integrated Security=SSPI" />
+    <add key="DatabaseProvider" value="System.Data.SqlClient" />
+    
     <add key="serviceType" value="SERVICE BROKER"/>
     <!-- The name of the Service displayed for the user, please change -->
     <add key="serviceName" value="Default iLab ServiceBroker"/>
@@ -21,9 +26,14 @@
     <add key="serviceURL" value="http://localhost/iLabServiceBroker/iLabServiceBroker.asmx"/>
     <add key="defaultPasskey" value="Let me in!"/>
 
-    <!-- the database connection information 
-    NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
-    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_SB;Integrated Security=SSPI" />
+    <!-- email address where bug reports are sent, this for the centralized bug tracking system at MIT. 
+	      Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
+    <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
+    <add key="bugReportOptions" value="System-wide error,Login,Group Issues,Grant Issues,UserInterface,Business logic"/>
+    <add key="helpOptions" value="General Help,Logging In,Running Lab,Page Specific Help"/>
+    
+    <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
+    <add key="supportMailAddress" value="ilab-comment@mit.edu"/>
 
     <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
     <add key="logPath" value=""/>
@@ -32,19 +42,10 @@
     <!-- Cookie support for applets needed for .Net 2.0. This should only need to be changed if you host more than one SB per machine -->
     <add key="isbAuthCookieName" value="isbAuth" />
    
-
-    <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
-    <add key="supportMailAddress" value="ilab-comment@mit.edu"/>
     <!-- CHANGE THIS TO LOCAL ADDRESS: default email address where requests for membership in a group are sent.
 	If the group has a contact address mail will be sent to that address -->
     <add key="registrationMailAddress" value="your_email@your_machine.edu"/>
     <add key="genericFromMailAddress" value="your_email@your_machine.edu"/>
-
-    <!-- email address where bug reports are sent, this for the centralized bug tracking system at MIT. 
-	Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
-    <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
-    <add key="bugReportOptions" value="System-wide error,Login,Group Issues,Grant Issues,UserInterface,Business logic"/>
-    <add key="helpOptions" value="General Help,Logging In,Running Lab,Page Specific Help"/>
 
     <!-- Default value for Service Administration ticket (in seconds)-->
     <add key="serviceAdminTicketDuration" value="3600"/>
@@ -191,14 +192,14 @@
       </authorization>
     </system.web>
   </location>
-  <location path="reportBug.aspx">
+  <location path="ssoAuth.aspx">
     <system.web>
       <authorization>
         <allow users="*"/>
       </authorization>
     </system.web>
   </location>
-  <location path="InteractiveSB.asmx">
+  <location path="reportBug.aspx">
     <system.web>
       <authorization>
         <allow users="*"/>

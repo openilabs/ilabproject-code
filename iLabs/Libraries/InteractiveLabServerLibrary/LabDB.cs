@@ -2,8 +2,7 @@ using System;
 using System.Configuration;
 using System.Collections;
 using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
+using System.Data.Common;
 using System.Runtime.InteropServices;
 
 using iLabs.Core;
@@ -83,89 +82,36 @@ namespace iLabs.LabServer.Interactive
             
         {
             int id = -1;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
-                SqlCommand cmd = new SqlCommand("InsertLabApp", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("InsertLabApp", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-
-                SqlParameter Param = null;
-                Param = cmd.Parameters.Add("@title", SqlDbType.VarChar, 256);
-                Param.Value = title;
-                Param = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                Param.Value = appGuid;
-                Param = cmd.Parameters.Add("@version", SqlDbType.VarChar, 50);
-                if (version != null && version.Length > 0)
-                    Param.Value = version;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@appKey", SqlDbType.VarChar, 100);
-                if (appKey != null && appKey.Length > 0)
-                    Param.Value = appKey;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@path", SqlDbType.VarChar, 256);
-                Param.Value = path;
-                Param = cmd.Parameters.Add("@application", SqlDbType.VarChar, 100);
-                Param.Value = application;
-                Param = cmd.Parameters.Add("@page", SqlDbType.VarChar, 256);
-                if (page != null && page.Length > 0)
-                    Param.Value = page;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@cgi", SqlDbType.VarChar, 256);
-                if (cgi != null && cgi.Length > 0)
-                    Param.Value = cgi;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@width", SqlDbType.Int);
-                Param.Value = width;
-                Param = cmd.Parameters.Add("@height", SqlDbType.Int);
-                Param.Value = height;
-                Param = cmd.Parameters.Add("@datasource", SqlDbType.VarChar, 2000);
-                if (datasource != null && datasource.Length > 0)
-                    Param.Value = datasource;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@server", SqlDbType.VarChar, 256);
-                if (server != null && server.Length > 0)
-                    Param.Value = server;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@port", SqlDbType.Int);
+              
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@title", title,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", appGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@version", version, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appKey", appKey, DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@path", path, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@application", application, DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@page", page, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cgi", cgi,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@width",width, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@height", height,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@datasource", datasource, DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@server", server,DbType.String, 256));
                 if (port > 0)
-                    Param.Value = port;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", port,DbType.Int32));
                 else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@contact", SqlDbType.VarChar, 256);
-                if (contact != null && contact.Length > 0)
-                    Param.Value = contact;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@description", SqlDbType.VarChar, 2000);
-                if (description != null && description.Length > 0)
-                    Param.Value = description;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@comment", SqlDbType.VarChar, 256);
-                if (comment != null && comment.Length > 0)
-                    Param.Value = comment;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@extra", SqlDbType.NVarChar, 2000);
-                if (extra != null && extra.Length > 0)
-                    Param.Value = extra;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@rev", SqlDbType.VarChar, 50);
-                if (rev != null && rev.Length > 0)
-                    Param.Value = rev;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@type", SqlDbType.Int);
-                Param.Value = type;
-
+                   cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", null, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@contact", contact, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@description", description, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@comment", comment,DbType.String,2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@extra", extra,DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rev", rev, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.Int32));
+                
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
@@ -200,91 +146,36 @@ namespace iLabs.LabServer.Interactive
             string rev, int type)
         {
             int count = -1;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
-                SqlCommand cmd = new SqlCommand("ModifyLabApp", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ModifyLabApp", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter Param = null;
-                Param = cmd.Parameters.Add("@appId", SqlDbType.Int);
-                Param.Value = appId;
-                Param = cmd.Parameters.Add("@title", SqlDbType.VarChar, 256);
-                Param.Value = title;
-                Param = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                if (version != null && version.Length > 0)
-                    Param.Value = appGuid;
-                Param = cmd.Parameters.Add("@version", SqlDbType.VarChar, 50);
-                if (version != null && version.Length > 0)
-                    Param.Value = version;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@appKey", SqlDbType.VarChar, 100);
-                if (appKey != null && appKey.Length > 0)
-                    Param.Value = appKey;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@path", SqlDbType.VarChar, 256);
-                Param.Value = path;
-                Param = cmd.Parameters.Add("@application", SqlDbType.VarChar, 100);
-                Param.Value = application;
-                Param = cmd.Parameters.Add("@page", SqlDbType.VarChar, 256);
-                if (page != null && page.Length > 0)
-                    Param.Value = page;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@cgi", SqlDbType.VarChar, 256);
-                if (cgi != null && cgi.Length > 0)
-                    Param.Value = cgi;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@width", SqlDbType.Int);
-                Param.Value = width;
-                Param = cmd.Parameters.Add("@height", SqlDbType.Int);
-                Param.Value = height;
-                Param = cmd.Parameters.Add("@datasource", SqlDbType.VarChar, 2000);
-                if (datasource != null && datasource.Length > 0)
-                    Param.Value = datasource;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@server", SqlDbType.VarChar, 256);
-                if (server != null && server.Length > 0)
-                    Param.Value = server;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@port", SqlDbType.Int);
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@title", title,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", appGuid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@version", version, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appKey", appKey,DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@path", path,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@application", application,DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@page", page, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cgi", cgi,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@width", width,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@height", height, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@datasource", datasource, DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@server", server, DbType.String, 256));  
                 if (port > 0)
-                    Param.Value = port;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", port, DbType.Int32));
                 else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@contact", SqlDbType.VarChar, 256);
-                if (contact != null && contact.Length > 0)
-                    Param.Value = contact;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@description", SqlDbType.VarChar, 2000);
-                if (description != null && description.Length > 0)
-                    Param.Value = description;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@comment", SqlDbType.VarChar, 256);
-                if (comment != null && comment.Length > 0)
-                    Param.Value = comment;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@extra", SqlDbType.NVarChar, 2000);
-                if (extra != null && extra.Length > 0)
-                    Param.Value = extra;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@rev", SqlDbType.VarChar, 50);
-                if (rev != null && rev.Length > 0)
-                    Param.Value = rev;
-                else
-                    Param.Value = DBNull.Value;
-                Param = cmd.Parameters.Add("@type", SqlDbType.Int);
-                Param.Value = type;
-
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", null, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@contact", contact, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@description", description, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@comment", comment,DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@extra", extra,DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rev", rev,DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.Int32));
+               
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
@@ -306,17 +197,16 @@ namespace iLabs.LabServer.Interactive
         public int ModifyLabPaths(string oldPath, string newPath)
         {
             int count = -1;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
-                SqlCommand cmd = new SqlCommand("ModifyLabPaths", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ModifyLabPaths", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter oldParam = cmd.Parameters.Add("@oldPath", SqlDbType.VarChar, 256);
-                oldParam.Value = oldPath;
-                SqlParameter newParam = cmd.Parameters.Add("@newPath", SqlDbType.VarChar, 256);
-                newParam.Value =newPath;
 
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@oldPath", oldPath,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@newPath", newPath,DbType.String, 256));
+            
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
@@ -337,15 +227,14 @@ namespace iLabs.LabServer.Interactive
         public int DeleteLabApp(int appId)
         {
             int count = -1;
-              SqlConnection connection = FactoryDB.GetConnection();
+              DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
-                SqlCommand cmd = new SqlCommand("RemoveLabApp", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("RemoveLabApp", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter Param = cmd.Parameters.Add("@appId", SqlDbType.Int);
-                Param.Value = appId;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId, DbType.Int32));
+               
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
@@ -365,7 +254,7 @@ namespace iLabs.LabServer.Interactive
 
         public LabAppInfo GetLabApp(int appId)
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             connection.Open();
             LabAppInfo info = GetLabApp(connection, appId);
             connection.Close();
@@ -374,7 +263,7 @@ namespace iLabs.LabServer.Interactive
 
         public LabAppInfo GetLabApp(string appKey)
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             connection.Open();
             LabAppInfo info = GetLabApp(connection, appKey);
             connection.Close();
@@ -384,12 +273,12 @@ namespace iLabs.LabServer.Interactive
         public IntTag [] GetLabAppTags()
         {
             ArrayList list = new ArrayList();
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
            // create sql command
-			SqlCommand cmd = new SqlCommand("GetLabAppTags", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetLabAppTags", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
@@ -402,7 +291,7 @@ namespace iLabs.LabServer.Interactive
                     list.Add(tag);
                 }
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -418,17 +307,16 @@ namespace iLabs.LabServer.Interactive
         public IntTag GetLabAppTag(int appId)
         {
             IntTag tag = null;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             // create sql command
 			// command executes the "GetVI" stored procedure
-			SqlCommand cmd = new SqlCommand("GetLabAppTag", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetLabAppTag", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter Param = cmd.Parameters.Add("@appId", SqlDbType.Int);
-			Param.Value = appId;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId, DbType.Int32));
 			
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
@@ -442,7 +330,7 @@ namespace iLabs.LabServer.Interactive
                     tag.tag = dataReader.GetString(1);
                 }
 			}
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -457,17 +345,16 @@ namespace iLabs.LabServer.Interactive
         public IntTag GetLabAppTag(string appKey)
         {
             IntTag tag = null;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
            // create sql command
 			// command executes the "GetVI" stored procedure
-			SqlCommand cmd = new SqlCommand("GetLabAppTagByKey", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetLabAppTagByKey", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter Param = cmd.Parameters.Add("@appKey", SqlDbType.VarChar,100);
-			Param.Value = appKey;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@appKey", appKey, DbType.String, 100));
 			
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -479,7 +366,7 @@ namespace iLabs.LabServer.Interactive
                     tag.tag = dataReader.GetString(1);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -492,24 +379,23 @@ namespace iLabs.LabServer.Interactive
             return tag;
         }
 
-        public LabAppInfo GetLabApp(SqlConnection connection, int appId)
+        public LabAppInfo GetLabApp(DbConnection connection, int appId)
         {
 	
 			// create sql command
 			// command executes the "GetVI" stored procedure
-			SqlCommand cmd = new SqlCommand("GetLabApp", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetLabApp", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter Param = cmd.Parameters.Add("@appId", SqlDbType.Int);
-			Param.Value = appId;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId, DbType.Int32));
 			
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
 				dataReader = cmd.ExecuteReader();
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -558,25 +444,24 @@ namespace iLabs.LabServer.Interactive
 	return appInfo;
 	}
 
-    public LabAppInfo GetLabApp(SqlConnection connection, string appKey)
+    public LabAppInfo GetLabApp(DbConnection connection, string appKey)
         {
             LabAppInfo appInfo = null;
 
             // create sql command
             // command executes the "GetVI" stored procedure
-            SqlCommand cmd = new SqlCommand("GetLabAppByKey", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetLabAppByKey", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter Param = cmd.Parameters.Add("@appKey", SqlDbType.VarChar,100);
-            Param.Value = appKey;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@appKey", appKey, DbType.String, 100));
 
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 dataReader = cmd.ExecuteReader();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -625,27 +510,27 @@ namespace iLabs.LabServer.Interactive
 
         public LabAppInfo[] GetLabApps()
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             connection.Open();
             LabAppInfo[] labs = GetLabApps(connection);
             connection.Close();
             return labs;
         }
 
-        public LabAppInfo[] GetLabApps(SqlConnection connection)
+        public LabAppInfo[] GetLabApps(DbConnection connection)
         {
 
             // create sql command
-            SqlCommand cmd = new SqlCommand("GetLabApps", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetLabApps", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
          
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 dataReader = cmd.ExecuteReader();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -702,25 +587,22 @@ namespace iLabs.LabServer.Interactive
  
         public LabAppInfo GetLabAppForGroup(string groupName, string serviceGUID)
 		{
-			SqlConnection connection =  FactoryDB.GetConnection();
+			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
-            SqlCommand cmd = new SqlCommand("GetLabAppByGroup", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetLabAppByGroup", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,256);
-			idParam.Value = groupName;
-            SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar,50);
-            guidParam.Value = serviceGUID;
-
-          
-			SqlDataReader dataReader = null;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupName", groupName,DbType.String, 256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", serviceGUID, DbType.AnsiString,50));
+            
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw e;
@@ -775,41 +657,28 @@ namespace iLabs.LabServer.Interactive
 		{
             LabTask task = new LabTask();
 
-			SqlConnection connection =  FactoryDB.GetConnection();
-			// create sql command
-			SqlCommand cmd = new SqlCommand("InsertTask", connection);
+			DbConnection connection =  FactoryDB.GetConnection();
+			DbCommand cmd = FactoryDB.CreateCommand("InsertTask", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@appid", SqlDbType.Int);
-			idParam.Value = app_id;
-            SqlParameter expidParam = cmd.Parameters.Add("@expid", SqlDbType.Int);
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appid", app_id, DbType.Int32));	
             if(exp_id < 1)
-                expidParam.Value = DBNull.Value;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@expid", null, DbType.Int64));
             else
-                expidParam.Value = exp_id;
-			SqlParameter groupParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,128);
-			groupParam.Value = groupName;
-			SqlParameter startParam = cmd.Parameters.Add("@startTime", SqlDbType.DateTime);
-            // This must be in UTC
-			startParam.Value = startTime;
-			SqlParameter endParam = cmd.Parameters.Add("@endTime", SqlDbType.DateTime);
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@expid", exp_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName,DbType.String,256));
+             // This must be in UTC
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime,DbType.DateTime));
             if (duration > 0)
-                endParam.Value = startTime.AddTicks(duration * TimeSpan.TicksPerSecond);
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime",startTime.AddTicks(duration * TimeSpan.TicksPerSecond), DbType.DateTime));
             else
-                endParam.Value = DateTime.MinValue;
-			SqlParameter statusParam = cmd.Parameters.Add("@status", SqlDbType.Int);
-			statusParam.Value = (int) status;
-			SqlParameter couponParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponParam.Value = coupon_ID;
-			SqlParameter guidParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.VarChar,50);
-			guidParam.Value = issuerGuidStr;
-			SqlParameter dataParam = cmd.Parameters.Add("@data", SqlDbType.NVarChar,2000);
-			if(data == null)
-                dataParam.Value = DBNull.Value;
-			else
-				dataParam.Value = data;
-           
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime",DateTime.MinValue, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", status,DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon_ID,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuidStr, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@data", data,DbType.String,2048));
+			
             // id of created task
             long itemID = -1;
 
@@ -818,7 +687,7 @@ namespace iLabs.LabServer.Interactive
                 connection.Open();
                 itemID = Convert.ToInt64(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw e;
@@ -847,16 +716,15 @@ namespace iLabs.LabServer.Interactive
 
 		public LabTask GetTask(long task_id)
 		{
-			SqlConnection connection =  FactoryDB.GetConnection();
+			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
-			SqlCommand cmd = new SqlCommand("GetTask", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetTask", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter Param = cmd.Parameters.Add("@taskid", SqlDbType.BigInt);
-			Param.Value = task_id;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@taskid",task_id, DbType.Int64));
 			
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             // id of created coupon
             LabTask taskInfo = new LabTask();
             try
@@ -864,8 +732,6 @@ namespace iLabs.LabServer.Interactive
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
 
-
-              
                 taskInfo.taskID = task_id;
                 while (dataReader.Read())
                 {
@@ -884,7 +750,7 @@ namespace iLabs.LabServer.Interactive
                         taskInfo.data = dataReader.GetString(8);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw e;
@@ -899,24 +765,22 @@ namespace iLabs.LabServer.Interactive
 
         public LabTask GetTask(long experiment_id, string sbGUID)
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             // create sql command
-            SqlCommand cmd = new SqlCommand("GetTaskByExperiment", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetTaskByExperiment", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter param = cmd.Parameters.Add("@experimentid", SqlDbType.BigInt);
-            param.Value = experiment_id;
-            SqlParameter paramSB = cmd.Parameters.Add("@sbguid", SqlDbType.VarChar,50);
-            paramSB.Value = sbGUID;
-
-            SqlDataReader dataReader = null;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentid", experiment_id,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sbguid", sbGUID, DbType.AnsiString,50));
+                        
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw e;
@@ -957,18 +821,18 @@ select taskID,Status
 */
 		public LabTask [] GetActiveTasks()
 		{
-			SqlConnection connection =  FactoryDB.GetConnection();
+			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
-			SqlCommand cmd = new SqlCommand("GetActiveTasks", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetActiveTasks", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw e;
@@ -1013,22 +877,21 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 */
 		public LabTask [] GetExpiredTasks(DateTime targetTime)
 		{
-			SqlConnection connection =  FactoryDB.GetConnection();
+			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
-			SqlCommand cmd = new SqlCommand("GetExpiredTasks", connection);
-			cmd.CommandType = CommandType.StoredProcedure;
-
+			DbCommand cmd = FactoryDB.CreateCommand("GetExpiredTasks", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
 			// populate parameters
-			SqlParameter Param = cmd.Parameters.Add("@targetTime", SqlDbType.DateTime);
-			Param.Value = targetTime;
-			
-			SqlDataReader dataReader = null;
+           
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@targetTime", targetTime, DbType.DateTime));
+		
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw e;
@@ -1065,27 +928,22 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 
 		public void SetTaskData(long task_id,string data)
 		{
-			SqlConnection connection =  FactoryDB.GetConnection();
+			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
-			SqlCommand cmd = new SqlCommand("SetTaskData", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("SetTaskData", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@taskid", SqlDbType.BigInt);
-			idParam.Value = task_id;
-			SqlParameter dataParam = cmd.Parameters.Add("@data", SqlDbType.NVarChar,2000);
-			if(data == null)
-				dataParam.Value = DBNull.Value;
-			else
-				dataParam.Value = data;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@taskid", task_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@data", data, DbType.String,2048));
+			
             try
             {
                 connection.Open();
                 cmd.ExecuteNonQuery();
 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw e;
@@ -1106,24 +964,22 @@ update task set status = @status where taskID = @taskID
 */
 		public void SetTaskStatus(long task_id, int status)
 		{
-			SqlConnection connection =  FactoryDB.GetConnection();
+			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
-			SqlCommand cmd = new SqlCommand("SetTaskStatus", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("SetTaskStatus", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@taskID", SqlDbType.BigInt);
-			idParam.Value = task_id;
-			SqlParameter statusParam = cmd.Parameters.Add("@status", SqlDbType.Int);
-			statusParam.Value = status;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@taskID", task_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", status, DbType.Int32));
 			
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw e;
@@ -1248,19 +1104,17 @@ update task set status = @status where taskID = @taskID
         {
             LabTask.eStatus status = LabTask.eStatus.NotFound;
             int result = -10;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             // create sql command
             // command executes the "GetExperimentStatus" stored procedure
-            SqlCommand cmd = new SqlCommand("GetTaskStatusByExperiment", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetTaskStatusByExperiment", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter ParamID = cmd.Parameters.Add("@id", SqlDbType.BigInt);
-            ParamID.Value = id;
-            SqlParameter ParamGUID = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-            ParamGUID.Value = issuer;
-
-            SqlDataReader dataReader = null;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", id, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", issuer, DbType.AnsiString, 50));
+            
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -1274,7 +1128,7 @@ update task set status = @status where taskID = @taskID
                 }
                 Utilities.WriteLog("ExperimentStatus count: " + count);
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;

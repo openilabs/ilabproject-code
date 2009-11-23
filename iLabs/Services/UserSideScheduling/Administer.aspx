@@ -35,7 +35,7 @@
 		<tr>
 										<th>
 											<label for="lss">Lab Side Scheduling Server</label></th>
-										<td style="width: 454px"><asp:DropDownList id="ddlLSS" runat="server" AutoPostBack="True" onselectedindexchanged="ddlLSS_SelectedIndexChanged" Width="100%"></asp:DropDownList>
+										<td style="width: 454px"><asp:DropDownList cssClass="i18n" id="ddlLSS" runat="server" AutoPostBack="True" onselectedindexchanged="ddlLSS_SelectedIndexChanged" Width="100%"></asp:DropDownList>
 											</td>
 									</tr>
 		<tr>

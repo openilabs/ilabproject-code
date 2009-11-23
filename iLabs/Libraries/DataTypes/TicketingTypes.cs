@@ -8,6 +8,7 @@ namespace iLabs.DataTypes.TicketingTypes
     /// Coupons convey passcodes and domain authorization information.
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class Coupon
     {
         /// <summary>
@@ -79,6 +80,7 @@ namespace iLabs.DataTypes.TicketingTypes
     }
 
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class Ticket
     {
         /// <summary>

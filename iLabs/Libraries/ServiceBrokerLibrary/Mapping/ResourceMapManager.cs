@@ -212,6 +212,8 @@ namespace iLabs.ServiceBroker.Mapping
         public static List<ResourceMapping> Find(ResourceMappingEntry key, ResourceMappingValue[] values)
         {
             List<ResourceMapping> returnList = null;
+            //if (needsRefresh)
+            //    Refresh();
             List<ResourceMapping> list = Get(key);
             if (list != null && list.Count > 0)
             {

@@ -67,7 +67,7 @@ Please see license.txt in top level directory for full license.
 											<label for="affiliation">Affiliation</label></th>
 										<td>
 											<% if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true")){ %>
-											<asp:dropdownlist id="ddlAffiliation" Runat="server" Width="171px"></asp:dropdownlist>
+											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server" Width="171px"></asp:dropdownlist>
 											<!--select name="affiliation" id="affiliation">
 												<option value="0" selected>-- Make selection --</option>
 												<option>item 1</option>
@@ -102,7 +102,7 @@ Please see license.txt in top level directory for full license.
 								</table>
 							</div>
 						</div>
-						<div class="simpleform"><label for="searchby">Search by</label><asp:dropdownlist id="ddlSearchBy" Runat="server" Width="200">
+						<div class="simpleform"><label for="searchby">Search by</label><asp:dropdownlist CssClass="i18n" id="ddlSearchBy" Runat="server" Width="200">
 								<asp:ListItem Value="-- select one --">-- select one --</asp:ListItem>
 								<asp:ListItem Value="Username">Username</asp:ListItem>
 								<asp:ListItem Value="Last Name">Last Name</asp:ListItem>
@@ -114,7 +114,7 @@ Please see license.txt in top level directory for full license.
 						<div>&nbsp;</div>
 						<div class="simpleform"><label for="selectauser">Select a User (Last Name, First Name - 
 								Username)</label><br>
-							<asp:listbox id="lbxSelectUser" Runat="server" Width="256px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectUser_SelectedIndexChanged"></asp:listbox></div>
+							<asp:listbox cssClass="i18n" id="lbxSelectUser" Runat="server" Width="256px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectUser_SelectedIndexChanged"></asp:listbox></div>
 					</div>
 					<br clear="all">
 					<!-- end pagecontent div --></div>

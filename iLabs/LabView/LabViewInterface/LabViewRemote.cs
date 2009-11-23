@@ -26,14 +26,15 @@ using CWDSLib;
 
 #if LabVIEW_86
 using LabVIEW.lv86;
+
 namespace iLabs.LabView.LV86
-{
 #endif
 #if LabVIEW_82
 using LabVIEW.lv821;
+
 namespace iLabs.LabView.LV82
-{
 #endif
+{
 
 
     /// <summary>
@@ -65,7 +66,8 @@ namespace iLabs.LabView.LV82
         /// <param name="host"></param>
         /// <param name="port"></param>
         public LabViewRemote(string host, int port)
-        : base(){
+            : base()
+        {
             if (host != null)
                 this.host = host;
             this.port = port;
@@ -142,7 +144,7 @@ namespace iLabs.LabView.LV82
 
                 url = "dstp://" + host + "/iLabsReader";
             else
-                url ="dstp://localhost" + "/iLabsReader";
+                url = "dstp://localhost" + "/iLabsReader";
             StringBuilder buf = new StringBuilder();
             if (state)
                 data = "lockvi|" + viName;
@@ -151,7 +153,7 @@ namespace iLabs.LabView.LV82
             string[] connectors = new String[2];
             connectors[0] = @"URL";
             connectors[1] = @"data";
-           
+
             object param1 = (object)connectors;
 
             object[] values = new object[2];
@@ -245,10 +247,10 @@ namespace iLabs.LabView.LV82
 
                 object[] data = new object[4];
                 data[0] = (object)viname;
-                data[2] = (object) host;
-                data[3] = (object) port;
-            
-           
+                data[2] = (object)host;
+                data[3] = (object)port;
+
+
                 object param2 = (object)data;
 
                 //Call the VI
@@ -273,7 +275,7 @@ namespace iLabs.LabView.LV82
         public override VirtualInstrument GetVI(string viName, bool resvForCall, int options)
         {
             VirtualInstrument vi = null;
-            VirtualInstrument getterVI  = getGetVI();
+            VirtualInstrument getterVI = getGetVI();
             StringBuilder msg = new StringBuilder();
             try
             {
@@ -284,18 +286,18 @@ namespace iLabs.LabView.LV82
                 connectors[1] = "viReference";
                 connectors[2] = "errorOut";
                 connectors[3] = "machineName";
-                data[3] = (object) host;
+                data[3] = (object)host;
                 connectors[4] = "port";
-                data[4] = (object) port;
+                data[4] = (object)port;
 
                 object param1 = (object)connectors;
                 object param2 = (object)data;
-              //Call the VI
+                //Call the VI
                 getterVI.Call(ref param1, ref param2);
                 //Display the result
                 //Data returned
                 if (((object[])param2)[1] != null)
-                    vi = (VirtualInstrument) ((object[])param2)[1];
+                    vi = (VirtualInstrument)((object[])param2)[1];
                 //Error returned
                 if (((object[])param2)[2] != null)
                     msg.Append(((object[])param2)[2].ToString());
@@ -306,8 +308,8 @@ namespace iLabs.LabView.LV82
             }
             return vi;
         }
- 
-        public  override string CreateFromTemplate(string path, string templateBase, string suffix)
+
+        public override string CreateFromTemplate(string path, string templateBase, string suffix)
         {
             string buf = null;
             VirtualInstrument templateVI = getFromTemplate();
@@ -333,12 +335,12 @@ namespace iLabs.LabView.LV82
                 templateVI.Call(ref param1, ref param2);
 
                 if (((object[])param2)[3] != null)
-                    buf = (string) ((object[])param2)[3];
+                    buf = (string)((object[])param2)[3];
             }
             return buf;
         }
 
-   
+
 
         /*
                 /// <summary>
@@ -403,7 +405,7 @@ namespace iLabs.LabView.LV82
                 }
  
         */
-     
+
         public override string submitAction(string actionStr, string valueStr)
         {
             /*
@@ -481,7 +483,7 @@ namespace iLabs.LabView.LV82
             return message.ToString();
         }
 
- 
+
 
         VirtualInstrument getCGI()
         {
@@ -766,10 +768,4 @@ namespace iLabs.LabView.LV82
  */
 
     }
-#if LabVIEW_86
 }
-#endif
-#if LabVIEW_82
-}
-#endif
-

@@ -1,4 +1,4 @@
-#define LabVIEW_82
+#define LabVIEW_86
 
 namespace iLabs.LabServer.LabView
 {

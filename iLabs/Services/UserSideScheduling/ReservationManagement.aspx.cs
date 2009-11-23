@@ -179,32 +179,29 @@ namespace iLabs.Scheduling.UserSide
 		}
 		protected void btnGo_Click(object sender, System.EventArgs e)
 		{
+            string userName = null;
+            int credentialSetId = -1;
+            int experimentInfoId = -1;
 			lblErrorMessage.Text ="";
 			lblErrorMessage.Visible=false;
-			if(ddlGroup.SelectedIndex <= 0)
-			{
-				lblErrorMessage.Text =Utilities.FormatWarningMessage("please select a group!");
-				lblErrorMessage.Visible=true;
-				return;
-			}
-			    int credentialSetId = Int32.Parse(ddlGroup.SelectedValue) ;
-				int experimentInfoId = -1;
-				string userName = txtUserName.Text;
 
-                if (ddlExperiment.SelectedIndex >= 1)
+            userName = txtUserName.Text;
+            if (ddlGroup.SelectedIndex > 0)
+            {
+                credentialSetId = Int32.Parse(ddlGroup.SelectedValue);
+            }
+				
+				
+
+                if (ddlExperiment.SelectedIndex > 0)
                 {
                     experimentInfoId = Int32.Parse(ddlExperiment.SelectedValue);
                 }
-                else
-                {
-                    lblErrorMessage.Text = Utilities.FormatWarningMessage("please select a experiment!");
-                    lblErrorMessage.Visible = true;
-                    return;
-                }
+                
 				
-				if (ddlTimeIs.SelectedIndex<1)
+				if (ddlTimeIs.SelectedIndex<1) // select-Time
 				{
-					BuildReservationListBox(userName, experimentInfoId,credentialSetId, DateTime.MinValue,DateTime.MinValue);
+                    BuildReservationListBox(userName, experimentInfoId, credentialSetId, FactoryDB.MinDbDate, FactoryDB.MaxDbDate);
 
 				}
 				else 
@@ -220,22 +217,22 @@ namespace iLabs.Scheduling.UserSide
 						lblErrorMessage.Visible=true;
 						return;
 					}
-					if(ddlTimeIs.SelectedIndex==1)
+					if(ddlTimeIs.SelectedIndex==1) // Equal
 					{
 						BuildReservationListBox(userName, experimentInfoId,credentialSetId, time1,time1);
 
 					}
-					else if(ddlTimeIs.SelectedIndex==2)
+					else if(ddlTimeIs.SelectedIndex==2) // before
 					{
-						BuildReservationListBox(userName, experimentInfoId,credentialSetId, DateTime.MinValue,time1);
+                        BuildReservationListBox(userName, experimentInfoId, credentialSetId, FactoryDB.MinDbDate, time1);
 
 					}				
-					else if(ddlTimeIs.SelectedIndex==3)
+					else if(ddlTimeIs.SelectedIndex==3) // after
 					{
-						BuildReservationListBox(userName, experimentInfoId,credentialSetId,time1,DateTime.MinValue);
+                        BuildReservationListBox(userName, experimentInfoId, credentialSetId, time1, FactoryDB.MaxDbDate);
 
 					}
-					else if(ddlTimeIs.SelectedIndex==4)
+					else if(ddlTimeIs.SelectedIndex==4) // between
 					{
 						DateTime time2;
 						try

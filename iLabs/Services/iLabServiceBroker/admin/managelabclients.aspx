@@ -70,7 +70,7 @@ Please see license.txt in top level directory for full license.
 								<tr>
 									<th>
 										<label for="labclient">Lab Client</label></th>
-									<td style="width: 501px"><asp:dropdownlist id="ddlLabClient" Runat="server" Width="496px" AutoPostBack="True" onselectedindexchanged="ddlLabClient_SelectedIndexChanged"></asp:dropdownlist></td>
+									<td style="width: 501px"><asp:dropdownlist CssClass="i18n" id="ddlLabClient" Runat="server" Width="496px" AutoPostBack="True" onselectedindexchanged="ddlLabClient_SelectedIndexChanged"></asp:dropdownlist></td>
 								</tr>
 								<tr>
 									<th>
@@ -126,7 +126,7 @@ Please see license.txt in top level directory for full license.
 								<tr>
 									<th>
 										<label for="notes">Client Type</label></th>
-									<td style="width: 501px"><asp:DropDownList id="ddlClientTypes" Runat="server" Width="496px"></asp:DropDownList></td>
+									<td style="width: 501px"><asp:DropDownList CssClass="i18n" id="ddlClientTypes" Runat="server" Width="496px"></asp:DropDownList></td>
 								</tr>
 								<tr>
 									<th>
@@ -136,7 +136,7 @@ Please see license.txt in top level directory for full license.
 								<tr id="trNeedsESS">
 									<th>
 										<label for="needsExperimentStorage">Needs&nbsp;ESS</label></th>
-									<td style="height: 26px; width: 501px;"><asp:checkBox id="cbxESS" Runat="server" Width="24px"></asp:checkBox>&nbsp;<asp:DropDownList id="ddlAssociatedESS" Runat="server" Width="344px"></asp:DropDownList>
+									<td style="height: 26px; width: 501px;"><asp:checkBox id="cbxESS" Runat="server" Width="24px"></asp:checkBox>&nbsp;<asp:DropDownList CssClass="i18n" id="ddlAssociatedESS" Runat="server" Width="344px"></asp:DropDownList>
                                         &nbsp;&nbsp;&nbsp;
                                         <asp:Button ID="btnRegisterESS" CssClass="button" runat="server" Text="Associate" OnClick="btnRegisterESS_Click" />
                                         <asp:Button ID="btnDissociateESS" CssClass="button" runat="server" Text="Dissociate" OnClick="btnDissociateESS_Click" />
@@ -147,7 +147,7 @@ Please see license.txt in top level directory for full license.
 								<tr id="trNeedsUSS">
 									<th>
 										<label for="needsSchduling">Needs&nbsp;Scheduling</label></th>
-									<td style="height: 26px; width: 501px;"><asp:checkbox id="cbxScheduling" Runat="server" Width="24px"></asp:checkbox>&nbsp;<asp:DropDownList id="ddlAssociatedUSS" Runat="server" Width="344px"></asp:DropDownList>
+									<td style="height: 26px; width: 501px;"><asp:checkbox id="cbxScheduling" Runat="server" Width="24px"></asp:checkbox>&nbsp;<asp:DropDownList CssClass="i18n" id="ddlAssociatedUSS" Runat="server" Width="344px"></asp:DropDownList>
 									    &nbsp;&nbsp;&nbsp;
 									    <asp:Button ID="btnRegisterUSS" runat="server" CssClass="button" OnClick="btnRegisterUSS_Click" Text="Associate" />
                                         <asp:Button ID="btnDissociateUSS" runat="server" CssClass="button" OnClick="btnDissociateUSS_Click" Text="Dissociate" />
@@ -155,7 +155,7 @@ Please see license.txt in top level directory for full license.
                                         &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;
                                         </td>
 								</tr>
-								<tr id="trIsReentrant" runat="server" visible="false">
+								<tr id="trIsReentrant" runat="server" visible="true">
 									<th style="height: 26px">
 										<label for="isReentrant">Is Reentrant</label></th>
 									<td style="width: 501px"><asp:checkbox id="cbxIsReentrant" Runat="server" Width="24px"></asp:checkbox></td>

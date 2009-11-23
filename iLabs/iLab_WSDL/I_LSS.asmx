@@ -27,19 +27,20 @@ using iLabs.DataTypes.SchedulingTypes;
 
 
 	/// <summary>
-	/// Summary description for SchedulingService.
+	/// The interface specification for Lab Scheduling Servers.
 	/// </summary>
     [XmlType(Namespace = "http://ilab.mit.edu/iLabs/Type")]
     [WebServiceBinding(Name = "ILSS", Namespace = "http://ilab.mit.edu/iLabs/Services"),
-    WebService(Name = "LabSchedulingProxy", Namespace = "http://ilab.mit.edu/iLabs/Services")]
+    WebService(Name = "LabSchedulingProxy", Namespace = "http://ilab.mit.edu/iLabs/Services",
+        Description="The interface specification for Lab Scheduling Servers.")]
     public abstract class I_LSS : System.Web.Services.WebService
 	{
         public OperationAuthHeader opHeader = new OperationAuthHeader();
         public AgentAuthHeader agentAuthHeader = new AgentAuthHeader();
        
 		/// <summary>
-		/// retrieve available time periods(UTC) overlaps 
-        /// with a time chunk for a particular group and particular experiment,
+        /// Retrieve an array of available time periods(UTC) for a particular group and particular experiment delimited by a time period. 
+        /// Time periods should be ordered by start time and may contain differing quantums and length.
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
@@ -50,7 +51,8 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="endTime">UTC end time</param>
         /// <returns>return an array of time periods (UTC), each of the 
         /// time periods is longer than the experiment's minimum time</returns> 
-        [WebMethod(Description="Retrieve available time periods for a particular group and particular experiment")]
+        [WebMethod(Description=" Retrieve an array of available time periods(UTC) for a particular group and particular experiment delimited by a time period. " 
+        + "Time periods should be ordered by start time and may contain differing quantums and length.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract TimePeriod[] RetrieveAvailableTimePeriods(string serviceBrokerGuid,
@@ -66,9 +68,9 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
-		/// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
-        /// <param name="startTime">UTC start time</param>
+        /// <param name="clientGuid"></param>param>
+        /// <param name="startTime">UTC start time</
         /// <param name="endTime">UTC end time</param>
         /// <returns>the notification whether the reservation is confirmed. If not, 
         /// notification will give a reason</returns>
@@ -81,7 +83,7 @@ using iLabs.DataTypes.SchedulingTypes;
             DateTime startTime, DateTime endTime);
 
         /// <summary>
-        /// Update the reservation status
+        /// Redeem the reservation
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
@@ -91,7 +93,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="startTime">UTC start time</param>
         /// <param name="endTime">UTC end time</param>
         /// <returns>true updated successfully, false otherwise</returns>
-        [WebMethod(Description="Used to update reservation status on LSS")]
+        [WebMethod(Description="Used to redeem the reservation status on LSS,")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RedeemReservation(string serviceBrokerGuid, string groupName,
@@ -99,7 +101,7 @@ using iLabs.DataTypes.SchedulingTypes;
             DateTime startTime, DateTime endTime);
         
 		/// <summary>
-		/// Removes all resevations which intersect the parameters, called from the USS does not require the LSS to notify the USS.
+		/// Removes all reservations which intersect the parameters, called from the USS does not require the LSS to notify the USS.
 		/// </summary>
         /// <param name="serviceBrokerGuid">Must be specified if groupName specified</param>
 		/// <param name="groupName"></param>
@@ -109,7 +111,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="startTime">UTC start time, trucated within the method to UTCnow</param>
         /// <param name="endTime">UTC end time</param>
         /// <returns>true remove successfully, false otherwise</returns>
-        [WebMethod]
+        [WebMethod(Description="Removes all reservations which intersect the parameters, called from the USS does not require the LSS to notify the USS.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RemoveReservation(string serviceBrokerGuid, string groupName,
@@ -123,44 +125,45 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// <param name="ussName"></param>
 		/// <param name="ussUrl"></param>
         /// <returns>true if the USSInfo is added successfully, false otherwise</returns>
-        [WebMethod]
+        [WebMethod(Description="Add information of a particular user side scheduling server. "
+        + "This is called from the ServiceBroker, it may be called many times, duplicate entries are not added to the database")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int AddUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon);
 
         /// <summary>
-        /// Add information of a particular user side scheduling server identified by ussID 
+        /// Modify information about a registered USS. 
         /// </summary>
         /// <param name="ussGuid"></param>
         /// <param name="ussName"></param>
         /// <param name="ussUrl"></param>
         /// <returns>true if the USSInfo is added successfully, false otherwise</returns>
-        [WebMethod]
+        [WebMethod(Description="Modify information about a registered USS.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int ModifyUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon);
         
         /// <summary>
-        /// Add information of a particular user side scheduling server identified by ussID 
+        /// Remove information of a particular user side scheduling server identified by ussGuid. 
         /// </summary>
         /// <param name="ussGuid"></param>
         /// <param name="ussName"></param>
         /// <param name="ussUrl"></param>
         /// <returns>true if the USSInfo is added successfully, false otherwise</returns>
-        [WebMethod]
+        [WebMethod(Description="Remove information of a particular user side scheduling server identified by ussGuid.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RemoveUSSInfo(string ussGuid);
         
 		/// <summary>
-		/// add a credential set of a particular group
+		/// Add a credential set for a particular group, this may be callled multiple times for the same group.
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="serviceBrokerName"></param>
 		/// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns>true if the CredentialSet is added successfully, false otherwise</returns>
-        [WebMethod]
+        [WebMethod(Description="Add a credential set for a particular group, this may be callled multiple times for the same group.")]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, 
@@ -168,34 +171,34 @@ using iLabs.DataTypes.SchedulingTypes;
 
 
         /// <summary>
-        /// add a credential set of a particular group
+        ///Modify the ServiceBroker's server name for a credential set.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="serviceBrokerName"></param>
         /// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns>true if the CredentialSet is added successfully, false otherwise</returns>
-        [WebMethod]
+        [WebMethod(Description="Modify the ServiceBroker's server name for a credential set.")]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int ModifyCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid);
 
         /// <summary>
-        /// remove a credential set of a particular group
+        /// Remove a credential set of a particular group.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns></returns>true if the CredentialSet is removed successfully, false otherwise
-        [WebMethod]
+        [WebMethod(Description="Remove a credential set of a particular group.")]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RemoveCredentialSet(string serviceBrokerGuid,
             string groupName, string ussGuid);
 
         /// <summary>
-        /// add information of a particular experiment
+        /// Add information of a particular experiment
         /// </summary>
         /// <param name="labServerGuid"></param>
         /// <param name="labServerName"></param>
@@ -205,7 +208,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="providerName"></param>
         /// <returns></returns>true, the experimentInfo is added 
         /// successfully, false otherwise
-        [WebMethod]
+        [WebMethod(Description="Add information for a particular experiment.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int AddExperimentInfo(string labServerGuid, string labServerName,
@@ -213,7 +216,7 @@ using iLabs.DataTypes.SchedulingTypes;
             string providerName);
 
         /// <summary>
-        /// add information of a particular experiment
+        /// Modify information of a particular experiment
         /// </summary>
         /// <param name="labServerGuid"></param>
         /// <param name="labServerName"></param>
@@ -223,7 +226,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="providerName"></param>
         /// <returns></returns>true, the experimentInfo is added 
         /// successfully, false otherwise
-        [WebMethod]
+        [WebMethod(Description="Modify information of a particular experiment.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int ModifyExperimentInfo(string labServerGuid, string labServerName,
@@ -241,7 +244,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="providerName"></param>
         /// <returns></returns>true, the experimentInfo is removed 
         /// successfully, false otherwise
-        [WebMethod]
+        [WebMethod(Description="Remove a particular experiment.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RemoveExperimentInfo(string labServerGuid, string clientGuid);

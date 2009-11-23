@@ -92,12 +92,12 @@ Please see license.txt in top level directory for full license.
 								</th>
 							</tr>
 							<tr>
-								<td style="WIDTH: 307px"><asp:listbox id="lbxAllParents" Runat="server" Width="280px" Rows="6" Columns="30" TextMode="MultiLine"></asp:listbox></td>
+								<td style="WIDTH: 307px"><asp:listbox cssClass="i18n" id="lbxAllParents" Runat="server" Width="280px" Rows="6" Columns="30" TextMode="MultiLine"></asp:listbox></td>
 								<td class="buttonstyle"><asp:imagebutton id="ibtnAddParent" Runat="server" Width="50" ImageUrl="../img/add-btn.gif" CssClass="buttonstyle"
 										Height="22"></asp:imagebutton><br />
 									<asp:imagebutton id="ibtnRemoveParent" Runat="server" Width="74" ImageUrl="../img/remove-btn.gif"
 										CssClass="buttonstyle" Height="22"></asp:imagebutton></td>
-								<td style="WIDTH: 306px"><asp:listbox id="lbxParentGroups" Runat="server" Width="288px" Rows="6" Columns="30" TextMode="MultiLine"></asp:listbox></td>
+								<td style="WIDTH: 306px"><asp:listbox cssClass="i18n" id="lbxParentGroups" Runat="server" Width="288px" Rows="6" Columns="30" TextMode="MultiLine"></asp:listbox></td>
 								<td style="WIDTH: 1px"></td>
 							</tr>
 						</table>

@@ -12,7 +12,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 
 using iLabs.Core;
 using iLabs.DataTypes;
@@ -42,7 +42,7 @@ namespace iLabs.ExpStorage
             long experimentId = -1;
             int code = -1;
 
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
+            DbConnection myConnection = FactoryDB.GetConnection();
             try
             {
                 myConnection.Open();
@@ -74,24 +74,24 @@ namespace iLabs.ExpStorage
             return code;
         }
 
-        public long CreateExperiment(SqlConnection myConnection, long duration, long sbExperimentId, string sbGuid)
+        public long CreateExperiment(DbConnection myConnection, long duration, long sbExperimentId, string sbGuid)
         {
             long experimentId = -1;
 
-            SqlCommand myCommand = new SqlCommand("CreateExperiment", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("CreateExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@experimentID", sbExperimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            SqlParameter scheduledParam = myCommand.Parameters.Add("@scheduledClose", SqlDbType.DateTime);
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", sbExperimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+            
             if (duration != -1)
             {
                 DateTime scheduledClose = DateTime.UtcNow.AddTicks(duration * TimeSpan.TicksPerSecond);
-                scheduledParam.Value = scheduledClose;
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", scheduledClose, DbType.DateTime));
             }
             else
             {
-                scheduledParam.Value = System.DBNull.Value;
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", null, DbType.DateTime));
             }
             try
             {
@@ -104,32 +104,30 @@ namespace iLabs.ExpStorage
             return experimentId;
         }
 
-        public int UpdateExperiment(SqlConnection myConnection, long sbExperimentId, string sbGuid,
+        public int UpdateExperiment(DbConnection myConnection, long sbExperimentId, string sbGuid,
             int statusCode, DateTime scheduledClose, DateTime closeTime)
         {
             int status = -1;
-            SqlCommand myCommand = new SqlCommand("UpdateExperiment", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("UpdateExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentID", sbExperimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            myCommand.Parameters.Add(new SqlParameter("@status", statusCode));
-            SqlParameter scheduledParam = myCommand.Parameters.Add("@scheduledClose", SqlDbType.DateTime);
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", sbExperimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@status", statusCode, DbType.Int32));
             if (scheduledClose != DateTime.MinValue)
             {
-                scheduledParam.Value = scheduledClose;
+                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", scheduledClose, DbType.DateTime));
             }
             else
             {
-                scheduledParam.Value = System.DBNull.Value;
+                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", null, DbType.DateTime));
             }
-            SqlParameter closeParam = myCommand.Parameters.Add("@closeTime", SqlDbType.DateTime);
             if (closeTime != DateTime.MinValue)
             {
-                closeParam.Value = closeTime;
+                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@closeTime", closeTime, DbType.DateTime));
             }
             else
             {
-                closeParam.Value = System.DBNull.Value;
+                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@closeTime", null, DbType.DateTime));
             }
             try
             {
@@ -155,7 +153,7 @@ namespace iLabs.ExpStorage
         /// <returns>true if the experiment was successfully closed; false otherwise</returns>
         public bool CloseExperiment(long experimentId, string guid, int statusCode)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
+            DbConnection myConnection = FactoryDB.GetConnection();
 
             try
             {
@@ -172,13 +170,13 @@ namespace iLabs.ExpStorage
             }
         }
 
-        public bool CloseExperiment(SqlConnection myConnection, long experimentId, string guid, int statusCode)
+        public bool CloseExperiment(DbConnection myConnection, long experimentId, string guid, int statusCode)
         {
-            SqlCommand myCommand = new SqlCommand("CloseExperiment", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("CloseExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", guid));
-            myCommand.Parameters.Add(new SqlParameter("@statusCode", statusCode));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", guid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@statusCode", statusCode, DbType.Int32));
 
             try
             {
@@ -196,7 +194,7 @@ namespace iLabs.ExpStorage
         public StorageStatus GetExperimentStatus(long experimentID, string guid)
         {
             StorageStatus status = null;
-            SqlConnection connection = ProcessAgentDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 connection.Open();
@@ -211,17 +209,17 @@ namespace iLabs.ExpStorage
 
 
 
-        public StorageStatus GetExperimentStatus(SqlConnection connection, long experimentID, string guid)
+        public StorageStatus GetExperimentStatus(DbConnection connection, long experimentID, string guid)
         {
             StorageStatus status = null;
 
             try
             {
-                SqlCommand myCommand = new SqlCommand("GetExperimentStatus", connection);
+                DbCommand myCommand = FactoryDB.CreateCommand("GetExperimentStatus", connection);
                 myCommand.CommandType = CommandType.StoredProcedure;
-                myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentID));
-                myCommand.Parameters.Add(new SqlParameter("@issuerGuid", guid));
-                SqlDataReader reader = myCommand.ExecuteReader();
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentId", experimentID, DbType.Int64));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", guid, DbType.AnsiString,50));
+                DbDataReader reader = myCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     status = new StorageStatus();
@@ -253,7 +251,7 @@ namespace iLabs.ExpStorage
         public StorageStatus SetExperimentStatus(long experimentID, string guid, int statusCode)
         {
             StorageStatus status = null;
-            SqlConnection connection = ProcessAgentDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 connection.Open();
@@ -266,14 +264,14 @@ namespace iLabs.ExpStorage
             }
             return status;
         }
-        private bool setExperimentStatus(SqlConnection connection, long experimentID, string guid, int statusCode)
+        private bool setExperimentStatus(DbConnection connection, long experimentID, string guid, int statusCode)
         {
 
-            SqlCommand myCommand = new SqlCommand("SetExperimentStatus", connection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SetExperimentStatus", connection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentID));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", guid));
-            myCommand.Parameters.Add(new SqlParameter("@statusCode", statusCode));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentId", experimentID, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", guid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@statusCode", statusCode, DbType.Int32));
             try
             {
 
@@ -287,7 +285,7 @@ namespace iLabs.ExpStorage
             }
         }
 
-        public long[] GetEssExpIDs(SqlConnection connection, long[] expIds, string issuer)
+        public long[] GetEssExpIDs(DbConnection connection, long[] expIds, string issuer)
         {
             List<long> essIds = new List<long>();
             StringBuilder sql = new StringBuilder("select essExp_Id from experiments where issuer_GUID ='");
@@ -306,14 +304,14 @@ namespace iLabs.ExpStorage
                 sql.Append(")");
             }
 
-            SqlCommand myCommand = new SqlCommand(sql.ToString(), connection);
+            DbCommand myCommand = FactoryDB.CreateCommand(sql.ToString(), connection);
 
 
             try
             {
                 connection.Open();
                 // get experiment ids from table experiments
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 while (myReader.Read())
                 {
@@ -415,16 +413,16 @@ namespace iLabs.ExpStorage
                 //sql.AppendLine(") ");
             }
             //sql.AppendLine(")");
-            SqlConnection connection = ProcessAgentDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             Utilities.WriteLog(sql.ToString());
-            SqlCommand myCommand = new SqlCommand(sql.ToString(), connection);
+            DbCommand myCommand = FactoryDB.CreateCommand(sql.ToString(), connection);
 
 
             try
             {
                 connection.Open();
                 // get experiment ids from table experiments
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 while (myReader.Read())
                 {
@@ -452,11 +450,11 @@ namespace iLabs.ExpStorage
         /// <returns>the idle time in minutes</returns>
         public int GetIdleTime(long experimentId, string sbGuid)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveExperimentIdleTime", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentIdleTime", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
             try
             {
                 myConnection.Open();
@@ -481,11 +479,11 @@ namespace iLabs.ExpStorage
         /// <returns>true if the Experiment was successfully deleted</returns>
         public bool DeleteExperiment(long experimentId, string sbGuid)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("DeleteExperiment", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("DeleteExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
 
             try
             {
@@ -516,9 +514,9 @@ namespace iLabs.ExpStorage
         public int AddRecord(long experimentId, string sbGuid, string submitter, string type, bool xmlSearchable,
             string contents, RecordAttribute[] attributes)//, recordCreatorName
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("AddExperimentRecord", myConnection);
-            SqlTransaction tran = null;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("AddExperimentRecord", myConnection);
+            DbTransaction tran = null;
             myCommand.CommandType = CommandType.StoredProcedure;
 
             ////Get the Service Broker record from the database
@@ -527,18 +525,18 @@ namespace iLabs.ExpStorage
             ////Get the Service Broker name - This is the sponsor of the "ADMINISTER EXPERIMENT" ticket
             //string sponsorGuid = paInfo[0].agentGuid;
 
-            //myCommand.Parameters.Add(new SqlParameter("@sponsorGuid", sponsorGuid));
+            //myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sponsorGuid", sponsorGuid));
 
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            myCommand.Parameters.Add(new SqlParameter("@submitter", submitter));
-            myCommand.Parameters.Add(new SqlParameter("@type", type));
-            myCommand.Parameters.Add(new SqlParameter("@xmlSearchable", xmlSearchable));
-            myCommand.Parameters.Add(new SqlParameter("@contents", contents));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", sbGuid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@submitter", submitter, DbType.String,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@type", type, DbType.AnsiString,100));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@xmlSearchable", xmlSearchable, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@contents", contents, DbType.String));
 
             //NOTE: TEMPORARY PARAMETER
-            //myCommand.Parameters.Add(new SqlParameter("@submitterName", "Service Broker"));
-            //myCommand.Parameters.Add(new SqlParameter("@submitterName", recordCreatorName));
+            //myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@submitterName", "Service Broker"));
+            //myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@submitterName", recordCreatorName));
 
 
             try
@@ -556,11 +554,11 @@ namespace iLabs.ExpStorage
                     myCommand.Parameters.Clear();
                     myCommand.CommandText = "AddRecordAttribute";
                     myCommand.CommandType = CommandType.StoredProcedure;
-                    myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                    myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                    myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNo));
-                    myCommand.Parameters.Add("@attributeName", SqlDbType.VarChar);
-                    myCommand.Parameters.Add("@attributeValue", SqlDbType.VarChar);
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentId", experimentId, DbType.Int64));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNo, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeName", null, DbType.String,256));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeValue", null, DbType.String,256));
 
                     foreach (RecordAttribute a in attributes)
                     {
@@ -645,26 +643,24 @@ namespace iLabs.ExpStorage
                             break;
                     }
                  }
-                 SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveExperimentRecordNumbersCriteria", myConnection);
+                 DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentRecordNumbersCriteria", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            SqlParameter fieldParam = myCommand.Parameters.Add(new SqlParameter("@fieldQuery",SqlDbType.VarChar,(2000)));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
             if (hasFields)
-                fieldParam.Value = sql.ToString();
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@fieldQuery",sql.ToString(), DbType.AnsiString,2000));
             else
-                fieldParam.Value = DBNull.Value;
-            SqlParameter attributeParam = myCommand.Parameters.Add(new SqlParameter("@attributeQuery", SqlDbType.VarChar, (2000)));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@fieldQuery",null, DbType.AnsiString,2000));
             if (hasAttributes)
-                attributeParam.Value = sql.ToString();
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeQuery", attributes.ToString(), DbType.AnsiString, 2000));
             else
-                attributeParam.Value = DBNull.Value;
-                try{
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeQuery", null, DbType.AnsiString, 2000));
+            try{
                 myConnection.Open();
 
                 // get experiment record information from table experiment_records
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 while (myReader.Read())
                 {
@@ -678,18 +674,18 @@ namespace iLabs.ExpStorage
                 }
             }
             else{ // get all the sequence numbers
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveExperimentRecordNumbers", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentRecordNumbers", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
 
             try
             {
                 myConnection.Open();
 
                 // get experiment record information from table experiment_records
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 while (myReader.Read())
                 {
@@ -752,27 +748,25 @@ namespace iLabs.ExpStorage
                             break;
                     }
                 }
-                SqlConnection myConnection = ProcessAgentDB.GetConnection();
-                SqlCommand myCommand = new SqlCommand("RetrieveExperimentRecordsCriteria", myConnection);
+                DbConnection myConnection = FactoryDB.GetConnection();
+                DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentRecordsCriteria", myConnection);
                 myCommand.CommandType = CommandType.StoredProcedure;
-                myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                SqlParameter fieldParam = myCommand.Parameters.Add(new SqlParameter("@fieldQuery", SqlDbType.VarChar, (2000)));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
                 if (hasFields)
-                    fieldParam.Value = sql.ToString();
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@fieldQuery", sql.ToString(), DbType.AnsiString,2000));
                 else
-                    fieldParam.Value = DBNull.Value;
-                SqlParameter attributeParam = myCommand.Parameters.Add(new SqlParameter("@attributeQuery", SqlDbType.VarChar, (2000)));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@fieldQuery", null, DbType.AnsiString,2000));
                 if (hasAttributes)
-                    attributeParam.Value = sql.ToString();
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeQuery", attributes.ToString(), DbType.AnsiString,2000));
                 else
-                    attributeParam.Value = DBNull.Value;
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeQuery", null, DbType.AnsiString,2000));
                 try
                 {
                     myConnection.Open();
 
                     // get experiment record information from table experiment_records
-                    SqlDataReader myReader = myCommand.ExecuteReader();
+                    DbDataReader myReader = myCommand.ExecuteReader();
 
                     while (myReader.Read())
                     {
@@ -808,18 +802,18 @@ namespace iLabs.ExpStorage
             }
             else
             { // get all the sequence numbers
-                SqlConnection myConnection = ProcessAgentDB.GetConnection();
-                SqlCommand myCommand = new SqlCommand("RetrieveExperimentRecords", myConnection);
+                DbConnection myConnection = FactoryDB.GetConnection();
+                DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentRecords", myConnection);
                 myCommand.CommandType = CommandType.StoredProcedure;
-                myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId,DbType.Int64));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString, 50));
 
                 try
                 {
                     myConnection.Open();
 
                     // get experiment record information from table experiment_records
-                    SqlDataReader myReader = myCommand.ExecuteReader();
+                    DbDataReader myReader = myCommand.ExecuteReader();
 
                     while (myReader.Read())
                     {
@@ -875,19 +869,19 @@ namespace iLabs.ExpStorage
         {
             ExperimentRecord expRecord = new ExperimentRecord();
 
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveExperimentRecord", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentRecord", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", sbGuid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sequenceNo", sequenceNum, DbType.Int32));
 
             try
             {
                 myConnection.Open();
 
                 // get experiment record information from table experiment_records
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 while (myReader.Read())
                 {
@@ -939,13 +933,13 @@ namespace iLabs.ExpStorage
         /// <param name="sequenceNO"></param>
         public void DeleteRecord(long experimentId, string sbGuid, int sequenceNO)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("DeleteExperimentRecord", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("DeleteExperimentRecord", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myConnection.Open();
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            myCommand.Parameters.Add(new SqlParameter("@seqNo", sequenceNO));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", sbGuid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@seqNo", sequenceNO, DbType.Int32));
             try
             {
                 myCommand.ExecuteNonQuery();
@@ -973,17 +967,17 @@ namespace iLabs.ExpStorage
             exp.experimentId = experimentId;
             int recordCt = 0;
 
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveExperiment", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", sbGuid, DbType.AnsiString,50));
             try
             {
                 myConnection.Open();
 
                 // get experiment record information from table experiments
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 int count = 0;
 
@@ -1008,11 +1002,11 @@ namespace iLabs.ExpStorage
 
                 ExperimentRecord[] expRecs = new ExperimentRecord[recordCt];
 
-                SqlCommand myCommand2 = new SqlCommand("RetrieveRecordsForExperiment", myConnection);
+                DbCommand myCommand2 = FactoryDB.CreateCommand("RetrieveRecordsForExperiment", myConnection);
                 myCommand2.CommandType = CommandType.StoredProcedure;
-                myCommand2.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                myCommand2.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                SqlDataReader myReader2 = myCommand2.ExecuteReader();
+                myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2,"@experimentId", experimentId, DbType.Int64));
+                myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+                DbDataReader myReader2 = myCommand2.ExecuteReader();
 
                 int i = 0;
                 //Not calling GetExperimentRecords as this is more efficient
@@ -1074,8 +1068,8 @@ namespace iLabs.ExpStorage
         /// <returns>an array of the IDs of the newly added attributes</returns>
         public int[] AddAttributes(long experimentId, string sbGuid, int sequenceNum, RecordAttribute[] attributes)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("AddRecordAttribute", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("AddRecordAttribute", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             int[] attIDs = new int[attributes.Length];
@@ -1085,11 +1079,11 @@ namespace iLabs.ExpStorage
                 myConnection.Open();
                 if (attributes != null)
                 {
-                    myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                    myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                    myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
-                    myCommand.Parameters.Add("@attributeName", SqlDbType.VarChar);
-                    myCommand.Parameters.Add("@attributeValue", SqlDbType.VarChar);
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNum, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeName", null,DbType.AnsiString));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeValue", null, DbType.AnsiString));
                     int i = 0;
 
                     foreach (RecordAttribute a in attributes)
@@ -1122,8 +1116,8 @@ namespace iLabs.ExpStorage
         /// <returns>an array of the requested RecordAttributes</returns>
         public RecordAttribute[] GetRecordAttributes(long experimentId, string sbGuid, int sequenceNum, int[] attributeIDs)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveRecordAttributeByID", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveRecordAttributeByID", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             RecordAttribute[] attributes = new RecordAttribute[attributeIDs.Length];
@@ -1133,15 +1127,15 @@ namespace iLabs.ExpStorage
                 myConnection.Open();
                 if (attributes != null)
                 {
-                    myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                    myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                    myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
-                    myCommand.Parameters.Add("@attributeID", SqlDbType.Int);
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNum, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@attributeID", null, DbType.Int32));
 
                     for (int i = 0; i < attributeIDs.Length; i++)
                     {
                         myCommand.Parameters["@attributeID"].Value = attributeIDs[i];
-                        SqlDataReader myReader = myCommand.ExecuteReader();
+                        DbDataReader myReader = myCommand.ExecuteReader();
                         RecordAttribute att = new RecordAttribute();
 
                         while (myReader.Read())
@@ -1178,8 +1172,8 @@ namespace iLabs.ExpStorage
         /// <returns>an array of the IDs of the requested RecordAttributes</returns>
         public RecordAttribute[] GetRecordAttributes(long experimentId, string sbGuid, int sequenceNum, string attributeName)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveRecordAttributeByName", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveRecordAttributeByName", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             ArrayList attList = new ArrayList();
@@ -1189,12 +1183,12 @@ namespace iLabs.ExpStorage
                 myConnection.Open();
                 if (attributeName != null)
                 {
-                    myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                    myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                    myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
-                    myCommand.Parameters.AddWithValue("@attributeName", attributeName);
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentId", experimentId, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sequenceNo", sequenceNum, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@attributeName", attributeName, DbType.String,256));
 
-                    SqlDataReader myReader = myCommand.ExecuteReader();
+                    DbDataReader myReader = myCommand.ExecuteReader();
                     while (myReader.Read())
                     {
                         RecordAttribute att = new RecordAttribute();
@@ -1240,8 +1234,8 @@ namespace iLabs.ExpStorage
         /// <returns>an array of the deleted RecordAttributes</returns>
         public RecordAttribute[] DeleteRecordAttributes(long experimentId, string sbGuid, int sequenceNum, int[] attributeIDs)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("DeleteRecordAttribute", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("DeleteRecordAttribute", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             RecordAttribute[] attributes = new RecordAttribute[attributeIDs.Length];
@@ -1251,15 +1245,15 @@ namespace iLabs.ExpStorage
                 myConnection.Open();
                 if (attributes != null)
                 {
-                    myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                    myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                    myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
-                    myCommand.Parameters.Add("@attributeID", SqlDbType.Int);
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sequenceNo", sequenceNum, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@attributeID", null, DbType.Int32));
 
                     for (int i = 0; i < attributeIDs.Length; i++)
                     {
                         myCommand.Parameters["@attributeID"].Value = attributeIDs[i];
-                        SqlDataReader myReader = myCommand.ExecuteReader();
+                        DbDataReader myReader = myCommand.ExecuteReader();
                         RecordAttribute att = new RecordAttribute();
                         while (myReader.Read())
                         {

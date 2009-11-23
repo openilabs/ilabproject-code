@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -12,18 +13,17 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using System.Web.SessionState;
-using System.Collections.Generic;
+using System.Globalization;
 
 using iLabs.Core;
 using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.DataTypes.StorageTypes;
 using iLabs.Proxies.PAgent;
 using iLabs.ServiceBroker;
 using iLabs.Ticketing;
-using iLabs.ServiceBroker.DataStorage;
-using iLabs.DataTypes.StorageTypes;
 using iLabs.Proxies.ESS;
 
 using iLabs.ServiceBroker.Internal;
@@ -31,7 +31,11 @@ using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authentication;
 using iLabs.ServiceBroker.Authorization;
+using iLabs.ServiceBroker.DataStorage;
 using iLabs.UtilLib;
+
+
+
 namespace iLabs.ServiceBroker.admin
 {
     /// <summary>
@@ -42,7 +46,8 @@ namespace iLabs.ServiceBroker.admin
     {
         private Color disabled = Color.FromArgb(243, 239, 229);
         private bool secure = false;
-
+        int userTZ;
+        CultureInfo culture = null;
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
         BrokerDB dbTicketing = new BrokerDB();
@@ -118,8 +123,12 @@ namespace iLabs.ServiceBroker.admin
 					lblResponse.Visible = true; 
 				}
                 ddlReportTarget.Items.Add(new ListItem("Group Roster", "1"));
-                ddlReportTarget.Items.Add(new ListItem("Group Experiment Report", "2"));
-                //ddlReportTarget.Items.Add(new ListItem("Group Stats Report", "3"));
+                ddlReportTarget.Items.Add(new ListItem("Group Summary Report", "2"));
+                ddlReportTarget.Items.Add(new ListItem("Group Detail Report", "3"));
+                ddlReportTarget.Items.Add(new ListItem("Group Experiment Report", "4"));
+                ddlReportTarget.Items.Add(new ListItem("Group Detail 2", "5"));
+                //ddlReportTarget.Items.Add(new ListItem("Group Roster CVS", "6"));
+                //ddlReportTarget.Items.Add(new ListItem("Group Stats Report", "7"));
 
 			} //end displayform
 
@@ -141,14 +150,32 @@ namespace iLabs.ServiceBroker.admin
                     case "1":
                         ReportDisplayArea.Text = GroupRoster(Convert.ToInt32(ddlGroupTarget.Text));
                         ReportDisplayArea.Visible = true;
+                        btn_ExportCVS.Visible = true;
                         break;
                     case "2":
-                        ReportDisplayArea.Text = GroupExpReport(Convert.ToInt32(ddlGroupTarget.Text));
+                        ReportDisplayArea.Text = GroupSummaryReport(Convert.ToInt32(ddlGroupTarget.Text));
                         ReportDisplayArea.Visible = true;
+                        btn_ExportCVS.Visible = true;
                         break;
                     case "3":
+                        ReportDisplayArea.Text = GroupDetailReport(Convert.ToInt32(ddlGroupTarget.Text));
+                        ReportDisplayArea.Visible = true;
+                        btn_ExportCVS.Visible = true;
+                        break;
+                    case "4":
+                        ReportDisplayArea.Text = GroupExperimentReport(Convert.ToInt32(ddlGroupTarget.Text));
+                        ReportDisplayArea.Visible = true;
+                        btn_ExportCVS.Visible = true;
+                        break;
+                    case "5":
+                        ReportDisplayArea.Text = GroupDetailReport2(Convert.ToInt32(ddlGroupTarget.Text));
+                        ReportDisplayArea.Visible = true;
+                        btn_ExportCVS.Visible = true;
+                        break;
+                    case "7":
                         ReportDisplayArea.Text = GroupStatReport(Convert.ToInt32(ddlGroupTarget.Text));
                         ReportDisplayArea.Visible = true;
+                        btn_ExportCVS.Visible = true;
                         break;
 
                 } //end switch statement
@@ -190,7 +217,7 @@ namespace iLabs.ServiceBroker.admin
 
         /// ***************************************************
 
-        protected string GroupExpReport(int groupID)
+        protected string GroupSummaryReport(int groupID)
         {
             string reportDate = System.DateTime.Now.ToString();
             string groupExpTXT = "";
@@ -220,7 +247,7 @@ namespace iLabs.ServiceBroker.admin
 
             // Get the number of user logins
             // Get the number of experiments submitted
-            groupExpTXT2 = "<p><table border=1 width=650 ><tr><th>Last Name</th><th>First Name</th><th>Username</th><th>Logins</th><th>Stored Experiments</th></tr> \n";
+            groupExpTXT2 = "<p><table border=1 width=650 ><tr><th>Last Name</th><th>First Name</th><th>Username</th><th>Logins</th><th>Experiment Runs</th></tr> \n";
             // Get Group user information (name, username, last_login, number of experiments submitted)
             int[] userIDs = wrapper.ListUserIDsInGroupWrapper(groupID);
             User[] users = wrapper.GetUsersWrapper(userIDs);
@@ -233,11 +260,254 @@ namespace iLabs.ServiceBroker.admin
                 groupExpTXT2 = groupExpTXT2 + "<tr><td>" + u.lastName + "</td><td>" + u.firstName + "</td><td>" + u.userName + "</td><td>" + numSession + "</td><td>" + numExp + "</td></tr>\n";
             }
             groupExpTXT2 = groupExpTXT2 + "</table></p>";
-            groupExpTXT = groupExpTXT + "Number of users: " + users.Length + "\n<br>Number of user logins: " + totalSessions + "\n<br>Number of stored experiments: " + totalExp + "\n<br><br>";
+            groupExpTXT = groupExpTXT + "Number of users: " + users.Length + "\n<br>Number of user logins: " + totalSessions + "\n<br>Number of experiment runs: " + totalExp + "\n<br><br>";
             groupExpTXT = groupExpTXT + groupExpTXT2;
             return groupExpTXT;
 
-        } // end GroupRoster
+        } // end GroupSummaryReport
+
+        /// ***************************************************
+
+        protected string GroupDetailReport(int groupID)
+        {
+            string reportDate = System.DateTime.Now.ToString();
+            string groupExpTXT = "";
+            string groupExpTXT2 = "";
+            string groupClientTXT = "";
+            string userExpTXT = "";
+            string totExpTXT = "";
+            int numSession = 0;
+            int totalSessions = 0;
+            int numExp = 0;
+            int totalExp = 0;
+            int numClients = 0;
+            int numClientExp = 0;
+            int[] gIDs;
+            int[] totalExpByClient;
+            string[] totClientName;
+            gIDs = new int[1] { groupID };
+            Group[] groups = wrapper.GetGroupsWrapper(gIDs);
+            foreach (Group g in groups)
+            {
+                // Get GroupName from GroupID
+                groupExpTXT = "<br><br><hr><br><center><h1><b>" + g.groupName + "</b></h1></center><br><br>Report Date: " + reportDate + " <br>Description: " + g.description + "<br><br>\n";
+
+                // get the associated lab clients
+                int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                numClients = lcList.Length;
+            }
+            totalExpByClient = new int[numClients];
+            totClientName = new string[numClients];
+
+            // Get the number of user logins
+            // Get the number of experiment Launches
+            groupExpTXT2 = "<p><table border=1 width=650 ><tr><th>Last Name</th><th>First Name</th><th>Username</th><th>Logins</th><th>Experiment Runs</th></tr> \n";
+            // Get Group user information (name, username, last_login, number of experiments submitted)
+            int[] userIDs = wrapper.ListUserIDsInGroupWrapper(groupID);
+            User[] users = wrapper.GetUsersWrapper(userIDs);
+            foreach (User u in users)
+            {
+                // get the number of logins for this user
+                numSession = GetNumLogin(u.userID, groupID);
+                totalSessions = totalSessions + numSession;
+                //get the number of experiments launches for this user
+                numExp = GetNumExp(u.userID, groupID);
+                totalExp = totalExp + numExp;
+
+                // for each client get the number of experiment for that client
+                foreach (Group gr in groups)
+                {
+                    userExpTXT = "";  //clear client list
+                    // get the associated lab clients
+                    int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(gr.groupID);
+                    LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                    for (int j = 0; j < lcList.Length; j++)
+                    {
+                        numClientExp = GetNumExpByClient(u.userID, groupID, lcList[j].clientID);
+                        userExpTXT += "<br>" + lcList[j].clientName + " - " + numClientExp;
+                        totalExpByClient[j] += numClientExp;
+                        totClientName[j] = lcList[j].clientName;
+                    }
+                }
+
+                // Create user table row
+                groupExpTXT2 = groupExpTXT2 + "<tr><td>" + u.lastName + "</td><td>" + u.firstName + "</td><td>" + u.userName + "</td><td>" + numSession + "</td><td>Total: " + numExp + userExpTXT + "</td></tr>\n";
+            }
+            for (int k = 0; k < numClients; k++)
+            {
+                totExpTXT += "<li>" + totClientName[k] + ": " + totalExpByClient[k];
+            }
+
+            groupExpTXT2 = groupExpTXT2 + "</table></p>";
+            groupExpTXT = groupExpTXT + "Number of users: " + users.Length + "\n<br>Number of user logins: " + totalSessions + "\n<br>Number of experiment runs: " + totalExp + "\n<br><ul>" + totExpTXT + "</ul><br>";
+            groupExpTXT = groupExpTXT + groupExpTXT2;
+
+            return groupExpTXT;
+
+        } // end GroupDetailReport
+
+        /// ***************************************************
+
+        protected string GroupExperimentReport(int groupID)
+        {
+            string reportDate = System.DateTime.Now.ToString();
+            string groupExpTXT = "";
+            string groupExpTXT2 = "";
+            string groupExpRows = "";
+            int numSession = 0;
+            int totalSessions = 0;
+            int numExp = 0;
+            int totalExp = 0;
+            int[] gIDs;
+            gIDs = new int[1] { groupID };
+            Group[] groups = wrapper.GetGroupsWrapper(gIDs);
+            foreach (Group g in groups)
+            {
+                // Get GroupName from GroupID
+                groupExpTXT = "<br><br><hr><br><center><h1><b>" + g.groupName + "</b></h1></center><br><br>Report Date: " + reportDate + " <br>Description: " + g.description + "<br><br>\n";
+
+                // get the associated lab clients
+                int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                groupExpTXT += "Associated Clients: <ul>";
+                for (int i = 0; i < lcList.Length; i++)
+                {
+                    groupExpTXT += "<li><strong class=lab>" + lcList[i].clientName + "</strong> - " + lcList[i].clientShortDescription + "</li>";
+                }
+                groupExpTXT += "</ul><br>";
+            }
+
+            // Get the number of experiments submitted
+            groupExpTXT2 = "<p><table border=1 width=650 ><tr><th>Experiment ID</th><th>Client Name</th><th>Username</th><th>Submission Time</th><th>Completion Time</th></tr> \n";
+            long[] eIDs = GetGroupExpIDs(0, groupID);
+            //LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture, true, true, true, true, true, true, true, true);
+            if (eIDs.Length == 0)
+            {
+                string msg = "No experiments were found for the selection criteria!";
+                lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                lblResponse.Visible = true;
+            }
+
+            ExperimentSummary[] expInfo = wrapper.GetExperimentSummaryWrapper(eIDs);
+            int l = expInfo.Length;
+            int j;
+            for (j = 0; j <l ; j++)
+            {
+                if (expInfo[j] != null)
+                {
+
+                    string a = expInfo[j].experimentId.ToString();
+                    string b = expInfo[j].userName;
+                    string c = "";
+                    string d = DateUtil.ToUserTime(expInfo[j].creationTime, culture, userTZ);
+                    string e = expInfo[j].clientName;
+                    if ((expInfo[j].closeTime != null) && (expInfo[j].closeTime != DateTime.MinValue))
+                        c = DateUtil.ToUserTime(expInfo[j].closeTime, culture, userTZ);
+                    else
+                        c = "Not Closed!";
+
+                    groupExpRows += "<tr><td>" + a +"</td><td>"+ e +"</td><td>"+ b +"</td><td>"+ d +"</td><td>"+ c +"</td></tr>";
+                }
+            }
+            groupExpTXT2 = groupExpTXT2 + groupExpRows + "</table></p>";
+            groupExpTXT = groupExpTXT + groupExpTXT2;
+            return groupExpTXT;
+
+        } // end GroupExperimentReport
+
+
+
+        /// ***************************************************
+
+        protected string GroupDetailReport2(int groupID)
+        {
+            string reportDate = System.DateTime.Now.ToString();
+            string groupExpTXT = "";
+            string groupExpTXT2 = "";
+            string groupClientTXT = "";
+            string groupExpTXTheader = "";
+            string userExpTXT = "";
+            string totExpTXT = "";
+            string expListTable = "";
+            string expListName = "";
+            int numSession = 0;
+            int totalSessions = 0;
+            int numExp = 0;
+            int totalExp = 0;
+            int numClients = 0;
+            int numClientExp = 0;
+            int[] gIDs;
+            int[] totalExpByClient;
+            string[] totClientName;
+            gIDs = new int[1] { groupID };
+            Group[] groups = wrapper.GetGroupsWrapper(gIDs);
+            foreach (Group g in groups)
+            {
+                // Get GroupName from GroupID
+                groupExpTXT = "<br><br><hr><br><center><h1><b>" + g.groupName + "</b></h1></center><br><br>Report Date: " + reportDate + " <br>Description: " + g.description + "<br><br>\n";
+
+                // get the associated lab clients
+                int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                numClients = lcList.Length;
+            }
+            totalExpByClient = new int[numClients];
+            totClientName = new string[numClients];
+
+            // Get the number of user logins
+            // Get the number of experiment Launches
+            // Get Group user information (name, username, last_login, number of experiments submitted)
+            int[] userIDs = wrapper.ListUserIDsInGroupWrapper(groupID);
+            User[] users = wrapper.GetUsersWrapper(userIDs);
+            foreach (User u in users)
+            {
+                // get the number of logins for this user
+                numSession = GetNumLogin(u.userID, groupID);
+                totalSessions = totalSessions + numSession;
+                //get the number of experiments launches for this user
+                numExp = GetNumExp(u.userID, groupID);
+                totalExp = totalExp + numExp;
+
+                // for each client get the number of experiment for that client
+                foreach (Group gr in groups)
+                {
+                    userExpTXT = "";  //clear client list
+                    expListTable = "";
+                    // get the associated lab clients
+                    int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(gr.groupID);
+                    LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                    for (int j = 0; j < lcList.Length; j++)
+                    {
+                        numClientExp = GetNumExpByClient(u.userID, groupID, lcList[j].clientID);
+                        userExpTXT += "<br>" + lcList[j].clientName + " - " + numClientExp;
+                        expListTable += "<td>" + numClientExp + "</td>";
+                        totalExpByClient[j] += numClientExp;
+                        totClientName[j] = lcList[j].clientName;
+                    }
+                }
+
+                // Create user table row
+                groupExpTXT2 = groupExpTXT2 + "<tr><td>" + u.lastName + "</td><td>" + u.firstName + "</td><td>" + u.userName + "</td><td>" + numSession + "</td><td>" + numExp + "</td>" + expListTable + "</tr>\n";
+            }
+            for (int k = 0; k < numClients; k++)
+            {
+                totExpTXT += "<li>" + totClientName[k] + ": " + totalExpByClient[k];
+                expListName += "<th>" + totClientName[k] + "</th>";
+
+            }
+            groupExpTXTheader = "<p><table border=1><tr><th>Last Name</th><th>First Name</th><th>Username</th><th>Logins</th><th>Total Experiments</th>" + expListName + "</tr> \n";
+
+            groupExpTXT2 = groupExpTXT2 + "</table></p>";
+            groupExpTXT = groupExpTXT + "Number of users: " + users.Length + "\n<br>Number of user logins: " + totalSessions + "\n<br>Number of experiment runs: " + totalExp + "\n<br><ul>" + totExpTXT + "</ul><br>";
+            groupExpTXT = groupExpTXT + groupExpTXTheader;
+            groupExpTXT = groupExpTXT + groupExpTXT2;
+
+            return groupExpTXT;
+
+        } // end GroupDetailReport
+
+        /// ***************************************************
 
         /// ***************************************************
 
@@ -246,7 +516,7 @@ namespace iLabs.ServiceBroker.admin
             string var1 = "Group Statistic Report " + groupID;
             return var1;
 
-        } // end GroupRoster
+        } // end GroupStatReport
 
         /// ***************************************************
 
@@ -326,9 +596,129 @@ namespace iLabs.ServiceBroker.admin
             return num;
         }
 
+        /// ***************************************************
+
+        private int GetNumExpByClient(int userID, int groupID, int clientID)
+        {
+            int num = 0;
+            List<Criterion> cList = new List<Criterion>();
+            cList.Add(new Criterion("Group_ID", "=", groupID.ToString()));
+            cList.Add(new Criterion("User_ID", "=", userID.ToString()));
+            cList.Add(new Criterion("client_id", "=", clientID.ToString()));
+
+            try
+            {
+                long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userID, groupID, cList.ToArray());
+                num = eIDs.Length;
+            }
+            catch (Exception ex)
+            {
+                lblResponse.Text = "<div class=errormessage><p>Cannot retrieve UserSessions for this client. " + ex.GetBaseException() + "</p></div>";
+                lblResponse.Visible = true;
+            }
+            return num;
+        }
+
+        /// ***************************************************
+
+        private long[] GetGroupExpIDs(int userID, int groupID)
+        {
+            long[] eIDs = null;
+            List<Criterion> cList = new List<Criterion>();
+            cList.Add(new Criterion("Group_ID", "=", groupID.ToString()));
+            //cList.Add(new Criterion("User_ID", "=", userID.ToString()));
+
+            try
+            {
+                eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userID, groupID, cList.ToArray());
+            }
+            catch (Exception ex)
+            {
+                lblResponse.Text = "<div class=errormessage><p>Cannot retrieve UserSessions for this group. " + ex.GetBaseException() + "</p></div>";
+                lblResponse.Visible = true;
+            } 
+            return eIDs;
+        }
+
+        protected void btnExportCVS_Click(object sender, System.EventArgs e)
+        {
+            //
+            // Export html table data to CVS file for user to save locally.
+            //
+            // generate report
+            string reportString = "";
+
+            switch (ddlReportTarget.Text)
+            {
+                case "1":
+                    reportString = GroupRoster(Convert.ToInt32(ddlGroupTarget.Text));
+                    break;
+                case "2":
+                    reportString = GroupSummaryReport(Convert.ToInt32(ddlGroupTarget.Text));
+                    break;
+                case "3":
+                    reportString = GroupDetailReport(Convert.ToInt32(ddlGroupTarget.Text));
+                    break;
+                case "4":
+                    reportString = GroupExperimentReport(Convert.ToInt32(ddlGroupTarget.Text));
+                    break;
+                case "5":
+                    reportString = GroupDetailReport2(Convert.ToInt32(ddlGroupTarget.Text));
+                    break;
+                case "7":
+                    reportString = GroupStatReport(Convert.ToInt32(ddlGroupTarget.Text));
+                    break;
+
+            } //end switch statement  
+          
+            // convert to CVS
+            String CVSstring = convertCVS(reportString);
+
+            // Export to downloadble file
+            Response.Clear();
+            Response.AddHeader("content-disposition", "attachment; filename=export.cvs");
+            Response.AddHeader("content-type", "text/csv");
+            Response.Write(CVSstring);
+            Response.End();
+        }
+
+        protected string convertCVS(string inputS)
+        {
+            // take an input HTML string with a table and convert to CVS format
+            //
+
+            StringBuilder outputS = new StringBuilder(inputS);
+            outputS.Replace("<table>",string.Empty);
+            outputS.Replace("<table border=1>", string.Empty);
+            outputS.Replace("</table>", string.Empty);
+            outputS.Replace("</tr>",string.Empty);
+            outputS.Replace("</td>",string.Empty);
+            outputS.Replace("</th>", string.Empty);
+            outputS.Replace("</p>", string.Empty);
+            outputS.Replace("<h1>", string.Empty);
+            outputS.Replace("</h1>", string.Empty);
+            outputS.Replace("</center>", string.Empty);
+            outputS.Replace("<center>", string.Empty);
+            outputS.Replace("<b>", string.Empty);
+            outputS.Replace("</b>", string.Empty);
+            outputS.Replace("<hr>", string.Empty);
+            outputS.Replace("<ul>", string.Empty);
+            outputS.Replace("</ul>", string.Empty);
+            outputS.Replace("\n", string.Empty);
+            outputS.Replace("<table border=1 width=650 >", string.Empty);
+            outputS.Replace("<li>", Environment.NewLine);
+            outputS.Replace("</li>",string.Empty);
+            outputS.Replace("<p>", Environment.NewLine);
+            outputS.Replace("<tr>", Environment.NewLine);
+            outputS.Replace("<br>", Environment.NewLine);
+            outputS.Replace("<br/>", Environment.NewLine);
+            outputS.Replace("<th>", "\t");
+            outputS.Replace("<td>", "\t");
+            return outputS.ToString();
+        }
+
         } //end public class sbReport
     } // end Namespace
 
 
 
-    // client items  string[] ListClientItems(int clientID, int userID)

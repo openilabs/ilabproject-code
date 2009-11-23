@@ -45,7 +45,7 @@ Please see license.txt in top level directory for full license.
                             <label for="name">
                                 <span style="font-size: 9pt">Ticket Type &nbsp;</span></label></th>
                         <td style="font-size: 9pt; width: 536px; height: 22px;">
-                            <asp:DropDownList ID="ttDropDownList" runat="server" AutoPostBack="True">
+                            <asp:DropDownList  CssClass="i18n" ID="ttDropDownList" runat="server" AutoPostBack="True">
                             </asp:DropDownList></td>
                     </tr>
                     <tr style="font-size: 9pt">

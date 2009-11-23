@@ -35,19 +35,19 @@
 		<tr>
 										<th style="width: 151px">
 											<label for="policyfor">Policy For</label></th>
-										<td style="width: 454px"><asp:dropdownlist id="ddlPolicy"  Runat="server" AutoPostBack="True" onselectedindexchanged="ddlPolicy_SelectedIndexChanged" Width="100%"></asp:dropdownlist>
+										<td style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlPolicy"  Runat="server" AutoPostBack="True" onselectedindexchanged="ddlPolicy_SelectedIndexChanged" Width="100%"></asp:dropdownlist>
 											</td>
 									</tr>
 		<tr>
 										<th style="width: 151px">
 											<label for="experiment">Experiment</label></th>
-										<td style="width: 454px"><asp:dropdownlist id="ddlExperiment"  Runat="server" Width="100%"></asp:dropdownlist>
+										<td style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlExperiment"  Runat="server" Width="100%"></asp:dropdownlist>
 											</td>
 									</tr>
 									<tr>
 										<th style="width: 151px">
 											<label for="group">Group</label></th>
-										<td style="width: 454px"><asp:dropdownlist id="ddlGroup" Runat="server" Width="100%" ></asp:dropdownlist>
+										<td style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlGroup" Runat="server" Width="100%" ></asp:dropdownlist>
 											</td>
 									</tr>
 									<tr>

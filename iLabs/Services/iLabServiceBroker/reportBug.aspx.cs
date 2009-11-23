@@ -145,9 +145,18 @@ namespace iLabs.ServiceBroker.iLabSB
 				}
 				string problemArea = ddlArea.SelectedItem.Text;
 				StringBuilder sb = new StringBuilder();
+                ProcessAgentDB agentDB = new ProcessAgentDB();
+                SystemSupport support = agentDB.RetrieveSystemSupport(ProcessAgentDB.ServiceGuid);
 				//Generate email
 				MailMessage mail = new MailMessage();
-				mail.To = ConfigurationSettings.AppSettings["bugReportMailAddress"];
+                if (support.bugEmail != null && support.bugEmail.Length > 2)
+                {
+                    mail.To = support.bugEmail;
+                }
+                else
+                {
+                    mail.To = ConfigurationSettings.AppSettings["bugReportMailAddress"];
+                }
 				mail.From = userEmail;
 				mail.Subject = "[iLabs] " + Server.MachineName + " Bug Report: " + problemArea ;
 				

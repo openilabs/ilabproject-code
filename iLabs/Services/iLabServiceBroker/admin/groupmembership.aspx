@@ -66,7 +66,7 @@ Please see license.txt in top level directory for full license.
 								<tr>
 									<td style="WIDTH: 300px">
 										<!--Check to see if default style can be set from the css -->
-										<asp:TreeView   id="agentsTreeView" runat="server" cssClass="treeView" SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor=BlueViolet ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
+										<asp:TreeView   id="agentsTreeView" runat="server" cssClass="treeView" SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet" ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
 									</td>
 									<td class="buttonstyle"><asp:ImageButton ID="ibtnCopyTo" Runat="server" Width="74" Height="22" CssClass="buttonstyle" ImageUrl="../img/copy-btn.gif"
 											AlternateText="Copy To"></asp:ImageButton><!--img src="../img/copy-btn.gif" alt="Copy to" width="74" height="22" class="buttonstyle"--><br/>
@@ -77,7 +77,7 @@ Please see license.txt in top level directory for full license.
 									</td>
 									<td style="WIDTH: 310px">
 										<!-- Check to see if default style can be set from the css -->
-										<asp:TreeView id="groupsTreeView" runat="server" cssClass="treeView" SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor=BlueViolet ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
+										<asp:TreeView id="groupsTreeView" runat="server"  cssClass="treeView" SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor=BlueViolet ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
 										<div></div>
 									</td>
 								</tr>

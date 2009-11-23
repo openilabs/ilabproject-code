@@ -223,7 +223,7 @@ namespace iLabs.Scheduling.LabSide
                 //buf.Append("</pre>");
 				recurItem.Text = buf.ToString();
                 recurItem.Value = recur.recurrenceId.ToString();
-				lbxSelectTimeBlock.Items .Add (recurItem);
+				lbxSelectTimeBlock.Items .Add(recurItem);
 			}
 		}
 

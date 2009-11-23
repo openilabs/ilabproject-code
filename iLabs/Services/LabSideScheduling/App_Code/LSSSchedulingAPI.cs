@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
+using System.Text;
+using System.Web.Mail;
 
 using iLabs.DataTypes;
 using iLabs.DataTypes.SchedulingTypes;
@@ -86,6 +89,7 @@ namespace iLabs.Scheduling.LabSide
         /// the name of the provider of the experiment
         /// </summary>
         public string providerName;
+        public string contactEmail;
     
         /// <summary>
         /// the start up time needed for the execution of the experiment
@@ -338,18 +342,19 @@ namespace iLabs.Scheduling.LabSide
 		/// <param name="labClientVersion"></param>
 		/// <param name="labClientName"></param>
 		/// <param name="providerName"></param>
+        /// <param name="contactEmail"></param>
 		/// <param name="quantum"></param>
 		/// <param name="prepareTime"></param>
 		/// <param name="recoverTime"></param>
 		/// <param name="minimumTime"></param>
 		/// <param name="earlyArriveTime"></param>
 		/// <returns></returns>the unique ID which identifies the experiment information added, >0 was successfully added, ==-1 otherwise
-        public static int AddExperimentInfo( string labServerGuid, string labServerName, string labClientGuid, 
-            string labClientName, string labClientVersion, string providerName, 
+        public static int AddExperimentInfo( string labServerGuid, string labServerName, string labClientGuid,
+            string labClientName, string labClientVersion, string providerName, string contactEmail,
             int prepareTime, int recoverTime, int minimumTime, int earlyArriveTime)
 		{
-            int experimentInfoID = DBManager.AddExperimentInfo(labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion, 
-                providerName, prepareTime, recoverTime, minimumTime, earlyArriveTime);
+            int experimentInfoID = DBManager.AddExperimentInfo(labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion,
+                providerName, contactEmail, prepareTime, recoverTime, minimumTime, earlyArriveTime);
 				return experimentInfoID;		
 		}
 		/// <summary>
@@ -388,10 +393,10 @@ namespace iLabs.Scheduling.LabSide
 		/// <returns></returns>true if modified successfully, falso otherwise
         public static bool ModifyExperimentInfo(int experimentInfoID, string labServerGuid, string labServerName,
              string labClientGuid, string labClientName, string labClientVersion, string providerName, 
-            int prepareTime, int recoverTime, int minimumTime, int earlyArriveTime)
+            string contactEmail, int prepareTime, int recoverTime, int minimumTime, int earlyArriveTime)
 		{
             bool i = DBManager.ModifyExperimentInfo(experimentInfoID, labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion,
-                providerName, prepareTime, recoverTime, minimumTime, earlyArriveTime);
+                providerName, contactEmail,prepareTime, recoverTime, minimumTime, earlyArriveTime);
 		    return i;
 		}
 
@@ -1215,6 +1220,54 @@ namespace iLabs.Scheduling.LabSide
         {
             bool removed = DBManager.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
                 labServerGuid, clientGuid, startTime, endTime);
+            if (removed)
+            {
+                int eID = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+                LssExperimentInfo exInfo = GetExperimentInfos(new int[] { eID })[0];
+                if (exInfo.contactEmail != null && exInfo.contactEmail.Length > 0)
+                {
+                    // Send a mail Message
+                    StringBuilder message = new StringBuilder();
+
+                    MailMessage mail = new MailMessage();
+                    mail.To = exInfo.contactEmail;
+                    mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
+                    mail.Subject = "Removed Reservation: " + exInfo.labClientName;
+
+                    message.Append("A reservation for " + exInfo.labClientName + " version: " + exInfo.labClientVersion);
+                    message.AppendLine(" on " + exInfo.labServerName + " has been made.");
+                    message.AppendLine("\tGroup: " + groupName + " ServiceBroker: " + serviceBrokerGuid);
+                    message.Append("\tFrom: " + DateUtil.ToUserTime(startTime, CultureInfo.CurrentCulture, DateUtil.LocalTzOffset));
+                    message.AppendLine("\t\tTo: " + DateUtil.ToUserTime(endTime, CultureInfo.CurrentCulture, DateUtil.LocalTzOffset));
+                    message.AppendLine("\tDateFormat: " + CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern + " \tUTC Offset: " + (DateUtil.LocalTzOffset / 60.0));
+                    message.AppendLine();
+                    mail.Body = message.ToString();
+                    SmtpMail.SmtpServer = "127.0.0.1";
+
+                    try
+                    {
+                        SmtpMail.Send(mail);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Report detailed SMTP Errors
+                        StringBuilder smtpErrorMsg = new StringBuilder();
+                        smtpErrorMsg.Append("Exception: " + ex.Message);
+                        //check the InnerException
+                        if (ex.InnerException != null)
+                        {
+                            smtpErrorMsg.Append("<br>Inner Exceptions:");
+                            while (ex.InnerException != null)
+                            {
+                                smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                                ex = ex.InnerException;
+                            }
+                            Utilities.WriteLog(smtpErrorMsg.ToString());
+                        }
+                    }
+                }
+            }
+            
             return removed;
         }
 
@@ -1370,7 +1423,51 @@ namespace iLabs.Scheduling.LabSide
                     //add the reservation to to reservationInfo table
                     int status = AddReservationInfo(serviceBrokerGuid, groupName, ussGuid, labServerGuid, clientGuid, startTime.ToUniversalTime(), endTime.ToUniversalTime(), 0);
                     if (status > 0)
+                    {
                         notification = "The reservation is confirmed successfully";
+                        if (exInfo.contactEmail != null && exInfo.contactEmail.Length > 0)
+                        {
+                            // Send a mail Message
+                            StringBuilder message = new StringBuilder();
+
+                            MailMessage mail = new MailMessage();
+                            mail.To = exInfo.contactEmail;
+                            mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
+                            mail.Subject = "New Reservation: " + exInfo.labClientName;
+
+                            message.Append("A new reservation for " + exInfo.labClientName + " version: " + exInfo.labClientVersion);
+                            message.AppendLine(" on " + exInfo.labServerName + " has been made.");
+                            message.AppendLine("\tGroup: " + groupName + " ServiceBroker: " + serviceBrokerGuid);
+                            message.Append("\tFrom: " + DateUtil.ToUserTime(startTime, CultureInfo.CurrentCulture, DateUtil.LocalTzOffset));
+                            message.AppendLine("\t\tTo: " + DateUtil.ToUserTime(endTime, CultureInfo.CurrentCulture, DateUtil.LocalTzOffset));
+                            message.AppendLine("\tDateFormat: " + CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern + " \tUTC Offset: " + (DateUtil.LocalTzOffset / 60.0));
+                            message.AppendLine();
+                            mail.Body = message.ToString();
+                            SmtpMail.SmtpServer = "127.0.0.1";
+
+                            try
+                            {
+                                SmtpMail.Send(mail);
+                            }
+                            catch (Exception ex)
+                            {
+                                // Report detailed SMTP Errors
+                                StringBuilder smtpErrorMsg = new StringBuilder();
+                                smtpErrorMsg.Append("Exception: " + ex.Message);
+                                //check the InnerException
+                                if (ex.InnerException != null)
+                                {
+                                    smtpErrorMsg.Append("<br>Inner Exceptions:");
+                                    while (ex.InnerException != null)
+                                    {
+                                        smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                                        ex = ex.InnerException;
+                                    }
+                                    Utilities.WriteLog(smtpErrorMsg.ToString());
+                                }
+                            }
+                        }
+                    }
                     else
                         notification = "Error: AddReservation status = " + status;
                     return notification;

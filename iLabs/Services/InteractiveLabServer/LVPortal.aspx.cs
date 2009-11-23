@@ -79,22 +79,16 @@ namespace iLabs.LabServer.LabView
                 }
                
 
-                //Parse experiment payload, only get what is needed 	
+                ////Parse experiment payload, only get what is needed 	
                 string payload = expTicket.payload;
                 XmlQueryDoc expDoc = new XmlQueryDoc(payload);
-
-                string essService = expDoc.Query("ExecuteExperimentPayload/essWebAddress");
-        
+                string tzStr = expDoc.Query("ExecuteExperimentPayload/userTZ");
+                if ((tzStr != null) && (tzStr.Length > 0))
+                    Session["userTZ"] = tzStr;
                 string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
                 Session["groupName"] = groupName;
                 string sbStr = expDoc.Query("ExecuteExperimentPayload/sbGuid");
                 Session["brokerGUID"] = sbStr;
-                string experimentStr = expDoc.Query("ExecuteExperimentPayload/experimentID");
-                if ((experimentStr != null) && (experimentStr.Length > 0))
-                    expID = Convert.ToInt64(experimentStr);
-                string tzStr = expDoc.Query("ExecuteExperimentPayload/userTZ");
-                if ((tzStr != null) && (tzStr.Length > 0))
-                    Session["userTZ"] = tzStr;
 
                 //Get Lab specific info for this URL or group
                 LabAppInfo appInfo = null;
@@ -111,44 +105,36 @@ namespace iLabs.LabServer.LabView
                 {
                     Response.Redirect("AccessDenied.aspx?text=Unable+to+find+application+information,+please+notify+your+administrator.", true);
                 }
-                string strRedirect = appInfo.page;
 
+                // Use taskFactory to create a new task, return an existing reentrant task or null if there is an error
+                LabViewTaskFactory factory = new LabViewTaskFactory();
+                task = factory.CreateLabTask(appInfo, expCoupon, expTicket);
 
-                // Check to see if an experiment with this ID is already running
-                LabTask.eStatus status = dbManager.ExperimentStatus(expID, sbStr);
-                if (status == LabTask.eStatus.NotFound)
+                if (task != null)
                 {
-                    //Create a new Task
-                    // The Factory processes the information, it could be done directly
-                    // The returned task and related experiment Storage structures 
-                    // have been added to the database and in memory task list.
-                    LabViewTaskFactory factory = new LabViewTaskFactory();
-                    task = factory.CreateLabTask(appInfo, expCoupon, expTicket);
 
+                    //Useful for debugging overloads the use of a field in the banner
+                    //Session["GroupName"] = "TaskID: " + task.taskID.ToString();
+
+                    //Utilities.WriteLog("TaskXML: " + task.taskID + " \t" + task.data);
+
+                    //Construct the information to be passed to the target page
+                    TimeSpan taskDur = task.endTime - task.startTime;
+                    string vipayload = LabTask.constructSessionPayload(appInfo,
+                        task.startTime, taskDur.Ticks / TimeSpan.TicksPerSecond, task.taskID,
+                        returnTarget, null, null);
+
+                    //Utilities.WriteLog("sessionPayload: " + payload);
+                    //Store Session information
+                    Session["payload"] = vipayload;
+
+                    //redirect to Presentation page...
+                    Response.Redirect(appInfo.page, true);
                 }
                 else
                 {
-                    task = (LabTask)Global.tasks.GetTask(expID);
-
+                    Response.Redirect("AccessDenied.aspx?text=Unable+to+launch++application,+please+notify+your+administrator.", true);
                 }
-                //Useful for debugging overloads the use of a field in the banner
-                //Session["GroupName"] = "TaskID: " + task.taskID.ToString();
-
-                //Utilities.WriteLog("TaskXML: " + task.taskID + " \t" + task.data);
-
-                //Construct the information to be passed to the target page
-                TimeSpan taskDur = task.endTime - task.startTime;
-                string vipayload = LabTask.constructSessionPayload(appInfo.appID, appInfo.title, appInfo.application, 
-                    appInfo.appURL, appInfo.width, appInfo.height,
-                    task.startTime, taskDur.Ticks / TimeSpan.TicksPerSecond, task.taskID,
-                    essService, returnTarget, null, null);
-
-                //Utilities.WriteLog("sessionPayload: " + payload);
-                //Store Session information
-                Session["payload"] = vipayload;
-
-                //redirect to Presentation page...
-                Response.Redirect(strRedirect, true);
 
             }
 

@@ -90,8 +90,6 @@ namespace iLabs.ServiceBroker.iLabSB
 					Session["SessionID"] = AdministrativeAPI.InsertUserSession (userID, 0, Convert.ToInt32(Request.Params["userTZ"]), Session.SessionID.ToString()).ToString ();
                     HttpCookie cookie = new HttpCookie(ConfigurationManager.AppSettings["isbAuthCookieName"], Session["SessionID"].ToString());
                     Response.AppendCookie(cookie);
-
-               
 					Response.Redirect(Global.FormatRegularURL(Request,"myGroups.aspx"));
 				}
 				else

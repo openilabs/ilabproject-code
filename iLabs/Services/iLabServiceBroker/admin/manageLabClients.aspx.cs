@@ -511,6 +511,12 @@ namespace iLabs.ServiceBroker.admin
                 lblResponse.Visible = true;
                 return;
             }
+            if (txtClientGuid.Text == null || txtClientGuid.Text.Equals("") || txtClientGuid.Text.Length >50)
+            {
+                lblResponse.Text = Utilities.FormatWarningMessage("You must speecify a GUID for the client, the maximun number of characters is 50!");
+                lblResponse.Visible = true;
+                return;
+            }
 			int[] labServerIDs = new int[0];
 			ClientInfo[] clientInfos;
 

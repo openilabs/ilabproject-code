@@ -2,8 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
+using System.Data.Common;
 using System.Text;
 
 using iLabs.Core;
@@ -121,20 +120,17 @@ namespace iLabs.Scheduling.UserSide
         public static int AddUSSPolicy(string groupName, string serviceBrokerGuid, int experimentInfoId, string rule)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "addUSSPolicy" store procedure
-            SqlCommand cmd = new SqlCommand("AddUSSPolicy", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("AddUSSPolicy", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar, 50);
-            groupNameParam.Value = groupName;
-            SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar, 50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-            SqlParameter experimentInfoIdParam = cmd.Parameters.Add("@experimentInfoId", SqlDbType.Int);
-            experimentInfoIdParam.Value = experimentInfoId;
-            SqlParameter ruleParam = cmd.Parameters.Add("@rule", SqlDbType.VarChar, 1024);
-            ruleParam.Value = rule;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rule", rule, DbType.AnsiString, 2048));
+            
             int i = -1;
 
             // execute the command
@@ -168,12 +164,12 @@ namespace iLabs.Scheduling.UserSide
         {
             ArrayList arrayList = new ArrayList();
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "deleteUSSPolicy" store procedure
-            SqlCommand cmd = new SqlCommand("DeleteUSSPolicy", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("DeleteUSSPolicy", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("@ussPolicyId", SqlDbType.Int));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussPolicyId", null, DbType.Int32));
             // execute the command
             try
             {
@@ -210,20 +206,17 @@ namespace iLabs.Scheduling.UserSide
         public static bool ModifyUSSPolicy(int ussPolicyId, int experimentInfoId, string rule, int credentialSetId)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "modifyUSSPolicy" store procedure
-            SqlCommand cmd = new SqlCommand("ModifyUSSPolicy", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ModifyUSSPolicy", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            SqlParameter ussPolicyIdParam = cmd.Parameters.Add("@ussPolicyId", SqlDbType.Int);
-            ussPolicyIdParam.Value = ussPolicyId;
-            SqlParameter experimentInfoIdParam = cmd.Parameters.Add("@experimentInfoID", SqlDbType.Int);
-            experimentInfoIdParam.Value = experimentInfoId;
-            SqlParameter ruleParam = cmd.Parameters.Add("@rule", SqlDbType.VarChar, 1024);
-            ruleParam.Value = rule;
-            SqlParameter credentialSetIdParam = cmd.Parameters.Add("@credentialSetId", SqlDbType.Int);
-            credentialSetIdParam.Value = credentialSetId;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussPolicyId", ussPolicyId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoID", experimentInfoId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rule", rule, DbType.AnsiString, 2048));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetId", credentialSetId, DbType.Int32));
+           
             bool i = false;
 
             // execute the command
@@ -261,14 +254,14 @@ namespace iLabs.Scheduling.UserSide
         {
             int[] ussPolicyIds;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyIDsByGroup" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveUSSPolicyIDs", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveUSSPolicyIDs", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             ArrayList arrayList = new ArrayList();
             try
             {
@@ -305,21 +298,19 @@ namespace iLabs.Scheduling.UserSide
         {
             int[] ussPolicyIds;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyIDsByGroup" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveUSSPolicyIDsByGroup", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveUSSPolicyIDsByGroup", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar, 50);
-            groupNameParam.Value = groupName;
-            SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar, 50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
 
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             ArrayList arrayList = new ArrayList();
             try
             {
@@ -357,25 +348,21 @@ namespace iLabs.Scheduling.UserSide
         {
             int[] ussPolicyIds;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyIDsByGroupandExp" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveUSSPolicyIDsByGroupandExp", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveUSSPolicyIDsByGroupandExp", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar, 50);
-            groupNameParam.Value = groupName;
-            SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar, 50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-            SqlParameter labClientNameParam = cmd.Parameters.Add("@clientGuid", SqlDbType.VarChar, 50);
-            labClientNameParam.Value = clientGuid;
-            SqlParameter labClientVersionParam = cmd.Parameters.Add("@labServerGuid", SqlDbType.VarChar, 50);
-            labClientVersionParam.Value = labServerGuid;
-
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString, 50));
+            
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             ArrayList arrayList = new ArrayList();
             try
             {
@@ -415,13 +402,13 @@ namespace iLabs.Scheduling.UserSide
                 ussPolicies[i] = new USSPolicy();
             }
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveUSSPolicyByID" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveUSSPolicyByID", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveUSSPolicyByID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("@ussPolicyId", SqlDbType.Int));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussPolicyId", null, DbType.Int32));
             //execute the command
             try
             {
@@ -430,7 +417,7 @@ namespace iLabs.Scheduling.UserSide
                 {
                     // populate the parameters
                     cmd.Parameters["@ussPolicyId"].Value = ussPolicyIds[i];
-                    SqlDataReader dataReader = null;
+                    DbDataReader dataReader = null;
                     dataReader = cmd.ExecuteReader();
                     while (dataReader.Read())
                     {
@@ -494,24 +481,19 @@ namespace iLabs.Scheduling.UserSide
         public static int AddReservation(string userName, string serviceBrokerGuid, string groupName, int experimentInfoId, DateTime startTime, DateTime endTime)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddReservation" store procedure
-			SqlCommand cmd=new SqlCommand("AddReservation",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("AddReservation",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter userNameParam = cmd.Parameters.Add("@userName", SqlDbType.VarChar,50);
-			userNameParam.Value = userName;
-			SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,50);
-			groupNameParam.Value = groupName;
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-			SqlParameter experimentInfoIdParam = cmd.Parameters.Add("@experimentInfoId", SqlDbType.Int);
-			experimentInfoIdParam.Value = experimentInfoId;
-			SqlParameter startTimeParam = cmd.Parameters.Add("@startTime", SqlDbType.DateTime);
-			startTimeParam.Value = startTime;
-			SqlParameter endTimeParam = cmd.Parameters.Add("@endTime", SqlDbType.DateTime);
-			endTimeParam.Value = endTime;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
+			
 			int i=-1;
 
 			// execute the command
@@ -543,12 +525,12 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteReservation" store procedure
-			SqlCommand cmd=new SqlCommand("DeleteReservation",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("DeleteReservation",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@reservationID", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", null, DbType.Int32));
 			// execute the command
 			try
 			{
@@ -585,22 +567,18 @@ namespace iLabs.Scheduling.UserSide
 		public static bool ModifyReservation(int reservationID,int experimentInfoId,DateTime startTime,DateTime endTime)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyReservation" store procedure
-			SqlCommand cmd=new SqlCommand("ModifyReservation",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("ModifyReservation",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter reservationIDParam = cmd.Parameters.Add("@reservationID", SqlDbType.Int);
-			reservationIDParam.Value = reservationID;
-			SqlParameter experimentInfoIdParam = cmd.Parameters.Add("@experimentInfoId", SqlDbType.Int);
-			experimentInfoIdParam.Value = experimentInfoId;
-			SqlParameter startTimeParam = cmd.Parameters.Add("@startTime", SqlDbType.DateTime);
-			startTimeParam.Value = startTime;
-			SqlParameter endTimeParam = cmd.Parameters.Add("@endTime", SqlDbType.DateTime);
-			endTimeParam.Value = endTime;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", reservationID, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
+			
 			bool i=false;
-
 			// execute the command
 			try
 			{
@@ -638,22 +616,20 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] reservationIDs;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDsByUser" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveReservationIDsByUser", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationIDsByUser", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter userNameParam = cmd.Parameters.Add("@userName", SqlDbType.VarChar,50);
-			userNameParam.Value = userName;
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-			SqlParameter experimentInfoIdParam = cmd.Parameters.Add("@experimentInfoId", SqlDbType.Int);
-			experimentInfoIdParam.Value = experimentInfoId;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
+			
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			ArrayList arrayList=new ArrayList();
 			try 
 			{
@@ -690,21 +666,19 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] reservationIDs;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDsByGroup" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveReservationIDsByGroup", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationIDsByGroup", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,50);
-			groupNameParam.Value = groupName;
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));			
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+           
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			ArrayList arrayList=new ArrayList();
 			try 
 			{
@@ -743,23 +717,20 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] reservationIDs;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDsByLabServer" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveReservationIDsByLabServer", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationIDsByLabServer", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar,50);
-            labServerIDParam.Value = labServerGuid;
-			SqlParameter startTimeParam = cmd.Parameters.Add("@startTime", SqlDbType.DateTime);
-			startTimeParam.Value = startTime;
-			SqlParameter endTimeParam = cmd.Parameters.Add("@endTime", SqlDbType.DateTime);
-			endTimeParam.Value = endTime;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
+			
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			ArrayList arrayList=new ArrayList();
 			try 
 			{
@@ -800,26 +771,20 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int i= 0;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationIDByUser" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveReservationIDByUser", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationIDByUser", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter userNameParam = cmd.Parameters.Add("@userName", SqlDbType.VarChar,50);
-			userNameParam.Value = userName;
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-			SqlParameter labClientNameParam = cmd.Parameters.Add("@clientGuid", SqlDbType.VarChar,50);
-			labClientNameParam.Value = clientGuid;
-			SqlParameter labClientVersionParam = cmd.Parameters.Add("@labServerGuid", SqlDbType.VarChar,50);
-			labClientVersionParam.Value = labServerGuid;
-			SqlParameter timeParam = cmd.Parameters.Add("@time", SqlDbType.DateTime);
-			timeParam.Value = time;
-
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGuid", serviceBrokerGuid,DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@timeUTC", time, DbType.DateTime));
+			
 			// execute the command
 			try 
 			{
@@ -858,13 +823,13 @@ namespace iLabs.Scheduling.UserSide
 				reservations[i]=new  ReservationInfo();
 			}
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveReservationByID" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveReservationByID", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@reservationID", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -873,7 +838,7 @@ namespace iLabs.Scheduling.UserSide
 				{
 					// populate the parameters
 					cmd.Parameters["@reservationID"].Value = reservationIDs[i];	
-					SqlDataReader dataReader = null;
+					DbDataReader dataReader = null;
 					dataReader=cmd.ExecuteReader();
 					while(dataReader.Read())
 					{	
@@ -908,7 +873,9 @@ namespace iLabs.Scheduling.UserSide
             string lsGuid, string clientGuid, DateTime start, DateTime end)
         {
             int experimentId = DBManager.ListExperimentInfoIDByExperiment(lsGuid, clientGuid);
-            int credId = DBManager.GetCredentialSetID(sbGuid, groupName);
+            int credId = -1;
+            if(groupName != null && groupName.Length >0)
+                credId = DBManager.GetCredentialSetID(sbGuid, groupName);
             return DBManager.GetReservations(userName, experimentId, credId, start, end);
         }
 
@@ -927,87 +894,78 @@ namespace iLabs.Scheduling.UserSide
                 action |= 4;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = null;
-            SqlParameter expParam = null;
-            SqlParameter credParam = null;
-            SqlParameter userParam = null;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = null;
+            DbParameter expParam = null;
+            DbParameter credParam = null;
+            DbParameter userParam = null;
             // create sql command
             switch (action)
             {
                 case 0:
-                    cmd = new SqlCommand("RetrieveReservations", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservations", connection);
                     break;
                 case 1:
-                    cmd = new SqlCommand("RetrieveReservationsByExperiment", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationsByExperiment", connection);
                     break;
                 case 2:
-                    cmd = new SqlCommand("RetrieveReservationsByGroup", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationsByGroup", connection);
                     break;
                 case 3:
-                    cmd = new SqlCommand("RetrieveReservationsByGroupAndExperiment", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationsByGroupAndExperiment", connection);
                     break;
                 case 4:
-                    throw new Exception("Wrong combination of arguments in selectReservations 4");
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationsByUser", connection);
                     break;
                 case 5:
                     throw new Exception("Wrong combination of arguments in selectReservations 5");
+                    // NOT Implemented cmd = FactoryDB.CreateCommand("RetrieveReservationsByExperiment", connection);
                     break;
                 case 6:
-                    cmd = new SqlCommand("RetrieveReservationsByUser", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationsByUserAndGroup", connection);
                     break;
                 case 7:
-                    cmd = new SqlCommand("RetrieveReservationsByAll", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationsByAll", connection);
                     break;
                 default:
                     throw new Exception("Wrong combination of arguments in selectReservations");
                     break;
             }
             cmd.CommandType = CommandType.StoredProcedure;
-            SqlParameter startParam = cmd.Parameters.Add(new SqlParameter("@start", SqlDbType.DateTime));
-            startParam.Value = start;
-            SqlParameter endParam = cmd.Parameters.Add(new SqlParameter("@end", SqlDbType.DateTime));
-            endParam.Value = end;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@start", start, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@end", end, DbType.DateTime));
             switch (action)
             {
                 case 0:
                     break;
                 case 1:
-                    expParam = cmd.Parameters.Add(new SqlParameter("@experInfoID", SqlDbType.Int));
-                    expParam.Value = experimentInfoId;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experInfoID", experimentInfoId, DbType.Int32));
                     break;
                 case 2:
-                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
-                    credParam.Value = credentialSetId;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId, DbType.Int32));
                     break;
                 case 3:
-                    expParam = cmd.Parameters.Add(new SqlParameter("@experInfoID", SqlDbType.Int));
-                    expParam.Value = experimentInfoId;
-                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
-                    credParam.Value = credentialSetId;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experInfoID", experimentInfoId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId, DbType.Int32));
                     break;
                 case 4:
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
                     break;
                 case 5:
                     break;
                 case 6:
-                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
-                    credParam.Value = credentialSetId;
-                    userParam = cmd.Parameters.Add(new SqlParameter("@userName", SqlDbType.VarChar, 256));
-                    userParam.Value = userName;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId,DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
                     break;
                 case 7:
-                    expParam = cmd.Parameters.Add(new SqlParameter("@experInfoID", SqlDbType.Int));
-                    expParam.Value = experimentInfoId;
-                    credParam = cmd.Parameters.Add(new SqlParameter("@credSetID", SqlDbType.Int));
-                    credParam.Value = credentialSetId;
-                    userParam = cmd.Parameters.Add(new SqlParameter("@userName", SqlDbType.VarChar, 256));
-                    userParam.Value = userName;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experInfoID", experimentInfoId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String, 256));
                     break;
                 default:
                     break;
             }
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -1058,26 +1016,20 @@ namespace iLabs.Scheduling.UserSide
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddExperimentInfo" store procedure
-			SqlCommand cmd=new SqlCommand("AddExperimentInfo",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("AddExperimentInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-            SqlParameter labClientIDParam = cmd.Parameters.Add("@labClientGUID", SqlDbType.VarChar, 50);
-            labClientIDParam.Value = labClientGuid;
-			SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar,50);
-            labServerIDParam.Value = labServerGuid;
-			SqlParameter labServerNameParam = cmd.Parameters.Add("@labServerName", SqlDbType.VarChar,256);
-			labServerNameParam.Value = labServerName;
-			SqlParameter labClientVersionParam = cmd.Parameters.Add("@labClientVersion", SqlDbType.VarChar,50);
-			labClientVersionParam.Value = labClientVersion;
-			SqlParameter labClientNameParam = cmd.Parameters.Add("@labClientName", SqlDbType.VarChar,256);
-			labClientNameParam.Value = labClientName;
-			SqlParameter providerNameParam = cmd.Parameters.Add("@providerName", SqlDbType.VarChar,256);
-			providerNameParam.Value = providerName;
-			SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar,50);
-            lssIDParam.Value = lssGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientGUID", labClientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerName", labServerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientVersion", labClientVersion, DbType.String,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientName", labClientName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@providerName", providerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
+           
 			int i=-1;
 
 			// execute the command
@@ -1109,12 +1061,12 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteExperimentInfo" store procedure
-			SqlCommand cmd=new SqlCommand("DeleteExperimentInfo",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("DeleteExperimentInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@experimentInfoId", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", null, DbType.Int32));
 			// execute the command
 			try
 			{
@@ -1148,15 +1100,15 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] experimentInfoIds;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveExperimentIDs" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveExperimentIDs", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveExperimentIDs", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			ArrayList arrayList=new ArrayList();
 			try 
 			{
@@ -1196,13 +1148,13 @@ namespace iLabs.Scheduling.UserSide
 				experimentInfos[i]=new  UssExperimentInfo();
 			}
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveExperimentInfoByID" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveExperimentInfoByID", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveExperimentInfoByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@experimentInfoId", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -1211,7 +1163,7 @@ namespace iLabs.Scheduling.UserSide
 				{
 					// populate the parameters
 					cmd.Parameters["@experimentInfoId"].Value = experimentInfoIds[i];	
-					SqlDataReader dataReader = null;
+					DbDataReader dataReader = null;
 					dataReader=cmd.ExecuteReader();
 					while(dataReader.Read())
 					{	
@@ -1255,19 +1207,17 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int experimentInfoId=-1;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveExperimentInfoIDByExperiment" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveExperimentInfoIDByExperiment", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveExperimentInfoIDByExperiment", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter labClientNameParam = cmd.Parameters.Add("@clientGuid", SqlDbType.VarChar,50);
-			labClientNameParam.Value = clientGuid;
-			SqlParameter labClientVersionParam = cmd.Parameters.Add("@labServerGuid", SqlDbType.VarChar,50);
-			labClientVersionParam.Value = labServerGuid;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
+			
 			// execute the command
 			
 			try 
@@ -1301,19 +1251,17 @@ namespace iLabs.Scheduling.UserSide
 		{
 			string url = null;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveLSSURLbyExperiment" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveLSSURLbyExperiment", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSURLbyExperiment", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter labClientNameParam = cmd.Parameters.Add("@clientGuid", SqlDbType.VarChar,50);
-			labClientNameParam.Value = clientGuid;
-			SqlParameter labClientVersionParam = cmd.Parameters.Add("@labServerGuid", SqlDbType.VarChar,50);
-			labClientVersionParam.Value = labServerGuid;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
+			
 			// execute the command
 			
 			try 
@@ -1347,18 +1295,16 @@ namespace iLabs.Scheduling.UserSide
         {
             string lssID = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveLSSURLbyExperiment" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveLSSIDbyExperiment", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSIDbyExperiment", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter labClientNameParam = cmd.Parameters.Add("@clientGuid", SqlDbType.VarChar, 50);
-            labClientNameParam.Value = clientGuid;
-            SqlParameter labClientVersionParam = cmd.Parameters.Add("@labServerGuid", SqlDbType.VarChar, 50);
-            labClientVersionParam.Value = labServerGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString, 50));
 
             // execute the command
 
@@ -1398,28 +1344,21 @@ namespace iLabs.Scheduling.UserSide
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyExperimentInfo" store procedure
-			SqlCommand cmd=new SqlCommand("ModifyExperimentInfo",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("ModifyExperimentInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter experimentInfoIdParam = cmd.Parameters.Add("@experimentInfoId", SqlDbType.Int);
-		    experimentInfoIdParam.Value = experimentInfoId;
-            SqlParameter labClientIDParam = cmd.Parameters.Add("@labClientGUID", SqlDbType.VarChar, 50);
-            labClientIDParam.Value = labClientGuid;
-			SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar,50);
-            labServerIDParam.Value = labServerGuid;
-			SqlParameter labServerNameParam = cmd.Parameters.Add("@labServerName", SqlDbType.VarChar,256);
-			labServerNameParam.Value = labServerName;
-			SqlParameter labClientVersionParam = cmd.Parameters.Add("@labClientVersion", SqlDbType.VarChar,50);
-			labClientVersionParam.Value = labClientVersion;
-			SqlParameter labClientNameParam = cmd.Parameters.Add("@labClientName", SqlDbType.VarChar,256);
-			labClientNameParam.Value = labClientName;
-			SqlParameter providerNameParam = cmd.Parameters.Add("@providerName", SqlDbType.VarChar,256);
-			providerNameParam.Value = providerName;
-			SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar,50);
-            lssIDParam.Value = lssGuid;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId,DbType.Int32));
+		    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientGUID", labClientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerName", labServerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientVersion", labClientVersion, DbType.String,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientName", labClientName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@providerName", providerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
+            
 			int i=0;
 
 			// execute the command
@@ -1459,27 +1398,20 @@ namespace iLabs.Scheduling.UserSide
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "ModifyExperimentInfo" store procedure
-            SqlCommand cmd = new SqlCommand("ModifyExperimentInfoByGuid", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ModifyExperimentInfoByGuid", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientGUID", labClientGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerName", labServerName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientVersion", labClientVersion, DbType.String, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientName", labClientName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@providerName", providerName, DbType.String, 25));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString, 50));
             
-            SqlParameter labClientIDParam = cmd.Parameters.Add("@labClientGUID", SqlDbType.VarChar, 50);
-            labClientIDParam.Value = labClientGuid;
-            SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar, 50);
-            labServerIDParam.Value = labServerGuid;
-            SqlParameter labServerNameParam = cmd.Parameters.Add("@labServerName", SqlDbType.VarChar, 256);
-            labServerNameParam.Value = labServerName;
-            SqlParameter labClientVersionParam = cmd.Parameters.Add("@labClientVersion", SqlDbType.VarChar, 50);
-            labClientVersionParam.Value = labClientVersion;
-            SqlParameter labClientNameParam = cmd.Parameters.Add("@labClientName", SqlDbType.VarChar, 256);
-            labClientNameParam.Value = labClientName;
-            SqlParameter providerNameParam = cmd.Parameters.Add("@providerName", SqlDbType.VarChar, 256);
-            providerNameParam.Value = providerName;
-            SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar, 50);
-            lssIDParam.Value = lssGuid;
             int i = 0;
 
             // execute the command
@@ -1508,30 +1440,24 @@ namespace iLabs.Scheduling.UserSide
 
 
         /// <summary>
-        /// modify the experimentInfo
+        /// modify the LabServer name
         /// </summary>
-        /// <param name="experimentInfoId"></param>
         /// <param name="labServerGuid"></param>
         /// <param name="labServerName"></param>
-        /// <param name="labClientVersion"></param>
-        /// <param name="labClientName"></param>
-        /// <param name="providerName"></param>
-        /// <param name="lssGuid"></param>
         /// <returns></returns>true modified successfully, false otherwise
         public static int ModifyExperimentLabServer(string labServerGuid, string labServerName)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "ModifyExperimentInfo" store procedure
-            SqlCommand cmd = new SqlCommand("ModifyExperimentLabServer", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ModifyExperimentLabServer", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-           
-            SqlParameter labServerIDParam = cmd.Parameters.Add("@labServerGUID", SqlDbType.VarChar, 50);
-            labServerIDParam.Value = labServerGuid;
-            SqlParameter labServerNameParam = cmd.Parameters.Add("@labServerName", SqlDbType.VarChar, 256);
-            labServerNameParam.Value = labServerName;
+
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGUID", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerName", labServerName, DbType.String, 256));
+            
             int count = -1;
 
             // execute the command
@@ -1570,18 +1496,16 @@ namespace iLabs.Scheduling.UserSide
         public static int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddLSSInfo" store procedure
-			SqlCommand cmd=new SqlCommand("AddLSSInfo",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("AddLSSInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar,50);
-            lssIDParam.Value = lssGuid;
-			SqlParameter lssNameParam = cmd.Parameters.Add("@lssName", SqlDbType.VarChar,256);
-			lssNameParam.Value = lssName;
-			SqlParameter lssURLParam = cmd.Parameters.Add("@lssURL", SqlDbType.VarChar,256);
-			lssURLParam.Value = lssUrl;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssName", lssName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssURL", lssUrl, DbType.String,512));
+			
 			int i=-1;
 
 			// execute the command
@@ -1616,20 +1540,17 @@ namespace iLabs.Scheduling.UserSide
         public static int ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyLSSInfo" store procedure
-			SqlCommand cmd=new SqlCommand("ModifyLssInfo",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("ModifyLssInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter lssInfoIdParam = cmd.Parameters.Add("@lssInfoId", SqlDbType.Int);
-			lssInfoIdParam.Value = lssInfoId;
-			SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar,50);
-            lssIDParam.Value = lssGuid;
-			SqlParameter lssNameParam = cmd.Parameters.Add("@lssName", SqlDbType.VarChar,256);
-			lssNameParam.Value = lssName;
-			SqlParameter lssURLParam = cmd.Parameters.Add("@lssURL", SqlDbType.VarChar,256);
-			lssURLParam.Value = lssUrl;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssInfoId", lssInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssName", lssName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssURL", lssUrl, DbType.String,512));
+			
             int count = -1;
 
 			// execute the command
@@ -1666,19 +1587,16 @@ namespace iLabs.Scheduling.UserSide
         public static int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "ModifyLSSInfo" store procedure
-            SqlCommand cmd = new SqlCommand("ModifyLssInfoByGuid", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ModifyLssInfoByGuid", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-          
-            SqlParameter lssIDParam = cmd.Parameters.Add("@lssGUID", SqlDbType.VarChar, 50);
-            lssIDParam.Value = lssGuid;
-            SqlParameter lssNameParam = cmd.Parameters.Add("@lssName", SqlDbType.VarChar, 256);
-            lssNameParam.Value = lssName;
-            SqlParameter lssURLParam = cmd.Parameters.Add("@lssURL", SqlDbType.VarChar, 256);
-            lssURLParam.Value = lssUrl;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssName", lssName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssURL", lssUrl, DbType.String, 512));
+            
             int count = -1;
 
             // execute the command
@@ -1712,12 +1630,12 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeletLSSInfo" store procedure
-			SqlCommand cmd=new SqlCommand("DeletLSSInfo",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("DeletLSSInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@lssInfoId", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssInfoId", null, DbType.Int32));
 			// execute the command
 			try
 			{
@@ -1753,13 +1671,13 @@ namespace iLabs.Scheduling.UserSide
         {
             int status;
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "DeletLSSInfoByGuid" store procedure
-            SqlCommand cmd = new SqlCommand("DeletLSSInfoByGuid", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("DeletLSSInfoByGuid", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            SqlParameter guidParam = cmd.Parameters.Add(new SqlParameter("@guid", SqlDbType.VarChar, 50));
-            guidParam.Value = lssGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", lssGuid, DbType.AnsiString, 50));
+            
             // execute the command
             try
             {
@@ -1786,15 +1704,15 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] lssInfoIds;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveRetrieveLssInfoIDs" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveLssInfoIDs", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveLssInfoIDs", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			ArrayList arrayList=new ArrayList();
 			try 
 			{
@@ -1834,13 +1752,13 @@ namespace iLabs.Scheduling.UserSide
 				lssInfos[i]=new LSSInfo();
 			}
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveLSSInfoByID" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveLSSInfoByID", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSInfoByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@lssInfoId", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssInfoId", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -1849,7 +1767,7 @@ namespace iLabs.Scheduling.UserSide
 				{
 					// populate the parameters
 					cmd.Parameters["@lssInfoId"].Value = lssInfoIds[i];	
-					SqlDataReader dataReader = null;
+					DbDataReader dataReader = null;
 					dataReader=cmd.ExecuteReader();
 					while(dataReader.Read())
 					{	
@@ -1886,18 +1804,18 @@ namespace iLabs.Scheduling.UserSide
             LSSInfo lssInfo = new LSSInfo();
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
-            SqlCommand cmd = new SqlCommand("RetrieveLSSInfoByGUID", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSInfoByGUID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("@lssGuid", SqlDbType.VarChar, 50));
-            cmd.Parameters["@lssGuid"].Value = lssGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGuid", lssGuid, DbType.AnsiString, 50));
+            
             //execute the command
             try
             {
                 connection.Open();
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
@@ -1937,18 +1855,16 @@ namespace iLabs.Scheduling.UserSide
         public static int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "AddCredentialSet" store procedure
-			SqlCommand cmd=new SqlCommand("AddCredentialSet",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("AddCredentialSet",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-			SqlParameter serviceBrokerNameParam = cmd.Parameters.Add("@serviceBrokerName", SqlDbType.VarChar,256);
-			serviceBrokerNameParam.Value = serviceBrokerName;
-			SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,50);
-			groupNameParam.Value = groupName;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
+		
 			int i=-1;
 
 			// execute the command
@@ -1982,20 +1898,17 @@ namespace iLabs.Scheduling.UserSide
         public static bool ModifyCredentialSet(int credentialSetId, string groupName, string serviceBrokerGuid, string serviceBrokerName)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "ModifyCredentialSet" store procedure
-			SqlCommand cmd=new SqlCommand("ModifyCredentialSet",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("ModifyCredentialSet",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter credentialSetIdParam = cmd.Parameters.Add("@credentialSetId", SqlDbType.Int);
-			credentialSetIdParam.Value = credentialSetId;
-			SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,50);
-			groupNameParam.Value = groupName;
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-			SqlParameter serviceBrokerNameParam = cmd.Parameters.Add("@serviceBrokerName", SqlDbType.VarChar,256);
-			serviceBrokerNameParam.Value = serviceBrokerName;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetId", credentialSetId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String,256));
+			
 			bool i=false;
 
 			// execute the command
@@ -2035,18 +1948,16 @@ namespace iLabs.Scheduling.UserSide
         public static int ModifyCredentialSetServiceBroker(string originalGuid, string serviceBrokerGuid, string serviceBrokerName)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "ModifyCredentialSet" store procedure
-            SqlCommand cmd = new SqlCommand("ModifyCredentialSetServiceBroker", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ModifyCredentialSetServiceBroker", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            SqlParameter originalParam = cmd.Parameters.Add("@originalGUID", SqlDbType.VarChar, 50);
-            originalParam.Value = originalGuid;
-            SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar, 50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-            SqlParameter serviceBrokerNameParam = cmd.Parameters.Add("@serviceBrokerName", SqlDbType.VarChar, 256);
-            serviceBrokerNameParam.Value = serviceBrokerName;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@originalGUID", originalGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String, 256));
+           
             int count = -1;
 
             // execute the command
@@ -2081,12 +1992,12 @@ namespace iLabs.Scheduling.UserSide
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteCredentialSet" store procedure
-			SqlCommand cmd=new SqlCommand("DeleteCredentialSetByID",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("DeleteCredentialSetByID",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@credentialSetId", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetId", null, DbType.Int32));
 			
 			// execute the command
 			try
@@ -2122,18 +2033,16 @@ namespace iLabs.Scheduling.UserSide
         public static int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
 			//create a connection
-			SqlConnection connection= FactoryDB.GetConnection();
+			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
 			//command executes the "DeleteCredentialSet" store procedure
-			SqlCommand cmd=new SqlCommand("DeleteCredentialSet",connection);
+			DbCommand cmd=FactoryDB.CreateCommand("DeleteCredentialSet",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar,50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-			SqlParameter serviceBrokerNameParam = cmd.Parameters.Add("@serviceBrokerName", SqlDbType.VarChar,256);
-			serviceBrokerNameParam.Value = serviceBrokerName;
-			SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar,50);
-			groupNameParam.Value = groupName;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
+			
 			int removed = 0;
 
 			// execute the command
@@ -2161,15 +2070,15 @@ namespace iLabs.Scheduling.UserSide
 		{
 			int[] credentialSetIds;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCredentialSetIDs" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveCredentialSetIDs", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveCredentialSetIDs", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			ArrayList arrayList=new ArrayList();
 			try 
 			{
@@ -2209,13 +2118,13 @@ namespace iLabs.Scheduling.UserSide
 				credentialSets[i]=new UssCredentialSet();
 			}
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCredentialSetByID" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveCredentialSetByID", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveCredentialSetByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(new SqlParameter("@credentialSetID", SqlDbType.Int));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetID", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -2224,7 +2133,7 @@ namespace iLabs.Scheduling.UserSide
 				{
 					// populate the parameters
 					cmd.Parameters["@credentialSetID"].Value = credentialSetIds[i];	
-					SqlDataReader dataReader = null;
+					DbDataReader dataReader = null;
 					dataReader=cmd.ExecuteReader();
 					while(dataReader.Read())
 					{	
@@ -2261,17 +2170,15 @@ namespace iLabs.Scheduling.UserSide
         public static int GetCredentialSetID(string serviceBrokerGuid, string groupName)
         {
             //create a connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             //create a command
             //command executes the "AddCredentialSet" store procedure
-            SqlCommand cmd = new SqlCommand("GetCredentialSetID", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetCredentialSetID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            SqlParameter serviceBrokerIDParam = cmd.Parameters.Add("@serviceBrokerGUID", SqlDbType.VarChar, 50);
-            serviceBrokerIDParam.Value = serviceBrokerGuid;
-            SqlParameter groupNameParam = cmd.Parameters.Add("@groupName", SqlDbType.VarChar, 50);
-            groupNameParam.Value = groupName;
-           
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
+                       
             int i = 0;
 
             // execute the command

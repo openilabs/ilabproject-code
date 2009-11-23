@@ -48,9 +48,8 @@ using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker.Internal;
 using iLabs.Ticketing;
 using iLabs.TicketIssuer;
-
 using iLabs.UtilLib;
-
+using iLabs.Web;
 
 namespace iLabs.ServiceBroker.iLabSB
 {
@@ -304,11 +303,19 @@ namespace iLabs.ServiceBroker.iLabSB
 
         protected override void register(string registerGuid, ServiceDescription[] info)
         {
+            StringBuilder message = new StringBuilder();
+            if (info == null)
+            {
+                //message.AppendLine("Register called without any ServiceDescriptions");
+                throw new ArgumentNullException("Register called without any ServiceDescriptions");
+            }
+
+            base.register(registerGuid, info);
             bool hasProvider = false;
             bool hasConsumer = false;
             string ns = "";
             BrokerDB brokerDB = new BrokerDB();
-            StringBuilder message = new StringBuilder();
+           
             int lssID = 0;
             int lsID = 0;
             ProcessAgentInfo ls = null;
@@ -316,20 +323,15 @@ namespace iLabs.ServiceBroker.iLabSB
             ProcessAgentInfo uss = null;
             LabClient labClient;
             GroupCredential credential = null;
-
             try
             {
                 ResourceDescriptorFactory rFactory = ResourceDescriptorFactory.Instance();
                 string jobGuid = registerGuid;
-                message.AppendLine(" Register called at " + DateTime.UtcNow + " UTC \t registerGUID: " + registerGuid);
+                //message.AppendLine(" Register called at " + DateTime.UtcNow + " UTC \t registerGUID: " + registerGuid);
                 ProcessAgent sourceAgent = brokerDB.GetProcessAgent(agentAuthHeader.agentGuid);
-                message.AppendLine("Source Agent: " + sourceAgent.agentName);
+                //message.AppendLine("Source Agent: " + sourceAgent.agentName);
 
-                if (info == null)
-                {
-                    message.AppendLine("Register called without any ServiceDescriptions");
-                    throw new ArgumentNullException("Register called without any ServiceDescriptions");
-                }
+               
 
                 for (int i = 0; i < info.Length; i++)
                 {
@@ -359,7 +361,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 if (lssID > 0)
                                 {
                                     // Already in database
-                                    message.AppendLine("Reference to existing LSS: " + lssID + " GUID: " + paGuid);
+                                    //message.AppendLine("Reference to existing LSS: " + lssID + " GUID: " + paGuid);
 
                                 }
                                 else
@@ -374,7 +376,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 if (lsID > 0)
                                 {
                                     // Already in database
-                                    message.AppendLine("Reference to existing LS: " + lsID + " GUID: " + paGuid);
+                                    //message.AppendLine("Reference to existing LS: " + lsID + " GUID: " + paGuid);
                                     
                                 }
                                 else
@@ -405,6 +407,19 @@ namespace iLabs.ServiceBroker.iLabSB
                                 // LabServer should already be in the Database, once multiple LS supported may need work
                                 // LS is specified in clientDescriptor
                                 int clientID = rFactory.LoadLabClient(xdoc, ref message);
+                            }
+                        }
+                        else if (descriptorType.Equals("systemSupport"))
+                        {
+                            SystemSupport ss = SystemSupport.Parse(xdoc);
+                            if (ss.agentGuid != null && ss.agentGuid.Length > 0)
+                            {
+                                int id = brokerDB.GetProcessAgentID(ss.agentGuid);
+                                if (id > 0)
+                                {
+                                    brokerDB.SaveSystemSupport(ss.agentGuid, ss.contactEmail, ss.bugEmail,
+                                        ss.infoUrl, ss.description, ss.location);
+                                }
                             }
                         }
                         // Add Relationships: LSS, LS Client

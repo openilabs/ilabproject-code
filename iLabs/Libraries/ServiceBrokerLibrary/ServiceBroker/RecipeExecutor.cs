@@ -90,17 +90,6 @@ namespace iLabs.ServiceBroker
             BrokerDB brokerDB = new BrokerDB();
             TicketLoadFactory factory = TicketLoadFactory.Instance();
 
-            if (client.needsESS)
-            {      
-                //  Query Client resources to see if ESS required and assigned
-
-                //Hashtable mappingsTable = brokerDB.GetResourceMappingsForKey(client.clientID, ResourceMappingTypes.CLIENT);
-                //ResourceMappingValue[][] values = brokerDB.GetResourceMappingValues(mappingsTable);
-
-                essId = brokerDB.FindProcessAgentIdForClient(client.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
-
-            }
-
             // 1. Create Coupon for ExperimentCollection
             Coupon coupon = brokerDB.CreateCoupon();
 
@@ -113,55 +102,53 @@ namespace iLabs.ServiceBroker
 
             // Store a record of the Experiment Collection Coupon
             DataStorageAPI.InsertExperimentCoupon(experimentID, coupon.couponId);
+             string essWebAddress = null;
 
-            // If a ESS is specified Create the ESS Tickets, this should only happen if a resource is mapped
-            if (essId > 0)
-            {
-                //3.A create ESS administer experiment ticket, Add 10 minutes to duration
-                // This must be created before the ESS experiment records may be created
-                essAgent = brokerDB.GetProcessAgentInfo(essId);
-                if ((essAgent != null) && !essAgent.retired)
-                {
-                    brokerDB.AddTicket(coupon,
-                           TicketTypes.ADMINISTER_EXPERIMENT, essAgent.AgentGuid, brokerDB.GetIssuerGuid(), ticketDuration, factory.createAdministerExperimentPayload(experimentID, essAgent.webServiceUrl));
+             if (client.needsESS)
+             {
+                 essId = brokerDB.FindProcessAgentIdForClient(client.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
 
-                    //3.B create store record ticket
-                    brokerDB.AddTicket(coupon,
-                           TicketTypes.STORE_RECORDS, essAgent.agentGuid, labServer.agentGuid, ticketDuration, factory.StoreRecordsPayload(true, experimentID, essAgent.webServiceUrl));
+                 // If a ESS is specified Create the ESS Tickets, this should only happen if a resource is mapped
+                 if (essId > 0)
+                 {
+                     //3.A create ESS administer experiment ticket, Add 10 minutes to duration
+                     // This must be created before the ESS experiment records may be created
+                     essAgent = brokerDB.GetProcessAgentInfo(essId);
+                     if ((essAgent != null) && !essAgent.retired)
+                     {
+                         brokerDB.AddTicket(coupon,
+                                TicketTypes.ADMINISTER_EXPERIMENT, essAgent.AgentGuid, brokerDB.GetIssuerGuid(), ticketDuration, factory.createAdministerExperimentPayload(experimentID, essAgent.webServiceUrl));
 
-                    //3.C create retrieve experiment ticket, retrieve Experiment Records never expires, unless experiment deleted
-                    //    This should be changed to a long but finite period once eadExisting Expermint is in place.
-                    brokerDB.AddTicket(coupon,
-                           TicketTypes.RETRIEVE_RECORDS, essAgent.agentGuid, brokerDB.GetIssuerGuid(), -1, factory.RetrieveRecordsPayload(experimentID, essAgent.webServiceUrl));
+                         //3.B create store record ticket
+                         brokerDB.AddTicket(coupon,
+                                TicketTypes.STORE_RECORDS, essAgent.agentGuid, labServer.agentGuid, ticketDuration, factory.StoreRecordsPayload(true, experimentID, essAgent.webServiceUrl));
+
+                         //3.C create retrieve experiment ticket, retrieve Experiment Records never expires, unless experiment deleted
+                         //    This should be changed to a long but finite period once eadExisting Expermint is in place.
+                         brokerDB.AddTicket(coupon,
+                                TicketTypes.RETRIEVE_RECORDS, essAgent.agentGuid, brokerDB.GetIssuerGuid(), -1, factory.RetrieveRecordsPayload(experimentID, essAgent.webServiceUrl));
 
 
-                    // 3.D Create the ESS Experiment Records
-                    ExperimentStorageProxy ess = new ExperimentStorageProxy();
-                    ess.AgentAuthHeaderValue = new AgentAuthHeader();
-                    ess.AgentAuthHeaderValue.coupon = essAgent.identOut;
-                    ess.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                    ess.Url = essAgent.webServiceUrl;
+                         // 3.D Create the ESS Experiment Records
+                         ExperimentStorageProxy ess = new ExperimentStorageProxy();
+                         ess.AgentAuthHeaderValue = new AgentAuthHeader();
+                         ess.AgentAuthHeaderValue.coupon = essAgent.identOut;
+                         ess.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                         ess.Url = essAgent.webServiceUrl;
+                         essWebAddress = essAgent.webServiceUrl;
 
-                    // Call the ESS to create the ESS Records and open the experiment
-                    StorageStatus status = ess.OpenExperiment(experimentID, ticketDuration);
-                    if(status != null)
-                        DataStorageAPI.UpdateExperimentStatus(status);
-                }
-            }
-
-            
-                
-
-            
+                         // Call the ESS to create the ESS Records and open the experiment
+                         StorageStatus status = ess.OpenExperiment(experimentID, ticketDuration);
+                         if (status != null)
+                             DataStorageAPI.UpdateExperimentStatus(status);
+                     }
+                 }
+             }
             //
             // 4. create the execution ticket for the experiment
             //
  
             // 4.A create payload 
-            string essWebAddress = "";
-            if (essAgent != null)
-                essWebAddress = essAgent.ServiceUrl;
-           
             string payload = factory.createExecuteExperimentPayload(essWebAddress, startExecution, duration,
                 userTZ, groupName, brokerDB.GetIssuerGuid(), experimentID);
 

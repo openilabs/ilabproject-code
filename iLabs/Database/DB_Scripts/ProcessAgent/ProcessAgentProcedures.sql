@@ -935,9 +935,9 @@ GO
 CREATE PROCEDURE InsertProcessAgent 
 @processAgentType varchar(100),
 @guid varchar(50),
-@name varchar(100),
-@codeBaseURL varchar(256) = null,
-@webServiceURL varchar(256),
+@name nvarchar(256),
+@codeBaseURL nvarchar(512) = null,
+@webServiceURL nvarchar(512),
 @issuer varchar(50) = null,
 @inID bigint = null,
 @outID bigint = null,
@@ -1012,9 +1012,9 @@ Create PROCEDURE WriteSelfProcessAgent
 @processAgentType varchar(100),
 @guid varchar(50),
 @domain varchar(50),
-@name varchar(100),
-@codeBaseURL varchar(256) = null,
-@webServiceURL varchar(256)
+@name nvarchar(256),
+@codeBaseURL nvarchar(512) = null,
+@webServiceURL nvarchar(512)
 
 AS
 Declare @processAgentTypeID int 
@@ -1071,10 +1071,10 @@ GO
 CREATE PROCEDURE UpdateProcessAgent
 @guid varchar(50),
 @domain varchar (50), 
-@name varchar(100),
+@name nvarchar(256),
 @type varchar(100),
-@codeBaseURL varchar(256) = null,
-@webServiceURL varchar(256)
+@codeBaseURL nvarchar(512),
+@webServiceURL nvarchar(512)
 
 AS
 Declare @processAgentTypeID int 
@@ -1100,10 +1100,10 @@ CREATE PROCEDURE UpdateProcessAgentByID
 @id int,
 @guid varchar(50),
 @domain varchar (50), 
-@name varchar(100),
+@name nvarchar(256),
 @type varchar(100),
-@codeBaseURL varchar(256) = null,
-@webServiceURL varchar(256)
+@codeBaseURL nvarchar(512) = null,
+@webServiceURL nvarchar(512)
 
 AS
 Declare @processAgentTypeID int 
@@ -1748,7 +1748,7 @@ CREATE PROCEDURE InsertTicket
   	@sponsorGUID varchar(50),
 	@creationTime DateTime,
   	@duration bigint,
-  	@payload text,
+  	@payload ntext,
   	@cancelled bit=0
    AS
 	DECLARE @ticketTypeID int
@@ -1959,8 +1959,8 @@ GO
 CREATE PROCEDURE RetrieveSystemSupport
 @guid varchar(50)
 AS
-select Contact_Email, Info_URL, description 
-from ProcesAgent where Agent_Guid=@guid
+select agent_GUID, Contact_Email, bug_email, Info_URL, description , location
+from ProcessAgent where Agent_Guid=@guid
 go
 
 SET QUOTED_IDENTIFIER OFF 
@@ -1976,8 +1976,8 @@ GO
 CREATE PROCEDURE RetrieveSystemSupportById
 @id int
 AS
-select Contact_Email, Info_URL, description 
-from ProcesAgent where Agent_id=@id
+select agent_GUID, Contact_Email, Bug_Email, Info_URL, description , location
+from ProcessAgent where Agent_id=@id
 go
 
 SET QUOTED_IDENTIFIER OFF 
@@ -1993,12 +1993,14 @@ GO
 
 CREATE PROCEDURE SaveSystemSupport
 @guid varchar(50),
-@email varchar(50),
-@info varchar(256),
-@desc text
+@contactEmail nvarchar(256),
+@bugEmail nvarchar(256),
+@info nvarchar(512),
+@desc ntext,
+@location nvarchar(256)
 AS
 
-UPDATE PRocessAgent set Contact_Email=@email,Info_Url=@info,Description=@desc
+UPDATE ProcessAgent set Contact_Email=@contactEmail,Bug_Email=@bugEmail,Info_Url=@info,Description=@desc, location=@location
 WHERE Agent_GUID =@guid
 select @@rowcount
 go
@@ -2015,12 +2017,14 @@ GO
 
 CREATE PROCEDURE SaveSystemSupportById
 @id int,
-@email varchar(50),
-@info varchar(256),
-@desc text
+@contactEmail nvarchar(256),
+@bugEmail nvarchar(256),
+@info nvarchar(512),
+@desc ntext,
+@location nvarchar(256)
 AS
 
-UPDATE PRocessAgent set Contact_Email=@email,Info_Url=@info,Description=@desc
+UPDATE PRocessAgent set Contact_Email=@contactEmail,Bug_Email=@bugEmail,Info_Url=@info,Description=@desc, location=@location
 WHERE Agent_ID =@id
 select @@rowcount
 go

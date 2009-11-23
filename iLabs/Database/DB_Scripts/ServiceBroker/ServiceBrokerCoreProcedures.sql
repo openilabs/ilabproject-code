@@ -486,6 +486,11 @@ drop procedure [dbo].[RetrieveAuthorizedExpIDs]
 GO
 
 /****** Object:  Stored Procedure dbo.RetrieveExperimentInformat    Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveActiveExpIDs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveActiveExpIDs]
+GO
+
+/****** Object:  Stored Procedure dbo.RetrieveExperimentInformat    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveAuthorizedExpIDs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveAuthorizedExpIDs]
 GO
@@ -551,6 +556,11 @@ GO
 /****** Object:  Stored Procedure dbo.RetrieveGroupID    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveGroupID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveGroupID]
+GO
+
+/****** Object:  Stored Procedure dbo.RetrieveGroupName   Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveGroupName]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveGroupName]
 GO
 
 /****** Object:  Stored Procedure dbo.RetrieveGroupMembers    Script Date: 5/18/2005 4:17:55 PM ******/
@@ -667,6 +677,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveUs
 drop procedure [dbo].[RetrieveUserID]
 GO
 
+/****** Object:  Stored Procedure dbo.RetrieveUserName    Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveUserName]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveUserName]
+GO
 /****** Object:  Stored Procedure dbo.RetrieveUserIDs    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveUserIDs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveUserIDs]
@@ -907,8 +921,14 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[UpdateRegi
 drop procedure [dbo].[UpdateRegistrationStatus]
 GO
 
-
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetLoaderScript]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetLoaderScript]
 GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SetLoaderScript]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SetLoaderScript]
+GO
+
 
 create Function IsSuperuser(@userid int,@groupid int)
 returns bit
@@ -954,9 +974,9 @@ GO
 
 CREATE PROCEDURE AddClientInfo
 	@labClientID int,
-	@infoURL varchar (256),
-	@infoName varchar(256),
-	@description varchar(512),
+	@infoURL nvarchar (512),
+	@infoName nvarchar(256),
+	@description nvarchar(2048),
 	@displayOrder int
 AS
 	insert into client_info (client_id,info_url,info_name,description, display_order)
@@ -975,7 +995,7 @@ GO
 
 CREATE PROCEDURE AddGrant
 	@agentID int,
-	@functionName varchar(50),
+	@functionName varchar(128),
 	@qualifierID int
 AS
 	DECLARE @functionID int
@@ -995,9 +1015,9 @@ GO
 
 /****** Object:  Stored Procedure dbo.AddGroup    Script Date: 5/18/2005 4:17:55 PM ******/
 CREATE PROCEDURE AddGroup
-	@groupName varchar(256),
-	@description varchar(4000),
-	@email varchar(50),
+	@groupName nvarchar(256),
+	@description nvarchar(2048),
+	@email nvarchar(256),
 	@parentGroupID int, 
 	@groupType varchar(256),
 	@associatedGroupID int
@@ -1042,16 +1062,16 @@ GO
 
 CREATE PROCEDURE AddLabClient
 	@guid varchar(50),
-	@labClientName varchar(256),
-	@shortDescription varchar(256),
-	@longDescription varchar(2000),
-	@version varchar(50),
-	@loaderScript varchar (2500),
-	@clientType varchar (4000),
-	@email varchar(50),
-	@firstName varchar(128),
-	@lastName varchar(128),
-	@notes varchar(2000),
+	@labClientName nvarchar(256),
+	@shortDescription nvarchar(256),
+	@longDescription ntext,
+	@version nvarchar(50),
+	@loaderScript nvarchar(2000),
+	@clientType varchar (100),
+	@email nvarchar(256),
+	@firstName nvarchar(128),
+	@lastName nvarchar(128),
+	@notes nvarchar(2048),
 	@needsScheduling bit,
 	@needsESS bit,
 	@isReentrant bit
@@ -1078,6 +1098,20 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+CREATE PROCEDURE GetLoaderScript
+	@id int
+AS
+	SELECT loader_script from lab_clients where client_ID = @id
+return
+GO
+
+CREATE PROCEDURE setLoaderScript
+	@id int,
+	@script nvarchar(2000)
+AS
+	UPDATE loader_script set loader_script = @script  where client_ID = @id
+return
+GO
 /****** Object:  Stored Procedure dbo.AddLabServerClient    Script Date: 5/18/2005 4:17:55 PM ******/
 
 CREATE PROCEDURE AddLabServerClient
@@ -1198,7 +1232,7 @@ GO
 CREATE PROCEDURE AddQualifier
 	@qualifierTypeID int,
 	@qualifierReferenceID int,
-	@qualifierName varchar (256)
+	@qualifierName nvarchar (512)
 AS
 	/*DECLARE @qualifierTypeID int
 	select @qualifierTypeID = (select qualifier_type_id from qualifier_Types where 
@@ -1234,7 +1268,7 @@ GO
 CREATE PROCEDURE ModifyQualifierName
 @qualifierTypeID int,
 @refID int,
-@newName varchar(256)
+@newName nvarchar(512)
 
 AS
 
@@ -1254,20 +1288,22 @@ GO
 
 CREATE PROCEDURE AddSystemMessage
 	@messageType varchar(256),
-	@messageTitle varchar(256),
+	@messageTitle nvarchar(256),
 	@toBeDisplayed bit,
 	@groupID int,
-	@labServerID int,
-	@messageBody text 
+	@clientID int,
+	@agentID int,
+	@messageBody nvarchar(3000)
 
 AS 
 	DECLARE @messageTypeID int
 
 	select @messageTypeID = (select message_type_id from message_types 
 							where upper(description) = upper(@messageType))
-	insert into System_Messages (message_type_id, to_be_displayed, group_id, lab_server_id,
-								message_body, message_title)
-		values (@messageTypeID,  @toBeDisplayed, @groupID,@labServerID, @messageBody, @messageTitle)
+	insert into System_Messages (message_type_id, to_be_displayed, agent_id, client_ID, group_id, 
+		message_body, message_title, date_created,last_modified)
+		values (@messageTypeID, @toBeDisplayed, @agentID, @clientID, @groupID, @messageTitle, @messageBody,
+			getUtcdate(),getUtcdate())
 	
 	select ident_current('system_messages')
 return
@@ -1281,15 +1317,15 @@ GO
 /****** Object:  Stored Procedure dbo.AddUser    Script Date: 5/18/2005 4:17:55 PM ******/
 
 CREATE PROCEDURE AddUser
-	@userName varchar(50),
-	@firstName varchar(256),
-	@lastName varchar(256),
-	@email varchar(50),
-	@affiliation varchar(256),
-	@reason varchar(4000),
+	@userName nvarchar(256),
+	@firstName nvarchar(256),
+	@lastName nvarchar(256),
+	@email nvarchar(256),
+	@affiliation nvarchar(256),
+	@reason nvarchar(2048),
 	@XMLExtension text,
 	@lockUser bit,
-	@principalString varchar (50),
+	@principalString nvarchar (256),
 	@authenType varchar(256),
 	@initialGroupID int
 AS
@@ -1364,7 +1400,6 @@ GO
 
 CREATE PROCEDURE ModifyUserSession
 	@sessionID bigint,
-	@userID int,
 	@groupID int,
 	@clientID int,
 	@tzOffset int,
@@ -1573,7 +1608,7 @@ GO
 /****** Object:  Stored Procedure dbo.CreateNativePrincipal    Script Date: 5/18/2005 4:17:55 PM ******/
 
 CREATE PROCEDURE CreateNativePrincipal
-	@userName varchar(50)
+	@userName nvarchar(256)
 AS
 	DECLARE @authTypeID int
 	DECLARE @userID int
@@ -1615,7 +1650,7 @@ GO
 CREATE PROCEDURE DeleteClientItem
 	@clientID int,
 	@userID int,
-	@itemName varchar(256)
+	@itemName nvarchar(256)
 AS
 		delete from client_items 
 		where client_id = @ClientID and user_ID=@userID and item_Name = @itemName
@@ -2010,31 +2045,6 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-/****** Object:  Stored Procedure dbo.DeleteRecordAttribute    Script Date: 5/18/2005 4:17:55 PM ******/
-
-CREATE PROCEDURE DeleteRecordAttribute
-	@attributeID int,
-	@experimentID BigInt,
-	@sequenceNo int
-	
-AS
-	declare @recordID BigInt
-	select @recordID = (select record_id from experiment_records where experiment_id =@experimentID
-				and sequence_no = @sequenceNo)
-
-	select attribute_name, attribute_value from Record_Attributes 
-		where attribute_id = @attributeID and record_id = @recordID
-
-	delete from Record_Attributes 
-		where attribute_id = @attributeID and record_id = @recordID
-
-return
-GO
-
-SET QUOTED_IDENTIFIER ON 
-GO
-SET ANSI_NULLS OFF 
-GO
 
 /****** Object:  Stored Procedure dbo.DeleteSystemMessageByID    Script Date: 5/18/2005 4:17:55 PM ******/
 
@@ -2054,8 +2064,9 @@ GO
 
 CREATE PROCEDURE DeleteSystemMessages
 	@messageType varchar(256),
+	@clientID int,
 	@groupID int,
-	@labServerID int
+	@agentID int
 
 /* Delete by message type & group/lab server */
 AS
@@ -2065,7 +2076,7 @@ AS
 							where upper(description) = upper(@messageType))
 							
 	delete from System_Messages
-	where message_type_id = @messageTypeID and group_ID = @groupID and lab_server_ID=@labServerID;
+	where message_type_id = @messageTypeID and group_ID = @groupID and agent_ID=@agentID and client_ID = @clientID;
 
 GO
 
@@ -2080,7 +2091,7 @@ CREATE PROCEDURE DeleteUser
 	@userID int
 AS
 BEGIN TRANSACTION
-	DECLARE @userName varchar(50)
+	DECLARE @userName nvarchar(256)
 	DECLARE @qualifierTypeID int
 	DECLARE @agentID int
 	
@@ -2168,12 +2179,12 @@ GO
 
 CREATE PROCEDURE ModifyGroup
 	@groupID int,
-	@groupName varchar(256),
-	@description varchar(4000),
-	@email varchar(50)
+	@groupName nvarchar(256),
+	@description nvarchar(4000),
+	@email nvarchar(256)
 AS
 BEGIN TRANSACTION
-	DECLARE @oldGroupName varchar(256)
+	DECLARE @oldGroupName nvarchar(256)
 	DECLARE @qualifierTypeID1 int
 	DECLARE @qualifierTypeID2 int
 	
@@ -2224,16 +2235,16 @@ GO
 
 CREATE PROCEDURE ModifyLabClient
 	@labClientID int,
-	@labClientName varchar(256),
-	@shortDescription varchar(256),
-	@longDescription varchar(2000),
-	@version varchar(50),
-	@loaderScript varchar (2500),
-	@clientType varchar (4000),
-	@email varchar(50),
-	@firstName varchar(128),
-	@lastName varchar(128),
-	@notes varchar(2000),
+	@labClientName nvarchar(256),
+	@shortDescription nvarchar(256),
+	@longDescription ntext,
+	@version nvarchar(50),
+	@loaderScript nvarchar(2000),
+	@clientType varchar (128),
+	@email nvarchar(256),
+	@firstName nvarchar(128),
+	@lastName nvarchar(128),
+	@notes nvarchar(2048),
 	@needsScheduling bit,
 	@needsESS bit,
 	@isReentrant bit
@@ -2265,11 +2276,12 @@ GO
 CREATE PROCEDURE ModifySystemMessage
 	@messageID	int,
 	@messageType varchar(256),
-	@messageTitle varchar(256),
+	@messageTitle nvarchar(256),
 	@toBeDisplayed bit,
 	@groupID int,
-	@labServerID int,
-	@messageBody text 
+	@agentID int,
+	@clientID int,
+	@messageBody nvarchar (3000) 
 AS
 	DECLARE @messageTypeID int
 
@@ -2278,8 +2290,8 @@ AS
 							
 	update System_Messages
 	set message_type_id = @messageTypeID, to_be_displayed=@toBeDisplayed, 
-	group_ID = @groupID, lab_server_id=@labServerID, message_title = @messageTitle,
-	message_body = @messageBody, last_modified = getdate()
+	group_ID = @groupID, agent_id=@agentID, client_ID = @clientID, message_title = @messageTitle,
+	message_body = @messageBody, last_modified = getUtcdate()
 	where system_message_ID = @messageID;
 
 return
@@ -2294,20 +2306,20 @@ GO
 
 CREATE PROCEDURE ModifyUser
 	@userID int,
-	@userName varchar(50),
-	@firstName varchar(256),
-	@lastName varchar(256),
-	@email varchar(50),
-	@affiliation varchar(256),
-	@reason varchar(4000),
+	@userName nvarchar(256),
+	@firstName nvarchar(256),
+	@lastName nvarchar(256),
+	@email varchar(256),
+	@affiliation nvarchar(256),
+	@reason nvarchar(2048),
 	@XMLExtension text,
 	@lockUser bit,
-	@principalString varchar (50),
+	@principalString nvarchar (256),
 	@authenType varchar(256)
 AS
 BEGIN TRANSACTION
 	DECLARE @authTypeID int
-	DECLARE @oldUserName varchar(50)
+	DECLARE @oldUserName nvarchar(256)
 	DECLARE @qualifierTypeID int
 		
 	begin
@@ -2484,7 +2496,7 @@ GO
 CREATE PROCEDURE RetrieveClientItem
 	@clientID int,
 	@userID int,
-	@itemName varchar(256)
+	@itemName nvarchar(256)
 AS
 	select item_value 
 	from client_items
@@ -2712,6 +2724,28 @@ AS
 	where Experiment_ID = @experimentID
 GO
 
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+--DROP procedure RetrieveActiveExpIDs
+GO
+create procedure RetrieveActiveExpIDs
+@userId int,
+@groupId int,
+@serverId int,
+@clientId int
+AS
+ 
+select experiment_ID from experiments
+where user_ID = @userId and Group_ID = @groupId and agent_ID = @serverId and Client_ID = @clientID
+AND DATEADD(second,duration,scheduledStart) > GETUTCDATE()
+
+return
+GO
+
 SET QUOTED_IDENTIFIER ON 
 GO
 SET ANSI_NULLS OFF 
@@ -2891,11 +2925,24 @@ GO
 /****** Object:  Stored Procedure dbo.RetrieveGroupID    Script Date: 5/18/2005 4:17:56 PM ******/
 
 CREATE PROCEDURE RetrieveGroupID
-	@groupName varchar(256)
+	@groupName nvarchar(256)
 AS
 	select group_ID
 	from groups
 	where group_name = @groupName
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE RetrieveGroupName
+	@groupID int
+AS
+	select group_Name
+	from groups
+	where group_ID = @groupID
 GO
 
 SET QUOTED_IDENTIFIER OFF 
@@ -2975,12 +3022,16 @@ GO
 CREATE PROCEDURE RetrieveLabClientByGuid
 	@clientGuid varchar(50)
 AS
-	select client_id,client_guid, lab_client_name, short_description, long_description, version, loader_script, 
+	select client_id, client_guid, lab_client_name, short_description, long_description, version, loader_script, 
 		contact_email, contact_first_name, contact_last_name, notes, date_created,
 		client_types.description,NeedsScheduling,NeedsESS,IsReentrant
 	from lab_clients, client_types
 	where client_guid = @clientGuid and lab_clients.client_type_id = client_types.client_type_id
+GO
 
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
 GO
 
 /****** Object:  Stored Procedure dbo.RetrieveLabClientID    Script Date: 5/18/2005 4:17:56 PM ******/
@@ -3106,11 +3157,11 @@ CREATE PROCEDURE RetrieveSystemMessageByID
 	@messageID int
 /*Retrieve by message ID*/
 AS
-	select  message_body, to_be_displayed, last_modified, group_id, 
-			lab_server_id,message_title, description
+	select  description, to_be_displayed, last_modified, agent_ID, client_ID, group_id, 
+			message_title, message_body
 	from system_messages sm, message_types mt
-	where sm.system_message_ID= @messageID and to_be_Displayed=1
-		and sm.message_type_id=mt.message_type_id
+	where sm.system_message_ID= @messageID and to_be_displayed = 1
+		and sm.message_type_id=mt.message_type_id 
 	
 GO
 
@@ -3125,8 +3176,8 @@ CREATE PROCEDURE RetrieveSystemMessageByIDForAdmin
 	@messageID int
 /*Retrieve by message ID for admin pages (all messages)*/
 AS
-	select  message_body, to_be_displayed, last_modified, group_id, 
-			lab_server_id,message_title, description
+	select  message_body, to_be_displayed, last_modified, client_ID, group_id, 
+			agent_id,message_title, description
 	from system_messages sm, message_types mt
 	where sm.system_message_ID= @messageID and sm.message_type_id=mt.message_type_id
 GO
@@ -3141,8 +3192,9 @@ GO
 CREATE PROCEDURE RetrieveSystemMessages
 /*Retrieves by message type and group */
 	@messageType varchar(256),
-	@groupID int,
-	@labServerID int
+	@agentID int,
+	@clientID int,
+	@groupID int
 AS
 	DECLARE @messageTypeID int
 	
@@ -3152,7 +3204,7 @@ AS
 	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
-			and group_ID=@groupID and lab_server_ID=@labServerID
+			and group_ID=@groupID and agent_ID=@agentID and client_ID =@clientID
 GO
 
 SET QUOTED_IDENTIFIER ON 
@@ -3165,8 +3217,9 @@ GO
 CREATE PROCEDURE RetrieveSystemMessagesForAdmin
 /*Retrieves by message type and group */
 	@messageType varchar(256),
+	@clientID int,
 	@groupID int,
-	@labServerID int
+	@agentID int
 AS
 	DECLARE @messageTypeID int
 	
@@ -3175,7 +3228,7 @@ AS
 	
 	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
 	from system_messages sm
-	where sm.message_type_id=@messageTypeID	and group_ID=@groupID and lab_server_ID=@labServerID
+	where sm.message_type_id=@messageTypeID	and group_ID=@groupID and agent_ID=@agentID and client_ID = @clientID
 GO
 
 SET QUOTED_IDENTIFIER OFF 
@@ -3202,7 +3255,7 @@ GO
 /****** Object:  Stored Procedure dbo.RetrieveUserEmail    Script Date: 5/18/2005 4:17:56 PM ******/
 
 CREATE PROCEDURE RetrieveUserEmail
-	@userName varchar(50)
+	@userName nvarchar(256)
 AS
 	select email
 	from users
@@ -3217,7 +3270,7 @@ GO
 /****** Object:  Stored Procedure dbo.RetrieveUserID    Script Date: 5/18/2005 4:17:56 PM ******/
 
 CREATE PROCEDURE RetrieveUserID
-	@userName varchar(50)
+	@userName nvarchar(256)
 AS
 	select user_ID
 	from users
@@ -3242,11 +3295,26 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+/****** Object:  Stored Procedure dbo.RetrieveUserName    Script Date: 5/18/2005 4:17:56 PM ******/
+
+CREATE PROCEDURE RetrieveUserName
+	@userID int
+AS
+	select user_Name
+	from users
+	where user_id = @userID
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
 /****** Object:  Stored Procedure dbo.SaveBlobXMLExtensionSchemaURL    Script Date: 5/18/2005 4:17:56 PM ******/
 
 CREATE PROCEDURE SaveBlobXMLExtensionSchemaURL
  	@labserverID varchar(256),
-	@URL varchar(256)
+	@URL nvarchar(512)
 AS
 /* hardcoded account ID*/
 	update accounts
@@ -3264,10 +3332,10 @@ GO
 CREATE PROCEDURE SaveClientItem
 	@clientID int,
 	@userID int,
-	@itemName varchar(256),
-	@itemValue text
+	@itemName nvarchar(256),
+	@itemValue ntext
 AS
-	DECLARE @clientItemID varchar(256)
+	DECLARE @clientItemID bigint
 	select @clientItemID = (select client_item_id from client_items where client_id = @ClientID and user_ID=@userID and item_Name = @itemName);
 	if (@clientItemID is not null) 
 	begin
@@ -3301,7 +3369,7 @@ GO
 
 CREATE PROCEDURE SaveExperimentAnnotation
 	@experimentID BigInt,
-	@annotation text 
+	@annotation ntext 
 AS
 	/*select annotation 
 	from experiments 
@@ -3326,7 +3394,7 @@ GO
 
 CREATE PROCEDURE SaveNativePassword
 	@userID int,
-	@password varchar(256)
+	@password nvarchar(256)
 AS
 BEGIN TRANSACTION
 	update users
@@ -3349,7 +3417,7 @@ GO
 /* This procedure is probably not being used anywhere */
 CREATE PROCEDURE SaveResultXMLExtensionSchemaURL
  	@labserverID int,
-	@URL varchar(256)
+	@URL varchar(512)
 AS
 /* hardcoded account ID*/
 	update accounts
@@ -3368,7 +3436,7 @@ CREATE PROCEDURE SaveUserSessionEndTime
 	@sessionID BigInt
 
 AS 
-	update user_sessions set session_end_time = getdate()
+	update user_sessions set session_end_time = getutcdate()
 	where session_id=@sessionID
 	
 	select session_end_time from user_sessions where session_ID = @sessionID
@@ -3510,7 +3578,7 @@ GO
 
 CREATE PROCEDURE DeleteAdminURL
 @processAgentID int,
-@adminURL varchar (256),
+@adminURL nvarchar (512),
 @ticketType varchar (100)
 AS
 DECLARE @ticket_Type_ID int
@@ -3546,7 +3614,7 @@ GO
 CREATE PROCEDURE InsertAdminURL
 
 @processAgentID int,
-@adminURL varchar (256),
+@adminURL nvarchar (512),
 @ticketType varchar (100)
 AS
 DECLARE @ticket_Type_ID int
@@ -3568,7 +3636,7 @@ GO
 
 CREATE PROCEDURE ModifyAdminURL
 @id int,
-@url varchar(256),
+@url nvarchar(512),
 @typeID int
 AS
 update AdminURLs set AdminURL=@url where ProcessAgentID=@id and Ticket_Type_ID = @typeID
@@ -3585,8 +3653,8 @@ GO
 
 CREATE PROCEDURE ModifyAdminUrlCodebase
 @id int,
-@old varchar(256),
-@new varchar(256)
+@old nvarchar(512),
+@new nvarchar(512)
 AS
 update AdminURLs set AdminURL=REPLACE(AdminURL,@old,@new) where ProcessAgentID=@id
 select @@rowcount
@@ -3601,28 +3669,6 @@ SET QUOTED_IDENTIFIER OFF
 GO
 SET ANSI_NULLS OFF 
 GO
-CREATE PROCEDURE ModifyClientCodebase
-@id int,
-@old varchar(256),
-@new varchar(256)
-AS
-update Client_Info set Info_Url=REPLACE(Info_Url,@old,@new)
-where client_ID in (select client_id from Lab_Server_To_Client_MAP where agent_ID=@id)
-update Lab_Clients set Loader_Script=REPLACE(Loader_Script,@old,@new) 
-where client_ID in (select client_id from Lab_Server_To_Client_MAP where agent_ID=@id)
-select @@rowcount
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS ON 
-GO
-
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
-
 
 CREATE PROCEDURE RetrieveAdminURLs 
 
@@ -3681,7 +3727,7 @@ SET ANSI_NULLS OFF
 GO
 
 CREATE PROCEDURE AddResourceMappingString
-	@string_Value varchar(2000)
+	@string_Value nvarchar(2048)
  AS
 
 	insert into ResourceMappingStrings (String_Value) values (@string_Value)
@@ -3698,7 +3744,7 @@ GO
 SET ANSI_NULLS OFF 
 GO
 Create Procedure GetResourceTypeString
-@resourceType varchar( 256),
+@resourceType nvarchar( 256),
 @type int,
 @target int
 
@@ -3774,7 +3820,7 @@ SET ANSI_NULLS OFF
 GO
 
 CREATE PROCEDURE AddResourceMappingResourceType
-	@resourceType_Value varchar(400)
+	@resourceType_Value nvarchar(256)
  AS
 	if(select count(*) from ResourceMappingResourceTypes where ResourceType_Value = @resourceType_Value) = 0
 		begin
@@ -3872,7 +3918,7 @@ GO
 
 Create  PROCEDURE UpdateResourceMappingString
 	@id int,
-	@string varchar(2000)
+	@string nvarchar(2048)
  AS
 
 	update ResourceMappingStrings set String_Value= @string where ID = @id
@@ -4031,7 +4077,7 @@ GO
 
 
 Create PROCEDURE GetResourceMapIdsByValue
-@type varchar(100),
+@type nvarchar(256),
 @id int
 
 AS
@@ -4059,8 +4105,8 @@ CREATE PROCEDURE InsertRegistration
 @registerGuid varchar (50),
 @sourceGuid varchar (50),
 @status int,
-@descriptor TEXT,
-@email varchar (256)
+@descriptor NTEXT,
+@email nvarchar (256)
 
 AS
 

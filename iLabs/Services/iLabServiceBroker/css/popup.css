@@ -75,6 +75,11 @@ body {
 	padding: 5px;
 	}
 	
+.i18n
+{
+	font-family: Arial Unicode MS, Helvetica, sans-serif;
+}
+	
 .unit {
 	margin-bottom: 10px;
 	}

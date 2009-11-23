@@ -60,7 +60,7 @@ Please see license.txt in top level directory for full license.
 									<th>
 										<label for="timeis">Time </label>
 									</th>
-									<td colspan="2"><asp:dropdownlist id="ddlTimeAttribute" Runat="server" Width="200px" AutoPostBack="True" onselectedindexchanged="ddlTimeAttribute_SelectedIndexChanged">
+									<td colspan="2"><asp:dropdownlist CssClass="i18n" id="ddlTimeAttribute" Runat="server" Width="200px" AutoPostBack="True" onselectedindexchanged="ddlTimeAttribute_SelectedIndexChanged">
 											<asp:ListItem Value="-- Select one --">-- Select one --</asp:ListItem>
 											<asp:ListItem Value="equal to">equal to</asp:ListItem>
 											<asp:ListItem Value="before">before</asp:ListItem>
@@ -89,7 +89,7 @@ Please see license.txt in top level directory for full license.
 					<td>
 						<div class="simpleform">
 							<label for="selectexperiment">Select experiment</label><br />
-							<asp:listbox id="lbxSelectExperiment" Runat="server" Rows="20" Width="430px" AutoPostBack="True"
+							<asp:listbox cssClass="i18n" id="lbxSelectExperiment" Runat="server" Rows="20" Width="430px" AutoPostBack="True"
 								Height="354px" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged">
 							</asp:listbox>
 						</div>

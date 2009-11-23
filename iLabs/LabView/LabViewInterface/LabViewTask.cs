@@ -5,18 +5,16 @@
  * $Id$
  */
 
-#define LabVIEW_82
-
 using System;
 using System.Data;
 using System.Configuration;
 using System.Text;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+//using System.Web.Security;
+//using System.Web.UI;
+//using System.Web.UI.WebControls;
+//using System.Web.UI.WebControls.WebParts;
+//using System.Web.UI.HtmlControls;
 
 using iLabs.Core;
 using iLabs.DataTypes.ProcessAgentTypes;
@@ -26,26 +24,227 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.Proxies.ESS;
 using iLabs.Proxies.ISB;
 using iLabs.Proxies.Ticketing;
-using iLabs.UtilLib;
 using iLabs.Ticketing;
+using iLabs.UtilLib;
+//using iLabs.Ticketing;
 using iLabs.LabServer.Interactive;
 
 #if LabVIEW_82
 using LabVIEW.lv821;
-using iLabs.LabView.LV82;
+
+namespace iLabs.LabView.LV82
 #endif
 #if LabVIEW_86
 using LabVIEW.lv86;
-using iLabs.LabView.LV86;
-#endif
 
-namespace iLabs.LabServer.LabView
+namespace iLabs.LabView.LV86
+#endif
 {
     /// <summary>
     /// Summary description for LabViewTask
     /// </summary>
     public class LabViewTask : LabTask
     {
+
+        public static LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket)
+        {
+            // set defaults
+            DateTime startTime = DateTime.UtcNow;
+            long duration = -1L;
+            long experimentID = 0;
+            int status = -1;
+
+            string statusViName = null;
+            string statusTemplate = null;
+            string templatePath = null;
+            LabDB dbManager = new LabDB();
+            string qualName = null;
+            string fullName = null;  // set defaults
+           
+            LabTask labTask = null;
+            LabViewTask task = null;
+            VirtualInstrument vi = null;
+            LabViewInterface lvi = null;
+            
+
+            ////Parse experiment payload, only get what is needed 	
+            string payload = expTicket.payload;
+            XmlQueryDoc expDoc = new XmlQueryDoc(payload);
+            string essService = expDoc.Query("ExecuteExperimentPayload/essWebAddress");
+            string startStr = expDoc.Query("ExecuteExperimentPayload/startExecution");
+            string durationStr = expDoc.Query("ExecuteExperimentPayload/duration");
+            string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
+            string userName = expDoc.Query("ExecuteExperimentPayload/userName");
+
+            if ((startStr != null) && (startStr.Length > 0))
+            {
+                startTime = DateUtil.ParseUtc(startStr);
+            }
+            if ((durationStr != null) && (durationStr.Length > 0) && !(durationStr.CompareTo("-1") == 0))
+            {
+                duration = Convert.ToInt64(durationStr);
+            }
+
+
+            if (appInfo.extraInfo != null)
+            {
+                // Note should have either statusVI or template pair
+                // Add Option for VNCserver access
+                XmlQueryDoc viDoc = new XmlQueryDoc(appInfo.extraInfo);
+                statusViName = viDoc.Query("extra/status");
+                statusTemplate = viDoc.Query("extra/statusTemplate");
+                templatePath = viDoc.Query("extra/templatePath");
+            }
+
+            // log the experiment for debugging
+
+            Utilities.WriteLog("Experiment: " + experimentID + " Start: " + DateUtil.ToUtcString(startTime) + " \tduration: " + duration);
+            long statusSpan = DateUtil.SecondsRemaining(startTime, duration);
+
+
+
+            if ((appInfo.server != null) && (appInfo.server.Length > 0) && (appInfo.port > 0))
+            {
+                lvi = new LabViewRemote(appInfo.server, appInfo.port);
+            }
+            else
+            {
+                lvi = new LabViewInterface();
+            }
+            if (!lvi.IsLoaded(appInfo.application))
+            {
+                vi = lvi.loadVI(appInfo.path, appInfo.application);
+                vi.OpenFrontPanel(true, FPStateEnum.eVisible);
+            }
+            else
+            {
+                vi = lvi.GetVI(appInfo.path, appInfo.application);
+            }
+            if (vi == null)
+            {
+                status = -1;
+                string err = "Unable to Find: " + appInfo.path + @"\" + appInfo.application;
+                Utilities.WriteLog(err);
+                throw new Exception(err);
+            }
+            // Get qualifiedName
+            qualName = lvi.qualifiedName(vi);
+            fullName = appInfo.path + @"\" + appInfo.application;
+
+
+            status = lvi.GetVIStatus(vi);
+
+            Utilities.WriteLog("CreateLabTask - " + qualName + ": VIstatus: " + status);
+            switch (status)
+            {
+                case -10:
+                    throw new Exception("Error GetVIStatus: " + status);
+                    break;
+                case -1:
+                    // VI not in memory
+                    throw new Exception("Error GetVIStatus: " + status);
+
+                    break;
+                case 0: // eBad == 0
+                    break;
+                case 1: // eIdle == 1 vi in memory but not running 
+                    FPStateEnum fpState = vi.FPState;
+                    if (fpState != FPStateEnum.eVisible)
+                    {
+                        vi.OpenFrontPanel(true, FPStateEnum.eVisible);
+                    }
+                    vi.ReinitializeAllToDefault();
+                    break;
+                case 2: // eRunTopLevel: this should be the LabVIEW application
+                    break;
+                case 3: // eRunning
+                    //Unless the Experiment is reentrant it should be stopped and be reset.
+                    if(!appInfo.reentrant){
+                        int stopStatus = lvi.StopVI(vi);
+                        if (stopStatus != 0)
+                        {
+                            lvi.AbortVI(vi);
+                        }
+                        vi.ReinitializeAllToDefault();
+                    }
+                    break;
+                default:
+                    throw new Exception("Error GetVIStatus: unknown status: " + status);
+                    break;
+            }
+            try
+            {
+                lvi.SetBounds(vi, 0, 0, appInfo.width, appInfo.height);
+                Utilities.WriteLog("SetBounds: " + appInfo.application);
+            }
+            catch (Exception sbe)
+            {
+                Utilities.WriteLog("SetBounds exception: " + Utilities.DumpException(sbe));
+            }
+            lvi.SubmitAction("unlockvi", lvi.qualifiedName(vi));
+            Utilities.WriteLog("unlockvi Called: ");
+
+
+            // Set up in-memory and database task control structures
+            DataSourceManager dsManager = null;
+
+            // Create the labTask & store in database;
+            labTask = dbManager.InsertTask(appInfo.appID, experimentID,
+           groupName, startTime, duration,
+           LabTask.eStatus.Scheduled, expTicket.couponId, expTicket.issuerGuid, null);
+            if (labTask != null)
+            {
+                //Convert the generic LabTask to a LabViewTask
+                task = new LabViewTask(labTask);
+            }
+            if ((statusTemplate != null) && (statusTemplate.Length > 0))
+            {
+                statusViName = lvi.CreateFromTemplate(templatePath, statusTemplate, task.taskID.ToString());
+            }
+
+
+            if (((essService != null) && (essService.Length > 0)) && ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0)))
+            {
+                // Create DataSourceManager to manage dataSocket connections
+                dsManager = new DataSourceManager();
+
+                // set up an experiment storage handler
+                ExperimentStorageProxy ess = new ExperimentStorageProxy();
+                ess.OperationAuthHeaderValue = new OperationAuthHeader();
+                ess.OperationAuthHeaderValue.coupon = expCoupon;
+                ess.Url = essService;
+                dsManager.essProxy = ess;
+                dsManager.ExperimentID = experimentID;
+                dsManager.AppKey = qualName;
+                string[] sockets = appInfo.dataSources.Split(',');
+                // Use the experimentID as the storage parameter
+                foreach (string s in sockets)
+                {
+                    LVDataSocket reader = new LVDataSocket();
+                    dsManager.AddDataSource(reader);
+                    if (s.Contains("="))
+                    {
+                        string[] nv = s.Split('=');
+                        reader.Type = nv[1];
+                        reader.Connect(nv[0], LabDataSource.READ_AUTOUPDATE);
+
+                    }
+                    else
+                    {
+                        reader.Connect(s, LabDataSource.READ_AUTOUPDATE);
+                    }
+
+                }
+                TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
+            }
+            string taskData = null;
+            taskData = LabTask.constructTaskXml(appInfo.appID, fullName,appInfo.rev, statusViName, essService);
+            dbManager.SetTaskData(task.taskID, taskData);
+            task.data = taskData;
+            TaskProcessor.Instance.Add(task);
+            return task;
+        }
+
         public LabViewTask()
         {
             //
@@ -74,6 +273,14 @@ namespace iLabs.LabServer.LabView
         public override eStatus Expire()
         {
             Utilities.WriteLog("Task expired: " + taskID);
+            
+            Close();
+            status |= eStatus.Expired;
+            return base.Expire();
+        }
+
+        public override eStatus Close()
+        {
             LabDB dbService = new LabDB();
             LabViewInterface lvi = null;
             try
@@ -113,7 +320,7 @@ namespace iLabs.LabServer.LabView
                     //Server takes control of RemotePanel, connection not broken
                     lvi.SubmitAction("lockvi", lvi.qualifiedName(vi));
                     int stopStatus = lvi.StopVI(vi);
-                    if (stopStatus == 0)
+                    if (stopStatus != 0)
                     { //VI found but no stop control
                         vi.Abort();
                         Utilities.WriteLog("Expire: AbortVI() called because no stop control");
@@ -127,13 +334,15 @@ namespace iLabs.LabServer.LabView
                 }
                 Utilities.WriteLog("TaskID = " + taskID + " has expired");
                 dbService.SetTaskStatus(taskID, (int)eStatus.Expired);
-                status = eStatus.Expired;
-                if (Global.taskTable.ContainsKey(taskID))
-                {
-                    DataSourceManager dsManager = (DataSourceManager)Global.taskTable[taskID];
-                    dsManager.CloseDataSources();
-                    Global.taskTable.Remove(taskID);
-                }
+                status = eStatus.Closed;
+               
+                    DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(taskID);
+                    if (dsManager != null)
+                    {
+                        dsManager.CloseDataSources();
+                        TaskProcessor.Instance.RemoveDataManager(taskID);
+                    }
+                
                 dbService.SetTaskStatus(taskID, (int)status);
                 if (couponID > 0)
                 { // this task was created with a valid ticket, i.e. not a test.
@@ -197,8 +406,7 @@ namespace iLabs.LabServer.LabView
             {
                 lvi = null;
             }
-
-            return status;
+            return base.Close();
         }
 
 
@@ -256,9 +464,4 @@ namespace iLabs.LabServer.LabView
         }
 
     }
-#if LabVIEW_82
 }
-#endif
-#if LabVIEW_86
-}
-#endif

@@ -151,6 +151,16 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.SCHEDULE_SESSION, keyValueDictionary);
         }
 
+
+        public string createRedeemReservationPayload(DateTime startTime,DateTime endTime)
+        {
+            string rootElemt = "RedeemReservationPayload";
+            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            keyValueDictionary.Add("start", DateUtil.ToUtcString(startTime));
+            keyValueDictionary.Add("end", DateUtil.ToUtcString(endTime));
+            return writeTicketLoad(rootElemt, TicketTypes.REDEEM_RESERVATION, keyValueDictionary);
+        }
+
         public string createRevokeReservationPayload()
         {
             string rootElemt = "RevokeReservationPayload";
@@ -216,6 +226,20 @@ namespace iLabs.Ticketing
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
             keyValueDictionary.Add("userTZ", userTZ);
             return writeTicketLoad(rootElemt, TicketTypes.ADMINISTER_LS, keyValueDictionary);
+        }
+
+        public string createCreateExperimentPayload(DateTime startExecution, long duration,
+            string userName, string groupName, string sbGuid, string clientGuid)
+        {
+            string rootElemt = "CreateExperimentPayload";
+            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            keyValueDictionary.Add("startExecution", DateUtil.ToUtcString(startExecution));
+            keyValueDictionary.Add("duration", duration);
+            keyValueDictionary.Add("userName", groupName);
+            keyValueDictionary.Add("groupName", groupName);
+            keyValueDictionary.Add("labGuid", sbGuid);
+            keyValueDictionary.Add("clientGuid", clientGuid);
+            return writeTicketLoad(rootElemt, TicketTypes.CREATE_EXPERIMENT, keyValueDictionary);
         }
 
         public string createExecuteExperimentPayload(string essWebAddress, DateTime startExecution, long duration, 

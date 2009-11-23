@@ -292,8 +292,8 @@ GO
 CREATE PROCEDURE CredentialSet_Add
 
 @serviceBrokerGUID varchar(50),
-@serviceBrokerName varchar(256),
-@groupName varchar(128),
+@serviceBrokerName nvarchar(256),
+@groupName nvarchar(256),
 @ussGUID varchar(50)
 
 AS
@@ -338,7 +338,7 @@ GO
 CREATE PROCEDURE CredentialSet_GetID
 
 @serviceBrokerGUID varchar(50),
-@groupName varchar(128),
+@groupName nvarchar(256),
 @ussGUID varchar(50)
 
 AS
@@ -361,8 +361,8 @@ GO
 CREATE PROCEDURE CredentialSet_Modify
 @credentialSetID int,
 @serviceBrokerGUID varchar(50),
-@serviceBrokerName varchar(256),
-@groupName varchar(50),
+@serviceBrokerName nvarchar(256),
+@groupName nvarchar(256),
 @ussGUID varchar(50)
 
  AS
@@ -388,7 +388,7 @@ GO
 CREATE PROCEDURE CredentialSet_ModifyServiceBroker
 @originalGUID varchar(50),
 @serviceBrokerGUID varchar(50),
-@serviceBrokerName varchar(256)
+@serviceBrokerName nvarchar(256)
 
  AS
 
@@ -412,8 +412,8 @@ GO
 CREATE PROCEDURE CredentialSet_Remove
 
 @serviceBrokerGUID varchar(50),
-@serviceBrokerName varchar(256),
-@groupName varchar(128),
+@serviceBrokerName nvarchar(256),
+@groupName nvarchar(256),
 @ussGUID varchar(50)
 
 AS
@@ -479,10 +479,11 @@ GO
 CREATE PROCEDURE ExperimentInfo_Add 
 @labClientGUID varchar(50),
 @labServerGUID varchar(50),
-@labServerName varchar(256),
-@labClientVersion varchar(50),
-@labClientName varchar(256),
-@providerName varchar(256),
+@labServerName nvarchar(256),
+@labClientVersion nvarchar(50),
+@labClientName nvarchar(256),
+@providerName nvarchar(256),
+@contactEmail nvarchar(256),
 @prepareTime int,
 @recoverTime int,
 @minimumTime int,
@@ -491,9 +492,9 @@ CREATE PROCEDURE ExperimentInfo_Add
 AS
 
 insert into Experiment_Info(Lab_Client_GUID,Lab_Server_GUID, Lab_Server_Name, Lab_Client_Version, Lab_Client_Name,
- Provider_Name, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time) 
+ Provider_Name, Contact_Email, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time) 
 values (@labClientGuid, @labServerGUID, @labServerName, @labClientVersion,@labClientName, 
- @providerName, @prepareTime, @recoverTime, @minimumTime,@earlyArriveTime)
+ @providerName, @contactEmail, @prepareTime, @recoverTime, @minimumTime,@earlyArriveTime)
 select ident_current('Experiment_Info')
 
 
@@ -535,10 +536,11 @@ CREATE PROCEDURE ExperimentInfo_Modify
 @experimentInfoID int,
 @labClientGUID varchar(50),
 @labServerGUID varchar(50),
-@labServerName varchar(256),
-@labClientVersion varchar(50),
-@labClientName varchar(256),
-@providerName varchar(256),
+@labServerName nvarchar(256),
+@labClientVersion nvarchar(50),
+@labClientName nvarchar(256),
+@providerName nvarchar(256),
+@contactEmail nvarchar(256),
 @prepareTime int,
 @recoverTime int,
 @minimumTime int,
@@ -548,7 +550,8 @@ CREATE PROCEDURE ExperimentInfo_Modify
 
 update Experiment_Info set Lab_Client_GUID=@labClientGUID,Lab_Server_GUID=@labServerGUID, 
 Lab_Server_Name=@labServerName, Lab_Client_Version=@labClientVersion,Lab_Client_Name=@labClientName, 
-Provider_Name=@providerName, Prepare_Time=@prepareTime, Recover_Time=@recoverTime, 
+Provider_Name=@providerName, Contact_Email=@contactEmail,
+Prepare_Time=@prepareTime, Recover_Time=@recoverTime, 
 Minimum_Time=@minimumTime, Early_Arrive_Time=@earlyArriveTime 
 where Experiment_Info_ID=@experimentInfoID
 
@@ -571,7 +574,7 @@ GO
 CREATE PROCEDURE ExperimentInfo_ModifyLabServer
 @originalGUID varchar(50),
 @labServerGUID varchar(50),
-@labServerName varchar(256)
+@labServerName nvarchar(256)
 
  AS
 
@@ -599,7 +602,7 @@ CREATE PROCEDURE ExperimentInfo_Retrieve
 AS
 
 select Lab_Client_GUID, Lab_Server_GUID, Lab_Server_Name, Lab_Client_Version, Lab_Client_Name,
-Provider_Name, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time 
+Provider_Name, Contact_Email, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time 
 from Experiment_Info where Experiment_Info_ID=@experimentInfoID
 
 
@@ -621,7 +624,7 @@ CREATE PROCEDURE ExperimentInfo_RetrieveByID
 AS
 
 select Lab_Client_GUID, Lab_Server_GUID, Lab_Server_Name, Lab_Client_Version, Lab_Client_Name,
-Provider_Name, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time 
+Provider_Name, Contact_Email, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time 
 from Experiment_Info where Experiment_Info_ID=@experimentInfoID
 
 
@@ -753,7 +756,7 @@ GO
 
 CREATE PROCEDURE LSSPolicy_Add 
 
-@rule varchar(1024),
+@rule varchar(2048),
 @experimentInfoID int,
 @credentialSetID int
 
@@ -1182,7 +1185,7 @@ GO
 
 CREATE PROCEDURE Recurrence_Get
 @sbGuid varchar(50),
-@groupName varchar(256),
+@groupName nvarchar(256),
 @clientGuid varchar(50),
 @lsGuid varchar(50),
 @startTime DateTime,
@@ -1306,7 +1309,7 @@ GO
 
 CREATE PROCEDURE Recurrences_Retrieve
 @sbGuid varchar(50),
-@group varchar(128),
+@group nvarchar(256),
 @clientGuid varchar(50),
 @lsGuid varchar(50),
 @start datetime,
@@ -1397,7 +1400,7 @@ GO
 /****** Object:  Stored Procedure dbo.AddReservationInfo    Script Date: 4/11/2006 6:19:42 PM ******/
 CREATE PROCEDURE ReservationInfo_Add
 @serviceBrokerGUID varchar(50),
-@groupName varchar(128),
+@groupName nvarchar(256),
 @ussGUID varchar(50),
 @clientGuid varchar(50),
 @labServerGuid varchar(50),
@@ -1435,7 +1438,7 @@ GO
 CREATE PROCEDURE ReservationInfo_Delete
 
 @serviceBrokerGUID varchar(50),
-@groupName varchar(128),
+@groupName nvarchar(256),
 @ussGUID varchar(50),
 @clientGuid varchar(50),
 @labServerGuid varchar(50),
@@ -1500,7 +1503,7 @@ GO
 
 /****** Object:  Stored Procedure dbo.RetrieveReservationInfoByID    Script Date: 4/11/2006 6:19:42 PM ******/
 CREATE PROCEDURE ReservationInfo_RetrieveByID
-@reservationInfoID numeric
+@reservationInfoID int
  AS
 select resource_ID,Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID,status from Reservation_Info where Reservation_Info_ID=@reservationInfoID
 
@@ -1571,7 +1574,7 @@ GO
 CREATE PROCEDURE ReservationInfo_RetrieveIDs
 
 @serviceBrokerGUID varchar(50),
-@groupName varchar(128),
+@groupName nvarchar(256),
 @ussGUID varchar(50),
 @clientGuid varchar(50),
 @labServerGuid varchar(50),
@@ -1738,7 +1741,7 @@ GO
 
 CREATE PROCEDURE Resource_AddGetID
 @guid varchar (50),
-@name varchar (256)
+@name nvarchar (256)
 AS
 if( select count(resource_ID) from LS_Resources where Lab_Server_Guid = @guid) >0
 select resource_id from LS_Resources where Lab_Server_Guid = @guid
@@ -1834,7 +1837,7 @@ GO
 
 
 CREATE PROCEDURE Resource_GetTagsByGuid
-@guid varchar (256)
+@guid varchar (50)
 AS
 
 Select resource_id, Lab_Server_Name + ': ' + isnull(description ,'')
@@ -1854,8 +1857,8 @@ GO
 
 CREATE PROCEDURE Resource_Insert
 @guid varchar (50),
-@name varchar (256),
-@description varchar (1024)
+@name nvarchar (256),
+@description nvarchar (2048)
 AS
 insert into LS_Resources (Lab_Server_Guid, Lab_Server_Name,description)
 values (@guid,@name,@description)
@@ -1875,7 +1878,7 @@ GO
 
 CREATE PROCEDURE Resource_SetDescription
 @id int,
-@description varchar (1024)
+@description nvarchar (2048)
 AS
 UPDATE LS_Resources set description=@description
 where resource_id = @id
@@ -1900,8 +1903,8 @@ GO
 CREATE PROCEDURE USSInfo_Add
 
 @ussGUID varchar(50),
-@ussName varchar(256),
-@ussURL varchar(256),
+@ussName nvarchar(256),
+@ussURL nvarchar(512),
 @couponId bigint,
 @domainGuid varchar(50)
 
@@ -1955,8 +1958,8 @@ GO
 CREATE PROCEDURE USSInfo_Modify
 @ussInfoID int,
 @ussGUID varchar(50),
-@ussName varchar(256),
-@ussURL varchar(256),
+@ussName nvarchar(256),
+@ussURL nvarchar(512),
 @couponId bigint,
 @domainGuid varchar(50)
 

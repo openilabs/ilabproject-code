@@ -69,7 +69,7 @@ Please see license.txt in top level directory for full license.
 									<th style="WIDTH: 258px" colSpan="2">
 										<label for="changeorder">Select an item to change its order</label></th></tr>
 								<tr>
-									<td style="WIDTH: 177px"><asp:listbox id="lbxChangeOrder" Runat="server" Width="224px"></asp:listbox></td>
+									<td style="WIDTH: 177px"><asp:listbox cssClass="i18n" id="lbxChangeOrder" Runat="server" Width="224px"></asp:listbox></td>
 									<td class="buttonstyle" style="WIDTH: 131px"><asp:imagebutton id="ibtnMoveUp" Runat="server" CssClass="buttonstyle" Width="43" ImageUrl="../img/up-btn.gif"
 											Height="22"></asp:imagebutton><br>
 										<asp:imagebutton id="ibtnMoveDown" Runat="server" CssClass="buttonstyle" Width="57" ImageUrl="../img/down-btn.gif"

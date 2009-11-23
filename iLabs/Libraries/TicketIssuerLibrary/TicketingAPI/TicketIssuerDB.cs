@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
+using System.Data.Common;
 
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes;
@@ -94,7 +93,7 @@ namespace iLabs.TicketIssuer
         public bool AuthenticateIssuedCoupon(long couponID, string passkey)
         {
             bool status = false;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 connection.Open();
@@ -117,9 +116,10 @@ namespace iLabs.TicketIssuer
             bool status = false;
             if (String.Compare(coupon.issuerGuid, GetIssuerGuid(), true) == 0)
             {
-                SqlConnection connection = CreateConnection();
+                DbConnection connection = FactoryDB.GetConnection();
                 try
                 {
+                    connection.Open();
                     status = AuthenticateIssuedCoupon(connection, coupon.couponId, coupon.passkey);
                 }
                 finally
@@ -130,25 +130,24 @@ namespace iLabs.TicketIssuer
             return status;
         }
 
-        protected bool AuthenticateIssuedCoupon(SqlConnection connection, long couponID, string passkey)
+        protected bool AuthenticateIssuedCoupon(DbConnection connection, long couponID, string passkey)
         {
             bool status = false;
             
-                SqlCommand cmd = new SqlCommand("AuthenticateIssuedCoupon", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("AuthenticateIssuedCoupon", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-                idParam.Value = couponID;
-                SqlParameter passKeyParam = cmd.Parameters.Add("@passKey", SqlDbType.VarChar, 100);
-                passKeyParam.Value = passkey;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", passkey,DbType.AnsiString, 100));
+                
                 try
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    DbDataReader reader = cmd.ExecuteReader();
                     status = reader.HasRows;
                     reader.Close();
                 }
-                catch (SqlException e)
+                catch (DbException e)
                 {
                     writeEx(e);
                     throw;
@@ -157,25 +156,24 @@ namespace iLabs.TicketIssuer
             return status;
         }
 
-        protected bool AuthenticateIssuedCoupon(SqlConnection connection, Coupon coupon)
+        protected bool AuthenticateIssuedCoupon(DbConnection connection, Coupon coupon)
         {
             bool status = false;
 
-            SqlCommand cmd = new SqlCommand("AuthenticateIssuedCoupon", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("AuthenticateIssuedCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            idParam.Value = coupon.couponId;
-            SqlParameter passKeyParam = cmd.Parameters.Add("@passKey", SqlDbType.VarChar, 100);
-            passKeyParam.Value = coupon.passkey;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", coupon.passkey, DbType.AnsiString, 100));
+           
             try
             {
-                SqlDataReader reader = cmd.ExecuteReader();
+                DbDataReader reader = cmd.ExecuteReader();
                 status = reader.HasRows;
                 reader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -187,7 +185,7 @@ namespace iLabs.TicketIssuer
        
         public Coupon CreateCoupon()
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
@@ -197,7 +195,7 @@ namespace iLabs.TicketIssuer
 
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -212,7 +210,7 @@ namespace iLabs.TicketIssuer
 
         public Coupon CreateCoupon(string passcode)
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
@@ -222,7 +220,7 @@ namespace iLabs.TicketIssuer
 
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -240,26 +238,25 @@ namespace iLabs.TicketIssuer
         /// a generated passkey and the service GUID. 
         /// </summary>
         /// <returns>Created Coupon</returns>
-        protected Coupon CreateCoupon(SqlConnection connection)
+        protected Coupon CreateCoupon(DbConnection connection)
         {
             long couponID = -1;
            
 
             // create sql command
             // command executes the "CreateCoupon" stored procedure
-            SqlCommand cmd = new SqlCommand("CreateCoupon", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("CreateCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             string pass = TicketUtil.NewPasskey();
             // populate parameters
-            SqlParameter passKeyParam = cmd.Parameters.Add("@passKey", SqlDbType.VarChar, 100);
-            passKeyParam.Value = pass;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", pass,DbType.AnsiString, 100));
 
-            //SqlDataReader dataReader = null;
+            //DbDataReader dataReader = null;
             try
             {
                 couponID = Convert.ToInt64(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -274,26 +271,25 @@ namespace iLabs.TicketIssuer
         /// a generated passkey and the service GUID. 
         /// </summary>
         /// <returns>Created Coupon</returns>
-        protected Coupon CreateCoupon(SqlConnection connection, string pass)
+        protected Coupon CreateCoupon(DbConnection connection, string pass)
         {
             long couponID = -1;
 
 
             // create sql command
             // command executes the "CreateCoupon" stored procedure
-            SqlCommand cmd = new SqlCommand("CreateCoupon", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("CreateCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter passKeyParam = cmd.Parameters.Add("@passKey", SqlDbType.VarChar, 100);
-            passKeyParam.Value = pass;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", pass, DbType.AnsiString, 100));
 
-            //SqlDataReader dataReader = null;
+            //DbDataReader dataReader = null;
             try
             {
                 couponID = Convert.ToInt64(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -306,20 +302,19 @@ namespace iLabs.TicketIssuer
         public void CancelIssuedCoupon(long couponID)
         {
             bool status = false;
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("CancelIssuedCoupon", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("CancelIssuedCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            idParam.Value = couponID;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
 
             try
             {
                 connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -333,20 +328,19 @@ namespace iLabs.TicketIssuer
         public void DeleteIssuedCoupon(long couponID)
         {
             bool status = false;
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("DeleteIssuedCoupon", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("DeleteIssuedCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            idParam.Value = couponID;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@couponID", couponID, DbType.Int64));
 
             try
             {
                 connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -368,7 +362,7 @@ namespace iLabs.TicketIssuer
         {
 
             Coupon coupon = null;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 
@@ -394,22 +388,21 @@ namespace iLabs.TicketIssuer
         /// <param name="connection"></param>
         /// <param name="couponID"></param>
         /// <returns>Coupon if found,  null if cancelled or not found</returns>
-        protected Coupon GetIssuedCoupon(SqlConnection connection, long couponID)
+        protected Coupon GetIssuedCoupon(DbConnection connection, long couponID)
         {
             Coupon coupon = null;
-            SqlCommand cmd = new SqlCommand("GetIssuedCoupon", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            idParam.Value = couponID;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
 
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 dataReader = cmd.ExecuteReader();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -436,7 +429,7 @@ namespace iLabs.TicketIssuer
         public int GetIssuedCouponCollectionCount(long couponID)
         {
             int count = -1;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 connection.Open();
@@ -453,22 +446,22 @@ namespace iLabs.TicketIssuer
 
         }
 
-        protected int GetIssuedCouponCollectionCount(SqlConnection connection, long couponID)
+        protected int GetIssuedCouponCollectionCount(DbConnection connection, long couponID)
         {
             int count = -1;
-            SqlCommand cmd = new SqlCommand("GetIssuedCollectionCount", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedCollectionCount", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
 
             // populate parameters 
-            SqlParameter couponIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIDParam.Value = couponID;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+           
             count = Convert.ToInt32(cmd.ExecuteScalar());
             return count;
         }
 
 
-        protected Ticket InsertIssuedTicket(SqlConnection connection, long couponID, string redeemerGUID, string sponsorGUID,
+        protected Ticket InsertIssuedTicket(DbConnection connection, long couponID, string redeemerGUID, string sponsorGUID,
             string type, long duration, string payload)
         {
 
@@ -476,33 +469,25 @@ namespace iLabs.TicketIssuer
             DateTime creation = DateTime.UtcNow;
 
             // command executes the "InsertIssuedTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("InsertIssuedTicket", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("InsertIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            ticketTypeParam.Value = type;
-            SqlParameter couponIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIDParam.Value = couponID;
-            SqlParameter redeemerIDParam = cmd.Parameters.Add("@redeemerGUID", SqlDbType.VarChar, 50);
-            redeemerIDParam.Value = redeemerGUID.ToString();
-            SqlParameter sponsorIDParam = cmd.Parameters.Add("@sponsorGUID", SqlDbType.VarChar, 50);
-            sponsorIDParam.Value = sponsorGUID.ToString();
-            SqlParameter payloadParam = cmd.Parameters.Add("@payload", SqlDbType.Text);
-            payloadParam.Value = payload;
-
-            SqlParameter cancelledParam = cmd.Parameters.Add("@cancelled", SqlDbType.Bit);
-            cancelledParam.Value = 0;
-            SqlParameter creationTimeParam = cmd.Parameters.Add("@creationTime", SqlDbType.DateTime);
-            creationTimeParam.Value = creation;
-            SqlParameter durationParam = cmd.Parameters.Add("@duration", SqlDbType.BigInt);
-            durationParam.Value = duration;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGUID", redeemerGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sponsorGUID", sponsorGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@payload", payload, DbType.String));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cancelled", 0,DbType.Boolean));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@creationTime", creation, DbType.DateTime)); 
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@duration", duration,DbType.Int64));
+         
             long id = -1;
             try
             {
                 id = Convert.ToInt64(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -531,7 +516,7 @@ namespace iLabs.TicketIssuer
         {
             Ticket ticket = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
@@ -561,7 +546,7 @@ namespace iLabs.TicketIssuer
         public Coupon CreateTicket(string ticketType, string redeemerID, string sponsorID,
              long duration, string payload)
         {
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
@@ -592,29 +577,25 @@ namespace iLabs.TicketIssuer
         {
             bool status = false;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("CancelIssuedTicket", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("CancelIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIdParam.Value = coupon.couponId;
-            SqlParameter redeemerIdParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerIdParam.Value = ticket.redeemerGuid.ToString();
-            SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            ticketTypeParam.Value = ticket.type;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", ticket.redeemerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticket.type,DbType.AnsiString, 100));
 
             // execute the command
-            //SqlDataReader dataReader = null;
             try
             {
                 connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -630,20 +611,20 @@ namespace iLabs.TicketIssuer
         public void DeleteIssuedTicket(long ticketID)
         {
             bool status = false;
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("DeleteIssuedTicket", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("DeleteIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@ticketID", SqlDbType.BigInt);
-            idParam.Value = ticketID;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketID", ticketID,DbType.Int64));
+            
 
             try
             {
                 connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -667,25 +648,21 @@ namespace iLabs.TicketIssuer
         {
             List<Coupon> results = new List<Coupon>(); ;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("GetIssuedTicketCoupon", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedTicketCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
            
-            SqlParameter ticketTypeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-            ticketTypeParam.Value = ticketType;
-            SqlParameter redeemerParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerParam.Value = redeemerGuid;
-            SqlParameter sponsorParam = cmd.Parameters.Add("@sponsor", SqlDbType.VarChar, 50);
-            sponsorParam.Value = sponsorGuid;
-
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", ticketType,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sponsor", sponsorGuid,DbType.AnsiString, 50));
 
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -704,7 +681,7 @@ namespace iLabs.TicketIssuer
                 }
 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -762,24 +739,20 @@ namespace iLabs.TicketIssuer
         {
             Ticket result = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("GetIssuedTicketByRedeemer", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedTicketByRedeemer", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIdParam.Value = coupon.couponId;
-            SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            ticketTypeParam.Value = ticketType; 
-            SqlParameter redeemerIdParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerIdParam.Value = redeemerID;
-            
-
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID",coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerID, DbType.AnsiString, 50));
+           
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -802,6 +775,7 @@ namespace iLabs.TicketIssuer
                     ticket.creationTime = dataReader.GetDateTime(5);
                     ticket.duration = dataReader.GetInt64(6);
                     // read payload
+                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
                     ticket.payload = dataReader.GetString(7);
                     // read Cancelled
                     bool cancelled = dataReader.GetBoolean(8);
@@ -810,7 +784,7 @@ namespace iLabs.TicketIssuer
                 }
 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -839,20 +813,18 @@ namespace iLabs.TicketIssuer
             Ticket results = null;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("GetIssuedTicket", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIdParam.Value = coupon.couponId;
-            SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            typeParam.Value = type;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID",coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType",  type, DbType.AnsiString, 100));
 
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -868,6 +840,7 @@ namespace iLabs.TicketIssuer
                     ticket.sponsorGuid = dataReader.GetString(4);
                     ticket.creationTime = dataReader.GetDateTime(5);
                     ticket.duration = dataReader.GetInt64(6);
+                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
                     ticket.payload = dataReader.GetString(7);
                     bool cancelled = dataReader.GetBoolean(8);
                     if (!cancelled)
@@ -877,7 +850,7 @@ namespace iLabs.TicketIssuer
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -897,22 +870,19 @@ namespace iLabs.TicketIssuer
             Ticket results = null;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("GetIssuedTicketByRedeemer", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedTicketByRedeemer", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIdParam.Value = coupon.couponId;
-            SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            typeParam.Value = type;
-            SqlParameter redeemerParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerParam.Value = redeemer;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemer,DbType.AnsiString, 50));
 
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -928,6 +898,7 @@ namespace iLabs.TicketIssuer
                     ticket.sponsorGuid = dataReader.GetString(4);
                     ticket.creationTime = dataReader.GetDateTime(5);
                     ticket.duration = dataReader.GetInt64(6);
+                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
                     ticket.payload = dataReader.GetString(7);
                     bool cancelled = dataReader.GetBoolean(8);
                     if (!cancelled)
@@ -937,7 +908,7 @@ namespace iLabs.TicketIssuer
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -955,17 +926,15 @@ namespace iLabs.TicketIssuer
         public bool RequestTicketCancellation(Coupon coupon, string type, string redeemerGuid)
         {
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("CancelIssuedTicket", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("CancelIssuedTicket", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIdParam.Value = coupon.couponId;
-            SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            typeParam.Value = type;
-            SqlParameter redeemerParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerParam.Value = redeemerGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID",coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerGuid,DbType.AnsiString, 50));
+            
             try{
                 connection.Open();
                 Object status = cmd.ExecuteScalar();
@@ -990,16 +959,16 @@ namespace iLabs.TicketIssuer
             List<Ticket> tickets = new List<Ticket>();
 
               // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("GetExpiredIssuedTickets", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetExpiredIssuedTickets", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
          
 
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try{
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
@@ -1014,14 +983,15 @@ namespace iLabs.TicketIssuer
                     ticket.sponsorGuid = dataReader.GetString(4);
                     ticket.creationTime = dataReader.GetDateTime(5);
                     ticket.duration = dataReader.GetInt64(6);
-                    ticket.payload = dataReader.GetString(7);
+                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
+                        ticket.payload = dataReader.GetString(7);
                     ticket.isCancelled = !dataReader.GetBoolean(8);
                     tickets.Add(ticket);
 
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;

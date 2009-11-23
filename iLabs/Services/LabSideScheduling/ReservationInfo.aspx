@@ -36,20 +36,20 @@
 		<tr>
 										<th>
 											<label for="Experiment">Experiment</label></th>
-										<td  colspan="3" style="width: 454px"><asp:dropdownlist id="ddlExperiment"  runat="server" AutoPostBack="True"  Width="100%"></asp:dropdownlist>
+										<td  colspan="3" style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlExperiment"  runat="server" AutoPostBack="True"  Width="100%"></asp:dropdownlist>
 											</td>
 									</tr>
 		<tr>
 										<th>
 											<label for="Group">Group</label></th>
-										<td colspan="3" style="width: 454px"><asp:dropdownlist id="ddlGroup"  Runat="server" Width="100%"></asp:dropdownlist>
+										<td colspan="3" style="width: 454px"><asp:dropdownlist cssClass="i18n" id="ddlGroup"  Runat="server" Width="100%"></asp:dropdownlist>
 											</td>
 									</tr>
 									
 									<tr>
 										<th>
 											<label for="time">Time</label></th>
-										<td  colspan="3" style="width: 454px"><asp:DropDownList id="ddlTimeIs" runat="server" Width="104px" AutoPostBack="True"  OnSelectedIndexChanged="ddlTimeIs_SelectedIndexChanged">
+										<td  colspan="3" style="width: 454px"><asp:DropDownList cssClass="i18n" id="ddlTimeIs" runat="server" Width="104px" AutoPostBack="True"  OnSelectedIndexChanged="ddlTimeIs_SelectedIndexChanged">
 				<asp:ListItem Value="select">--Select one--</asp:ListItem>
 				<asp:ListItem Value="equal">equal to</asp:ListItem>
 				<asp:ListItem Value="before">before</asp:ListItem>

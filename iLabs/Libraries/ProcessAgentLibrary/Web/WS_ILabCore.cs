@@ -31,9 +31,10 @@ using iLabs.UtilLib;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.Proxies.PAgent;
 
 
-namespace iLabs.Core
+namespace iLabs.Web
 {
 	/// <summary>
 	/// WS_ILabCore provides a base WebService implementation of all of the ProcessAgent required Web Service Methods.
@@ -108,10 +109,10 @@ namespace iLabs.Core
             //}
             //else
             //{
-                return DateTime.Now;
+            return DateTime.Now;
             //}
         }
-    
+
         /// <summary>
         /// Generate a statusReort.
         /// </summary>
@@ -151,7 +152,7 @@ namespace iLabs.Core
         /// <returns>return true if deleted or not found</returns>
         [WebMethod(Description = "CancelTicket -- Try to delete a cached ticket, should return true if deleted or not found."
            + " If the receiver is a serviceBroker and is not the redeemer the call needs to be repackaged and forwarded to the redeemer."
-            + " Each ProcessAgent type may need to override this method depending on the ticket type." ),
+            + " Each ProcessAgent type may need to override this method depending on the ticket type."),
         SoapDocumentMethod(Binding = "IProcessAgent"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public virtual bool CancelTicket(Coupon coupon, string type, string redeemer)
@@ -201,7 +202,7 @@ namespace iLabs.Core
             + "Agent_guid is key to the service to be modified and may not be modiied. The agentAuthorizationHeader must use the old values."),
         SoapDocumentMethod(Binding = "IProcessAgent"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public virtual int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, string extra, 
+        public virtual int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, string extra,
             Coupon inCoupon, Coupon outCoupon)
         {
             int status = 0;
@@ -211,7 +212,7 @@ namespace iLabs.Core
             }
             return status;
         }
-        
+
 
         [WebMethod(Description = "Modify the specified services Domain credentials on this static process agent. "
             + "Agent_guid is key to the service to be modified and may not be modiied. The agentAuthorizationHeader must use the old values."),
@@ -227,16 +228,16 @@ namespace iLabs.Core
             }
             return status;
         }
-      
-        
-    /// <summary>
-    /// Informs this processAgent that it should modify all references to a specific processAent. 
-    /// This is used to propagate modifications, The agentGuid must remain the same.
-    /// </summary>
-    /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
-    /// <param name="serviceGuid">The guid of the service</param>
-    /// <param name="state">The retired state to be set</param>
-    /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+
+
+        /// <summary>
+        /// Informs this processAgent that it should modify all references to a specific processAent. 
+        /// This is used to propagate modifications, The agentGuid must remain the same.
+        /// </summary>
+        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+        /// <param name="serviceGuid">The guid of the service</param>
+        /// <param name="state">The retired state to be set</param>
+        /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
         [WebMethod,
         SoapDocumentMethod(Binding = "IProcessAgent"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -249,7 +250,7 @@ namespace iLabs.Core
             }
             return status;
         }
-     
+
 
         /// <summary>
         /// Informs a processAgent that it should retire/un-retire all references to a specific processAent. 
@@ -272,17 +273,17 @@ namespace iLabs.Core
             }
             return status;
         }
-    
+
         [WebMethod(Description = "Register, an optional method, default virtual method is a no-op."),
         SoapDocumentMethod(Binding = "IProcessAgent"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public void Register(string registerGuid, ServiceDescription[] info)
         {
-              if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
-            // This is an optional method, the base method is a no-op.
-                  register(registerGuid,info);
-              }
+                // This is an optional method, the base method is a no-op.
+                register(registerGuid, info);
+            }
         }
 
         protected virtual ProcessAgent installDomainCredentials(ProcessAgent service,
@@ -293,9 +294,9 @@ namespace iLabs.Core
             {
                 if (ProcessAgentDB.ServiceAgent == null)
                 {
-                    throw new Exception("The specified ProcessAgent has not been configured, please contact the administrator.");
+                    throw new Exception("The target ProcessAgent has not been configured, please contact the administrator.");
                 }
-                
+
                 if (service.type.Equals(ProcessAgentType.SERVICE_BROKER))
                 {
 
@@ -314,6 +315,7 @@ namespace iLabs.Core
                             ProcessAgentDB.RefreshServiceAgent();
                             Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
                             agent = ProcessAgentDB.ServiceAgent;
+
                         }
                         else
                         {
@@ -336,7 +338,7 @@ namespace iLabs.Core
                         if (pid > 0)
                         {
                             Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
-                            agent = ProcessAgentDB.ServiceAgent;
+                            agent = ProcessAgentDB.ServiceAgent;                           
                         }
                         else
                         {
@@ -354,7 +356,7 @@ namespace iLabs.Core
             return agent;
         }
 
-   
+
 
         protected virtual int removeDomainCredentials(string domainGuid, string agentGuid)
         {
@@ -363,7 +365,7 @@ namespace iLabs.Core
             return status;
         }
 
-       
+
 
         protected virtual int retireProcessAgent(string domainGuid, string serviceGuid, bool state)
         {
@@ -371,9 +373,55 @@ namespace iLabs.Core
             status = dbTicketing.RetireProcessAgent(domainGuid, serviceGuid, state);
             return status;
         }
-    
 
-         protected virtual void register(string registerId, ServiceDescription[] info){
-         }
-}
+
+        protected virtual void register(string registerGuid, ServiceDescription[] info)
+        {
+            if (info != null && info.Length > 0)
+            {
+                foreach (ServiceDescription sd in info)
+                {
+                    Coupon coupon = null;
+                    if (sd.coupon != null)
+                    {
+                        coupon = sd.coupon;
+                    }
+                    XmlQueryDoc xdoc = new XmlQueryDoc(sd.serviceProviderInfo);
+                    string descriptorType = xdoc.GetTopName();
+                    if (descriptorType.Equals("systemSupport"))
+                    {
+                        SystemSupport ss = SystemSupport.Parse(xdoc);
+                        if (ss.agentGuid != null && ss.agentGuid.Length > 0)
+                        {
+                            int id = dbTicketing.GetProcessAgentID(ss.agentGuid);
+                            if (id > 0)
+                            {
+                                dbTicketing.SaveSystemSupport(ss.agentGuid, ss.contactEmail, ss.bugEmail,
+                                    ss.infoUrl, ss.description, ss.location);
+                                if (sd.consumerInfo != null && sd.consumerInfo.CompareTo("requestSystemSupport") == 0)
+                                {
+                                    ProcessAgentInfo paInfo = dbTicketing.GetProcessAgentInfo(ss.agentGuid);
+                                    if (paInfo != null)
+                                    {
+                                        SystemSupport mySS = dbTicketing.RetrieveSystemSupport(ProcessAgentDB.ServiceGuid);
+                                        if (mySS != null)
+                                        {
+                                            ServiceDescription[] values = new ServiceDescription[1];
+                                            values[0] = new ServiceDescription(mySS.ToXML(), null, null);
+                                            ProcessAgentProxy proxy = new ProcessAgentProxy();
+                                            proxy.Url = paInfo.webServiceUrl;
+                                            proxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                            proxy.AgentAuthHeaderValue.coupon = paInfo.identOut;
+                                            proxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                            proxy.Register(registerGuid, values);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

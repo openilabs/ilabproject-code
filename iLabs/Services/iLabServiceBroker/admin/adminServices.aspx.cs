@@ -49,28 +49,30 @@ namespace iLabs.ServiceBroker.admin
                 {
                     // load the PA's that this user is an administer of         
                     Dictionary<int, List<Grant>>.Enumerator paEnum = servAdminGrants.GetEnumerator();
-
                     paDropDownList.Items.Add(new ListItem("--- Select Process Agent ---"));
 
 
                     while (paEnum.MoveNext())
                     {
                         KeyValuePair<int, List<Grant>> entry = paEnum.Current;
-
-                        string agentName = ticketIssuer.GetProcessAgentTagWithType((int)entry.Key).tag;
-                        List<Grant> grants = entry.Value;
-                        StringBuilder buf = new StringBuilder();
-                        int count = 0;
-                        foreach (Grant g in grants)
+                        IntTag tag = ticketIssuer.GetProcessAgentTagWithType((int)entry.Key);
+                        if (tag != null)
                         {
-                            if (count > 0)
+                            string agentName = tag.tag;
+                            List<Grant> grants = entry.Value;
+                            StringBuilder buf = new StringBuilder();
+                            int count = 0;
+                            foreach (Grant g in grants)
                             {
-                                buf.Append(",");
+                                if (count > 0)
+                                {
+                                    buf.Append(",");
+                                }
+                                buf.Append(g.grantID);
+                                count++;
                             }
-                            buf.Append(g.grantID);
-                            count++;
+                            paDropDownList.Items.Add(new ListItem(agentName, buf.ToString()));
                         }
-                        paDropDownList.Items.Add(new ListItem(agentName, buf.ToString()));
                     }
                 }
                

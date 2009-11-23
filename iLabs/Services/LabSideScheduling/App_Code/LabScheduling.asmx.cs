@@ -5,7 +5,9 @@ using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 using System.Web;
+using System.Web.Mail;
 using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.Xml;
@@ -19,6 +21,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
+using iLabs.Web;
 
 
 namespace iLabs.Scheduling.LabSide
@@ -181,6 +184,7 @@ namespace iLabs.Scheduling.LabSide
             string ussGuid, string labServerGuid, string clientGuid, 
             DateTime startTime, DateTime endTime)
 		{
+            string confirm = null;
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -188,15 +192,14 @@ namespace iLabs.Scheduling.LabSide
             try
             {
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
-
-                return LSSSchedulingAPI.ConfirmReservation(serviceBrokerGuid, groupName, ussGuid,
+                confirm = LSSSchedulingAPI.ConfirmReservation(serviceBrokerGuid, groupName, ussGuid,
                     labServerGuid, clientGuid, startTime, endTime);
+                return confirm;
             }
             catch
             {
                 throw;
             }
-			
 		}
 
         /// <summary>
@@ -439,7 +442,7 @@ namespace iLabs.Scheduling.LabSide
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 int id = LSSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
-                    clientVersion, providerName, 0, 0, 0, 0);
+                    clientVersion, providerName,null, 0, 0, 0, 0);
                 int ok = LSSSchedulingAPI.CheckForLSResource(labServerGuid, labServerName);
                 return (id > 0)? 1:0;
             }
@@ -461,7 +464,8 @@ namespace iLabs.Scheduling.LabSide
                 LssExperimentInfo[] exps = DBManager.GetExperimentInfos(new int[] { id });
                 if (exps != null && exps.Length > 0)
                 {
-                    if (DBManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName,
+                    if (DBManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName,
+                        clientVersion, providerName, null,
                         exps[0].prepareTime, exps[0].recoverTime, exps[0].minimumTime, exps[0].earlyArriveTime))
                         status++;
                 }

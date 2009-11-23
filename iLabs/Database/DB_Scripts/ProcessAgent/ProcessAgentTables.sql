@@ -129,15 +129,17 @@ CREATE TABLE [ProcessAgent] (
 	[ProcessAgent_Type_ID] [int] NOT NULL ,
 	[IdentIn_ID] [bigint] NULL ,
 	[IdentOut_ID] [bigint] NULL ,
-	[Description] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Domain_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Agent_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Agent_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[WebService_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Codebase_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Info_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Contact_Email] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[WebService_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Codebase_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Info_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Bug_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Location] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Description] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	CONSTRAINT [PK_ProcessAgent] PRIMARY KEY  CLUSTERED 
 	(
 		[Agent_ID]
@@ -158,7 +160,7 @@ GO
 CREATE TABLE [dbo].[Ticket_Type] (
 	[Ticket_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Short_Description] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	[Short_Description] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Abstract] [bit] NOT NULL,
 CONSTRAINT [PK_Ticket_Type] PRIMARY KEY  CLUSTERED 
 	(
@@ -173,7 +175,7 @@ CREATE TABLE [dbo].[Ticket] (
 	[Creation_Time] [DateTime] NOT NULL, 
 	[Duration] [bigint] NOT NULL ,
 	[Cancelled] [bit] NOT NULL ,
-	[Payload] [text]  NULL ,
+	[Payload] [ntext]  NULL ,
 	[Coupon_ID] [bigint] NOT NULL ,
 	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Redeemer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,

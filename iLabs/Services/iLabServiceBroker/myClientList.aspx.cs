@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -53,6 +54,26 @@ namespace iLabs.ServiceBroker.iLabSB
 				
 			repLabs.DataSource = lcList;
 			repLabs.DataBind();
+
+            List<SystemMessage> messagesList = new List<SystemMessage>();
+            SystemMessage[] groupMessages = null;
+            
+            groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP, Convert.ToInt32(Session["GroupID"]), 0, 0);
+            if (groupMessages != null)
+                messagesList.AddRange(groupMessages);
+
+            if (messagesList != null && messagesList.Count > 0)
+            {
+                messagesList.Sort(SystemMessage.CompareDateDesc);
+                //messagesList.Reverse();
+                repSystemMessage.DataSource = messagesList;
+                repSystemMessage.DataBind();
+            }
+
+            else
+            {
+                lblGroupNameSystemMessage.Text += "<p>No Messages at this time</p>";
+            }
 		}
 
 		#region Web Form Designer generated code

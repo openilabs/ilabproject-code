@@ -86,9 +86,16 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
         ////   EXPERIMENT METHODS      ////
         ///////////////////////////////////
 
-   
+    [WebMethod(Description = "Creates an Experiment on the ServiceBroker, if an ESS is "
++ "associated with this experiment the ESS experiment is opened so that ExperimentRecords "
++ "or BLOBs can be written to the ESS.",
+EnableSession = true)]
+    [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+    [SoapDocumentMethod(Binding = "IServiceBroker")]
+    public abstract StorageStatus CreateExperiment(DateTime startTime, long duration, string labServerGuid, string clientGuid, string groupName, string userName);
         
-        [WebMethod(Description = "Agent to Agent call, Opens an Experiment on the Ess, if an ESS is "
+        
+        [WebMethod(Description = "Opens an existing Experiment, if an ESS is "
     + "associated with this experiment the ESS experiment is opened so that ExperimentRecords "
     + "or BLOBs can be written to the ESS.",
     EnableSession = true)]

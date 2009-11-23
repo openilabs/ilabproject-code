@@ -28,7 +28,7 @@
 					<!-- end pageintro div -->
 					<div id="pagecontent">
 					</div>
-                     <asp:DropDownList ID="paDropDownList" Runat="server" AutoPostBack="True" OnSelectedIndexChanged="paDropDownList_SelectedIndexChanged">
+                     <asp:DropDownList CssClass="i18n" ID="paDropDownList" Runat="server" AutoPostBack="True" OnSelectedIndexChanged="paDropDownList_SelectedIndexChanged">
                     </asp:DropDownList><br/>
                     <br />
                     <asp:Repeater ID="repAdminGrants" runat="server" OnItemCommand="repAdminGrants_ItemCommand">

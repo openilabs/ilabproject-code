@@ -6,10 +6,10 @@
 /* $Id: InternalAuthenticationDB.cs,v 1.3 2007/12/26 05:27:26 pbailey Exp $ */
 
 using System;
-using System.Data ;
-using System.Data .SqlClient ;
-using System.Configuration ;
-using System.Collections ;
+using System.Data;
+using System.Data.Common;
+using System.Configuration;
+using System.Collections;
 
 using iLabs.Core;
 using iLabs.ServiceBroker;
@@ -38,10 +38,10 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			int userID=-1;
 
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("CreateNativePrincipal", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("CreateNativePrincipal", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters.Add (new SqlParameter("@userName",userName));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userName",userName,DbType.String,256));
 			try
 			{
 				myConnection.Open();
@@ -63,10 +63,10 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static int[] DeleteNativePrincipals (int[] userIDs)
 		{
-			SqlConnection myConnection = new SqlConnection (ConfigurationSettings.AppSettings ["sqlConnection"]);
-			SqlCommand myCommand = new SqlCommand ("DeleteNativePrincipal", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("DeleteNativePrincipal", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
-			myCommand.Parameters.Add (new SqlParameter("@userID",null));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",null,DbType.Int32));
 
 			/*
 			 * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
@@ -86,7 +86,7 @@ namespace iLabs.ServiceBroker.Internal
 					myCommand.Parameters["@userID"].Value = userID;
 					if(myCommand.ExecuteNonQuery () == 0)
 					{
-						arrayList.Add (userID);
+						arrayList.Add(userID);
 					}
 				}
 			}
@@ -109,9 +109,9 @@ namespace iLabs.ServiceBroker.Internal
 		public static int[] SelectNativePrincipals ()
 		{
 			int[] userIDs;
-			
-			SqlConnection myConnection = new SqlConnection (ConfigurationSettings.AppSettings ["sqlConnection"]);
-			SqlCommand myCommand = new SqlCommand ("RetrieveNativePrincipals", myConnection);
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveNativePrincipals", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -120,7 +120,7 @@ namespace iLabs.ServiceBroker.Internal
 				
 
 				// get native principal ids from table principals
-				SqlDataReader myReader = myCommand.ExecuteReader ();
+				DbDataReader myReader = myCommand.ExecuteReader ();
 				ArrayList uIDs = new ArrayList();
 
 				while(myReader.Read ())
@@ -152,13 +152,13 @@ namespace iLabs.ServiceBroker.Internal
 		/// <param name="password"></param>
 		public static void SaveNativePassword (int userID, string password)
 		{
-			
-			SqlConnection myConnection = new SqlConnection (ConfigurationSettings.AppSettings ["sqlConnection"]);
-			SqlCommand myCommand = new SqlCommand ("SaveNativePassword", myConnection);
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("SaveNativePassword", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			
-			myCommand.Parameters.Add (new SqlParameter("@userID",userID));
-			myCommand.Parameters.Add (new SqlParameter("@password",password));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",userID,DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@password",password,DbType.AnsiString));
 
 			try 
 			{
@@ -186,12 +186,12 @@ namespace iLabs.ServiceBroker.Internal
 		/// <returns></returns>
 		public static string ReturnNativePassword (int userID)
 		{
-			
-			SqlConnection myConnection = new SqlConnection (ConfigurationSettings.AppSettings ["sqlConnection"]);
-			SqlCommand myCommand = new SqlCommand ("RetrieveNativePassword", myConnection);
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveNativePassword", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			
-			myCommand.Parameters.Add (new SqlParameter("@userID",userID));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",userID,DbType.Int32));
 			
 			try 
 			{

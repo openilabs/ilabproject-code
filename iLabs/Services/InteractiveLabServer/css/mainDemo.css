@@ -821,6 +821,11 @@ body {
 	}
 /* End Item Display used to display Selected Messages, Experiments, and Users */
 
+.i18n
+{
+	font-family: Arial Unicode MS, Helvetica, sans-serif;
+}
+
 .unit {
 	margin-bottom: 10px;
 	}

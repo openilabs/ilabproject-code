@@ -63,15 +63,16 @@ using iLabs.DataTypes.SchedulingTypes;
             string message);
 		
 		/// <summary>
-		/// Returns an Boolean indicating whether it the right time for 
-        /// a particular user to execute a particular experiment
+		/// Returns an existing reservation for the current time for 
+        /// a particular user to execute a particular experiment. 
+        /// This does not create the AllowExperiment ticket.
 		/// </summary>
 		/// <param name="userName"></param>
 		/// <param name="serviceBrokerGuid"></param>
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
-		/// <returns></returns>true if it is the right time for a particular
-        /// user to execute a particular experiment
+        /// <returns>the existing reservation if it is the right time for a particular
+        /// user to execute a particular experiment, or null.</returns>
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]

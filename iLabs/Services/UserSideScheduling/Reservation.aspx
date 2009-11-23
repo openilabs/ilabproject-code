@@ -56,7 +56,7 @@
 				</tr>
 				<tr>
 				    <th colspan ="2">
-					    <asp:listbox id="lbxReservation"   AutoPostBack="true" OnSelectedIndexChanged="ReservationSelected" runat="server" Width="407px" Height="198px" ></asp:listbox>
+					    <asp:listbox cssClass="i18n" id="lbxReservation"   AutoPostBack="true" OnSelectedIndexChanged="ReservationSelected" runat="server" Width="407px" Height="198px" ></asp:listbox>
 				    </th>
 				</tr>
 				<tr>

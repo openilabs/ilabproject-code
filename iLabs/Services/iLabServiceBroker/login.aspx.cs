@@ -58,7 +58,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 
 			ArrayList messagesList = new ArrayList();
-			SystemMessage[] messages = wrapper.GetSystemMessagesWrapper(SystemMessage.SYSTEM,0,0);
+			SystemMessage[] messages = wrapper.GetSystemMessagesWrapper(SystemMessage.SYSTEM,0,0,0);
 			foreach(SystemMessage message in messages)
 			{
 				messagesList.Add(message);
@@ -71,7 +71,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			repSystemMessage.DataBind();
 
 			if (messagesList==null)
-				lblSystemMessage.Text +="No Messages at this time";
+				lblSystemMessage.Text +="<p>No Messages at this time</p>";
 		}
 
 		#region Web Form Designer generated code

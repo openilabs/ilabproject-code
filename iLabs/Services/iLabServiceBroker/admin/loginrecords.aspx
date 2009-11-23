@@ -52,7 +52,7 @@ Please see license.txt in top level directory for full license.
 										<th style="HEIGHT: 31px">
 											<label for="timeis">Time </label>
 										</th>
-										<td style="WIDTH: 118px; HEIGHT: 31px"><asp:dropdownlist id="ddlTimeIs" Runat="server" Width="112px" AutoPostBack="True" onselectedindexchanged="ddlTimeIs_SelectedIndexChanged">
+										<td style="WIDTH: 118px; HEIGHT: 31px"><asp:dropdownlist CssClass="i18n" id="ddlTimeIs" Runat="server" Width="112px" AutoPostBack="True" onselectedindexchanged="ddlTimeIs_SelectedIndexChanged">
 												<asp:ListItem Value="select">--Select one--</asp:ListItem>
 												<asp:ListItem Value="equal">equal to</asp:ListItem>
 												<asp:ListItem Value="before">before</asp:ListItem>

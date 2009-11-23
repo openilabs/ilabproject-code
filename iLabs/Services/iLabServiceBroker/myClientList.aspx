@@ -37,12 +37,8 @@ Please see license.txt in top level directory for full license.
 						<div id="messagebox-right">
 							<h3>Messages for
 								<asp:Label ID="lblGroupNameSystemMessage" Runat="server"></asp:Label></h3>
-							<!--
-							<p class="message">The WebLab 6.0 Lab Server is available and operating normally.</p>
-							<p class="date">Date Posted: 8/19/2004 11:02:45 AM</p>
-							<p class="message">Another message for testing.</p>
-							<p class="date">Date Posted: 11/16/2004 11:02:45 AM</p> -->
-							<H3></H3>
+						
+							<h3></h3>
 							<asp:repeater id="repSystemMessage" runat="server">
 								<ItemTemplate>
 									<p class="message">

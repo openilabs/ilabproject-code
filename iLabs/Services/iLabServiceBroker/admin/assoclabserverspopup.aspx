@@ -44,12 +44,12 @@ Please see license.txt in top level directory for full license.
 								<th class="top" style="WIDTH: 71px">
 									Reorder</th></tr>
 							<tr>
-								<td><asp:listbox id="lbxAvailable" Height="90px" Width="200px" Runat="server"></asp:listbox></td>
+								<td><asp:listbox cssClass="i18n" id="lbxAvailable" Height="90px" Width="200px" Runat="server"></asp:listbox></td>
 								<td class="buttonstyle" style="WIDTH: 91px"><asp:imagebutton id="ibtnAdd" Height="22" Width="50" Runat="server" ImageUrl="../img/add-btn.gif"
 										CssClass="buttonstyle" AlternateText="Add"></asp:imagebutton><br>
 									<asp:imagebutton id="ibtnRemove" Height="22" Width="74" Runat="server" ImageUrl="../img/remove-btn.gif"
 										CssClass="buttonstyle" AlternateText="Remove"></asp:imagebutton></td>
-								<td><asp:listbox id="lbxAssociated" Height="90px" Width="200px" Runat="server"></asp:listbox></td>
+								<td><asp:listbox cssClass="i18n" id="lbxAssociated" Height="90px" Width="200px" Runat="server"></asp:listbox></td>
 								<td class="buttonstyle" style="WIDTH: 71px"><asp:imagebutton id="ibtnMoveUp" Height="22" Width="43" Runat="server" ImageUrl="../img/up-btn.gif"
 										CssClass="buttonstyle" AlternateText="Move Up"></asp:imagebutton><br>
 									<asp:imagebutton id="ibtnMoveDown" Height="22" Width="57" Runat="server" ImageUrl="../img/down-btn.gif"

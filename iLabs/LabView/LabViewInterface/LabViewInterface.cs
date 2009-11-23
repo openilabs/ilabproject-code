@@ -25,6 +25,7 @@ using iLabs.UtilLib;
 
 using CWDataServer;
 using CWDSLib;
+using iLabs.LabView;
 
 #if LabVIEW_86
 using LabVIEW.lv86;
@@ -47,7 +48,7 @@ namespace iLabs.LabView.LV82
 	/// </summary>
 	public class LabViewInterface : I_LabViewInterface
 	{
-
+        protected string lvVersion = null;
 		protected _Application viServer;
 
         protected string appDir = null;
@@ -58,10 +59,25 @@ namespace iLabs.LabView.LV82
 		/// what version and LabView application will be the target
 		/// </summary>
 		public LabViewInterface()
-		{	
-			viServer = new ApplicationClass();
-            appDir = viServer.ApplicationDirectory;
-			viServer.AutomaticClose = false;
+        {
+            try
+            {
+#if LabVIEW_86
+                lvVersion = "LabVIEW 8.6";
+#endif
+#if LabVIEW_82
+                lvVersion = "LabVIEW 8.2.1";
+#endif
+                viServer = new ApplicationClass();
+                appDir = viServer.ApplicationDirectory;
+                viServer.AutomaticClose = false;
+            }
+            catch (Exception e)
+            {
+
+                Exception ex = new Exception("ERROR: Creating ApplicationClass " + lvVersion +": ", e);
+                throw ex;
+            }
 		}
 
 	public string GetLabViewVersion(){
@@ -402,46 +418,57 @@ namespace iLabs.LabView.LV82
 
         public int StopVI(VirtualInstrument vi)
         {
-            int status = -1;
+            string controlName = "stop";
+            int status = 4;
             if (vi != null)
             {
-                status = 0;
+                status = 1;
                 object state = null;
                 bool found = false;
                 try
                 {
-                    state = vi.GetControlValue("stop");
+                    state = vi.GetControlValue(controlName);
                     if (state != null)
                     {
-                        status = 1;
+                        status = 2;
                         found = true;
                     }
                     else
                     {
-                        Utilities.WriteLog("stop control not found: null returned");
+                        Utilities.WriteLog(controlName + " control not found: null returned");
                     }
                 }
                 catch (Exception e)
                 {
-                    Exception stopEx = new Exception("Control NotFound: stop", e);
-                    Utilities.WriteLog("stop control not found: " + e.Message);
-                    throw stopEx;
+                    Utilities.WriteLog(controlName + " control not found: Exception: " + e.Message);
                 }
                 if (found)
                 {
                     try
                     {
-                        vi.SetControlValue("stop", true);
-                        Thread.Sleep(10);
-                        vi.SetControlValue("stop", false);
-                        Utilities.WriteLog("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
-                        status = 2;
+                        vi.SetControlValue(controlName, true);
+                        int count = 0;
+                        int maxCount = 1000;
+                        while (vi.ExecState == ExecStateEnum.eRunning && count < maxCount)
+                        {
+                            count++;
+                            Thread.Sleep(20);
+                        }
+                        if (count == maxCount)
+                        {
+                            // Timeout error
+                            status = 3;
+                        }
+                        vi.SetControlValue(controlName, false);
+                        if ((vi.ExecState != ExecStateEnum.eRunning) && (vi.ExecState != ExecStateEnum.eRunTopLevel))
+                        {
+                            Utilities.WriteLog("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
+                            status = 0;
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Exception setControl = new Exception("setControl: stop", ex);
-                        Utilities.WriteLog("Error: setControl stop: " + ex.Message);
-                        throw setControl;
+                        Utilities.WriteLog("Error: setControl " +controlName +": " + ex.Message);
                     }
                 }
             }

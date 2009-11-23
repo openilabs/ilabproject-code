@@ -1,5 +1,5 @@
 <%@ Page language="c#" Inherits="iLabs.Services.SelfRegistration" CodeFile="SelfRegistration.aspx.cs" EnableEventValidation="false" %>
-<%@ Register TagPrefix="uc1" TagName="register" Src="SelfRegistration.ascx" %>
+<%@ Register Assembly="iLabControls" Namespace="iLabs.Controls" TagPrefix="iLab" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <HTML>
@@ -17,14 +17,12 @@ Please see license.txt in top level directory for full license.
 		</style>
 	</HEAD>
 	<body>
-		<form method="post" runat="server">
-			<a name="top"></a>
-				<div id="innerwrapper">
-				<uc1:register ID="selfReg" runat="server" AgentType="LAB SERVER" />	
-				<!-- end innerwrapper div -->
-				</div>
-				<br clear="all" />
-				</form>
-				
+	    <form id="Form1" method="post" runat="server">
+	    <a name="top"></a>
+		<div id="innerwrapper">
+				<iLab:RegisterSelf ID="selfReg" runat="server" AgentType="LAB SERVER" />		
+		</div><!-- end innerwrapper div -->
+		<br clear="all" />
+		</form>
 	</body>
 </HTML>

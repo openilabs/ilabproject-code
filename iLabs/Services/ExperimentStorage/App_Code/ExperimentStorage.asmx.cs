@@ -2,8 +2,8 @@
 
 using System;
 using System.Xml.Serialization;
-using System.Data;
-using System.Data.SqlClient;
+//using System.Data;
+//using System.Data.Common;
 using System.Collections;
 using System.Configuration;
 using System.Text;
@@ -23,6 +23,7 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 using iLabs.ExpStorage;
+using iLabs.Web;
 
 
 namespace iLabs.ExpStorage.ESS
@@ -100,7 +101,7 @@ namespace iLabs.ExpStorage.ESS
                     experimentDeleted = experimentsAPI.DeleteExperiment(experimentId, agentAuthHeader.coupon.issuerGuid);
                 }
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("DeleteExperiment: " + ex.Message);
                 throw;
@@ -203,7 +204,7 @@ namespace iLabs.ExpStorage.ESS
                 
                 return status;
             }
-            catch(SqlException ex)
+            catch(Exception ex)
             {
                 Utilities.WriteLog("SetExperimentStatuus: " + ex.Message);
                 throw;
@@ -270,7 +271,7 @@ namespace iLabs.ExpStorage.ESS
                 return seqNo;
             }
 
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("AddRecord: " + ex.Message);
                 throw;
@@ -311,7 +312,7 @@ namespace iLabs.ExpStorage.ESS
                 return seqNo;
             }
 
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("AddRecord: " + ex.Message);
                 throw;
@@ -336,7 +337,7 @@ namespace iLabs.ExpStorage.ESS
                 return expRecord;
             }
 
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("GetRecord: " + ex.Message);
                 throw;
@@ -361,7 +362,7 @@ namespace iLabs.ExpStorage.ESS
                 return expRecords;
             }
 
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("GetRecord: " + ex.Message);
                 throw;
@@ -386,7 +387,7 @@ namespace iLabs.ExpStorage.ESS
                 return expRecords;
             }
 
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("GetRecord: " + ex.Message);
                 throw;
@@ -413,7 +414,7 @@ namespace iLabs.ExpStorage.ESS
                 return exp;
             }
 
-            catch (SqlException ex)
+            catch (Exception ex)
             {
                 Utilities.WriteLog("GetExperiment: " + ex.Message);
                 throw;
@@ -435,7 +436,7 @@ namespace iLabs.ExpStorage.ESS
 
                 }
 
-                catch (SqlException ex)
+                catch (Exception ex)
                 {
                     Utilities.WriteLog("GetExperimentIDs: " + ex.Message);
                     throw;

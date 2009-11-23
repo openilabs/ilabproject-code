@@ -47,7 +47,7 @@ CREATE TABLE [dbo].[IssuedTicket] (
 	[Coupon_ID] [bigint] NOT NULL ,
 	[creation_Time] [DateTime] NOT NULL ,
 	[duration] [bigint] NOT NULL ,
-	[Payload] [text]  NULL, 
+	[Payload] [ntext]  NULL, 
 	[Cancelled] [bit] NOT NULL ,
 	[Sponsor_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Redeemer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL

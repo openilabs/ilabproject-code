@@ -38,7 +38,7 @@
 		<tr>
 										<th>
 											<label for="group">Group</label></th>
-										<td style="width: 454px"><asp:DropDownList id="ddlGroup" runat="server" AutoPostBack="True" onselectedindexchanged="ddlGroup_SelectedIndexChanged" Width="100%"></asp:DropDownList>
+										<td style="width: 454px"><asp:DropDownList cssClass="i18n" id="ddlGroup" runat="server" AutoPostBack="True" onselectedindexchanged="ddlGroup_SelectedIndexChanged" Width="100%"></asp:DropDownList>
 											</td>
 									</tr>
 		<tr>
@@ -62,7 +62,7 @@
 									<tr>
 										<th>
 											<label for="userSideSchedulingServer">User Side Scheduling Server</label></th>
-										<td style="width: 454px"><asp:DropDownList id="ddlUSS" Runat="server" Width="100%"></asp:DropDownList>
+										<td style="width: 454px"><asp:DropDownList cssClass="i18n" id="ddlUSS" Runat="server" Width="100%"></asp:DropDownList>
 											</td>
 									</tr>
 								

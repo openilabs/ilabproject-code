@@ -39,24 +39,32 @@ Please see license.txt in top level directory for full license.
 					<!-- end pageintro div -->
 					<div id="pagecontent">
 					<div class="simpleform">
-					    <table border=1>
+					    <table border="1">
 					        <tr>
-							<td><label for="messagetype">Select the groupname</label> <br>
-							<asp:dropdownlist id="ddlGroupTarget" Runat="server" Width="248px"></asp:dropdownlist></SELECT-->
+							<td><label for="messagetype">Select the groupname</label> <br/>
+							<asp:dropdownlist id="ddlGroupTarget" Runat="server" Width="300px"></asp:dropdownlist>
 							</td>
-							<td><label for="messagetype">Select the report</label>							<br>
-							<asp:dropdownlist id="ddlReportTarget" Runat="server" Width="248px"></asp:dropdownlist></SELECT-->
+							<td><label for="messagetype">Select the report</label> <br/>
+							<asp:dropdownlist id="ddlReportTarget" Runat="server" Width="300px"></asp:dropdownlist>
 							</td>
-							<td><asp:button id="btnSubmit" Runat="server" Width="45px" CssClass="button" Text="Submit" onclick="btnSubmit_Click"></asp:button></td>
+							<td><asp:button id="btnSubmit" Runat="server" Width="55px" CssClass="button" Text="Submit" onclick="btnSubmit_Click"></asp:button></td>
 							</tr>
                         </table>
 					</div>
 					<asp:Literal runat="server" EnableViewState="False" Visible="False" ID="ReportDisplayArea"> </asp:Literal>
-					<br clear="all">
+                    <table>
+                    <tr> <td>&nbsp;</td> <td></td></tr>
+                    <tr><td width="75%"></td>
+                    <td>
+                    <asp:Button ID="btn_ExportCVS" runat="server" EnableViewState="False" Visible="False" OnClick="btnExportCVS_Click"  text="Export To CVS" />
+                    </td></tr>
+                    </table>
+					<br clear="all"/>
 
 					<!-- end pagecontent div-->
 				</div>
 				<!-- end innerwrapper div -->
+			</div>
 			</div>
 		</form>
 </body>

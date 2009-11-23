@@ -348,8 +348,8 @@ GO
 CREATE TABLE [dbo].[AdminURLs] (
 	[id] [int] IDENTITY (1, 1) NOT NULL ,
 	[ProcessAgentID] [int] NOT NULL ,
-	[AdminURL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Ticket_Type_ID] [int] NOT NULL 
+	[Ticket_Type_ID] [int] NOT NULL,
+	[AdminURL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL  
 ) ON [PRIMARY]
 GO
 
@@ -362,7 +362,7 @@ GO
 
 /****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Agents] (
-	[Agent_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Is_Group] [bit] NOT NULL ,
 	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL 
 ) ON [PRIMARY]
@@ -371,7 +371,7 @@ GO
 /****** Object:  Table [dbo].[Authentication_Types]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Authentication_Types] (
 	[Auth_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -380,27 +380,29 @@ GO
 CREATE TABLE [dbo].[Client_Info] (
 	[Client_Info_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
 	[Client_ID] [int] NOT NULL ,
-	[Info_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Info_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Description] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Display_Order] [int] NULL 
+	[Display_Order] [int] NULL ,
+	[Info_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Info_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+	
 ) ON [PRIMARY]
 GO
 
 /****** Object:  Table [dbo].[Client_Items]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Client_Items] (
 	[Client_Item_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
-	[Item_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Item_Value] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[User_ID] [int] NOT NULL ,
-	[Client_ID] [int] NOT NULL 
+	[Client_ID] [int] NOT NULL,
+	[Item_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Item_Value] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+	 
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
 /****** Object:  Table [dbo].[Client_Types]    Script Date: 8/30/2005 4:07:56 PM ******/
 CREATE TABLE [dbo].[Client_Types] (
 	[Client_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Description] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -409,6 +411,7 @@ GO
 
 CREATE TABLE [dbo].[Experiments] (
 	[Experiment_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
+	[LabSession_ID] [bigint] NOT NULL Default 0,
 	[status] [int] NOT NULL ,
 	[User_ID] [int] NOT NULL ,
 	[Group_ID] [int] NOT NULL ,
@@ -420,7 +423,7 @@ CREATE TABLE [dbo].[Experiments] (
 	[Duration] [bigint] NULL ,
 	[CreationTime] [datetime] NOT NULL ,	
 	[CloseTime] [datetime] NULL ,
-	[Annotation] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Annotation] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
@@ -436,8 +439,8 @@ GO
 /****** Object:  Table [dbo].[Functions]    Script Date: 8/30/2005 4:07:57 PM ******/
 CREATE TABLE [dbo].[Functions] (
 	[Function_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Function_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Function_Name] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -454,19 +457,20 @@ GO
 /****** Object:  Table [dbo].[Group_Types]    Script Date: 8/30/2005 4:07:57 PM ******/
 CREATE TABLE [dbo].[Group_Types] (
 	[Group_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Description] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
 /****** Object:  Table [dbo].[Groups]    Script Date: 8/30/2005 4:07:57 PM ******/
 CREATE TABLE [dbo].[Groups] (
-	[Group_Name] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Date_Created] [datetime] NOT NULL ,
 	[Group_ID] [int] NOT NULL ,
-	[Email] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Group_Type_ID] [int] NOT NULL ,
-	[Associated_Group_ID] [int] NULL 
+	[Associated_Group_ID] [int] NULL ,
+	[AccessCode] [int] NOT NULL DEFAULT 0,
+	[Date_Created] [datetime] NOT NULL ,
+	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 
@@ -477,17 +481,36 @@ CREATE TABLE [dbo].[Lab_Clients] (
 	[NeedsScheduling] [bit] NOT NULL,
 	[NeedsESS] [bit] NOT NULL,
 	[IsReentrant] [bit] NOT NULL,
+	[Loader_Script] [nvarchar](2000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Long_Description] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Short_Description] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Version] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact_First_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact_Last_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Date_Created] [datetime] NOT NULL ,
 	[Client_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Lab_Client_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Loader_Script] [varchar] (3000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Long_Description] [varchar] (2000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Contact_Email] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Short_Description] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Version] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Contact_First_Name] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Contact_Last_Name] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Notes] [varchar] (2000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Lab_Client_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	
+	[Notes] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[Lab_Sessions] (
+	[LabSession_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
+	[Coupon_ID] [bigint] NOT NULL,
+	[User_ID] [int] NOT NULL ,
+	[Group_ID] [int] NOT NULL ,
+	[Agent_ID] [int] NOT NULL ,
+	[Client_ID] [int] NOT NULL ,
+	[ScheduledStart] [datetime] NULL ,
+	[Duration] [bigint] NULL
+) ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[LabSession_To_Experiment](
+	[LabSession_ID] [bigint],
+	[experiment_id] [bigint]
 ) ON [PRIMARY]
 GO
 
@@ -499,29 +522,10 @@ CREATE TABLE [dbo].[Lab_Server_To_Client_Map] (
 ) ON [PRIMARY]
 GO
 
-/****** Object:  Table [dbo].[Lab_Servers]    Script Date: 8/30/2005 4:07:58 PM ******/
-
- CREATE TABLE [dbo].[Lab_Servers] (
-	[Lab_Server_ID] [int] IDENTITY (1, 1) NOT NULL ,
- 	[GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Web_Service_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Info_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
- 	[Lab_Server_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Contact_First_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Contact_Last_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Contact_Email] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
- 	[Date_Created] [datetime] NOT NULL ,
- 	[Outgoing_Passkey] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
- 	[Incoming_Passkey] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
- 	
- ) ON [PRIMARY]
- GO
-
 /****** Object:  Table [dbo].[Message_Types]    Script Date: 8/30/2005 4:07:58 PM ******/
 CREATE TABLE [dbo].[Message_Types] (
 	[Message_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -530,7 +534,7 @@ CREATE TABLE [dbo].[Principals] (
 	[Principal_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Auth_Type_ID] [int] NOT NULL ,
 	[User_ID] [int] NOT NULL ,
-	[Principal_String] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Principal_String] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -545,7 +549,7 @@ GO
 /****** Object:  Table [dbo].[Qualifier_Types]    Script Date: 8/30/2005 4:07:59 PM ******/
 CREATE TABLE [dbo].[Qualifier_Types] (
 	[Qualifier_Type_ID] [int] NOT NULL ,
-	[Description] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -554,8 +558,9 @@ CREATE TABLE [dbo].[Qualifiers] (
 	[Qualifier_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Qualifier_Type_ID] [int] NOT NULL ,
 	[Qualifier_Reference_ID] [int] NOT NULL ,
-	[Qualifier_Name] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Date_Created] [datetime] NOT NULL 
+	[Date_Created] [datetime] NOT NULL ,
+	[Qualifier_Name] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+	
 ) ON [PRIMARY]
 GO
 
@@ -565,25 +570,11 @@ CREATE TABLE [dbo].[Registration] (
 	[status] [int] NOT NULL,
 	[createTime] [DATETIME] NOT NULL,
 	[lastModTime] [DATETIME] NOT NULL,
-	[descriptor] [TEXT] NOT NULL,
+	[descriptor] [NTEXT] NOT NULL,
 	[registerGuid] [varchar](50) NOT NULL,
 	[sourceGuid] [varchar](50) NOT NULL,
 	[couponGuid] [varchar](50) NULL,
-	[email] [varchar] (256) NULL
-) ON [PRIMARY]
-GO
-
-
-CREATE TABLE [dbo].[ResourceMap](
-	[mapId] [int] IDENTITY (1, 1) NOT NULL ,
-	[keyType] [int] NOT NULL ,
-	[keyValue] [int] NOT NULL ,
-	[Type_0] [int] NOT NULL ,
-	[Value_0] [int] NOT NULL ,
-	[Type_1] [int] NOT NULL ,
-	[Value_1] [int] NOT NULL ,
-	[Type_2] [int] NOT NULL ,
-	[Value_2] [int] NOT NULL
+	[email] [nvarchar] (256) NULL
 ) ON [PRIMARY]
 GO
 
@@ -596,14 +587,15 @@ GO
 
 CREATE TABLE [dbo].[ResourceMappingStrings] (
 	[ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[String_Value] [varchar] (400) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[String_Value] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
 
+/* These may be set by the specific service broker */
 CREATE TABLE [dbo].[ResourceMappingTypes] (
 	[Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Type_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Description] [varchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Type_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
@@ -615,28 +607,27 @@ CREATE TABLE [dbo].[ResourceMappingValues] (
 ) ON [PRIMARY]
 GO
 
+/* Defined set of resource types */
 CREATE TABLE [dbo].[ResourceMappingResourceTypes] (
 	[ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[ResourceType_Value] [varchar] (400) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[ResourceType_Value] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
-
-
-
-
 
 /****** Object:  Table [dbo].[System_Messages]    Script Date: 8/30/2005 4:07:59 PM ******/
 CREATE TABLE [dbo].[System_Messages] (
 	[System_Message_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Message_Title] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Message_Type_ID] [int] NOT NULL ,
-	[Message_Body] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Agent_ID] [int] NULL ,
+	[Client_ID] [int] NULL ,
 	[Group_ID] [int] NULL ,
-	[Lab_Server_ID] [int] NULL ,
 	[To_Be_Displayed] [bit] NOT NULL ,
 	[Last_Modified] [datetime] NOT NULL ,
-	[Date_Created] [datetime] NOT NULL 
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+	[Date_Created] [datetime] NOT NULL ,
+	[Message_Title] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Message_Body] [nvarchar] (3000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+	
+) ON [PRIMARY]
 GO
 
 
@@ -644,11 +635,11 @@ GO
 CREATE TABLE [dbo].[User_Sessions] (
 	[Session_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
 	[Modify_Time] [datetime] NOT NULL ,
-	[Session_Start_Time] [datetime] NOT NULL ,
-	[Session_End_Time] [datetime] NULL ,
 	[User_ID] [int] NOT NULL ,
 	[Effective_Group_ID] [int] NOT NULL ,
 	[Client_ID] [int] NULL ,
+	[Session_Start_Time] [datetime] NOT NULL ,
+	[Session_End_Time] [datetime] NULL ,
 	[TZ_Offset] [int] NOT NULL CONSTRAINT [DF_User_Sessions_tz_Offset] DEFAULT (0),
 	[Session_Key] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
@@ -656,17 +647,17 @@ GO
 
 /****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:08:00 PM ******/
 CREATE TABLE [dbo].[Users] (
-	[User_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[First_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Last_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Email] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Affiliation] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Date_Created] [datetime] NOT NULL ,
-	[Xml_Extension] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Password] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Lock_User] [bit] NOT NULL ,
 	[User_ID] [int] NOT NULL ,
-	[Signup_Reason] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Date_Created] [datetime] NOT NULL ,
+	[Lock_User] [bit] NOT NULL ,
+	[Xml_Extension] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[User_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[First_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Last_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Affiliation] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Signup_Reason] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 

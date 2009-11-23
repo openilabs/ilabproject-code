@@ -58,7 +58,8 @@ namespace iLabs.LabServer.LabView
 			string payload = (string) Session["payload"];
 			XmlQueryDoc xDoc = new XmlQueryDoc(payload);
 			String viidStr= xDoc.Query("payload/appId");
-			String viname = xDoc.Query("payload/application");  
+			String viname = xDoc.Query("payload/application");
+            String revision = xDoc.Query("payload/revision");  
             String appUrl = xDoc.Query("payload/appUrl");
 			String widthStr = xDoc.Query("payload/width");
 			String heightStr= xDoc.Query("payload/height");
@@ -79,6 +80,7 @@ namespace iLabs.LabServer.LabView
             }
    
 			thePanel.viName = viname;
+            thePanel.version = revision;
 			thePanel.width = width;
 			thePanel.height= height;
             if(duration > 0){

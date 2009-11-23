@@ -7,13 +7,13 @@ Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserve
 Please see license.txt in top level directory for full license. 
 -->
 		<!-- $Id: default.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
-		<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+		<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1" />
 		<style type="text/css">@import url( css/main.css ); 
 		</style>
 	</HEAD>
 	<frameset rows="*,1" cols="*">
-		<frame src="home.aspx" name="theuser" />
-		<frame src="no_applet.html" name="theapplet" scrolling="no" noresize />
+		<frame id="frmUser" runat="server"  src="home.aspx" name="theuser" />
+		<frame src="no_applet.html" name="theapplet" scrolling="no" noresize="true" />
 		<noframes>
 		<p>This application requires frames, please upgrade your browser.</p>
 		</noframes>

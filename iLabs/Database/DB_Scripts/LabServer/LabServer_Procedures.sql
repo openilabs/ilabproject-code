@@ -144,7 +144,7 @@ GO
 
 
 CREATE PROCEDURE GetLocalGroupIDByName
-@groupName varchar(256),
+@groupName nvarchar(256),
 @guid  varchar(50)
 AS
 select GroupID
@@ -161,24 +161,24 @@ SET ANSI_NULLS OFF
 GO
 
 CREATE PROCEDURE InsertLabApp
-@application varchar (100),
+@application nvarchar (100),
 @guid varchar(50),
-@appKey varchar (100),
-@path varchar (256),
-@version varchar (50),
-@rev varchar (50),
-@page varchar (256),
-@title varchar (256),
-@description varchar (2000),
-@comment varchar (256),
+@appKey nvarchar (100),
+@path nvarchar (256),
+@version nvarchar (50),
+@rev nvarchar (50),
+@page nvarchar (256),
+@title nvarchar (256),
+@description nvarchar (2000),
+@comment nvarchar (256),
 @width int,
 @height int,
 @type int,
-@server varchar (256),
+@server nvarchar (256),
 @port int,
-@contact varchar (256),
-@cgi varchar (256),
-@datasource varchar (2000),
+@contact nvarchar (256),
+@cgi nvarchar (512),
+@datasource nvarchar (2000),
 @extra nvarchar (2000)
 
 AS
@@ -199,24 +199,24 @@ GO
 
 CREATE PROCEDURE ModifyLabApp
 @appId int,
-@application varchar (100),
+@application nvarchar (100),
 @guid varchar(50),
-@appKey varchar (100),
-@path varchar (256),
-@version varchar (50),
-@rev varchar (50),
-@page varchar (256),
-@title varchar (256),
-@description varchar (2000),
-@comment varchar (256),
+@appKey nvarchar (100),
+@path nvarchar (256),
+@version nvarchar (50),
+@rev nvarchar (50),
+@page nvarchar (256),
+@title nvarchar (256),
+@description nvarchar (2000),
+@comment nvarchar (256),
 @width int,
 @height int,
 @type int,
-@server varchar (256),
+@server nvarchar (256),
 @port int,
-@contact varchar (256),
-@cgi varchar (256),
-@datasource varchar (2000),
+@contact nvarchar (256),
+@cgi nvarchar (512),
+@datasource nvarchar (2000),
 @extra nvarchar (2000)
 
 AS
@@ -237,8 +237,8 @@ SET ANSI_NULLS ON
 GO
 
 CREATE PROCEDURE ModifyLabPaths
-@oldPath varchar(256),
-@newPath varchar(256)
+@oldPath nvarchar(256),
+@newPath nvarchar(256)
 
  AS
 
@@ -318,7 +318,7 @@ GO
 
 CREATE PROCEDURE GetLabAppByKey 
 
- @appKey varchar (100)
+ @appKey nvarchar (100)
 AS
 
 select LabApp_ID,path,Application,page,title,description,extraInfo,contact,comment,
@@ -332,7 +332,7 @@ SET ANSI_NULLS ON
 GO
 
 CREATE PROCEDURE GetLabAppByGroup 
-@groupName Varchar (256),
+@groupName nvarchar (256),
 @guid varchar (50)
 AS
 declare @app_id int;
@@ -381,7 +381,7 @@ SET ANSI_NULLS ON
 GO
 
 CREATE PROCEDURE GetLabAppTagByKey
-@appKey varchar (100)
+@appKey nvarchar (100)
 as 
 select LabApp_id,title from LabApp
 where AppKey = @appKey
@@ -431,7 +431,7 @@ GO
 
 
 CREATE PROCEDURE GetAppIdForRemoteGroupName
-@groupName varchar(256),
+@groupName nvarchar(256),
 @guid varchar(50)
 
 AS

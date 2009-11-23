@@ -180,6 +180,7 @@ namespace iLabs.ServiceBroker.admin
 			catch (Exception ex)
 			{
 				lblResponse.Text = Utilities.FormatErrorMessage("Cannot list users and groups. "+ex.GetBaseException());
+                lblResponse.Visible = true;
 			}
 		}
 
@@ -187,6 +188,7 @@ namespace iLabs.ServiceBroker.admin
 		{
 			foreach(TreeNode n in nodes)
 			{
+                
 				if(Convert.ToInt32(n.Value) == nodeID)
 				{
 					n.Expanded=true;
@@ -216,6 +218,7 @@ namespace iLabs.ServiceBroker.admin
                 string msg = "Error: You must select an item from each list";
 				lblResponse.Text = Utilities.FormatErrorMessage(msg);
 				lblResponse.Visible = true;
+                return;
             }
 			int memberID = Convert.ToInt32(agentNode.Value);
 			string memberName = agentNode.Text;
@@ -360,6 +363,7 @@ namespace iLabs.ServiceBroker.admin
                 string msg = "Error: You must select an item from each list";
 				lblResponse.Text = Utilities.FormatErrorMessage(msg);
 				lblResponse.Visible = true;
+                return;
             }
 			int memberID = Convert.ToInt32(agentNode.Value);
 			string memberName = agentNode.Text;
@@ -526,6 +530,7 @@ namespace iLabs.ServiceBroker.admin
                 string msg = "Error: You must select an item from each list";
 				lblResponse.Text = Utilities.FormatErrorMessage(msg);
 				lblResponse.Visible = true;
+                return;
             }
 			int memberID = Convert.ToInt32(agentNode.Value);
 			string memberName = agentNode.Text;

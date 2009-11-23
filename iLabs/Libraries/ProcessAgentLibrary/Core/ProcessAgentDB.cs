@@ -10,8 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
+using System.Data.Common;
 using System.Text;
 using iLabs.UtilLib;
 using iLabs.DataTypes;
@@ -30,18 +29,18 @@ namespace iLabs.Core
 	/// </summary>
 	public class ProcessAgentDB 
 	{
-		protected static string connectionStr;
+		//protected static string connectionStr;
         protected static ProcessAgent serviceAgent;
         protected static ProcessAgentInfo domainSB;
 
         static ProcessAgentDB()
         {
             // read connection string from the app settings
-            connectionStr = ConfigurationManager.AppSettings["sqlConnection"];
-            if (connectionStr == null)
-            {
-                throw new NoNullAllowedException(" The connection string is not specified, check configuration");
-            }
+            //connectionStr = ConfigurationManager.AppSettings["sqlConnection"];
+            //if (connectionStr == null)
+            //{
+            //    throw new NoNullAllowedException(" The connection string is not specified, check configuration");
+            //}
             RefreshServiceAgent();
         }
 
@@ -64,31 +63,7 @@ namespace iLabs.Core
             return (serviceAgent != null);
         }
 
-        /// <summary>
-        /// Creates an unopened connection to the database
-        /// </summary>
-        /// <returns></returns>
-        public static  SqlConnection GetConnection()
-        {
-            SqlConnection connection = null;
-            try
-            {
-                if (connectionStr == null || connectionStr.Equals(""))
-                {
-                    // read connection string from the app settings
-                    connectionStr= ConfigurationManager.AppSettings["sqlConnection"];
-                }
-                // create an SqlConnection
-                connection = new SqlConnection(connectionStr);
-            }
-            catch (Exception e)
-            {
-                Utilities.WriteLog(Utilities.DumpException(e));
-                throw;
-            }
-            return connection;
-        }
-
+        
 
         /// <summary>
         /// this serviceAgent, null if selfRecord has not been saved to database.
@@ -122,6 +97,39 @@ namespace iLabs.Core
 
         }
 
+        //public DbCommand CreateCommand(string text, DbConnection connection)
+        //{
+        //    DbCommand cmd = connection.CreateCommand()
+        //    cmd.CommandText = text;
+        //    return cmd;
+        //}
+
+        //public DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type)
+        //{
+        //    DbParameter param = cmd.CreateParameter();
+        //    param.ParameterName = name;
+        //    param.DbType = type;
+        //    if (value == null)
+        //        param.Value = System.DBNull.Value;
+        //    else
+        //    {
+        //        if((value is string) && (((string)value).Length ==0)){
+        //            param.Value = System.DBNull.Value;
+        //        }
+        //        else{
+        //            param.Value = value;
+        //        }
+        //    }
+        //    return param;
+        //}
+
+        //public DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type, int size)
+        //{
+        //    DbParameter param = CreateParameter(cmd,name,value,type);
+        //    param.Size = size;
+        //    return param;
+        //}
+
         /// <summary>
         /// Inserts or updates the domain ServiceBroker record in the database.
         /// </summary>
@@ -130,20 +138,20 @@ namespace iLabs.Core
         public bool SetDomainGuid(string guid)
         {
             bool status = false;
-            SqlConnection connection = FactoryDB.GetConnection();
-           SqlCommand cmd = new SqlCommand("UpdateDomainGuid", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+           DbCommand cmd = FactoryDB.CreateCommand("UpdateDomainGuid",connection);
 			 cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-				guidParam.Value = guid;
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+				
 				
 			try{
                 connection.Open();
 				status = Convert.ToBoolean(cmd.ExecuteScalar());
                 RefreshServiceAgent();
 			}
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -154,49 +162,6 @@ namespace iLabs.Core
 			return status;
 		}
         
-        /// <summary>
-        /// Creates an open connection to the database
-        /// </summary>
-        /// <returns></returns>
-		protected SqlConnection CreateConnection() 
-		{
-			try 
-			{
-				if (connectionStr == null || connectionStr.Equals("")) 
-				{
-					// read connection string from the app settings
-					connectionStr
-                        = ConfigurationManager.AppSettings["sqlConnection"];
-					Console.WriteLine("DB_CONNECTION: " + connectionStr);
-				}
-			} 
-			catch (Exception e) 
-			{
-				writeEx(e);
-				throw;
-			}
-
-			// create an SqlConnection
-			SqlConnection connection = new SqlConnection(connectionStr);
-
-			try 
-			{
-				// open connection
-				connection.Open();
-			} 
-			catch (SqlException e) 
-			{
-				writeEx(e);
-				throw;
-			}
-			catch (InvalidOperationException e) 
-			{
-				writeEx(e);
-			}
-
-			return connection;
-		}
-
         /// <summary>
         ///  This agent's Web Service URL
         /// </summary>
@@ -215,7 +180,7 @@ namespace iLabs.Core
 		public bool AuthenticateCoupon(Coupon coupon)
 		{
 			bool status = false;
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
             connection.Open();
 			status = AuthenticateCoupon(connection,coupon);
 			connection.Close();
@@ -228,25 +193,23 @@ namespace iLabs.Core
         /// <param name="connection">an open connection</param>
         /// <param name="coupon"></param>
         /// <returns></returns>
-		public bool AuthenticateCoupon(SqlConnection connection, Coupon coupon){
+		public bool AuthenticateCoupon(DbConnection connection, Coupon coupon){
 
 			bool status = false;
 			try 
 			{
-				SqlCommand cmd = new SqlCommand("AuthenticateCoupon", connection);
+				DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "AuthenticateCoupon";
 				cmd.CommandType = CommandType.StoredProcedure;
-
 				// populate parameters
-				SqlParameter idParam = cmd.Parameters.Add("@couponid", SqlDbType.BigInt);
-				idParam.Value = coupon.couponId;
-				SqlParameter issuerParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.VarChar, 50);
-				issuerParam.Value = coupon.issuerGuid;
-				SqlParameter passKeyParam = cmd.Parameters.Add("@passKey", SqlDbType.VarChar, 100);
-				passKeyParam.Value = coupon.passkey;
+             
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponid", coupon.couponId, DbType.Int64));
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", coupon.passkey, DbType.AnsiString, 100));
 			
 				status = Convert.ToBoolean(cmd.ExecuteScalar());
 			}
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -260,7 +223,7 @@ namespace iLabs.Core
         /// <param name="coupon"></param>
 		public void InsertCoupon(Coupon coupon)
         {
-            SqlConnection connection = null;
+            DbConnection connection = null;
 
             try
             {
@@ -287,29 +250,25 @@ namespace iLabs.Core
 		/// </summary>
 		/// <param name="couponID"></param>
 		/// <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
-		public void InsertCoupon(SqlConnection connection, long id,string issuerGuid,string pass) 
+		public void InsertCoupon(DbConnection connection, long id,string issuerGuid,string pass) 
 		{
 
 			// create sql command
 			// command executes the "GetCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("InsertCoupon", connection);
+			DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "InsertCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponIdParam.Value = id;
-			SqlParameter couponGuidParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.VarChar, 50);
-			couponGuidParam.Value = issuerGuid;
-			SqlParameter passKeyParam = cmd.Parameters.Add("@passKey", SqlDbType.VarChar, 100);
-			passKeyParam.Value = pass;
-			
-			
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", id,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuid, DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", pass, DbType.AnsiString, 100));
 			try 
 			{
 				
 				cmd.ExecuteNonQuery();
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -317,7 +276,7 @@ namespace iLabs.Core
 	
 		}
 		
-		protected void InsertCoupon(SqlConnection connection, Coupon coupon)
+		protected void InsertCoupon(DbConnection connection, Coupon coupon)
 		{
 				InsertCoupon(connection,coupon.couponId,coupon.issuerGuid,coupon.passkey);
 		}
@@ -333,25 +292,24 @@ namespace iLabs.Core
 		{
 			bool status = false;
 			// create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "CancelCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("CancelCoupon", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "CancelCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponIdParam.Value = coupon.couponId;
-			SqlParameter issuerParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.BigInt);
-			couponIdParam.Value = coupon.issuerGuid;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID",coupon.issuerGuid, DbType.Int64));
 			// execute the command
             try
             {
                 connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -369,16 +327,16 @@ namespace iLabs.Core
         {
             int status = 0;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "DeleteCoupons" stored procedure
-            SqlCommand cmd = new SqlCommand("DeleteCoupons", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "DeleteCoupons";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar,50);
-            guidParam.Value = guid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString,50));
             
             // execute the command
             try
@@ -386,7 +344,7 @@ namespace iLabs.Core
                 connection.Open();
                 status = Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -410,7 +368,7 @@ namespace iLabs.Core
 		/// <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
 		public Coupon GetCoupon(long couponID, string issuerGuid) 
 		{
-            SqlConnection connection = null;
+            DbConnection connection = null;
             Coupon coupon = null;
 
             try
@@ -442,23 +400,22 @@ namespace iLabs.Core
 		/// <param name="issuerGuid"></param>
 		/// <param name="couponID"></param>
 		/// <returns>Retrieved Coupon, or null if the ticket cannot be found or has been cancelled</returns>
-		public Coupon GetCoupon(SqlConnection connection,long couponID, string issuerGuid) 
+		public Coupon GetCoupon(DbConnection connection,long couponID, string issuerGuid) 
 		{
             bool cancelled = false;
             Coupon coupon = null;
 
 			// command executes the "GetCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetCoupon", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "GetCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponIdParam.Value = couponID;
-			SqlParameter couponGuidParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.VarChar, 50);
-			couponGuidParam.Value = issuerGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuid,DbType.AnsiString, 50));
 
 			// read the result
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
 				dataReader = cmd.ExecuteReader();
@@ -494,14 +451,14 @@ namespace iLabs.Core
         {
 			Coupon coupon = null;
             bool cancelled = true;
-			SqlConnection connection = FactoryDB.GetConnection();
-			SqlCommand cmd = new SqlCommand("GetIdentInCoupon", connection);
+			DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText ="GetIdentInCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
-			SqlParameter guidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar,50);
-			guidParam.Value = agentGUID;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", agentGUID,DbType.AnsiString,50));
 			
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -543,14 +500,15 @@ namespace iLabs.Core
 		{
 			Coupon coupon = null;
             bool cancelled = true;
-			SqlConnection connection = FactoryDB.GetConnection();
-			SqlCommand cmd = new SqlCommand("GetIdentOutCoupon", connection);
+			DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "GetIdentOutCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
-			SqlParameter guidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar,50);
-			guidParam.Value = agentGUID;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", agentGUID, DbType.AnsiString,50));
+			
 			
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -563,7 +521,7 @@ namespace iLabs.Core
                     coupon.passkey = dataReader.GetString(2);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -671,26 +629,25 @@ namespace iLabs.Core
 		{
 			bool status = false;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "CancelTicket" stored procedure
-			SqlCommand cmd = new SqlCommand("CancelTicketByID", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "CancelTicketByID";
 			cmd.CommandType = CommandType.StoredProcedure;
 			// populate the parameters
-			SqlParameter couponIdParam = cmd.Parameters.Add("@ticketID", SqlDbType.BigInt);
-			couponIdParam.Value = ticket.ticketId;
-            SqlParameter issuerParam = cmd.Parameters.Add("@issuer", SqlDbType.VarChar,50);
-            issuerParam.Value = ticket.issuerGuid;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketID", ticket.ticketId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", ticket.issuerGuid, DbType.AnsiString,50));
 			
 			// execute the command
-			//SqlDataReader dataReader = null;
+			//DbDataReader dataReader = null;
             try
             {
                 connection.Open();
                 status = Convert.ToBoolean(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -716,30 +673,26 @@ namespace iLabs.Core
 		{
 			int status = -1;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "CancelTicket" stored procedure
-			SqlCommand cmd = new SqlCommand("CancelTicket", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "CancelTicket";
 			cmd.CommandType = CommandType.StoredProcedure;
 			// populate the parameters
-			SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar,100);
-			typeParam.Value = type;
-			SqlParameter redeemerParam = cmd.Parameters.Add("@redeemerGuid", SqlDbType.VarChar,50);
-			redeemerParam.Value = redeemerGUID;
-			SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponIdParam.Value = coupon.couponId;
-			SqlParameter issuerParam = cmd.Parameters.Add("@issuerGuid", SqlDbType.VarChar,50);
-			issuerParam.Value = coupon.issuerGuid;
-			
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type, DbType.AnsiString,100));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGuid", redeemerGUID, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGuid", coupon.issuerGuid,DbType.AnsiString,50));
+						
 			// execute the command
-			
             try
             {
                 connection.Open();
                 status = Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -766,21 +719,18 @@ namespace iLabs.Core
             int status = -1;
             int ccount = 0;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "CancelTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("DeleteTicket", connection);
+            DbCommand cmd =  connection.CreateCommand();
+            cmd.CommandText = "DeleteTicket";
             cmd.CommandType = CommandType.StoredProcedure;
             // populate the parameters
-            SqlParameter typeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            typeParam.Value = type;
-            SqlParameter redeemerParam = cmd.Parameters.Add("@redeemerGuid", SqlDbType.VarChar, 50);
-            redeemerParam.Value = redeemerGUID;
-            SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIdParam.Value = coupon.couponId;
-            SqlParameter issuerParam = cmd.Parameters.Add("@issuerGuid", SqlDbType.VarChar, 50);
-            issuerParam.Value = coupon.issuerGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGuid", redeemerGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@couponID", coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGuid", coupon.issuerGuid, DbType.AnsiString, 50));
 
             // execute the command
 
@@ -790,24 +740,24 @@ namespace iLabs.Core
                 status = Convert.ToInt32(cmd.ExecuteScalar());
                 cmd.Dispose();
                 if(status > 0){
-                    cmd = new SqlCommand("GetCouponCollectionCount", connection);
+                    cmd =  connection.CreateCommand();
+                    cmd.CommandText = "GetCouponCollectionCount";
                     cmd.CommandType = CommandType.StoredProcedure;
-                    SqlParameter coupIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-                    SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar,50);
-                    coupIDParam.Value = coupon.couponId;
-                    guidParam.Value = coupon.issuerGuid;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", coupon.issuerGuid, DbType.AnsiString,50));
+                    
                     int collectioncount = Convert.ToInt32(cmd.ExecuteScalar());
                     if (collectioncount == 0)
                     {
                         cmd.Dispose();
-                 
-                        cmd = new SqlCommand("DeleteCoupon", connection);
+
+                        cmd = connection.CreateCommand();
+                        cmd.CommandText = "DeleteCoupon";
                         cmd.CommandType = CommandType.StoredProcedure;
                         //cmd.Transaction = transaction;
-                        coupIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-                        guidParam = cmd.Parameters.Add("@issuerGuid", SqlDbType.VarChar, 50);
-                        coupIDParam.Value = coupon.couponId;
-                        guidParam.Value = coupon.issuerGuid;
+                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGuid", coupon.issuerGuid,DbType.AnsiString, 50));
+                        
                         ccount = Convert.ToInt32(cmd.ExecuteScalar());
                           
                     }
@@ -816,7 +766,7 @@ namespace iLabs.Core
                 Utilities.WriteLog("DeleteTicket: ticketCount=" + status + " \tcouponCount=" + ccount);
             }
             
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -834,15 +784,15 @@ namespace iLabs.Core
         {
             int status = 0;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
-            SqlCommand cmd = new SqlCommand("DeleteTickets", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "DeleteTickets";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-            guidParam.Value = guid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString, 50));
 
             // execute the command
             try
@@ -850,7 +800,7 @@ namespace iLabs.Core
                 connection.Open();
                 status = Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -873,42 +823,32 @@ namespace iLabs.Core
         {
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // command executes the "InsertTicket" stored procedure
-            SqlCommand cmd = new SqlCommand("InsertTicket", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "InsertTicket";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter ticketIDParam = cmd.Parameters.Add("@ticketID", SqlDbType.BigInt);
-            ticketIDParam.Value = ticket.ticketId;
-            SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-            ticketTypeParam.Value = ticket.type;
-            SqlParameter couponIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            couponIDParam.Value = ticket.couponId;
-            SqlParameter issuerIDParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.VarChar, 50);
-            issuerIDParam.Value = ticket.issuerGuid.ToString();
-            SqlParameter redeemerIDParam = cmd.Parameters.Add("@redeemerGUID", SqlDbType.VarChar, 50);
-            redeemerIDParam.Value = ticket.redeemerGuid.ToString();
-            SqlParameter sponsorIDParam = cmd.Parameters.Add("@sponsorGUID", SqlDbType.VarChar, 50);
-            sponsorIDParam.Value = ticket.sponsorGuid.ToString();
-            SqlParameter payloadParam = cmd.Parameters.Add("@payload", SqlDbType.Text);
-            payloadParam.Value = ticket.payload;
-
-            SqlParameter cancelledParam = cmd.Parameters.Add("@cancelled", SqlDbType.Bit);
-            cancelledParam.Value = 0;
-            SqlParameter creationTimeParam = cmd.Parameters.Add("@creationTime", SqlDbType.DateTime);
-            creationTimeParam.Value = ticket.creationTime;
-
-            SqlParameter durationParam = cmd.Parameters.Add("@duration", SqlDbType.BigInt);
-            durationParam.Value = ticket.duration;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketID", ticket.ticketId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticket.type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", ticket.couponId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", ticket.issuerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGUID", ticket.redeemerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sponsorGUID", ticket.sponsorGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@payload",ticket.payload, DbType.String));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cancelled",0, DbType.Boolean));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@creationTime",ticket.creationTime, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@duration", ticket.duration,DbType.Int64));
+            
             long id = -1;
             try
             {
                 connection.Open();
                 id = Convert.ToInt64(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -934,25 +874,22 @@ namespace iLabs.Core
 		{
 			Ticket result = null;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveTicket" stored procedure
-			SqlCommand cmd = new SqlCommand("GetTicket", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "GetTicket";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			SqlParameter couponIdParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponIdParam.Value = coupon.couponId;
-			SqlParameter issuerIdParam = cmd.Parameters.Add("@issuer", SqlDbType.VarChar, 50);
-			issuerIdParam.Value = coupon.issuerGuid;
-            SqlParameter redeemerIdParam = cmd.Parameters.Add("@redeemer", SqlDbType.VarChar, 50);
-            redeemerIdParam.Value = redeemerGUID;
-			SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-			ticketTypeParam.Value = ticketType;    
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", coupon.issuerGuid,DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType,DbType.AnsiString, 100)); 
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -983,7 +920,7 @@ namespace iLabs.Core
                 }
 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1008,18 +945,18 @@ namespace iLabs.Core
             Ticket ticket = null;
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveTicketsByType" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveTicketsByType", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText= "RetrieveTicketsByType";
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar,100);
-			ticketTypeParam.Value = ticketType;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType,DbType.AnsiString,100));
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -1052,7 +989,7 @@ namespace iLabs.Core
                         ticketsList.Add(ticket);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1079,20 +1016,19 @@ namespace iLabs.Core
             Ticket ticket = new Ticket();
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveTickets" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveTickets", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "RetrieveTickets";
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			SqlParameter couponIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-			couponIDParam.Value = coupon.couponId;
-			SqlParameter issuerParam = cmd.Parameters.Add("@issuer", SqlDbType.VarChar,50);
-			issuerParam.Value = coupon.issuerGuid;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", coupon.issuerGuid, DbType.AnsiString,50));
+			
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -1125,7 +1061,7 @@ namespace iLabs.Core
                         ticketsList.Add(ticket);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1150,15 +1086,16 @@ namespace iLabs.Core
             TicketType ticketType = null;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveTicketsByType" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveTicketTypes", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "RetrieveTicketTypes";
             cmd.CommandType = CommandType.StoredProcedure;
             
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -1180,7 +1117,7 @@ namespace iLabs.Core
                     ticketTypesList.Add(ticketType);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1219,20 +1156,21 @@ namespace iLabs.Core
 
             // Get all Expired Ticket information
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlTransaction transaction = null;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbTransaction transaction = null;
             try
             {
                 connection.Open();
                 transaction = connection.BeginTransaction();
 
                 // create sql command
-                SqlCommand cmd = new SqlCommand("GetExpiredTickets", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText =  "GetExpiredTickets";
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Transaction = transaction;
 
                 // execute the command
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
 
 
                 dataReader = cmd.ExecuteReader();
@@ -1255,11 +1193,14 @@ namespace iLabs.Core
                 if (tickets.Count > 0)
                 {
                     Utilities.WriteLog("ProcessExpiredTickets: expired count = " + tickets.Count);
-                    cmd = new SqlCommand("DeleteTicketByID", connection);
+                    cmd = connection.CreateCommand();
+                    cmd.CommandText = "DeleteTicketByID";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Transaction = transaction;
-                    SqlParameter ticketIDParam = cmd.Parameters.Add("@ticketID", SqlDbType.BigInt);
-                    SqlParameter issuerParam = cmd.Parameters.Add("@issuer", SqlDbType.VarChar, 50);
+                    DbParameter ticketIDParam = FactoryDB.CreateParameter(cmd,"@ticketID", null, DbType.Int64);
+                    cmd.Parameters.Add(ticketIDParam);
+                    DbParameter issuerParam = FactoryDB.CreateParameter(cmd,"@issuer", null, DbType.AnsiString, 50);
+                    cmd.Parameters.Add(issuerParam);
                     foreach (LongTag tag in tickets)
                     {
                         ticketIDParam.Value = tag.id;
@@ -1269,11 +1210,14 @@ namespace iLabs.Core
 
                     }
                     cmd.Dispose();
-                    cmd = new SqlCommand("GetCouponCollectionCount", connection);
+                    cmd = connection.CreateCommand();
+                    cmd.CommandText = "GetCouponCollectionCount";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Transaction = transaction;
-                    SqlParameter couponIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-                    SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
+                    DbParameter couponIDParam = FactoryDB.CreateParameter(cmd,"@couponID", null, DbType.Int64);
+                    cmd.Parameters.Add(couponIDParam);
+                    DbParameter guidParam = FactoryDB.CreateParameter(cmd,"@guid", null, DbType.AnsiString, 50);
+                    cmd.Parameters.Add(guidParam);
 
                     foreach (Coupon c in coupons)
                     {
@@ -1289,13 +1233,15 @@ namespace iLabs.Core
                         }
                     }
                     cmd.Dispose();
-                    if (remove.Count > 0)
-                    {
-                        cmd = new SqlCommand("DeleteCoupon", connection);
+                    if (remove.Count > 0){
+                        cmd = connection.CreateCommand();
+                        cmd.CommandText = "DeleteCoupon";
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Transaction = transaction;
-                        couponIDParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-                        guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
+                        couponIDParam = FactoryDB.CreateParameter(cmd,"@couponID", null, DbType.Int64);
+                        cmd.Parameters.Add(couponIDParam);
+                        guidParam = FactoryDB.CreateParameter(cmd,"@guid", null, DbType.AnsiString, 50);
+                        cmd.Parameters.Add(guidParam);
                         foreach (Coupon co in remove)
                         {
                             couponIDParam.Value = co.couponId;
@@ -1331,40 +1277,36 @@ namespace iLabs.Core
         public void SetIdentCoupons(string agentGuid, long inId, long outId, string issuerGuid)
         {
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "SetIdentificationCouponID" stored procedure
-            SqlCommand cmd = new SqlCommand("SetIdentCoupons", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "SetIdentCoupons";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate params
-            SqlParameter processAgentGuidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar, 50);
-            processAgentGuidParam.Value = agentGuid;
-
-            SqlParameter inIdParam = cmd.Parameters.Add("@inID", SqlDbType.BigInt);
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", agentGuid, DbType.AnsiString, 50));
+            
             if(inId > 0)
-            inIdParam.Value = inId;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", inId,DbType.Int64));
             else
-            inIdParam.Value = null;
-            SqlParameter outIdParam = cmd.Parameters.Add("@outID", SqlDbType.BigInt);
+               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", null,DbType.Int64));
             if(outId > 0)
-            outIdParam.Value = outId;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", outId,DbType.Int64));
             else
-                outIdParam.Value = null;
-
-            SqlParameter issuerGuidParam = cmd.Parameters.Add("@issuerGUID", SqlDbType.VarChar, 50);
+               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", null,DbType.Int64));
             if (issuerGuid != null && issuerGuid.Length > 0)
-                issuerGuidParam.Value = issuerGuid;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuid,DbType.AnsiString, 50));
             else
-                issuerGuidParam.Value = null;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", null, DbType.AnsiString, 50));
             // execute the command
             try
             {
                 connection.Open();
                 cmd.ExecuteNonQuery();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw e;
@@ -1381,20 +1323,19 @@ namespace iLabs.Core
         public void SetIdentInCouponID(string guid, long id)
         {
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "SetIdentificationCouponID" stored procedure
-            SqlCommand cmd = new SqlCommand("SetIdentInCouponID", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SetIdentInCouponID";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate GUID param
-            SqlParameter processAgentGuidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar, 50);
-            processAgentGuidParam.Value = guid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", guid, DbType.AnsiString, 50));
 
             // populate coupon id param
-            SqlParameter couponIdParam = cmd.Parameters.Add("@ID", SqlDbType.BigInt);
-            couponIdParam.Value = id;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", id, DbType.Int64));
 
             // execute the command
             try
@@ -1402,7 +1343,7 @@ namespace iLabs.Core
                 connection.Open();
                 cmd.ExecuteNonQuery();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw e;
@@ -1418,20 +1359,19 @@ namespace iLabs.Core
         public void SetIdentOutCouponID(string guid, long id)
         {
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "SetIdentificationCouponID" stored procedure
-            SqlCommand cmd = new SqlCommand("SetIdentOutCouponID", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SetIdentOutCouponID";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate GUID param
-            SqlParameter processAgentGuidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar, 50);
-            processAgentGuidParam.Value = guid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", guid,DbType.AnsiString, 50));
 
             // populate coupon id param
-            SqlParameter couponIdParam = cmd.Parameters.Add("@ID", SqlDbType.BigInt);
-            couponIdParam.Value = id;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", id,DbType.Int64));
 
             // execute the command
             try
@@ -1439,7 +1379,7 @@ namespace iLabs.Core
                 connection.Open();
                 cmd.ExecuteNonQuery();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw e;
@@ -1515,24 +1455,24 @@ namespace iLabs.Core
 
         public int RemoveDomainCredentials(string domainGuid, string agentGuid){
             int status = -1;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "RetrieveTickets" stored procedure
-                SqlCommand cmd = new SqlCommand("RemoveDomainCredentials", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "RemoveDomainCredentials";
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter domainParam = cmd.Parameters.Add("@domainGuid", SqlDbType.VarChar,50);
-                domainParam.Value = domainGuid;
-                SqlParameter agentParam = cmd.Parameters.Add("@agentGuid", SqlDbType.VarChar,50);
-                agentParam.Value = agentGuid;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domainGuid", domainGuid,DbType.AnsiString,50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGuid",agentGuid, DbType.AnsiString,50));
+                
                 // execute the command
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
                 if (obj != null)
                     status = Convert.ToInt32(obj);
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1551,6 +1491,22 @@ namespace iLabs.Core
             {
                 status = UpdateProcessAgent(id, agent.agentGuid, agent.agentName, agent.type, agent.domainGuid,
                     agent.codeBaseUrl, agent.webServiceUrl);
+                if (extra != null && extra.Length > 0)
+                {
+                    try
+                    {
+                        SystemSupport systemSupport = SystemSupport.Parse(extra);
+                        if (systemSupport != null && systemSupport.agentGuid.CompareTo(agent.agentGuid) == 0)
+                        {
+                            SaveSystemSupport(systemSupport.agentGuid, systemSupport.contactEmail, systemSupport.bugEmail,
+                                systemSupport.infoUrl, systemSupport.description, systemSupport.location);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Utilities.WriteLog("InstallDomainCredentials: Error on systemSupport - " + e.Message);
+                    }
+                }
             }
 
             return status;
@@ -1560,23 +1516,24 @@ namespace iLabs.Core
         {
             string name = null;
             // create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try
 			{
 				// create sql command
 				// command executes the "RetrieveTickets" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentName", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentName";
 				cmd.CommandType = CommandType.StoredProcedure;
 				
-                SqlParameter idParam = cmd.Parameters.Add("@agentID", SqlDbType.Int);
-            idParam.Value = id;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentID", id, DbType.Int32));
+          
 				// execute the command
                 connection.Open();
 				Object obj = cmd.ExecuteScalar();
                 if(obj != null)
                 name = obj.ToString();
 			}
-			catch( SqlException)
+			catch( DbException)
 			{
 				throw;
 			}
@@ -1591,20 +1548,19 @@ namespace iLabs.Core
         {
             string name = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "RetrieveTickets" stored procedure
-                SqlCommand cmd = new SqlCommand("GetProcessAgentNameWithType", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentNameWithType";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                SqlParameter idParam = cmd.Parameters.Add("@agentID", SqlDbType.Int);
-                idParam.Value = id;
-                // execute the command
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@agentID", id, DbType.Int32));
 
                 // execute the command
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
@@ -1612,7 +1568,7 @@ namespace iLabs.Core
                     name = dataReader.GetString(0) +": " + dataReader.GetString(1);
                 }			
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1632,16 +1588,17 @@ namespace iLabs.Core
 			ArrayList list = new ArrayList();
 			IntTag tag = new IntTag();
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try
 			{
 				// create sql command
 				// command executes the "RetrieveTickets" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentTags", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentTags";
 				cmd.CommandType = CommandType.StoredProcedure;
 				
 				// execute the command
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 				while (dataReader.Read()) 
@@ -1652,7 +1609,7 @@ namespace iLabs.Core
 					list.Add(tag);
 				}			
 			}
-			catch( SqlException)
+			catch( DbException)
 			{
 				throw;
 			}
@@ -1674,17 +1631,18 @@ namespace iLabs.Core
             ArrayList list = new ArrayList();
             IntTag tag = new IntTag();
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "RetrieveTickets" stored procedure
-                SqlCommand cmd = new SqlCommand("GetDomainProcessAgentTags", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetDomainProcessAgentTags";
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 50);
-                domainParam.Value = domainGuid;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                
                 // execute the command
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
@@ -1695,7 +1653,7 @@ namespace iLabs.Core
                     list.Add(tag);
                 }
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1715,17 +1673,18 @@ namespace iLabs.Core
 			ArrayList list = new ArrayList();
 			IntTag tag = new IntTag();
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
            
 			try
 			{
 				// create sql command
 				// command executes the "RetrieveTickets" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentTagsWithType", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentTagsWithType";
 				cmd.CommandType = CommandType.StoredProcedure;
 				
 				// execute the command
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 				while (dataReader.Read()) 
@@ -1736,7 +1695,7 @@ namespace iLabs.Core
 					list.Add(tag);
 				}			
 			}
-			catch( SqlException)
+			catch( DbException)
 			{
 				throw;
 			}
@@ -1757,19 +1716,19 @@ namespace iLabs.Core
             ArrayList list = new ArrayList();
             IntTag tag = new IntTag();
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
                 // create sql command
                 // command executes the "RetrieveTickets" stored procedure
-                SqlCommand cmd = new SqlCommand("GetDomainProcessAgentTagsWithType", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetDomainProcessAgentTagsWithType";
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 50);
-                domainParam.Value = domainGuid;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain",domainGuid,DbType.AnsiString, 50));
+                
                 // execute the command
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
@@ -1780,7 +1739,7 @@ namespace iLabs.Core
                     list.Add(tag);
                 }
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1802,12 +1761,13 @@ namespace iLabs.Core
 
             IntTag tag = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("GetProcessAgentTagByGuid", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "GetProcessAgentTagByGuid";
             cmd.CommandType = CommandType.StoredProcedure;
-            SqlParameter processAgentIdParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-            processAgentIdParam.Value = guid;
-            SqlDataReader dataReader = null;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+            
+            DbDataReader dataReader = null;
             try
             {
                 // execute the command
@@ -1822,7 +1782,7 @@ namespace iLabs.Core
                 }
                 dataReader.Close();
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1843,17 +1803,15 @@ namespace iLabs.Core
 
             IntTag tag = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("GetProcessAgentTagsWithTypeByGuid", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "GetProcessAgentTagsWithTypeByGuid";
             cmd.CommandType = CommandType.StoredProcedure;
-            SqlParameter processAgentIdParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-            processAgentIdParam.Value = guid;
-            SqlDataReader dataReader = null;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@guid", guid, DbType.AnsiString, 50));
+            
+            DbDataReader dataReader = null;
             try
             {
-
-                
-
                 // execute the command
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
@@ -1866,7 +1824,7 @@ namespace iLabs.Core
                 }
                 dataReader.Close();
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1884,20 +1842,17 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag GetProcessAgentTagWithType(int paId)
         {
-         
             IntTag tag = null;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("GetProcessAgentTagsWithTypeById", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "GetProcessAgentTagsWithTypeById";
             cmd.CommandType = CommandType.StoredProcedure;
-            SqlParameter processAgentIdParam = cmd.Parameters.Add("@agentID", SqlDbType.VarChar, 50);
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@agentID", paId, DbType.AnsiString, 50));
 
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
-             
-                    processAgentIdParam.Value = paId;
-
                     // execute the command
                     connection.Open();
                     dataReader = cmd.ExecuteReader();
@@ -1910,7 +1865,7 @@ namespace iLabs.Core
                     }
                     dataReader.Close();   
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1928,15 +1883,17 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag[] GetProcessAgentTagsWithType(int []paIds)
         {
-            ArrayList list = new ArrayList();
-            IntTag tag = new IntTag();
+            List<IntTag> list = new List<IntTag>();
+          
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("GetProcessAgentTagsWithTypeById", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "GetProcessAgentTagsWithTypeById";
             cmd.CommandType = CommandType.StoredProcedure;
-            SqlParameter processAgentIdParam = cmd.Parameters.Add("@agentID", SqlDbType.VarChar, 50);
+            DbParameter processAgentIdParam = FactoryDB.CreateParameter(cmd,"@agentID", null, DbType.AnsiString, 50);
+            cmd.Parameters.Add(processAgentIdParam);
             
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 for (int i = 0; i < paIds.Length; i++)
@@ -1948,7 +1905,7 @@ namespace iLabs.Core
                     dataReader = cmd.ExecuteReader();
                     while (dataReader.Read())
                     {
-                        tag = new IntTag();
+                        IntTag tag = new IntTag();
                         tag.id = dataReader.GetInt32(0);
                         tag.tag = dataReader.GetString(1) + ": " + dataReader.GetString(2);
                         list.Add(tag);
@@ -1956,7 +1913,7 @@ namespace iLabs.Core
                     dataReader.Close();
                 }
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -1964,8 +1921,7 @@ namespace iLabs.Core
             {
                 connection.Close();
             }
-            IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-            return info;
+            return list.ToArray();
         }
         /// <summary>
         /// return tags for all aprocessAgents of typeID
@@ -1977,17 +1933,18 @@ namespace iLabs.Core
 			ArrayList list = new ArrayList();
 			IntTag tag = new IntTag();
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try
 			{
 				// create sql command
 				// command executes the "RetrieveTickets" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentTagsByTypeID", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentTagsByTypeID";
 				cmd.CommandType = CommandType.StoredProcedure;
-				SqlParameter typeParam = cmd.Parameters.Add("@typeID", SqlDbType.Int);
-				typeParam.Value = typeID;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@typeID", typeID, DbType.Int32));
+				
 				// execute the command
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 				while (dataReader.Read()) 
@@ -1998,7 +1955,7 @@ namespace iLabs.Core
 					list.Add(tag);
 				}			
 			}
-			catch( SqlException)
+			catch( DbException)
 			{
 				throw;
 			}
@@ -2017,20 +1974,22 @@ namespace iLabs.Core
         /// <returns></returns>
 		public IntTag[] GetProcessAgentTagsByType(int[] typeIDs)
 		{
-			ArrayList list = new ArrayList();
-			IntTag tag = new IntTag();
+			List<IntTag> list = new List<IntTag>();
+		
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try
 			{
 				// create sql command
 				// command executes the "RetrieveTickets" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentTagsByTypeID", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText =  "GetProcessAgentTagsByTypeID";
 				cmd.CommandType = CommandType.StoredProcedure;
-				SqlParameter typeParam = cmd.Parameters.Add("@typeID", SqlDbType.Int);
+				DbParameter typeParam = FactoryDB.CreateParameter(cmd,"@typeID", null, DbType.Int32);
+                cmd.Parameters.Add(typeParam);
 				
 				// execute the command
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				foreach( int i in typeIDs)
 				{
@@ -2038,14 +1997,14 @@ namespace iLabs.Core
 					dataReader = cmd.ExecuteReader();
 					while (dataReader.Read()) 
 					{
-						tag = new IntTag();
+						IntTag tag = new IntTag();
 						tag.id = dataReader.GetInt32(0);
 						tag.tag = dataReader.GetString(1);
 						list.Add(tag);
 					}
 				}
 			}
-			catch( SqlException)
+			catch( DbException)
 			{
 				throw;
 			}
@@ -2053,8 +2012,7 @@ namespace iLabs.Core
 			{
 				connection.Close();
 			}
-			IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-			return info;
+			return list.ToArray();
 		}
         /// <summary>
         /// Return all ProcessAgent tags for the specified type.
@@ -2066,18 +2024,18 @@ namespace iLabs.Core
 			ArrayList list = new ArrayList();
 			IntTag tag = new IntTag();
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try
 			{
 				// create sql command
                 // command executes the "GetProcessAgentTagsByType" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentTagsByType", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText= "GetProcessAgentTagsByType";
 				cmd.CommandType = CommandType.StoredProcedure;
-				SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar,100);
-				typeParam.Value = type;
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type,DbType.AnsiString,100));
 				
 				// execute the command
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 				while (dataReader.Read()) 
@@ -2088,7 +2046,7 @@ namespace iLabs.Core
 					list.Add(tag);
 				}			
 			}
-			catch( SqlException)
+			catch( DbException)
 			{
 				throw;
 			}
@@ -2109,19 +2067,19 @@ namespace iLabs.Core
             ArrayList list = new ArrayList();
             IntTag tag = new IntTag();
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "GetProcessAgentTagsByType" stored procedure
-                SqlCommand cmd = new SqlCommand("GetDomainProcessAgentTagsByType", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetDomainProcessAgentTagsByType";
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-                typeParam.Value = type;
-                SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 50);
-                domainParam.Value = domainGuid;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type,DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+               
                 // execute the command
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
@@ -2132,7 +2090,7 @@ namespace iLabs.Core
                     list.Add(tag);
                 }
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -2154,20 +2112,20 @@ namespace iLabs.Core
             int typeID = -1;
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveProcessAgentTypeID" stored procedure
-			SqlCommand cmd = new SqlCommand("RetrieveProcessAgentTypeID", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "RetrieveProcessAgentTypeID";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameter
 			// 1. type
-			SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-			typeParam.Value = processAgentType;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", processAgentType,DbType.AnsiString, 100));
+			
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -2179,7 +2137,7 @@ namespace iLabs.Core
                     typeID = Convert.ToInt32(dataReader.GetValue(0));
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -2202,7 +2160,7 @@ namespace iLabs.Core
         /// </summary>
         /// <param name="dataReader"></param>
         /// <returns></returns>
-        protected ProcessAgent readProcessAgent(SqlDataReader dataReader)
+        protected ProcessAgent readProcessAgent(DbDataReader dataReader)
         {
             ProcessAgent agent = new ProcessAgent();
             long id = dataReader.GetInt32(0);
@@ -2232,21 +2190,22 @@ namespace iLabs.Core
 		public ProcessAgent[] GetProcessAgents()
 		{
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveProcessAgentDescriptor" stored procedure
-			SqlCommand cmd = new SqlCommand("GetProcessAgents", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText= "GetProcessAgents";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -2276,18 +2235,19 @@ namespace iLabs.Core
         ProcessAgent agent = null;
 
 	    // create sql connection
-	    SqlConnection connection = FactoryDB.GetConnection();
+	    DbConnection connection = FactoryDB.GetConnection();
 
 	    // create sql command
 	    // command executes the "RetrieveProcessAgentDescriptors" stored procedure
-	    SqlCommand cmd = new SqlCommand("GetProcessAgentsByType", connection);
+        DbCommand cmd = connection.CreateCommand();
+        cmd.CommandText = "GetProcessAgentsByType";
 	    cmd.CommandType = CommandType.StoredProcedure;	
 
-	    SqlParameter typeParam = cmd.Parameters.Add("@agentType", SqlDbType.VarChar, 100);
-	    typeParam.Value = agentType;
+	    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentType",agentType, DbType.AnsiString, 100));
+	    
 
 	    // execute the command
-	    SqlDataReader dataReader = null;
+	    DbDataReader dataReader = null;
         try
         {
             connection.Open();
@@ -2300,7 +2260,7 @@ namespace iLabs.Core
                 list.Add(agent);
             }
         }
-        catch (SqlException e)
+        catch (DbException e)
         {
             writeEx(e);
             throw;
@@ -2325,7 +2285,7 @@ namespace iLabs.Core
 		public ProcessAgent GetProcessAgent(int id)
 		{
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
             ProcessAgent agent = GetProcessAgent(connection, id);
 
@@ -2337,20 +2297,20 @@ namespace iLabs.Core
         /// <summary>
         /// Retrieve a process agent record from the database by it's local ID
         /// </summary>
-        public ProcessAgent GetProcessAgent(SqlConnection connection, int id)
+        public ProcessAgent GetProcessAgent(DbConnection connection, int id)
         {
             ProcessAgent agent = null;
 
             // create sql command
             // command executes the "RetrieveProcessAgentDescriptor" stored procedure
-            SqlCommand cmd = new SqlCommand("GetProcessAgentByID", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "GetProcessAgentByID";
             cmd.CommandType = CommandType.StoredProcedure;
 
-            SqlParameter idParam = cmd.Parameters.Add("@ID", SqlDbType.Int);
-            idParam.Value = id;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", id, DbType.Int32));
 
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try{
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
@@ -2361,7 +2321,7 @@ namespace iLabs.Core
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -2386,18 +2346,18 @@ namespace iLabs.Core
             ProcessAgent agent = null;
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveProcessAgentDescriptor" stored procedure
-			SqlCommand cmd = new SqlCommand("GetProcessAgent", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText =  "GetProcessAgent";
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			SqlParameter guidParam = cmd.Parameters.Add("@agentGUID", SqlDbType.VarChar, 50);
-			guidParam.Value = guid.ToString();
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID",guid, DbType.AnsiString, 50));
 
 			// execute the command
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -2408,7 +2368,7 @@ namespace iLabs.Core
                     agent = readProcessAgent(dataReader);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -2445,7 +2405,7 @@ namespace iLabs.Core
              Coupon inCoupon, Coupon outCoupon) 
 		{
 			int id = -1;
-            SqlConnection connection = null;
+            DbConnection connection = null;
 
             try
             {
@@ -2484,8 +2444,8 @@ namespace iLabs.Core
         /// <param name="inCoupon"></param>
         /// <param name="outCoupon"></param>
 		/// <returns>An int status flag, negative numbers are errors</returns>
-		/// <exception>Throws SqlException</exception>
-		protected int InsertProcessAgent(SqlConnection connection, string guid, string name, string processAgentType, 
+		/// <exception>Throws DbException</exception>
+		protected int InsertProcessAgent(DbConnection connection, string guid, string name, string processAgentType, 
             string domainGuid, string codeBaseUrl, string webServiceUrl,
             Coupon inCoupon, Coupon outCoupon)
 		{
@@ -2510,18 +2470,18 @@ namespace iLabs.Core
 			try 
 			{
 			// command executes the "RetrieveProcessAgentTypeID" stored procedure
-			SqlCommand cmd = new SqlCommand("GetProcessAgentTypeID", connection);
+			DbCommand cmd =  connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentTypeID";
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameter
 			// 1. type
-			SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-			typeParam.Value = processAgentType;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", processAgentType, DbType.AnsiString, 100));
 
 			// execute the command
 			typeID  = Convert.ToInt32(cmd.ExecuteScalar());
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -2537,58 +2497,46 @@ namespace iLabs.Core
 
 					// create sql command
 					// command executes the "InsertProcessAgent" stored procedure
-					SqlCommand cmd = new SqlCommand("InsertProcessAgent", connection);
+                    DbCommand cmd = connection.CreateCommand();
+                    cmd.CommandText = "InsertProcessAgent";
 					cmd.CommandType = CommandType.StoredProcedure;
 
 					// populate parameters
 					// 2. processAgentType
-					SqlParameter processAgentTypeParam = cmd.Parameters.Add("@processAgentType", SqlDbType.VarChar,100);
-					processAgentTypeParam.Value = processAgentType;
+					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentType", processAgentType,DbType.AnsiString,100));
+					
 					// 1. guid
-					SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-					guidParam.Value = guid;
-					SqlParameter nameParam = cmd.Parameters.Add("@name", SqlDbType.VarChar, 100);
-                    if (name != null)
-                        nameParam.Value = name;
-                    else
-                        nameParam.Value = System.DBNull.Value;
-
-                    SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 50);
-                    domainParam.Value = domainGuid;
+					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+					
+					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name, DbType.String, 256));
+                    
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                    
 					// 4. webServiceURL
-					SqlParameter webServiceParam = cmd.Parameters.Add("@webServiceURL", SqlDbType.VarChar, 256);
-					webServiceParam.Value = webServiceUrl;
+					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceURL", webServiceUrl, DbType.String, 512));
+					
 					// 5. redirectURL
-					SqlParameter applicationURLParam = cmd.Parameters.Add("@codeBaseURL", SqlDbType.VarChar, 256);
-                    if (codeBaseUrl != null)
-                        applicationURLParam.Value = codeBaseUrl;
-                    else
-                        applicationURLParam.Value = System.DBNull.Value;
+					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseURL", codeBaseUrl, DbType.String, 512));
+                    
                     // 9. issuerGUID
-                    SqlParameter issuerParam = cmd.Parameters.Add("@issuer", SqlDbType.VarChar, 50);
-                    if (issuerGuid != null)
-                        issuerParam.Value = issuerGuid;
-                    else
-                        issuerParam.Value = System.DBNull.Value;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", issuerGuid, DbType.AnsiString, 50));
+                   
                     // if inCoupon is null and outCoupon is null, then the processAgent is from another domain
                     // 10. inCouponID
-                    SqlParameter idInParam = cmd.Parameters.Add("@inID", SqlDbType.BigInt);
                     if (inCoupon != null)
-                        idInParam.Value = inCoupon.couponId;
+                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", inCoupon.couponId, DbType.Int64));
                     else
-                        idInParam.Value = DBNull.Value;
-
+                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", null, DbType.Int64));
                     // 11. OutCouponID
-                    SqlParameter idOutParam = cmd.Parameters.Add("@outID", SqlDbType.BigInt);
-                    if (outCoupon != null)    
-                        idOutParam.Value = outCoupon.couponId;
+                    if (outCoupon != null) 
+                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", outCoupon.couponId, DbType.Int64));
                     else
-                        idOutParam.Value = DBNull.Value;
+                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", null, DbType.Int64));
 
 					// execute the command
 			    	itemID = Convert.ToInt32(cmd.ExecuteScalar());
 				} 
-				catch (SqlException e) 
+				catch (DbException e) 
 				{
 					writeEx(e);
 					throw;
@@ -2599,21 +2547,20 @@ namespace iLabs.Core
         public int SetProcessAgentRetired(string guid, bool state)
         {
              int status = -1;
-            SqlConnection connection = null;
+            DbConnection connection = null;
 
             try
             {
                 connection = FactoryDB.GetConnection();
                 connection.Open();
-                SqlCommand cmd = new SqlCommand("SetProcessAgentRetired", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText =  "SetProcessAgentRetired";
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-                  SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                guidParam.Value = guid;
-                SqlParameter stateParam = cmd.Parameters.Add("@state", SqlDbType.Bit);
-                stateParam.Value =state;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@state", state, DbType.Boolean));
+               
                 // execute the command
                 status = Convert.ToInt32(cmd.ExecuteScalar());
             }
@@ -2634,20 +2581,19 @@ namespace iLabs.Core
         public int SetSelfState(string guid, bool state)
         {
             int status = -1;
-            SqlConnection connection = null;
+            DbConnection connection = null;
 
             try
             {
                 connection = FactoryDB.GetConnection();
-                
-                SqlCommand cmd = new SqlCommand("SetSelfState", connection);
+
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText= "SetSelfState";
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-                SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                guidParam.Value = guid;
-                SqlParameter stateParam = cmd.Parameters.Add("@state", SqlDbType.Bit);
-                stateParam.Value = state;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@state",state, DbType.Boolean));
 
                 // execute the command
                 connection.Open();
@@ -2668,24 +2614,24 @@ namespace iLabs.Core
         }
 
         /// <summary>
-        /// Retrieve a process agent record from the database, by it's Guid
+        /// Retrieve this process agent's record from the database
         /// </summary>
-        /// <param name="guid">The Guid id of the static process agent</param>
         /// <returns>Object that represents the retrieved static process agent</returns>
         public ProcessAgent GetSelfProcessAgent()
         {
             ProcessAgent agent = null;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveProcessAgentDescriptor" stored procedure
-            SqlCommand cmd = new SqlCommand("ReadSelfProcessAgent", connection);
+            DbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "ReadSelfProcessAgent";
             cmd.CommandType = CommandType.StoredProcedure;
 
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -2696,7 +2642,7 @@ namespace iLabs.Core
                     agent = readProcessAgent(dataReader);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -2728,7 +2674,7 @@ namespace iLabs.Core
             string applicationURL,  string webserviceURL)
         {
             int id = -1;
-            SqlConnection connection = null;
+            DbConnection connection = null;
 
             try
             {
@@ -2756,7 +2702,7 @@ namespace iLabs.Core
         /// may be the same the same. Registering the domainServer will overwrite the domainGuid.
         /// THis method should not be called after a domainServer has been registed.
         /// </summary>
-        public int SelfRegisterProcessAgent(SqlConnection connection, string guid, string name,
+        public int SelfRegisterProcessAgent(DbConnection connection, string guid, string name,
             string processAgentType, string domainGuid,string codebaseURL, string webserviceURL)
         {
             int typeID = -1;
@@ -2766,18 +2712,18 @@ namespace iLabs.Core
             {
                 // Check if the type is valid
                 // command executes the "RetrieveProcessAgentTypeID" stored procedure
-                SqlCommand cmd = new SqlCommand("GetProcessAgentTypeID", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "GetProcessAgentTypeID";
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
                 // 1. type
-                SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-                typeParam.Value = processAgentType;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", processAgentType, DbType.AnsiString, 100));
+           
                 // execute the command
                 typeID = Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -2788,40 +2734,29 @@ namespace iLabs.Core
                 {
                     // create sql command
                     // command executes the "WriteSelfProcessAgent" stored procedure
-                    SqlCommand cmd = new SqlCommand("WriteSelfProcessAgent", connection);
+                    DbCommand cmd = connection.CreateCommand();
+                    cmd.CommandText = "WriteSelfProcessAgent";
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
                     // 2. processAgentType
-                    SqlParameter processAgentTypeParam = cmd.Parameters.Add("@processAgentType", SqlDbType.VarChar, 100);
-                    processAgentTypeParam.Value = processAgentType;
-                    // 1. guid
-                    SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                    guidParam.Value = guid;
-                    SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 100);
-                    if (domainGuid != null)
-                        domainParam.Value = domainGuid;
-                    else
-                        domainParam.Value = "";
-                    SqlParameter nameParam = cmd.Parameters.Add("@name", SqlDbType.VarChar, 100);
-                    if (name != null)
-                        nameParam.Value = name;
-                    else
-                        nameParam.Value = "";
-                    // 4. webServiceURL
-                    SqlParameter webServiceParam = cmd.Parameters.Add("@webServiceURL", SqlDbType.VarChar, 256);
-                    webServiceParam.Value = webserviceURL;
-                    // 5. redirectURL
-                    SqlParameter applicationURLParam = cmd.Parameters.Add("@codeBaseURL", SqlDbType.VarChar, 256);
-                    if (codebaseURL != null)
-                        applicationURLParam.Value = codebaseURL;
-                    else
-                        applicationURLParam.Value = "";
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentType", processAgentType, DbType.AnsiString, 100));
                   
+                    // 1. guid
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString, 50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name, DbType.String, 256));
+                    
+                    // 4. webServiceURL
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceURL",webserviceURL, DbType.String, 512));
+                   
+                    // 5. redirectURL
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseURL", codebaseURL, DbType.String, 512));
+                       
                     // execute the command
                     itemID = Convert.ToInt32(cmd.ExecuteScalar());
                 }
-                catch (SqlException e)
+                catch (DbException e)
                 {
                     writeEx(e);
                     throw;
@@ -2835,32 +2770,25 @@ namespace iLabs.Core
 			string domainGuid,string codeBaseURL, string serviceURL)
 		{
 			int status = 0;
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try 
 			{
-				SqlCommand cmd = new SqlCommand("UpdateProcessAgent", connection);
+                DbCommand cmd = connection.CreateCommand();
+                cmd.CommandText= "UpdateProcessAgent";
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                guidParam.Value = guid;
-				SqlParameter nameParam = cmd.Parameters.Add("@name", SqlDbType.VarChar, 100);
-				nameParam.Value = name;
-				SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-				typeParam.Value = type;
-                SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 50);
-                domainParam.Value = domainGuid;
-                SqlParameter appParam = cmd.Parameters.Add("@codeBaseUrl", SqlDbType.VarChar, 256);
-                appParam.Value = codeBaseURL;
-				SqlParameter serviceParam = cmd.Parameters.Add("@webServiceUrl", SqlDbType.VarChar, 256);
-				serviceParam.Value = serviceURL;
-
-
-
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name,DbType.String, 256));
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type",type, DbType.AnsiString, 100));
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseUrl", codeBaseURL,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceUrl",serviceURL, DbType.String, 512));
+			
                 connection.Open();
 				status = Convert.ToInt32(cmd.ExecuteScalar());
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -2876,34 +2804,25 @@ namespace iLabs.Core
             string domainGuid, string codeBaseURL, string serviceURL)
         {
             int status = 0;
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
-                SqlCommand cmd = new SqlCommand("UpdateProcessAgentByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("UpdateProcessAgentByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.VarChar, 50);
-                idParam.Value = id;
-                SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-                guidParam.Value = guid;
-                SqlParameter nameParam = cmd.Parameters.Add("@name", SqlDbType.VarChar, 100);
-                nameParam.Value = name;
-                SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-                typeParam.Value = type;
-                SqlParameter domainParam = cmd.Parameters.Add("@domain", SqlDbType.VarChar, 50);
-                domainParam.Value = domainGuid;
-                SqlParameter appParam = cmd.Parameters.Add("@codeBaseUrl", SqlDbType.VarChar, 256);
-                appParam.Value = codeBaseURL;
-                SqlParameter serviceParam = cmd.Parameters.Add("@webServiceUrl", SqlDbType.VarChar, 256);
-                serviceParam.Value = serviceURL;
-
-
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", id, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseUrl", codeBaseURL, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceUrl", serviceURL, DbType.String,512));
+                
                 connection.Open();
                 status = Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -2921,26 +2840,25 @@ namespace iLabs.Core
 		/// </summary>
 		/// <param name="processAgentType"></param>
 		/// <returns><code>true</code> if processAgentType is a name of a static process agent type in the database</returns>
-		protected bool ProcessAgentTypeExists(SqlConnection connection, string processAgentType)
+		protected bool ProcessAgentTypeExists(DbConnection connection, string processAgentType)
 		{
 			bool status = false;
 			// create sql command
 			// command executes the "RetrieveProcessAgentTypeID" stored procedure
-			SqlCommand cmd = new SqlCommand("ProcessAgentTypeExists", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("ProcessAgentTypeExists", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameter
 			// 1. type
-			SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-			typeParam.Value = processAgentType;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", processAgentType, DbType.AnsiString, 100));
+			
 			// execute the command
 		
 			try 
 			{
 				status = Convert.ToBoolean(cmd.ExecuteScalar());
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				writeEx(e);
 				throw;
@@ -2957,24 +2875,23 @@ namespace iLabs.Core
 		{
 			int id = -1;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try 
 			{
 				// create sql command
 				// command executes the "RetrieveCoupon" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentID", connection);
+				DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentID", connection);
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-				guidParam.Value = guidStr;
-
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guidStr, DbType.AnsiString, 50));
+				
 				// read the result
-				//SqlDataReader dataReader = null;
+				//DbDataReader dataReader = null;
                 connection.Open();
 				id = Convert.ToInt32(cmd.ExecuteScalar());
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				Console.WriteLine(e);
 				throw;
@@ -2996,25 +2913,25 @@ namespace iLabs.Core
 		{
 			string url = null;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetServiceURL", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetServiceURL", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-			guidParam.Value = guidStr;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guidStr, DbType.AnsiString, 50));
+			
 
 			// read the result
-			//SqlDataReader dataReader = null;
+			//DbDataReader dataReader = null;
             try
             {
                 connection.Open();
                 url = Convert.ToString(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3037,25 +2954,25 @@ namespace iLabs.Core
 		{
 			string url = null;
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetServiceURLByID", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetServiceURLByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@agent_id", SqlDbType.Int);
-			idParam.Value = id;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agent_id", id, DbType.Int32));
+			
 
 			// read the result
-			//SqlDataReader dataReader = null;
+			//DbDataReader dataReader = null;
             try
             {
                 connection.Open();
                 url = Convert.ToString(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3069,7 +2986,7 @@ namespace iLabs.Core
 			return url.Trim();
 		}
 
-		protected ProcessAgentInfo readAgentInfo(SqlDataReader dataReader)
+		protected ProcessAgentInfo readAgentInfo(DbDataReader dataReader)
 		{
             long idIn = -1;
             long idOut = -1;
@@ -3139,19 +3056,18 @@ namespace iLabs.Core
             ProcessAgentInfo info = null;
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetProcessAgentInfoById", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentInfoById", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-			idParam.Value = id;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id",id, DbType.Int32));
 
 			// read the result
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -3164,7 +3080,7 @@ namespace iLabs.Core
                 }
 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3189,19 +3105,18 @@ namespace iLabs.Core
             ProcessAgentInfo info = null;
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetProcessAgentInfo", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentInfo", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter guidParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar, 50);
-			guidParam.Value = guidStr;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guidStr, DbType.AnsiString, 50));
+			
 			// read the result
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -3213,13 +3128,11 @@ namespace iLabs.Core
                     info = readAgentInfo(dataReader);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-
-
             finally
             {
                 // close the sql connection
@@ -3239,21 +3152,19 @@ namespace iLabs.Core
             ProcessAgentInfo info = null;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "RetrieveCoupon" stored procedure
-            SqlCommand cmd = new SqlCommand("GetProcessAgentInfoByInCoupon", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentInfoByInCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@couponID", SqlDbType.BigInt);
-            idParam.Value = couponID;
-            SqlParameter guidParam = cmd.Parameters.Add("@issuer", SqlDbType.VarChar, 50);
-            guidParam.Value = issuerGuid;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@issuer", issuerGuid, DbType.AnsiString, 50));
 
             // read the result
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -3265,19 +3176,16 @@ namespace iLabs.Core
                     info = readAgentInfo(dataReader);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-
-
             finally
             {
                 // close the sql connection
                 connection.Close();
             }
-
             return info;
         }
 
@@ -3290,16 +3198,16 @@ namespace iLabs.Core
 		{	
 			ArrayList list = new ArrayList();		
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try 
 			{
 				// create sql command
 				// command executes the "RetrieveCoupon" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentsInfo", connection);
+				DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentsInfo", connection);
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// read the result
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 			
@@ -3312,7 +3220,7 @@ namespace iLabs.Core
 					list.Add(info);
 				}
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				Console.WriteLine(e);
 				throw;
@@ -3338,20 +3246,20 @@ namespace iLabs.Core
 		{
 			ArrayList list = new ArrayList();
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try 
 			{
 				// create sql command
 				// command executes the "RetrieveCoupon" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentInfoByType", connection);
+				DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentInfoByType", connection);
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				SqlParameter typeParam = cmd.Parameters.Add("@agentType", SqlDbType.VarChar, 100);
-				typeParam.Value = type;
+				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentType",type, DbType.AnsiString, 100));
+			
 
 				// read the result
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();
 				dataReader = cmd.ExecuteReader();
 			
@@ -3364,7 +3272,7 @@ namespace iLabs.Core
 					list.Add(info);
 				}
 			} 
-			catch (SqlException e) 
+			catch (DbException e) 
 			{
 				Console.WriteLine(e);
 				throw;
@@ -3391,18 +3299,19 @@ namespace iLabs.Core
 			ProcessAgentInfo[] agents = new ProcessAgentInfo[ids.Length];
 
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetProcessAgentInfoByID", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentInfoByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@id",SqlDbType.BigInt);
+			DbParameter idParam = FactoryDB.CreateParameter(cmd,"@id",null,DbType.Int64);
+            cmd.Parameters.Add(idParam);
 
 			// read the result
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
 			try 
 			{
                 connection.Open();
@@ -3420,7 +3329,7 @@ namespace iLabs.Core
                     dataReader.Close();
 				}
 			}
-			catch(SqlException e)
+			catch(DbException e)
 			{
 				Console.WriteLine(e);
 				throw;
@@ -3443,17 +3352,17 @@ namespace iLabs.Core
             List<ProcessAgentInfo> agents = new List<ProcessAgentInfo>(); ;
 
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
-            SqlCommand cmd = new SqlCommand("GetProcessAgentInfosForDomain", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentInfosForDomain", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar,50);
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", domainGuid,DbType.AnsiString,50));
 
             // read the result
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -3469,7 +3378,7 @@ namespace iLabs.Core
                     dataReader.Close();
                 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3505,19 +3414,19 @@ namespace iLabs.Core
 		{	
 			List<int> list = new List<int>();
 			// create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 			try 
 			{
 				// create sql command
 				// command executes the "RetrieveCoupon" stored procedure
-				SqlCommand cmd = new SqlCommand("GetProcessAgentIdsByTypeID", connection);
+				DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentIdsByTypeID", connection);
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				SqlParameter idParam = cmd.Parameters.Add("@typeid",SqlDbType.Int);
-				idParam.Value = typeID;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@typeid", typeID, DbType.Int32));
+				
 				// read the result
-				SqlDataReader dataReader = null;
+				DbDataReader dataReader = null;
                 connection.Open();		
 				dataReader = cmd.ExecuteReader();
 		
@@ -3527,7 +3436,7 @@ namespace iLabs.Core
 					list.Add(dataReader.GetInt32(0));
 				}
 			}
-			catch(SqlException e)
+			catch(DbException e)
 			{
 				Console.WriteLine(e);
 				throw;
@@ -3548,17 +3457,17 @@ namespace iLabs.Core
         {
             List<int> ids = new List<int>();
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "RetrieveTickets" stored procedure
-                SqlCommand cmd = new SqlCommand("GetProcessAgentIdsByTypeID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentIdsByTypeID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                SqlParameter typeParam = cmd.Parameters.Add("@typeID", SqlDbType.Int);
-
+                DbParameter typeParam = FactoryDB.CreateParameter(cmd,"@typeID", null,DbType.Int32);
+                cmd.Parameters.Add(typeParam);
                 // execute the command
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 foreach (int i in typeIDs)
                 {
@@ -3571,7 +3480,7 @@ namespace iLabs.Core
                     dataReader.Close();
                 }
             }
-            catch (SqlException)
+            catch (DbException)
             {
                 throw;
             }
@@ -3658,19 +3567,18 @@ namespace iLabs.Core
         {
             SystemSupport  ss = null;
             // create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetSystemSupportById", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveSystemSupportById", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-			idParam.Value = id;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id",id, DbType.Int32));
 
 			// read the result
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -3681,17 +3589,26 @@ namespace iLabs.Core
                 {
                     ss = new SystemSupport();
                     if (!dataReader.IsDBNull(0))
-			            ss.contactEmail = dataReader.GetString(0);
+                        ss.agentGuid = dataReader.GetString(0);
+                    else ss.agentGuid= null;
+                    if (!dataReader.IsDBNull(1))
+                        ss.contactEmail = dataReader.GetString(1);
                     else ss.contactEmail = null;
-                     if (!dataReader.IsDBNull(1))
-			            ss.infoUrl = dataReader.GetString(1);
+                    if (!dataReader.IsDBNull(2))
+                        ss.bugEmail = dataReader.GetString(2);
+                    else ss.contactEmail = null;
+                    if (!dataReader.IsDBNull(3))
+                        ss.infoUrl = dataReader.GetString(3);
                     else ss.infoUrl = null;
-                     if (!dataReader.IsDBNull(2))
-			            ss.description = dataReader.GetString(2);
+                    if (!dataReader.IsDBNull(4))
+                        ss.description = dataReader.GetString(4);
                     else ss.description = null;
+                    if (!dataReader.IsDBNull(5))
+                        ss.location = dataReader.GetString(5);
+                    else ss.location = null;
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3710,19 +3627,18 @@ namespace iLabs.Core
         {
                       SystemSupport  ss = null;
             // create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
 
 			// create sql command
 			// command executes the "RetrieveCoupon" stored procedure
-			SqlCommand cmd = new SqlCommand("GetSystemSupport", connection);
+			DbCommand cmd = FactoryDB.CreateCommand("RetrieveSystemSupport", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			SqlParameter idParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar,50);
-			idParam.Value = guid;
-
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString,50));
+			
 			// read the result
-			SqlDataReader dataReader = null;
+			DbDataReader dataReader = null;
             try
             {
                 connection.Open();
@@ -3733,17 +3649,26 @@ namespace iLabs.Core
                 {
                     ss = new SystemSupport();
                     if (!dataReader.IsDBNull(0))
-                        ss.contactEmail = dataReader.GetString(0);
-                    else ss.contactEmail = null;
+                        ss.agentGuid = dataReader.GetString(0);
+                    else ss.agentGuid = null;
                     if (!dataReader.IsDBNull(1))
-                        ss.infoUrl = dataReader.GetString(1);
-                    else ss.infoUrl = null;
+                        ss.contactEmail = dataReader.GetString(1);
+                    else ss.contactEmail = null;
                     if (!dataReader.IsDBNull(2))
-                        ss.description = dataReader.GetString(2);
+                        ss.bugEmail = dataReader.GetString(2);
+                    else ss.contactEmail = null;
+                    if (!dataReader.IsDBNull(3))
+                        ss.infoUrl = dataReader.GetString(3);
+                    else ss.infoUrl = null;
+                    if (!dataReader.IsDBNull(4))
+                        ss.description = dataReader.GetString(4);
                     else ss.description = null;
+                    if (!dataReader.IsDBNull(5))
+                        ss.location = dataReader.GetString(5);
+                    else ss.location = null;
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3758,46 +3683,34 @@ namespace iLabs.Core
 
         }
 
-        public int SaveSystemSupport(int id, string contactEmail, string infoUrl, string description)
+        public int SaveSystemSupport(int id, string contactEmail, string bugEmail, string infoUrl, string description, string location)
         {
             int status = -1;
             // create sql connection
-			SqlConnection connection = FactoryDB.GetConnection();
+			DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "RetrieveCoupon" stored procedure
-                SqlCommand cmd = new SqlCommand("SaveSystemSupportById", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("SaveSystemSupportById", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-                idParam.Value = id;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", id,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@contactEmail", contactEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@bugEmail", bugEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@info", infoUrl, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@desc", description, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@location", location, DbType.String, 256));
                 
-                SqlParameter emailParam = cmd.Parameters.Add("@email", SqlDbType.VarChar, 100);
-                if (contactEmail != null)
-                    emailParam.Value = contactEmail;
-                else emailParam.Value = null;
-
-                SqlParameter infoParam = cmd.Parameters.Add("@info", SqlDbType.VarChar, 256);
-                if(infoUrl != null)
-                infoParam.Value = infoUrl;
-            else emailParam.Value = null;
-                
-                SqlParameter descParam = cmd.Parameters.Add("@desc", SqlDbType.Text);
-                if (description != null)
-                descParam.Value = description;
-                 else descParam.Value = null;
-
-
                 // read the result
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 object obj = cmd.ExecuteScalar();
                 if (obj != null)
                     status = Convert.ToInt32(obj);
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3812,46 +3725,35 @@ namespace iLabs.Core
 
         }
 
-        public int SaveSystemSupport(string guid, string contactEmail, string infoUrl, string description)
+        public int SaveSystemSupport(string guid, string contactEmail, string bugEmail,string infoUrl, 
+                string description, string location)
         {
             int status = -1;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
                 // create sql command
                 // command executes the "RetrieveCoupon" stored procedure
-                SqlCommand cmd = new SqlCommand("SaveSystemSupport", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("SaveSystemSupport", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@guid", SqlDbType.VarChar,50);
-                idParam.Value = guid;
-
-                SqlParameter emailParam = cmd.Parameters.Add("@email", SqlDbType.VarChar, 100);
-                if (contactEmail != null)
-                    emailParam.Value = contactEmail;
-                else emailParam.Value = null;
-
-                SqlParameter infoParam = cmd.Parameters.Add("@info", SqlDbType.VarChar, 256);
-                if (infoUrl != null)
-                    infoParam.Value = infoUrl;
-                else emailParam.Value = null;
-
-                SqlParameter descParam = cmd.Parameters.Add("@desc", SqlDbType.Text);
-                if (description != null)
-                    descParam.Value = description;
-                else descParam.Value = null;
-
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid,DbType.AnsiString,50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@contactEmail",contactEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@bugEmail", bugEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@info", infoUrl,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@desc",description, DbType.String,2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@location", location, DbType.String, 256));
+                
                 // read the result
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 object obj = cmd.ExecuteScalar();
                 if (obj != null)
                     status = Convert.ToInt32(obj);
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -3865,13 +3767,13 @@ namespace iLabs.Core
             return status;
 
         }
-            
- 
-		protected void writeEx(Exception e)
-		{
-			Console.WriteLine("DB_CONNECTION: " + connectionStr);
-			Console.WriteLine(e.Message + "\n" + e.StackTrace);
-		}
+
+
+        protected void writeEx(Exception e)
+        {
+            //Console.WriteLine("DB_CONNECTION: " + connectionStr);
+            Console.WriteLine(e.Message + "\n" + e.StackTrace);
+        }
 
 	}
  }

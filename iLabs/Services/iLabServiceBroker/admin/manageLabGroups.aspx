@@ -35,7 +35,7 @@ Please see license.txt in top level directory for full license.
 					<div id="pagecontent">
 						<div class="simpleform"><label for="labclient">Select Lab Client</label>
 							<br />
-							<asp:dropdownlist id="ddlLabClient" Runat="server" AutoPostBack="True" Width="260px" onselectedindexchanged="ddlLabClient_SelectedIndexChanged"></asp:dropdownlist></div>
+							<asp:dropdownlist CssClass="i18n" id="ddlLabClient" Runat="server" AutoPostBack="True" Width="260px" onselectedindexchanged="ddlLabClient_SelectedIndexChanged"></asp:dropdownlist></div>
 						<DIV class="simpleform">&nbsp;</DIV>
 						<div id="messagebox">
 							<h3>Associated Lab Servers
@@ -89,11 +89,11 @@ Please see license.txt in top level directory for full license.
 							<tr>
 								<th class="top" style="width: 201px; height: 22px">
 									<label for="userGroup">User Group</label>
-                                    <asp:DropDownList ID="ddlUserGroup" runat="server" Width="240px"></asp:DropDownList>
+                                    <asp:DropDownList CssClass="i18n" ID="ddlUserGroup" runat="server" Width="240px"></asp:DropDownList>
                                 </th>         
 								<th id="thManagementGroup" runat="server" class="top" style="width: 201px; height: 22px">
 									<label for="managementGroup">Management Group</label>
-                                    <asp:DropDownList ID="ddlAdminGroup" runat="server" Width="288px"></asp:DropDownList>
+                                    <asp:DropDownList CssClass="i18n" ID="ddlAdminGroup" runat="server" Width="288px"></asp:DropDownList>
                                 </th>         
 							</tr>
 							<tr>

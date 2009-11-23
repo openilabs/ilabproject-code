@@ -123,13 +123,13 @@ namespace iLabs.ServiceBroker.admin
 				if(txtGroupname.Text != "")
 				{
 					int gID = wrapper.GetGroupIDWrapper(txtGroupname.Text);
-					cList.Add (new Criterion ("Group_ID", "=",gID.ToString()));
+					cList.Add(new Criterion ("Group_ID", "=",gID.ToString()));
 				}
 
 				if(txtUsername.Text != "")
 				{
 					int uID = wrapper.GetUserIDWrapper(txtUsername.Text);
-					cList.Add (new Criterion ("User_ID", "=", uID.ToString() ));
+					cList.Add(new Criterion ("User_ID", "=", uID.ToString() ));
 				}
 			if((ddlTimeAttribute.SelectedValue.ToString() != "") && ((txtTime1.Text != null) && (txtTime1.Text != "")))
 			{
@@ -160,16 +160,16 @@ namespace iLabs.ServiceBroker.admin
                 }
 				if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("before")== 0)
 				{
-					cList.Add (new Criterion ("CreationTime", "<", time1.ToString()));
+					cList.Add(new Criterion ("CreationTime", "<", time1.ToString()));
 				}
 				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("after") == 0)
 				{
-					cList.Add (new Criterion ("CreationTime", ">=", time1.ToString()));
+					cList.Add(new Criterion ("CreationTime", ">=", time1.ToString()));
 				}
 				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("between") == 0)
 				{
-					cList.Add (new Criterion ("CreationTime", ">=",time1.ToString()));
-					cList.Add (new Criterion ("CreationTime", "<", time2.ToString()));
+					cList.Add(new Criterion ("CreationTime", ">=",time1.ToString()));
+					cList.Add(new Criterion ("CreationTime", "<", time2.ToString()));
 				}
                 else if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") == 0)
                 {

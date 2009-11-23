@@ -59,5 +59,6 @@ INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUE
 INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (24,'ADMINISTER LS','Administer LS', 0);
 INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (25,'EXECUTE EXPERIMENT','Execute Experiment', 0);
 INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (26,'CREATE EXPERIMENT','Create Experiment', 0);
+INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (27,'REDEEM RESERVATION','Redeem Reservation', 0);
 
 SET IDENTITY_INSERT Ticket_Type OFF

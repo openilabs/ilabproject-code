@@ -10,6 +10,12 @@
     <!-- The following  keys specify the WebService required Values -->
     <!-- They are used by the SelfRegistration page to generate the ProcessAgent's
          Bootstrap ProcessAgent Record, which must be created before installing domain credientials -->
+  
+  <!-- the database connection information 
+    NOTE: You Must set the database catalog to the database name that you created as part of the installation process -->
+  <add key="sqlConnection" value="data source=(local);initial catalog=iLab_USS;Integrated Security=SSPI"/>
+  <add key="DatabaseProvider" value="System.Data.SqlClient" />
+  
     <!-- The Service Type - Do Not Change -->
     <add key="serviceType" value="SCHEDULING SERVER"/>
     <!-- The name of the Service displayed for the user, please change -->
@@ -20,10 +26,7 @@
     <add key="serviceURL" value="http://localhost/UserSideScheduling/UserScheduling.asmx"/>
     <add key="defaultPasskey" value="USS"/>
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
-
-    <!-- the database connection information 
-    NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->  
-    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_USS;Integrated Security=SSPI"/>
+    <add key="supportMailAddress" value="ilab-comment@mit.edu"/>
 
   <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
   <add key="logPath" value=""/>

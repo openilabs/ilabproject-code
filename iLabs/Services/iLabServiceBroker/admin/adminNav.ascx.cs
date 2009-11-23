@@ -159,6 +159,7 @@ namespace iLabs.ServiceBroker.admin
                     ulNav3Records.Visible = true;
                     aNav3SBinfo.Attributes.Add("class", "first");
                     aNav3SBinfo.Attributes.Add("class", "nav3active");
+                    aNav3LoginRecords.Attributes.Add("class", "last");
                     break;
 
                 case "sbReport.aspx":
@@ -166,13 +167,16 @@ namespace iLabs.ServiceBroker.admin
                     ulNav3Records.Visible = true;
                     aNav3SBinfo.Attributes.Add("class", "first");
                     aNav3Reports.Attributes.Add("class", "nav3active");
+                    aNav3LoginRecords.Attributes.Add("class", "last");
                     break;
 
 				case "loginRecords.aspx":
 					aExperimentRecords.Attributes.Add("class", "topactive");
 					ulNav3Records.Visible = true;
                     aNav3SBinfo.Attributes.Add("class", "first");
+                    //aNav3LoginRecords.Attributes.Add("class", "last");
 					aNav3LoginRecords.Attributes.Add("class", "nav3active");
+                    
 					break;
 
 					// Nav Level

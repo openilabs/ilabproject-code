@@ -37,6 +37,11 @@ textarea.noneditable
 	background-color: #eee;
 }
 
+.i18n
+{
+	font-family:   Arial Unicode MS, Helvetica, sans-serif;
+}
+
 .simpleform legend
 {
 	color: #000;
@@ -193,7 +198,7 @@ textarea.noneditable
 /******* Fonts ***************/
 
 body {
-	font-family: Arial, Helvetica, sans-serif;
+	font-family:   Arial Unicode MS, Helvetica, sans-serif;
 }
 
 /*********** Layout ***********/
@@ -779,6 +784,7 @@ body {
 	padding: 0 0 0 0;
 	}
 /* End boxes that display actions */
+
 
 /* Tree view classes */
 /* For boxes that are placeholders for treeviews */

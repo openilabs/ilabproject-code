@@ -403,6 +403,8 @@ namespace iLabs.ServiceBroker.admin
             txtDomainServer.Text = "";
             txtInfoURL.Text = "";
             txtContactEmail.Text = "";
+            txtBugEmail.Text = "";
+            txtLocation.Text = "";
             txtOutPassKey.Text = "";
             txtBatchPassIn.Text = "";
             txtBatchPassOut.Text = "";
@@ -457,6 +459,7 @@ namespace iLabs.ServiceBroker.admin
             {
                 if (agent.retired)
                 {
+                    ClearFormFields();
                     throw new Exception("The requested service is retired");
                 }
                 txtServiceName.Text = agent.agentName;
@@ -465,44 +468,62 @@ namespace iLabs.ServiceBroker.admin
                 txtServiceGUID.Text = agent.agentGuid;
                 txtWebServiceURL.Text = agent.webServiceUrl;
                 txtApplicationURL.Text = agent.codeBaseUrl;
-                if (agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                if (agent.domainGuid != null)
                 {
-                    txtDomainServer.Text = ProcessAgentDB.ServiceAgent.agentName;
-                }
-                else
-                {
-                    if (agent.domainGuid != null)
+                    if (agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                     {
+                        txtDomainServer.Text = ProcessAgentDB.ServiceAgent.agentName;
+                    }
+                    else
+                    {
+                   
                         ProcessAgent remote = brokerDB.GetProcessAgent(agent.domainGuid);
                         txtDomainServer.Text = remote.agentName;
                     }
                 }
                 Session["DomainGuid"] = agent.domainGuid;
 
-                Hashtable resources = brokerDB.GetResourceStringTags(agentId, ResourceMappingTypes.PROCESS_AGENT);
-                if (resources != null)
-                {
-                    if (resources.ContainsKey("Description"))
-                        txtServiceDescription.Text = ((IntTag)resources["Description"]).tag;
-                    else
-                        txtServiceDescription.Text = "";
-
-                    if (resources.ContainsKey("Info URL"))
-                        txtInfoURL.Text = ((IntTag)resources["Info URL"]).tag;
-                    else
-                        txtInfoURL.Text = "";
-
-                    if (resources.ContainsKey("Contact Email"))
-                        txtContactEmail.Text = ((IntTag)resources["Contact Email"]).tag;
-                    else
-                        txtContactEmail.Text = "";
+                SystemSupport ss = brokerDB.RetrieveSystemSupport(agentId);
+                if(ss != null){
+                    txtServiceDescription.Text = ss.description;
+                    txtInfoURL.Text = ss.infoUrl;
+                    txtContactEmail.Text = ss.contactEmail;
+                    txtBugEmail.Text = ss.bugEmail;
+                    txtLocation.Text = ss.location;
                 }
-                else
-                {
+                else{
                     txtServiceDescription.Text = "";
                     txtInfoURL.Text = "";
                     txtContactEmail.Text = "";
+                    txtBugEmail.Text = "";
+                    txtLocation.Text = "";
                 }
+
+
+                //Hashtable resources = brokerDB.GetResourceStringTags(agentId, ResourceMappingTypes.PROCESS_AGENT);
+                //if (resources != null)
+                //{
+                //    if (resources.ContainsKey("Description"))
+                //        txtServiceDescription.Text = ((IntTag)resources["Description"]).tag;
+                //    else
+                //        txtServiceDescription.Text = "";
+
+                //    if (resources.ContainsKey("Info URL"))
+                //        txtInfoURL.Text = ((IntTag)resources["Info URL"]).tag;
+                //    else
+                //        txtInfoURL.Text = "";
+
+                //    if (resources.ContainsKey("Contact Email"))
+                //        txtContactEmail.Text = ((IntTag)resources["Contact Email"]).tag;
+                //    else
+                //        txtContactEmail.Text = "";
+                //}
+                //else
+                //{
+                //    txtServiceDescription.Text = "";
+                //    txtInfoURL.Text = "";
+                //    txtContactEmail.Text = "";
+                //}
                 if (agent.agentType.Equals(ProcessAgentType.AgentType.BATCH_LAB_SERVER))
                 {
                     cbxDoBatch.Checked = true;
@@ -614,93 +635,10 @@ namespace iLabs.ServiceBroker.admin
             SetInputMode(false);
         }
 
-        protected void modifyResources(int agentId)
+        protected void modifySystemSupport(int agentId)
         {
-            Hashtable resources = brokerDB.GetResourceStringTags(agentId, ResourceMappingTypes.PROCESS_AGENT);
-            if (resources != null) // Check the current resources
-            {
-                IntTag resourceTag = null;
-                if (resources.ContainsKey("Description"))
-                {
-                    resourceTag = (IntTag)resources["Description"];
-                    if (txtServiceDescription.Text != resourceTag.tag)
-                    {
-                        if (txtServiceDescription.Text != null && txtServiceDescription.Text.Length > 0)
-                        {
-                            brokerDB.UpdateResourceMappingString(resourceTag.id, txtServiceDescription.Text);
-                        }
-                        else
-                        { //Now An Empty String 
-                            //Should delete mappingID group
-                            brokerDB.DeleteResourceMapping(ResourceMappingTypes.PROCESS_AGENT, agentId,
-                                ResourceMappingTypes.STRING, resourceTag.id);
-                        }
-                    }
-                }
-                if (resources.ContainsKey("Info URL"))
-                {
-                    resourceTag = (IntTag)resources["Info URL"];
-                    if (txtInfoURL.Text != resourceTag.tag)
-                    {
-                        if (txtInfoURL.Text != null && txtInfoURL.Text.Length > 0)
-                        {
-                            brokerDB.UpdateResourceMappingString(resourceTag.id, txtInfoURL.Text);
-                        }
-                        else
-                        { //Now An Empty String 
-                            //Should delete mappingID group
-                            brokerDB.DeleteResourceMapping(ResourceMappingTypes.PROCESS_AGENT, agentId,
-                                ResourceMappingTypes.STRING, resourceTag.id);
-                        }
-                    }
-                }
-                if (resources.ContainsKey("Contact Email"))
-                {
-                    resourceTag = (IntTag)resources["Contact Email"];
-                    if (txtContactEmail.Text != resourceTag.tag)
-                    {
-
-                        if (txtContactEmail.Text != null && txtContactEmail.Text.Length > 0)
-                        {
-                            brokerDB.UpdateResourceMappingString(resourceTag.id, txtContactEmail.Text);
-                        }
-                        else
-                        { //Now An Empty String 
-                            //Should delete mappingID group
-                            brokerDB.DeleteResourceMapping(ResourceMappingTypes.PROCESS_AGENT, agentId,
-                                ResourceMappingTypes.STRING, resourceTag.id);
-                        }
-                    }
-
-                }
-            }
-            else // No Current Resource Type Strings
-            {
-                if (txtServiceDescription.Text != null && txtServiceDescription.Text.Length > 0)
-                {
-                    ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, agentId);
-                    ResourceMappingValue[] values = new ResourceMappingValue[2];
-                    values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, "Description");
-                    values[1] = new ResourceMappingValue(ResourceMappingTypes.STRING, txtServiceDescription.Text);
-                    brokerDB.AddResourceMapping(key, values);
-                }
-                if (txtInfoURL.Text != null && txtInfoURL.Text.Length > 0)
-                {
-                    ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, agentId);
-                    ResourceMappingValue[] values = new ResourceMappingValue[2];
-                    values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, "Info URL");
-                    values[1] = new ResourceMappingValue(ResourceMappingTypes.STRING, txtInfoURL.Text);
-                    brokerDB.AddResourceMapping(key, values);
-                }
-                if (txtContactEmail.Text != null && txtContactEmail.Text.Length > 0)
-                {
-                    ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, agentId);
-                    ResourceMappingValue[] values = new ResourceMappingValue[2];
-                    values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, "Contact Email");
-                    values[1] = new ResourceMappingValue(ResourceMappingTypes.STRING, txtContactEmail.Text);
-                    brokerDB.AddResourceMapping(key, values);
-                }
-            }
+            brokerDB.SaveSystemSupport(agentId, txtContactEmail.Text, txtBugEmail.Text, txtInfoURL.Text,
+                txtServiceDescription.Text, txtLocation.Text);
         }
 
         /// <summary>
@@ -800,12 +738,12 @@ namespace iLabs.ServiceBroker.admin
                         dGuid = Session["DomainGuid"].ToString();
                     }
                    
-                    // Modify the ProcessAgent record -- this should never really change anything
+                    // Modify the ProcessAgent record
                     wrapper.ModifyProcessAgentWrapper(txtServiceGUID.Text, txtServiceName.Text, txtServiceType.Text,
                        dGuid,txtApplicationURL.Text, txtWebServiceURL.Text);
 
-                    // Need to add processing for resourceMapping used by form
-                    modifyResources(agentId);
+                    // Need to add processing for SystemSupport, replaces esourceMapping for these fields
+                    modifySystemSupport(agentId);
 
                     // Modify coupons if needed
                     if (txtServiceType.Text.Equals(ProcessAgentType.BATCH_LAB_SERVER))
@@ -1095,7 +1033,7 @@ namespace iLabs.ServiceBroker.admin
                     ProcessAgentType.BATCH_LAB_SERVER, ProcessAgentDB.ServiceGuid, txtApplicationURL.Text,
                     txtWebServiceURL.Text, inCoupon, outCoupon);
 
-                modifyResources(agentID);
+                modifySystemSupport(agentID);
                 if (agentID > 0)
                 {
                     lblErrorMessage.Visible = true;
@@ -1163,10 +1101,16 @@ namespace iLabs.ServiceBroker.admin
                                 default:
                                     break;
                             }
-
-
-                            
-
+                            SystemSupport mySS = brokerDB.RetrieveSystemSupport(ProcessAgentDB.ServiceGuid);
+                            if (mySS != null)
+                            {
+                                ServiceDescription[] values = new ServiceDescription[1];
+                                values[0] = new ServiceDescription(mySS.ToXML(), null, "requestSystemSupport");
+                                proxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                proxy.AgentAuthHeaderValue.coupon = inIdentCoupon;
+                                proxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                proxy.Register(Utilities.MakeGuid(), values);
+                            }
                             lblErrorMessage.Visible = true;
                             lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Relationship with the service has been created and saved.");
 

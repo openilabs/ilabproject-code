@@ -132,7 +132,6 @@
     <Compile Include="ServiceBroker\ResourceDescriptorFactory.cs" />
     <Compile Include="ServiceBroker\SBTicketRemover.cs" />
     <Content Include="Authorization\AuthorizationWrapperClass.aspx">
-      <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="obj\Debug\iLabsArchitecture.dll" />
     <Content Include="obj\Debug\iLabsArchitecture.pdb" />

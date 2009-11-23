@@ -825,6 +825,12 @@ body {
 
 
 /*Other styles */
+
+.i18n
+{
+	font-family: Arial Unicode MS, Helvetica, sans-serif;
+}
+
  ul.inline {
 	list-style-type: none;
 	margin: 5px 0 5px 0;

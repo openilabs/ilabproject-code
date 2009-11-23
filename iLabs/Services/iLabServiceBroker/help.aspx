@@ -110,7 +110,7 @@ Please see license.txt in top level directory for full license.
 										<tr>
 											<th>
 												<label for="lab">Select the type of help you need.</label></th>
-											<td><asp:dropdownlist id="ddlHelpType" Runat="server"></asp:dropdownlist></td>
+											<td><asp:dropdownlist CssClass="i18n" id="ddlHelpType" Runat="server"></asp:dropdownlist></td>
 										</tr>
 										<tr>
 											<th>

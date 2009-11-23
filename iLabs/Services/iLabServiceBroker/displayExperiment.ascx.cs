@@ -27,7 +27,6 @@ using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.Authentication;
 using iLabs.ServiceBroker.DataStorage;
-using iLabs.ServiceBroker;
 
 using iLabs.Ticketing;
 
@@ -71,12 +70,12 @@ public partial class displayExperiment : System.Web.UI.UserControl
 
             if (Session["UserID"] == null)
             {
-                //aList.Add (new Criterion ("User_ID", "=", Session["UserID"].ToString() ));
+                //aList.Add(new Criterion ("User_ID", "=", Session["UserID"].ToString() ));
             }
 
             if (Session["GroupID"] == null)
             {
-                //aList.Add (new Criterion ("Group_ID", "=", Session["GroupID"].ToString()));
+                //aList.Add(new Criterion ("Group_ID", "=", Session["GroupID"].ToString()));
             }
 
             string expIdStr = Request.QueryString["expid"];

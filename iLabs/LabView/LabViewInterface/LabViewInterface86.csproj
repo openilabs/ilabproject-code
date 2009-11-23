@@ -50,10 +50,15 @@
     <Compile Include="I_LabViewInterface.cs" />
     <Compile Include="LabViewInterface.cs" />
     <Compile Include="LabViewRemote.cs" />
+    <Compile Include="LabViewTask.cs" />
     <Compile Include="LVDataSocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\ProcessAgentLibrary\ProcessAgentLibrary.csproj">
+      <Project>{1138C760-3D21-4592-BCF0-00C38449F4CC}</Project>
+      <Name>ProcessAgentLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\UtilLibrary\UtilLibrary.csproj">
       <Project>{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}</Project>
       <Name>UtilLibrary</Name>
@@ -69,6 +74,14 @@
     <ProjectReference Include="..\..\Proxies\ExperimentStorageProxy\ExperimentStorageProxy.csproj">
       <Project>{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}</Project>
       <Name>ExperimentStorageProxy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\InteractiveSBProxy\InteractiveSBProxy.csproj">
+      <Project>{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}</Project>
+      <Name>InteractiveSBProxy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\TicketIssuerProxy\TicketIssuerProxy.csproj">
+      <Project>{9A2772DF-71D6-44E1-BAA9-87669A9FA942}</Project>
+      <Name>TicketIssuerProxy</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

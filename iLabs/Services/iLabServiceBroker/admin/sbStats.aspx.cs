@@ -256,7 +256,7 @@ namespace iLabs.ServiceBroker.admin
                 }
                 txtLClist.Text = lcList.ToString();
                 txtLCnum.Text = numLC.ToString();
-                txtLCnum1.Text = numLC.ToString();
+                
 
                 // Group information
                //int groupNum = GroupListRepeater();

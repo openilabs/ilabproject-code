@@ -736,22 +736,36 @@ namespace iLabs.Scheduling.UserSide
 				throw new Exception("Exception thrown in RevokeReservation",ex);
 			}
 		}
+        /// <summary>
+        /// Returns an existing ReservationInfo or null, indicating whether it is the right time for a particular user to execute a particular experiment
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <returns></returns>true if it is the right time for a particular user to execute a particular experiment
+        public static ReservationInfo RedeemReservation(String userName, String serviceBrokerGuid, String clientGuid, String labServerGuid)
+        {
+            return RedeemReservation(userName,serviceBrokerGuid,clientGuid,labServerGuid,DateTime.UtcNow);
+         
+        }
 
 		/// <summary>
-		/// Returns an Boolean indicating whether it the right time for a particular user to execute a particular experiment
+		/// Returns an existing ReservationInfo or null, indicating whether it is the right time for a particular user to execute a particular experiment
 		/// </summary>
 		/// <param name="userName"></param>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
 		/// <returns></returns>true if it is the right time for a particular user to execute a particular experiment
-        public static ReservationInfo RedeemReservation(String userName, String serviceBrokerGuid, String clientGuid, String labServerGuid)
+        public static ReservationInfo RedeemReservation(String userName, String serviceBrokerGuid, 
+            String clientGuid, String labServerGuid,DateTime targetTime)
 		{
-			ReservationInfo redeemedRes = new ReservationInfo();
+			ReservationInfo redeemedRes = null;
 			try
 			{
-                int i = DBManager.ListReservationIDByUser(userName, serviceBrokerGuid, clientGuid, labServerGuid, DateTime.UtcNow);
-				if (i != -1)
+                int i = DBManager.ListReservationIDByUser(userName, serviceBrokerGuid, clientGuid, labServerGuid, targetTime);
+				if (i >0)
 				{
                     redeemedRes = DBManager.GetReservations(new int[] { i })[0];
 				}

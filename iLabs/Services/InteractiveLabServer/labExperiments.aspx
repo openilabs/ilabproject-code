@@ -44,7 +44,7 @@ Please see license.txt in top level directory for full license.
 											<tr>
 												<th style="width: 480px">
 													<label for="appName">Lab Application</label></th>
-												<td style="width: 484px"><asp:dropdownlist id="ddlApplications" Runat="server" Width="360px" onselectedindexchanged="ddlApplications_SelectedIndexChanged" AutoPostBack="True"></asp:dropdownlist></td>
+												<td style="width: 484px"><asp:dropdownlist cssClass="i18n" id="ddlApplications" Runat="server" Width="360px" onselectedindexchanged="ddlApplications_SelectedIndexChanged" AutoPostBack="True"></asp:dropdownlist></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">

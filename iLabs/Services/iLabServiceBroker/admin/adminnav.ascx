@@ -1,6 +1,6 @@
 <%@ Control Language="c#" Inherits="iLabs.ServiceBroker.admin.adminNav" CodeFile="adminNav.ascx.cs" %>
 <div id="navbar"><div id="nav">
-		<ul class="navlist">
+		<ul class="navlist" id="ulAdminNavList" runat="server">
 			<li>
 				<A class="first" href="../home.aspx">Home</A>
 			<li>
@@ -25,11 +25,8 @@
 	<!-- end nav div -->
 	<div id="nav2">
 		<ul class="navlist2">
-			<li>
-				<a id="aHelp" runat="server">Help</a>
-			<li>
-				<asp:LinkButton ID="lbtnLogout" Runat="server" onclick="lbtnLogout_Click">Log out</asp:LinkButton>
-			</li>
+			<li><a id="aHelp" runat="server">Help</a></li>
+			<li><asp:LinkButton ID="lbtnLogout" Runat="server" onclick="lbtnLogout_Click">Log out</asp:LinkButton></li>
 		</ul>
 	</div>
 	<!-- end nav2 div -->

@@ -181,7 +181,7 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListLabServerIDsWrapper()
 		{
-			return Administration.AdministrativeAPI .ListLabServerIDs ();
+			return new ProcessAgentDB().GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.LAB_SERVER);
 		}
 /*
 		/// <summary>
@@ -2317,11 +2317,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="messageType"></param>
 		/// <param name="toBeDisplayed"></param>
 		/// <param name="groupID"></param>
-		/// <param name="labServerID"></param>
+		/// <param name="clientID"></param>
+        /// <param name="agentID"></param>
 		/// <param name="messageBody"></param>
 		/// <param name="messageTitle"></param>
 		/// <returns></returns>
-		public int AddSystemMessageWrapper (string messageType, bool toBeDisplayed, int groupID, int labServerID, string messageBody, string messageTitle)
+        public int AddSystemMessageWrapper(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
 		{
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 			string sessionGroupName = Session["GroupName"].ToString();
@@ -2330,7 +2331,7 @@ namespace iLabs.ServiceBroker.Authorization
 			int qID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.groupQualifierTypeID);
 			if((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))			
 			{
-				return Administration.AdministrativeAPI.AddSystemMessage(messageType, toBeDisplayed, groupID, labServerID, messageBody, messageTitle);
+                return Administration.AdministrativeAPI.AddSystemMessage(messageType, toBeDisplayed, groupID, clientID, agentID, messageBody, messageTitle);
 			}
 			else
 				throw new AccessDeniedException("Access denied adding system message.");
@@ -2356,7 +2357,7 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="labServerID"></param>
 		/// <param name="messageBody"></param>
 		/// <param name="messageTitle"></param>
-		public void ModifySystemMessageWrapper (int messageID, string messageType, bool toBeDisplayed, int groupID, int labServerID, string messageBody, string messageTitle)
+		public void ModifySystemMessageWrapper (int messageID, string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
 		{
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 			string sessionGroupName = Session["GroupName"].ToString();
@@ -2365,7 +2366,7 @@ namespace iLabs.ServiceBroker.Authorization
 			int qID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.groupQualifierTypeID);
 			if((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))
 			{
-				Administration.AdministrativeAPI.ModifySystemMessage(messageID, messageType, toBeDisplayed, groupID, labServerID, messageBody, messageTitle);
+				Administration.AdministrativeAPI.ModifySystemMessage(messageID, messageType, toBeDisplayed, groupID, clientID, agentID, messageBody, messageTitle);
 			}
 			else
 				throw new AccessDeniedException("Access denied modifying system message.");
@@ -2378,9 +2379,9 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="groupID"></param>
 		/// <param name="labServerID"></param>
 		/// <returns></returns>
-		public SystemMessage[] GetSystemMessagesWrapper (string messageType, int groupID, int labServerID)
+		public SystemMessage[] GetSystemMessagesWrapper (string messageType, int groupID, int clientID, int agentID)
 		{
-			return Administration.AdministrativeAPI.GetSystemMessages(messageType, groupID, labServerID);
+			return Administration.AdministrativeAPI.GetSystemMessages(messageType, groupID, clientID, agentID);
 		}
 
  

@@ -233,7 +233,7 @@ CREATE PROCEDURE InsertIssuedTicket
 	@couponID bigint,
 	@redeemerGUID varchar(50),
         @sponsorGUID varchar(50),
-        @payload text,
+        @payload ntext,
         @cancelled bit=0,
 	@creationTime DateTime,
 	@duration bigint

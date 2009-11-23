@@ -99,7 +99,7 @@ cssClass="treeView" runat="server"  SelectedNodeStyle-ForeColor="White" Selected
 												</div>
 												<!--textarea name="usersgroups" cols="30" rows="15" id="usersgroups"></textarea--></td>
 											<td style="HEIGHT: 350px" valign="top">
-												<asp:ListBox ID="lbxFunctions" Runat="server" Height="270px" Width="190px" Rows="8" Font-Names="Arial"
+												<asp:listbox cssClass="i18n" ID="lbxFunctions" Runat="server" Height="270px" Width="190px" Rows="8" Font-Names="Arial"
 													Font-Size="12px"></asp:ListBox>
 												<!--select name="functions" size="12" id="functions">
 												<option value="0" selected>-- Select function type --</option>

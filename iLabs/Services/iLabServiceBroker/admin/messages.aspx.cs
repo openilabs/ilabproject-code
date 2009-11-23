@@ -9,6 +9,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -40,6 +41,8 @@ namespace iLabs.ServiceBroker.admin
 	{
 
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+        CultureInfo culture;
+        int userTZ;
 		
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -47,22 +50,29 @@ namespace iLabs.ServiceBroker.admin
 				Response.Redirect("../login.aspx");
 
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this message?')== false) return false;");
-		
+            userTZ = Convert.ToInt32(Session["UserTZ"]);
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
 			if (!Page.IsPostBack)
 			{
+                lblDateFormat.Text = culture.DateTimeFormat.ShortDatePattern;
+                lblTzOff.Text = "&nbsp;&nbsp;UTC:&nbsp;&nbsp;" + userTZ / 60.0;
 				if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
 				{
 					try
 					{
 						ddlMessageTarget.Items .Clear ();
-						ddlMessageTarget.Items .Add ("--Select one--");
+						ddlMessageTarget.Items .Add("--Select one--");
 						int[] groupIDs = wrapper.ListGroupIDsWrapper();
 						Group[] groups=wrapper.GetGroupsWrapper(groupIDs);
 						foreach(Group gr in groups)
 						{
 							//if(!gr.groupName.EndsWith ("request"))
-							if ((gr.groupID>0)&&(!gr.groupName.Equals(Group.ROOT))&&(!gr.groupName.Equals(Group.SUPERUSER))&&(!gr.groupName.Equals(Group.NEWUSERGROUP))&&(!gr.groupName.Equals(Group.ORPHANEDGROUP)))
-								ddlMessageTarget.Items .Add (new ListItem(gr.groupName,gr.groupID.ToString()));
+                            if ((gr.groupID > 0) && gr.GroupType.Equals(GroupType.REGULAR) && (!gr.groupName.Equals(Group.ROOT))
+                                && (!gr.groupName.Equals(Group.SUPERUSER)) && (!gr.groupName.Equals(Group.NEWUSERGROUP))
+                                && (!gr.groupName.Equals(Group.ORPHANEDGROUP)))
+                            {
+                                ddlMessageTarget.Items.Add(new ListItem(gr.groupName, gr.groupID.ToString()));
+                            }
 						}
 					}
 					catch(Exception ex)
@@ -109,18 +119,18 @@ namespace iLabs.ServiceBroker.admin
         }
 
 			
-		private void BuildMsgListBox(string msgType, int groupID, int labServerID)
+		private void BuildMsgListBox(string msgType, int groupID, int clientID, int agentID)
 		{
 			lbxSelectMessage.ClearSelection();
 
 			try
 			{
-				SystemMessage[] msg=InternalAdminDB.SelectAdminSystemMessages(msgType, groupID, labServerID);
+				SystemMessage[] msg=InternalAdminDB.SelectAdminSystemMessages(msgType, groupID, clientID, agentID);
 				lbxSelectMessage.Items.Clear ();
 
 				for (int i =0;i <msg.Length ; i++)
 				{
-					lbxSelectMessage.Items .Add (new ListItem(msg[i].messageTitle + " / (" + msg[i].lastModified.ToString () +")", msg[i].messageID.ToString () ));
+					lbxSelectMessage.Items .Add(new ListItem(msg[i].messageTitle + " / (" + msg[i].lastModified.ToString () +")", msg[i].messageID.ToString () ));
 				}
 			}
 			catch(Exception ex)
@@ -136,7 +146,7 @@ namespace iLabs.ServiceBroker.admin
 			switch (radioButtonValue)
 			{
 				case "system":
-					BuildMsgListBox(SystemMessage.SYSTEM,0,0);
+					BuildMsgListBox(SystemMessage.SYSTEM,0,0,0);
 					break;
 				case "group":
 					if(ddlMessageTarget.SelectedIndex==0)
@@ -147,7 +157,7 @@ namespace iLabs.ServiceBroker.admin
 					}
 					else
 					{
-						BuildMsgListBox(SystemMessage.GROUP,Convert.ToInt32(ddlMessageTarget.SelectedItem.Value),0);
+						BuildMsgListBox(SystemMessage.GROUP,Convert.ToInt32(ddlMessageTarget.SelectedItem.Value),0,0);
 					}
 					break;
 				case"lab":
@@ -160,7 +170,7 @@ namespace iLabs.ServiceBroker.admin
 					}
 					else
 					{
-						BuildMsgListBox(SystemMessage.LAB,0,Convert.ToInt32(ddlMessageTarget.SelectedItem.Value));
+						BuildMsgListBox(SystemMessage.LAB,0,0,Convert.ToInt32(ddlMessageTarget.SelectedItem.Value));
 					}
 					break;			
 			}
@@ -176,14 +186,14 @@ namespace iLabs.ServiceBroker.admin
 					try
 					{
 						ddlMessageTarget.Items .Clear ();
-						ddlMessageTarget.Items .Add ("--Select one--");
+						ddlMessageTarget.Items .Add("--Select one--");
 						int[] groupIDs = wrapper.ListGroupIDsWrapper();
 						Group[] groups=wrapper.GetGroupsWrapper(groupIDs);
 						foreach(Group gr in groups)
 						{
 							//if(!gr.groupName.EndsWith ("request"))
 							if ((gr.groupID>0)&&(!gr.groupName.Equals(Group.ROOT))&&(!gr.groupName.Equals(Group.SUPERUSER))&&(!gr.groupName.Equals(Group.NEWUSERGROUP))&&(!gr.groupName.Equals(Group.ORPHANEDGROUP)))
-								ddlMessageTarget.Items .Add (new ListItem(gr.groupName,gr.groupID.ToString()));
+								ddlMessageTarget.Items .Add(new ListItem(gr.groupName,gr.groupID.ToString()));
 						}
 					}
 					catch(Exception ex)
@@ -197,13 +207,13 @@ namespace iLabs.ServiceBroker.admin
 					try
 					{
 						ddlMessageTarget.Items .Clear ();
-						ddlMessageTarget.Items .Add ("--Select one--");
+						ddlMessageTarget.Items .Add("--Select one--");
 						//int[] labServerIDs = wrapper.ListLabServerIDsWrapper();
 						IntTag[] labServers = wrapper.GetProcessAgentTagsByTypeWrapper(ProcessAgentType.LAB_SERVER);
 						foreach(IntTag ls in labServers)
 						{
 							if (ls.id > 0)
-								ddlMessageTarget.Items .Add (new ListItem(ls.tag,ls.id.ToString()));
+								ddlMessageTarget.Items .Add(new ListItem(ls.tag,ls.id.ToString()));
 						}
 					}
 					catch(Exception ex)
@@ -216,9 +226,9 @@ namespace iLabs.ServiceBroker.admin
 				case "system":
 				{
 					ddlMessageTarget.Items .Clear ();
-					ddlMessageTarget.Items .Add ("System");
+					ddlMessageTarget.Items .Add("System");
 					ddlMessageTarget.Items[0].Selected=true;
-					BuildMsgListBox(SystemMessage.SYSTEM, 0, 0);
+					BuildMsgListBox(SystemMessage.SYSTEM, 0, 0, 0);
 				}
 					break;
 			}
@@ -232,7 +242,7 @@ namespace iLabs.ServiceBroker.admin
 				{
 					SystemMessage msg = InternalAdminDB.SelectAdminSystemMessages(new int[] {Int32.Parse (lbxSelectMessage.Items [lbxSelectMessage.SelectedIndex].Value)})[0];
 					txtMessageBody.Text = msg.messageBody ;
-					txtLastModified.Text = msg.lastModified.ToString ();
+					txtLastModified.Text = DateUtil.ToUserTime(msg.lastModified,culture,userTZ);
 					txtMessageID.Text = msg.messageID .ToString ();
 					txtMessageTitle.Text = msg.messageTitle ;
 					cbxDisplayMessage.Checked = msg.toBeDisplayed ;
@@ -328,7 +338,7 @@ namespace iLabs.ServiceBroker.admin
 				// select group
 				if(ddlMessageTarget.SelectedIndex!=0)
 				{
-					BuildMsgListBox("Group", Convert.ToInt32(ddlMessageTarget.SelectedValue),0);
+					BuildMsgListBox("Group", Convert.ToInt32(ddlMessageTarget.SelectedValue),0,0);
 					txtTargetGroups.Text=ddlMessageTarget.SelectedItem.Text;	
 					ProcessAgentInfo[] labServers=wrapper.GetProcessAgentInfosWrapper(AdministrativeUtilities.GetGroupLabServers(Int32.Parse(ddlMessageTarget.SelectedValue)));
 					foreach (ProcessAgentInfo ls in labServers)
@@ -407,7 +417,8 @@ namespace iLabs.ServiceBroker.admin
 					{
 						msg.messageType = SystemMessage.SYSTEM;
 						msg.groupID = 0;
-						msg.labServerID=0;
+						msg.clientID=0;
+                        msg.agentID = 0;
 					}
 						break;
 
@@ -438,7 +449,7 @@ namespace iLabs.ServiceBroker.admin
 						else
 						{
 							msg.messageType =SystemMessage.LAB;
-							msg.labServerID=Int32.Parse(ddlMessageTarget.SelectedValue);
+							msg.agentID=Int32.Parse(ddlMessageTarget.SelectedValue);
 						}
 					}
 						break;
@@ -453,7 +464,7 @@ namespace iLabs.ServiceBroker.admin
 			{
 				try
 				{
-					msg.messageID =wrapper.AddSystemMessageWrapper(msg.messageType, msg.toBeDisplayed, msg.groupID, msg.labServerID, msg.messageBody, msg.messageTitle);
+					msg.messageID =wrapper.AddSystemMessageWrapper(msg.messageType, msg.toBeDisplayed, msg.groupID, msg.clientID,msg.agentID, msg.messageBody, msg.messageTitle);
 
 					BuildMsgListBox(rbtnSelectType.SelectedValue);
 					
@@ -476,7 +487,7 @@ namespace iLabs.ServiceBroker.admin
 				msg.messageID = Int32.Parse (txtMessageID.Text) ;
 				try 
 				{
-					wrapper.ModifySystemMessageWrapper(msg.messageID, msg.messageType, msg.toBeDisplayed, msg.groupID, msg.labServerID, msg.messageBody, msg.messageTitle);
+					wrapper.ModifySystemMessageWrapper(msg.messageID, msg.messageType, msg.toBeDisplayed, msg.groupID, msg.clientID, msg.agentID, msg.messageBody, msg.messageTitle);
 					txtLastModified.Text = msg.LastModified.ToString ();
 
 					//update record in list box

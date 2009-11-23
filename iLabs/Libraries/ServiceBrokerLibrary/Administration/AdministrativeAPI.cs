@@ -93,75 +93,6 @@ namespace iLabs.ServiceBroker.Administration
 
 	}
 
-	/// <summary>
-	/// Structure which holds information pertaining to a Lab Server.
-	/// </summary>
-	public struct LabServer
-	{
-		/// <summary>
-		/// The integer ID of the Lab Server.
-		/// </summary>
-		public int labServerID;
-
-		/// <summary>
-		/// The name of the Lab Server.
-		/// </summary>
-		public string labServerName;
-
-		/// <summary>
-		/// The string GUID (Globally Unique Identifier) of the Lab Server. 
-		/// This value guarantees that a Lab Server will be uniquely identified to all Service Brokers.
-		/// </summary>
-		public string labServerGUID;
-
-		/// <summary>
-		/// The URL where this Lab Server's Web Services are located.
-		/// </summary>
-		public string webServiceURL;
-
-		/// <summary>
-		/// The description of this Lab Server.
-		/// </summary>
-		public string labServerDescription;
-
-		/// <summary>
-		/// A URL where documentation and information pertaining to this Lab Server may be found.
-		/// </summary>
-		public string labInfoURL;
-
-		/// <summary>
-		/// First name of the person to contact regarding this Lab Server.
-		/// </summary>
-		public string contactFirstName;
-
-		/// <summary>
-		/// Last name of the person to contact regarding this Lab Server.
-		/// </summary>
-		public string contactLastName;
-
-		/// <summary>
-        /// Email address of the person to contact regarding this Lab Server.
-		/// </summary>
-		public string contactEmail;
-
-		/// <summary>
-		/// Property for the Lab Server Name.
-		/// This is needed in order for a Repeater object to display the value in the labServerName field.
-		/// </summary>
-		public string LabServerName
-		{
-			get{ return labServerName; } 
-		}
-
-		/// <summary>
-		/// Property for the Lab Server Description.
-		/// This is needed in order for a Repeater object to display the value in the labServerDescription field. 
-		/// </summary>
-		public string LabServerDescription
-		{
-			get{ return labServerDescription; } 
-		}
-	}
 
 	/// <summary>
 	/// Structure containing information pertaining to a Lab Client.
@@ -303,6 +234,11 @@ namespace iLabs.ServiceBroker.Administration
         /// Named constant for the Client type.
         /// </summary>
         public const string INTERACTIVE_HTML_REDIRECT = "Interactive Redirect";
+
+        /// <summary>
+        /// Named constant for the Client type.
+        /// </summary>
+        public const string WEB_SERVICE_REDIRECT = "Web Service Redirect";
 	}
 
 	/// <summary>
@@ -608,16 +544,19 @@ namespace iLabs.ServiceBroker.Administration
 		/// true if the message is to be displayed.
 		/// </summary>
 		public bool toBeDisplayed;
-
+        /// <summary>
+        /// Client that should display this message.
+        /// </summary>
+        public int clientID;
 		/// <summary>
 		/// Effective Group of the user who created this message.
 		/// </summary>
 		public int groupID;
 
 		/// <summary>
-		/// Lab Server ID of the Lab Server which was in use when the message was last modified.
+		/// ID of the ProcessAgent which this message refers to.
 		/// </summary>
-		public int labServerID; // This currently (5/22/2004) refers to the last_modified field in the database
+		public int agentID;
 
 		/// <summary>
 		/// Date/Time of the last modification of the message.
@@ -666,6 +605,15 @@ namespace iLabs.ServiceBroker.Administration
 		/// Named constant for the Lab message type.
 		/// </summary>
 		public const string LAB = "Lab";
+
+        public static int CompareDateAsc(SystemMessage m1, SystemMessage m2)
+        {
+            return m1.lastModified.CompareTo(m2.lastModified);
+        }
+        public static int CompareDateDesc(SystemMessage m1, SystemMessage m2)
+        {
+            return m2.lastModified.CompareTo(m1.lastModified);
+        }
 	}
 
     public class DateComparer : IComparer
@@ -804,7 +752,8 @@ namespace iLabs.ServiceBroker.Administration
 		/// <seealso cref="LabServer">LabServer Class</seealso>
 		public static ProcessAgent[] GetLabServers()
 		{
-			return InternalAdminDB.SelectLabServers ();
+            
+			return new ProcessAgentDB().GetProcessAgentsByType(ProcessAgentType.LAB_SERVER);
 		}
 
 		/// <summary>
@@ -812,7 +761,7 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public static int GetLabServerID(string labServerGUID)
 		{
-			return InternalAdminDB.SelectLabServerID (labServerGUID);
+			return new ProcessAgentDB().GetProcessAgentID(labServerGUID);
 		}
 
 		/// <summary>
@@ -942,13 +891,13 @@ namespace iLabs.ServiceBroker.Administration
                 }
         */
         /// <summary>
-		/// Lists the IDs of all lab servers registered with the Service Broker.
-		/// </summary>
-		/// <returns>An array of LabServerIDs for all registered lab servers.</returns>
-		public static int[] ListLabServerIDs()
-		{
-			return InternalAdminDB.SelectLabServerIDs ();
-		}
+        /// Lists the IDs of all lab servers registered with the Service Broker.
+        /// </summary>
+        /// <returns>An array of LabServerIDs for all registered lab servers.</returns>
+        public static int[] ListLabServerIDs()
+        {
+            return new ProcessAgentDB().GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.LAB_SERVER);
+        }
 /*
 		/// <summary>
 		/// Generates and installs a new passkey that will be used to authenticate web service calls made by the remote server identified by labServerID.
@@ -1169,10 +1118,6 @@ namespace iLabs.ServiceBroker.Administration
 			}
 		}
 
-        public static int GetLabClientID(string clientGuid)
-        {
-            return InternalAdminDB.SelectLabClientId(clientGuid);
-        }
 		/// <summary>
 		/// Lists the IDs of all lab clients registered with the service broker.
 		/// </summary>
@@ -1182,6 +1127,25 @@ namespace iLabs.ServiceBroker.Administration
 			return InternalAdminDB.SelectLabClientIDs ();
 		}
 
+        /// <summary>
+        /// Returns a labClient.
+        /// </summary>
+        /// <param name="labClientIDs">The IDs identifying the registered lab clients whose information is to be retrieved.</param>
+        /// <returns>An array of LabClient objects describing the registered lab clients specified in labClientIDs; if the nth LabClient ID does not correspond to a valid lab client, the nth entry in the return array will be null.</returns>
+        public static LabClient GetLabClient(int labClientID)
+        {
+            return InternalAdminDB.SelectLabClient(labClientID);
+        }
+
+        /// <summary>
+        /// Returns a labClient.
+        /// </summary>
+        /// <param name="labClientIDs">The IDs identifying the registered lab clients whose information is to be retrieved.</param>
+        /// <returns>An array of LabClient objects describing the registered lab clients specified in labClientIDs; if the nth LabClient ID does not correspond to a valid lab client, the nth entry in the return array will be null.</returns>
+        public static LabClient GetLabClient(string clientGuid)
+        {
+            return InternalAdminDB.SelectLabClient(clientGuid);
+        }
 		/// <summary>
 		/// Returns an array of the immutable labClient objects for the registered lab clients whose IDs are supplied in labClientIDs.
 		/// </summary>
@@ -1195,9 +1159,9 @@ namespace iLabs.ServiceBroker.Administration
         /// <summary>
         /// Returns the immutable labClient object for the specified Guid.
         /// </summary>
-        /// <param name="labClientIDs">The IDs identifying the registered lab clients whose information is to be retrieved.</param>
+        /// <param name="clientGuid">The guid identifying the registered lab client whose information is to be retrieved.</param>
         /// <returns>A LabClient object describing the registered lab client specified; if the labClient GUID does not correspond to a valid lab client, null</returns>
-        public static int GetLabClientId(string clientGuid)
+        public static int GetLabClientID(string clientGuid)
         {
             return InternalAdminDB.SelectLabClientId(clientGuid);
         }
@@ -1273,7 +1237,7 @@ namespace iLabs.ServiceBroker.Administration
                 }
                 catch
                 {
-                    //aList.Add (itemNames[i]);
+                    //aList.Add(itemNames[i]);
                     throw;
                 }
             }
@@ -1447,6 +1411,16 @@ namespace iLabs.ServiceBroker.Administration
 		{
 			return InternalAdminDB.SelectUserID(userName);
 		}
+
+        /// <summary>
+        /// Returns the integer userID that corresponds to the supplied username.
+        /// </summary>
+        /// <param name="userName">The userName identifying the user whose user ID is requested.</param>
+        /// <returns>The integer userID of the requested user.</returns>
+        public static string GetUserName(int userID)
+        {
+            return InternalAdminDB.SelectUserName(userID);
+        }
 
 
 		///*********************** GROUPS **************************///
@@ -1658,6 +1632,15 @@ namespace iLabs.ServiceBroker.Administration
 			return InternalAdminDB.SelectGroupID(groupName);
 		}
 
+        /// <summary>
+        /// Obtains a GroupName, given the group ID.
+        /// </summary>
+        /// <param name="groupID">The ID of the group whose name is to be obtained.</param>
+        /// <returns>Name of the group, or null if not found</returns>
+        public static string GetGroupName(int groupID)
+        {
+            return InternalAdminDB.SelectGroupName(groupID);
+        }
 		/// <summary>
 		/// Obtains the associated GroupID, given the group ID. A TA Group or Request 
 		/// group is associated with another group which it administers / is the request group of.
@@ -1830,7 +1813,7 @@ namespace iLabs.ServiceBroker.Administration
 					{
 						//Add user to list if it doesn't exist already
 						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add (agent[i].id );
+							arrayList.Add(agent[i].id );
 					}
 				}
 			}
@@ -1865,7 +1848,7 @@ namespace iLabs.ServiceBroker.Administration
 					{
 						//Add user to list if it doesn't exist already
 						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add (agent[i].id );
+							arrayList.Add(agent[i].id );
 					}
 					else //If Agent is a group
 					{
@@ -1876,7 +1859,7 @@ namespace iLabs.ServiceBroker.Administration
 						for(int j =0; j < list.Length ; j++)
 						{
 							if(!arrayList.Contains (list[j]))
-								arrayList.Add (list[j]);
+								arrayList.Add(list[j]);
 						}
 
 					}
@@ -1913,7 +1896,7 @@ namespace iLabs.ServiceBroker.Administration
 					{
 						//Add group to list if it doesn't exist already
 						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add (agent[i].id );
+							arrayList.Add(agent[i].id );
 					}
 				}
 			}
@@ -1948,7 +1931,7 @@ namespace iLabs.ServiceBroker.Administration
 					{
 						//Add group to list if it doesn't exist already
 						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add (agent[i].id );
+							arrayList.Add(agent[i].id );
 					}
 					//Get the members of the group
 					int[] list = ListSubgroupIDsRecursively(agent[i].id );
@@ -1957,7 +1940,7 @@ namespace iLabs.ServiceBroker.Administration
 					for(int j =0; j < list.Length ; j++)
 					{
 						if(!arrayList.Contains (list[j]))
-							arrayList.Add (list[j]);
+							arrayList.Add(list[j]);
 					}
 				}
 			}
@@ -1990,7 +1973,7 @@ namespace iLabs.ServiceBroker.Administration
 
 
 		/// <summary>
-		/// Checks whether the specified agent is a member of the specified group. 
+		/// Recursively checks whether the specified agent is a member of the specified group. 
 		/// </summary>
 		/// <param name="agentID">The ID of the agent whose membership in the enclosing group is to be checked; note that the agent may be a single user (represented by a userID) or a subgroup of the target group to satisfy the query.</param>
 		/// <param name="groupID">The ID of the Group in which the agent's membership is being checked.</param>
@@ -2047,7 +2030,7 @@ namespace iLabs.ServiceBroker.Administration
 			{
 				if(!myHT.Contains (gps[i]))
 				{
-					myHT.Add (gps[i],"");
+					myHT.Add(gps[i],"");
 				}
 			}
 			
@@ -2059,7 +2042,7 @@ namespace iLabs.ServiceBroker.Administration
 				{
 					if(!myHT.Contains (	groups[j]))
 					{
-						myHT.Add (groups[j],"");
+						myHT.Add(groups[j],"");
 					}
 				}
 			}
@@ -2116,14 +2099,14 @@ namespace iLabs.ServiceBroker.Administration
 		/// <param name="messageBody">The text of the message to be displayed.</param>
 		/// <param name="messageTitle">The title of the message to be displayed.</param>
 		/// <returns></returns>
-		public static int AddSystemMessage(string messageType, bool toBeDisplayed, int groupID, int labServerID, string messageBody, string messageTitle)
+        public static int AddSystemMessage(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
 		{
 			SystemMessage sm = new SystemMessage();
 			sm.messageType=messageType;
 			sm.toBeDisplayed = toBeDisplayed;
 			sm.groupID = groupID;
-
-			sm.labServerID = labServerID;
+            sm.clientID = clientID;
+			sm.agentID = agentID;
 			sm.messageBody = messageBody;
 			sm.messageTitle = messageTitle;
 
@@ -2150,14 +2133,15 @@ namespace iLabs.ServiceBroker.Administration
 		/// <param name="labServerID">-1 if message is not targeted at users of a particular lab server; if >0, this message is targeted at users who have selected as their effective group, a group that has access to the lab server specified by this ID. If this argument and groupID are both ==-1, then the message is intended as a general system message visible to all users.</param>
 		/// <param name="messageBody">The text of the message to be displayed; if NULL, then the previous value will not be changed.</param>
 		/// <param name="messageTitle">The title of the message to be displayed; if NULL, then the previous value will not be changed.</param>
-		public static void ModifySystemMessage(int messageID, string messageType, bool toBeDisplayed, int groupID, int labServerID, string messageBody, string messageTitle)
+		public static void ModifySystemMessage(int messageID, string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
 		{
 			SystemMessage sm = new SystemMessage();
 			sm.messageID = messageID;
 			sm.messageType=messageType;
 			sm.toBeDisplayed = toBeDisplayed;
 			sm.groupID = groupID;
-			sm.labServerID = labServerID;
+			sm.clientID = clientID;
+            sm.agentID = agentID;
 			sm.messageBody = messageBody;
 			sm.messageTitle = messageTitle;
 
@@ -2172,9 +2156,9 @@ namespace iLabs.ServiceBroker.Administration
 		/// <param name="labServerID">If >0, messages for the labServer identified by this labServerID are retrieved. If ==-1, then the labServerID is not used as a selection criterion. Note groupID has precedence over this argument; that is, if both groupID and labServerID are both >0, then labServerID will be ignored as a selection criterion. If groupID and labServerID are both ==-1, then only general system messages visible to all users will be retrieved.</param>
 		/// <returns>An SystemMessage array of the requested system messages.</returns>
 		/// <seealso cref="SystemMessage">SystemMessage Class</seealso>
-		public static SystemMessage[] GetSystemMessages(string messageType, int groupID, int labServerID)
+		public static SystemMessage[] GetSystemMessages(string messageType, int groupID, int clientID, int agentID)
 		{
-			return InternalAdminDB.SelectSystemMessages(messageType, groupID, labServerID);
+			return InternalAdminDB.SelectSystemMessages(messageType, groupID, clientID, agentID);
 		}
 		
 

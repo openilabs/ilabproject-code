@@ -58,7 +58,7 @@ Please see license.txt in top level directory for full license.
                                                                     </label>
                                                                 </th>
                                                                 <td colspan="3">
-                                                                    <asp:DropDownList ID="ddlTimeAttribute" runat="server" Width="128px" AutoPostBack="True"
+                                                                    <asp:DropDownList CssClass="i18n" ID="ddlTimeAttribute" runat="server" Width="128px" AutoPostBack="True"
                                                                         OnSelectedIndexChanged="ddlTimeAttribute_SelectedIndexChanged">
                                                                         <asp:ListItem Value="Select before">-- Select One --</asp:ListItem>
                                                                         <asp:ListItem Value="before">before</asp:ListItem>
@@ -99,7 +99,7 @@ Please see license.txt in top level directory for full license.
                                                 <div class="simpleform">
                                                     <label for="selectexperiment">
                                                         Select Experiment</label><br />
-                                                    <asp:ListBox ID="lbxSelectExperiment" runat="server" Width="430px" Height="156px"
+                                                    <asp:listbox cssClass="i18n" ID="lbxSelectExperiment" runat="server" Width="430px" Height="156px"
                                                         AutoPostBack="True" OnSelectedIndexChanged="lbxSelectExperiment_SelectedIndexChanged">
                                                     </asp:ListBox>
                                                 </div>

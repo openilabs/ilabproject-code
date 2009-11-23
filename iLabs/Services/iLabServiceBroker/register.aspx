@@ -1,7 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
-<%@ Page language="c#" CodeFile="register.aspx.cs" AutoEventWireup="false" Inherits="iLabs.ServiceBroker.iLabSB.register" EnableEventValidation="false" %>
+<%@ Page language="c#" CodeFile="register.aspx.cs" AutoEventWireup="false" Inherits="iLabs.ServiceBroker.iLabSB.register" EnableEventValidation="true" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html>
 	<head>
@@ -32,6 +32,8 @@ Please see license.txt in top level directory for full license.
 							a confirmation.</p>
 						<!-- Errormessage should appear here:-->
 						<!--div class="errormessage"-->
+						<asp:ValidationSummary ID="ValSummmary" runat="server" ShowSummary="true" DisplayMode="List"
+						HeaderText="Please correct the following erors." />
 						<asp:Label Runat="server" id="lblResponse" Visible="False"></asp:Label>
 						<!--/div--> <!--End error message -->
 					</div> <!-- end pageintro div -->
@@ -69,14 +71,19 @@ Please see license.txt in top level directory for full license.
 										<th>
 											<label for="email">Email</label></th>
 										<td><asp:textbox id="txtEmail" Runat="server"></asp:textbox>
-											<!--input type="text" name="email" id="email"--></td>
+										<asp:RegularExpressionValidator ID = valEmail runat="server"
+										ControlToValidate="txtEmail" ValidationExpression=".*@.*\..*"
+										ErrorMessage="* The email address is not in the correct format!"
+										Display="dynamic">*</asp:RegularExpressionValidator>
+											<!--input type="text" name="email" id="email"-->
+										</td>
 									</tr>
 									<tr>
 										<th style="HEIGHT: 7px">
 											<label for="affiliation">Affiliation</label></th>
 										<td style="HEIGHT: 7px">
 											<% if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true")){ %>
-											<asp:dropdownlist id="ddlAffiliation" Runat="server"></asp:dropdownlist>
+											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server"></asp:dropdownlist>
 											<% }else{ %>
 											<asp:TextBox id="txtAffiliation" Runat="server"></asp:TextBox>
 											<% } %>
@@ -86,7 +93,7 @@ Please see license.txt in top level directory for full license.
 										<th>
 											<label for="group">Requested Group </label>
 										</th>
-										<td><asp:dropdownlist id="ddlGroup" Runat="server"></asp:dropdownlist>
+										<td><asp:dropdownlist CssClass="i18n" id="ddlGroup" Runat="server"></asp:dropdownlist>
 										</td>
 									</tr>
 									<tr>

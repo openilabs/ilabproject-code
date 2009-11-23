@@ -64,17 +64,16 @@ namespace iLabs.ServiceBroker.iLabSB
 				//Redirect to single lab single group page?
                 if (nonRequestGroups.Count == 1)
                 {
-                    if (nonRequestGroups[0] != null)
-                    {
-
+                    
                         if (nonRequestGroups[0] != null)
                         {
                             Session["GroupID"] = ((Group)nonRequestGroups[0]).groupID;
                             Session["GroupName"] = ((Group)nonRequestGroups[0]).groupName;
                             Session["GroupCount"] = 1;
+                            AdministrativeAPI.SetSessionGroup(Convert.ToInt64(Session["SessionID"]), ((Group)nonRequestGroups[0]).groupID);
                             PageRedirect((Group)nonRequestGroups[0]);
                         }
-                    }
+                    
                 }
                 else
                 {

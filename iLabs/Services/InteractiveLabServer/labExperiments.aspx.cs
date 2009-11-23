@@ -10,6 +10,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.Security;
@@ -24,7 +25,6 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
-using iLabs.Services;
 using iLabs.LabServer.Interactive;
 
 

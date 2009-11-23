@@ -12,11 +12,11 @@ Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserve
 Please see license.txt in top level directory for full license. 
 -->
 		<!-- $Id: manageservices.aspx,v 1.15 2007/05/08 23:08:21 pbailey Exp $ -->
-		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
-		<meta content="C#" name="CODE_LANGUAGE">
-		<meta content="JavaScript" name="vs_defaultClientScript">
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
+		<meta content="C#" name="CODE_LANGUAGE"/>
+		<meta content="JavaScript" name="vs_defaultClientScript"/>
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<style type="text/css">@import url( ../css/main.css ); 
 		</style>
 	</head>
@@ -26,7 +26,7 @@ Please see license.txt in top level directory for full license.
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
 				<uc1:adminNav id="AdminNav1" runat="server"></uc1:adminNav>
-				<br clear="all">
+				<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Manage Process Agents</h1>
@@ -47,7 +47,7 @@ Please see license.txt in top level directory for full license.
 											<tr>
 												<th style="width: 120px">
 													<label for="Service">Service</label></th>
-												<td colspan="2" style="width: 560px"><asp:dropdownlist id="ddlService" Runat="server" AutoPostBack="True" Width="560px" onselectedindexchanged="ddlService_SelectedIndexChanged"></asp:dropdownlist></td>
+												<td colspan="2" style="width: 560px;"><asp:dropdownlist CssClass="i18n" id="ddlService" Runat="server" AutoPostBack="True" Width="560px" onselectedindexchanged="ddlService_SelectedIndexChanged"></asp:dropdownlist></td>
 											</tr>
 											<tr>
 												<th style="width: 120px">
@@ -109,22 +109,34 @@ Please see license.txt in top level directory for full license.
 											</tr>
 											<tr>
 												<th style="width: 120px">
-													<label for="infourl">Info URL </label>
+													<label for="infourl">Info URL</label>
 												</th>
 												<td colspan="2" style="width: 560px"><asp:textbox id="txtInfoURL" Runat="server" Width="560px"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 120px">
-													<label for="contactemail">Contact Email </label>
+													<label for="contactemail">Contact Email</label>
 												</th>
 												<td colspan="2" style="width: 560px"><asp:textbox id="txtContactEmail" Runat="server" Width="560px"></asp:textbox></td>
+											</tr>
+											<tr>
+												<th style="width: 120px">
+													<label for="bugemail">Bug Report Email</label>
+												</th>
+												<td colspan="2" style="width: 560px"><asp:textbox id="txtBugEmail" Runat="server" Width="560px"></asp:textbox></td>
+											</tr>
+											<tr>
+												<th style="width: 120px">
+													<label for="location">Location</label>
+												</th>
+												<td colspan="2" style="width: 560px"><asp:textbox id="txtLocation" Runat="server" Width="560px"></asp:textbox></td>
 											</tr>
 											<tr id="trAdminGroup" runat="server">
 												<th style="width: 120px">
 													<label id="lblAdminGroup" runat="server" for="adminGroup">Admin Group</label>
 												</th>
 												<td colspan="2" style="width: 560px">
-                                                    <asp:DropDownList ID="ddlAdminGroup" runat="server" Width="560px"></asp:DropDownList>
+                                                    <asp:DropDownList CssClass="i18n" ID="ddlAdminGroup" runat="server" Width="560px"></asp:DropDownList>
                                                 </td>
 											</tr>
 											<tr id="trAssociate" runat="server">
@@ -132,7 +144,7 @@ Please see license.txt in top level directory for full license.
 													<label id="lblAssociate" runat="server"  for="associatedLSS">Associated LSS</label>
                                                 </th>
 												<td style="width: 440px; height: 1px;">
-                                                    <asp:DropDownList ID="ddlLSS" runat="server" Width="440px"></asp:DropDownList>
+                                                    <asp:DropDownList CssClass="i18n" ID="ddlLSS" runat="server" Width="440px"></asp:DropDownList>
                                                 </td>
                                                 <td rowspan="2" style="width: 120px">
                                                     <asp:Button ID="btnAssociateLSS" CssClass="button"  runat="server" Text="Associate" OnClick="btnAssociateLSS_Click"></asp:Button>
@@ -143,7 +155,7 @@ Please see license.txt in top level directory for full license.
 													<label id="lblManage" runat="server"  for="ManageLSS">Manage on LSS</label>
                                                 </th>
 												<td style="width: 440px; height: 1px;">
-                                                    <asp:DropDownList ID="ddlManageLSS" runat="server" Width="440px"></asp:DropDownList>
+                                                    <asp:DropDownList CssClass="i18n" ID="ddlManageLSS" runat="server" Width="440px"></asp:DropDownList>
                                                 </td>
 											</tr>                                            
 											<tr align="right">

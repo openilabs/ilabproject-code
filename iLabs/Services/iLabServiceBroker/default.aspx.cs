@@ -32,9 +32,12 @@ namespace iLabs.ServiceBroker.iLabSB
 				showUrl = Global.FormatSecureURL(Request,"home.aspx");
 			else
 				showUrl = Global.FormatRegularURL(Request,"home.aspx");
-			
-			if(Request.Params["login"] != null)
-				showUrl = "login.aspx";
+
+            if (Request.Params["login"] != null)
+            {
+                string query = Request.QueryString["ReturnUrl"];
+                showUrl = "login.aspx";
+            }
 			// Put user code to initialize the page here
 		}
 

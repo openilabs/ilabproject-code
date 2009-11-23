@@ -198,6 +198,23 @@ namespace iLabs.UtilLib
                     type = languageStr;
                 }
                 culture = new CultureInfo(type);
+                if (culture.IsNeutralCulture)
+                {
+                    if (type.Length == 2)
+                    {
+                        string langStr = type.ToLower() + "-" + type.ToUpper();
+                        culture = new CultureInfo(langStr);
+
+                    }
+                    else
+                    {
+                        culture = CultureInfo.CreateSpecificCulture(type);
+                    }
+                    if (culture.IsNeutralCulture)
+                    {
+                        throw new Exception("Unable to parse language string: " + languageStr);
+                    }
+                }
             }
             catch(Exception e)
             {

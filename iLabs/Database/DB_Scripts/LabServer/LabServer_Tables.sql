@@ -75,21 +75,21 @@ CREATE TABLE [LabApp] (
 	[Height] [int] NOT NULL ,
 	[Type] [int] NOT NULL ,
 	[Port] [int] NULL ,
-	[Description] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Comment] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Description] [nvarchar](2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Comment] [nvarchar](2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[DataSource] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[ExtraInfo] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[AppKey] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[ExtraInfo] [nvarchar](2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[AppKey] [nvarchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[AppGuid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Path] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Application] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Title] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Version] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Rev] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Server] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Page] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[CgiURL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Contact] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Path] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Application] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Title] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Version] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Rev] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Server] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Page] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[CgiURL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
@@ -98,9 +98,9 @@ GO
 
 CREATE TABLE [dbo].[LocalGroup] (
 	[GroupID] [int] IDENTITY (1, 1) NOT NULL ,
-	[GroupName] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Contact] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Comment] [varchar] (2000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[GroupName] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact] [vnarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Comment] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
@@ -115,9 +115,9 @@ CREATE TABLE [dbo].[SBGroup] (
 	[GroupID] [int] NOT NULL ,
 	[SBGroup_ID] [int] NOT NULL ,
 	[SB_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[GroupName] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Contact] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Comment] [varchar] (2000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[GroupName] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Contact] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Comment] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
@@ -126,13 +126,13 @@ CREATE TABLE [dbo].[Task] (
 	[Coupon_ID] [bigint] NULL ,
 	[Experiment_ID] [bigint] NULL ,
 	[Status] [int] NOT NULL ,
-	[LAbApp_ID] [int] NOT NULL ,
-	[GroupName] [varchar](128) NOT NULL ,
+	[LabApp_ID] [int] NOT NULL ,
+	[GroupName] [nvarchar](256) NOT NULL ,
 	[StartTime] [datetime] NOT NULL ,
 	[EndTime] [datetime] NOT NULL ,
 	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Storage] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
-	[Data] [nvarchar] (2000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+	[Storage] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
+	[Data] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 	
 ) ON [PRIMARY]
 GO

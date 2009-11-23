@@ -68,7 +68,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/LabSideSch
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/ExperimentStorage/", "http://localhost/ExperimentStorage", "{7757CCE6-A356-4478-9D71-769F015C6CCD}"
 	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;"
+		ProjectReferences = "{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/ExperimentStorage"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\Services\ExperimentStorage\"
 		Debug.AspNetCompiler.TargetPath = "..\..\Builds\ExperimentStorage\"
@@ -88,7 +88,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/Experiment
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/TimeOfDay/", "http://localhost/TimeOfDay", "{644BE09A-AAA5-4596-A19D-3C053F51F2F9}"
 	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}|ExperimentStorageProxy.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;"
+		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}|ExperimentStorageProxy.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/TimeOfDay"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\Services\InteractiveTimeOfDay\"
 		Debug.AspNetCompiler.TargetPath = "..\..\Builds\TimeOfDay\"
@@ -108,7 +108,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/TimeOfDay/
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLabServiceBroker/", "http://localhost/iLabServiceBroker", "{5947A0A6-FD73-4D90-82C4-61B5E90F5FCB}"
 	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{06EF99E2-DB59-4139-AF0C-EC9B339DD460}|UserSchedulingProxy.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{8C295C05-959B-483C-9F31-62E45FE46543}|iLabsArchitecture.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{BF60ADC0-5696-45D3-8B3E-986E88C565F0}|LabSchedulingProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{0FCD1E67-C460-4854-9707-61A0F00C75C8}|BatchLabSeverProxy.dll;"
+		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{06EF99E2-DB59-4139-AF0C-EC9B339DD460}|UserSchedulingProxy.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{8C295C05-959B-483C-9F31-62E45FE46543}|iLabsArchitecture.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{BF60ADC0-5696-45D3-8B3E-986E88C565F0}|LabSchedulingProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{0FCD1E67-C460-4854-9707-61A0F00C75C8}|BatchLabSeverProxy.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/iLabServiceBroker"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\Services\iLabServiceBroker\"
 		Debug.AspNetCompiler.TargetPath = "..\..\Builds\iLabServiceBroker\"
@@ -128,7 +128,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLabServic
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/InteractiveLabServer/", "http://localhost/InteractiveLabServer", "{D09173F2-695B-405E-9D63-39698DA9FBAF}"
 	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}|ExperimentStorageProxy.dll;{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{482C3D3E-9596-4AB0-BD61-E3E427995AC4}|LabServerLibrary.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{F4E146A2-AFB8-400F-967A-C46AA626B603}|LabViewInterface86.dll;{FFFC2C73-33E5-4D53-914A-76D369E3295F}|LabViewInterface82.dll;"
+		ProjectReferences = "{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}|ExperimentStorageProxy.dll;{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{482C3D3E-9596-4AB0-BD61-E3E427995AC4}|LabServerLibrary.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{F4E146A2-AFB8-400F-967A-C46AA626B603}|LabViewInterface86.dll;{FFFC2C73-33E5-4D53-914A-76D369E3295F}|LabViewInterface82.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/InteractiveLabServer"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\Services\InteractiveLabServer\"
 		Debug.AspNetCompiler.TargetPath = "..\..\Builds\InteractiveLabServer\"

@@ -2,6 +2,9 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Configuration;
 using System.Web;
 using System.IO;
@@ -10,7 +13,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using System.Data.SqlClient;
+
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
@@ -75,17 +78,17 @@ namespace iLabs.ExpStorage
         /// <returns>the ID of the created BLOB object</returns>
         public long CreateBlob(long experimentId, string sbGuid, string description, int byteCount, string checksum, string checksumAlgorithm)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("CreateBlob", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("CreateBlob", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myConnection.Open();
 
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            myCommand.Parameters.Add(new SqlParameter("@description", description));
-            myCommand.Parameters.Add(new SqlParameter("@byteCount", byteCount));
-            myCommand.Parameters.Add(new SqlParameter("@checksum", checksum));
-            myCommand.Parameters.Add(new SqlParameter("@checksumAlgorithm", checksumAlgorithm));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString, 50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@description", description, DbType.String,2048));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@byteCount", byteCount, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@checksum", checksum, DbType.AnsiString,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@checksumAlgorithm", checksumAlgorithm, DbType.AnsiString,256));
 
             try
             {
@@ -111,10 +114,10 @@ namespace iLabs.ExpStorage
         {
             long experimentId = -1;
 
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlobExperiment", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId,DbType.Int64));
 
             try
             {
@@ -146,10 +149,10 @@ namespace iLabs.ExpStorage
         /// <returns>the sequence number of the ExperimentRecord with which the BLOB is associated; -1 if there is no such record; note that a BLOB can be associated with at most one ExperimentRecord</returns>
         public int GetBlobAssociation(long blobId)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlobAssociation", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobAssociation", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId, DbType.Int64));
 
             try
             {
@@ -181,10 +184,10 @@ namespace iLabs.ExpStorage
         /// <returns>a status code</returns>
         public int GetBlobStatus(long blobId)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlobDownloadStatus", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobDownloadStatus", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
 
             int statusCode = -1;
 
@@ -212,11 +215,11 @@ namespace iLabs.ExpStorage
         public bool SetBlobStatus(long blobId, int status)
         {
             bool statusCode = false;
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("SetBlobDownloadStatus", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("SetBlobDownloadStatus", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
-            myCommand.Parameters.Add(new SqlParameter("@blobStatus", status));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobStatus", status, DbType.Int32));
 
             try
             {
@@ -320,12 +323,12 @@ namespace iLabs.ExpStorage
         /// <returns></returns>
         public static bool StoreBlobAccess(long blobId, string blobUrl)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("AddBlobAccess", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("AddBlobAccess", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
-            myCommand.Parameters.Add(new SqlParameter("@blobUrl", blobUrl));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobUrl", blobUrl, DbType.String,512));
 
             try
             {
@@ -354,20 +357,31 @@ namespace iLabs.ExpStorage
         /// <returns>true if the data is successfully stored</returns>
         public byte[] RetrieveBlobData(long blobId)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlobData", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobData", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
             byte[] data = null;
             try
             {
                 myConnection.Open();
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
+                
                 while (myReader.Read())
                 {
                     if (!myReader.IsDBNull(0))
-                        data = myReader.GetSqlBytes(0).Buffer;
+                    {
+                        // BLOB warning
+                        int bufSize = 8000;
+                        Byte[] buffer = new byte[bufSize];
+                        long count = myReader.GetBytes(0, 0L, buffer, 0, bufSize);
+                        data = new byte[count];
+                        for (long i = 0L; i < count;i++ )
+                        {
+                            data[i] = buffer[i];
+                        } 
+                    }
                 }
 
             }
@@ -390,14 +404,15 @@ namespace iLabs.ExpStorage
         /// <returns>true if the data is successfully stored</returns>
         public bool StoreBlobData(long blobId, string mimeType, byte[] blobData)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("AddBlobData", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("AddBlobData", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
-            myCommand.Parameters.Add(new SqlParameter("@blobStatus", Blob.eStatus.COMPLETE));
-            myCommand.Parameters.Add(new SqlParameter("@mimeType", mimeType));
-            myCommand.Parameters.Add("@blobData", SqlDbType.Image, blobData.Length).Value = blobData;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobStatus", Blob.eStatus.COMPLETE, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@mimeType", mimeType, DbType.AnsiString,1024));
+            // BLOB Warning
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobData", blobData, DbType.Binary, blobData.Length));
             
 
             try
@@ -421,11 +436,11 @@ namespace iLabs.ExpStorage
 
         //public static bool StoreBlobUrl(long blobID)
         //{
-        //    SqlConnection myConnection = ProcessAgentDB.GetConnection();
-        //    SqlCommand myCommand = new SqlCommand("AddBlobAccess", myConnection);
+        //    DbConnection myConnection = FactoryDB.GetConnection();
+        //    DbCommand myCommand = FactoryDB.CreateCommand("AddBlobAccess", myConnection);
         //    myCommand.CommandType = CommandType.StoredProcedure;
 
-        //    myCommand.Parameters.Add(new SqlParameter("@blobId", blobID));
+        //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobID));
 
         //    try
         //    {
@@ -477,11 +492,11 @@ namespace iLabs.ExpStorage
 
 
             /* Totally punt for the moment
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlobAccess", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobAccess", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
-            myCommand.Parameters.Add(new SqlParameter("@duration", duration));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@duration", duration));
 
             try
             {
@@ -516,13 +531,13 @@ namespace iLabs.ExpStorage
         /// <returns>true if the association was successful</returns>
         public bool AddBlobToRecord(long blobId, long experimentId, string sbGuid, int sequenceNum)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("AddBlobToExperimentRecord", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("AddBlobToExperimentRecord", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-            myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
-            myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNum, DbType.Int32));
 
             try
             {
@@ -557,8 +572,8 @@ namespace iLabs.ExpStorage
             }
             else
             {
-                SqlConnection myConnection = ProcessAgentDB.GetConnection();
-                SqlCommand myCommand = new SqlCommand("RetrieveBlobsForExperimentRecord", myConnection);
+                DbConnection myConnection = FactoryDB.GetConnection();
+                DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobsForExperimentRecord", myConnection);
                 myCommand.CommandType = CommandType.StoredProcedure;
                 myConnection.Open();
 
@@ -566,11 +581,11 @@ namespace iLabs.ExpStorage
 
                 try
                 {
-                    myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                    myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
-                    myCommand.Parameters.Add(new SqlParameter("@sequenceNo", sequenceNum));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNum, DbType.Int32));
 
-                    SqlDataReader myReader = myCommand.ExecuteReader();
+                    DbDataReader myReader = myCommand.ExecuteReader();
                     while (myReader.Read())
                     {
                         Blob b = new Blob();
@@ -634,8 +649,8 @@ namespace iLabs.ExpStorage
         /// then all the BLOB objects associated with all the ExperimentRecords of the Experiment designated by experimentId are returned</returns>
         public Blob[] GetBlobsForExperiment(long experimentId, string sbGuid)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlobsForExperiment", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobsForExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myConnection.Open();
 
@@ -643,10 +658,10 @@ namespace iLabs.ExpStorage
 
             try
             {
-                myCommand.Parameters.Add(new SqlParameter("@experimentId", experimentId));
-                myCommand.Parameters.Add(new SqlParameter("@issuerGuid", sbGuid));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
 
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
                 while (myReader.Read())
                 {
                     Blob b = new Blob();
@@ -713,16 +728,16 @@ namespace iLabs.ExpStorage
         {
             Blob b = new Blob();
 
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveBlob", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlob", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId, DbType.Int64));
 
             try
             {
                 myConnection.Open();
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
 
                 while (myReader.Read())
                 {

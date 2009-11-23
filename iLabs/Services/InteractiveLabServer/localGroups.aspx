@@ -41,7 +41,7 @@ Please see license.txt in top level directory for full license.
 											<tr>
 												<th style="width: 480px">
 													<label for="groups">Local Groups</label></th>
-												<td style="width: 484px"><asp:dropdownlist id="ddlGroup" Runat="server" AutoPostBack="True" Width="360px" onselectedindexchanged="ddlGroups_SelectedIndexChanged"></asp:dropdownlist></td>
+												<td style="width: 484px"><asp:dropdownlist cssClass="i18n" id="ddlGroup" Runat="server" AutoPostBack="True" Width="360px" onselectedindexchanged="ddlGroups_SelectedIndexChanged"></asp:dropdownlist></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">

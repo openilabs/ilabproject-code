@@ -565,7 +565,7 @@ namespace iLabs.ServiceBroker.DataStorage
 				}
 				catch (Exception ex)
 				{
-					//aList.Add (itemNames[i]);
+					//aList.Add(itemNames[i]);
 					throw;
 				}
 			}

@@ -39,8 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Div.cs" />
-    <Compile Include="Core\Div.Designer.cs">
+    <Compile Include="Web\Div.cs" />
+    <Compile Include="Web\Div.Designer.cs">
       <DependentUpon>Div.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\FactoryDB.cs" />
@@ -49,9 +49,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\ProcessAgentType.cs" />
-    <Compile Include="Core\RegisterSelf.cs" />
+    <Compile Include="Web\RegisterSelf.cs" />
     <Compile Include="Core\SystemSupport.cs" />
-    <Compile Include="Core\WS_ILabCore.cs">
+    <Compile Include="Web\WS_ILabCore.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

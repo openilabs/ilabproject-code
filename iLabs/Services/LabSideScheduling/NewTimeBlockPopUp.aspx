@@ -36,14 +36,14 @@ function DIV1_onclick() {
     <table border="0" style="width: 900px" >
     <tr>
       <td style="width: 158px; height: 50px;"><asp:Label CssClass = "label" ID="Label6" runat="server" Text="Lab Server Resource" TabIndex="15"></asp:Label></td>
-      <td colspan="4" style="height: 50px" align="left" valign="middle"><asp:DropDownList ID="ddlLabServers" runat="server" Width="544px">
+      <td colspan="4" style="height: 50px" align="left" valign="middle"><asp:DropDownList cssClass="i18n" ID="ddlLabServers" runat="server" Width="544px">
         </asp:DropDownList><br />
       </td>
     </tr>
      <tr>
       <td style="width: 158px; height: 50px;"><asp:Label ID="Label1" runat="server" Text="Recurrence Type" CssClass = "label" TabIndex="15"></asp:Label></td>
       <td colspan="4" style="height: 50px">
-        <asp:DropDownList ID="ddlRecurrence" runat="server" AutoPostBack="True" TabIndex="3" Width="235px" >
+        <asp:DropDownList cssClass="i18n" ID="ddlRecurrence" runat="server" AutoPostBack="True" TabIndex="3" Width="235px" >
             <asp:ListItem Value="0">-- Select Recurrence Type--</asp:ListItem>
             <asp:ListItem Value="1">Single Block</asp:ListItem>
             <asp:ListItem Value="2">Daily</asp:ListItem>
@@ -71,7 +71,7 @@ function DIV1_onclick() {
     <tr>
     <td style="width: 158px; height: 50px;"><asp:Label ID="Label8" runat="server" Text="Time Each Day" CssClass = "label" TabIndex="15"></asp:Label></td> 
       <td style="width: 30px; height: 50px;"> <asp:Label ID="Label2" runat="server" Text="Start&nbsp;Time" CssClass = "label" TabIndex="15"></asp:Label></td>
-      <td style="width: 150px; height: 50px;"><asp:DropDownList ID="ddlStartHour" runat="server"
+      <td style="width: 150px; height: 50px;"><asp:DropDownList cssClass="i18n" ID="ddlStartHour" runat="server"
             Width="55px" TabIndex="4">
             <asp:ListItem>12</asp:ListItem>
             <asp:ListItem>1</asp:ListItem>
@@ -86,13 +86,13 @@ function DIV1_onclick() {
             <asp:ListItem>10</asp:ListItem>
             <asp:ListItem>11</asp:ListItem>
         </asp:DropDownList>&nbsp;:&nbsp;<asp:TextBox ID="txtStartMin" runat="server" 
-        Width="25px" TabIndex="5">00</asp:TextBox>&nbsp;<asp:DropDownList ID="ddlStartAM" runat="server" TabIndex="6" Width="50px">
+        Width="25px" TabIndex="5">00</asp:TextBox>&nbsp;<asp:DropDownList cssClass="i18n" ID="ddlStartAM" runat="server" TabIndex="6" Width="50px">
             <asp:ListItem>AM</asp:ListItem>
             <asp:ListItem>PM</asp:ListItem>
         </asp:DropDownList>
       </td>
       <td style="width: 30px; height: 50px;"><asp:Label ID="Label3" runat="server" Text="End&nbsp;Time" CssClass = "label" TabIndex="15"></asp:Label></td>
-      <td style="width: 150px; height: 50px;"><asp:DropDownList ID="ddlEndHour" runat="server"
+      <td style="width: 150px; height: 50px;"><asp:DropDownList cssClass="i18n" ID="ddlEndHour" runat="server"
             Width="55px" TabIndex="7">
             <asp:ListItem>12</asp:ListItem>
             <asp:ListItem>1</asp:ListItem>
@@ -107,7 +107,7 @@ function DIV1_onclick() {
             <asp:ListItem>10</asp:ListItem>
             <asp:ListItem>11</asp:ListItem>
         </asp:DropDownList>&nbsp;:&nbsp;<asp:TextBox ID="txtEndMin" runat="server" 
-        Width="25px" TabIndex="8">00</asp:TextBox>&nbsp;<asp:DropDownList ID="ddlEndAM" runat="server" TabIndex="9" Width="50px">
+        Width="25px" TabIndex="8">00</asp:TextBox>&nbsp;<asp:DropDownList cssClass="i18n" ID="ddlEndAM" runat="server" TabIndex="9" Width="50px">
             <asp:ListItem>AM</asp:ListItem>
             <asp:ListItem>PM</asp:ListItem>
         </asp:DropDownList>

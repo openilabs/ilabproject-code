@@ -119,7 +119,7 @@ namespace iLabs.ServiceBroker.admin
 					ListItem userItem = new ListItem();
 					userItem.Text = user.lastName+", "+user.firstName+" - "+user.userName;
 					userItem.Value = user.userID.ToString();
-					lbxSelectUser.Items .Add (userItem);
+					lbxSelectUser.Items .Add(userItem);
 				}
 			}
 			catch(Exception ex)
@@ -143,7 +143,7 @@ namespace iLabs.ServiceBroker.admin
 				ListItem userItem = new ListItem();
 				userItem.Text = user.lastName+", "+user.firstName+" - "+user.userName;
 				userItem.Value = user.userID.ToString();
-				lbxSelectUser.Items .Add (userItem);
+				lbxSelectUser.Items .Add(userItem);
 			}
 		}
 
@@ -160,7 +160,7 @@ namespace iLabs.ServiceBroker.admin
 				ListItem userItem = new ListItem();
 				userItem.Text = user.lastName+", "+user.firstName+" - "+user.userName;
 				userItem.Value = user.userID.ToString();
-				lbxSelectUser.Items .Add (userItem);
+				lbxSelectUser.Items .Add(userItem);
 			}
 		}
 

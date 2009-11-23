@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
-using System.Data.SqlTypes;
+using System.Data.Common;
 using System.Text;
 
 using iLabs.Core;
@@ -42,15 +41,15 @@ namespace iLabs.ServiceBroker
 
         public ProcessAgentInfo GetExperimentESS(long experimentID)
         {
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("getEssInfoForExperiment", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("getEssInfoForExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@experimentID", experimentID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", experimentID, DbType.Int64));
             ProcessAgentInfo ess = null;
             try
             {
                 myConnection.Open();
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
                 while (myReader.Read())
                 {
                     ess = readAgentInfo(myReader);
@@ -199,7 +198,7 @@ namespace iLabs.ServiceBroker
 
         /** Admin URL **/
 
-        public int InsertAdminURL(SqlConnection connection, int id, string url, string ticketType)
+        public int InsertAdminURL(DbConnection connection, int id, string url, string ticketType)
         {
             try
             {
@@ -207,54 +206,32 @@ namespace iLabs.ServiceBroker
                     throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
 
                 // command executes the "InsertAdminURL" stored procedure
-                SqlCommand cmd = new SqlCommand("InsertAdminURL", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("InsertAdminURL", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
                 // 1. type
-                SqlParameter typeParam = cmd.Parameters.Add("@processAgentID", SqlDbType.Int);
-                typeParam.Value = id;
-                // 2. admin URL
-                SqlParameter urlParam = cmd.Parameters.Add("@adminURL", SqlDbType.VarChar, 256);
-                urlParam.Value = url;
-                // 3. ticket type
-                SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-                ticketTypeParam.Value = ticketType;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentID", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@adminURL", url,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType, DbType.AnsiString, 100));
+                
 
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
             }
         }
 
-        //public int InsertAdminURL(ProcessAgentInfo processAgentInfo, string url, string ticketType)
-        //{
-        //    if (!TicketTypes.TicketTypeExists(ticketType))
-        //        throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
-        //    // create sql connection
-        //    SqlConnection connection = CreateConnection();
-
-        //    try
-        //    {
-        //        return InsertAdminURL(connection, processAgentInfo.agentId, url, ticketType);
-        //    }
-
-        //    finally
-        //    {
-        //        connection.Close();
-        //    }
-        //}
-
         public int InsertAdminURL(int id, string url, string ticketType)
         {
             if (!TicketTypes.TicketTypeExists(ticketType))
                 throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
@@ -272,10 +249,11 @@ namespace iLabs.ServiceBroker
         {
 
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 DeleteAdminURL(connection, Id);
             }
             finally
@@ -285,25 +263,22 @@ namespace iLabs.ServiceBroker
         }
 
 
-        public int DeleteAdminURL(SqlConnection connection, int Id)
+        public int DeleteAdminURL(DbConnection connection, int Id)
         {
             try
             {
 
                 // command executes the "DeleteAdminURLbyID" stored procedure
-                SqlCommand cmd = new SqlCommand("DeleteAdminURLbyID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("DeleteAdminURLbyID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-
-                SqlParameter idParam = cmd.Parameters.Add("@adminURLID", SqlDbType.Int);
-                idParam.Value = Id;
-
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@adminURLID",Id, DbType.Int32));
+                
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -311,7 +286,7 @@ namespace iLabs.ServiceBroker
         }
 
 
-        public int DeleteAdminURL(SqlConnection connection, int processAgentId, string url, string ticketType)
+        public int DeleteAdminURL(DbConnection connection, int processAgentId, string url, string ticketType)
         {
             try
             {
@@ -319,24 +294,20 @@ namespace iLabs.ServiceBroker
                     throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
 
                 // command executes the "InsertAdminURL" stored procedure
-                SqlCommand cmd = new SqlCommand("DeleteAdminURL", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("DeleteAdminURL", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
                 // 1. type
-                SqlParameter typeParam = cmd.Parameters.Add("@processAgentID", SqlDbType.Int);
-                typeParam.Value = processAgentId;
-                // 2. admin URL
-                SqlParameter urlParam = cmd.Parameters.Add("@adminURL", SqlDbType.VarChar, 256);
-                urlParam.Value = url;
-                // 3. ticket type
-                SqlParameter ticketTypeParam = cmd.Parameters.Add("@ticketType", SqlDbType.VarChar, 100);
-                ticketTypeParam.Value = ticketType;
+               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentID",processAgentId,DbType.Int32));
+               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@adminURL", url, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType, DbType.AnsiString, 100));
+                
 
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -348,14 +319,15 @@ namespace iLabs.ServiceBroker
             if (!TicketTypes.TicketTypeExists(ticketType))
                 throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 DeleteAdminURL(connection, processAgentInfo.AgentId, url, ticketType);
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -372,14 +344,15 @@ namespace iLabs.ServiceBroker
             if (!TicketTypes.TicketTypeExists(adminURL.TicketType.name))
                 throw new Exception("\"" + adminURL.TicketType.name + "\" is not a valid ticket type.");
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 DeleteAdminURL(connection, adminURL.ProcessAgentId, adminURL.Url, adminURL.TicketType.name);
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -396,21 +369,17 @@ namespace iLabs.ServiceBroker
 
             int status = 0;
             // create sql connection
-            SqlConnection connection = FactoryDB.GetConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             // command executes the "InsertAdminURL" stored procedure
-            SqlCommand cmd = new SqlCommand("ModifyAdminUrlCodebase", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ModifyAdminUrlCodebase", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameter
             // 1. type
-            SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-            idParam.Value = agentID;
-            // 2. admin URL
-            SqlParameter oldParam = cmd.Parameters.Add("@old", SqlDbType.VarChar, 256);
-            oldParam.Value = oldCodebase;
-            // 3. ticket type
-            SqlParameter newParam = cmd.Parameters.Add("@new", SqlDbType.VarChar, 256);
-            newParam.Value = newCodebase;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", agentID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@old", oldCodebase,DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@new",newCodebase,DbType.String, 512));
+            
             try{
              // execute the command
                 connection.Open();
@@ -429,30 +398,36 @@ namespace iLabs.ServiceBroker
             return status;
         }
 
-        public int ModifyClientScripts(int agentID, string oldCodebase, string newCodebase)
+        public int ModifyClientScripts(int clientID, string oldCodebase, string newCodebase)
         {
              int status = 0;
              // create sql connection
-             SqlConnection connection = FactoryDB.GetConnection();
+             DbConnection connection = FactoryDB.GetConnection();
             
-             SqlCommand cmd = new SqlCommand("ModifyClientCodebase", connection);
+             DbCommand cmd = FactoryDB.CreateCommand("GetLoaderScript", connection);
              cmd.CommandType = CommandType.StoredProcedure;
 
              // populate parameter
              // 1. type
-             SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-             idParam.Value = agentID;
-             // 2. admin URL
-             SqlParameter oldParam = cmd.Parameters.Add("@old", SqlDbType.VarChar, 256);
-             oldParam.Value = oldCodebase;
-             // 3. ticket type
-             SqlParameter newParam = cmd.Parameters.Add("@new", SqlDbType.VarChar, 256);
-             newParam.Value = newCodebase;
+             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", clientID,DbType.Int32));
+            
+             int count = -1;
              try
              {
                  // execute the command
                  connection.Open();
-                 return Convert.ToInt32(cmd.ExecuteScalar());
+                 string loaderScript = Convert.ToString(cmd.ExecuteScalar());
+                 if (loaderScript.Contains(oldCodebase))
+                 {
+                     loaderScript = loaderScript.Replace(oldCodebase, newCodebase);
+
+                     DbCommand cmd2 = FactoryDB.CreateCommand("SetLoaderScript", connection);
+                     cmd2.CommandType = CommandType.StoredProcedure;
+                     cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@id", clientID, DbType.Int32));
+                     cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@script", loaderScript, DbType.String,2000));
+                     
+                     count = cmd2.ExecuteNonQuery();
+                 }
              }
              catch (Exception ex)
              {
@@ -488,14 +463,15 @@ namespace iLabs.ServiceBroker
         public AdminUrl[] RetrieveAdminURLs(int processAgentID)
         {
             // create sql connection
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 return RetrieveAdminURLs(connection, processAgentID);
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -529,20 +505,20 @@ namespace iLabs.ServiceBroker
                 return null;
         }
 
-        public AdminUrl[] RetrieveAdminURLs(SqlConnection connection, int processAgentID)
+        public AdminUrl[] RetrieveAdminURLs(DbConnection connection, int processAgentID)
         {
             // create sql command
             // command executes the "RetrieveAdminURLs" stored procedure
-            SqlCommand cmd = new SqlCommand("RetrieveAdminURLs", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveAdminURLs", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@processAgentID", SqlDbType.Int);
-            idParam.Value = processAgentID;
+           cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", processAgentID, DbType.Int32));
+           
 
             // read the result
             ArrayList list = new ArrayList();
-            SqlDataReader dataReader = cmd.ExecuteReader();
+            DbDataReader dataReader = cmd.ExecuteReader();
             try
             {
                 while (dataReader.Read())
@@ -556,7 +532,7 @@ namespace iLabs.ServiceBroker
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -690,18 +666,18 @@ namespace iLabs.ServiceBroker
         public IntTag[] GetAdminServiceTags(int groupID)
         {
             ArrayList list = new ArrayList();
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
-                SqlCommand cmd = new SqlCommand("GetAdminServiceTags", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetAdminServiceTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                    // populate stored procedure parameters
-                SqlParameter groupParam = cmd.Parameters.Add("@groupId", SqlDbType.Int);
-                groupParam.Value = groupID;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupId", groupID,DbType.Int32));
+                
 
                 // read the result
-                
-                SqlDataReader dataReader = cmd.ExecuteReader();
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
            
                 while (dataReader.Read())
                 {
@@ -711,7 +687,7 @@ namespace iLabs.ServiceBroker
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -732,18 +708,17 @@ namespace iLabs.ServiceBroker
         public IntTag[] GetAdminProcessAgentTags(int groupID)
         {
             ArrayList list = new ArrayList();
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             try
             {
-                SqlCommand cmd = new SqlCommand("GetAdminProcessAgentTags", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetAdminProcessAgentTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                    // populate stored procedure parameters
-                SqlParameter groupParam = cmd.Parameters.Add("@groupID", SqlDbType.Int);
-                groupParam.Value = groupID;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupID", groupID, DbType.Int32));
 
                 // read the result
-                
-                SqlDataReader dataReader = cmd.ExecuteReader();
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
            
                 while (dataReader.Read())
                 {
@@ -753,7 +728,7 @@ namespace iLabs.ServiceBroker
                 }
                 dataReader.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 Console.WriteLine(e);
                 throw;
@@ -773,17 +748,17 @@ namespace iLabs.ServiceBroker
         public Grant[] GetProcessAgentAdminGrants(int agentID, int groupID)
         {
             ArrayList list = new ArrayList();
-            SqlConnection myConnection = CreateConnection();
-            SqlCommand myCommand = new SqlCommand("GetProcessAgentAdminGrants", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("GetProcessAgentAdminGrants", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(new SqlParameter("@agentID", agentID));
-            myCommand.Parameters.Add(new SqlParameter("@groupID", groupID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
 
 
             try
             {
-               
-                SqlDataReader reader = myCommand.ExecuteReader();
+                myConnection.Open();
+                DbDataReader reader = myCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     Grant grant = new Grant();
@@ -811,28 +786,24 @@ namespace iLabs.ServiceBroker
      
 	
        public ResourceMapping AddResourceMapping(string keyType, object key, string[] valueTypes, object[] values){
-           SqlConnection connection = CreateConnection();
+           DbConnection connection = FactoryDB.GetConnection();
            ResourceMapping mapping = null;
            try
            {
+               connection.Open();
                mapping = InsertResourceMapping(connection, keyType, key, valueTypes, values);
                if (mapping != null)
                {
                   
                    // add the new resource mapping to the static resource mappings array
                    ResourceMapManager.Add(mapping);
-                   //ResourceMapping[] mappings = new ResourceMapping[BrokerDB.resourceMappings.Length + 1];
-                   //for (int i = 0; i < BrokerDB.resourceMappings.Length; i++)
-                   //    mappings[i] = BrokerDB.resourceMappings[i];
-                   //mappings[mappings.Length - 1] = mapping;
-                   //// reassign ticket issuer mappings
-                   //BrokerDB.resourceMappings = mappings;
+                   
 
                }
 
 
            }
-           catch (SqlException sqlEx)
+           catch (DbException sqlEx)
            {
            }
            finally
@@ -844,7 +815,7 @@ namespace iLabs.ServiceBroker
 
        }
 
-        protected ResourceMapping InsertResourceMapping(SqlConnection connection, string keyType, object key, string[] valueTypes, object[] values)
+        protected ResourceMapping InsertResourceMapping(DbConnection connection, string keyType, object key, string[] valueTypes, object[] values)
         {
             if (valueTypes == null || values == null)
                 throw new ArgumentException("Arguments cannot be null", "valueTypes and values");
@@ -857,7 +828,7 @@ namespace iLabs.ServiceBroker
          
             try
             {
-                SqlCommand cmd = new SqlCommand("InsertResourceMappingKey", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("InsertResourceMappingKey", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // Get the key type id
@@ -870,12 +841,11 @@ namespace iLabs.ServiceBroker
                 // if the key is a string, add the string to the strings table
                 if (keyType.Equals(ResourceMappingTypes.STRING))
                 {
-                    SqlCommand cmd2 = new SqlCommand("AddResourceMappingString", connection);
+                    DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingString", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    SqlParameter idParam = cmd2.Parameters.Add("@string_Value", SqlDbType.VarChar);
-                    idParam.Value = (string)key;
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@string_Value", key, DbType.String,2048));
 
                     keyID = Convert.ToInt32(cmd2.ExecuteScalar());
                 }
@@ -883,11 +853,10 @@ namespace iLabs.ServiceBroker
                 // if the key is a Resource Type, add the string to the ResourceTypes table
                 else if (keyType.Equals(ResourceMappingTypes.RESOURCE_TYPE))
                 {
-                    SqlCommand cmd2 = new SqlCommand("AddResourceMappingResourceType", connection);
+                    DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingResourceType", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
 
-                    SqlParameter idParam = cmd2.Parameters.Add("@resourceType_Value", SqlDbType.VarChar);
-                    idParam.Value = (string)key;
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@resourceType_Value", key, DbType.String,256));
 
                     keyID = Convert.ToInt32(cmd2.ExecuteScalar());
                 }
@@ -899,11 +868,9 @@ namespace iLabs.ServiceBroker
                     throw new ArgumentException("Value for key is invalid");
 
                 // populate stored procedure parameters
-                SqlParameter keyTypeParam = cmd.Parameters.Add("@MappingKey_Type", SqlDbType.Int);
-                SqlParameter keyParam = cmd.Parameters.Add("@MappingKey", SqlDbType.Int);
-                keyTypeParam.Value = keyTypeID;
-                keyParam.Value = keyID;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingKey_Type",keyTypeID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingKey", keyID,DbType.Int32));
+                
                 // execute the command
                 int mappingID = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -925,25 +892,22 @@ namespace iLabs.ServiceBroker
                     // if the value is a string, add the string to the strings table
                     if (valueTypes[i].Equals(ResourceMappingTypes.STRING))
                     {
-                        SqlCommand cmd2 = new SqlCommand("AddResourceMappingString", connection);
+                        DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingString", connection);
                         cmd2.CommandType = CommandType.StoredProcedure;
 
                         // populate parameters
-                        SqlParameter idParam = cmd2.Parameters.Add("@string_Value", SqlDbType.VarChar);
-                        idParam.Value = (string)values[i];
-
+                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@string_Value", (string)values[i],DbType.String,2048));
+                    
                         valueID = Convert.ToInt32(cmd2.ExecuteScalar());
                     }
 
                     // if the key is a Resource Type, add the string to the ResourceTypes table
                     else if (valueTypes[i].Equals(ResourceMappingTypes.RESOURCE_TYPE))
                     {
-                        SqlCommand cmd2 = new SqlCommand("AddResourceMappingResourceType", connection);
+                        DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingResourceType", connection);
                         cmd2.CommandType = CommandType.StoredProcedure;
 
-                        SqlParameter idParam = cmd2.Parameters.Add("@resourceType_Value", SqlDbType.VarChar);
-                        idParam.Value = (string)values[i];
-
+                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@resourceType_Value",(string)values[i],DbType.String,256));
                         valueID = Convert.ToInt32(cmd2.ExecuteScalar());
                     }
 
@@ -953,17 +917,14 @@ namespace iLabs.ServiceBroker
                     if (valueID == -1)
                         throw new ArgumentException("Value \"" + i + "\" is invalid");
 
-                    cmd = new SqlCommand("InsertResourceMappingValue", connection);
+                    cmd = FactoryDB.CreateCommand("InsertResourceMappingValue", connection);
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Clear();
+                    //cmd.Parameters.Clear();
 
                     // populate stored procedure parameters
-                    SqlParameter mappingIDParam = cmd.Parameters.Add("@Mapping_ID", SqlDbType.Int);
-                    SqlParameter valueTypeParam = cmd.Parameters.Add("@MappingValue_Type", SqlDbType.Int);
-                    SqlParameter valueParam = cmd.Parameters.Add("@MappingValue", SqlDbType.Int);
-                    mappingIDParam.Value = mappingID;
-                    valueTypeParam.Value = valueTypeID;
-                    valueParam.Value = valueID;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@Mapping_ID", mappingID,DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingValue_Type", valueTypeID,DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingValue", valueID, DbType.Int32));
 
                     // execute the command
                     mappingID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -977,7 +938,7 @@ namespace iLabs.ServiceBroker
                 return mapping;
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1022,7 +983,7 @@ namespace iLabs.ServiceBroker
         public bool DeleteResourceMapping(int mappingId)
         {
             bool status = false;
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
@@ -1035,13 +996,13 @@ namespace iLabs.ServiceBroker
                     AuthorizationAPI.RemoveQualifiers(new int[] { qualifierId });
                 }
 
-                SqlCommand cmd = new SqlCommand("DeleteResourceMapping", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("DeleteResourceMapping", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@mapping_ID", SqlDbType.Int);
-                idParam.Value = mappingId;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@mapping_ID", mappingId,DbType.Int32));
+               
+                connection.Open();
                 cmd.ExecuteNonQuery();
 
                 // Remove the Deleted ResourceMapping
@@ -1064,7 +1025,7 @@ namespace iLabs.ServiceBroker
                 //resourceMappings = temp;
 
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1093,31 +1054,28 @@ namespace iLabs.ServiceBroker
         public bool DeleteResourceMapping(int keyTypeId, int keyId, int valueTypeId, int valueId)
         {
             bool status = false;
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
                 int mapId = -1;
-                SqlCommand cmd = new SqlCommand("GetMappingIdByKeyValue", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetMappingIdByKeyValue", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter keyIdParam = cmd.Parameters.Add("@keyID", SqlDbType.Int);
-                keyIdParam.Value = keyId;
-                SqlParameter keyTypeParam = cmd.Parameters.Add("@keyType", SqlDbType.Int);
-                keyTypeParam.Value = keyTypeId;
-                SqlParameter valueIdParam = cmd.Parameters.Add("@valueID", SqlDbType.Int);
-                valueIdParam.Value = valueId;
-                SqlParameter valueTypeParam = cmd.Parameters.Add("@valueType", SqlDbType.Int);
-                valueTypeParam.Value = valueTypeId;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyID", keyId,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyType", keyTypeId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@valueID", valueId,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@valueType", valueTypeId,DbType.Int32));
+                
+                connection.Open();
                 mapId  = (int)cmd.ExecuteScalar();
                 if (mapId > 0)
                 {
                     status = DeleteResourceMapping(mapId);
                 }
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1148,20 +1106,18 @@ namespace iLabs.ServiceBroker
         public int[] GetResourceMappingIdsByValue(string type, int value)
         {
             List<int> list = new List<int>();
-            SqlConnection connection = FactoryDB.GetConnection();
-            SqlCommand cmd = new SqlCommand("GetResourceMapIDsByValue", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("GetResourceMapIDsByValue", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.VarChar, 100);
-            typeParam.Value = type;
-            SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-            idParam.Value = value;
-
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type,DbType.AnsiString, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", value, DbType.Int32));
+           
             // execute the command
             try
             {
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
@@ -1188,16 +1144,17 @@ namespace iLabs.ServiceBroker
         /// <returns>ResourceMapping object</returns>
         public ResourceMapping ReadResourceMapping(int mappingID)
         {
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
+                connection.Open();
                 ResourceMapping mapping = ReadResourceMapping(mappingID, connection);
 
                 return mapping;
             }
 
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1209,20 +1166,18 @@ namespace iLabs.ServiceBroker
             }
         }
       
-        public ResourceMapping ReadResourceMapping(int mappingID, SqlConnection connection)
+        public ResourceMapping ReadResourceMapping(int mappingID, DbConnection connection)
         {
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             try
             {
-                SqlCommand cmd = new SqlCommand("GetResourceMappingByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetResourceMappingByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@mappingID", SqlDbType.Int);
-                idParam.Value = mappingID;
-
-                // execute the command
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@mappingID", mappingID, DbType.Int32));
                 
+                // execute the command
                 dataReader = cmd.ExecuteReader();
 
                 // first row is (key_type, key)
@@ -1259,7 +1214,7 @@ namespace iLabs.ServiceBroker
                 //    return null;
                 //}
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1296,15 +1251,15 @@ namespace iLabs.ServiceBroker
         public List<ResourceMapping> RetrieveResourceMapping()
         {
             // Read mappings from the database            
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("GetResourceMappingIDs", connection);
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("GetResourceMappingIDs", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             ResourceMapping mapping = null;
             List<ResourceMapping> mappingList = new List<ResourceMapping>();
-
+            connection.Open();
             // execute the command
-            SqlDataReader dataReader = null;
+            DbDataReader dataReader = null;
             dataReader = cmd.ExecuteReader();
 
             // read mapping ID's
@@ -1347,7 +1302,7 @@ namespace iLabs.ServiceBroker
         /// <param name="entryID"></param>
         /// <param name="isKey">Determines whether the method should return a key or a value</param>
         /// <returns></returns>
-        private ResourceMappingEntry CompleteResourceMappingKeyRead(SqlConnection connection, int typeID, int entryID, bool isKey)
+        private ResourceMappingEntry CompleteResourceMappingKeyRead(DbConnection connection, int typeID, int entryID, bool isKey)
         {
             // get the entry type
             string type = ResourceMappingTypes.GetResourceMappingType(typeID);            
@@ -1391,21 +1346,20 @@ namespace iLabs.ServiceBroker
         /// <returns></returns>
         public String GetResourceMappingString(int strID)
         {
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
-                SqlCommand cmd = new SqlCommand("GetResourceStringByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetResourceStringByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@ID", SqlDbType.Int);
-                idParam.Value = strID;
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", strID, DbType.Int32));
 
-                //connection.Close();
+                connection.Open();
                 return Convert.ToString(cmd.ExecuteScalar());
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1419,17 +1373,17 @@ namespace iLabs.ServiceBroker
 
         public int AddResourceMappingString(string s)
         {
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
-                SqlCommand cmd = new SqlCommand("AddResourceMappingString", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("AddResourceMappingString", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter param = cmd.Parameters.Add("@string_Value", SqlDbType.VarChar);
-                param.Value = (string)s;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@string_Value", s, DbType.String,2048));
+                
+                connection.Open();
                 return Convert.ToInt32(cmd.ExecuteScalar());
 
             }
@@ -1443,19 +1397,18 @@ namespace iLabs.ServiceBroker
 
         public int UpdateResourceMappingString(int id, string s)
         {
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
             int mappingID = 0;
             try
             {
-                SqlCommand cmd = new SqlCommand("UpdateResourceMappingString", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("UpdateResourceMappingString", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
-                idParam.Value = id;
-                SqlParameter strParam = cmd.Parameters.Add("@string", SqlDbType.VarChar,2000);
-                strParam.Value = s;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", id,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@string", s, DbType.String,2048));
+               
+                connection.Open();
                 mappingID = Convert.ToInt32(cmd.ExecuteScalar());
                 if (mappingID > 0)
                 {
@@ -1474,17 +1427,17 @@ namespace iLabs.ServiceBroker
 
         public int AddResourceMappingResourceType(string s)
         {
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
-                SqlCommand cmd = new SqlCommand("AddResourceMappingResourceType", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("AddResourceMappingResourceType", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter param = cmd.Parameters.Add("@resourceType_Value", SqlDbType.VarChar);
-                param.Value = (string)s;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@resourceType_Value", s,DbType.String,256));
+            
+                connection.Open();
                 return Convert.ToInt32(cmd.ExecuteScalar());
 
             }
@@ -1498,21 +1451,20 @@ namespace iLabs.ServiceBroker
 
         public String GetResourceMappingResourceType(int resourceTypeID)
         {
-            SqlConnection connection = CreateConnection();
+            DbConnection connection = FactoryDB.GetConnection();
 
             try
             {
-                SqlCommand cmd = new SqlCommand("GetResourceTypeByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("GetResourceTypeByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                SqlParameter idParam = cmd.Parameters.Add("@ID", SqlDbType.Int);
-                idParam.Value = resourceTypeID;
-
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", resourceTypeID, DbType.Int32));
+               
+                connection.Open();
                 return Convert.ToString(cmd.ExecuteScalar());
-                connection.Close();
             }
-            catch (SqlException e)
+            catch (DbException e)
             {
                 writeEx(e);
                 throw;
@@ -1593,20 +1545,19 @@ namespace iLabs.ServiceBroker
             Hashtable resources = null;
             Hashtable results = null;
 
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("GetResourceTypeStrings", connection);
-           
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("GetResourceTypeStrings", connection);   
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
           
-            SqlParameter typeParam = cmd.Parameters.Add("@type", SqlDbType.Int);
-            typeParam.Value = type;
-            SqlParameter targetParam = cmd.Parameters.Add("@target", SqlDbType.Int);
-            targetParam.Value = target;
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@target", target,DbType.Int32));
+            
             try
             {
-                SqlDataReader reader = cmd.ExecuteReader();
+                connection.Open();
+                DbDataReader reader = cmd.ExecuteReader();
                 if(reader.HasRows){
                     resources = new Hashtable();
                     int mid = 0;                    
@@ -1948,26 +1899,26 @@ namespace iLabs.ServiceBroker
         //    int type0, object value0, int type1, object value1, int type2, object value2)
         //{
         //    int id = -1;
-        //    SqlConnection connection  = CreateConnection();
+        //    DbConnection connection  = CreateConnection();
         //      // command executes the "InsertResourceMap" stored procedure
-        //        SqlCommand cmd = new SqlCommand("InsertResourceMap", connection);
+        //        DbCommand cmd = FactoryDB.CreateCommand("InsertResourceMap", connection);
         //        cmd.CommandType = CommandType.StoredProcedure;
 
-        //        SqlParameter paramType = null;
-        //        SqlParameter paramValue = null;
+        //        DbParameter paramType = null;
+        //        DbParameter paramValue = null;
 
         //        // Need to do this in pairs 
-        //        paramType = cmd.Parameters.Add("@keyType", SqlDbType.Int);
-        //        paramValue = cmd.Parameters.Add("@keyValue", SqlDbType.Int);
+        //        paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyType", DbType.Int);
+        //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyValue", DbType.Int);
         //        paramType.Value = keyType; 
         //        paramValue.Value = keyValue;
-        //        paramType = cmd.Parameters.Add("@Type0", SqlDbType.Int);
-        //        paramValue = cmd.Parameters.Add("@value0", SqlDbType.Int);
+        //        paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@Type0", DbType.Int);
+        //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value0", DbType.Int);
         //        paramType.Value = type0;
         //        paramValue.Value = value0;
             
-        //    paramType = cmd.Parameters.Add("@type1", SqlDbType.Int);
-        //    paramValue = cmd.Parameters.Add("@value1", SqlDbType.Int);
+        //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type1", DbType.Int);
+        //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value1", DbType.Int);
         //    if(ResourceMap.IsResourceMapType(type1)){
         //        paramType.Value = type1;   
         //        paramValue.Value = value1;
@@ -1976,8 +1927,8 @@ namespace iLabs.ServiceBroker
         //        paramType.Value = DBNull.Value;   
         //        paramValue.Value =  DBNull.Value;
         //    }
-        //    paramType = cmd.Parameters.Add("@type2", SqlDbType.Int);
-        //    paramValue = cmd.Parameters.Add("@value2", SqlDbType.Int);
+        //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type2", DbType.Int);
+        //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value2", DbType.Int);
         //   if(ResourceMap.IsResourceMapType(type2)){
         //        paramType.Value = type2;   
         //        paramValue.Value = value2;
@@ -1991,7 +1942,7 @@ namespace iLabs.ServiceBroker
         //        // execute the command
         //        id = Convert.ToInt32(cmd.ExecuteScalar());
         //    }
-        //    catch (SqlException e)
+        //    catch (DbException e)
         //    {
         //        writeEx(e);
         //        throw;
@@ -2163,24 +2114,24 @@ namespace iLabs.ServiceBroker
         public int InsertRegisterRecord(int couponId, string couponGuid, string registerGuid,
             string sourceGuid, int status, string email, string descriptor)
         {
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("InsertRegistration", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@couponId", SqlDbType.Int );
+            DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponId", DbType.Int );
             idParam.Value = couponId;
-            SqlParameter couponGuidParam = cmd.Parameters.Add("@couponGuid", SqlDbType.VarChar,50 );
+            DbParameter couponGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponGuid", DbType.AnsiString,50 );
             couponGuidParam.Value = couponGuid;
-            SqlParameter registerGuidParam = cmd.Parameters.Add("@registerGuid", SqlDbType.Varchar,50);
+            DbParameter registerGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@registerGuid", DbType.Varchar,50);
             registerGuidParam.Value = registerGuid;
-            SqlParameter sourceParam = cmd.Parameters.Add("@sourceGuid", SqlDbType.Varchar,50);
+            DbParameter sourceParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sourceGuid", DbType.Varchar,50);
             sourceParam.Value = sourceGuid;
-            SqlParameter statusParam = cmd.Parameters.Add("@status", SqlDbType.Int );
+            DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int );
             statusParam.Value = status;
-            SqlParameter emailParam = cmd.Parameters.Add("@email", SqlDbType.VarChar,256 );
+            DbParameter emailParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@email", DbType.AnsiString,256 );
             emailParam.Value = email;
-            SqlParameter descriptorParam = cmd.Parameters.Add("@descriptor", SqlDbType.Text );
+            DbParameter descriptorParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@descriptor", DbType.Text );
             descriptorParam.Value = descriptor;
             try
             {
@@ -2201,17 +2152,17 @@ namespace iLabs.ServiceBroker
 
         public string[] SelectRegisterGuids()
         {
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("InsertRegistration", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter Param = cmd.Parameters.Add("@", SqlDbType.VarChar);
+            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
             Param.Value = (string)s;
             try
             {
 
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 dataReader = cmd.ExecuteReader();
 
             }
@@ -2227,7 +2178,7 @@ namespace iLabs.ServiceBroker
 
         }
 
-        protected RegisterRecord readRegisterRecord(SqlDataReader reader){
+        protected RegisterRecord readRegisterRecord(DbDataReader reader){
             RegisterRecord record = new RegisterRecord();
             
             record.recordId = reader.GetInt32(0);
@@ -2253,16 +2204,16 @@ namespace iLabs.ServiceBroker
         public RegisterRecord SelectRegisterRecord(int id)
         {
             RegisterRecord record = null;
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("SelectRegistrationRecord", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("SelectRegistrationRecord", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter Param = cmd.Parameters.Add("@id", SqlDbType.Int);
+            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
             Param.Value = id;
             try
             {
-                SqlDataReader dataReader = null;
+                DbDataReader dataReader = null;
                 dataReader = cmd.ExecuteReader();
                 while(dataReader.Read()){
                     record = readRegisterRecord(dataReader);
@@ -2283,12 +2234,12 @@ namespace iLabs.ServiceBroker
 
         public RegisterRecord[] SelectRegister(string registerGuid)
         {
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("InsertRegistration", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter Param = cmd.Parameters.Add("@", SqlDbType.VarChar);
+            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
             Param.Value = (string)s;
             try
             {
@@ -2309,12 +2260,12 @@ namespace iLabs.ServiceBroker
 
         public RegisterRecord[] SelectRegisterByStatus(int status)
         {
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("InsertRegistration", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter Param = cmd.Parameters.Add("@", SqlDbType.VarChar);
+            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
             Param.Value = (string)s;
             try
             {
@@ -2334,12 +2285,12 @@ namespace iLabs.ServiceBroker
         }
         public RegisterRecord[] SelectRegisterByStatus(int low, int high)
         {
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("InsertRegistration", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter Param = cmd.Parameters.Add("@", SqlDbType.VarChar);
+            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
             Param.Value = (string)s;
             try
             {
@@ -2361,14 +2312,14 @@ namespace iLabs.ServiceBroker
 
         public int SetRegisterStatus(int id, int status)
         {
-            SqlConnection connection = CreateConnection();
-            SqlCommand cmd = new SqlCommand("UpdateRegistrationStatus", connection);
+            DbConnection connection = CreateConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("UpdateRegistrationStatus", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            SqlParameter idParam = cmd.Parameters.Add("@id", SqlDbType.Int);
+            DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
             idParam.Value = id;
-            SqlParameter statusParam = cmd.Parameters.Add("@status", SqlDbType.Int);
+            DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int);
             statusParam.Value = status;
             try
             {

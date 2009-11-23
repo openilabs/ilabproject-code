@@ -1,7 +1,7 @@
 <%@ Page language="c#" Inherits="iLabs.Services.SelfRegistration" CodeFile="SelfRegistration.aspx.cs" EnableEventValidation="false" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="../banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
-<%@ Register TagPrefix="uc1" TagName="register" Src="SelfRegistration.ascx" %>
+<%@ Register Assembly="iLabControls" Namespace="iLabs.Controls" TagPrefix="iLab" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
@@ -20,17 +20,18 @@ Please see license.txt in top level directory for full license.
 		</style>
 	</head>
 	<body>
-		<form method="post" runat="server">
+	    <form id="Form1" method="post" runat="server">
 			<a name="top"></a>
-			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner>
-			<uc1:adminNav id="AdminNav1" runat="server"></uc1:adminNav>
+			<div id="outerwrapper">
+			    <uc1:banner id="Banner1" runat="server"></uc1:banner>
+			    <uc1:adminNav id="AdminNav1" runat="server"></uc1:adminNav>
+			    <br clear="all" />
 				<div id="innerwrapper">
-					<uc1:register id="selfReg"  AgentType="SERVICE BROKER" runat="server" ></uc1:register>
+					<iLab:RegisterSelf id="selfReg"  runat="server" AgentType="SERVICE BROKER" ></iLab:RegisterSelf>
 				</div><!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>
-				</div>
-				<br clear="all"/>
-				</form>
-				
+			</div>
+			<br clear="all"/>
+		</form>
 	</body>
 </html>

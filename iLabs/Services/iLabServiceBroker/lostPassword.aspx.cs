@@ -8,7 +8,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Drawing;
 using System.Web;
 using System.Web.SessionState;
@@ -170,11 +170,12 @@ namespace iLabs.ServiceBroker.iLabSB
 			//4. hash this password and store it into the database.
 			string hashedPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(newPassword, "sha1");
 
-			SqlConnection myConnection =ProcessAgentDB.GetConnection();
+			DbConnection myConnection =FactoryDB.GetConnection();
 			try 
 			{
-				string sqlCommand = "UPDATE Users SET Password = '" + hashedPassword + "' WHERE User_ID = " + userID.ToString();
-				SqlCommand cmd=new SqlCommand(sqlCommand,myConnection);
+
+                DbCommand cmd = myConnection.CreateCommand();
+                cmd.CommandText = "UPDATE Users SET Password = '" + hashedPassword + "' WHERE User_ID = " + userID.ToString();
 				myConnection.Open();
 				cmd.ExecuteNonQuery();
 			}

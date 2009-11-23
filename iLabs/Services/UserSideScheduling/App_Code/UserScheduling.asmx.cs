@@ -16,10 +16,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
 
 using iLabs.Proxies.ISB;
-
-
-
-
+using iLabs.Web;
 
 namespace iLabs.Scheduling.UserSide
 {
@@ -136,7 +133,25 @@ namespace iLabs.Scheduling.UserSide
         public Reservation[] ListReservations(string serviceBrokerGuid, string userName, 
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime)
         {
-            return new Reservation[] { new Reservation() };
+            
+            Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
+
+            ReservationInfo[] resInfos = USSSchedulingAPI.GetReservations(serviceBrokerGuid, userName, null,
+                labServerGuid, labClientGuid, startTime, endTime);
+            if (resInfos != null && resInfos.Length > 0)
+            {
+                Reservation[] reservations = new Reservation[resInfos.Length];
+
+                for (int i = 0; i < resInfos.Length; i++)
+                {
+                    reservations[i] = new Reservation(resInfos[i].startTime, resInfos[i].endTime);
+                    reservations[i].userName = resInfos[i].userName;
+                }
+                return reservations;
+            }
+            else 
+                return null;
+
         }
         
 
@@ -193,29 +208,41 @@ namespace iLabs.Scheduling.UserSide
 			
 		}
 		/// <summary>
-		/// Returns an Boolean indicating whether it the right time for a particular user to execute a particular experiment
+        /// Returns an existing reservation for the current time for 
+        /// a particular user to execute a particular experiment. 
+        /// This does not create the AllowExperiment ticket.
 		/// </summary>
 		/// <param name="userName"></param>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
-		/// <returns></returns>true if it is the right time for a particular user to execute a particular experiment
+        /// <returns>the existing reservation if it is the right time for a particular
+        /// user to execute a particular experiment, or null.</returns>
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-        public ReservationInfo RedeemReservations(string serviceBrokerGuid, String userName,  
+        public Reservation RedeemReservation(string serviceBrokerGuid, String userName,  
             String labServerGuid, string clientGuid)
 		{
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
-            string type = TicketTypes.EXECUTE_EXPERIMENT;
+            string type = TicketTypes.REDEEM_RESERVATION;
             try
             {
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
-
-                return USSSchedulingAPI.RedeemReservation(userName, serviceBrokerGuid, clientGuid, labServerGuid);
+                ReservationInfo res = USSSchedulingAPI.RedeemReservation(userName, serviceBrokerGuid, clientGuid, labServerGuid);
+                if (res != null)
+                {
+                    Reservation reservation = new Reservation(res.startTime, res.endTime);
+                    reservation.userName = res.userName;
+                    return reservation;
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch
             {

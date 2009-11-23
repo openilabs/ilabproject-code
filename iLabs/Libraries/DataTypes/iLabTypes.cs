@@ -8,6 +8,7 @@ namespace iLabs.DataTypes
     /// A triplet used as part of an SQL query.
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class Criterion
     {
         /// <summary>
@@ -56,6 +57,7 @@ namespace iLabs.DataTypes
     /// Utility for storing an int value and user readable string for DDL processing
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class IntTag
     {
         /// <summary>
@@ -86,6 +88,7 @@ namespace iLabs.DataTypes
     /// Utility for storing a long value and user readable string for DDL processing
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class LongTag
     {
         /// <summary>
@@ -116,6 +119,7 @@ namespace iLabs.DataTypes
     /// Utility for storing a long value and user readable string for DDL processing
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
+    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     public class StringTag
     {
         /// <summary>

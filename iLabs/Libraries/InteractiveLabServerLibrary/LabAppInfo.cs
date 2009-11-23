@@ -30,6 +30,7 @@ namespace iLabs.LabServer.Interactive
 		public string dataSources;
         public string server;
         public int port;
+        public bool reentrant = false;
 
 		public LabAppInfo()
 		{

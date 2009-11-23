@@ -38,15 +38,15 @@ Please see license.txt in top level directory for full license.
 							<table cellSpacing="5" cellPadding="0" border="0">
 				        <tr>
 				            <th><label for="servicebroker">Service Broker</label></th>
-							<td><asp:dropdownlist id="ddlServiceBroker" Runat="server" Width="260px" AutoPostBack="True" onselectedindexchanged="ddlServiceBroker_SelectedIndexChanged"></asp:dropdownlist></td>
+							<td><asp:dropdownlist CssClass="i18n" id="ddlServiceBroker" Runat="server" Width="260px" AutoPostBack="True" onselectedindexchanged="ddlServiceBroker_SelectedIndexChanged"></asp:dropdownlist></td>
 				        </tr>
 				        <tr>
 				            <th><label for="client">Client</label></th>
-							<td><asp:dropdownlist id="ddlClient" Runat="server" Width="260px" AutoPostBack="True" onselectedindexchanged="ddlClient_SelectedIndexChanged"></asp:dropdownlist></td>
+							<td><asp:dropdownlist CssClass="i18n" id="ddlClient" Runat="server" Width="260px" AutoPostBack="True" onselectedindexchanged="ddlClient_SelectedIndexChanged"></asp:dropdownlist></td>
 				       </tr>
 				       <tr>
 				            <th><label for="lab server">Lab Server</label></th>
-							<td><asp:dropdownlist id="ddlLabServer" Runat="server" Width="260px" AutoPostBack="True" onselectedindexchanged="ddlLabServer_SelectedIndexChanged"></asp:dropdownlist></td>
+							<td><asp:dropdownlist CssClass="i18n" id="ddlLabServer" Runat="server" Width="260px" AutoPostBack="True" onselectedindexchanged="ddlLabServer_SelectedIndexChanged"></asp:dropdownlist></td>
 									
 				        </tr>
 				        <tr>

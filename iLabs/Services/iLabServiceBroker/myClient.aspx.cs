@@ -6,6 +6,7 @@
  */
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Data;
@@ -24,7 +25,7 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
-using iLabs.ServiceBroker;
+using iLabs.ServiceBroker.Internal;
 using iLabs.UtilLib;
 
 
@@ -92,6 +93,26 @@ namespace iLabs.ServiceBroker.iLabSB
                                 //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
 
                                 btnLaunchLab.Visible = true;
+                                // Display reenter button if experiment is reentrant & a current experiment exists
+                                if (lc.IsReentrant)
+                                {
+
+                                    long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
+                                        Convert.ToInt32(Session["GroupID"]), lc.labServerIDs[0], lc.clientID);
+                                    if (ids.Length > 0)
+                                    {
+                                        btnLaunchLab.Text = "Launch New Experiment";
+                                        pReenter.Visible = true;
+                                        btnReenter.Visible = true;
+                                        btnReenter.CommandArgument = ids[0].ToString();
+                                    }
+                                    else
+                                    {
+                                        btnLaunchLab.Text = "Launch Lab";
+                                        pReenter.Visible = false;
+                                        btnReenter.Visible = false;
+                                    }
+                                }
                             }
                             else
                             {
@@ -160,41 +181,32 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
             }
 
-            ArrayList messagesList = new ArrayList();
+            List<SystemMessage> messagesList = new List<SystemMessage>();
             SystemMessage[] groupMessages = null;
             if (Session["ClientCount"] != null && Convert.ToInt32(Session["ClientCount"]) == 1)
             {
-                groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP, Convert.ToInt32(Session["GroupID"]), 0);
+                groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP, Convert.ToInt32(Session["GroupID"]),0, 0);
+                if (groupMessages != null)
+                    messagesList.AddRange(groupMessages);
             }
 
             foreach (int labServerID in lc.labServerIDs)
             {
-                SystemMessage[] labMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, labServerID);
+                SystemMessage[] labMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServerID);
                 if (labMessages != null)
-                    foreach (SystemMessage message in labMessages)
-                    {
-                        messagesList.Add(message);
-                    }
+                    messagesList.AddRange(labMessages);  
             }
 
-            if (groupMessages != null)
-            {
-                foreach (SystemMessage message in groupMessages)
-                {
-                    messagesList.Add(message);
-                }
-            }
 
-            if (messagesList != null)
+            if (messagesList != null && messagesList.Count > 0)
             {
-                messagesList.Sort(new DateComparer());
-                messagesList.Reverse();
-
+                messagesList.Sort(SystemMessage.CompareDateDesc);
+                //messagesList.Reverse();
                 repSystemMessage.DataSource = messagesList;
                 repSystemMessage.DataBind();
             }
 
-            if (messagesList == null)
+            else
             {
                 lblGroupNameSystemMessage.Text += "No Messages at this time";
             }
@@ -370,6 +382,42 @@ namespace iLabs.ServiceBroker.iLabSB
             }
             //lblDebug.Text = message.ToString();
             Utilities.WriteLog(message.ToString());
+        }
+        protected void btnReenter_Click(object sender, System.EventArgs e)
+        {
+            if (Session["UserID"] == null)
+            {
+                Response.Redirect("login.aspx");
+            }
+            BrokerDB brokerDB = new BrokerDB();
+            StringBuilder message = new StringBuilder("Message: clientID = ");
+            int[] labIds = new int[1];
+            message.Append(btnReenter.CommandArgument + " ");
+            long expid = Convert.ToInt64(btnReenter.CommandArgument);
+            LabClient client = AdministrativeAPI.GetLabClient(Convert.ToInt32(Session["ClientID"]));
+            if (client.clientID > 0)
+            {
+                if (client.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
+                {
+                    long[] coupIDs = InternalDataDB.RetrieveExperimentCouponIDs(expid);
+                    Coupon coupon = brokerDB.GetIssuedCoupon(coupIDs[0]);
+                    // construct the redirect query
+                    StringBuilder url = new StringBuilder(client.loaderScript.Trim());
+                    if (url.ToString().IndexOf("?") == -1)
+                        url.Append('?');
+                    else
+                        url.Append('&');
+                    url.Append("coupon_id=" + coupon.couponId + "&passkey=" + coupon.passkey
+                        + "&issuer_guid=" + brokerDB.GetIssuerGuid());
+
+                    // Add the return url to the redirect
+                    url.Append("&sb_url=");
+                    url.Append(Utilities.ExportUrlPath(Request.Url));
+
+                    // Now open the lab within the current Window/frame
+                    Response.Redirect(url.ToString(), true);
+                }
+            }
         }
 
 

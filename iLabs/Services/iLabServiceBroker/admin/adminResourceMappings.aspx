@@ -70,16 +70,16 @@ Please see license.txt in top level directory for full license.
 						                    <tr>
 						                        <th width="50" style="height: 71px" valign="top"><h3 style="position: static">New Key Type</h3></th>
 						                        <td width="300" style="height: 71px" valign="top">
-						                            <asp:dropdownlist id="keyTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="keyType_SelectedIndexChanged"></asp:dropdownlist>
+						                            <asp:dropdownlist  CssClass="i18n" id="keyTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="keyType_SelectedIndexChanged"></asp:dropdownlist>
 						                        </td>
             						        </tr>
 			            			        <tr>
 			            			            <th width="50" valign="top"><h3 style="position: static">New Key</h3></th>
 			            			            <td width="300" valign="top">
-						                            <asp:dropdownlist id="key_ProcessAgentDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_ProcessAgent_SelectedIndexChanged"></asp:dropdownlist>
-						                            <asp:dropdownlist id="key_ClientDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_Client_SelectedIndexChanged"></asp:dropdownlist>						                        
-						                            <asp:dropdownlist id="key_TicketTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged"></asp:dropdownlist>
-                                                    <asp:dropdownlist id="key_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged">
+						                            <asp:dropdownlist CssClass="i18n" id="key_ProcessAgentDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_ProcessAgent_SelectedIndexChanged"></asp:dropdownlist>
+						                            <asp:dropdownlist CssClass="i18n" id="key_ClientDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_Client_SelectedIndexChanged"></asp:dropdownlist>						                        
+						                            <asp:dropdownlist CssClass="i18n" id="key_TicketTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged"></asp:dropdownlist>
+                                                    <asp:dropdownlist CssClass="i18n" id="key_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged">
                                                     </asp:DropDownList>
 						                        </td>
 						                    </tr>
@@ -92,18 +92,18 @@ Please see license.txt in top level directory for full license.
 						                    <tr>
 						                        <th width="50"><h3 style="position: static">New Value Type</h3></th>
 						                        <td width="300">
-						                            <asp:dropdownlist id="valueTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="valueType_SelectedIndexChanged"></asp:dropdownlist>
+						                            <asp:dropdownlist  CssClass="i18n" id="valueTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="valueType_SelectedIndexChanged"></asp:dropdownlist>
 						                        </td>
             						        </tr>
 			            			        <tr>
 			            			            <th width="50"><h3 style="position: static">New Value</h3></th>
 			            			            <td width="300">
-						                            <asp:dropdownlist id="value_ProcessAgentDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_ProcessAgent_SelectedIndexChanged"></asp:dropdownlist>
-						                            <asp:dropdownlist id="value_ClientDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_Client_SelectedIndexChanged"></asp:dropdownlist>
-                                                    <asp:dropdownlist id="value_MappingDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged"></asp:dropdownlist>
+						                            <asp:dropdownlist CssClass="i18n" id="value_ProcessAgentDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_ProcessAgent_SelectedIndexChanged"></asp:dropdownlist>
+						                            <asp:dropdownlist CssClass="i18n" id="value_ClientDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_Client_SelectedIndexChanged"></asp:dropdownlist>
+                                                    <asp:dropdownlist CssClass="i18n" id="value_MappingDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged"></asp:dropdownlist>
                                                     <br />
 						                            <asp:textbox id="value_StringText" Runat="server" Width="293px"></asp:textbox>
-						                            <asp:dropdownlist id="value_TicketTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged"></asp:dropdownlist><asp:dropdownlist id="value_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged">
+						                            <asp:dropdownlist CssClass="i18n" id="value_TicketTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged"></asp:dropdownlist><asp:dropdownlist id="value_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged">
                                                     </asp:DropDownList><br />
                                                     <asp:TextBox ID="value_ResourceTypeText" runat="server" Width="293px"></asp:TextBox></td>						                          
 						                    </tr>						                    

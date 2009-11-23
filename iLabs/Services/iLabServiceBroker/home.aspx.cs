@@ -51,7 +51,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 			ArrayList messagesList = new ArrayList();
-			SystemMessage[] messages = wrapper.GetSystemMessagesWrapper(SystemMessage.SYSTEM,0,0);
+			SystemMessage[] messages = wrapper.GetSystemMessagesWrapper(SystemMessage.SYSTEM,0,0,0);
 			foreach(SystemMessage message in messages)
 			{
 				messagesList.Add(message);

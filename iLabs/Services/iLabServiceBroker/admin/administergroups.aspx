@@ -3,19 +3,19 @@
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
+<html>
 <!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
 <!-- $Id: administergroups.aspx,v 1.3 2006/04/10 18:33:16 rabih Exp $ -->
-	<HEAD>
+	<head>
 		<title>MIT iLab Service Broker - Administer Groups</title>
-		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
-		<meta content="C#" name="CODE_LANGUAGE">
-		<meta content="JavaScript" name="vs_defaultClientScript">
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
+		<meta content="C#" name="CODE_LANGUAGE"/>
+		<meta content="JavaScript" name="vs_defaultClientScript"/>
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<style type="text/css">@import url( ../css/main.css ); 
 		</style>
 		<script language="JavaScript" type="text/JavaScript">
@@ -36,7 +36,7 @@ Please see license.txt in top level directory for full license.
 
 	//-->
 		</script>
-	</HEAD>
+	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
 			<a name="top"></a><input id="hiddenPopupOnSave" type="hidden" runat="server" NAME="hiddenPopupOnSave">
@@ -44,7 +44,7 @@ Please see license.txt in top level directory for full license.
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
 				<uc1:adminNav id="AdminNav1" runat="server"></uc1:adminNav>
-				<br clear="all">
+				<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Administer Groups
@@ -104,4 +104,4 @@ Please see license.txt in top level directory for full license.
 			</div> <!-- end outerwrapper -->
 		</form>
 	</body>
-</HTML>
+</html>

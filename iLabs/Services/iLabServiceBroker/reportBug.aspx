@@ -64,7 +64,7 @@ Please see license.txt in top level directory for full license.
 										<th>
 											<label for="whichlab">Select the type of problem or lab server</label></th>
 										<td>
-											<asp:DropDownList ID="ddlArea" Runat="server"></asp:DropDownList>
+											<asp:DropDownList CssClass="i18n" ID="ddlArea" Runat="server"></asp:DropDownList>
 										</td>
 									</tr>
 									<tr>

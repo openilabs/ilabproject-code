@@ -99,19 +99,13 @@ Please see license.txt in top level directory for full license.
 								<b><%# Convert.ToString(DataBinder.Eval(Container,"DataItem.gname"))%> &nbsp;</b><br />
 								&nbsp;&nbsp;&nbsp; Description:        <%# Convert.ToString(DataBinder.Eval(Container,"DataItem.gdesc"))%> <br />
 								&nbsp;&nbsp;&nbsp; Number Users:       <%# Convert.ToString(DataBinder.Eval(Container,"DataItem.usersingroup"))%> <br />
-								&nbsp;&nbsp;&nbsp; Associated Clients:  <%# Convert.ToString(DataBinder.Eval(Container,"DataItem.gclients"))%> <br />
+								&nbsp;&nbsp;&nbsp; Associated Clients:  <%# Convert.ToString(DataBinder.Eval(Container,"DataItem.gclients"))%> <br />  
 								<br /><br />
 							</ItemTemplate>
 						    </asp:repeater>
 						    </td>
 					    </tr>
 					    
-  						<tr>
-                            <td colspan="2"><br /><br /><b>Client Information</b><br /><hr /><br /></td>
-                        </tr>
-                        <tr>
-                        <td colspan="2"><b><label for="labclient">Total Number of lab clients: <asp:Label id="txtLCnum1" Runat="server"></asp:Label>:</label> &nbsp;</b></td>
-                        </tr>
                     </table>
 					</div>
 					<!-- end pagecontent div-->

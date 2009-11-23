@@ -63,7 +63,7 @@ namespace iLabs.ServiceBroker.Administration
 
 			for (int i=0; i< grantIDs.Length ; i++)
 			{
-				aListGrants.Add (grantIDs[i]);
+				aListGrants.Add(grantIDs[i]);
 			}
 
 			// find the grants for all the parent groups, with function useLabClient
@@ -75,7 +75,7 @@ namespace iLabs.ServiceBroker.Administration
 
 				for (int j=0; j< grantIDs.Length ; j++)
 				{
-					aListGrants.Add (grantIDs[j]);
+					aListGrants.Add(grantIDs[j]);
 				}
 			}
 
@@ -115,7 +115,7 @@ namespace iLabs.ServiceBroker.Administration
 
 			for (int i=0; i< grantIDs.Length ; i++)
 			{
-				aListGrants.Add (grantIDs[i]);
+				aListGrants.Add(grantIDs[i]);
 			}
 
 			// find the grants for all the parent groups, with function useLabServer
@@ -127,7 +127,7 @@ namespace iLabs.ServiceBroker.Administration
 
 				for (int j=0; j< grantIDs.Length ; j++)
 				{
-					aListGrants.Add (grantIDs[j]);
+					aListGrants.Add(grantIDs[j]);
 				}
 			}
 

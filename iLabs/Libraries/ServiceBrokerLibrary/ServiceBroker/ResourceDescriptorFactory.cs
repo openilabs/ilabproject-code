@@ -141,7 +141,6 @@ namespace iLabs.ServiceBroker
                     xmlWriter.WriteEndElement();
 
                 }
-
                 xmlWriter.WriteEndElement();
                 xmlWriter.Flush();
                 return stringBuilder.ToString();
@@ -158,11 +157,12 @@ namespace iLabs.ServiceBroker
         {
             string descriptor = null;
             ProcessAgent agent = brokerDb.GetProcessAgent(agentId);
-            descriptor = CreateProcessAgentDescriptor(agentId, agent);
+            SystemSupport ss = brokerDb.RetrieveSystemSupport(agentId);
+            descriptor = CreateProcessAgentDescriptor(agentId, agent,ss);
             return descriptor;
         }
 
-        public string CreateProcessAgentDescriptor(int agentId, ProcessAgent agent)
+        public string CreateProcessAgentDescriptor(int agentId, ProcessAgent agent, SystemSupport ss)
         {
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
@@ -185,6 +185,8 @@ namespace iLabs.ServiceBroker
                 xmlWriter.WriteElementString("domainGuid", agent.domainGuid);
                 xmlWriter.WriteElementString("codeBaseUrl", agent.codeBaseUrl);
                 xmlWriter.WriteElementString("webServiceUrl", agent.webServiceUrl);
+                if (ss != null)
+                    xmlWriter.WriteRaw(ss.ToXML());
                 if(agent.type.Equals(ProcessAgentType.LAB_SERVER)){
                     int lssId = brokerDb.FindProcessAgentIdForAgent(agentId, ProcessAgentType.LAB_SCHEDULING_SERVER);
                     if(lssId > 0){
@@ -195,7 +197,7 @@ namespace iLabs.ServiceBroker
                         }
                     }
                 }
-   
+                
                 Hashtable resourceTags = brokerDb.GetResourceStringTags(agentId, 1);
                 if (resourceTags != null && resourceTags.Count > 0)
                 {
@@ -231,6 +233,20 @@ namespace iLabs.ServiceBroker
             pa.codeBaseUrl = xdoc.Query("/processAgentDescriptor/codeBaseUrl");
             pa.webServiceUrl = xdoc.Query("/processAgentDescriptor/webServiceUrl");
             int newID = brokerDb.InsertProcessAgent(pa, null, null);
+           
+            SystemSupport systemSupport = new SystemSupport();
+            systemSupport.agentGuid = xdoc.Query("/processAgentDescriptor/systemSupport/agentGuid");
+            systemSupport.bugEmail = xdoc.Query("/processAgentDescriptor/systemSupport/bugEmail");
+            systemSupport.contactEmail = xdoc.Query("/processAgentDescriptor/systemSupport/contactEmail");
+            systemSupport.infoUrl = xdoc.Query("/processAgentDescriptor/systemSupport/infoUrl");
+            systemSupport.description = xdoc.Query("/processAgentDescriptor/systemSupport/desciption");
+            systemSupport.location = xdoc.Query("/processAgentDescriptor/systemSupport/loction");
+            if (systemSupport != null && systemSupport.agentGuid.CompareTo(pa.agentGuid) == 0)
+            {
+                brokerDb.SaveSystemSupport(systemSupport.agentGuid, systemSupport.contactEmail, systemSupport.bugEmail,
+                    systemSupport.infoUrl, systemSupport.description, systemSupport.location);
+            }
+          
             // deal with resources later, need to decode resource Names
             XPathNodeIterator pathIter = xdoc.Select("/processAgentDescriptor/resources/*");
             if (pathIter != null && pathIter.Count > 0)

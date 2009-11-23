@@ -1,6 +1,6 @@
 using System;
 using System.Data;
-using System.Data.SqlClient;
+using System.Data.Common;
 
 namespace iLabs.ServiceBroker.Authorization
 {

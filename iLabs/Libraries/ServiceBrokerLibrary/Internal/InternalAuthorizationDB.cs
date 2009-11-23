@@ -7,7 +7,7 @@
 
 using System;
 using System.Data ;
-using System.Data.SqlClient ;
+using System.Data.Common ;
 using System.Configuration ;
 using System.Collections ;
 using System.Collections.Generic;
@@ -46,13 +46,13 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			int grantID=-1;
 
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("AddGrant", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("AddGrant", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-			myCommand.Parameters.Add(new SqlParameter("@agentID", grant.agentID));
-			myCommand.Parameters.Add(new SqlParameter("@functionName", grant.function));
-			myCommand.Parameters.Add(new SqlParameter("@qualifierID", grant.qualifierID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", grant.agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@functionName", grant.function, DbType.AnsiString,128));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", grant.qualifierID, DbType.Int32));
 			
 			try
 			{
@@ -79,10 +79,10 @@ namespace iLabs.ServiceBroker.Internal
 		public static int[] DeleteGrants(int[] grantIDs)
 		{
 
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("DeleteGrant", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("DeleteGrant", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters.Add(new SqlParameter("@grantID", 0));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@grantID", null, DbType.Int32));
 
 			/*
 			 * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
@@ -103,7 +103,7 @@ namespace iLabs.ServiceBroker.Internal
 					if(myCommand.ExecuteNonQuery () <= 0)
 					{
 						//grants that were not removed
-						arrayList.Add (grantID);
+						arrayList.Add(grantID);
 					}
 					else
 					{
@@ -141,17 +141,17 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static DataSet RetrieveGrants()
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveGrantsTable", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGrantsTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
 			try
 			{
-				SqlDataAdapter dataAdapter = new SqlDataAdapter();
+             
+				DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
 				dataAdapter.SelectCommand = myCommand;
 				dataAdapter.TableMappings.Add("Table","Grants");
-
 				dataAdapter.Fill(ds);
 			}
 			catch (Exception ex)
@@ -299,13 +299,13 @@ namespace iLabs.ServiceBroker.Internal
 		public static int InsertQualifier(Qualifier qualifier)
 		{
 			int qID= -1;
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("AddQualifier", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("AddQualifier", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			
-			myCommand.Parameters.Add(new SqlParameter("@qualifierTypeID", qualifier.qualifierType));
-			myCommand.Parameters.Add(new SqlParameter("@qualifierReferenceID", qualifier.qualifierReferenceID));
-			myCommand.Parameters.Add(new SqlParameter("@qualifierName", qualifier.qualifierName));
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierTypeID", qualifier.qualifierType, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierReferenceID", qualifier.qualifierReferenceID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierName", qualifier.qualifierName, DbType.String,512));
 			
 			try
 			{
@@ -334,11 +334,11 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static int[] DeleteQualifier(int[] qualifierIDs)
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("DeleteQualifier", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("DeleteQualifier", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-			myCommand.Parameters.Add(new SqlParameter("@qualifierID", 0));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", 0, DbType.Int32));
 			
 			/*
 			 * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
@@ -358,7 +358,7 @@ namespace iLabs.ServiceBroker.Internal
 					myCommand.Parameters["@qualifierID"].Value = qualifierID;
 					if(myCommand.ExecuteNonQuery () <= 0)
 					{
-						arrayList.Add (qualifierID);
+						arrayList.Add(qualifierID);
 					}
 					else
 					{
@@ -391,12 +391,12 @@ namespace iLabs.ServiceBroker.Internal
 				throw new Exception("Exception thrown in InsertQualifierHierarchy. Cannot insert node with itself as parent. This will cause an infinite cyclic loop.");
 			else
 			{
-				SqlConnection myConnection = ProcessAgentDB.GetConnection();
-				SqlCommand myCommand = new SqlCommand("AddQualifierHierarchy", myConnection);
+				DbConnection myConnection = FactoryDB.GetConnection();
+				DbCommand myCommand = FactoryDB.CreateCommand("AddQualifierHierarchy", myConnection);
 				myCommand.CommandType = CommandType.StoredProcedure;
 
-				myCommand.Parameters.Add(new SqlParameter("@qualifierID", qualifierID));
-				myCommand.Parameters.Add(new SqlParameter("@parentQualifierID", parentQualifierID));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", qualifierID, DbType.Int32));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@parentQualifierID", parentQualifierID, DbType.Int32));
 			
 				try
 				{
@@ -425,12 +425,12 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static bool DeleteQualifierHierarchy(int qualifierID, int parentQualifierID)
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("DeleteQualifierHierarchy", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("DeleteQualifierHierarchy", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-			myCommand.Parameters.Add(new SqlParameter("@qualifierID", qualifierID));
-			myCommand.Parameters.Add(new SqlParameter("@parentQualifierID", parentQualifierID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", qualifierID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@parentQualifierID", parentQualifierID, DbType.Int32));
 			
 			try
 			{
@@ -465,14 +465,14 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static DataSet RetrieveQualifiers()
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveQualifiersTable", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveQualifiersTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
 			try
 			{
-				SqlDataAdapter dataAdapter = new SqlDataAdapter();
+				DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
 				dataAdapter.SelectCommand = myCommand;
 				dataAdapter.TableMappings.Add("Table","Qualifiers");
 
@@ -495,14 +495,14 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static DataSet RetrieveQualifierHierarchy()
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveQualifierHierarchyTable", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveQualifierHierarchyTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
 			try
 			{
-				SqlDataAdapter dataAdapter = new SqlDataAdapter();
+				DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
 				dataAdapter.SelectCommand = myCommand;
 				dataAdapter.TableMappings.Add("Table","Qualifier_Hierarchy");
 
@@ -649,13 +649,13 @@ namespace iLabs.ServiceBroker.Internal
         public static int ModifyQualifierName(int qualifierTypeId, int referenceId, string name)
         {
             int status = 0;
-            SqlConnection myConnection = FactoryDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("ModifyQualifierName", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("ModifyQualifierName", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@qualifierTypeId", qualifierTypeId));
-            myCommand.Parameters.Add(new SqlParameter("@refid", referenceId));
-            myCommand.Parameters.Add(new SqlParameter("@newName", name));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierTypeId", qualifierTypeId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@refid", referenceId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@newName", name, DbType.String,256));
 
             try
             {
@@ -689,12 +689,12 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static bool IsAgentUser(int agentID)
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveAgentType", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentType", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			int isGroup = -1;
 
-			myCommand.Parameters.Add(new SqlParameter("@agentID", agentID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
 			
 			try
 			{
@@ -720,14 +720,14 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static DataSet RetrieveAgentHierarchy()
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveAgentHierarchyTable", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentHierarchyTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
 			try
 			{
-				SqlDataAdapter dataAdapter = new SqlDataAdapter();
+				DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
 				dataAdapter.SelectCommand = myCommand;
 				dataAdapter.TableMappings.Add("Table","Agent_Hierarchy");
 
@@ -756,10 +756,10 @@ namespace iLabs.ServiceBroker.Internal
 				a[i] = new Agent();
 			}
 
-			SqlConnection myConnection = new SqlConnection (ConfigurationSettings.AppSettings ["sqlConnection"]);
-			SqlCommand myCommand = new SqlCommand ("RetrieveAgent", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgent", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters .Add (new SqlParameter ("@agentID",SqlDbType.VarChar));
+			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@agentID",null,DbType.Int32));
 
 			try 
 			{
@@ -770,7 +770,7 @@ namespace iLabs.ServiceBroker.Internal
 					myCommand.Parameters["@agentID"].Value = agentIDs[i];
 
 					// get agent info from table agents
-					SqlDataReader myReader = myCommand.ExecuteReader ();
+					DbDataReader myReader = myCommand.ExecuteReader ();
 					while(myReader.Read ())
 					{	
 						a[i].id = agentIDs[i];
@@ -809,16 +809,16 @@ namespace iLabs.ServiceBroker.Internal
         {
             List<Int32> aList = new List<Int32>();
 
-            SqlConnection myConnection = ProcessAgentDB.GetConnection();
-            SqlCommand myCommand = new SqlCommand("RetrieveUserGroups", myConnection);
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUserGroups", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(new SqlParameter("@userID", agentID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@userID", agentID, DbType.Int32));
 
             try
             {
                 myConnection.Open();
-                SqlDataReader myReader = myCommand.ExecuteReader();
+                DbDataReader myReader = myCommand.ExecuteReader();
                 while (myReader.Read())
                 {
                     if (!myReader.IsDBNull(0))
@@ -843,22 +843,22 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			ArrayList aList = new ArrayList ();
 
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveAgentGroup", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentGroup", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-			myCommand.Parameters.Add(new SqlParameter("@agentID", agentID));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
 			
 			try
 			{
 				myConnection.Open();
-				SqlDataReader myReader = myCommand.ExecuteReader ();
+				DbDataReader myReader = myCommand.ExecuteReader ();
 				
 
 				while(myReader.Read ())
 				{
 					if(myReader["parent_group_ID"] != System.DBNull.Value )
-						aList.Add (Convert.ToInt32(myReader["parent_group_ID"]));
+						aList.Add(Convert.ToInt32(myReader["parent_group_ID"]));
 				}
 			}
 			catch (Exception ex)
@@ -886,14 +886,14 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static DataSet RetrieveAgents()
 		{
-			SqlConnection myConnection = ProcessAgentDB.GetConnection();
-			SqlCommand myCommand = new SqlCommand("RetrieveAgentsTable", myConnection);
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentsTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
 			try
 			{
-				SqlDataAdapter dataAdapter = new SqlDataAdapter();
+				DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
 				dataAdapter.SelectCommand = myCommand;
 				dataAdapter.TableMappings.Add("Table","Agents");
 

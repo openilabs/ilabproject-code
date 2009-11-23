@@ -31,9 +31,9 @@ namespace iLabs.LabServer.LabView
 	{
 		
 		static protected Thread threadLV;
-        static public Hashtable taskTable;
+        //static public Hashtable taskTable;
         public static TaskHandler taskThread;
-        public static TaskProcessor tasks;
+        //public static TaskProcessor tasks;
 
         /// <summary>
         /// Required designer variable.
@@ -66,8 +66,8 @@ namespace iLabs.LabServer.LabView
 			//threadLV.Start();
           
 			
-            taskTable = new Hashtable();
-            tasks = new TaskProcessor();
+            //taskTable = new Hashtable();
+            //tasks = new TaskProcessor();
             Utilities.WriteLog("Global Static ended");
 		}
 /*
@@ -100,9 +100,9 @@ namespace iLabs.LabServer.LabView
             LabTask[] activeTasks = dbService.GetActiveTasks();
             foreach (LabTask task in activeTasks)
             {
-                tasks.Add(task);
+                TaskProcessor.Instance.Add(task);
             }
-            taskThread= new TaskHandler(tasks);
+            taskThread = new TaskHandler(TaskProcessor.Instance);
             ticketRemover = new TicketRemover();
 		}
  
@@ -201,27 +201,7 @@ namespace iLabs.LabServer.LabView
 	}
 
 
-	public class TaskHandler
-	{
-		TaskProcessor taskProc;
-        bool go = true;
-
-		public TaskHandler(TaskProcessor task)
-		{
-			taskProc = task;
-			Thread tt = new Thread(new ThreadStart(Run));
-			tt.Name = "TaskProcessingTread";
-			tt.Start();
-		}
-		private void Run()
-		{
-			while(go)
-			{
-				taskProc.ProcessTasks();
-				Thread.Sleep(10000);
-			}
-		}
-	}
+	
 
 }
 

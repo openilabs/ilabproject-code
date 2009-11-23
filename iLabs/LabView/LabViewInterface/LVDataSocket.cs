@@ -17,25 +17,17 @@ using iLabs.LabServer.Interactive;
 
 using iLabs.Proxies.ESS;
 
-
+using CWDataServer;
 using CWDSLib;
 
-#if LabVIEW_86
-using LabVIEW.lv86;
-namespace iLabs.LabView.LV86
+
+namespace iLabs.LabView
 {
-#endif
-#if LabVIEW_82
-using LabVIEW.lv821;
-namespace iLabs.LabView.LV82
-{
-#endif
 
     public class LVDataSocket : LabDataSource
     {
-       
         private CWDataSocket theSocket;
-        
+
         public LVDataSocket()
         {
             theSocket = new CWDataSocketClass();
@@ -51,7 +43,7 @@ namespace iLabs.LabView.LV82
             {
                 throw new Exception("DataManager has not been assigned");
             }
-           
+
             if (!(theSocket.Status == CWDSStatus.cwdsUnconnected))
                 theSocket.Disconnect();
 
@@ -88,7 +80,7 @@ namespace iLabs.LabView.LV82
 
             theSocket.ConnectTo(TargetUrl, mode);
         }
-      
+
         public override void Update()
         {
             theSocket.Update();
@@ -107,23 +99,18 @@ namespace iLabs.LabView.LV82
 
         private void OnStatusUpdated(int i, int k, string message)
         {
-            Console.WriteLine(  message);
-            
+            Console.WriteLine(message);
+
         }
 
-        
+
         private void OnDataUpdated(CWData e)
         {
             Object obj = e.Value;
             manager.essProxy.AddRecord(manager.experimentID, "", recordType, true, obj.ToString(), null);
-            
+
         }
-    
+
 
     }
-#if LabVIEW_86
 }
-#endif
-#if LabVIEW_82
-}
-#endif

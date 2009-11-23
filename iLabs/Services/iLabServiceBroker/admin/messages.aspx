@@ -1,21 +1,21 @@
-<%@ Page language="c#" Inherits="iLabs.ServiceBroker.admin.messages" validateRequest=false CodeFile="messages.aspx.cs" %>
+<%@ Page language="c#" Inherits="iLabs.ServiceBroker.admin.messages" validateRequest="false" CodeFile="messages.aspx.cs" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="../banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
-	<HEAD>
+<html>
+	<head>
 		<title>MIT iLab Service Broker - Messages</title> 
 		<!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
 		<!-- $Id: messages.aspx,v 1.2 2007/10/18 18:02:13 pbailey Exp $ -->
-		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
-		<meta content="C#" name="CODE_LANGUAGE">
-		<meta content="JavaScript" name="vs_defaultClientScript">
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
+		<meta content="C#" name="CODE_LANGUAGE"/>
+		<meta content="JavaScript" name="vs_defaultClientScript"/>
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<style type="text/css">@import url( ../css/main.css ); 
 		</style>
 		<script language="JavaScript" type="text/JavaScript">
@@ -35,7 +35,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 
 //-->
 		</script>
-	</HEAD>
+	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
 			<a name="top"></a>
@@ -46,10 +46,9 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Messages</h1>
-						<p>Add, remove, or modify a system message below.
-						</p>
-						<!-- Messages Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message --><asp:label id="lblResponse" Runat="server" Visible="False" EnableViewState="False"></asp:label></div>
-					<!-- end pageintro div -->
+						<p>Add, remove, or modify a system message below.</p>
+						<asp:label id="lblResponse" Runat="server" Visible="False" EnableViewState="False"></asp:label>
+					</div><!-- end pageintro div -->
 					<div id="pagecontent">
 						<div id="itemdisplay" style="WIDTH: 50.13%; HEIGHT: 469px">
 							<h4>Selected Message
@@ -90,7 +89,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 										<th style="HEIGHT: 37px">
 											<label for="lasmodified">Last Modified </label>
 										</th>
-										<td style="HEIGHT: 37px"><asp:textbox id="txtLastModified" Runat="server" ReadOnly="true" BackColor="Lavender"></asp:textbox>
+										<td style="HEIGHT: 37px"><asp:textbox id="txtLastModified" Runat="server" ReadOnly="true" BackColor="Lavender"></asp:textbox>&nbsp;&nbsp;<asp:label id="lblDateFormat" for="dateformate" runat="server"></asp:label>&nbsp;&nbsp;<asp:label id="lblTzOff" for="timezoneOffset" runat="server"></asp:label>
 										</td>
 									</tr>
 									<tr>
@@ -102,13 +101,12 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 									<tr>
 										<th>
 											&nbsp;</th>
-										<td><asp:checkbox id="cbxDisplayMessage" Runat="server"></asp:checkbox>Display 
-											message</LABEL></td>
+										<td><asp:checkbox id="cbxDisplayMessage" Runat="server"></asp:checkbox>&nbsp;Display message
+										</td>
 									</tr>
 									<tr>
 										<th colSpan="2">
 											<asp:button id="previewMessage" Runat="server" Text="Preview Message" CssClass="buttonright" onclick="previewMessage_Click"></asp:button>
-											<!--input name="Submit" type="submit" class="buttonright" onclick="openPreviewPopup();" value="Preview Message"-->
 										</th>
 									</tr>
 									<tr>
@@ -126,18 +124,18 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 							<fieldset><legend>Select the type of message you want to view</legend><asp:radiobuttonlist id="rbtnSelectType" Runat="server" RepeatColumns="3" RepeatDirection="Horizontal"
 									TextAlign="Right" AutoPostBack="True" onselectedindexchanged="rbtnSelectType_SelectedIndexChanged">
 									<asp:ListItem Value="group">group</asp:ListItem>
-									<asp:ListItem Value="lab">lab</asp:ListItem>
+									<asp:ListItem Value="lab">lab server</asp:ListItem>
 									<asp:ListItem Value="system">system</asp:ListItem>
 								</asp:radiobuttonlist></fieldset> <%}%>
 							<label for="messagetype">Select the groupname
 									<%if (Session["GroupName"].ToString().Equals(iLabs.ServiceBroker.Administration.Group.SUPERUSER)) {%>, lab, or system<%}%></label>
 							<br>
-							<asp:dropdownlist id="ddlMessageTarget" Runat="server" Width="248px"></asp:dropdownlist></SELECT--><asp:button id="btnGo" Runat="server" Text="Go" CssClass="button" onclick="btnGo_Click"></asp:button>
+							<asp:dropdownlist CssClass="i18n" id="ddlMessageTarget" Runat="server" Width="248px"></asp:dropdownlist><asp:button id="btnGo" Runat="server" Text="Go" CssClass="button" onclick="btnGo_Click"></asp:button>
 						</div>
 						<div>&nbsp;</div>
 						<div class="simpleform"><label for="selectmessage">Select message</label>
 							<br>
-							<asp:listbox id="lbxSelectMessage" Runat="server" AutoPostBack="True" Width="288px" Height="346px" onselectedindexchanged="lbxSelectMessage_SelectedIndexChanged"></asp:listbox>
+							<asp:listbox cssClass="i18n" id="lbxSelectMessage" Runat="server" AutoPostBack="True" Width="288px" Height="346px" onselectedindexchanged="lbxSelectMessage_SelectedIndexChanged"></asp:listbox>
 						</div>
 						<p>&nbsp;</p>
 					</div> <!-- end pagecontent div -->
@@ -147,4 +145,4 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 			</div> <!-- end outerwrapper div -->
 		</form>
 	</body>
-</HTML>
+</html>

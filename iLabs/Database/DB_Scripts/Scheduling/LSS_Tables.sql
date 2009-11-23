@@ -73,8 +73,8 @@ GO
 CREATE TABLE [dbo].[Credential_Sets] (
 	[Credential_Set_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Service_Broker_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Service_Broker_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Group_Name] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Service_Broker_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[USS_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
@@ -83,11 +83,12 @@ CREATE TABLE [dbo].[Experiment_Info] (
 	[Experiment_Info_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Lab_Client_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Lab_Server_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Lab_Server_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Lab_Client_Version] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Lab_Client_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Provider_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Prepare_Time] [int] NOT NULL ,
+	[Lab_Server_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Lab_Client_Version] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Lab_Client_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Provider_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Prepare_Time] [int] NOT NULL default 1,
 	[Recover_Time] [int] NOT NULL ,
 	[Minimum_Time] [int] NOT NULL ,
 	[Early_Arrive_Time] [int] NOT NULL 
@@ -96,7 +97,7 @@ GO
 
 CREATE TABLE [dbo].[LSS_Policy] (
 	[LSS_Policy_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Rule] [varchar] (1024) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Rule] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Experiment_Info_ID] [int] NOT NULL ,
 	[Credential_Set_ID] [int] NOT NULL 
 ) ON [PRIMARY]
@@ -105,8 +106,9 @@ GO
 CREATE TABLE [dbo].[LS_Resources] (
 	[Resource_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Lab_Server_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Lab_Server_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[description] [varchar] (1024) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Lab_Server_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Contact_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
@@ -152,8 +154,8 @@ CREATE TABLE [dbo].[USS_Info] (
 	[USS_Info_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[coupon_ID] [bigint] NOT NULL ,
 	[USS_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[USS_Name] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[USS_URL] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[USS_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[USS_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[domain_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO

@@ -19,15 +19,31 @@ namespace iLabs.LabServer.Interactive
 	/// </summary>
 	public class TaskProcessor
 	{
+        private static TaskProcessor theInstance = null;
+
+        public static TaskProcessor Instance
+        {
+            get
+            {
+                if (theInstance == null)
+                {
+                    theInstance = new TaskProcessor();
+                }
+                return theInstance;
+            }
+        }
+
         private int waitTime = 10000;
         private int count = 0;
         private bool go = true;
         private List<LabTask> tasks;
+        private Dictionary<long, DataSourceManager> dataManagers = null;
         
 		public TaskProcessor()
 		{
             Utilities.WriteLog("TaskProcessor created");
             tasks = new List<LabTask>();
+            dataManagers = new Dictionary<long, DataSourceManager>();
            
 			//
 			// TODO: Add constructor logic here
@@ -37,6 +53,12 @@ namespace iLabs.LabServer.Interactive
         public TaskProcessor(int delay)
         : this() {
             waitTime = delay;
+        }
+
+        public int WaitTime
+        {
+            get { return waitTime; }
+            set { waitTime = value; }
         }
 
         public void Run()
@@ -95,6 +117,43 @@ namespace iLabs.LabServer.Interactive
             return task;
         }
 
+
+        public LabTask[] GetTasks(LabAppInfo app)
+        {
+            List<LabTask> active = new List<LabTask>();
+            lock (tasks)
+            {
+                foreach (LabTask t in tasks)
+                {
+                    if (t.labAppID == app.appID)
+                    {
+                        active.Add(t);
+                    }
+                }
+            }
+            return active.ToArray();
+        }
+
+        public void AddDataManager(long taskID, DataSourceManager mgr)
+        {
+            lock (dataManagers)
+            {
+                dataManagers.Add(taskID, mgr);
+            }
+        }
+
+        public DataSourceManager GetDataManager(long taskID)
+        {
+            return dataManagers[taskID];
+        }
+
+        public bool RemoveDataManager(long taskID)
+        {
+            lock (dataManagers)
+            {
+                return dataManagers.Remove(taskID);
+            }
+        }
 
 
         public void ProcessTasks()
@@ -157,4 +216,26 @@ namespace iLabs.LabServer.Interactive
             }// End tasks lock
         }
 	}
+
+    public class TaskHandler
+    {
+        TaskProcessor taskProc;
+        bool go = true;
+
+        public TaskHandler(TaskProcessor task)
+        {
+            taskProc = task;
+            Thread tt = new Thread(new ThreadStart(Run));
+            tt.Name = "TaskProcessingTread";
+            tt.Start();
+        }
+        private void Run()
+        {
+            while (go)
+            {
+                taskProc.ProcessTasks();
+                Thread.Sleep(10000);
+            }
+        }
+    }
 }

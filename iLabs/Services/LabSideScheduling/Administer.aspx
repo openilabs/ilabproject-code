@@ -37,7 +37,7 @@
 		<tr>
 										<th>
 											<label for="uss">User Side Scheduling Server</label></th>
-										<td style="width: 454px"><asp:DropDownList id="ddlUSS" runat="server" AutoPostBack="True" onselectedindexchanged="ddlUSS_SelectedIndexChanged" Width="100%"></asp:DropDownList>
+										<td style="width: 454px"><asp:DropDownList cssClass="i18n" id="ddlUSS" runat="server" AutoPostBack="True" onselectedindexchanged="ddlUSS_SelectedIndexChanged" Width="100%"></asp:DropDownList>
 											</td>
 									</tr>
 		<tr>

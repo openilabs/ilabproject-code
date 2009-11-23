@@ -95,7 +95,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				{
 					//System.Web.UI.WebControls.ListItem item = new System.Web.UI.WebControls.ListItem(eIDs[i].ToString () +" on "+eIDsinfo[i].submissionTime.ToString(),eIDs[i].ToString());
                     System.Web.UI.WebControls.ListItem item = new System.Web.UI.WebControls.ListItem(expTags[i].tag, expTags[i].id.ToString());
-					lbxSelectExperiment.Items .Add (item);
+					lbxSelectExperiment.Items .Add(item);
 				}
 
 				if(eIDs.Length == 0)
@@ -202,16 +202,16 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
 				if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("before")== 0)
 				{
-					cList.Add (new Criterion ("CreationTime", "<", time1.ToString()));
+					cList.Add(new Criterion ("CreationTime", "<", time1.ToString()));
 				}
 				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("after") == 0)
 				{
-					cList.Add (new Criterion ("CreationTime", ">=", time1.ToString()));
+					cList.Add(new Criterion ("CreationTime", ">=", time1.ToString()));
 				}
 				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("between") == 0)
 				{
-					cList.Add (new Criterion ("CreationTime", ">=",time1.ToString()));
-					cList.Add (new Criterion ("CreationTime", "<", time2.ToString()));
+					cList.Add(new Criterion ("CreationTime", ">=",time1.ToString()));
+					cList.Add(new Criterion ("CreationTime", "<", time2.ToString()));
 				}
                 else if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") == 0)
                 {
@@ -345,12 +345,12 @@ namespace iLabs.ServiceBroker.iLabSB
 				wrapper.RemoveExperimentsWrapper(new long[] {Convert.ToInt32(txtExperimentID.Text)});
 				if(Session["UserID"] != null)
 				{
-					aList.Add (new Criterion ("User_ID", "=", Session["UserID"].ToString() ));
+					aList.Add(new Criterion ("User_ID", "=", Session["UserID"].ToString() ));
 				}
 
 				if(Session["GroupID"] != null)
 				{
-					aList.Add (new Criterion ("Group_ID", "=", Session["GroupID"].ToString()));
+					aList.Add(new Criterion ("Group_ID", "=", Session["GroupID"].ToString()));
 				}
 
 				Criterion[] carray = new Criterion [aList.Count];
@@ -366,7 +366,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				for(int i =0; i< eTags.Length ; i++)
 				{
 					System.Web.UI.WebControls.ListItem item = new System.Web.UI.WebControls.ListItem(eTags[i].tag, eTags[i].id.ToString()) ;
-					lbxSelectExperiment.Items .Add (item);
+					lbxSelectExperiment.Items .Add(item);
 				}
 
 				if(eIDs.Length == 0)

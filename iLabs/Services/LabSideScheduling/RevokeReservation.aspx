@@ -43,7 +43,7 @@
            
 		</td>
 		<td style="width: 41px">
-		<asp:DropDownList ID="ddlStartHour" runat="server">
+		<asp:DropDownList cssClass="i18n" ID="ddlStartHour" runat="server">
             <asp:ListItem>12</asp:ListItem>
             <asp:ListItem>1</asp:ListItem>
             <asp:ListItem>2</asp:ListItem>
@@ -62,7 +62,7 @@
 		 <asp:TextBox ID="txtStartMin" runat="server" Width="24px" >00</asp:TextBox>
 		</td>
 		<td>
-		<asp:DropDownList ID="ddlStartAM" runat="server"  >
+		<asp:DropDownList cssClass="i18n" ID="ddlStartAM" runat="server"  >
             <asp:ListItem>AM</asp:ListItem>
             <asp:ListItem>PM</asp:ListItem>
         </asp:DropDownList>
@@ -80,7 +80,7 @@
            
 		</td>
 		<td style="width: 41px">
-		<asp:DropDownList ID="ddlEndHour" runat="server">
+		<asp:DropDownList cssClass="i18n" ID="ddlEndHour" runat="server">
             <asp:ListItem>12</asp:ListItem>
             <asp:ListItem>1</asp:ListItem>
             <asp:ListItem>2</asp:ListItem>
@@ -99,7 +99,7 @@
 		 <asp:TextBox ID="txtEndMin" runat="server" Width="25px" >00</asp:TextBox>
 		</td>
 		<td>
-		<asp:DropDownList ID="ddlEndAM" runat="server"  >
+		<asp:DropDownList cssClass="i18n" ID="ddlEndAM" runat="server"  >
             <asp:ListItem>AM</asp:ListItem>
             <asp:ListItem>PM</asp:ListItem>
         </asp:DropDownList>

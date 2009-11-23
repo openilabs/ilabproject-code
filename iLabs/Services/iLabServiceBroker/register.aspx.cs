@@ -305,6 +305,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     message.Append("User Name: " + userName + "\n\r");
                     message.Append("Name: " + firstName + " " + lastName + "\n\r");
                     message.Append("Email:  " + email + "\n\r\n\r");
+                    message.Append("iLab URL:  " + ProcessAgentDB.ServiceAgent.codeBaseUrl + "\n\r\n\r");
                     Group[] myGroups = AdministrativeAPI.GetGroups(new int[] { initialGroup });
                     if (useRequestGroups)
                     {
@@ -352,7 +353,7 @@ namespace iLabs.ServiceBroker.iLabSB
 						}
 
 						string msg;
-						msg = "Your request could not be submitted. Please cut & paste this entire message, and send it to " + registrationMailAddress;
+						msg = "Your request has been submitted, but the system was unable to send the notification email. Please cut & paste this entire message, and send it to " + registrationMailAddress;
 						msg += "<br><br>" + mail.Subject + "<br>" + mail.Body;
 						msg += "<br><br>" + smtpErrorMsg;
 						lblResponse.Text = Utilities.FormatErrorMessage(msg);
@@ -403,7 +404,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 {
                     name = sr.ReadLine();
                     data = sr.ReadLine();
-                    int clientID = InternalAdminDB.GetLabClientID(client);
+                    int clientID = InternalAdminDB.GetLabClientIDFromName(client);
                     AdministrativeAPI.SaveClientItemValue(clientID, userID, name, data);
                 }
 
