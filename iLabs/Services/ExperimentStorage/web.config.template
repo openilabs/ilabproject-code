@@ -25,7 +25,7 @@
     <add key="serviceURL" value="http://localhost/ExperimentStorage/ExperimentStorage.asmx"/>
     <add key="defaultPasskey" value="ESS"/>
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
-    <add key="supportMailAddress" value="ilab-comment@mit.edu"/>
+    <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
     
     <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
     <add key="logPath" value=""/>

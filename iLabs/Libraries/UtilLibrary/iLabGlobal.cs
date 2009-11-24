@@ -5,7 +5,7 @@ using System.Text;
 namespace iLabs.UtilLib
 {
     /// <summary>
-    /// static class to provide release tags
+    /// static class to provide release tags.
     /// </summary>
     public class iLabGlobal
     {

@@ -39,17 +39,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Web\Div.cs" />
-    <Compile Include="Web\Div.Designer.cs">
-      <DependentUpon>Div.cs</DependentUpon>
-    </Compile>
     <Compile Include="Core\FactoryDB.cs" />
     <Compile Include="Core\ProcessAgentDB.cs" />
     <Compile Include="Core\ProcessAgentInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Core\ProcessAgentType.cs" />
-    <Compile Include="Web\RegisterSelf.cs" />
     <Compile Include="Core\SystemSupport.cs" />
     <Compile Include="Web\WS_ILabCore.cs">
       <SubType>Component</SubType>

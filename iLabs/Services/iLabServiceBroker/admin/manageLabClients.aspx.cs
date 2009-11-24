@@ -517,6 +517,12 @@ namespace iLabs.ServiceBroker.admin
                 lblResponse.Visible = true;
                 return;
             }
+            if (txtLoaderScript.Text == null || txtLoaderScript.Text.Equals(""))
+            {
+                lblResponse.Text = Utilities.FormatWarningMessage("You must speecify a loader script for the client!");
+                lblResponse.Visible = true;
+                return;
+            }
 			int[] labServerIDs = new int[0];
 			ClientInfo[] clientInfos;
 
