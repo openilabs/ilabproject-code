@@ -1,1 +1,0 @@
-﻿<%@ WebService Language="C#" CodeBehind="Radioactivity.asmx.cs" Class="LabEquipment.RadioactivityService" %>
