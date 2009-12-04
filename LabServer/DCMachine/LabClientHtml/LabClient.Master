@@ -1,0 +1,70 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="LabClient.master.cs"
+    Inherits="LabClientHtml.LabClientMaster" %>
+
+<%@ Register TagPrefix="uc" TagName="Banner" Src="~/Controls/Banner.ascx" %>
+<%@ Register TagPrefix="uc" TagName="Status" Src="~/Controls/Status.ascx" %>
+<%@ Register TagPrefix="uc" TagName="Header" Src="~/Controls/Header.ascx" %>
+<%@ Register TagPrefix="uc" TagName="Navmenu" Src="~/Controls/Navmenu.ascx" %>
+<%@ Register TagPrefix="uc" TagName="Feedback" Src="~/Controls/Feedback.ascx" %>
+<%@ Register TagPrefix="uc" TagName="Footer" Src="~/Controls/Footer.ascx" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>LabClient Master Page</title>
+    <link rel="stylesheet" type="text/css" href="styles/labclient.css" />
+    <link rel="stylesheet" type="text/css" href="styles/Controls.css" />
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <table cols="2" cellspacing="0">
+        <tr>
+            <td colspan="2">
+                <uc:Banner ID="Banner" runat="server" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <uc:Status ID="Status" runat="server" />
+            </td>
+        </tr>
+        <tr>
+            <td class="menu">
+                <uc:Navmenu ID="Navmenu" runat="server" />
+            </td>
+            <td valign="top">
+                <table cellspacing="5">
+                    <tr>
+                        <td>
+                            <uc:Header ID="Header" runat="server" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                            </asp:ContentPlaceHolder>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <uc:Feedback ID="Feedback" runat="server" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <uc:Footer ID="Footer" runat="server" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <asp:Label ID="lblErrorMessages" runat="server"></asp:Label>&nbsp;
+            </td>
+        </tr>
+    </table>
+    </form>
+</body>
+</html>

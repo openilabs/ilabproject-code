@@ -1,0 +1,17 @@
+﻿td.labsetup-label
+{
+	width: 80px;
+	text-align: left;
+	vertical-align: middle;
+	padding-right: 5px;
+}
+td.labsetup-data160px
+{
+	text-align: left;
+	width: 160px;
+}
+td.labsetup-dataright
+{
+	text-align: left;
+	width: 100%;
+}

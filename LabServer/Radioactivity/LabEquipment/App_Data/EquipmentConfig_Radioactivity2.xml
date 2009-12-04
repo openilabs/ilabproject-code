@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<equipmentConfig title="Radioactivity #2" version="3.1">
+  <powerupDelay>7</powerupDelay>
+  <initialiseDelay>45</initialiseDelay>
+  <powerdownTimeout>1800</powerdownTimeout>
+  <flexMotionBoardID>2</flexMotionBoardID>
+  <tube>
+    <offsetDistance>18</offsetDistance>
+    <homeDistance>30</homeDistance>
+    <moveRate>530</moveRate>
+    <initAxis>true</initAxis>
+  </tube>
+  <sources>
+    <encoderPositions>74300,85000,10000,26050,42100,58200</encoderPositions>
+    <selectTimes>11.2,11.8,5.9,7.4,8.6,9.9</selectTimes>
+    <returnTimes>8.6,6.6,13.7,12.5,11.2,9.9</returnTimes>
+    <firstLocation>A</firstLocation>
+    <homeLocation>F</homeLocation>
+  </sources>
+  <absorbers>
+    <encoderPositions>3100,9200,15300,21400,27600,33700,39850,45950,52050,58150,64300,70450,76600,83000</encoderPositions>
+    <selectTimes>3,4,5,5,6,6,7,7,8,8,9,9,10,10</selectTimes>
+    <returnTimes>17,16,16,15,15,14,14,13,13,12,12,11,11,10</returnTimes>
+    <firstLocation>A</firstLocation>
+    <homeLocation>A</homeLocation>
+  </absorbers>
+  <serialLcd>
+    <port>COM3</port>
+    <baud>19200</baud>
+  </serialLcd>
+  <radiationCounter>
+    <type>ST360</type>
+    <execTimeAdjustment>
+      <duration>1.2</duration>
+    </execTimeAdjustment>
+  </radiationCounter>
+  <st360Counter>
+    <port>COM4</port>
+    <baud>9600</baud>
+    <voltage>400</voltage>
+    <volume>1</volume>
+  </st360Counter>
+</equipmentConfig>

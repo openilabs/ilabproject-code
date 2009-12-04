@@ -1,0 +1,583 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>How To Create A New LabServer</title>
+    <style>
+        body
+        {
+            font-family: Arial;
+            font-size: smaller;
+        }
+    </style>
+</head>
+<body>
+    <h2>
+        How To Create A New LabServer</h2>
+    <p>
+        Draft - 9 Sep 2009 - LJP</p>
+    <hr />
+    <p>
+        The following assumes that you are using Microsoft Visual Studio 2008 on a Microsoft
+        Windows operating system with Internet Information Service (IIS) installed.</p>
+    <p>
+        Two parts are required to create a new LabServer:
+    </p>
+    <ul>
+        <li><b>LabLibraries</b> – Code common to all LabServers which contains the base classes
+            and other classes required for LabServer operation. Download 'LabLibraries.zip'
+            either from the MIT Wiki or from SourceForge.<br />
+            <br />
+        </li>
+        <li><b>Template</b> – A template or skeleton for the new LabServer implementation which
+            contains the derived classes, setup and equipment drivers that may be required for
+            LabServer operation. This template contains minimal example code which takes a measurement
+            from a "pretend" LabEquipment service and also a simulated measurement. It can be
+            compiled and run in its current state just to show something running before code
+            gets changed for the new LabServer implementation. Download 'Template.zip' either
+            from the MIT Wiki or from SourceForge.<br />
+            <br />
+        </li>
+    </ul>
+    <p>
+        This part is optional but nice to have around as a reference:
+    </p>
+    <ul>
+        <li><b>TimeOfDay</b> - This example is one of several that are provided for comparison
+            and gives an idea of the changes that need to be made to create a new experiment.
+            It's a lot easier to 'Copy-Paste-Change' than it is to think it up from new. Download
+            'TimeOfDay.zip' either from the MIT Wiki or from SourceForge.
+            <br />
+            <br />
+        </li>
+    </ul>
+    <p>
+        Extract 'LabLibraries.zip' and 'Template.zip' to the same folder so that the folders
+        './LabLibraries/...' and './Template/...' exist in the same folder. Open the Visual
+        Studio solution './Template/Template.sln'. There are ten projects in the solution:
+    </p>
+    <ul>
+        <li>DummyServiceBroker</li>
+        <li>LabClientHtml</li>
+        <li>LabEquipment</li>
+        <li>LabServer</li>
+        <li>LibraryLab</li>
+        <li>LibraryLabClient</li>
+        <li>LibraryLabEquipment</li>
+        <li>LibraryLabServer</li>
+        <li>LibraryLabServerEngine</li>
+        <li>TestLibraryLabServer</li>
+    </ul>
+    <p>
+        You only need to be concerned with these five:
+    </p>
+    <ul>
+        <li>LabClientHtml</li>
+        <li>LabEquipment</li>
+        <li>LabServer</li>
+        <li>LibraryLabServer</li>
+        <li>TestLibraryLabServer</li>
+    </ul>
+    <p>
+        DO NOT make changes to the other projects! Well, you may want to later on but just
+        get something going first.
+    </p>
+    <h4>
+        DummyServiceBroker</h4>
+    <p>
+        This project is provided in the solution to allow development of the LabServer and
+        LabClient in an enviroment without an iLab ServiceBroker getting in the way. The
+        'DummyServiceBroker' simply provides pass-through methods to allow LabClient-to-LabServer
+        communication. It also generates experiment IDs when experiments are submitted.
+    </p>
+    <h4>
+        Development Server Ports</h4>
+    <p>
+        The 'LabClientHtml' web application and the 'LabEquipment', 'LabServer' and 'DummyServiceBroker'
+        web service applications use ports on 'localhost' and there is no need to use IIS
+        Virtual Directories. This makes it much easier to move the solution to different
+        development computers or even folders or drives on a single computer. To check these
+        settings, open the project's 'Properties' page and select the 'Web' tab. The 'Using
+        Visual Studio Development Server' will be selected and 'Specific Port' will be assigned
+        a value at or above '8081'.
+    </p>
+    <h4>
+        Preliminary Checks</h4>
+    <p>
+        Before we start making code changes, let's check a few things and then we can compile
+        the 'Template' solution. The startup project should be set to 'LabClientHtml'. Open
+        the 'Properties' page for the 'LabClientHtml' project and select the 'Web' tab.
+        The 'Start Action' should have 'Specific Page' selected with the entry
+        <nobr>
+            'LabClient.aspx?couponID=12345&passkey=100453924900132'</nobr>. This is the
+        same URL that the ServiceBroker launches except that the numbers will be different.
+        The 'DummyServiceBroker' only uses 'couponID' and 'passkey' is ignored.
+    </p>
+    <p>
+        Check that the 'Active solution configuration' is set to 'Debug' and not 'Release'.
+        This can be checked by selecting 'Build->Configuration Manager...' from the menu.
+        Compile the solution. It should compile without any errors or warnings. Don't run
+        the solution yet because there are a couple of things that need to be done first.
+    </p>
+    <h4>
+        Web.config</h4>
+    <h5>
+        LabClientHtml</h5>
+    <p>
+        In the folder './Template/LabClientHtml', copy 'Web.config.template' to 'Web.config'
+        and update the following keys:
+    </p>
+    <ul>
+        <li>ServiceBrokerUrl - For development, set to 'http://localhost:8081/ServiceBrokerService.asmx'.</li>
+        <li>LabServerGuid - For development, use '8C0BA543419E4d4ab340d449acd3e057'.</li>
+        <li>RootFilePath - Full path to this folder, e.g., 'C:\Visual Studio 2008\Batch\Template\LabClientHtml'.
+            A trailing backslash is optional.</li>
+        <li>FeedbackEmail - Set this to your email address in the form, 'you@your.email.address'.</li>
+    </ul>
+    <h5>
+        LabServer</h5>
+    <p>
+        In the folder './Template/LabLabServer', copy 'Web.config.template' to 'Web.config'
+        and update the following keys:
+    </p>
+    <ul>
+        <li>LabServerGuid - For development, use '8C0BA543419E4d4ab340d449acd3e057'.</li>
+        <li>RootFilePath - Full path to this folder, e.g., 'C:\Visual Studio 2008\Batch\Template\LabServer'.
+            A trailing backslash is optional.</li>
+        <li>AllowedCaller - This is used when the LabServer is configured on a ServiceBroker.
+            For development, set to
+            <nobr>
+                'localhost, 13B164323CDE4aaaA7E2884F0B2F6110, fd3cf16cc855484fb06801379f475837,
+                http://localhost:8081/ServiceBrokerService.asmx, ls2sbPasskey, true'</nobr>.</li>
+        <li>AuthenticateCaller - This is used when the LabServer is configured on a ServiceBroker.
+            For development, you may choose to set this to 'false'.</li>
+        <li>EquipmentService - For development, set to 'http://localhost:8087/EquipmentService.asmx'.</li>
+        <li>EquipmentPasskey - For development, use 'fd3cf16cc855484fb06801379f475837'.</li>
+    </ul>
+    <h5>
+        LabEquipment</h5>
+    <p>
+        In the folder './Template/LabEquipment', copy 'Web.config.template' to 'Web.config'
+        and update the following keys:
+    </p>
+    <ul>
+        <li>RootFilePath - Full path to this folder, e.g., 'C:\Visual Studio 2008\Batch\Template\LabEquipment'.
+            A trailing backslash is optional.</li>
+        <li>AllowedCaller - This is used to only allow a particular LabServer to communicate
+            with the LabEquipment. For development, set to
+            <nobr>
+                'localhost, 8C0BA543419E4d4ab340d449acd3e057, fd3cf16cc855484fb06801379f475837,
+                unused, unused, true'</nobr>.</li>
+        <li>AuthenticateCaller - For development, you may choose to set this to 'false'.</li>
+        <li>PowerupDelay - There is no real hardware that needs to be powered up or down but
+            let's get a feel for what this does anyway. For development, set this to '5'.</li>
+        <li>PowerdownTimeout - There is no real hardware that needs to be powered up or down
+            but let's get a feel for what this does anyway. For development, set this to '30'.</li>
+        <li>HardwareSetting - This is a LabEquipment specific setting and is not provided in
+            'Web.config.template' but is used as an example in the 'Template' solution. Add
+            an entry to the 'AppSettings' section of 'Web.config' with the 'key' set to 'HardwareSetting'
+            and the value set to 'A hardware setting of some sort'. </li>
+    </ul>
+    <h5>
+        DummyServiceBroker</h5>
+    <p>
+        The 'Web.config' file has already been supplied and does not need to be changed.
+        'DummyServiceBroker' is only used during development and does not get 'Published'
+        in the 'Release' version.
+    </p>
+    <h4>
+        Running the Template Solution</h4>
+    <p>
+        There is no need to compile the solution after making changes to the configuration
+        files. But let's not jump in and press 'F5' just yet. We need to run up the solution
+        in an orderly fashion.
+    </p>
+    <h5>
+        LabEquipment</h5>
+    <p>
+        We need to check that this one runs ok. Open the 'Properties' page for the 'LabEquipment'
+        project and select the 'Web' tab. Check that 'Start Action' is set to 'Specific
+        Page' with the entry 'EquipmentService.asmx'. Now, right-click the 'LabEquipment'
+        project in 'Solution Explorer' and select 'Debug->Start new instance' from the popup
+        menu. If all goes well, you should be presented with the 'EquipmentService' webpage
+        showing the operation 'ExecuteCommand'.
+    </p>
+    <p>
+        Click on 'ExecuteCommand' to run the operation. A 'Test' webpage appears where a
+        command and several parameters can be entered. Enter the command 'Online' and enter
+        '0' (zero) for each of the parameters and then click the 'Invoke' button. You should
+        be presented with another webpage containing some information in XML format. If
+        you get the error message 'Access Denied!' then close the web browser and edit the
+        'Web.config' file for the 'LabEquipment' project. Set the 'AuthenticateCaller' key
+        value to 'false' and then save and close the 'Web.config' file. Run the procedure
+        above again. If 'boolValue' is 'false' and there is no error message then the LabEquipment
+        might still be initialising. Wait a bit and invoke the operation again. 'boolValue'
+        should become 'true'.
+    </p>
+    <p>
+        Let's check the log file to see what was going on. Open the file './LabEquipment/LogFiles/YYYYMMDD.log'
+        where 'YYYY' is the year, 'MM' is the month and 'DD' is the day that the logile
+        was created. The logfile contains a lot of stuff but gives the developer some idea
+        of what's going on. If things didn't didn't run as expected, check the logfile to
+        find a possible cause.
+    </p>
+    <h5>
+        LabServer</h5>
+    <p>
+        We now need to check that this one runs ok. Open the 'Properties' page for the 'LabServer'
+        project and select the 'Web' tab. Check that 'Start Action' is set to 'Specific
+        Page' with the entry 'LabServerWebService.asmx'. Now, right-click the 'LabServer'
+        project in 'Solution Explorer' and select 'Debug->Start new instance' from the popup
+        menu. If all goes well, you should be presented with the 'LabServerWebService' webpage
+        showing several operations including 'GetLabStatus'.
+    </p>
+    <p>
+        Click on 'GetLabStatus' to run the operation. A 'Test' webpage appears. No parameters
+        can be entered for 'GetLabStatus' because it doesn't take any. Click the 'Invoke'
+        button. You should be presented with another webpage containing some information
+        in XML format. If you get the lab status message 'Access Denied!' then close the
+        web browser and edit the 'Web.config' file for the 'LabServer' project. Set the
+        'AuthenticateCaller' key value to 'false' and then save and close the 'Web.config'
+        file. Run the procedure above again. This time, 'online' should be 'true' and 'labStatusMessage'
+        should be contain the string 'Ready'.
+    </p>
+    <p>
+        Check the log file for the 'LabServer' project to see what was going on. Open the
+        file './LabServer/LogFiles/YYYYMMDD.log' just like you did for the 'LabEquipment'
+        project. If things didn't didn't run as expected, check the logfile to find a possible
+        cause.
+    </p>
+    <h5>
+        LabClientHtml</h5>
+    <p>
+        Finally, we now need to check that this one runs ok. Open the 'Properties' page
+        for the 'LabClientHtml' project and select the 'Web' tab. Check that 'Start Action'
+        is set to 'Specific Page' with the entry 'LabClient.aspx?couponID=12345&passkey=100453924900132'.
+        Now, either press 'F5' or right-click the 'LabClientHtml' project in 'Solution Explorer'
+        and select 'Debug->Start new instance' from the popup menu. If all goes well, you
+        should be presented with a webpage displaying the title 'Template', an image showing
+        some resistors on a circuit board and a navigation menu.
+    </p>
+    <p>
+        Check the log file for the 'LabClientHtml' project to see what was going on. Open
+        the file './LabClientHtml/LogFiles/YYYYMMDD.log' just like you did for the 'LabServer'
+        project. If things didn't didn't run as expected, check the logfile to find a possible
+        cause.
+    </p>
+    <p>
+        In the navigation menu, click 'Status'. The 'LabServer' should be 'Online' and 'Ready'
+        with '0 experiments queued'.
+    </p>
+    <p>
+        In the navigation menu, click 'Setup'. There are two setups provided, one for driving
+        the equipment and one for driving the simulation. These have almost no functionality
+        but are privided as an example to work with. For each setup, click the 'Validate'
+        button to validate the experiment specification for each setup. An estimated execution
+        time will be indicated in the message.
+    </p>
+    <p>
+        Select the setup 'Setup for Equipment' and click the 'Submit' button to submit an
+        experiment specification to the LabServer for processing. Then go to the 'Status'
+        webpage to check the status of the experiment just submitted. The experiment number
+        should be displayed so click the 'Check' button. A message will be displayed indicating
+        the staus of the experiment.
+    </p>
+    <p>
+        When the experiment completes, navigate to the 'Results' webpage. The experiment
+        number should be displayed so click the 'Retrieve' button. Information about the
+        experiment should be displayed. The experiment results can be saved to a CSV file
+        by clicking the 'Save' button.
+    </p>
+    <hr />
+    <h2>
+        Changing the Code - What to Change or Add
+    </h2>
+    <p>
+        In the descriptions that follow, references will be made to comments inserted in
+        the code. These comments are either:
+    </p>
+    <p>
+        <code>//</code><br />
+        <code>// YOUR CODE HERE</code><br />
+        <code>//</code>
+    </p>
+    <p>
+        or
+    </p>
+    <p>
+        <code>//</code><br />
+        <code>// YOUR CODE BETWEEN HERE ...</code><br />
+        <br />
+        <code>// ... AND HERE.</code><br />
+        <code>//</code>
+    </p>
+    <p>
+        This makes it a bit easier to know where to change or add code.
+    </p>
+    <hr />
+    <h2>
+        LabEquipment
+    </h2>
+    <p>
+        There are four files here that need to be changed:
+    </p>
+    <ul>
+        <li>Drivers\Hardware.cs</li>
+        <li>EquipmentEngine.cs</li>
+        <li>EquipmentService.asmx.cs</li>
+        <li>Web.config</li>
+    </ul>
+    <h5>
+        Drivers\Hardware.cs
+    </h5>
+    <p>
+        This is only a simple example of a hardware driver that drives 'pretend' hardware.
+        Thow it away and add your own drivers or use this as a starting point for something.
+    </p>
+    <h5>
+        EquipmentEngine.cs
+    </h5>
+    <p>
+        This creates an instance of the hardware driver. There may be multiple hardware
+        drivers depending on the equipment being used. The equipment may need to be powered
+        down when not in use.
+    </p>
+    <h5>
+        EquipmentService.asmx.cs
+    </h5>
+    <p>
+        This web service processes the commands being received from the LabServer and calls
+        upon the hardware drivers to carry out operations according to those commands.
+    </p>
+    <h5>
+        Web.config
+    </h5>
+    <p>
+        Add extra keys as required for the Hardware drivers.
+    </p>
+    <hr />
+    <h2>
+        LabServer
+    </h2>
+    <p>
+        There are three files here that need to be changed:
+    </p>
+    <ul>
+        <li>Xml\LabConfiguration.dtd</li>
+        <li>Xml\LabConfiguration.xml</li>
+        <li>Web.config</li>
+    </ul>
+    <h5>
+        LabConfiguration.xml
+    </h5>
+    <p>
+        This file contains the information required by the LabClient to display information
+        on the 'Setup' webpage and populate the controls.
+    </p>
+    <p>
+        The LabClient may want to display various versions of an experiment ('Experiment
+        Setup') that the user can choose from. The 'Configuration' element contains a list
+        of the setups to display. Each setup has an 'id', 'name' and 'description'. The
+        'id' is used by both the LabServer and LabClient to determine what operations to
+        perform. The 'name' and 'description' elements are displayed in fields in the 'Setup'
+        webpage.
+    </p>
+    <p>
+        The 'Configuration' element may contain elements with information common to all
+        listed setups.
+    </p>
+    <p>
+        An empty XML Validation element is provided so that the LabServer can determine
+        if information in the experiment specification is valid.
+    </p>
+    <p>
+        An empty XML Specification element is provided so that the LabClient can fill in
+        information and send it to the LabServer.
+    </p>
+    <p>
+        An empty ExperimentResults element is provided so that the LabServer can fill in
+        information and send it to the LabClient.
+    </p>
+    <h5>
+        Web.config
+    </h5>
+    <p>
+        Add extra keys as required for the Setup and Equipment Drivers.
+    </p>
+    <hr />
+    <h2>
+        LibraryLabServer
+    </h2>
+    <p>
+        This project contains the functionality specific to a LabServer. There are several
+        files here that need to be changed:
+    </p>
+    <ul>
+        <li>Configuration.cs </li>
+        <li>Consts.cs</li>
+        <li>ExperimentEngine.cs</li>
+        <li>ExperimentResult.cs</li>
+        <li>Specification.cs</li>
+        <li>TypeResultInfo.cs</li>
+        <li>Validation.cs</li>
+        <li>Drivers\Equipment\DoesNothing.cs</li>
+        <li>Drivers\Setup\DriverTemplate.cs</li>
+    </ul>
+    <h5>
+        Configuration.cs
+    </h5>
+    <p>
+        Takes information from the 'Configuration' element of 'LabConfiguration.xml' and
+        places it in private variables that can be accessed through 'Properties'. This is
+        information is not the setups. The setups are already handled by the base class
+        in 'LibraryLabServerEngine.LabConfiguration'.
+    </p>
+    <h5>
+        Consts.cs
+    </h5>
+    <p>
+        String constants and XML string constants are placed here in one place. It makes
+        them easier to find and helps to eliminate typing errors by using 'constants' instead
+        of 'strings'.
+    </p>
+    <h5>
+        ExperimentEngine.cs
+    </h5>
+    <p>
+        This creates an instance of the driver for the specified setup that will execute
+        the experiment.
+    </p>
+    <h5>
+        ExperimentResult.cs
+    </h5>
+    <p>
+        Information is taken from the Specification and ResultInfo structure and placed
+        in the XML ExperimentResult node which is then saved to local disk storage. This
+        information is available for retrieval by the ServiceBroker.
+    </p>
+    <h5>
+        Specification.cs
+    </h5>
+    <p>
+        Takes information from the XML Specification string and places it in private variables
+        that can be accessed through 'Properties'. This information is then checked for
+        validity. If the specification is valid, an instance of the driver for the specified
+        setup is created to obtain the estimated execution time.
+    </p>
+    <h5>
+        TypeResultInfo.cs
+    </h5>
+    <p>
+        The 'ResultInfo' structure that contains the information that will be placed in
+        the XML ExperimentResult node.
+    </p>
+    <h5>
+        Validation.cs
+    </h5>
+    <p>
+        May or may not be used, depending on the experiment. Boundary conditions such as
+        'Minimum' and 'Maximum' values are checked here.
+    </p>
+    <h5>
+        Drivers\Equipment\EquipmentServiceProxy.cs
+    </h5>
+    <p>
+        DO NOT EDIT. This file is auto-generated. It provides the interface to the LabEquipment
+        web service. There is a batch file called 'MakeProxy.bat' that is run from a command
+        prompt window to generate this file.
+    </p>
+    <p>
+        To generate this file, first run the LabEquipment web service. Then open a command
+        prompt window and navigate to './Template/LibraryLabServer/Drivers/Equipment'. Run
+        'MakeProxy.bat' to generate 'EquipmentServiceProxy.cs'. When this file is generated
+        successfully, the solution will need to be rebuilt.
+    </p>
+    <p>
+        This file will need be generated again each time any changes are made to the LabEquipment
+        web service.
+    </p>
+    <h5>
+        Drivers\Equipment\Simulation.cs
+    </h5>
+    <p>
+        This is only a simple example of a driver that does not communicate with a LabEquipment
+        web service. Instead of running a simulation, the driver could communicate with
+        equipment over a network connection.
+    </p>
+    <h5>
+        Drivers\Setup\DriverEquipment.cs
+    </h5>
+    <p>
+        This drives the experiment for a particular 'setup' which makes calls to a LabEquipment
+        web service.
+    </p>
+    <h5>
+        Drivers\Setup\DriverSimulation.cs
+    </h5>
+    <p>
+        This drives the experiment for a particular 'setup' which does not makes calls to
+        a LabEquipment service.
+    </p>
+    <hr />
+    <h2>
+        LabClientHtml</h2>
+    <p>
+        There are several files here that need to be changed:
+    </p>
+    <ul>
+        <li>LabControls\LabConsts.cs</li>
+        <li>LabControls\LabResults.ascx.cs</li>
+        <li>LabControls\LabSetup.ascx</li>
+        <li>LabControls\LabSetup.ascx.cs</li>
+        <li>LabControls\Result.cs</li>
+        <li>LabControls\TypeResultInfo.cs</li>
+        <li>Styles\LabControls.css</li>
+        <li>Web.config</li>
+    </ul>
+    <h5>
+        LabConsts.cs
+    </h5>
+    <p>
+        XML string constants and string constants are placed here in one place. It makes
+        them easier to find.
+    </p>
+    <p>
+        Used by 'LabResults.ascx.cs', 'LabSetup.ascx.cs' and 'Result.cs'.
+    </p>
+    <h5>
+        LabResults.ascx.cs
+    </h5>
+    <p>
+        Obtains the experiment specification and result information strings that are used
+        by 'Results.ascx.cs' to display information on the 'Results' webpage.
+    </p>
+    <h5>
+        LabSetup.ascx
+    </h5>
+    <p>
+        This file contains the HTML markup that provides the entry of the experiment specification.
+        Uses the styles in 'LabControls.css'.
+    </p>
+    <h5>
+        LabSetup.ascx.cs
+    </h5>
+    <p>
+        Add code to populate and update the webpage controls. The 'BuildSpecification' method
+        takes information from the controls and places it in the XML specification node
+        that is used by 'Setup.ascx.cs'.
+    </p>
+    <h5>
+        Result.cs
+    </h5>
+    <p>
+        Takes the information from the XML ExperimentResult node and places it into a 'ResultInfo'
+        structure where it can be accessed by 'LabResults.ascx.cs'.
+    </p>
+    <h5>
+        TypeResultInfo.cs
+    </h5>
+    <p>
+        The 'ResultInfo' structure that contains the information taken from the XML ExperimentResult
+        node.
+    </p>
+</body>
+</html>
