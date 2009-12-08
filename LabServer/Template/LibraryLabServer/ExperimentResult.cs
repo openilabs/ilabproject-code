@@ -38,7 +38,7 @@ namespace Library.LabServer
 
         public ExperimentResult(int experimentId, string sbName, DateTime dateTime, int unitId, Configuration configuration,
             Specification specification, ResultInfo resultInfo)
-            : base(experimentId, sbName, dateTime, specification.SetupId, unitId, configuration, resultInfo.dataType)
+            : base(experimentId, sbName, dateTime, specification.SetupId, unitId, configuration)
         {
             const string STRLOG_MethodName = "ExperimentResult";
 

@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\LabConfiguration.xml" />
+    <Content Include="App_Data\SimulationConfig.xml" />
     <Content Include="Controls\Banner.ascx" />
     <Content Include="Controls\Feedback.ascx" />
     <Content Include="Controls\Footer.ascx" />

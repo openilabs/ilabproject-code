@@ -24,7 +24,7 @@ namespace Library.LabEquipment
 
     /// <summary>
     /// These commands control and/or communicate with the equipment. These commands will
-    /// completes execution before another command can start execution.
+    /// complete execution before another command can start execution.
     /// </summary>
     public enum ExecuteCommands
     {
