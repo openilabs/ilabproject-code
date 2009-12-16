@@ -56,7 +56,7 @@ Please see license.txt in top level directory for full license.
                     <tr> <td>&nbsp;</td> <td></td></tr>
                     <tr><td width="75%"></td>
                     <td>
-                    <asp:Button ID="btn_ExportCVS" runat="server" EnableViewState="False" Visible="False" OnClick="btnExportCVS_Click"  text="Export To CVS" />
+                    <asp:Button ID="btn_ExportCVS" runat="server" EnableViewState="False" Visible="False" OnClick="btnExportCVS_Click"  text="Export Tab Delimited File" />
                     </td></tr>
                     </table>
 					<br clear="all"/>
