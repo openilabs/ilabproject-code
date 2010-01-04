@@ -25,7 +25,6 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SchedulingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
-
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authentication;
@@ -36,10 +35,7 @@ using iLabs.UtilLib;
 
 using iLabs.Proxies.USS;
 
-
 using iLabs.Ticketing;
-
-//using iLabs.Services;
 using iLabs.DataTypes.TicketingTypes;
 
 namespace iLabs.ServiceBroker.iLabSB
@@ -134,69 +130,7 @@ namespace iLabs.ServiceBroker.iLabSB
         }
         #endregion
 
-    //    void testLaunch(LabClient cl)
-    //    {
-    //        if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
-    //        {
-    //            btnLaunchLab.Visible = true;
-    //        }
-    //        else if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
-    //        {
-    //            if (lc.needsScheduling)
-    //            {
-    //                if (couponId != null && passkey != null && issuerGuid != null)
-    //                {
-    //                    Ticket allowExperimentExecutionTicket = issuer.RetrieveTicket(
-    //                        new Coupon(issuerGuid, Int64.Parse(couponId), passkey),
-    //                        TicketTypes.ALLOW_EXPERIMENT_EXECUTION);
-
-    //                    if (allowExperimentExecutionTicket != null)
-    //                    {
-    //                        XmlDocument payload = new XmlDocument();
-    //                        payload.LoadXml(allowExperimentExecutionTicket.payload);
-    //                        startExecution = DateUtil.ParseUtc(payload.GetElementsByTagName("startExecution")[0].InnerText);
-    //                        duration = Int64.Parse(payload.GetElementsByTagName("duration")[0].InnerText);
-
-    //                        Session["StartExecution"] = DateUtil.ToUtcString(startExecution);
-    //                        Session["Duration"] = duration;
-
-    //                        //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
-
-    //                        btnLaunchLab.Visible = true;
-    //                        // Display reenter button if experiment is reentrant & a current experiment exists
-    //                        if (lc.IsReentrant)
-    //                        {
-
-    //                            long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
-    //                                Convert.ToInt32(Session["GroupID"]), lc.labServerIDs[0], lc.clientID);
-    //                            if (ids.Length > 0)
-    //                            {
-    //                                btnLaunchLab.Text = "Launch New Experiment";
-    //                                pReenter.Visible = true;
-    //                                btnReenter.Visible = true;
-    //                                btnReenter.CommandArgument = ids[0].ToString();
-    //                            }
-    //                            else
-    //                            {
-    //                                btnLaunchLab.Text = "Launch Lab";
-    //                                pReenter.Visible = false;
-    //                                btnReenter.Visible = false;
-    //                            }
-    //                        }
-    //                    }
-    //                    else
-    //                    {
-    //                        btnLaunchLab.Visible = false;
-    //                    }
-    //                }
-    //            }
-    //            else
-    //            {
-    //                btnLaunchLab.Visible = true;
-    //            }
-    //        }
-    //        
-    //    }
+    
 
         /// <summary>
         /// This examines the specified parameters and current session state to resove the next action.
@@ -622,59 +556,9 @@ namespace iLabs.ServiceBroker.iLabSB
             //lblDebug.Text = message.ToString();
             Utilities.WriteLog(message.ToString());
         }
-       
-    //    protected void btnSchedule_Click(object sender, EventArgs e)
-    //    {
-    //        string username = Session["UserName"].ToString();
-    //        string groupName = Session["GroupName"].ToString();
-    //        string labClientName = lc.clientName;
-    //        string labClientVersion = lc.version;
-
-    //        ProcessAgent labServer = issuer.GetProcessAgent(lc.labServerIDs[0]);
-    //        int ussId = issuer.FindProcessAgentIdForClient(lc.clientID, ProcessAgentType.SCHEDULING_SERVER);
-
-    //        if (ussId > 0)
-    //        {
-
-    //            string ussGuid = issuer.GetProcessAgent(ussId).agentGuid;
-    //            int lssId = issuer.FindProcessAgentIdForAgent(lc.labServerIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
-
-    //            string lssGuid = issuer.GetProcessAgent(lssId).agentGuid;
-
-    //            // Find efective group
-    //            string effectiveGroupName = null;
-    //            int currentGroup = Convert.ToInt32(Session["GroupID"]);
-    //            int effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(currentGroup, lc.clientID,
-    //                Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
-    //            if (effectiveGroupID == currentGroup)
-    //            {
-    //                effectiveGroupName = Session["GroupName"].ToString();
-    //            }
-    //            else if (effectiveGroupID > 0)
-    //            {
-    //                Group[] effGroup = AdministrativeAPI.GetGroups(new int[] { effectiveGroupID });
-    //                effectiveGroupName = effGroup[0].groupName;
-    //            }
-
-    //            //Default duration ????
-    //            long duration = 36000;
-
-    //            RecipeExecutor recipeExec = RecipeExecutor.Instance();
-    //            string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(ussGuid, lssGuid, username, effectiveGroupName,
-    //                labServer.agentGuid, lc.clientGuid, labClientName, labClientVersion,
-    //                Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
-
-    //            schedulingUrl += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);
-    //            Response.Redirect(schedulingUrl, false);
-    //        }
-    //    }
 
         protected void btnLogIn_Click(object sender, System.EventArgs e)
         {
-            //object ok = Request.QueryString["hdnUserTZ2"];
-            //int clientID = 0;
-            //Object tz = hdnUserTZ.Value;
-            //Session["UserTZ"] = tz;
             if (txtUsername.Text.Equals("") || txtPassword.Text.Equals(""))
             {
                 lblLoginErrorMessage.Text = "<div class=errormessage><p>Missing user ID and/or password field. </p></div>";
@@ -742,9 +626,5 @@ namespace iLabs.ServiceBroker.iLabSB
             }
             //this.Page_Load(this, null);
         }
-
-        
-
-
     }
 }
