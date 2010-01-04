@@ -75,6 +75,15 @@ namespace iLabs.Core
             param.DbType = type;
             return param;
         }
+
+ 	/// <summary>
+        /// Convenience method to create a parameter
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="name"></param>
+        /// <param name="type">DbType</param>
+        /// <param name="maxSize"></param>
+        /// <returns></returns>
         public static DbParameter CreateParameter(DbCommand cmd, string name, DbType type, int max)
         {
             DbParameter param = cmd.CreateParameter();
@@ -83,45 +92,54 @@ namespace iLabs.Core
             param.Size = max;
             return param;
         }
+
+	 /// <summary>
+        ///  Convenience method to create a parameter, minimal value checking is done
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="name"></param>
+        /// <param name="value">If null or DBNull.Value, param.Value set to DBNull.Value, zero length strings are not converted to DBNull, 
+        /// DateTime values are checked and adjusted to Database min or max if needed.</param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type)
         {
             DbParameter param = cmd.CreateParameter();
             param.ParameterName = name;
             param.DbType = type;
-            if (type == DbType.DateTime)
+           if (value == null || value == System.DBNull.Value)
             {
-                if (value == null || ((DateTime)value) < minDbDate)
+                param.Value = System.DBNull.Value;
+            }
+            else
+            {
+                if (value is DateTime)
                 {
-                    param.Value = minDbDate;
-                }
-                else if (((DateTime)value) > maxDbDate)
-                {
-                    param.Value = maxDbDate;
+                    if (((DateTime)value) < MinDbDate)
+                        param.Value = MinDbDate;
+                    else if (((DateTime)value) > MaxDbDate)
+                        param.Value = MaxDbDate;
+                    else
+                        param.Value = value;
                 }
                 else
                 {
                     param.Value = value;
                 }
             }
-            else
-            {
-                if (value == null || value == System.DBNull.Value)
-                    param.Value = System.DBNull.Value;
-                else
-                {
-                    if ((value is string) && (((string)value).Length == 0))
-                    {
-                        param.Value = System.DBNull.Value;
-                    }
-                    else
-                    {
-                        param.Value = value;
-                    }
-                }
-            }
             return param;
         }
 
+
+	 /// <summary>
+        ///  Convenience method to create a parameter, minimal value checking is done
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="name"></param>
+        /// <param name="value">If null or DBNull.Value, param.Value set to DBNull.Value, zero length strings are not converted to DBNull, 
+        /// DateTime values are checked and adjusted to Database min or max if needed.</param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type, int size)
         {
             DbParameter param = CreateParameter(cmd, name, value, type);
