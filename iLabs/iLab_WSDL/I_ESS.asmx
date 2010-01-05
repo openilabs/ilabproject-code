@@ -24,7 +24,8 @@ using iLabs.DataTypes.SoapHeaderTypes;
 
 [XmlType(Namespace = "http://ilab.mit.edu/iLabs/type")]
 [WebServiceBinding(Name = "IESS", Namespace = "http://ilab.mit.edu/iLabs/Services")]
-[WebService(Name = "ExperimentStorageProxy", Namespace = "http://ilab.mit.edu/iLabs/Services")]
+[WebService(Name = "ExperimentStorageProxy", Namespace = "http://ilab.mit.edu/iLabs/Services",
+    Description="Implements the Storage Service.")]
 public abstract class I_ESS  : System.Web.Services.WebService {
    
     /// <summary>

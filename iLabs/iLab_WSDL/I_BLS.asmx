@@ -35,7 +35,8 @@ using iLabs.DataTypes.BatchTypes;
 [SoapDocumentService(RoutingStyle = SoapServiceRoutingStyle.RequestElement)]
 [XmlType(Namespace = "http://ilab.mit.edu")]
 [WebServiceBinding(Name = "I_BLS", Namespace = "http://ilab.mit.edu"),
-WebService(Name = "BatchLSProxy", Namespace = "http://ilab.mit.edu")]
+WebService(Name = "BatchLSProxy", Namespace = "http://ilab.mit.edu",
+    Description="The interface definition for an InteractiveLabServer. Currently only one method, additional methods will be added as needed.")]
 public abstract class I_BLS : System.Web.Services.WebService
 {
     public AuthHeader authHeader = new AuthHeader();

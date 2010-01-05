@@ -52,7 +52,12 @@ namespace iLabs.Services{
 	
     [WebServiceBinding(Name = "IBatchSB", Namespace = "http://ilab.mit.edu")]
 	[XmlType (Namespace="http://ilab.mit.edu")]
-	[WebService (Name="BatchSBProxy", Namespace="http://ilab.mit.edu")]
+	[WebService (Name="BatchSBProxy", Namespace="http://ilab.mit.edu",
+        Description="IBatchSB provides all of the 6.1 batch methods.  Many of these methods are passed through the ServiceBroker from client to LabServer or LabServer to Client."
+	+ " All of the ServiceBroker passthrough calls run in the context of a user's "
+	+ "ServiceBroker user session, and consequently have session enabled. "
+	+ "<br/>There is one Method, Notify(), that is called from the Lab Server directly. This "
+	+ "runs outside of the session context." )]
 	public abstract class I_BatchSB : System.Web.Services.WebService
 	{
 		//private LabServerAPI SSService = new LabServerAPI();
@@ -80,7 +85,7 @@ namespace iLabs.Services{
 		/// <returns>A LabStatus object containing a flag indicating whether or not the lab is online, along with a lab status description.</returns>
 		/// <seealso cref="LabStatus">LabStatus Class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod (Description="Checks on the status of the lab server", EnableSession = true)]
+		[WebMethod (Description="Checks on the status of the lab server.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract LabStatus GetLabStatus(string labServerID);
@@ -95,7 +100,7 @@ namespace iLabs.Services{
 		/// <returns>A WaitEstimate object containing information about how many experiments precede this one in the queue, along with an estimate of how long it will be before the submitted experiment will run.</returns>
 		/// <seealso cref="WaitEstimate">WaitEstimate Class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Checks on the effective queue length of the Lab Server", EnableSession = true)]
+		[WebMethod(Description="Checks on the effective queue length of the Lab Server.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract WaitEstimate GetEffectiveQueueLength(string labServerID, int priorityHint);
@@ -106,7 +111,7 @@ namespace iLabs.Services{
 		/// <param name="labServerID">A string GUID that uniquely identifies the Lab Server.</param>
 		/// <returns>A URL to a lab-specific information resource, e.g. a lab information page.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Gets general information about a lab server", EnableSession = true)]
+		[WebMethod(Description="Gets general information about a lab server.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string GetLabInfo(string labServerID);
@@ -118,7 +123,7 @@ namespace iLabs.Services{
 		/// <param name="labServerID">A string GUID that uniquely identifies the Lab Server.</param>
 		/// <returns>An opaque, domain-dependent lab configuration.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Gets the lab configuration of a lab server", EnableSession = true)]
+		[WebMethod(Description="Gets the lab configuration of a LabServer. The configuration specification returned is in a format specific to that LabServer.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string GetLabConfiguration (string labServerID);
@@ -132,7 +137,7 @@ namespace iLabs.Services{
 		/// <returns>A ValidationReport object containing information about whether or not the experiment would be accepted for execution, how long it would be before it could be run, and any error or warning messages.</returns>
 		/// <seealso cref="ValidationReport">ValidationReport Class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Submits an experiment specification to the lab server for exection", EnableSession = true)]
+		[WebMethod(Description="Submits an experiment specification to the lab server for validation.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract ValidationReport Validate (string labServerID, string experimentSpecification);
@@ -149,7 +154,7 @@ namespace iLabs.Services{
 		/// <seealso cref="ValidationReport">ValidationReport Class</seealso>
 		/// <seealso cref="WaitEstimate">WaitEstimate Class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Submits an experiment specification to the lab server for exection", EnableSession = true)]
+		[WebMethod(Description="Submits an experiment specification to the lab server for exection.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract ClientSubmissionReport Submit (string labServerID, string experimentSpecification, int priorityHint, bool emailNotification);
@@ -163,7 +168,7 @@ namespace iLabs.Services{
 		/// <seealso cref="LabExperimentStatus">LabExperimentStatus Class</seealso>
 		/// <seealso cref="ExperimentStatus">ExperimentStatus Class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod (Description="Checks on the status of a previously submitted experiment", EnableSession = true)]
+		[WebMethod (Description="Checks on the status of a previously submitted experiment.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract LabExperimentStatus GetExperimentStatus(int experimentID);
@@ -175,7 +180,7 @@ namespace iLabs.Services{
 		/// <param name="experimentID">A token tha identifies the experiment.</param>
 		/// <returns>true if experiment was successfully removed from the queue (before execution had begun).  If false, user may want to call GetExperimentStatus() for more detailed information.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod (Description="Cancels a previously submitted experiment. If the experiment is already running, makes best efforts to abort execution, but there is no guarantee that the experiment will not run to completion", EnableSession = true)]
+		[WebMethod (Description="Cancels a previously submitted experiment. If the experiment is already running, makes best efforts to abort execution, but there is no guarantee that the experiment will not run to completion.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract bool Cancel(int experimentID);
@@ -188,7 +193,7 @@ namespace iLabs.Services{
 		/// <returns>A ResultReport object containing the status code, result string, warning and error messages, and some optional XML information.</returns>
 		/// <seealso cref="ResultReport">ResultReport class</seealso>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Retrieves the results from (or errors generated by) a previously submitted experiment", EnableSession = true)]
+		[WebMethod(Description="Retrieves the results from (or errors generated by) a previously submitted experiment.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract ResultReport RetrieveResult (int experimentID);
@@ -217,7 +222,7 @@ namespace iLabs.Services{
 		/// <param name="name">The name of the client item whose value is to be saved.</param>
 		/// <param name="itemValue">The value that is to be saved with name.</param>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Sets a client item value in the user's opaque data store", EnableSession = true)]
+		[WebMethod(Description="Sets a client item value in the user's opaque data store.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract void SaveClientItem(string name, string itemValue);
@@ -229,7 +234,7 @@ namespace iLabs.Services{
 		/// <param name="name">The name of the client item whose value is to be returned.</param>
 		/// <returns>The value of a client item in the user's opaque data store.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Returns the value of an client item in the user's opaque data store", EnableSession = true)]
+		[WebMethod(Description="Returns the value of an client item in the user's opaque data store.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string LoadClientItem(string name);
@@ -240,7 +245,7 @@ namespace iLabs.Services{
 		/// </summary>
 		/// <param name="name">The name of the client item to be removed.</param>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description = "Removes an client item from the user's opaque data store", EnableSession = true)]
+		[WebMethod(Description = "Removes an client item from the user's opaque data store.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract void DeleteClientItem(string name);
@@ -251,7 +256,8 @@ namespace iLabs.Services{
 		/// </summary>
 		/// <returns>An array of client items.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Enumerates the names of all client items in the user's opaque data store", EnableSession = true)]
+		[WebMethod(Description="Enumerates the names of all client items in the user's opaque data store. "
+        + "The list is specific to the current client in the user's session state.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string[] ListAllClientItems();
@@ -267,7 +273,8 @@ namespace iLabs.Services{
 		/// <param name="experimentID">A token which identifies the experiment.</param>
 		/// <returns> The experimentSpecification, a domain-dependent experiment specification originally created by the Lab Client.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Retrieves a previously saved experiment specification", EnableSession = true)]
+		[WebMethod(Description="Retrieves a previously saved experiment specification. "
+            + "A domain-dependent experiment specification originally created by the Lab Client.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string RetrieveSpecification (int experimentID);
@@ -290,7 +297,7 @@ namespace iLabs.Services{
 		/// <param name="experimentID">A token which identifies the experiment.</param>
 		/// <returns> The labConfiguration, an opaque string included in the ResultReport by the Lab Server to specify the configuration in which an experiment is executed.</returns>
 		/// <remarks>Web Method</remarks>
-		[WebMethod(Description="Retrieves a previously saved lab configuration for a particular experiment", EnableSession = true)]
+		[WebMethod(Description="Retrieves a previously saved lab configuration for a particular experiment.", EnableSession = true)]
 		[SoapHeader("sbHeader", Direction=SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IBatchSB")]
 		public abstract string RetrieveLabConfiguration (int experimentID);

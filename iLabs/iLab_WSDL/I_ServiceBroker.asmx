@@ -31,7 +31,7 @@ using iLabs.DataTypes.SoapHeaderTypes;
 [WebServiceBinding(Name = "IServiceBroker", Namespace = "http://ilab.mit.edu/iLabs/Services")]
     [XmlType(Namespace = "http://ilab.mit.edu/iLabs/type")]
     [WebService(Name = "InteractiveSBProxy", Namespace = "http://ilab.mit.edu/iLabs/Services",
-         Description = "Client and experiment methods.")]
+        Description = "Interactive ServiceBroker Interface.")]
 
 public abstract class I_ServiceBroker : System.Web.Services.WebService
     {
@@ -77,8 +77,9 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
         /// </summary>
         /// <returns>An array of client items.</returns>
         /// <remarks>Web Method</remarks>
-        [WebMethod(Description = "enumerates the names of all client items in the user's opaque data store", EnableSession = true),
-      SoapHeader("opHeader", Direction = SoapHeaderDirection.In),
+        [WebMethod(Description = "Enumerates the names of all client items in the user's opaque data store. "
+        + "This is performed for the user's current client as stored in the session state.", EnableSession = true),
+       SoapHeader("opHeader", Direction = SoapHeaderDirection.In),
        SoapDocumentMethod(Binding = "IServiceBroker")]
         public abstract string[] ListClientDataItems();
 
@@ -111,9 +112,9 @@ EnableSession = true)]
         /// <param name="coupon">coupon issued as part of ExperimentExecution collection, used to route to the issueing SB</param>
         /// <param name="experimentId"></param>
         /// <returns></returns>
-        [WebMethod(Description = "Agent to agent call, coupon is from the original ExecuteExperiment collection and is used to route to the issueing SB, "
+        [WebMethod(Description = "Agent to ServiceBroker call, coupon is from the original ExecuteExperiment collection and is used to route to the issueing SB. "
        + "Closes an Experiment on the ServiceBroker, if an ESS is "
-       + "associated with this experiment   the ESS experiment is closed so that no further ExperimentRecords "
+       + "associated with this experiment the ESS experiment is closed so that no further ExperimentRecords "
        + "or BLOBs can be written to the ESS.",
     EnableSession = true)]
         [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -151,7 +152,7 @@ EnableSession = true)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract ExperimentRecord[] RetrieveExperimentRecords(long experimentID, Criterion[] carray);
 
-        [WebMethod(Description = "Uses the cridentials granted the experiment specified by the opHeader to check "
+        [WebMethod(Description = "Uses the credentials granted the experiment specified by the opHeader to check "
             + "access to the requested experiment, if allowed a new ticket collection is started "
         + "to access the requested experiment and optional ESS records. Returns null if access denied.",
         EnableSession = true)]
@@ -193,7 +194,7 @@ EnableSession = true)]
 /// <param name="endTime"></param>
 /// <param name="message"></param>
 /// <returns></returns>
-    [WebMethod(Description = "Revokes reservations that intersect the specifications, may be called from the LSS or ServiceBroker", EnableSession = true)]
+    [WebMethod(Description = "Revokes reservations that intersect the specifications, may be called from the LSS or USS, but normally is called from the USS.", EnableSession = true)]
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract bool RevokeReservation(string serviceBrokerGuid, string userName,string groupName,string labServerGuid, string labClientGuid,

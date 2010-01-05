@@ -32,7 +32,7 @@ using iLabs.DataTypes.SchedulingTypes;
     [XmlType(Namespace = "http://ilab.mit.edu/iLabs/Type")]
     [WebServiceBinding(Name = "ILSS", Namespace = "http://ilab.mit.edu/iLabs/Services"),
     WebService(Name = "LabSchedulingProxy", Namespace = "http://ilab.mit.edu/iLabs/Services",
-        Description="The interface specification for Lab Scheduling Servers.")]
+        Description="The interface specification for Lab Scheduling Servers (LSS).")]
     public abstract class I_LSS : System.Web.Services.WebService
 	{
         public OperationAuthHeader opHeader = new OperationAuthHeader();
@@ -40,17 +40,17 @@ using iLabs.DataTypes.SchedulingTypes;
        
 		/// <summary>
         /// Retrieve an array of available time periods(UTC) for a particular group and particular experiment delimited by a time period. 
-        /// Time periods should be ordered by start time and may contain differing quantums and length.
+        /// TimePeriods returned ordered by start time and may contain differing quantums and length.
 		/// </summary>
-        /// <param name="serviceBrokerGuid"></param>
-		/// <param name="groupName"></param>
-        /// <param name="ussGuid"></param>
-		/// <param name="clientGuid"></param>
-		/// <param name="labServerGuid"></param>
+        /// <param name="serviceBrokerGuid">the Groups ServiceBroker</param>
+		/// <param name="groupName">the group requesting the available time</param>
+        /// <param name="ussGuid">the USS</param>
+		/// <param name="clientGuid">the client GUID</param>
+		/// <param name="labServerGuid">the LabServer GUID</param>
         /// <param name="startTime">UTC start time</param>
         /// <param name="endTime">UTC end time</param>
-        /// <returns>return an array of time periods (UTC), each of the 
-        /// time periods is longer than the experiment's minimum time</returns> 
+        /// <returns>An array of time periods (UTC), ordered by time, each of the 
+        /// time periods is longer than the experiment's minimum time and may contain differing quantums and length.</returns> 
         [WebMethod(Description=" Retrieve an array of available time periods(UTC) for a particular group and particular experiment delimited by a time period. " 
         + "Time periods should be ordered by start time and may contain differing quantums and length.")]
         [SoapDocumentMethod(Binding = "ILSS"),
@@ -74,7 +74,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="endTime">UTC end time</param>
         /// <returns>the notification whether the reservation is confirmed. If not, 
         /// notification will give a reason</returns>
-        [WebMethod(Description="Returns an Boolean indicating whether a particular reservation from a USS is confirmed and added to the database in LSS successfully."
+        [WebMethod(Description="Returns a string indicating whether a particular reservation from a USS is confirmed and added to the database in LSS successfully."
         + "If it fails, a exception will be throw indicating the reason for rejection.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
@@ -156,14 +156,15 @@ using iLabs.DataTypes.SchedulingTypes;
         public abstract int RemoveUSSInfo(string ussGuid);
         
 		/// <summary>
-		/// Add a credential set for a particular group, this may be callled multiple times for the same group.
+		/// Add a credential set for a particular group, this may be callled multiple times for the same group, only one instance will be created.
+        /// CredentialSets represent a group of users from a specific ServiceBroker, and the USS that schedules them.
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="serviceBrokerName"></param>
 		/// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns>true if the CredentialSet is added successfully, false otherwise</returns>
-        [WebMethod(Description="Add a credential set for a particular group, this may be callled multiple times for the same group.")]
+        [WebMethod(Description="Add a credential set for a particular group, this may be called multiple times for the same group, only one instance will be created. CredentialSets represent a group of users from a specific ServiceBroker, and the USS that schedules them.")]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, 
@@ -171,21 +172,22 @@ using iLabs.DataTypes.SchedulingTypes;
 
 
         /// <summary>
-        ///Modify the ServiceBroker's server name for a credential set.
+        ///Modify the ServiceBroker's server name for a credential set. This is triggered by a ModifyDomainCredentals that
+        ///changes parameters for an existing service.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="serviceBrokerName"></param>
         /// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns>true if the CredentialSet is added successfully, false otherwise</returns>
-        [WebMethod(Description="Modify the ServiceBroker's server name for a credential set.")]
+        [WebMethod(Description="Modify the ServiceBroker's server name for a credential set.  This is triggered by a ModifyDomainCredentals that changes parameters for an existing service.")]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int ModifyCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid);
 
         /// <summary>
-        /// Remove a credential set of a particular group.
+        /// Remove the credential set of a particular group.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>

@@ -42,7 +42,7 @@ using iLabs.DataTypes.TicketingTypes;
         /// <param name="payload">Defines the alert parameters<wakeup><groupName></groupName><guid></guid><executionTime></executionTime></wakeup></param>
         /// <returns></returns>
         [WebMethod(Description = "Alert is used by the LabScheduling Server to notify the lab server about a scheduled event other than an experiment execution."
-            + " The actual payload format and response to this method is be determined by the LSS and LabServer implementation."),
+            + " The actual payload format and response to this method is be determined by the LSS and LabServer implementation. Currently NOP in reference implementation."),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
         SoapDocumentMethod(Binding = "I_ILS")]
         public abstract void Alert(string payload);
