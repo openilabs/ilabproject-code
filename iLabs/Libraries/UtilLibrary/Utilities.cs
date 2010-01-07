@@ -79,7 +79,11 @@ namespace iLabs.UtilLib
             return array;
         }
        
-
+        /// <summary>
+        /// A utility to pass an array of ints as a CSV string
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public static string ToCSV(int[] values)
         {
             StringBuilder buf = new StringBuilder();
@@ -92,6 +96,12 @@ namespace iLabs.UtilLib
             }
             return buf.ToString();
         }
+
+        /// <summary>
+        ///  A utility to pass an array of longs as a CSV string
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public static string ToCSV(long[] values)
         {
             StringBuilder buf = new StringBuilder();
