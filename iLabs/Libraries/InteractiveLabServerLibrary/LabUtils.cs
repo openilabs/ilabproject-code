@@ -47,8 +47,10 @@ namespace iLabs.LabServer.Interactive
             buf.Append("	s=parseInt(rtime-m*60);\n");
             buf.Append("	if(s<10)\n");
             buf.Append("		s=\"0\"+s\n");
+  
+            buf.Append("	window.setTimeout(\"checktime()\"," + checkEvery + ");\n");
             buf.Append("	window.status=\"Time Remaining :  \"+m+\":\"+s\n");
-            buf.Append("	window.setTimeout(\"checktime()\"," + checkEvery + ")\n");
+            buf.Append("    return true\n");
             buf.Append("}\n");
             buf.Append("function redirectSB(){\n");
             buf.Append("	location.href=\"" + returnURL + "\";\n");
