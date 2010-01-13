@@ -586,11 +586,9 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try 
 			{
-                //BrokerDB brokerDB = new BrokerDB();
                 //// No session state for this call, must process header information
-                
-                //if(sbHeader.couponID > 0 && sbHeader.couponPassKey != null){
-             
+                // It seems several of the older batch labs do not populate the header so commented out
+                //if(sbHeader.couponID > 0 && sbHeader.couponPassKey != null){ 
                 //    if(brokerDB.AuthenticateIssuedCoupon(sbHeader.couponID,sbHeader.couponPassKey)){
                         ResultReport report = BatchAPI.GetResultReport(experimentID);
                 //    }
