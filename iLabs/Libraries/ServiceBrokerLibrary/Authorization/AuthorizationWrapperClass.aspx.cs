@@ -2069,6 +2069,36 @@ namespace iLabs.ServiceBroker.Authorization
                 if (Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.writeExperimentFunctionType, qualifierID))
                 {
                     haveAccess = true;
+                    
+                }
+                else // Test for group permissions
+                {
+                    int grpQualID = 0;
+                    ExperimentAdminInfo expInfo = InternalDataDB.SelectExperimentAdminInfo(experimentID);
+                    if (expInfo.groupID == groupID)
+                    {
+                        //Check for group collection rights
+                        grpQualID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.experimentCollectionQualifierTypeID);
+                        if (Authorization.AuthorizationAPI.CheckAuthorization(groupID, Function.writeExperimentFunctionType, grpQualID))
+                        {
+                            haveAccess = true;
+                        }
+                    }
+                    else
+                    {
+                        // Check if group administer
+                        int adminID = InternalAdminDB.SelectGroupAdminGroup(expInfo.groupID);
+                        if (adminID == groupID)
+                        {
+                            //Check for group collection rights
+                            grpQualID = Authorization.AuthorizationAPI.GetQualifierID(expInfo.groupID, Qualifier.experimentCollectionQualifierTypeID);
+                            if (Authorization.AuthorizationAPI.CheckAuthorization(groupID, Function.writeExperimentFunctionType, grpQualID))
+                            {
+                                haveAccess = true;
+                            }
+                        }
+                    }
+
                 }
             }
 
