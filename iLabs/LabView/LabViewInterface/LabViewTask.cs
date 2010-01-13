@@ -86,14 +86,21 @@ namespace iLabs.LabView.LV86
             }
 
 
-            if (appInfo.extraInfo != null)
+            if (appInfo.extraInfo != null && appInfo.extraInfo.Length > 0)
             {
                 // Note should have either statusVI or template pair
                 // Add Option for VNCserver access
-                XmlQueryDoc viDoc = new XmlQueryDoc(appInfo.extraInfo);
-                statusViName = viDoc.Query("extra/status");
-                statusTemplate = viDoc.Query("extra/statusTemplate");
-                templatePath = viDoc.Query("extra/templatePath");
+                try
+                {
+                    XmlQueryDoc viDoc = new XmlQueryDoc(appInfo.extraInfo);
+                    statusViName = viDoc.Query("extra/status");
+                    statusTemplate = viDoc.Query("extra/statusTemplate");
+                    templatePath = viDoc.Query("extra/templatePath");
+                }
+                catch (Exception e)
+                {
+                    string err = e.Message;
+                }
             }
 
             // log the experiment for debugging
