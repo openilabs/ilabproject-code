@@ -38,7 +38,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="startTime">startTime(UTC)</param>
         /// <param name="endTime">endTime(UTC)</param>
         /// <returns></returns>
-        [WebMethod(Description = "")]
+        [WebMethod(Description = "Returns a list of all reservations that match the search parameters.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract Reservation[] ListReservations(string serviceBrokerGuid, string userName,
@@ -93,7 +93,7 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// <param name="groupName"></param>
 		/// <returns></returns>true the credential set has been added 
         /// successfully, false otherwise
-        [WebMethod(Description = "Add a credential set.")]
+        [WebMethod(Description = "Add a credential set. A credentialSet defines a specific group from a specific ServiceBroker.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
 		public abstract int AddCredentialSet(string serviceBrokerGuid,
@@ -106,7 +106,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="groupName"></param>
         /// <returns></returns>true the credential set has been added 
         /// successfully, false otherwise
-        [WebMethod(Description = "Modify a credential set.")]
+        [WebMethod(Description = "Modify a credential set. This may be called if a ServiceBroker or group name is changed on the ServiceBroker")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int ModifyCredentialSet(string serviceBrokerGuid,
@@ -119,7 +119,7 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// <param name="groupName"></param>
 		/// <returns></returns>true, the credentialset is removed 
         /// successfully, false otherwise
-        [WebMethod(Description = "Remove a credential set")]
+        [WebMethod(Description = "Remove a credential set.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RemoveCredentialSet(string serviceBrokerGuid, string groupName);
