@@ -20,7 +20,7 @@ using iLabs.DataTypes.SchedulingTypes;
 	/// </summary>
     [WebServiceBinding(Name = "IUSS", Namespace = "http://ilab.mit.edu/iLabs/Services"),
     WebService(Name = "UserSchedulingProxy", Namespace = "http://ilab.mit.edu/iLabs/Services",
-       Discription = "Interface description for User Scheduling Service (USS).")]
+       Description = "Interface description for User Scheduling Service (USS).")]
     public abstract class I_USS : System.Web.Services.WebService
 	{
 
