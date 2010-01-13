@@ -90,6 +90,12 @@ namespace iLabs.ServiceBroker
             BrokerDB brokerDB = new BrokerDB();
             TicketLoadFactory factory = TicketLoadFactory.Instance();
 
+            if (client.needsESS)
+            {
+                essId = brokerDB.FindProcessAgentIdForClient(client.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
+
+            }
+
             // 1. Create Coupon for ExperimentCollection
             Coupon coupon = brokerDB.CreateCoupon();
 
@@ -104,10 +110,7 @@ namespace iLabs.ServiceBroker
             DataStorageAPI.InsertExperimentCoupon(experimentID, coupon.couponId);
              string essWebAddress = null;
 
-             if (client.needsESS)
-             {
-                 essId = brokerDB.FindProcessAgentIdForClient(client.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
-
+             
                  // If a ESS is specified Create the ESS Tickets, this should only happen if a resource is mapped
                  if (essId > 0)
                  {
@@ -143,7 +146,7 @@ namespace iLabs.ServiceBroker
                              DataStorageAPI.UpdateExperimentStatus(status);
                      }
                  }
-             }
+             
             //
             // 4. create the execution ticket for the experiment
             //
