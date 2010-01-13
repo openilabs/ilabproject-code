@@ -25,7 +25,8 @@ using iLabs.DataTypes.SoapHeaderTypes;
 [XmlType(Namespace = "http://ilab.mit.edu/iLabs/type")]
 [WebServiceBinding(Name = "IESS", Namespace = "http://ilab.mit.edu/iLabs/Services")]
 [WebService(Name = "ExperimentStorageProxy", Namespace = "http://ilab.mit.edu/iLabs/Services",
-    Description="Implements the Storage Service.")]
+    Description="The Experiment Storage Service (ESS) provides iLab services and clients the ability to save, access and query experiment results. "
+    + " Experiments are always created by the ServiceBroker, and administrative information is managed by the ServiceBroker.")]
 public abstract class I_ESS  : System.Web.Services.WebService {
    
     /// <summary>
