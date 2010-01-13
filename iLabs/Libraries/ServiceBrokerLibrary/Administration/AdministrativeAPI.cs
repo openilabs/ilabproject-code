@@ -1480,7 +1480,8 @@ namespace iLabs.ServiceBroker.Administration
 					// add into Qualifier table as well as Q-H table
 					if (parentQualifierID >0)
 						Authorization.AuthorizationAPI .AddQualifier (g.groupID, Authorization.Qualifier .groupQualifierTypeID , g.groupName, parentQualifierID);
-					if (parentECQualifierID >0)
+                    // Only insert experiment collection Qualifier for regular groups
+					if (parentECQualifierID >0 && (groupType.CompareTo(GroupType.REGULAR) == 0))
 						Authorization.AuthorizationAPI.AddQualifier(g.groupID,Authorization.Qualifier.experimentCollectionQualifierTypeID,g.groupName+ " Experiment Collection",parentECQualifierID);
 				}
 				catch (Exception ex)
