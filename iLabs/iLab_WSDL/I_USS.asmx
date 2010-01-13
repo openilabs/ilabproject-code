@@ -125,7 +125,7 @@ using iLabs.DataTypes.SchedulingTypes;
         public abstract int RemoveCredentialSet(string serviceBrokerGuid, string groupName);
         
 		/// <summary>
-		/// add information of a particular experiment
+		/// Add information of a particular experiment
 		/// </summary>
         /// <param name="labServerGuid"></param>
 		/// <param name="labServerName"></param>
@@ -136,7 +136,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="lssGuid"></param>
 		/// <returns></returns>true, the experimentInfo is added 
         /// successfully, false otherwise
-        [WebMethod(Description = "")]
+        [WebMethod(Description = "Add iformation about an experiment that will have its users managed by the service.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
 		public abstract int AddExperimentInfo(string labServerGuid, string labServerName,
@@ -189,13 +189,13 @@ using iLabs.DataTypes.SchedulingTypes;
         public abstract int AddLSSInfo(string lssGuid, string lssName, string lssUrl);
         
         /// <summary>
-        /// mODIFY information of a particular lab side scheduling server identified by lssID
+        /// Modify information of a particular lab side scheduling server identified by lssID
         /// </summary>
         /// <param name="lssGuid"></param>
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
         /// <returns></returns>true, the LSSInfo is removed successfully, false otherwise
-        [WebMethod(Description = "mODIFY information of a particular lab side scheduling server identified by lssID")]
+        [WebMethod(Description = "Modify information of a particular lab side scheduling server identified by lssID")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public abstract int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl);
