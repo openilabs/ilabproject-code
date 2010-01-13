@@ -372,15 +372,17 @@ namespace iLabs.ExpStorage
                 {
                     if (!myReader.IsDBNull(0))
                     {
+                        int byteCount = myReader.GetInt32(0);
                         // BLOB warning
                         int bufSize = 8000;
-                        Byte[] buffer = new byte[bufSize];
-                        long count = myReader.GetBytes(0, 0L, buffer, 0, bufSize);
-                        data = new byte[count];
-                        for (long i = 0L; i < count;i++ )
-                        {
-                            data[i] = buffer[i];
-                        } 
+                        Byte[] buffer = new byte[byteCount];
+                        long count = myReader.GetBytes(1, 0L, buffer, 0, byteCount);
+                        //data = new byte[count];
+                        //for (long i = 0L; i < count;i++ )
+                        //{
+                        //    data[i] = buffer[i];
+                        //} 
+                        return buffer;
                     }
                 }
 
@@ -404,15 +406,18 @@ namespace iLabs.ExpStorage
         /// <returns>true if the data is successfully stored</returns>
         public bool StoreBlobData(long blobId, string mimeType, byte[] blobData)
         {
-            DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("AddBlobData", myConnection);
+            SqlConnection myConnection = (SqlConnection) FactoryDB.GetConnection();
+            SqlCommand myCommand = myConnection.CreateCommand();
+            myCommand.CommandText= "AddBlobData";
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobStatus", Blob.eStatus.COMPLETE, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@mimeType", mimeType, DbType.AnsiString,1024));
             // BLOB Warning
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobData", blobData, DbType.Binary, blobData.Length));
+            SqlParameter blobParam = new SqlParameter("@blobData",SqlDbType.Image, blobData.Length);
+            blobParam.Value = blobData;
+            myCommand.Parameters.Add(blobParam);
             
 
             try
