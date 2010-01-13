@@ -36,7 +36,9 @@ using iLabs.DataTypes.BatchTypes;
 [XmlType(Namespace = "http://ilab.mit.edu")]
 [WebServiceBinding(Name = "I_BLS", Namespace = "http://ilab.mit.edu"),
 WebService(Name = "BatchLSProxy", Namespace = "http://ilab.mit.edu",
-    Description="The interface definition for an InteractiveLabServer. Currently only one method, additional methods will be added as needed.")]
+    Description="The interface definition for a BatchLabServer. In the merged architecture most of these "
+    + "methods are built using the interactive API methods. Methods that in the traditional batch architecture "
+    + "automatically saves the messages to the database now save to the Experiment Storage Service.")]
 public abstract class I_BLS : System.Web.Services.WebService
 {
     public AuthHeader authHeader = new AuthHeader();
