@@ -414,6 +414,7 @@ namespace iLabs.ExpStorage
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobStatus", Blob.eStatus.COMPLETE, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@mimeType", mimeType, DbType.AnsiString,1024));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@byteCount", blobData.Length, DbType.Int32));
             // BLOB Warning
             SqlParameter blobParam = new SqlParameter("@blobData",SqlDbType.Image, blobData.Length);
             blobParam.Value = blobData;
