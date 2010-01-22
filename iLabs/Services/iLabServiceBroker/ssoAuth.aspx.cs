@@ -69,11 +69,31 @@ namespace iLabs.ServiceBroker.iLabSB
         {
             if (!IsPostBack)
             {
+                lblMessages.Text = "";
+                lblMessages.Visible = false;
                 hdnAuthority.Value = Request.QueryString["auth"];
                 hdnKey.Value = Request.QueryString["key"];
                 hdnUser.Value = Request.QueryString["usr"];
                 hdnGroup.Value = Request.QueryString["grp"];
+                if (hdnGroup.Value != null && hdnGroup.Value.Length > 0)
+                {
+                    int g_id = AdministrativeAPI.GetGroupID(hdnGroup.Value);
+                    if( g_id <= 0){
+                        lblMessages.Text = "The specified group does not exist!";
+                        lblMessages.Visible = true;
+                        return;
+                    }
+                }
                 hdnClient.Value = Request.QueryString["cid"];
+                if (hdnClient.Value != null && hdnClient.Value.Length > 0)
+                {
+                     int c_id = AdministrativeAPI.GetLabClientID(hdnClient.Value);
+                    if( c_id <= 0){
+                        lblMessages.Text = "The specified client does not exist!";
+                        lblMessages.Visible = true;
+                        return;
+                    }
+                }
                
             }
             //Check if user specified and matches logged in user
