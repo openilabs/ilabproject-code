@@ -164,7 +164,6 @@ Please see license.txt in top level directory for full license.
 													<asp:button id="btnSaveChanges" Runat="server" CssClass="button" Text="Save Changes" onclick="btnSaveChanges_Click"></asp:button>
 													<asp:button ID="btnAdminURLs" runat="server" CssClass="button"  Text="Domain URLs" Width="140px"></asp:button>
 													<asp:button id="btnNew" runat="server" CssClass="button" Text="New" onclick="btnNew_Click"></asp:button>
-													<asp:button id="btnRemove" Runat="server" CssClass="button" Text="Remove" onclick="btnRemove_Click"></asp:button>
 												</th>
 											</tr>
        									</TBODY>

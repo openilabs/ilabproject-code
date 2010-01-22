@@ -67,7 +67,14 @@ namespace iLabs.ServiceBroker.iLabSB
     [WebServiceBinding(Name = "IServiceBroker", Namespace = "http://ilab.mit.edu/iLabs/Services"),
     WebServiceBinding(Name = "IProcessAgent", Namespace = "http://ilab.mit.edu/iLabs/Services"),
     WebServiceBinding(Name = "ITicketIssuer", Namespace = "http://ilab.mit.edu/iLabs/Services"),
-    WebService(Name = "InteractiveServiceBroker", Namespace = "http://ilab.mit.edu/iLabs/Services")]
+    WebService(Name = "InteractiveServiceBroker", Namespace = "http://ilab.mit.edu/iLabs/Services",
+        Description="ServiceBrokerService contains all of the Service Broker Web Service Calls."
+	+ " All of the Service Broker to Lab Server passthrough calls run in the context of a user's "
+	+ " Service Broker Web Interface session, and consequently have session enabled. This works"
+	+ " because they are submitted from the Java Client, through one or more of the Service Broker"
+	+ " passthrough methods, on to the corresponding method on the Lab Server. "
+	+ " There is one Method, Notify(), that is called from the Lab Server directly. This"
+	+ " runs outside of the session context.")]
     public class InteractiveSB : WS_ILabCore
     {
 
@@ -303,7 +310,11 @@ namespace iLabs.ServiceBroker.iLabSB
 
         protected override void register(string registerGuid, ServiceDescription[] info)
         {
+
             StringBuilder message = new StringBuilder();
+            message.AppendLine("Service " + ProcessAgentDB.ServiceAgent.codeBaseUrl + " recieved a 'Register' webService call.");
+            
+
             if (info == null)
             {
                 //message.AppendLine("Register called without any ServiceDescriptions");
@@ -327,9 +338,9 @@ namespace iLabs.ServiceBroker.iLabSB
             {
                 ResourceDescriptorFactory rFactory = ResourceDescriptorFactory.Instance();
                 string jobGuid = registerGuid;
-                //message.AppendLine(" Register called at " + DateTime.UtcNow + " UTC \t registerGUID: " + registerGuid);
+                message.AppendLine(" Register called at " + DateTime.UtcNow + " UTC \t registerGUID: " + registerGuid);
                 ProcessAgent sourceAgent = brokerDB.GetProcessAgent(agentAuthHeader.agentGuid);
-                //message.AppendLine("Source Agent: " + sourceAgent.agentName);
+                message.AppendLine("Source Agent: " + sourceAgent.agentName);
 
                
 
@@ -407,6 +418,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 // LabServer should already be in the Database, once multiple LS supported may need work
                                 // LS is specified in clientDescriptor
                                 int clientID = rFactory.LoadLabClient(xdoc, ref message);
+                                message.AppendLine("Adding LabClient: GUID " + clientGuid);
                             }
                         }
                         else if (descriptorType.Equals("systemSupport"))
@@ -419,6 +431,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 {
                                     brokerDB.SaveSystemSupport(ss.agentGuid, ss.contactEmail, ss.bugEmail,
                                         ss.infoUrl, ss.description, ss.location);
+                                    message.AppendLine("Adding SystemSupport information for " + ss.agentGuid);
                                 }
                             }
                         }
@@ -498,6 +511,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             else
                             {
                                 clientId = rFactory.LoadLabClient(xdoc, ref message);
+                                message.AppendLine("Adding Lab Client GUID: " + clientGuid);
                             }
                         }
                         else if (descriptorType.Equals("credentialDescriptor"))
@@ -539,7 +553,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 mail.To = ConfigurationSettings.AppSettings["supportMailAddress"];
                 //mail.To = "pbailey@mit.edu";
                 mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
-                mail.Subject = ProcessAgentDB.ServiceAgent.agentName + " new Service Registration: " + registerGuid;
+                mail.Subject = "Register called on " + ProcessAgentDB.ServiceAgent.agentName;
                 mail.Body = message.ToString();
                 SmtpMail.SmtpServer = "127.0.0.1";
 

@@ -123,8 +123,7 @@ namespace iLabs.ServiceBroker.admin
             repSystemMessage.DataSource = messagesList;
             repSystemMessage.DataBind();
             */
-            // "Are you sure" javascript for Remove button
-            btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this Service?')== false) return false;");
+           
 
             // Reset error/confirmation message
             lblErrorMessage.Visible = false;
@@ -337,7 +336,6 @@ namespace iLabs.ServiceBroker.admin
             trAdminGroup.Visible = isDisplay;
             btnRegister.Visible = !isDisplay;
             btnAdminURLs.Visible = isDisplay;
-            btnRemove.Visible = isDisplay;
             btnSaveChanges.Visible = isDisplay;
         }
 
@@ -383,7 +381,6 @@ namespace iLabs.ServiceBroker.admin
             txtBatchPassOut.BackColor = enabled;
             btnRegister.Visible = !isDisplay;
             btnAdminURLs.Visible = false;
-            btnRemove.Visible = isDisplay;
             btnSaveChanges.Visible = isDisplay;
         }
 
@@ -1142,41 +1139,7 @@ namespace iLabs.ServiceBroker.admin
             }
         }
 
-        /// <summary>
-        /// Clicking this button deletes a ProcessAgent
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void btnRemove_Click(object sender, System.EventArgs e)
-        {
-            if (ddlService.SelectedIndex == 0)
-            {
-                lblErrorMessage.Visible = true;
-                lblErrorMessage.Text = Utilities.FormatErrorMessage("Please select a service from dropdown list to delete");
-                return;
-            }
-            else
-            {
-                int agentID = Convert.ToInt32(ddlService.SelectedValue);
-
-                try
-                {
-                    wrapper.RemoveProcessAgentWrapper(new int[] { agentID });
-                    lblErrorMessage.Visible = true;
-                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Service '" + txtServiceName.Text + "' has been deleted");
-                    InitializeDropDown();
-                    ClearFormFields();
-                    SetInputMode(false);
-                }
-                catch
-                {
-                    lblErrorMessage.Visible = true;
-                    lblErrorMessage.Text = Utilities.FormatErrorMessage("Process Agent " + txtServiceName.Text + "' cannot be deleted");
-                }
-
-            }
-
-        }
+     
 
         protected void ClearButtonScripts()
         {

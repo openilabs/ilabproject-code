@@ -107,13 +107,14 @@ namespace iLabs.ExpStorage
         public int UpdateExperiment(DbConnection myConnection, long sbExperimentId, string sbGuid,
             int statusCode, DateTime scheduledClose, DateTime closeTime)
         {
+            DateTime close_time = new DateTime();
             int status = -1;
             DbCommand myCommand = FactoryDB.CreateCommand("UpdateExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", sbExperimentId, DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@status", statusCode, DbType.Int32));
-            if (scheduledClose != DateTime.MinValue)
+            if (scheduledClose != DateTime.MinValue && scheduledClose != FactoryDB.MinDbDate)
             {
                  myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", scheduledClose, DbType.DateTime));
             }
@@ -121,7 +122,7 @@ namespace iLabs.ExpStorage
             {
                  myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", null, DbType.DateTime));
             }
-            if (closeTime != DateTime.MinValue)
+            if (closeTime != null && closeTime != DateTime.MinValue && closeTime != FactoryDB.MinDbDate)
             {
                  myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@closeTime", closeTime, DbType.DateTime));
             }
@@ -231,6 +232,7 @@ namespace iLabs.ExpStorage
                         status.creationTime = DateUtil.SpecifyUTC(reader.GetDateTime(3));
                     if (!reader.IsDBNull(4))
                         status.closeTime = DateUtil.SpecifyUTC(reader.GetDateTime(4));
+               ;
                     if (!reader.IsDBNull(5))
                         status.lastModified = DateUtil.SpecifyUTC(reader.GetDateTime(5));
                     status.issuerGuid = reader.GetString(6);

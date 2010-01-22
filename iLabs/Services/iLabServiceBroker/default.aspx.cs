@@ -7,15 +7,19 @@
 
 using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Configuration;
+
+using iLabs.Core;
 
 namespace iLabs.ServiceBroker.iLabSB
 {
@@ -38,6 +42,24 @@ namespace iLabs.ServiceBroker.iLabSB
                 string query = Request.QueryString["ReturnUrl"];
                 showUrl = "login.aspx";
             }
+            if (Request.Params["sso"] != null)
+            {
+                 StringBuilder buf = new StringBuilder("ssoAuth.aspx");
+                NameValueCollection nValues = Request.QueryString;
+                string[] keys= nValues.AllKeys;
+                int count = 0;
+                foreach(string k in keys){
+                    if (count > 0)
+                        buf.Append("&");
+                    else buf.Append("?");
+                   string v = nValues.Get(k);
+                    buf.Append(k);
+                    buf.Append("=");
+                    buf.Append(v);
+          
+                }
+                showUrl = buf.ToString();
+            }
 			// Put user code to initialize the page here
 		}
 
@@ -49,6 +71,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			//
 			InitializeComponent();
 			base.OnInit(e);
+
 		}
 		
 		/// <summary>
@@ -56,7 +79,31 @@ namespace iLabs.ServiceBroker.iLabSB
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent()
-		{    
+		{
+            if (Request.Params["sso"] != null)
+            {
+                StringBuilder buf = new StringBuilder("ssoAuth.aspx");
+                NameValueCollection nValues = Request.QueryString;
+                string[] keys = nValues.AllKeys;
+                int count = 0;
+                foreach (string k in keys)
+                {
+                    if (count > 0)
+                        buf.Append("&");
+                    else buf.Append("?");
+                    string v = nValues.Get(k);
+                    buf.Append(k);
+                    buf.Append("=");
+                    buf.Append(v);
+                    count++;
+
+                }
+                showUrl = buf.ToString();
+                frmUser.Attributes["src"] = showUrl;
+                //string jScript = @"<script language='javascript'>theuser.location.href = '"
+                //        + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/" +showUrl + @"'</script>";
+                //ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
+            } 
 		}
 		#endregion
 	}

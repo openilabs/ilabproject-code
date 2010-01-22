@@ -58,6 +58,17 @@ namespace iLabs.ServiceBroker.admin
             string passkey;
             string issuerGuid;
 
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            if (Session["UserTZ"] != null)
+                userTZ = Convert.ToInt32(Session["UserTZ"]);
+
+
+            string returnUrl = Request.QueryString["returnURL"];
+            if (returnUrl != null && returnUrl.Length > 0)
+                Session["returnURL"] = returnUrl;
+
+
+
             if (!IsPostBack)
             {
 
@@ -80,11 +91,6 @@ namespace iLabs.ServiceBroker.admin
                         Response.Redirect("AccessDenied.aspx", true);
                     }
                 }
-
-                string returnUrl = Request.QueryString["returnURL"];
-                if (returnUrl != null && returnUrl.Length > 0)
-                    Session["returnURL"] = returnUrl;
-
                 DisplayForm();
 
             }

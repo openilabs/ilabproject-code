@@ -40,8 +40,8 @@ Please see license.txt in top level directory for full license.
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Authorization</h1>
-						<h2>Group:
-							<asp:label id="lblGroupNameTitle" Runat="server"></asp:label></h2>
+						<h2>Group: <asp:label id="lblGroupNameTitle" Runat="server"></asp:label></h2>
+						<p><asp:label id="lblMessages" Runat="server" Visible="False"></asp:label></p>
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
