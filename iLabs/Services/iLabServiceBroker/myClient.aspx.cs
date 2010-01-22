@@ -317,7 +317,9 @@ namespace iLabs.ServiceBroker.iLabSB
 
             else
             {
-                lblGroupNameSystemMessage.Text += "No Messages at this time";
+
+                lblGroupNameSystemMessage.Text += "</h3><p>No Messages at this time</p><h3>";
+               
             }
         }
 
