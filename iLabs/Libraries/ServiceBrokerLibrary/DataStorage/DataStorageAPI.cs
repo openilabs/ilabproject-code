@@ -57,6 +57,12 @@ namespace iLabs.ServiceBroker.DataStorage
                 case StorageStatus.INITIALIZED:
                     statStr = "Initialized";
                     break;
+                case StorageStatus.OPEN:
+                    statStr = "Open";
+                    break;
+                case StorageStatus.REOPENED:
+                    statStr = "Re-Opened";
+                    break;
                 case StorageStatus.BATCH_RUNNING:
                 case StorageStatus.RUNNING:
                     statStr = "Running";

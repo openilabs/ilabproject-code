@@ -37,6 +37,7 @@ namespace iLabs.ServiceBroker
         // waitTime in milliseconds
         private int waitTime = 3600000; // default is once an hour
         //private int waitTime = 300000; // 5 minutes for debugging
+        //private int waitTime = 60000; // 1 minute for debugging
         //private int count = 0;  // Was used to output a log message every N times
         private bool go = true;
  

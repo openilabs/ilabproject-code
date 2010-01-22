@@ -377,6 +377,8 @@ namespace iLabs.Web
 
         protected virtual void register(string registerGuid, ServiceDescription[] info)
         {
+            StringBuilder message = new StringBuilder("Register called on " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
+
             if (info != null && info.Length > 0)
             {
                 foreach (ServiceDescription sd in info)
