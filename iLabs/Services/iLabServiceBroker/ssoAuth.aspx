@@ -39,9 +39,14 @@ Please see license.txt in top level directory for full license.
 				<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
-						<h1>Authorization</h1>
-						<h2>Group: <asp:label id="lblGroupNameTitle" Runat="server"></asp:label></h2>
+						<h1>Client Authorization</h1>
 						<p><asp:label id="lblMessages" Runat="server" Visible="False"></asp:label></p>
+						<h1>Welcome to iLab</h1> <!-- Graphic goes here <IMG height="150" alt=" " src="img/homepage-img-ph.gif" width="200"> - End Graphic -->
+						<p>iLab is dedicated to the proposition that online laboratories - real 
+							laboratories accessed through the Internet - can enrich science and engineering 
+							education by greatly expanding the range of experiments that students are 
+							exposed to in the course of their education.
+						</p>
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">

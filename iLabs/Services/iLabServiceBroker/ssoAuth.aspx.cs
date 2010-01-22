@@ -54,8 +54,6 @@ namespace iLabs.ServiceBroker.iLabSB
     /// 
     public partial class ssoAuth : System.Web.UI.Page
     {
-      
-
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
         object uTZ = null;
@@ -222,7 +220,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
                     else
                     {
-                        logout();
+                        //logout();
                         lblMessages.Visible = true;
                         lblMessages.Text = "You are not the user that was specified!";
                         return;
@@ -265,8 +263,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             // user is not a member of the group
                             group_ID = -1;
                             group_Name = null;
-                            //Session.Remove("GroupID");
-                            //Session.Remove("GroupName");
+                            
                         }
                     }
                 }
@@ -296,11 +293,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
                     if (clientMap.Count > 1) //more than one group with clients
                     {
-                        Session.Remove("GroupName");
-                        Session.Remove("GroupID");
-                        Session.Remove("ClientID");
-                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
-                            Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
+                        modifyUserSession(group_ID, client_ID);
                         Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"),true);
                     }
                     if (clientMap.Count == 1) // get the group with clients
@@ -321,17 +314,12 @@ namespace iLabs.ServiceBroker.iLabSB
 
                             if (clients == null || clients.Length > 1)
                             {
-                                Session["GroupID"] = group_ID;
-                                Session["GroupName"] = group_Name;
-                                Session.Remove("ClientID");
-                                AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
-                                    Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
+                               modifyUserSession(group_ID, client_ID);
                                 Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"),true);
                             }
                             else
                             {
                                 client_ID = clients[0];
-                               
                             }
                         }
                     }
@@ -343,11 +331,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
                     if (clientGroupIDs == null || clientGroupIDs.Length == 0)
                     {
-                        Session.Remove("GroupID");
-                        Session.Remove("GroupName");
-                        Session.Remove("ClientID");
-                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
-                                    Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
+                      modifyUserSession( group_ID, client_ID);
                         Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"),true);
                     }
                     else if (clientGroupIDs.Length == 1)
@@ -377,15 +361,11 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
                     {
                         group_ID = gid;
-                        group_Name = AdministrativeAPI.GetGroupName(group_ID); ;
-                        Session["GroupID"] = group_ID;
-                        Session["GroupName"] = group_Name;
+                       
                     }
                     else
                     {
-                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
-                                    Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
-                        Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"),true);
+                        modifyUserSession( group_ID, client_ID);
                     }
                 }
                 else if (client_ID <= 0 && group_ID > 0)
@@ -393,18 +373,12 @@ namespace iLabs.ServiceBroker.iLabSB
                     int[] clients = AdministrativeUtilities.GetGroupLabClients(group_ID);
                     if (clients == null || clients.Length != 1)
                     {
-                      
-                        group_Name = AdministrativeAPI.GetGroupName(group_ID); ;
-                        Session["GroupID"] = group_ID;
-                        Session["GroupName"] = group_Name;
-                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
-                                    Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
+                        modifyUserSession(group_ID, client_ID);
                         Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"),true);
                     }
                     else
                     {
                         client_ID = clients[0];
-                        Session["ClientID"] = client_ID;
                     }
                 }
                 if (user_ID > 0 && group_ID > 0 && client_ID > 0)
@@ -435,17 +409,133 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
 
                     // is authorized ?
-                    group_Name = AdministrativeAPI.GetGroupName(group_ID); ;
-                    Session["GroupID"] = group_ID;
-                    Session["GroupName"] = group_Name;
-                    Session["ClientID"] = client_ID;
-                    AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
-                                    Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
+                    
+                    modifyUserSession(group_ID, client_ID);
                     launchLab(user_ID, group_ID, client_ID);
+                   
                 }
             }
 
+
         protected void launchLab(int userID, int groupID, int clientID)
+        {
+            // Currently there is not a good solution for checking for an AllowExperiment ticket, will check the USS for reservation
+            StringBuilder buf = new StringBuilder("~/myClient.aspx?auto=t");
+          
+            string userName = null;
+            Coupon opCoupon = null;
+            Ticket allowTicket = null;
+            int effectiveGroupID = 0;
+            if (Session["UserName"] != null && Session["UserName"].ToString().Length > 0)
+            {
+                userName = Session["UserName"].ToString();
+            }
+            else
+            {
+                userName = AdministrativeAPI.GetUserName(userID);
+            }
+
+              LabClient client = AdministrativeAPI.GetLabClient(clientID);
+              if (client.clientID > 0) // It's a structure need to test for valid value
+              {
+                    DateTime start = DateTime.UtcNow;
+                    long duration = 36000L; // default is ten hours
+                    ProcessAgentInfo labServer = null;
+
+                    if (client.labServerIDs.Length > 0)
+                    {
+                        labServer = issuer.GetProcessAgentInfo(client.labServerIDs[0]);
+                    }
+                    else
+                    {
+                        throw new Exception("The lab server is not specified for lab client " + client.clientName + " version: " + client.version);
+                    }
+                    // Find efective group
+                    string effectiveGroupName = null;
+                    effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(groupID, clientID,
+                        Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
+                    if (effectiveGroupID == groupID)
+                    {
+                        if (Session["groupName"] != null)
+                        {
+                            effectiveGroupName = Session["groupName"].ToString();
+                        }
+                        else
+                        {
+                            effectiveGroupName = AdministrativeAPI.GetGroupName(groupID);
+                            Session["groupName"] = effectiveGroupName;
+                        }
+                    }
+                    else if (effectiveGroupID > 0)
+                    {
+                        effectiveGroupName = AdministrativeAPI.GetGroupName(effectiveGroupID);
+                    }
+
+                    //Check for Scheduling: 
+                    if (client.needsScheduling)
+                    {
+                        int ussId = issuer.FindProcessAgentIdForClient(client.clientID, ProcessAgentType.SCHEDULING_SERVER);
+                        if (ussId > 0)
+                        {
+                            ProcessAgent uss = issuer.GetProcessAgent(ussId);
+
+                            int lssId = issuer.FindProcessAgentIdForAgent(client.labServerIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
+                            ProcessAgent lss = issuer.GetProcessAgent(lssId);
+
+                            // check for current reservation
+
+                            //create a collection & redeemTicket
+                            string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow);
+                            opCoupon = issuer.CreateTicket(TicketTypes.REDEEM_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 600, redeemPayload);
+
+                            UserSchedulingProxy ussProxy = new UserSchedulingProxy();
+                            OperationAuthHeader op = new OperationAuthHeader();
+                            op.coupon = opCoupon;
+                            ussProxy.Url = uss.webServiceUrl;
+                            ussProxy.OperationAuthHeaderValue = op;
+                            Reservation reservation = ussProxy.RedeemReservation(ProcessAgentDB.ServiceGuid, userName, labServer.agentGuid, client.clientGuid);
+
+                            if (reservation != null)
+                            {
+                                // create the allowExecution Ticket
+                                start = reservation.Start;
+                                duration = reservation.Duration;
+                                string payload = TicketLoadFactory.Instance().createAllowExperimentExecutionPayload(
+                                    start, duration, effectiveGroupName);
+                                DateTime tmpTime = start.AddTicks(duration * TimeSpan.TicksPerSecond);
+                                DateTime utcNow = DateTime.UtcNow;
+                                long ticketDuration = (tmpTime.Ticks - utcNow.Ticks) / TimeSpan.TicksPerSecond;
+                                allowTicket = issuer.AddTicket(opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION,
+                                        ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, ticketDuration, payload);
+                                // Append op coupon to url
+                                buf.Append("&coupon_id=" + opCoupon.couponId);
+                                buf.Append("&passkey=" + opCoupon.passkey);
+                                buf.Append("&issuer_guid=" + opCoupon.issuerGuid);
+                            }
+                            //else
+                            //{
+
+                            //    string schedulingUrl = RecipeExecutor.Instance().ExecuteExerimentSchedulingRecipe(uss.agentGuid, lss.agentGuid, userName, groupName,
+                            //        labServer.agentGuid, client.clientGuid, client.clientName, client.version,
+                            //        Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
+
+                            //    schedulingUrl += "&sb_url=" + ProcessAgentDB.ServiceAgent.codeBaseUrl + "/myClient.aspx";
+                            //    Response.Redirect(schedulingUrl, true);
+                            //}
+                        }
+                        else{
+                            // USS Not Found
+                        }
+                    } // End needsScheduling
+                  //Response.Redirect(Global.FormatRegularURL(Request, "myClient.aspx"), true);
+                  Response.Redirect(buf.ToString(), true);
+                  } // End if valid client
+              else{
+                throw new Exception("The specified lab client could not be found");
+              }
+        }
+
+        protected void launchLabXX(int userID, int groupID, int clientID)
         {
             // Currently there is not a good solution for checking for an AllowExperiment ticket, will check the USS for reservation
             Coupon allowExecutionCoupon = null;
@@ -735,6 +825,33 @@ namespace iLabs.ServiceBroker.iLabSB
                 lblLoginErrorMessage.Visible = true;
             }
             //this.Page_Load(this, null);
+        }
+
+        protected void modifyUserSession(int group_ID, int client_ID)
+        {
+            if (group_ID > 0)
+            {
+                string group_Name = AdministrativeAPI.GetGroupName(group_ID); ;
+                Session["GroupID"] = group_ID;
+                Session["GroupName"] = group_Name;
+            }
+            else
+            {
+                Session.Remove("GroupName");
+                Session.Remove("GroupID");
+            }
+            if (client_ID > 0)
+            {
+                 Session["ClientID"] = client_ID;
+                 Session["ClientCount"] = 1;
+            }
+            else
+            {
+                Session.Remove("ClientID");
+                Session.Remove("ClientCount");
+            }
+            AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
+                Convert.ToInt32(Session["userTZ"]), Session.SessionID.ToString());
         }
     }
 }
