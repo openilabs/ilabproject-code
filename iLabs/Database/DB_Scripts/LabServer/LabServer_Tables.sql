@@ -99,7 +99,7 @@ GO
 CREATE TABLE [dbo].[LocalGroup] (
 	[GroupID] [int] IDENTITY (1, 1) NOT NULL ,
 	[GroupName] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Contact] [vnarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Contact] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Comment] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
