@@ -32,15 +32,15 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Blobs_A
 ALTER TABLE [dbo].[Blobs_Access] DROP CONSTRAINT FK_Blobs_Access_Experiment_Blobs
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Coupons_Experiments]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Coupons] DROP CONSTRAINT FK_Coupons_Experiments
-GO
+//if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Coupons_Experiments]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+//ALTER TABLE [dbo].[Coupons] DROP CONSTRAINT FK_Coupons_Experiments
+//GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ExperimentCoupon_Coupon]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Coupons] DROP CONSTRAINT FK_ExperimentCoupon_Coupon
+ALTER TABLE [dbo].[ExperimentCoupon] DROP CONSTRAINT FK_ExperimentCoupon_Coupon
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ExperimentCoupon_Experiment]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Coupons] DROP CONSTRAINT FK_ExperimentCoupon_Experiment
+ALTER TABLE [dbo].[ExperimentCoupon] DROP CONSTRAINT FK_ExperimentCoupon_Experiment
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiment_Blobs_Experiment_Records]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Experiment_Blobs] DROP CONSTRAINT FK_Experiment_Blobs_Experiment_Records
@@ -78,11 +78,9 @@ ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_LS
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_Clients]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_Clients
-
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_Users]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_Users
-GO
-
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_Groups
@@ -1100,7 +1098,7 @@ ALTER TABLE [dbo].[System_Messages] ADD
 	) ON DELETE CASCADE  ON UPDATE CASCADE ,
 	CONSTRAINT [FK_System_Messages_ProcessAgent] FOREIGN KEY 
 	(
-		[Lab_Server_ID]
+		[Agent_ID]
 	) REFERENCES [dbo].[ProcessAgent] (
 		[agent_ID]
 	) ON DELETE CASCADE  ON UPDATE CASCADE ,
