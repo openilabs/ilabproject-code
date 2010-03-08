@@ -55,7 +55,14 @@ namespace LabServer
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            // Need to do something here
+            //
+            // An unhandled error has occured
+            //
+            Exception ex = Server.GetLastError();
+            Logfile.WriteException(ex);
+
+            // Clear the error from the server
+            Server.ClearError();
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
         }

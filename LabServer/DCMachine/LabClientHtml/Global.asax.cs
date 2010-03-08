@@ -31,6 +31,26 @@ namespace LabClientHtml
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
         }
 
+        //-------------------------------------------------------------------------------------------------//
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            const string STRLOG_MethodName = "Application_Error";
+
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
+
+            //
+            // An unhandled error has occured
+            //
+            Exception ex = Server.GetLastError();
+            Logfile.WriteException(ex);
+
+            // Clear the error from the server
+            Server.ClearError();
+
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
+        }
+
         //---------------------------------------------------------------------------------------//
 
         protected void Application_End(object sender, EventArgs e)

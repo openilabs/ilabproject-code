@@ -291,7 +291,7 @@ namespace Library.LabServer.Drivers.Setup
 
                         case States_GetExecutionTime.sGetSetFieldDCDriveMutTime:
                             double setFieldDCDriveMutTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspSetFieldDCDriveMutTime, 0);
-                            stateExecutionTime = vectorLength * this.measurementCount * setFieldDCDriveMutTime;
+                            stateExecutionTime = vectorLength * setFieldDCDriveMutTime;
                             break;
 
                         case States_GetExecutionTime.sGetTakeMeasurementTime:

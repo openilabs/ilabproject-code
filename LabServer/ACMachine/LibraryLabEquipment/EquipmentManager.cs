@@ -156,6 +156,21 @@ namespace Library.LabEquipment
                             xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
                             break;
 
+                        case NonExecuteCommands.GetConfigureACDriveTime:
+
+                            //
+                            // Get the time to configure the AC drive
+                            //
+                            int configureACDriveTime = equipmentEngine.GetConfigureACDriveTime();
+
+                            //
+                            // Add the time to the response
+                            //
+                            xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspConfigureACDriveTime);
+                            xmlElement.InnerText = configureACDriveTime.ToString();
+                            xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
+                            break;
+
                         case NonExecuteCommands.GetStartACDriveTime:
 
                             //
@@ -256,6 +271,21 @@ namespace Library.LabEquipment
                                 resultInfo = (CommandInfo)equipmentEngine.ExecuteCommand((ExecuteCommandInfo)commandInfo);
                                 break;
 
+                            case ExecuteCommands.ConfigureACDrive:
+
+                                //
+                                // Get AC drive configuration from request
+                                //
+                                string strACDriveConfig = XmlUtilities.GetXmlValue(xmlRequestNode, Consts.STRXML_ReqACDriveConfig, false);
+                                RedLion.ACDriveConfigs acDriveConfig = (RedLion.ACDriveConfigs)Enum.Parse(typeof(RedLion.ACDriveConfigs), strACDriveConfig);
+
+                                //
+                                // Configure the AC drive
+                                //
+                                commandInfo.parameters = new object[] { acDriveConfig };
+                                resultInfo = (CommandInfo)equipmentEngine.ExecuteCommand((ExecuteCommandInfo)commandInfo);
+                                break;
+
                             case ExecuteCommands.StartACDrive:
 
                                 //
@@ -295,26 +325,41 @@ namespace Library.LabEquipment
                                 if (commandInfo.success == true)
                                 {
                                     //
-                                    // Get measurement values from the result
+                                    // Get measurement values from the result - ensure the order of the measurement values is the
+                                    // same as in EquipmentEngine.cs
                                     //
-                                    float voltage = (float)commandInfo.results[0];
-                                    float current = (float)commandInfo.results[1];
-                                    float powerFactor = (float)commandInfo.results[2];
-                                    int speed = (int)commandInfo.results[3];
-                                    int torque = (int)commandInfo.results[4];
+                                    float voltageMut = (float)commandInfo.results[0];
+                                    float currentMut = (float)commandInfo.results[1];
+                                    float powerFactorMut = (float)commandInfo.results[2];
+                                    float voltageVsd = (float)commandInfo.results[3];
+                                    float currentVsd = (float)commandInfo.results[4];
+                                    float powerFactorVsd = (float)commandInfo.results[5];
+                                    int speed = (int)commandInfo.results[6];
+                                    int torque = (int)commandInfo.results[7];
 
                                     //
                                     // Add the measurement values to the response
                                     //
-                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspVoltage);
-                                    xmlElement.InnerText = voltage.ToString();
+                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspVoltageMut);
+                                    xmlElement.InnerText = voltageMut.ToString();
                                     xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
-                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspCurrent);
-                                    xmlElement.InnerText = current.ToString();
+                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspCurrentMut);
+                                    xmlElement.InnerText = currentMut.ToString();
                                     xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
-                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspPowerFactor);
-                                    xmlElement.InnerText = powerFactor.ToString();
+                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspPowerFactorMut);
+                                    xmlElement.InnerText = powerFactorMut.ToString();
                                     xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
+
+                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspVoltageVsd);
+                                    xmlElement.InnerText = voltageVsd.ToString();
+                                    xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
+                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspCurrentVsd);
+                                    xmlElement.InnerText = currentVsd.ToString();
+                                    xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
+                                    xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspPowerFactorVsd);
+                                    xmlElement.InnerText = powerFactorVsd.ToString();
+                                    xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
+
                                     xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspSpeed);
                                     xmlElement.InnerText = speed.ToString();
                                     xmlResponseDocument.DocumentElement.AppendChild(xmlElement);

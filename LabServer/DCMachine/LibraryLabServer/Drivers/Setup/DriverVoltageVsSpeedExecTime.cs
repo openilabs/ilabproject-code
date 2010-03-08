@@ -280,7 +280,7 @@ namespace Library.LabServer.Drivers.Setup
 
                         case States_GetExecutionTime.sGetSetSpeedACDriveTime:
                             double setSpeedACDriveTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspSetSpeedACDriveTime, 0);
-                            stateExecutionTime = vectorLength * this.measurementCount * setSpeedACDriveTime;
+                            stateExecutionTime = vectorLength * setSpeedACDriveTime;
                             break;
 
                         case States_GetExecutionTime.sGetTakeMeasurementTime:

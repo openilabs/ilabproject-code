@@ -26,6 +26,19 @@
     <!-- XML Equipment configuration filename -->
     <add key="XmlEquipmentConfigFilename" value="" />
 
+    <!-- Logging level: where 0=Minimum, 1=Low, 2=Medium, 3=High, 4=Maximum and 5=Debug -->
+    <add key="LoggingLevel" value="4" />
+
+    <!-- Logging levels for each class: Set greater than "LoggingLevel" to disable logging. Comment out for minimum logging. -->
+    <add key="DCDriveMut" value="5" />
+    <add key="ACDrive" value="5" />
+    <add key="RedLion" value="3" />
+    <add key="EquipmentEngine" value="5" />
+    <add key="EquipmentManager" value="5" />
+    <add key="LabEquipmentEngine" value="5" />
+    <add key="LabEquipmentManager" value="5" />
+    <add key="EquipmentService" value="5" />
+
   </appSettings>
 
   <connectionStrings/>

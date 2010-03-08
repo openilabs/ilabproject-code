@@ -57,7 +57,7 @@
     <seconds />
   </experimentResult>
   <resultsApplet>
-    <archive>applets/TimeOfDayResults.jar</archive>
+    <archive>Applets/TimeOfDayResults.jar</archive>
     <code>src/ResultsApplet.class</code>
   </resultsApplet>
 </labConfiguration>

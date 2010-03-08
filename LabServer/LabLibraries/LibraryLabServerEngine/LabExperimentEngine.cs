@@ -18,6 +18,7 @@ namespace Library.LabServerEngine
         //
         // Constants
         //
+        private const int MAX_RUNEXPERIMENT_RETRIES = 3;
         private const int MAX_SBNOTIFY_RETRIES = 3;
 
         //
@@ -62,6 +63,7 @@ namespace Library.LabServerEngine
         private const string STRERR_FailedToSaveExperimentResults = "Failed to save experiment results!";
         private const string STRERR_FailedToUpdateStatisticsCancelled = "Failed to update statistics cancelled!";
         private const string STRERR_FailedToUpdateStatisticsCompleted = "Failed to update statistics completed!";
+        private const string STRERR_ReRunningExperiment = "Re-Running Experiment... Retry #";
 
 
         /// <summary>
@@ -739,6 +741,7 @@ namespace Library.LabServerEngine
             States state = States.sGetExperiment;
             States lastState = States.sStart;
             ExperimentInfo experimentInfo = null;
+            int runExperimentRetries = 0;
 
             try
             {
@@ -790,7 +793,10 @@ namespace Library.LabServerEngine
                                 break;
                             }
 
+                            //
                             // Run the experiment
+                            //
+                            runExperimentRetries = MAX_RUNEXPERIMENT_RETRIES;
                             state = States.sRunExperiment;
                             break;
 
@@ -799,6 +805,22 @@ namespace Library.LabServerEngine
                             // Run the experiment
                             experimentInfo = RunExperiment(experimentInfo);
 
+                            // Check if experiment failed, it should not!
+                            if (experimentInfo.resultReport.statusCode == (int)StatusCodes.Failed)
+                            {
+                                // Log the error message
+                                Logfile.WriteError(experimentInfo.resultReport.errorMessage);
+
+                                if (runExperimentRetries-- > 0)
+                                {
+                                    //
+                                    // Run the experiment again
+                                    //
+                                    int retry = MAX_RUNEXPERIMENT_RETRIES - runExperimentRetries;
+                                    Logfile.Write(STRERR_ReRunningExperiment + retry.ToString());
+                                    break;
+                                }
+                            }
                             state = States.sConcludeExperiment;
                             break;
 

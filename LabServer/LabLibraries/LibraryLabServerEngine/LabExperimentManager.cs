@@ -530,7 +530,6 @@ namespace Library.LabServerEngine
 
             lock (this.managerLock)
             {
-#if x
                 bool isOnline;
                 string message;
 
@@ -582,9 +581,6 @@ namespace Library.LabServerEngine
 
                     labStatus = new LabStatus(isOnline, message);
                 }
-#else
-                labStatus = new LabStatus(true, StatusCodes.Ready.ToString());
-#endif
             }
 
             return (labStatus);

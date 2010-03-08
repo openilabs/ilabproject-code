@@ -24,9 +24,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryLabEquipmentEngine", "..\LabLibraries\LibraryLabEquipmentEngine\LibraryLabEquipmentEngine.csproj", "{84F5CAB3-521B-4B51-919D-4B9021027122}"
 EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = TestLibraryLabServerEngine5.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

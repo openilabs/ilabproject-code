@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ITEE")]
 [assembly: AssemblyProduct("LabClientHtml")]
-[assembly: AssemblyCopyright("Copyright © ITEE 2008")]
+[assembly: AssemblyCopyright("Copyright © ITEE 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

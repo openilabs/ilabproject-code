@@ -107,7 +107,22 @@ namespace Library.Lab
 
         public static XmlNode GetXmlNode(XmlDocument xmlDocument, string strXmlNode)
         {
-            XmlNode xmlNodeTemp = xmlDocument.SelectSingleNode(strXmlNode);
+            return GetXmlNode(xmlDocument, strXmlNode, null);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        public static XmlNode GetXmlNode(XmlDocument xmlDocument, string strXmlNode, XmlNamespaceManager xnsManager)
+        {
+            XmlNode xmlNodeTemp;
+            if (xnsManager != null)
+            {
+                xmlNodeTemp = xmlDocument.SelectSingleNode(strXmlNode, xnsManager);
+            }
+            else
+            {
+                xmlNodeTemp = xmlDocument.SelectSingleNode(strXmlNode);
+            }
             if (xmlNodeTemp == null)
             {
                 throw new ArgumentNullException(strXmlNode, STRERR_XmlNodeNotFound);
@@ -167,10 +182,25 @@ namespace Library.Lab
 
         public static string GetXmlValue(XmlNode xmlNode, string strXmlNode, bool allowEmpty)
         {
+            return GetXmlValue(xmlNode, strXmlNode, null, allowEmpty);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        public static string GetXmlValue(XmlNode xmlNode, string strXmlNode, XmlNamespaceManager xnsManager, bool allowEmpty)
+        {
             //
             // Get the specified node
             //
-            XmlNode xmlNodeTemp = xmlNode.SelectSingleNode(strXmlNode);
+            XmlNode xmlNodeTemp;
+            if (xnsManager != null)
+            {
+                xmlNodeTemp = xmlNode.SelectSingleNode(strXmlNode, xnsManager);
+            }
+            else
+            {
+                xmlNodeTemp = xmlNode.SelectSingleNode(strXmlNode);
+            }
             if (xmlNodeTemp == null)
             {
                 throw new ArgumentNullException(strXmlNode, STRERR_XmlNodeNotFound);
@@ -401,10 +431,25 @@ namespace Library.Lab
 
         public static void SetXmlValue(XmlNode xmlNode, string strXmlNode, string value, bool allowNull)
         {
+            SetXmlValue(xmlNode, strXmlNode, null, value, allowNull);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        public static void SetXmlValue(XmlNode xmlNode, string strXmlNode, XmlNamespaceManager xnsManager, string value, bool allowNull)
+        {
             //
             // Get the specified node
             //
-            XmlNode xmlNodeTemp = xmlNode.SelectSingleNode(strXmlNode);
+            XmlNode xmlNodeTemp;
+            if (xnsManager != null)
+            {
+                xmlNodeTemp = xmlNode.SelectSingleNode(strXmlNode, xnsManager);
+            }
+            else
+            {
+                xmlNodeTemp = xmlNode.SelectSingleNode(strXmlNode);
+            }
             if (xmlNodeTemp == null)
             {
                 throw new ArgumentNullException(strXmlNode, STRERR_XmlNodeNotFound);
@@ -425,6 +470,17 @@ namespace Library.Lab
             {
                 xmlNodeTemp.InnerXml = value.Trim();
             }
+            else
+            {
+                xmlNodeTemp.InnerXml = string.Empty;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        public static void SetXmlValue(XmlNode xmlNode, string strXmlNode, bool value)
+        {
+            SetXmlValue(xmlNode, strXmlNode, value.ToString(), false);
         }
 
         //-------------------------------------------------------------------------------------------------//
@@ -436,7 +492,7 @@ namespace Library.Lab
 
         //-------------------------------------------------------------------------------------------------//
 
-        public static void SetXmlValue(XmlNode xmlNode, string strXmlNode, bool value)
+        public static void SetXmlValue(XmlNode xmlNode, string strXmlNode, double value)
         {
             SetXmlValue(xmlNode, strXmlNode, value.ToString(), false);
         }

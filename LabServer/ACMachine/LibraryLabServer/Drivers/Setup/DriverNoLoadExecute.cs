@@ -26,7 +26,14 @@ namespace Library.LabServer.Drivers.Setup
         private enum States_Execute
         {
             sSuspendPowerdown,
-            sCreateConnection, sResetACDrive, sStartACDrive, sTakeMeasurement, sStopACDrive, sCloseConnection,
+            sCreateConnection,
+            sResetACDrive,
+            sConfigureACDrive,
+            sStartACDrive,
+            sTakeMeasurement,
+            sStopACDrive,
+            sReconfigureACDrive,
+            sCloseConnection,
             sResumePowerdown,
             sCompleted,
         }
@@ -64,15 +71,23 @@ namespace Library.LabServer.Drivers.Setup
             //
             // ResetACDrive
             //
-            new SMTableEntry_Execute(States_Execute.sResetACDrive, States_Execute.sStartACDrive, States_Execute.sCloseConnection,
+            new SMTableEntry_Execute(States_Execute.sResetACDrive, States_Execute.sConfigureACDrive, States_Execute.sCloseConnection,
                 Consts.STRXML_CmdResetACDrive, null),
+
+            //
+            // ConfigureACDrive
+            //
+            new SMTableEntry_Execute(States_Execute.sConfigureACDrive, States_Execute.sStartACDrive, States_Execute.sCloseConnection,
+                Consts.STRXML_CmdConfigureACDrive, new string[,] {
+                    { Consts.STRXML_ReqACDriveConfig, Consts.STR_ACDriveConfig_MaximumCurrent }
+                } ),
 
             //
             // StartACDrive
             //
             new SMTableEntry_Execute(States_Execute.sStartACDrive, States_Execute.sTakeMeasurement, States_Execute.sStopACDrive,
                 Consts.STRXML_CmdStartACDrive, new string[,] {
-                    { Consts.STRXML_ReqACDriveMode, string.Empty }
+                    { Consts.STRXML_ReqACDriveMode, Consts.STR_ACDriveMode_NoLoad }
                 } ),
 
             //
@@ -84,9 +99,17 @@ namespace Library.LabServer.Drivers.Setup
             //
             // StopACDrive
             //
-            new SMTableEntry_Execute(States_Execute.sStopACDrive, States_Execute.sCloseConnection, States_Execute.sCloseConnection,
+            new SMTableEntry_Execute(States_Execute.sStopACDrive, States_Execute.sReconfigureACDrive, States_Execute.sCloseConnection,
                 Consts.STRXML_CmdStopACDrive, new string[,] {
-                    { Consts.STRXML_ReqACDriveMode, string.Empty }
+                    { Consts.STRXML_ReqACDriveMode, Consts.STR_ACDriveMode_NoLoad }
+                } ),
+
+            //
+            // ReconfigureACDrive
+            //
+            new SMTableEntry_Execute(States_Execute.sReconfigureACDrive, States_Execute.sCloseConnection, States_Execute.sCloseConnection,
+                Consts.STRXML_CmdConfigureACDrive, new string[,] {
+                    { Consts.STRXML_ReqACDriveConfig, Consts.STR_ACDriveConfig_Default }
                 } ),
 
             //
@@ -247,13 +270,9 @@ namespace Library.LabServer.Drivers.Setup
                     //
                     switch (entry.currentState)
                     {
-                        case States_Execute.sStartACDrive:
-                            entry.commandArguments[0, 1] = specification.SetupId;
-                            break;
-
-                        case States_Execute.sStopACDrive:
-                            entry.commandArguments[0, 1] = specification.SetupId;
-                            break;
+                            //
+                            // Nothing to do here
+                            //
 
                         default:
                             break;
@@ -286,9 +305,9 @@ namespace Library.LabServer.Drivers.Setup
                             //
                             // Add in the values
                             //
-                            resultInfo.voltage += (float)XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspVoltage, 0.0);
-                            resultInfo.current += (float)XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspCurrent, 0.0);
-                            resultInfo.powerFactor += (float)XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspPowerFactor, 0.0);
+                            resultInfo.voltage += (float)XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspVoltageMut, 0.0);
+                            resultInfo.current += (float)XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspCurrentMut, 0.0);
+                            resultInfo.powerFactor += (float)XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspPowerFactorMut, 0.0);
                             resultInfo.speed += XmlUtilities.GetIntValue(xmlResponseNode, Consts.STRXML_RspSpeed, 0);
                             resultInfo.torque += XmlUtilities.GetIntValue(xmlResponseNode, Consts.STRXML_RspTorque, 0);
 
@@ -315,8 +334,6 @@ namespace Library.LabServer.Drivers.Setup
                         default:
                             break;
                     }
-
-                    Trace.WriteLine("nextState: " + entry.nextState.ToString());
 
                     //
                     // Next state

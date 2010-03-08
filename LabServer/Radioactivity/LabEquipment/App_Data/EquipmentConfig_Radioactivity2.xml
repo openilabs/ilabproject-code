@@ -2,12 +2,13 @@
 <equipmentConfig title="Radioactivity #2" version="3.1">
   <powerupDelay>7</powerupDelay>
   <initialiseDelay>45</initialiseDelay>
-  <powerdownTimeout>1800</powerdownTimeout>
+  <!--<powerdownTimeout>1800</powerdownTimeout>-->
+  <powerdownTimeout>20</powerdownTimeout>
   <flexMotionBoardID>2</flexMotionBoardID>
   <tube>
     <offsetDistance>18</offsetDistance>
     <homeDistance>30</homeDistance>
-    <moveRate>530</moveRate>
+    <moveRate>0.530</moveRate>
     <initAxis>true</initAxis>
   </tube>
   <sources>
@@ -25,8 +26,16 @@
     <homeLocation>A</homeLocation>
   </absorbers>
   <serialLcd>
-    <port>COM3</port>
-    <baud>19200</baud>
+    <type>Network</type>
+    <!--<type>Serial</type>-->
+    <network>
+      <ipaddr>130.102.71.116</ipaddr>
+      <port>10002</port>
+    </network>
+    <serial>
+      <port>COM3</port>
+      <baud>19200</baud>
+    </serial>
   </serialLcd>
   <radiationCounter>
     <type>ST360</type>
@@ -35,8 +44,16 @@
     </execTimeAdjustment>
   </radiationCounter>
   <st360Counter>
-    <port>COM4</port>
-    <baud>9600</baud>
+    <type>Network</type>
+    <!--<type>Serial</type>-->
+    <network>
+      <ipaddr>130.102.71.116</ipaddr>
+      <port>10001</port>
+    </network>
+    <serial>
+      <port>COM4</port>
+      <baud>9600</baud>
+    </serial>
     <voltage>400</voltage>
     <volume>1</volume>
   </st360Counter>

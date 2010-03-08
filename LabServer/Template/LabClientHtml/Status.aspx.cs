@@ -24,16 +24,21 @@ namespace LabClientHtml
 
         #endregion
 
-        //-------------------------------------------------------------------------------------------------//
+        //---------------------------------------------------------------------------------------//
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected void Page_Init(object sender, EventArgs e)
         {
             //
             // Set webpage title
             //
             Master.HeaderTitle = this.Title;
             this.Title = Master.PageTitle + this.Title;
+        }
 
+        //-------------------------------------------------------------------------------------------------//
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
             if (!IsPostBack)
             {
                 //
@@ -49,7 +54,7 @@ namespace LabClientHtml
                 //
                 // Initialise experiment number if experiment has been submitted
                 //
-                if (Master.MultipleSubmit == true)
+                if (Master.MultiSubmit == true)
                 {
                     if (Session[Consts.STRSSN_SubmittedIDs] != null)
                     {
@@ -303,7 +308,7 @@ namespace LabClientHtml
                 //
                 // Experiment status no longer needs to be checked
                 //
-                if (Master.MultipleSubmit == true)
+                if (Master.MultiSubmit == true)
                 {
                     if (Session[Consts.STRSSN_SubmittedIDs] != null)
                     {

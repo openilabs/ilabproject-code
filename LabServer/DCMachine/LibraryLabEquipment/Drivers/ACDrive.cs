@@ -717,7 +717,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = speed.ToString() + STRLOG_Rpm;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
-            Trace.WriteLine(STRLOG_MethodName);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -761,6 +761,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -804,6 +805,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = seconds.ToString() + STRLOG_Seconds;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -847,6 +849,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = current.ToString() + STRLOG_Milliamps;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -890,6 +893,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -933,6 +937,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 

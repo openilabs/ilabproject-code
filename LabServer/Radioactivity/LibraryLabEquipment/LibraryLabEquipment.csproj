@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_NO_HARDWARE NO_POWERDOWN</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_NO_HARDWARE _NO_POWERDOWN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -42,7 +42,11 @@
     <Compile Include="Drivers\Nimc.cs" />
     <Compile Include="Drivers\RadiationCounter.cs" />
     <Compile Include="Drivers\SerialLcd.cs" />
-    <Compile Include="Drivers\ST360CounterSerial.cs" />
+    <Compile Include="Drivers\SerialLcdSer.cs" />
+    <Compile Include="Drivers\SerialLcdTcp.cs" />
+    <Compile Include="Drivers\ST360Counter.cs" />
+    <Compile Include="Drivers\ST360CounterSer.cs" />
+    <Compile Include="Drivers\ST360CounterTcp.cs" />
     <Compile Include="EquipmentEngine.cs" />
     <Compile Include="EquipmentManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

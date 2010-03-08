@@ -34,15 +34,20 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Administration.aspx" />
+    <Content Include="App_Data\LabConfiguration.dtd" />
+    <Content Include="App_Data\LabConfiguration1.xml" />
+    <Content Include="App_Data\LabConfiguration2.xml" />
+    <Content Include="App_Data\LabConfiguration2_NoAbsorbers.xml" />
+    <Content Include="App_Data\SimulationConfig1.xml" />
+    <Content Include="App_Data\SimulationConfig2.xml" />
+    <Content Include="App_Data\SimulationConfig2_NoAbsorbers.xml" />
     <Content Include="Controls\Banner.ascx" />
     <Content Include="Controls\Feedback.ascx" />
     <Content Include="Controls\Footer.ascx" />
     <Content Include="Controls\Header.ascx" />
-    <Content Include="Controls\Login.ascx" />
     <Content Include="Controls\Navmenu.ascx" />
     <Content Include="Controls\Status.ascx" />
     <Content Include="Default.aspx" />
@@ -52,13 +57,18 @@
     <Content Include="Images\level2-arrow.gif" />
     <Content Include="Images\level2-underline.gif" />
     <Content Include="Images\mit-blackred-footer1.gif" />
-    <Content Include="Images\radioactivity.jpg" />
+    <Content Include="Images\Radioactivity1.png" />
+    <Content Include="Images\Radioactivity2.png" />
     <Content Include="Images\uq-logo.gif" />
+    <Content Include="LabServer.Master" />
     <Content Include="LabServerWebService.asmx" />
     <Content Include="Styles\Controls.css" />
     <Content Include="Styles\LabControls.css" />
     <Content Include="Styles\LabServer.css" />
-    <Content Include="Web.config" />
+    <None Include="Web.config" />
+    <None Include="Web.config.Radioactivity1" />
+    <None Include="Web.config.Radioactivity2" />
+    <Content Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Administration.aspx.cs">
@@ -96,13 +106,6 @@
     <Compile Include="Controls\Header.ascx.designer.cs">
       <DependentUpon>Header.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Login.ascx.cs">
-      <DependentUpon>Login.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Controls\Login.ascx.designer.cs">
-      <DependentUpon>Login.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Controls\Navmenu.ascx.cs">
       <DependentUpon>Navmenu.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -139,19 +142,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="App_Data\LabConfiguration1.xml" />
-    <Content Include="App_Data\LabConfiguration2.xml" />
-    <Content Include="App_Data\LabConfiguration2_NoAbsorbers.xml" />
-    <Content Include="App_Data\SimulationConfig1.xml" />
-    <Content Include="App_Data\SimulationConfig2.xml" />
-    <Content Include="App_Data\SimulationConfig2_NoAbsorbers.xml" />
-    <Content Include="LabServer.Master" />
-    <None Include="App_Data\LabConfiguration.dtd" />
-    <None Include="Web.config.Radioactivity1" />
-    <None Include="Web.config.Radioactivity2" />
-    <None Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\LabLibraries\LibraryLabServerEngine\LibraryLabServerEngine.csproj">

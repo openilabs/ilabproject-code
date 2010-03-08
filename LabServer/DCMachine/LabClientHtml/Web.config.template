@@ -7,20 +7,21 @@
   
   <appSettings>
 
-    <!-- ServiceBroker URL - MUST BE SUPPLIED. -->
-    <add key="ServiceBrokerUrl" value=""/>
+    <!-- ServiceBroker URL - If not specified in the LabClient URL as a query string parameter then it must be specified here. -->
+    <add key="ServiceURL" value=""/>
 
-    <!-- LabServer GUID - MUST BE SUPPLIED. -->
-    <add key="LabServerGuid" value="" />
+    <!-- LabServer ID (Guid) - If not specified in the LabClient URL as a query string parameter then it must be specified here. -->
+    <add key="LabserverID" value="" />
+
+    <!-- When true allows experiments to be submitted without waiting for a previous experiment to complete -
+         If not specified in the LabClient URL as a query string parameter then it must be specified here. -->
+    <add key="MultiSubmit" value="false" />
 
     <!-- Path for log files, filename format is the current date of the form YYYYMMDD.log -->
     <add key="LogFilesPath" value="LogFiles" />
 
     <!-- Email address to provide feedback on the website -->
-    <add key="FeedbackEmail" value="ilab-admin@itee.uq.edu.au" />
-
-    <!-- When true allows experiments to be submitted with out waiting for a previous experiment to complete -->
-    <add key="MultipleSubmit" value="true" />
+    <add key="FeedbackEmail" value="" />
 
   </appSettings>
 

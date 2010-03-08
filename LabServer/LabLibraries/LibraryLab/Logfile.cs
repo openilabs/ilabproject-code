@@ -46,6 +46,14 @@ namespace Library.Lab
         private const string STRLOG_CompletedMarker = " << ";
         private const string STRLOG_CreateThreadObjectsFailed = "Create thread objects failed!";
         private const string STR_Error = " ***ERROR*** ";
+        private const string STRLOG_InnerExceptionType = "Inner Exception Type: ";
+        private const string STRLOG_InnerException = "Inner Exception: ";
+        private const string STRLOG_InnerSource = "Inner Source: ";
+        private const string STRLOG_InnerStackTrace = "Inner Stack Trace: ";
+        private const string STRLOG_ExceptionType = "Exception Type: ";
+        private const string STRLOG_Exception = "Exception: ";
+        private const string STRLOG_Source = "Source: ";
+        private const string STRLOG_StackTrace = "Stack Trace: ";
 
         private static string logfilePath = null;
         private static Queue logfileQueue = null;
@@ -74,7 +82,7 @@ namespace Library.Lab
 
         #endregion
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void SetFilePath(string path)
         {
@@ -123,7 +131,7 @@ namespace Library.Lab
             threadLogfile.Start();
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void SetLoggingLevel(LoggingLevels loggingLevel)
         {
@@ -133,8 +141,8 @@ namespace Library.Lab
                 Write(STRLOG_LogLevel + logLevel.ToString());
             }
         }
-            
-        //---------------------------------------------------------------------------------------//
+
+        //-------------------------------------------------------------------------------------------------//
 
         /// <summary>
         /// Terminate the logging thread. Messages can still be written but the logfile
@@ -171,21 +179,21 @@ namespace Library.Lab
             threadLogfile = null;
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void Write()
         {
             Write(string.Empty);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void Write(string message)
         {
             Write(LoggingLevels.Minimum, message);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void Write(LoggingLevels loggingLevel, string message)
         {
@@ -230,7 +238,7 @@ namespace Library.Lab
             }
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteError(string message)
         {
@@ -240,7 +248,7 @@ namespace Library.Lab
             }
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteError(string methodName, string message)
         {
@@ -251,7 +259,7 @@ namespace Library.Lab
             WriteError(message);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteError(string className, string methodName, string message)
         {
@@ -266,28 +274,54 @@ namespace Library.Lab
             WriteError(message);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
+
+        public static void WriteException(Exception ex)
+        {
+            string message = string.Empty;
+
+            if (ex.InnerException != null)
+            {
+                message += STRLOG_NewLine + STRLOG_InnerExceptionType + ex.InnerException.GetType().ToString();
+                message += STRLOG_NewLine + STRLOG_InnerException + ex.InnerException.Message;
+                message += STRLOG_NewLine + STRLOG_InnerSource + ex.InnerException.Source;
+                if (ex.InnerException.StackTrace != null)
+                {
+                    message += STRLOG_NewLine + STRLOG_InnerStackTrace + STRLOG_NewLine + ex.InnerException.StackTrace;
+                }
+            }
+            message += STRLOG_NewLine + STRLOG_ExceptionType + ex.GetType().ToString();
+            message += STRLOG_NewLine + STRLOG_Exception + ex.Message;
+            message += STRLOG_NewLine + STRLOG_Source + ex.Source;
+            if (ex.StackTrace != null)
+            {
+                message += STRLOG_NewLine + STRLOG_StackTrace + STRLOG_NewLine + ex.StackTrace;
+            }
+            WriteError(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCalled(string className, string methodName)
         {
             WriteCalled(LoggingLevels.Minimum, className, methodName, null);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCalled(string className, string methodName, string logMessage)
         {
             WriteCalled(LoggingLevels.Minimum, className, methodName, logMessage);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCalled(LoggingLevels logLevel, string className, string methodName)
         {
             WriteCalled(logLevel, className, methodName, null);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCalled(LoggingLevels logLevel, string className, string methodName, string logMessage)
         {
@@ -311,28 +345,28 @@ namespace Library.Lab
             }
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCompleted(string className, string methodName)
         {
             WriteCompleted(LoggingLevels.Minimum, className, methodName, null);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCompleted(string className, string methodName, string logMessage)
         {
             WriteCompleted(LoggingLevels.Minimum, className, methodName, logMessage);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCompleted(LoggingLevels logLevel, string className, string methodName)
         {
             WriteCompleted(logLevel, className, methodName, null);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         public static void WriteCompleted(LoggingLevels logLevel, string className, string methodName, string logMessage)
         {
@@ -356,7 +390,7 @@ namespace Library.Lab
             }
         }
 
-        //---------------------------------------------------------------------------------------//
+        //=================================================================================================//
 
         private static void LogfileThread()
         {
@@ -414,7 +448,7 @@ namespace Library.Lab
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
         }
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         private static string CreateDatedFilename(string path)
         {

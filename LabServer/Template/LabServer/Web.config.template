@@ -39,7 +39,7 @@
     <add key="FarmSize" value="1" />
 
     <!-- Equipment service comma-seperated-value list: Webservice URL and passkey -->
-    <add key="EquipmentService" value=" , " />
+    <add key="EquipmentService" value="" />
 
   </appSettings>
 

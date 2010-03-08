@@ -31,20 +31,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App_Data\EquipmentConfig.xml" />
-    <Content Include="Global.asax" />
+    <Content Include="App_Data\EquipmentConfig1.xml" />
+    <Content Include="App_Data\EquipmentConfig2.xml" />
+    <Content Include="App_Data\EquipmentConfig3.xml" />
+    <Content Include="App_Data\EquipmentConfig4.xml" />
+    <Content Include="App_Data\EquipmentConfig5.xml" />
     <Content Include="EquipmentService.asmx" />
-    <Content Include="Web.config" />
+    <Content Include="Global.asax" />
+    <None Include="Web.config" />
+    <Content Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">
@@ -55,9 +56,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\LabLibraries\LibraryLabEquipmentEngine\LibraryLabEquipmentEngine.csproj">

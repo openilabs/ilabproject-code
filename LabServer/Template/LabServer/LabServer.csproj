@@ -34,14 +34,34 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Administration.aspx" />
+    <Content Include="App_Data\LabConfiguration.dtd" />
+    <Content Include="App_Data\LabConfiguration.xml" />
+    <Content Include="App_Data\SimulationConfig.xml" />
+    <Content Include="Controls\Banner.ascx" />
+    <Content Include="Controls\Feedback.ascx" />
+    <Content Include="Controls\Footer.ascx" />
+    <Content Include="Controls\Header.ascx" />
+    <Content Include="Controls\Navmenu.ascx" />
+    <Content Include="Controls\Status.ascx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Images\feedback-gradient.gif" />
+    <Content Include="Images\generic_content32.jpg" />
+    <Content Include="Images\gradient.gif" />
+    <Content Include="Images\level2-arrow.gif" />
+    <Content Include="Images\level2-underline.gif" />
+    <Content Include="Images\mit-blackred-footer1.gif" />
+    <Content Include="Images\uq-logo.gif" />
+    <Content Include="LabServer.Master" />
     <Content Include="LabServerWebService.asmx" />
-    <Content Include="Web.config" />
+    <Content Include="Styles\Controls.css" />
+    <Content Include="Styles\LabControls.css" />
+    <Content Include="Styles\LabServer.css" />
+    <None Include="Web.config" />
+    <Content Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Administration.aspx.cs">
@@ -79,13 +99,6 @@
     <Compile Include="Controls\Header.ascx.designer.cs">
       <DependentUpon>Header.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Login.ascx.cs">
-      <DependentUpon>Login.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Controls\Login.ascx.designer.cs">
-      <DependentUpon>Login.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Controls\Navmenu.ascx.cs">
       <DependentUpon>Navmenu.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -122,30 +135,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="App_Data\LabConfiguration.xml" />
-    <Content Include="App_Data\SimulationConfig.xml" />
-    <Content Include="Controls\Banner.ascx" />
-    <Content Include="Controls\Feedback.ascx" />
-    <Content Include="Controls\Footer.ascx" />
-    <Content Include="Controls\Header.ascx" />
-    <Content Include="Controls\Login.ascx" />
-    <Content Include="Controls\Navmenu.ascx" />
-    <Content Include="Controls\Status.ascx" />
-    <Content Include="Images\feedback-gradient.gif" />
-    <Content Include="Images\generic_content32.jpg" />
-    <Content Include="Images\gradient.gif" />
-    <Content Include="Images\level2-arrow.gif" />
-    <Content Include="Images\level2-underline.gif" />
-    <Content Include="Images\mit-blackred-footer1.gif" />
-    <Content Include="Images\uq-logo.gif" />
-    <Content Include="LabServer.Master" />
-    <Content Include="Styles\Controls.css" />
-    <Content Include="Styles\LabControls.css" />
-    <Content Include="Styles\LabServer.css" />
-    <None Include="App_Data\LabConfiguration.dtd" />
-    <None Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\LabLibraries\LibraryLabServerEngine\LibraryLabServerEngine.csproj">

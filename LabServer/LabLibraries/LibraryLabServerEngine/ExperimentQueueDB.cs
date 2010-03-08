@@ -673,17 +673,17 @@ namespace Library.LabServerEngine
                     {
                         this.sqlConnection.Close();
                     }
+
+                    logMessage = STRLOG_position + queuedExperimentInfo.position.ToString() +
+                        Logfile.STRLOG_Spacer + STRLOG_queueLength + queuedExperimentInfo.queueLength +
+                        Logfile.STRLOG_Spacer + STRLOG_waitTime + queuedExperimentInfo.waitTime.ToString() + STRLOG_seconds +
+                        Logfile.STRLOG_Spacer + STRLOG_estExecutionTime + queuedExperimentInfo.estExecutionTime.ToString() + STRLOG_seconds;
                 }
                 catch (Exception ex)
                 {
                     Logfile.WriteError(ex.Message);
                 }
             }
-
-            logMessage = STRLOG_position + queuedExperimentInfo.position.ToString() +
-                Logfile.STRLOG_Spacer + STRLOG_queueLength + queuedExperimentInfo.queueLength +
-                Logfile.STRLOG_Spacer + STRLOG_waitTime + queuedExperimentInfo.waitTime.ToString() + STRLOG_seconds +
-                Logfile.STRLOG_Spacer + STRLOG_estExecutionTime + queuedExperimentInfo.estExecutionTime.ToString() + STRLOG_seconds;
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 

@@ -53,13 +53,21 @@ namespace LabClientHtml
 
         #endregion
 
+        //---------------------------------------------------------------------------------------//
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            //
+            // Set webpage title
+            //
+            Master.HeaderTitle = this.Title;
+            this.Title = Master.PageTitle + this.Title;
+        }
+
         //-------------------------------------------------------------------------------------------------//
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Master.HeaderTitle = this.Title;
-            this.Title = Master.PageTitle + this.Title;
-
             if (!IsPostBack)
             {
                 //
@@ -79,7 +87,7 @@ namespace LabClientHtml
                 //
                 // Initialise experiment number if experiment has completed
                 //
-                if (Master.MultipleSubmit == true)
+                if (Master.MultiSubmit == true)
                 {
                     if (Session[Consts.STRSSN_CompletedIDs] != null)
                     {
@@ -309,7 +317,7 @@ namespace LabClientHtml
                     //
                     // Completed experiment is no longer needed
                     //
-                    if (Master.MultipleSubmit == true)
+                    if (Master.MultiSubmit == true)
                     {
                     }
                     else
@@ -339,13 +347,13 @@ namespace LabClientHtml
             // Download the result string as an Excel csv file
 
             // Set the content type of the file to be downloaded
-            Response.ContentType = Consts.StrRsp_ContentTypeCsv;
+            Response.ContentType = Consts.STRRSP_ContentTypeCsv;
 
             // Clear all response headers
             Response.Clear();
 
             // Add response header
-            Response.AddHeader(Consts.StrRsp_Disposition, Consts.StrRsp_AttachmentCsv);
+            Response.AddHeader(Consts.STRRSP_Disposition, Consts.STRRSP_AttachmentCsv);
 
             // Add specification string
             Response.Write(lblHiddenResults.Text);
@@ -536,10 +544,10 @@ namespace LabClientHtml
                     //
                     // Check to see if the applet archive file exists
                     //
-                    string path = Path.GetDirectoryName(appletArchive);
-                    path = MapPath(path);
+                    string filepath = Path.GetDirectoryName(appletArchive);
+                    filepath = MapPath(filepath);
                     string filename = Path.GetFileName(appletArchive);
-                    filename = path + "\\" + filename;
+                    filename = Path.Combine(filepath, filename);
                     if (File.Exists(filename) == true)
                     {
                         //

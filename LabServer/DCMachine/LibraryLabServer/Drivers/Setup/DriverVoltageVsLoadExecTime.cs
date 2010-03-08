@@ -290,7 +290,7 @@ namespace Library.LabServer.Drivers.Setup
 
                         case States_GetExecutionTime.sGetSetTorqueDCDriveMutTime:
                             double setTorqueDCDriveMutTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspSetTorqueDCDriveMutTime, 0);
-                            stateExecutionTime = vectorLength * this.measurementCount * setTorqueDCDriveMutTime;
+                            stateExecutionTime = vectorLength * setTorqueDCDriveMutTime;
                             break;
 
                         case States_GetExecutionTime.sGetTakeMeasurementTime:

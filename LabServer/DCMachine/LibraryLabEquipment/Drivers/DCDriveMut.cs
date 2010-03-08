@@ -23,7 +23,7 @@ namespace Library.LabEquipment.Drivers
         private const string STRLOG_ReadingHex = " Reading: 0x";
         private const string STRLOG_Rpm = " RPM";
         private const string STRLOG_Volts = " volts";
-        private const string STRLOG_Milliamps = " milliAmps";
+        private const string STRLOG_Amps = " amps";
         private const string STRLOG_Percent = " percent";
         private const string STRLOG_Seconds = " seconds";
         private const string STRLOG_ConvertsTo = " => ";
@@ -919,7 +919,7 @@ namespace Library.LabEquipment.Drivers
                 // Convert current to an integer value
                 current = regs[0];
                 current /= 100;
-                logMessage += STRLOG_ConvertsTo + current.ToString() + STRLOG_Milliamps;
+                logMessage += STRLOG_ConvertsTo + current.ToString() + STRLOG_Amps;
 
                 Logfile.Write(this.logLevel, logMessage);
                 Trace.WriteLine(logMessage);
@@ -979,7 +979,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = speed.ToString() + STRLOG_Rpm;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
-            Trace.WriteLine(STRLOG_MethodName);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1022,6 +1022,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1064,7 +1065,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = speed.ToString() + STRLOG_Rpm;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
-            Trace.WriteLine(STRLOG_MethodName);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1107,7 +1108,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = speed.ToString() + STRLOG_Rpm;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
-            Trace.WriteLine(STRLOG_MethodName);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1150,6 +1151,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1192,6 +1194,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1234,6 +1237,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = seconds.ToString() + STRLOG_Seconds;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 
@@ -1276,6 +1280,7 @@ namespace Library.LabEquipment.Drivers
             string logMessage = percent.ToString() + STRLOG_Percent;
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Trace.WriteLine(STRLOG_MethodName + Logfile.STRLOG_Spacer + logMessage);
 
             logMessage = string.Empty;
 

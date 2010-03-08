@@ -17,7 +17,12 @@ namespace Library.LabServer.Drivers.Setup
         //
         private enum States_GetExecutionTime
         {
-            sGetResetACDriveTime, sGetStartACDriveTime, sGetTakeMeasurementTime, sGetStopACDriveTime,
+            sGetResetACDriveTime,
+            sGetConfigureACDriveTime,
+            sGetStartACDriveTime,
+            sGetTakeMeasurementTime,
+            sGetStopACDriveTime,
+            sGetReconfigureACDriveTime,
             sCompleted
         }
 
@@ -48,8 +53,14 @@ namespace Library.LabServer.Drivers.Setup
             //
             // GetResetACDriveTime
             //
-            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetResetACDriveTime, States_GetExecutionTime.sGetStartACDriveTime,
+            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetResetACDriveTime, States_GetExecutionTime.sGetConfigureACDriveTime,
                 Consts.STRXML_CmdGetResetACDriveTime, null
+                ),
+            //
+            // GetConfigureACDriveTime
+            //
+            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetConfigureACDriveTime, States_GetExecutionTime.sGetStartACDriveTime,
+                Consts.STRXML_CmdGetConfigureACDriveTime, null
                 ),
             //
             // GetStartACDriveTime
@@ -68,10 +79,16 @@ namespace Library.LabServer.Drivers.Setup
             //
             // GetStopACDriveTime
             //
-            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetStopACDriveTime, States_GetExecutionTime.sCompleted,
+            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetStopACDriveTime, States_GetExecutionTime.sGetReconfigureACDriveTime,
                 Consts.STRXML_CmdGetStopACDriveTime, new string[,] {
                     { Consts.STRXML_ReqACDriveMode, string.Empty},
                 }
+                ),
+            //
+            // GetReconfigureACDriveTime
+            //
+            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetReconfigureACDriveTime, States_GetExecutionTime.sCompleted,
+                Consts.STRXML_CmdGetConfigureACDriveTime, null
                 ),
         };
 
@@ -140,7 +157,7 @@ namespace Library.LabServer.Drivers.Setup
                     }
                     if (index == -1)
                     {
-                        throw new ArgumentOutOfRangeException(state.ToString(), "State not found!");
+                        throw new ArgumentOutOfRangeException(state.ToString(), STRERR_StateNotFound);
                     }
 
                     //
@@ -148,6 +165,10 @@ namespace Library.LabServer.Drivers.Setup
                     //
                     SMTableEntry_GetExecutionTime entry = smTable_GetExecutionTime[index];
                     States_GetExecutionTime nextState = entry.nextState;
+
+                    logMessage = " [ " + STRLOG_MethodName + ": " + entry.currentState.ToString() + " ]";
+                    Logfile.Write(logMessage);
+                    Trace.WriteLine(logMessage);
 
                     //
                     // Add command arguments where required
@@ -191,6 +212,10 @@ namespace Library.LabServer.Drivers.Setup
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspResetACDriveTime, 0);
                             break;
 
+                        case States_GetExecutionTime.sGetConfigureACDriveTime:
+                            stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspConfigureACDriveTime, 0);
+                            break;
+
                         case States_GetExecutionTime.sGetStartACDriveTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspStartACDriveTime, 0);
                             break;
@@ -204,16 +229,20 @@ namespace Library.LabServer.Drivers.Setup
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspStopACDriveTime, 0);
                             break;
 
+                        case States_GetExecutionTime.sGetReconfigureACDriveTime:
+                            stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspConfigureACDriveTime, 0);
+                            break;
+
                         default:
                             break;
                     }
+
+                    Trace.WriteLine("stateExecutionTime: " + stateExecutionTime.ToString());
 
                     //
                     // Update the execution time so far
                     //
                     executionTime += stateExecutionTime;
-
-                    Trace.WriteLine("nextState: " + entry.nextState.ToString());
 
                     //
                     // Next state

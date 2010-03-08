@@ -1,4 +1,5 @@
-﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="LabServer.Master.cs" Inherits="LabServer.LabServerMaster" %>
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="LabServer.Master.cs"
+    Inherits="LabServer.LabServerMaster" %>
 
 <%@ Register TagPrefix="uc" TagName="Banner" Src="~/Controls/Banner.ascx" %>
 <%@ Register TagPrefix="uc" TagName="Status" Src="~/Controls/Status.ascx" %>
@@ -7,8 +8,7 @@
 <%@ Register TagPrefix="uc" TagName="Feedback" Src="~/Controls/Feedback.ascx" %>
 <%@ Register TagPrefix="uc" TagName="Footer" Src="~/Controls/Footer.ascx" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" >
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>LabServer Master Page</title>
     <link rel="stylesheet" type="text/css" href="styles/LabServer.css" />
@@ -44,6 +44,8 @@
                         <td>
                             <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
                             </asp:ContentPlaceHolder>
+                            <p>
+                                &nbsp;</p>
                         </td>
                     </tr>
                 </table>

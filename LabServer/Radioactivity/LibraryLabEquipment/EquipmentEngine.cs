@@ -28,6 +28,8 @@ namespace Library.LabEquipment
         //
         // String constants for error messages
         //
+        private const string STRERR_SerialLcdCommsTypeNotSpecified = "Serial LCD communications type not specified!";
+        private const string STRERR_ST360CounterCommsTypeNotSpecified = "ST360 Counter communications type not specified!";
         private const string STRERR_RadiationCounterTypeNotSpecified = "Radiation counter type not specified!";
         private const string STRERR_FailedToInitialiseSerialLcd = "Failed to initialise Serial LCD!";
         private const string STRERR_FailedToInitialiseST360Counter = "Failed to initialise ST360 Counter!";
@@ -35,7 +37,15 @@ namespace Library.LabEquipment
         private const string STRERR_FailedToInitialiseFlexMotion = "Failed to initialise FlexMotion controller!";
 
         //
-        // Radiation counter types - the counter being used is specified in the application's configuration file
+        // Serial LCD types - the type being used is specified in the application's configuration file
+        //
+        private enum CommunicationTypes
+        {
+            Network, Serial
+        }
+
+        //
+        // Radiation counter types - the type being used is specified in the application's configuration file
         //
         private enum RadiationCounterTypes
         {
@@ -46,8 +56,14 @@ namespace Library.LabEquipment
         // Local variables
         //
         private FlexMotion flexMotion;
+        private CommunicationTypes serialLcdCommType;
+        private SerialLcdSer serialLcdSer;
+        private SerialLcdTcp serialLcdTcp;
         private SerialLcd serialLcd;
         private RadiationCounterTypes radiationCounterType;
+        private CommunicationTypes st360CounterCommType;
+        private ST360CounterSer st360CounterSer;
+        private ST360CounterTcp st360CounterTcp;
         private ST360Counter st360Counter;
         private RadiationCounter radiationCounter;
 
@@ -67,10 +83,33 @@ namespace Library.LabEquipment
                 int initialiseDelay = 0;
 
                 //
+                // Get the serial LCD communication type
+                //
+                XmlNode xmlNodeSerialLcd = XmlUtilities.GetXmlNode(this.xmlNodeEquipmentConfig, Consts.STRXML_serialLcd);
+                string strSerialLcdCommType = XmlUtilities.GetXmlValue(xmlNodeSerialLcd, Consts.STRXML_type, false);
+                this.serialLcdCommType = (CommunicationTypes)Enum.Parse(typeof(CommunicationTypes), strSerialLcdCommType);
+
+                //
                 // Create an instance of the SerialLcd class, must be done before creating the Radiation Counter class
                 //
-                this.serialLcd = new SerialLcd(this.xmlNodeEquipmentConfig);
-                initialiseDelay += this.serialLcd.InitialiseDelay;
+                if (this.serialLcdCommType == CommunicationTypes.Network)
+                {
+                    this.serialLcdTcp = new SerialLcdTcp(this.xmlNodeEquipmentConfig);
+                    this.serialLcd = this.serialLcdTcp;
+                    this.serialLcdSer = null;
+                    initialiseDelay += this.serialLcdTcp.InitialiseDelay;
+                }
+                else if (this.serialLcdCommType == CommunicationTypes.Serial)
+                {
+                    this.serialLcdSer = new SerialLcdSer(this.xmlNodeEquipmentConfig);
+                    this.serialLcd = this.serialLcdSer;
+                    this.serialLcdTcp = null;
+                    initialiseDelay += this.serialLcdSer.InitialiseDelay;
+                }
+                else
+                {
+                    throw new ArgumentException(STRERR_SerialLcdCommsTypeNotSpecified);
+                }
 
                 //
                 // Get the radiation counter type
@@ -90,17 +129,56 @@ namespace Library.LabEquipment
                 //
                 if (this.radiationCounterType == RadiationCounterTypes.ST360)
                 {
+                    //
+                    // Get the ST360 counter communication type
+                    //
+                    XmlNode xmlNodeST360Counter = XmlUtilities.GetXmlNode(this.xmlNodeEquipmentConfig, Consts.STRXML_st360Counter);
+                    string strST360CounterCommType = XmlUtilities.GetXmlValue(xmlNodeST360Counter, Consts.STRXML_type, false);
+                    this.st360CounterCommType = (CommunicationTypes)Enum.Parse(typeof(CommunicationTypes), strST360CounterCommType);
+
+                    //
+                    // Create an instance of the ST360 counter class depending on the communication type
+                    //
+                    if (this.st360CounterCommType == CommunicationTypes.Network)
+                    {
+                        this.st360CounterTcp = new ST360CounterTcp(this.xmlNodeEquipmentConfig);
+                        this.st360Counter = st360CounterTcp;
+                        this.st360CounterSer = null;
+                        initialiseDelay += this.st360CounterTcp.InitialiseDelay;
+                        this.st360CounterTcp.AdjustDuration = adjustDuration;
+                    }
+                    else if (this.st360CounterCommType == CommunicationTypes.Serial)
+                    {
+                        this.st360CounterSer = new ST360CounterSer(this.xmlNodeEquipmentConfig);
+                        this.st360Counter = st360CounterTcp;
+                        this.st360CounterTcp = null;
+                        initialiseDelay += this.st360CounterSer.InitialiseDelay;
+                        this.st360CounterSer.AdjustDuration = adjustDuration;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(STRERR_ST360CounterCommsTypeNotSpecified);
+                    }
                     this.radiationCounter = null;
-                    this.st360Counter = new ST360Counter(this.xmlNodeEquipmentConfig);
-                    initialiseDelay += this.st360Counter.InitialiseDelay;
-                    this.st360Counter.AdjustDuration = adjustDuration;
                 }
                 else if (this.radiationCounterType == RadiationCounterTypes.Physics)
                 {
-                    this.st360Counter = null;
-                    this.radiationCounter = new RadiationCounter(this.serialLcd);
+                    this.st360CounterTcp = null;
+                    this.st360CounterSer = null;
+                    if (this.serialLcdCommType == CommunicationTypes.Network)
+                    {
+                        this.radiationCounter = new RadiationCounter(this.serialLcdTcp);
+                    }
+                    else if (this.serialLcdCommType == CommunicationTypes.Serial)
+                    {
+                        this.radiationCounter = new RadiationCounter(this.serialLcdSer);
+                    }
                     initialiseDelay += this.radiationCounter.InitialiseDelay;
                     this.radiationCounter.AdjustDuration = adjustDuration;
+                }
+                else
+                {
+                    throw new ArgumentException(STRERR_RadiationCounterTypeNotSpecified);
                 }
 
                 //
@@ -182,6 +260,16 @@ namespace Library.LabEquipment
 
             try
             {
+                SerialLcd serialLcd;
+                if (this.serialLcdCommType == CommunicationTypes.Network)
+                {
+                    serialLcd = this.serialLcdTcp;
+                }
+                else if (this.serialLcdCommType == CommunicationTypes.Serial)
+                {
+                    serialLcd = this.serialLcdSer;
+                }
+
                 //
                 // The initialisation delay may change once the equipment has been initialised
                 // for the first time, so recalculate it
@@ -211,7 +299,7 @@ namespace Library.LabEquipment
                 if (this.radiationCounterType == RadiationCounterTypes.ST360)
                 {
                     this.radiationCounter = null;
-                    if (this.st360Counter.Initialise() == false)
+                    if (this.st360Counter.Initialise(true) == false)
                     {
                         throw new Exception(STRERR_FailedToInitialiseST360Counter);
                     }

@@ -18,7 +18,8 @@ namespace Library.LabEquipment
     /// </summary>
     public enum NonExecuteCommands
     {
-        GetResetACDriveTime, GetStartACDriveTime, GetStopACDriveTime, GetTakeMeasurementTime,
+        GetResetACDriveTime, GetConfigureACDriveTime, GetStartACDriveTime, GetStopACDriveTime,
+        GetTakeMeasurementTime,
     }
 
     /// <summary>
@@ -28,7 +29,7 @@ namespace Library.LabEquipment
     public enum ExecuteCommands
     {
         CreateConnection, CloseConnection,
-        ResetACDrive, StartACDrive, StopACDrive,
+        ResetACDrive, ConfigureACDrive, StartACDrive, StopACDrive,
         TakeMeasurement
     }
 

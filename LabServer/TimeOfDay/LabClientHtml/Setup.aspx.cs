@@ -62,14 +62,19 @@ namespace LabClientHtml
 
         //---------------------------------------------------------------------------------------//
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected void Page_Init(object sender, EventArgs e)
         {
             //
             // Set webpage title
             //
             Master.HeaderTitle = this.Title;
             this.Title = Master.PageTitle + this.Title;
+        }
 
+        //---------------------------------------------------------------------------------------//
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
             //
             // Update local variables
             //
@@ -94,7 +99,7 @@ namespace LabClientHtml
             //
             // Check if an experiment has been submitted
             //
-            if (Master.MultipleSubmit == true)
+            if (Master.MultiSubmit == true)
             {
                 if (Session[Consts.STRSSN_SubmittedIDs] != null)
                 {
@@ -335,7 +340,7 @@ namespace LabClientHtml
                     //
                     // Experiment has been submitted successfully
                     //
-                    if (Master.MultipleSubmit == true)
+                    if (Master.MultiSubmit == true)
                     {
                         // Add experiment ID to the list in the session
                         if (Session[Consts.STRSSN_SubmittedIDs] != null)

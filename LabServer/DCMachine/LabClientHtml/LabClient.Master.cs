@@ -1,4 +1,6 @@
 using System;
+using System.Net;
+using System.Web;
 using System.Xml;
 using Library.Lab;
 using Library.LabClient;
@@ -15,14 +17,15 @@ namespace LabClientHtml
         // String constants
         //
         public const string STR_Initialising = " Initialising...";
-        public const string STR_CouponID = "couponID";
-        public const string STR_CouponPasskey = "passkey";
         public const string STR_Version = "Version ";
         public const string STR_MailTo = "mailto:";
 
         //
         // String constants for logfile messages
         //
+        public const string STRLOG_SessionExistsRemovingSession = " Session already exists! Removing session...";
+        public const string STRLOG_SessionNotExist = " Session does not exist! Web page has expired.";
+        public const string STRLOG_MultiSubmit = " MultiSubmit: ";
         public const string STRLOG_GettingLabStatus = " Getting Lab Status...";
         public const string STRLOG_Online = " Online: ";
         public const string STRLOG_LabStatusMessage = " LabStatus Message: ";
@@ -34,52 +37,91 @@ namespace LabClientHtml
         public const string STRLOG_PhotoUrl = " Photo Url: ";
         public const string STRLOG_LabInfoText = " LabInfo Text: ";
         public const string STRLOG_LabInfoUrl = " LabInfo Url: ";
-
-        //
-        // Local variables
-        //
-        private static bool initialised = false;
-        private static string navmenuPhotoUrl;
-        private static string mailtoUrl;
+        private const string STRLOG_UserHostName = " UserHostName: ";
+        private const string STRLOG_UserHostAddress = " UserHostAddress: ";
 
         #endregion
 
         #region Properties
 
-        private static string bannerTitle;
-        private static string statusVersion;
-        private static string labinfoText;
-        private static string labinfoUrl;
-        private static bool multipleSubmit;
-        private static XmlNode xmlNodeLabConfiguration;
-        private static XmlNode xmlNodeConfiguration;
-        private static XmlNode xmlNodeValidation;
-        private static XmlNode xmlNodeSpecification;
-        private static LabClientToSbAPI labClientToSbAPI;
-
         public string Title
         {
-            get { return bannerTitle; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.bannerTitle;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public string Version
         {
-            get { return statusVersion; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.statusVersion;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public string LabinfoText
         {
-            get { return labinfoText; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.labinfoText;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public string LabinfoUrl
         {
-            get { return labinfoUrl; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.labinfoUrl;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public string PageTitle
         {
-            get { return bannerTitle + " - "; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.bannerTitle + " - ";
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public string HeaderTitle
@@ -88,34 +130,100 @@ namespace LabClientHtml
             set { Header.Title = value; }
         }
 
-        public bool MultipleSubmit
+        public bool MultiSubmit
         {
-            get { return multipleSubmit; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.multiSubmit;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         public XmlNode XmlNodeLabConfiguration
         {
-            get { return xmlNodeLabConfiguration; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.xmlNodeLabConfiguration;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public XmlNode XmlNodeConfiguration
         {
-            get { return xmlNodeConfiguration; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.xmlNodeConfiguration;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public XmlNode XmlNodeValidation
         {
-            get { return xmlNodeValidation; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.xmlNodeValidation;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public XmlNode XmlNodeSpecification
         {
-            get { return xmlNodeSpecification; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.xmlNodeSpecification;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         public LabClientToSbAPI ServiceBroker
         {
-            get { return labClientToSbAPI; }
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.labClientToSbAPI;
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
         #endregion
@@ -133,38 +241,67 @@ namespace LabClientHtml
             //
 
             //
-            // Check if initialisation has already been carried out
+            // Get query string values for coupon ID and passkey
             //
-            if (initialised == false)
+            string query = Request.Url.Query;
+            string queryCouponId = HttpUtility.ParseQueryString(query).Get(Consts.STRQRY_CouponID);
+            string queryPasskey = HttpUtility.ParseQueryString(query).Get(Consts.STRQRY_Passkey);
+
+            //
+            // Check if this is new LabClient session
+            //
+            if (Session[Consts.STRSSN_LabClient] != null && queryCouponId != null)
             {
+                //
+                // Remove the existing session because this is a new LabClient launch
+                //
+                Logfile.Write(STRLOG_SessionExistsRemovingSession);
+                Session.Remove(Consts.STRSSN_LabClient);
+            }
+
+            if (Session[Consts.STRSSN_LabClient] == null)
+            {
+                if (queryCouponId == null)
+                {
+                    //
+                    // Session has timed out
+                    //
+                    Logfile.Write(STRLOG_SessionNotExist);
+                    Response.Redirect(Consts.STRURL_Expired);
+                }
+
                 //
                 // Carry out one-time initialisation for all LabClient instances
                 //
                 Logfile.Write(STR_Initialising);
 
                 //
-                // Create authorisation header instance and fill in
+                // Log the caller's IP address and hostname
                 //
-                long couponID = 0;
-                string couponPasskey = null;
-                try
-                {
-                    // Get coupon identification number
-                    couponID = Convert.ToInt64(Request.QueryString[STR_CouponID]);
+                HttpRequest httpRequest = this.Request;
+                IPHostEntry ipHostEntry = Dns.GetHostEntry(httpRequest.UserHostAddress);
+                string logMessage = STRLOG_UserHostAddress + httpRequest.UserHostAddress +
+                    Logfile.STRLOG_Spacer + STRLOG_UserHostName + ipHostEntry.HostName;
+                Logfile.Write(logMessage);
 
-                    // Get passkey argument
-                    couponPasskey = Request.QueryString[STR_CouponPasskey];
-                }
-                catch (Exception ex)
-                {
-                    // couponID or passkey argument was not found
-                    Logfile.WriteError(ex.Message);
-                }
+
+                //
+                // Get query string values - the query string parameters are NOT case-sensensitive (good)
+                //
+                string queryServiceUrl = HttpUtility.ParseQueryString(query).Get(Consts.STRQRY_ServiceURL);
+                string queryLabServerId = HttpUtility.ParseQueryString(query).Get(Consts.STRQRY_LabServerID);
+                string queryMultiSubmit = HttpUtility.ParseQueryString(query).Get(Consts.STRQRY_MultiSubmit);
+
+                //
+                // Create a LabClient session information instance
+                //
+                LabClientSession labClientSession = new LabClientSession();
 
                 //
                 // Create ServiceBroker interface with authorisation information
                 //
-                labClientToSbAPI = new LabClientToSbAPI(couponID, couponPasskey);
+                LabClientToSbAPI serviceBroker = new LabClientToSbAPI(queryCouponId, queryPasskey, queryServiceUrl, queryLabServerId);
+                labClientSession.labClientToSbAPI = serviceBroker;
 
                 //
                 // Get the lab status and lab configuration
@@ -176,25 +313,22 @@ namespace LabClientHtml
                     //
                     Logfile.Write(STRLOG_GettingLabStatus);
 
-                    LabStatus labStatus = ServiceBroker.GetLabStatus();
+                    LabStatus labStatus = serviceBroker.GetLabStatus();
 
-                    Logfile.Write(STRLOG_Online + labStatus.online.ToString());
-                    Logfile.Write(STRLOG_LabStatusMessage + labStatus.labStatusMessage);
+                    logMessage = STRLOG_Online + labStatus.online.ToString() +
+                        Logfile.STRLOG_Spacer + STRLOG_LabStatusMessage + labStatus.labStatusMessage;
+                    Logfile.Write(logMessage);
 
                     //
                     // Get the XML lab configuration string
                     //
                     Logfile.Write(STRLOG_GettingLabConfiguration);
 
-                    string xmlLabConfiguration = ServiceBroker.GetLabConfiguration();
+                    string xmlLabConfiguration = serviceBroker.GetLabConfiguration();
                     if (xmlLabConfiguration != null)
                     {
-                        // Log a portion of the lab configuration string
-                        int len = xmlLabConfiguration.Length;
-                        Logfile.Write(" " + xmlLabConfiguration.Substring(0, (len > 64) ? 64 : len));
-
                         // Save information from the lab configuration string
-                        ParseLabConfiguration(xmlLabConfiguration);
+                        ParseLabConfiguration(labClientSession, xmlLabConfiguration);
                     }
                 }
                 catch (Exception ex)
@@ -212,21 +346,32 @@ namespace LabClientHtml
                 //
                 // Get feedback email URL
                 //
-                mailtoUrl = STR_MailTo + Utilities.GetAppSetting(Consts.STRCFG_FeedbackEmail);
+                labClientSession.mailtoUrl = STR_MailTo + Utilities.GetAppSetting(Consts.STRCFG_FeedbackEmail);
 
                 //
                 // Determine if multiple submission is enabled
                 //
                 try
                 {
-                    multipleSubmit = Convert.ToBoolean(Utilities.GetAppSetting(Consts.STRCFG_MultipleSubmit));
+                    if (queryMultiSubmit == null)
+                    {
+                        //
+                        // Querystring parameter is not specified, try getting it from the application's configuration file
+                        //
+                        labClientSession.multiSubmit = Convert.ToBoolean(Utilities.GetAppSetting(Consts.STRCFG_MultiSubmit));
+                    }
+                    else
+                    {
+                        labClientSession.multiSubmit = Convert.ToBoolean(queryMultiSubmit);
+                    }
                 }
                 catch
                 {
-                    multipleSubmit = false;
+                    labClientSession.multiSubmit = false;
                 }
+                Logfile.Write(STRLOG_MultiSubmit + labClientSession.multiSubmit.ToString());
 
-                initialised = true;
+                Session[Consts.STRSSN_LabClient] = labClientSession;
             }
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
@@ -236,15 +381,20 @@ namespace LabClientHtml
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Banner.Title = bannerTitle;
-            Status.Version = STR_Version + statusVersion;
-            Navmenu.PhotoUrl = navmenuPhotoUrl;
-            Feedback.MailtoUrl = mailtoUrl;
+            if (Session[Consts.STRSSN_LabClient] != null)
+            {
+                LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+
+                Banner.Title = labClientSession.bannerTitle;
+                Status.Version = STR_Version + labClientSession.statusVersion;
+                Navmenu.PhotoUrl = labClientSession.navmenuPhotoUrl;
+                Feedback.MailtoUrl = labClientSession.mailtoUrl;
+            }
         }
 
         //---------------------------------------------------------------------------------------//
 
-        private void ParseLabConfiguration(string xmlLabConfiguration)
+        private void ParseLabConfiguration(LabClientSession labClientSession, string xmlLabConfiguration)
         {
             const string STRLOG_MethodName = "ParseLabConfiguration";
 
@@ -263,32 +413,33 @@ namespace LabClientHtml
                 // Save a copy of the lab configuration XML node
                 //
                 XmlNode xmlNode = XmlUtilities.GetXmlRootNode(xmlDocument, Consts.STRXML_labConfiguration);
-                xmlNodeLabConfiguration = xmlNode.Clone();
+                XmlNode xmlNodeLabConfiguration = xmlNode.Clone();
+                labClientSession.xmlNodeLabConfiguration = xmlNodeLabConfiguration;
 
                 Logfile.Write(STRLOG_ParsingLabConfiguration);
 
                 //
                 // Get information from the lab configuration node
                 //
-                bannerTitle = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXMLPARAM_title, false);
-                statusVersion = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXMLPARAM_version, false);
-                navmenuPhotoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_navmenuPhoto_image, false);
-                labinfoText = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_text, true);
-                labinfoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_url, true);
+                labClientSession.bannerTitle = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXMLPARAM_title, false);
+                labClientSession.statusVersion = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXMLPARAM_version, false);
+                labClientSession.navmenuPhotoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_navmenuPhoto_image, false);
+                labClientSession.labinfoText = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_text, true);
+                labClientSession.labinfoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_url, true);
 
-                Logfile.Write(STRLOG_Title + bannerTitle);
-                Logfile.Write(STRLOG_Version + statusVersion);
-                Logfile.Write(STRLOG_PhotoUrl + navmenuPhotoUrl);
-                Logfile.Write(STRLOG_LabInfoText + labinfoText);
-                Logfile.Write(STRLOG_LabInfoUrl + labinfoUrl);
+                Logfile.Write(STRLOG_Title + labClientSession.bannerTitle);
+                Logfile.Write(STRLOG_Version + labClientSession.statusVersion);
+                Logfile.Write(STRLOG_PhotoUrl + labClientSession.navmenuPhotoUrl);
+                Logfile.Write(STRLOG_LabInfoText + labClientSession.labinfoText);
+                Logfile.Write(STRLOG_LabInfoUrl + labClientSession.labinfoUrl);
 
                 //
                 // These are mandatory
                 //
                 xmlNode = XmlUtilities.GetXmlNode(xmlNodeLabConfiguration, Consts.STRXML_configuration, false);
-                xmlNodeConfiguration = xmlNode.Clone();
+                labClientSession.xmlNodeConfiguration = xmlNode.Clone();
                 xmlNode = XmlUtilities.GetXmlNode(xmlNodeLabConfiguration, Consts.STRXML_experimentSpecification, false);
-                xmlNodeSpecification = xmlNode.Clone();
+                labClientSession.xmlNodeSpecification = xmlNode.Clone();
 
                 //
                 // These are optional and depend on the LabServer implementation
@@ -296,7 +447,7 @@ namespace LabClientHtml
                 xmlNode = XmlUtilities.GetXmlNode(xmlNodeLabConfiguration, Consts.STRXML_validation, true);
                 if (xmlNode != null)
                 {
-                    xmlNodeValidation = xmlNode.Clone();
+                    labClientSession.xmlNodeValidation = xmlNode.Clone();
                 }
             }
             catch (Exception ex)
@@ -307,5 +458,6 @@ namespace LabClientHtml
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
         }
+
     }
 }

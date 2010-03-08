@@ -24,7 +24,6 @@ namespace Library.LabEquipment
         //
         // String constants for logfile messages
         //
-        private const string STRLOG_InitialiseEquipment = " InitialiseEquipment: ";
         private const string STRLOG_MeasurementDelay = " MeasurementDelay: ";
         private const string STRLOG_RedLionPresentInitialised = " RedLion is present and initialised";
         private const string STRLOG_ResetACDriveTime = " ResetACDriveTime: ";
@@ -72,14 +71,6 @@ namespace Library.LabEquipment
                     this.InitialiseDelay = initialiseDelay;
                     Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString() + STRLOG_Seconds);
                 }
-
-                //
-                // Get the intialise equipment flag
-                //
-                bool initialiseEquipment = XmlUtilities.GetBoolValue(this.xmlNodeEquipmentConfig, Consts.STRXML_initialiseEquipment, false);
-                Logfile.Write(STRLOG_InitialiseEquipment + initialiseEquipment.ToString());
-
-                this.redLion.InitialiseEquipment = initialiseEquipment;
 
                 //
                 // Get the delay in seconds to wait before taking a measurement
@@ -263,9 +254,25 @@ namespace Library.LabEquipment
                     case ExecuteCommands.ResetACDrive:
 
                         //
-                        // Reet the AC drive controller
+                        // Reset the AC drive controller
                         //
                         if ((success = this.redLion.ResetACDrive()) == false)
+                        {
+                            errorMessage = this.redLion.GetLastError();
+                        }
+                        break;
+
+                    case ExecuteCommands.ConfigureACDrive:
+
+                        //
+                        // Get AC drive configuration from parameters
+                        //
+                        RedLion.ACDriveConfigs acDriveConfig = (RedLion.ACDriveConfigs)commandInfo.parameters[0];
+
+                        //
+                        // Configure the AC drive
+                        //
+                        if ((success = this.redLion.ConfigureACDrive(acDriveConfig)) == false)
                         {
                             errorMessage = this.redLion.GetLastError();
                         }
@@ -316,12 +323,16 @@ namespace Library.LabEquipment
                         else
                         {
                             //
-                            // Add the measurement values to results
+                            // Add the measurement values to results - ensure the order of the measurement values is the
+                            // same as in EquipmentManager.cs
                             //
                             commandInfo.results = new object[] {
-                                measurement.voltage,
-                                measurement.current,
-                                measurement.powerFactor,
+                                measurement.voltageMut,
+                                measurement.currentMut,
+                                measurement.powerFactorMut,
+                                measurement.voltageVsd,
+                                measurement.currentVsd,
+                                measurement.powerFactorVsd,
                                 measurement.speed,
                                 measurement.torque
                             };
@@ -388,6 +399,13 @@ namespace Library.LabEquipment
         public int GetResetACDriveTime()
         {
             return this.redLion.GetResetACDriveTime();
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        public int GetConfigureACDriveTime()
+        {
+            return this.redLion.GetConfigureACDriveTime();
         }
 
         //-------------------------------------------------------------------------------------------------//

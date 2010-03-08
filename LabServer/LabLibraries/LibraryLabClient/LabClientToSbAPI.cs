@@ -10,50 +10,95 @@ namespace Library.LabClient
         private const string STRLOG_ClassName = "LabClientToSbAPI";
 
         //
+        // String constants for logfile messages
+        //
+        private const string STRLOG_NotSpecified = "Not specified!";
+        private const string STRLOG_couponID = " couponID: ";
+        private const string STRLOG_serviceUrl = " serviceUrl: ";
+        private const string STRLOG_labserverID = " labserverID: ";
+
+        //
         // Local variables
         //
         private ServiceBrokerService serviceBroker;
-        private string labServerGuid;
+        private string labServerId;
 
         #endregion
 
         //---------------------------------------------------------------------------------------//
 
-        public LabClientToSbAPI()
-            : this(0, null)
-        {
-        }
-
-        //---------------------------------------------------------------------------------------//
-
-        public LabClientToSbAPI(long couponID, string passkey)
+        public LabClientToSbAPI(string strCouponID, string passkey, string serviceUrl, string labserverID)
         {
             const string STRLOG_MethodName = "LabClientToSbAPI";
 
-            Logfile.WriteCalled(null, STRLOG_MethodName);
+            //
+            // Log the serviceUrl and labserverID arguments
+            //
+            string logMessage = STRLOG_serviceUrl;
+            if (serviceUrl == null)
+            {
+                logMessage += STRLOG_NotSpecified;
+            }
+            else
+            {
+                logMessage += Logfile.STRLOG_Quote + serviceUrl + Logfile.STRLOG_Quote;
+            }
+            logMessage += Logfile.STRLOG_Spacer + STRLOG_labserverID;
+            if (labserverID == null)
+            {
+                logMessage += STRLOG_NotSpecified;
+            }
+            else
+            {
+                logMessage += Logfile.STRLOG_Quote;
+                if (labserverID.Length > 4)
+                {
+                    logMessage += "..." + labserverID.Substring(labserverID.Length - 4);
+                }
+                else
+                {
+                    logMessage += labserverID;
+                }
+                logMessage += Logfile.STRLOG_Quote;
+            }
+
+            Logfile.WriteCalled(null, STRLOG_MethodName, logMessage);
 
             //
-            // Get the ServiceBroker Url and LabServer Guid from the config file
+            // Get the coupon ID, ServiceBroker's service URL and LabServer ID
             //
-            string serviceBrokerUrl = null;
+            long couponID = 0;
             try
             {
                 //
-                // Get the ServiceBroker's Url
+                // Convert couponID to a number
                 //
-                serviceBrokerUrl = Utilities.GetAppSetting(Consts.STRCFG_ServiceBrokerUrl);
-                if (serviceBrokerUrl == null)
+                couponID = Convert.ToInt64(strCouponID);
+                Logfile.Write(STRLOG_couponID + couponID.ToString());
+
+                //
+                // Get the ServiceBroker's service URL
+                //
+                if (serviceUrl == null)
                 {
-                    throw new ArgumentNullException(Consts.STRCFG_ServiceBrokerUrl);
+                    serviceUrl = Utilities.GetAppSetting(Consts.STRCFG_ServiceUrl);
+                }
+                if (serviceUrl == null)
+                {
+                    throw new ArgumentNullException(Consts.STRCFG_ServiceUrl);
                 }
 
                 //
-                // Get the LabServer's GUID
+                // Get the LabServer's ID
                 //
-                this.labServerGuid = Utilities.GetAppSetting(Consts.STRCFG_LabServerGuid);
-                if (this.labServerGuid == null)
+                this.labServerId = labserverID;
+                if (this.labServerId == null)
                 {
-                    throw new ArgumentNullException(Consts.STRCFG_LabServerGuid);
+                    this.labServerId = Utilities.GetAppSetting(Consts.STRCFG_LabServerId);
+                }
+                if (this.labServerId == null)
+                {
+                    throw new ArgumentNullException(Consts.STRCFG_LabServerId);
                 }
             }
             catch (Exception ex)
@@ -66,7 +111,7 @@ namespace Library.LabClient
             // Create ServiceBroker interface
             //
             this.serviceBroker = new ServiceBrokerService();
-            this.serviceBroker.Url = serviceBrokerUrl;
+            this.serviceBroker.Url = serviceUrl;
 
             //
             // Create authorisation information and fill in
@@ -90,14 +135,14 @@ namespace Library.LabClient
 
         public WaitEstimate GetEffectiveQueueLength()
         {
-            return this.serviceBroker.GetEffectiveQueueLength(this.labServerGuid, 0);
+            return this.serviceBroker.GetEffectiveQueueLength(this.labServerId, 0);
         }
 
         //---------------------------------------------------------------------------------------//
 
         public WaitEstimate GetEffectiveQueueLength(int priorityHint)
         {
-            return this.serviceBroker.GetEffectiveQueueLength(this.labServerGuid, priorityHint);
+            return this.serviceBroker.GetEffectiveQueueLength(this.labServerId, priorityHint);
         }
 
         //---------------------------------------------------------------------------------------//
@@ -111,21 +156,21 @@ namespace Library.LabClient
 
         public string GetLabConfiguration()
         {
-            return this.serviceBroker.GetLabConfiguration(this.labServerGuid);
+            return this.serviceBroker.GetLabConfiguration(this.labServerId);
         }
 
         //---------------------------------------------------------------------------------------//
 
         public string GetLabInfo()
         {
-            return this.serviceBroker.GetLabInfo(this.labServerGuid);
+            return this.serviceBroker.GetLabInfo(this.labServerId);
         }
 
         //---------------------------------------------------------------------------------------//
 
         public LabStatus GetLabStatus()
         {
-            return this.serviceBroker.GetLabStatus(this.labServerGuid);
+            return this.serviceBroker.GetLabStatus(this.labServerId);
         }
 
         //---------------------------------------------------------------------------------------//
@@ -139,14 +184,14 @@ namespace Library.LabClient
 
         public SubmissionReport Submit(string experimentSpecification)
         {
-            return this.serviceBroker.Submit(this.labServerGuid, experimentSpecification, 0, false);
+            return this.serviceBroker.Submit(this.labServerId, experimentSpecification, 0, false);
         }
 
         //---------------------------------------------------------------------------------------//
 
         public SubmissionReport Submit(string experimentSpecification, int priorityHint, bool emailNotification)
         {
-            return this.serviceBroker.Submit(this.labServerGuid, experimentSpecification,
+            return this.serviceBroker.Submit(this.labServerId, experimentSpecification,
                 priorityHint, emailNotification);
         }
 
@@ -154,7 +199,7 @@ namespace Library.LabClient
 
         public ValidationReport Validate(string experimentSpecification)
         {
-            return this.serviceBroker.Validate(this.labServerGuid, experimentSpecification);
+            return this.serviceBroker.Validate(this.labServerId, experimentSpecification);
         }
 
     }

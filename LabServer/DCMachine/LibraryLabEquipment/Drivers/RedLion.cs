@@ -15,19 +15,14 @@ namespace Library.LabEquipment.Drivers
         private const string STRLOG_ClassName = "RedLion";
 
         //
-        // Constants
-        //
-        public const int DELAY_POWERUP = 0;
-        public const int DELAY_INITIALISE = 0;
-        public const int DELAY_MEASUREMENT = 5;
-
-        //
         // String constants for logfile messages
         //
-        private const string STRLOG_NotInitialised = "Not Initialised!";
-        private const string STRLOG_Initialising = "Initialising...";
         private const string STRLOG_MachineIP = " MachineIP: ";
         private const string STRLOG_MachinePort = " MachinePort: ";
+        private const string STRLOG_InitialiseEquipment = " InitialiseEquipment: ";
+        private const string STRLOG_MeasurementDelay = " MeasurementDelay: ";
+        private const string STRLOG_NotInitialised = "Not Initialised!";
+        private const string STRLOG_Initialising = "Initialising...";
         private const string STRLOG_Online = " Online: ";
         private const string STRLOG_Result = " Result: ";
         private const string STRLOG_Success = " Success: ";
@@ -62,7 +57,6 @@ namespace Library.LabEquipment.Drivers
         private Logfile.LoggingLevels logLevel;
         private bool initialised;
         private string lastError;
-        private string machineIP;
         private int machinePort;
         private TcpClient tcpClient;
         private ModbusIpMaster master;
@@ -77,6 +71,7 @@ namespace Library.LabEquipment.Drivers
         private string statusMessage;
         private bool initialiseEquipment;
         private int measurementDelay;
+        private string machineIP;
 
         /// <summary>
         /// Returns the time (in seconds) that it takes for the equipment to initialise.
@@ -109,6 +104,11 @@ namespace Library.LabEquipment.Drivers
         {
             get { return this.measurementDelay; }
             set { this.measurementDelay = value; }
+        }
+
+        public string MachineIP
+        {
+            get { return this.machineIP; }
         }
 
         #endregion
@@ -191,8 +191,6 @@ namespace Library.LabEquipment.Drivers
             //
             this.online = false;
             this.statusMessage = STRLOG_NotInitialised;
-            this.initialiseEquipment = true;
-            this.measurementDelay = DELAY_MEASUREMENT;
 
             //
             // Determine the logging level for this class
@@ -223,6 +221,18 @@ namespace Library.LabEquipment.Drivers
                 throw new Exception(STRERR_NumberIsNegative);
             }
             Logfile.Write(STRLOG_MachinePort + this.machinePort.ToString());
+
+            //
+            // Get the intialise equipment flag
+            //
+            this.initialiseEquipment = XmlUtilities.GetBoolValue(xmlNodeEquipmentConfig, Consts.STRXML_initialiseEquipment, false);
+            Logfile.Write(STRLOG_InitialiseEquipment + this.initialiseEquipment.ToString());
+
+            //
+            // Get the measurement delay
+            //
+            this.measurementDelay = XmlUtilities.GetIntValue(xmlNodeEquipmentConfig, Consts.STRXML_measurementDelay);
+            Logfile.Write(STRLOG_MeasurementDelay + this.measurementDelay.ToString());
 
             Logfile.WriteCompleted(null, STRLOG_MethodName);
         }

@@ -74,7 +74,7 @@
           the VSD induction machine will be providing the rotational losses, and the MUT
           induction machine will be supplying practically only magnetizing current.  The data
           retrieved from this test will be the line to line voltage, phase current and power
-          factor of the machine under test.
+          factor of the VSD induction machine.
         </p>
       </description>
     </setup>

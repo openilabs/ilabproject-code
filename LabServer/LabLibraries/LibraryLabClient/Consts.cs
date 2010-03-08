@@ -7,15 +7,25 @@ namespace Library.LabClient
         //
         // Config file key strings
         //
-        public const string STRCFG_ServiceBrokerUrl = "ServiceBrokerUrl";
-        public const string STRCFG_LabServerGuid = "LabServerGuid";
+        public const string STRCFG_ServiceUrl = "ServiceURL";
+        public const string STRCFG_LabServerId = "LabserverID";
+        public const string STRCFG_MultiSubmit = "MultiSubmit";
         public const string STRCFG_LogFilesPath = "LogFilesPath";
         public const string STRCFG_FeedbackEmail = "FeedbackEmail";
-        public const string STRCFG_MultipleSubmit = "MultipleSubmit";
+
+        //
+        // HttpRequest query strings
+        //
+        public const string STRQRY_CouponID = "CouponID";
+        public const string STRQRY_Passkey = "Passkey";
+        public const string STRQRY_ServiceURL = "ServiceURL";
+        public const string STRQRY_LabServerID = "LabserverID";
+        public const string STRQRY_MultiSubmit = "MultiSubmit";
 
         //
         // Session variables
         //
+        public const string STRSSN_LabClient = "LabClient";
         public const string STRSSN_SubmittedID = "SubmittedID";
         public const string STRSSN_CompletedID = "CompletedID";
         public const string STRSSN_SubmittedIDs = "SubmittedIDs";
@@ -64,8 +74,13 @@ namespace Library.LabClient
         //
         // Result string download response
         //
-        public const string StrRsp_ContentTypeCsv = "Application/x-msexcel";
-        public const string StrRsp_Disposition = "content-disposition";
-        public const string StrRsp_AttachmentCsv = "attachment; filename=\"result.csv\"";
+        public const string STRRSP_ContentTypeCsv = "Application/x-msexcel";
+        public const string STRRSP_Disposition = "content-disposition";
+        public const string STRRSP_AttachmentCsv = "attachment; filename=\"result.csv\"";
+
+        //
+        // Webpage URLs
+        //
+        public const string STRURL_Expired = "~/Expired.htm";
     }
 }

@@ -44,7 +44,7 @@
     <Content Include="App_Data\EquipmentConfig.xml" />
     <Content Include="Global.asax" />
     <Content Include="EquipmentService.asmx" />
-    <Content Include="Web.config" />
+    <None Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">
@@ -57,7 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Web.config.template" />
+    <Content Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\LabLibraries\LibraryLabEquipmentEngine\LibraryLabEquipmentEngine.csproj">

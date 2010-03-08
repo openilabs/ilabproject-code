@@ -48,10 +48,13 @@ namespace Library.LabEquipment
         public const string STRXML_firstLocation = "firstLocation";
         public const string STRXML_homeLocation = "homeLocation";
         public const string STRXML_serialLcd = "serialLcd";
+        public const string STRXML_type = "type";
+        public const string STRXML_network = "network";
+        public const string STRXML_ipaddr = "ipaddr";
         public const string STRXML_port = "port";
+        public const string STRXML_serial = "serial";
         public const string STRXML_baud = "baud";
         public const string STRXML_radiationCounter = "radiationCounter";
-        public const string STRXML_type = "type";
         public const string STRXML_st360Counter = "st360Counter";
         public const string STRXML_voltage = "voltage";
         public const string STRXML_volume = "volume";
