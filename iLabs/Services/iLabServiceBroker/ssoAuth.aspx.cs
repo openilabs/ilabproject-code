@@ -56,7 +56,7 @@ namespace iLabs.ServiceBroker.iLabSB
     {
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
-        object uTZ = null;
+        int uTZ = -2000;
 
         BrokerDB issuer = new BrokerDB();
 
@@ -65,8 +65,11 @@ namespace iLabs.ServiceBroker.iLabSB
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+            
+           
             if (!IsPostBack)
             {
+                //Session.Remove("userTZ");
                 lblMessages.Text = "";
                 lblMessages.Visible = false;
                 hdnAuthority.Value = Request.QueryString["auth"];
@@ -92,7 +95,24 @@ namespace iLabs.ServiceBroker.iLabSB
                         return;
                     }
                 }
-               
+                StringBuilder sbScript = new StringBuilder();
+                sbScript.AppendLine("<script language='JavaScript' type='text/javascript'>");
+                sbScript.AppendLine("<!--");
+                sbScript.AppendLine((this.ClientScript.GetPostBackEventReference(this, "PBArg") + ";"));
+                sbScript.AppendLine("// -->");
+                sbScript.AppendLine("</script>");
+                this.RegisterStartupScript("AutoPostBackScript", sbScript.ToString());
+            }
+            if (Session["userTZ"] == null || Session["userTZ"].ToString().Length == 0)
+            {
+                if (Request.Params["userTZ"] != null && Request.Params["userTZ"].Length > 0)
+                {
+                    Session["UserTZ"] = Request.Params["userTZ"];
+                    if (Session["SessionID"] != null && Session["SessionID"].ToString().Length > 0)
+                    {
+                        AdministrativeAPI.SetSessionTimeZone(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["UserTZ"]));
+                    }
+                }
             }
             //Check if user specified and matches logged in user
             if (hdnUser.Value != null && hdnUser.Value.Length > 0)
@@ -142,18 +162,16 @@ namespace iLabs.ServiceBroker.iLabSB
 
                     }
                 }
+                // Find out who you are
+                else if(hdnUser.Value != null && hdnUser.Value.Length > 0
+                    && hdnKey.Value != null && hdnKey.Value.Length > 0)
+                { 
+                        divLogin.Visible = !authenticateUser(hdnUser.Value,hdnKey.Value, hdnAuthority.Value);
+                }
                 else
-                { // Find out who you are, no authority means use local login
-                    if (hdnAuthority.Value == null || hdnAuthority.Value.Length == 0)
-                    {
-                        // SB is Authority
-                        divLogin.Visible = true;
-                    }
-                    else
-                    {
+                {
                         // Use 3rd party Auth Service - not implmented
                         divLogin.Visible = true;
-                    }
                 }
             }
             else // We have a user Session
@@ -765,26 +783,33 @@ namespace iLabs.ServiceBroker.iLabSB
 
         protected void btnLogIn_Click(object sender, System.EventArgs e)
         {
-            if (txtUsername.Text.Equals("") || txtPassword.Text.Equals(""))
+            if(authenticateUser(txtUsername.Text, txtPassword.Text, null))
+                ResolveAction();
+        }
+
+        protected bool authenticateUser(string userName, string passwd, string authority)
+        {
+            bool status = false;
+            if (userName == null || userName.Length == 0 || passwd == null || passwd.Length == 0)
             {
                 lblLoginErrorMessage.Text = "<div class=errormessage><p>Missing user ID and/or password field. </p></div>";
                 lblLoginErrorMessage.Visible = true;
-                return;
+                return status;
             }
             if (hdnUser.Value != null && hdnUser.Value.Length > 0)
             {
                 // Check that the specified user & current user match
-                if (hdnUser.Value.ToLower().CompareTo(txtUsername.Text.ToLower()) != 0)
+                if (hdnUser.Value.ToLower().CompareTo(userName.ToLower()) != 0)
                 {
                     lblMessages.Visible = true;
                     lblMessages.Text = "You are currently trying to login  in as a different user than the specified user. Please login as " + hdnUser.Value;
-                    return;
+                    return status;
                 }
             }
           
 
             int userID = -1;
-            userID = wrapper.GetUserIDWrapper(txtUsername.Text);
+            userID = wrapper.GetUserIDWrapper(userName);
 
             if (userID > 0)
             {
@@ -794,29 +819,33 @@ namespace iLabs.ServiceBroker.iLabSB
                 {
                     lblLoginErrorMessage.Text = "<div class=errormessage><p>Account locked - Email " + supportMailAddress + ". </p></div>";
                     lblLoginErrorMessage.Visible = true;
-                    return;
+                    return status;
                 }
 
-                if (AuthenticationAPI.Authenticate(userID, txtPassword.Text))
+                if (AuthenticationAPI.Authenticate(userID, passwd))
                 {
                     FormsAuthentication.SetAuthCookie(txtUsername.Text, false);
                     Session["UserID"] = userID;
                     Session["UserName"] = user.userName;
                     hdnUser.Value = user.userName;
-                    Session["UserTZ"] = Request.Params["userTZ"];
-                    uTZ = Request.Params["userTZ"];
+                    if (Request.Params["userTZ"] != null && Request.Params["userTZ"].ToString().Length > 0)
+                    {
+                        Session["UserTZ"] = Request.Params["userTZ"];
+                        uTZ = Convert.ToInt32(Request.Params["userTZ"]);
+                    }
                 
-                    Session["SessionID"] = AdministrativeAPI.InsertUserSession(userID, 0, Convert.ToInt32(Request.Params["userTZ"]), Session.SessionID.ToString()).ToString();
+                    Session["SessionID"] = AdministrativeAPI.InsertUserSession(userID, 0, uTZ, Session.SessionID.ToString()).ToString();
                     HttpCookie cookie = new HttpCookie(ConfigurationManager.AppSettings["isbAuthCookieName"], Session["SessionID"].ToString());
                     Response.AppendCookie(cookie);
                     divLogin.Visible = false;
-
-                    ResolveAction();
+                    status = true;
+                    return status;
                 }
                 else
                 {
                     lblLoginErrorMessage.Text = "<div class=errormessage><p>Invalid user ID and/or password. </p></div>";
                     lblLoginErrorMessage.Visible = true;
+                    return status;
                 }
             }
             else
@@ -824,7 +853,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 lblLoginErrorMessage.Text = "<div class=errormessage><p>Username does not exist. </p></div>";
                 lblLoginErrorMessage.Visible = true;
             }
-            //this.Page_Load(this, null);
+            return status;
         }
 
         protected void modifyUserSession(int group_ID, int client_ID)
