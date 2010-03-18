@@ -2202,6 +2202,10 @@ namespace iLabs.ServiceBroker.Administration
         {
             return InternalAdminDB.SetSessionKey(sessionID, key);
         }
+        public static bool SetSessionTimeZone(long sessionID, int tzOffset)
+        {
+            return InternalAdminDB.SetSessionTimeZone(sessionID, tzOffset);
+        }
 
 
 		/// <summary>

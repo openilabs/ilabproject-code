@@ -2199,6 +2199,30 @@ namespace iLabs.ServiceBroker.Internal
                 myConnection.Close();
             }
         }
+        /// <summary>
+        /// to insert a user session record. returns a database generated session id.
+        /// </summary>
+        public static bool SetSessionTimeZone(long sessionID, int tzOffset)
+        {
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("SetSessionTzOffset", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sessionID", sessionID, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@tzOffset", tzOffset, DbType.Int32));
+            try
+            {
+                myConnection.Open();
+                return Convert.ToBoolean(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown setting user session timezone", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+        }
 
 		/// <summary>
 		/// to update the session end time in the user's session record -returns the user's session end time.
