@@ -127,6 +127,14 @@ namespace iLabs.LabServer.LabView
                     //Utilities.WriteLog("sessionPayload: " + payload);
                     //Store Session information
                     Session["payload"] = vipayload;
+                    if (appInfo.rev != null && appInfo.rev.Length > 0)
+                    {
+                        Session["lvversion"] = appInfo.rev;
+                    }
+                    else
+                    {
+                        Session.Remove("lvversion");
+                    }
 
                     //redirect to Presentation page...
                     Response.Redirect(appInfo.page, true);

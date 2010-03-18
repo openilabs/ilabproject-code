@@ -54,41 +54,49 @@ Please see license.txt in top level directory for full license.
 											<tr>
 									            <th>
 										            <label for="ClientGuid">Client GUID</label></th>
-									            <td><asp:textbox id="txtClientGuid" Runat="server" Width="260px"></asp:textbox>&nbsp;&nbsp;&nbsp;<asp:Button ID="btnGuid" runat="server" Text="Make Guid" OnClick="btnGuid_Click" /></td>
+									            <td><asp:textbox id="txtClientGuid" Runat="server"  Width="260px"
+									            ToolTip="You must enter a GUID and it must match the client GUID on the ServiceBroker"></asp:textbox>&nbsp;&nbsp;&nbsp;<asp:Button ID="btnGuid" runat="server" Text="Make Guid" OnClick="btnGuid_Click" /></td>
 								            </tr>
 								            <tr runat="server">
 												<th style="width: 480px">
 													<label for="version">Version</label></th>
-												<td style="width: 484px"><asp:textbox id="txtVersion" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtVersion" Runat="server" Width="360px"
+												ToolTip="You must enter a version string" ></asp:textbox></td>
 											</tr>
 											<tr id="Tr1" runat="server">
 												<th style="width: 480px">
 													<label for="version">Revision</label></th>
-												<td style="width: 484px"><asp:textbox id="txtRev" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtRev" Runat="server" Width="360px"
+												 ToolTip="You may specify the LabVIEW release in this field. Legal values are 8.2, 8.6 or 2009"></asp:textbox></td>
 											</tr><tr runat="server">
 												<th style="width: 480px">
 													<label for="applicationKey">Application Key</label></th>
-												<td style="width: 484px"><asp:textbox id="txtAppKey" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtAppKey" Runat="server" Width="360px"
+												ToolTip="The app value used in the loader script to select this application"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
 													<label for="applicationPath">Path</label></th>
-												<td style="width: 484px"><asp:textbox id="txtApplicationPath" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtApplicationPath" Runat="server" Width="360px" 
+												ToolTip="The absolute path to the application without a trailing seperator"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
 													<label for="application">Application</label></th>
-												<td style="width: 484px"><asp:textbox id="txtApplication" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtApplication" Runat="server" Width="360px"
+												ToolTip="The application file name including file type extension"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
 													<label for="webPageUrl">Web Page URL</label></th>
-												<td style="width: 484px"><asp:textbox id="txtPageUrl" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtPageUrl" Runat="server" Width="360px"
+												ToolTip="The URL used to display the client"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
 													<label for="width">Application URL</label></th>
-												<td style="width: 484px"><asp:textbox id="txtURL" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtURL" Runat="server" Width="360px"
+												ToolTip="The URL used execute the client, for LabVIEW it is the LabVIEW Web Server"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
@@ -103,7 +111,8 @@ Please see license.txt in top level directory for full license.
 											<tr>
 												<th style="width: 480px">
 													<label for="dataSources">Data Sources </label></th>
-												<td style="width: 484px"><asp:textbox id="txtDataSources" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtDataSources" Runat="server" Width="360px"
+												ToolTip="A comma delimited list of dataSource URLs with optional record type"></asp:textbox></td>
 											</tr>		
 											<tr>
 												<th style="width: 480px">
@@ -129,7 +138,8 @@ Please see license.txt in top level directory for full license.
 											<tr>
 												<th style="width: 480px">
 													<label for="infoUrl">Info URL </label></th>
-												<td style="width: 484px"><asp:textbox id="txtInfoUrl" Runat="server" Width="360px"></asp:textbox></td>
+												<td style="width: 484px"><asp:textbox id="txtInfoUrl" Runat="server" Width="360px"
+												ToolTip="An optional URL to information about the lab"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">

@@ -5,7 +5,7 @@
  * $Id$
  */
 
-#define LabVIEW_86
+#define LabVIEW_2009
 
 using System;
 using System.Collections;
@@ -25,6 +25,9 @@ using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 
+#if LabVIEW_2009
+using iLabs.LabView.LV2009;
+#endif
 #if LabVIEW_82
 using iLabs.LabView.LV82;
 #endif
@@ -40,7 +43,7 @@ namespace iLabs.LabServer.LabView
     /// WebService were defined for testing. The code has not been updated 
     /// and should only be used for debuging the state of the LabView processes.
     /// </summary>
-   // [System.Diagnostics.DebuggerStepThroughAttribute()]
+    // [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     //[SoapDocumentService(RoutingStyle=SoapServiceRoutingStyle.RequestElement)]
     [WebService(Name = "InteractiveLabView", Namespace = "http://ilab.mit.edu/iLabs/Services", Description = "LabVIEW Lab Server"),
@@ -103,18 +106,18 @@ namespace iLabs.LabServer.LabView
         {
             return new LabViewInterface().SubmitAction(actionStr, dataStr);
         }
-/*
-        /// <summary>
-        /// Checks on the status of the lab server.  
-        /// </summary>
-        [WebMethod(Description = @"Submits an action to the Labview Interface: loadvi, closevi, publishvi, monitorvi, disconnectuser, listvis. C:\Program Files\National Instruments\LabVIEW 7.1\examples\apps\tankmntr.llb\Tank Simulation.vi"),
-            //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
-        SoapDocumentMethod(Binding = "LabViewLS")]
-        public string SubmitCommandRemote(string actionStr, string dataStr, string host, int port)
-        {
-            return new LabViewRemote(host,port).SubmitAction(actionStr, dataStr);
-        }
- */
+        /*
+                /// <summary>
+                /// Checks on the status of the lab server.  
+                /// </summary>
+                [WebMethod(Description = @"Submits an action to the Labview Interface: loadvi, closevi, publishvi, monitorvi, disconnectuser, listvis. C:\Program Files\National Instruments\LabVIEW 7.1\examples\apps\tankmntr.llb\Tank Simulation.vi"),
+                    //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
+                SoapDocumentMethod(Binding = "LabViewLS")]
+                public string SubmitCommandRemote(string actionStr, string dataStr, string host, int port)
+                {
+                    return new LabViewRemote(host,port).SubmitAction(actionStr, dataStr);
+                }
+         */
 
         /// <summary>
         /// Reports the status of the lab server.  
@@ -129,45 +132,45 @@ namespace iLabs.LabServer.LabView
 
         }
 
-/*
-        /// <summary>
-        /// Checks on the status of the lab server.  
-        /// </summary>
-        [WebMethod(Description = "Lab Server Method: Returns the current status of the VIServer connection. "
-        + "Members of struct LabStatus are 'online' (boolean) and 'labStatusMessage' (string)."),
-       SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
-        SoapDocumentMethod(Binding = "ILabServer")]
-        public LabStatus GetLabStatus()
-        {
-            return getLabStatus();
+        /*
+                /// <summary>
+                /// Checks on the status of the lab server.  
+                /// </summary>
+                [WebMethod(Description = "Lab Server Method: Returns the current status of the VIServer connection. "
+                + "Members of struct LabStatus are 'online' (boolean) and 'labStatusMessage' (string)."),
+               SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
+                SoapDocumentMethod(Binding = "ILabServer")]
+                public LabStatus GetLabStatus()
+                {
+                    return getLabStatus();
 
-        }
+                }
 
         
-        protected LabStatus getLabStatus()
-        {
-            string report = new LabViewInterface().GetViServerStatus();
-            LabStatus status = new LabStatus();
-            status.online = true;
-            status.labStatusMessage = report;
-            return status;
+                protected LabStatus getLabStatus()
+                {
+                    string report = new LabViewInterface().GetViServerStatus();
+                    LabStatus status = new LabStatus();
+                    status.online = true;
+                    status.labStatusMessage = report;
+                    return status;
 
-        }
+                }
 
 
-        [WebMethod(Description = @"Submits an action to the Labview Interface: loadvi, closevi, publishvi, monitorvi, disconnectuser, listvis. C:\Program Files\National Instruments\LabVIEW 7.1\examples\apps\tankmntr.llb\Tank Simulation.vi"),
-            //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
-       SoapDocumentMethod(Binding = "LabViewLS")]
-        public LabStatus getLabStatusRemote(String host, int port)
-        {
-            string report = new LabViewRemote(host, port).GetViServerStatus();
-            LabStatus status = new LabStatus();
-            status.online = true;
-            status.labStatusMessage = report;
-            return status;
+                [WebMethod(Description = @"Submits an action to the Labview Interface: loadvi, closevi, publishvi, monitorvi, disconnectuser, listvis. C:\Program Files\National Instruments\LabVIEW 7.1\examples\apps\tankmntr.llb\Tank Simulation.vi"),
+                    //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
+               SoapDocumentMethod(Binding = "LabViewLS")]
+                public LabStatus getLabStatusRemote(String host, int port)
+                {
+                    string report = new LabViewRemote(host, port).GetViServerStatus();
+                    LabStatus status = new LabStatus();
+                    status.online = true;
+                    status.labStatusMessage = report;
+                    return status;
 
-        }
-*/
+                }
+        */
         [WebMethod(Description = @"GetLockState"),
             //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
 SoapDocumentMethod(Binding = "LabViewLS")]
@@ -184,19 +187,19 @@ SoapDocumentMethod(Binding = "LabViewLS")]
         {
             I_LabViewInterface lvi = new LabViewInterface();
             return lvi.SetLockState(viName, state);
-            
-        }
-/*
-        [WebMethod(Description = @"QuitLabView"),
-            //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
-SoapDocumentMethod(Binding = "LabViewLS")]
-        public string QuitLabView()
-        {
-            I_LabViewInterface lvi = new LabViewInterface();
-            return lvi.QuitLabView();
 
         }
-*/
+        /*
+                [WebMethod(Description = @"QuitLabView"),
+                    //SoapHeader("authHeader", Direction=SoapHeaderDirection.In), 
+        SoapDocumentMethod(Binding = "LabViewLS")]
+                public string QuitLabView()
+                {
+                    I_LabViewInterface lvi = new LabViewInterface();
+                    return lvi.QuitLabView();
+
+                }
+        */
 
         protected string getConfiguration(string group)
         {
@@ -205,13 +208,7 @@ SoapDocumentMethod(Binding = "LabViewLS")]
         }
 
     } // END OF LabViewLS Class
-
-#if LabVIEW_82
 }
-#endif
-#if LabVIEW_86
-}
-#endif
 
 
 

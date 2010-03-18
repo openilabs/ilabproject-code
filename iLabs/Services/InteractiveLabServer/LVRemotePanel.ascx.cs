@@ -1,8 +1,8 @@
-#define LabVIEW_86
 
 namespace iLabs.LabServer.LabView
 {
 	using System;
+    using System.Configuration;
 	using System.Data;
 	using System.Drawing;
     using System.Globalization;
@@ -14,16 +14,13 @@ namespace iLabs.LabServer.LabView
     using iLabs.UtilLib;
 
 	/// <summary>
-	///		Creates an OBJECT block which contains parameters for the LabVIEW RemotePanel runtime control.
+	///	Creates an OBJECT block which contains parameters for the LabVIEW RemotePanel runtime control.
+    /// Currently this defaults to LabVIEW 2009, but the default may be changed by modifing the Web.config value 'LabViewVersion' 
+    /// or by specifing the version in the Revision field on the labApplication page.
 	/// </summary>
     public partial class LVRemotePanel : System.Web.UI.UserControl
     {
-#if LabVIEW_82
-        public string version = "8.2";
-#endif
-#if LabVIEW_86
-        public string version= "8.6";
-#endif
+        public string version = null;
         public string viName = null;
         public string serverURL = null;
         public string hasControl = "true";
@@ -40,6 +37,10 @@ namespace iLabs.LabServer.LabView
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+            if(ConfigurationManager.AppSettings["LabViewVersion"] != null && ConfigurationManager.AppSettings["LabViewVersion"].ToString().Length >0)
+                version = ConfigurationManager.AppSettings["LabViewVersion"].ToString();
+            if(Session["lvversion"] != null && Session["lvversion"].ToString().Length >0)
+                version = Session["lvversion"].ToString();
             switch (version)
             {
                 case "8.2":
@@ -80,11 +81,18 @@ namespace iLabs.LabServer.LabView
                     codebase = buf.ToString();
                     break;
                 case "8.6":
-                default:
                     appMimeType = "application/x-labviewrpvi86";
                     classId = "CLSID:A40B0AD4-B50E-4E58-8A1D-8544233807B0";
                     codebase = @"ftp://ftp.ni.com/support/labview/runtime/windows/8.6/LVRTE8.6min.exe";
                     fpProtocol = ".LV_FrontPanelProtocol.rpvi86";
+                    pluginspace = @"http://digital.ni.com/express.nsf/bycode/exck2m";
+                    break;
+                case "2009":
+                default:
+                    appMimeType = "application/x-labviewrpvi90";
+                    classId = "CLSID:A40B0AD4-B50E-4E58-8A1D-8544233807B1";
+                    codebase = @"ftp://ftp.ni.com/support/labview/runtime/windows/9.0/LVRTE90min.exe";
+                    fpProtocol = ".LV_FrontPanelProtocol.rpvi90";
                     pluginspace = @"http://digital.ni.com/express.nsf/bycode/exck2m";
                     break;
             }

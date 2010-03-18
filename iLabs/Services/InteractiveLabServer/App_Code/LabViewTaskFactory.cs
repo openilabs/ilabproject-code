@@ -5,8 +5,6 @@
  * $Id$
  */
 
-#define LabVIEW_86
-
 using System;
 using System.Data;
 using System.Configuration;
@@ -28,6 +26,7 @@ using iLabs.UtilLib;
 using iLabs.LabView;
 using iLabs.LabView.LV82;
 using iLabs.LabView.LV86;
+using iLabs.LabView.LV2009;
 
 namespace iLabs.LabServer.LabView
 {
@@ -73,6 +72,10 @@ namespace iLabs.LabServer.LabView
                 //Create the new Task
                 if(appInfo.rev.Contains("8.2")){
                    task = iLabs.LabView.LV82.LabViewTask.CreateLabTask(appInfo,expCoupon,expTicket);
+                }
+                else if (appInfo.rev.Contains("2009"))
+                {
+                    task = iLabs.LabView.LV2009.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
                 }
                 else{
                      task = iLabs.LabView.LV86.LabViewTask.CreateLabTask(appInfo,expCoupon,expTicket);
