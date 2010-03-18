@@ -15,17 +15,19 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
-
+#if LabVIEW_2009
+using LabVIEW.lv2009;
+namespace iLabs.LabView.LV2009
+#endif
 #if LabVIEW_86
 using LabVIEW.lv86;
 namespace iLabs.LabView.LV86
-{
 #endif
 #if LabVIEW_82
 using LabVIEW.lv821;
 namespace iLabs.LabView.LV82
-{
 #endif
+{
 
     /// <summary>
     /// Summary description for I_LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
@@ -177,9 +179,4 @@ namespace iLabs.LabView.LV82
        
       
     }
-#if LabVIEW_86
 }
-#endif
-#if LabVIEW_82
-}
-#endif

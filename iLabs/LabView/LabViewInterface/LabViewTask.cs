@@ -29,16 +29,22 @@ using iLabs.UtilLib;
 //using iLabs.Ticketing;
 using iLabs.LabServer.Interactive;
 
-#if LabVIEW_82
-using LabVIEW.lv821;
+#if LabVIEW_2009
+using LabVIEW.lv2009;
 
-namespace iLabs.LabView.LV82
+namespace iLabs.LabView.LV2009
 #endif
 #if LabVIEW_86
 using LabVIEW.lv86;
 
 namespace iLabs.LabView.LV86
 #endif
+#if LabVIEW_82
+using LabVIEW.lv821;
+
+namespace iLabs.LabView.LV82
+#endif
+
 {
     /// <summary>
     /// Summary description for LabViewTask

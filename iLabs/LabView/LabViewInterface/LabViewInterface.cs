@@ -27,6 +27,11 @@ using CWDataServer;
 using CWDSLib;
 using iLabs.LabView;
 
+#if LabVIEW_2009
+using LabVIEW.lv2009;
+namespace iLabs.LabView.LV2009
+{
+#endif
 #if LabVIEW_86
 using LabVIEW.lv86;
 namespace iLabs.LabView.LV86
@@ -62,6 +67,9 @@ namespace iLabs.LabView.LV82
         {
             try
             {
+#if LabVIEW_2009
+                lvVersion = "LabVIEW 2009";
+#endif
 #if LabVIEW_86
                 lvVersion = "LabVIEW 8.6";
 #endif
@@ -1364,6 +1372,9 @@ namespace iLabs.LabView.LV82
  */
 
     }
+#if LabVIEW_2009
+}
+#endif
 #if LabVIEW_86
 }
 #endif
