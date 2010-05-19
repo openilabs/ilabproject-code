@@ -4,6 +4,15 @@
  * 
  * $Id: SchedulingControl.cs,v 1.5 2007/02/16 22:50:36 pbailey Exp $
  */
+
+/* Use the following DOCTYPE and meta values for using this control
+ <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+   <meta http-equiv="X-UA-Compatible" content="IE=Edge"/> 
+	<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/xhtml-11"/>
+    <style type="text/css">@import url( css/main.css );  @import url( css/scheduling.css ); 
+ */
+#define noStyle
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,6 +47,9 @@ namespace iLabs.Controls.Scheduling
         string scheduleTableClass = "scheduling";
         string hourTableClass = "hours";
         string dayTableClass = "day";
+        string voidClass = "void";
+        string reservedClass = "reserved";
+        string availableClass = "available";
         Unit one = new Unit(1);
         Unit zero = new Unit(0);
        
@@ -49,15 +61,15 @@ namespace iLabs.Controls.Scheduling
         int columnWidth = 120;
         int headerHeight = 25;
         int hourHeight = 40;
-        int hourWidth = 40; 
+        int hourWidth = 50; 
         int defaultCellDuration = 30;
         int userTZ;
         Unit scheduleWidth = new Unit("100%");
         
         Color availableColor = ColorTranslator.FromHtml("#55ff55");
-        Color scheduledColor = ColorTranslator.FromHtml("#aaaaaa");
+        Color scheduledColor = ColorTranslator.FromHtml("#ff0000");
         Color timeBorderColor = ColorTranslator.FromHtml("#000000");
-        Color voidColor = ColorTranslator.FromHtml("#ff0000");
+        Color voidColor = ColorTranslator.FromHtml("#aaaaaa");
 
         public DateTime StartTime
         {
@@ -68,7 +80,6 @@ namespace iLabs.Controls.Scheduling
             set
             {
                 startTime = value;
-               
             }
         }
         public DateTime EndTime
@@ -80,7 +91,6 @@ namespace iLabs.Controls.Scheduling
             set
             {
                 endTime = value;
-                
             }
         }
         public DateTime StartDate
@@ -160,9 +170,7 @@ namespace iLabs.Controls.Scheduling
                     tmp = 1;
                 }
                 return tmp;
-                
             }
-           
         }
 
          public bool BindResevations
@@ -298,7 +306,6 @@ namespace iLabs.Controls.Scheduling
         /// <param name="output"></param>
         protected override void Render(HtmlTextWriter output)
         {
-           
             Type bType = Page.Request.Browser.TagWriter;
             output.WriteLine();
             output.WriteLine("<!- Scheduling Table -->");
@@ -306,24 +313,39 @@ namespace iLabs.Controls.Scheduling
             output.AddAttribute("id", ID);
             output.AddAttribute("class", scheduleTableClass);
             output.AddAttribute("cols",(NumDays + 1).ToString());
+            
             //output.AddAttribute("width", scheduleWidth);
-            output.AddAttribute("cellpadding", zero.ToString());
-            output.AddAttribute("cellspacing", zero.ToString());
+//#if useStyle 
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute("border-top", "1px");
+            output.AddStyleAttribute("border-right", "1px");
+            output.AddStyleAttribute("border-left", "1px");
+            output.AddStyleAttribute("border-bottom", "1px");     
+//#endif
             //output.AddStyleAttribute("position", "relative");
             output.RenderBeginTag("table");
             //output.WriteLine();
             
             // <tr> Table contents
             output.AddAttribute("id", "trTableContents");
-            output.RenderBeginTag("tr");
-            output.WriteLine();
+            output.AddAttribute(HtmlTextWriterAttribute.Valign, "top");
+#if useStyle
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+#endif
+            output.RenderBeginTag("tr"); //Single row
+            //output.WriteLine();
 
             int offset = 1;
-            // hours column
+            // hours cell
+           
             renderHoursTable(output,offset);
             offset += hourWidth;
 
-            output.Write("<!- Day Tables -->");
+            output.WriteLine("<!- Day Tables -->");
             for (DateTime day = StartDate; day < EndDate; day = day.AddDays(1))
             {
                 renderDay(output,day.AddMinutes(-userTZ),offset);
@@ -339,66 +361,95 @@ namespace iLabs.Controls.Scheduling
 
         private void renderHoursTable(HtmlTextWriter output, int offset)
         {
-            output.AddAttribute("id", "tdHourTable");
-            output.AddAttribute("width", hourWidth + "px");
+            output.AddAttribute("id", "tdHourCell");
+            output.AddStyleAttribute("background-color", "blue");
+#if useStyle
+            //output.AddStyleAttribute("width", hourWidth + "px");
+          
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute("border", "0px");
+            //output.AddStyleAttribute("border-top", "0px");
+            //output.AddStyleAttribute("border-right", "1px");
+            //output.AddStyleAttribute("border-left", "0px");
+            //output.AddStyleAttribute("border-bottom", "1px");
             //output.AddStyleAttribute("position", "absolute");
-            //output.AddStyleAttribute("top", zero);
+            //output.AddStyleAttribute("top", zero.ToString());
             //output.AddStyleAttribute("left", offset.ToString() + "px");
+#endif
             output.RenderBeginTag("td");
             output.WriteLine();
             output.WriteLine("<!- Hour Table -->");
-            output.AddAttribute("class", hourTableClass);         
-            output.AddAttribute("width", hourWidth + "px");
-            output.AddAttribute("cellpadding", "0");
-            output.AddAttribute("cellspacing", "0");
-            output.AddAttribute("border", "0");
-            output.AddStyleAttribute("border-left", "1px solid " + ColorTranslator.ToHtml(timeBorderColor));
-             //output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(timeBorderColor));
+            output.AddAttribute("class", hourTableClass);
+            output.AddStyleAttribute("width", hourWidth + "px");
+#if useStyle
+           
+           
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute("border-top", "0px");
+            output.AddStyleAttribute("border-right", "1px");
+            output.AddStyleAttribute("border-left", "0px");
+            output.AddStyleAttribute("border-bottom", "1px");
              output.AddStyleAttribute("text-align", "right");
+#endif
             output.RenderBeginTag("table");
-            //output.WriteLine();
-            // <tr> first emtpy
+            output.WriteLine();
             output.RenderBeginTag("tr");
-            output.AddStyleAttribute("height", "1px");
-            output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(timeBorderColor));
-            output.RenderBeginTag("td");
-            output.RenderEndTag();
-            output.RenderEndTag();
-            //output.WriteLine();
-
-            output.RenderBeginTag("tr");
-            output.AddStyleAttribute("height", HeaderHeight + "px");
-            output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
+            output.AddStyleAttribute("height", HeaderHeight * 2 + "px");
+#if useStyle
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+#endif
             output.RenderBeginTag("th");
             output.Write("&nbsp;");
             output.RenderEndTag();
             output.RenderEndTag();
-            //output.WriteLine();
+            output.WriteLine();
             
             for (int i = minTOD.Hours; i < (int) maxTOD.TotalHours; i++)
             {
                 renderHourCell(output, i);
             }
 
-            output.RenderEndTag();
             //output.WriteLine();
-            output.RenderEndTag(); // </td> End of hours column
-            //output.WriteLine();
+            output.RenderEndTag(); // end of table
+            output.RenderEndTag(); // </td> End of hours cell
+            output.WriteLine();
 
+        }
+
+        private string strHeight(int height)
+        {
+            int h = height -1;
+            return h.ToString();
+        }
+
+        private int calcHeight(int height)
+        {
+
+            return height -1;
         }
 
         private int renderHourCell(HtmlTextWriter output, int hour)
         {
-            output.RenderBeginTag("tr");
+            output.Write("<tr>");
 
             //output.AddStyleAttribute("top", top + "px");
-            output.AddStyleAttribute("height", HourHeight + "px");
+            output.AddStyleAttribute("height", calcHeight(HourHeight) + "px");
+            output.AddStyleAttribute("background-color", "Yellow");
+#if useStyle
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+
             output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
+#endif
             output.RenderBeginTag("th");
-            
-            
-            //output.RenderBeginTag("div");
-            
+          
             bool am = (hour / 12) == 0;
             if (!hours24)
             {
@@ -421,11 +472,8 @@ namespace iLabs.Controls.Scheduling
                     output.Write("PM");
             }
             output.Write("</span>");
-            //output.RenderEndTag();
-
-            output.RenderEndTag(); // </td>
-            output.RenderEndTag(); // </tr>
-            output.WriteLine();
+            output.RenderEndTag();
+            output.WriteLine("</tr>");
             return HourHeight;
         }
         /// <summary>
@@ -443,30 +491,40 @@ namespace iLabs.Controls.Scheduling
             output.RenderBeginTag("td");
             // <table>
             output.AddAttribute("class", dayTableClass);
-            output.AddAttribute("width", columnWidth +"px");
-            output.AddAttribute("cellpadding", "0");
-            output.AddAttribute("cellspacing", "0");
-            //output.AddAttribute("border", "0");
+            //output.AddStyleAttribute("width", columnWidth + "px");
+#if useStyle
+            output.AddStyleAttribute("width", columnWidth + "px");
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute("border-top", "0px");
+            output.AddStyleAttribute("border-right", "1px");
+            output.AddStyleAttribute("border-left", "0px");
+            output.AddStyleAttribute("border-bottom", "1px");
+#endif
             output.RenderBeginTag("table");
 
-            output.RenderBeginTag("tr");
-            output.AddStyleAttribute("height", "1px");
-            output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(timeBorderColor));
-            output.RenderBeginTag("td");
-            output.RenderEndTag();
-            output.RenderEndTag();
-            output.WriteLine();
+            //output.Write("<tr>");
+            //output.AddStyleAttribute("height", "1px");
+            //output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(timeBorderColor));
+            //output.RenderBeginTag("td");
+            //output.RenderEndTag();
+            //output.WriteLine("</tr>");
 
             //Day Header 
-            output.RenderBeginTag("tr");
-            output.AddStyleAttribute("height", headerHeight + "px");
+            output.Write("<tr>");
+            output.AddStyleAttribute("height", headerHeight*2 + "px");
+#if useStyle
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
-            //output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(timeBorderColor));
+#endif
             output.RenderBeginTag("th");
+            output.Write(day.AddMinutes(userTZ).ToString("ddd", culture) + "<br />");
             output.Write(DateUtil.ToUserDate(day,culture,userTZ));
             output.RenderEndTag();
-            output.RenderEndTag();
-            output.WriteLine();
+            output.WriteLine("</tr>");
             if (bindReservations)
             {
                 renderReservations(output, day, reservations);
@@ -475,13 +533,7 @@ namespace iLabs.Controls.Scheduling
             {
                 renderTimePeriods(output, day, periods);
             }
-            output.RenderBeginTag("tr");
-            output.AddStyleAttribute("height", one.ToString());
-            output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(BorderColor));
-            output.RenderBeginTag("td");
-            output.RenderEndTag();
-            output.RenderEndTag();
-            output.WriteLine();
+           
             output.RenderEndTag();
             output.RenderEndTag();
         }
@@ -553,33 +605,40 @@ namespace iLabs.Controls.Scheduling
        
         private int renderVoidTime(HtmlTextWriter output, int duration)
         {
-            output.WriteLine();
-            output.RenderBeginTag("tr");
+            output.Write("<tr>");
            int height = Convert.ToInt32((hourHeight* duration)/3600.0);
-                //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
-          
-            //output.AddStyleAttribute("background-color",scheduledColor);
+           output.AddAttribute("class", voidClass);
+           //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
            output.AddAttribute("title", (duration / 60.0).ToString());
+           output.AddStyleAttribute("height", calcHeight(height) + "px");
+#if useStyle
+           output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+           output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+
            output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(voidColor));
-            output.AddStyleAttribute("height", height + "px");
-            output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
-            output.RenderBeginTag("td");
+            //output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
+#endif
+           output.RenderBeginTag("td");
             output.RenderEndTag();
-            output.RenderEndTag();
+            output.WriteLine("</tr>");
             return height;
         }
 
         private int renderScheduledTime(HtmlTextWriter output,  ITimeBlock tb)
         {
-            output.WriteLine();
-            output.RenderBeginTag("tr");
+            output.Write("<tr>");
            int height = Convert.ToInt32((((hourHeight * tb.Duration)/3600.0)));
            //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
-
+#if useStyle
+             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
            output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(scheduledColor));
             output.AddStyleAttribute("cursor", "hand");
-            output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
-            output.AddStyleAttribute("height", height + "px");
+            //output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
+#endif
+           output.AddAttribute("class", reservedClass);
+            output.AddStyleAttribute("height", calcHeight(height) + "px");
+           
             output.AddAttribute("title", tb.Start.AddMinutes(userTZ).TimeOfDay.ToString() + " - " + tb.End.AddMinutes(userTZ).TimeOfDay.ToString());
             output.RenderBeginTag("td");
             //if(height > 24)
@@ -587,7 +646,7 @@ namespace iLabs.Controls.Scheduling
             //if(height > 48)
             //    output.Write(" - " + tb.End.AddMinutes(userTZ).TimeOfDay);
             output.RenderEndTag();
-            output.RenderEndTag();
+            output.WriteLine("</tr>");
             return height;
              
         }
@@ -595,27 +654,32 @@ namespace iLabs.Controls.Scheduling
         private int renderAvailableTime(HtmlTextWriter output, DateTime startTime, int duration,int quantum, int cellDuration,bool lastCell)
         {
             string str = startTime.ToString("o") + ", " + duration + ", " + quantum;
-            output.WriteLine();
-            output.RenderBeginTag("tr");
+            output.Write("<tr>");
             int height = Convert.ToInt32((((hourHeight* cellDuration)/3600.0)));
-
+            output.AddAttribute("class", availableClass);
             output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, str));
+            output.AddAttribute("title", startTime.AddMinutes(userTZ).TimeOfDay.ToString());
+            output.AddStyleAttribute("height", calcHeight(height) + "px");
+            
+#if useSttyle
+            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
+            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
+            output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(availableColor));
             output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(availableColor));
             output.AddStyleAttribute("cursor", "hand");
-            output.AddStyleAttribute("height", height + "px");
+            
           
             if(lastCell)
                 output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
             else
                 output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(timeBorderColor));
-            
-            output.AddAttribute("title", startTime.AddMinutes(userTZ).TimeOfDay.ToString());
+#endif
             output.RenderBeginTag("td");
             //DateTime end = startTime.AddSeconds(duration);
             //output.Write(startTime.AddMinutes(userTZ).TimeOfDay + " - " + end.AddMinutes(userTZ).TimeOfDay);
            
             output.RenderEndTag();
-            output.RenderEndTag();
+            output.WriteLine("</tr>");
             return height;
         }
 
