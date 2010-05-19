@@ -2,16 +2,21 @@
 <%@ Register Assembly="iLabControls" Namespace="iLabs.Controls.Scheduling" TagPrefix="iLab" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Select Time Periods</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
 		<meta content="C#" name="CODE_LANGUAGE"/>
 		<meta content="JavaScript" name="vs_defaultClientScript"/>
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema"/>
-		<style type="text/css">@import url( css/main.css );  @import url( css/Scheduling.css ); 
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/> 
+		<meta name="vs_targetSchema"  content="http://schemas.microsoft.com/intellisense/html-401" />
+		<style type="text/css">@import url( css/main.css ); @import url( css/scheduling.css );
 		</style>
+		
+
 		<script type="text/javascript">
 		<!--
 		function ReloadParent() 
@@ -24,28 +29,28 @@
         }
         -->
         </script>
-		
 	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
 	<div id="outerwrapper">
 	<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
 
-	<br clear="all"/>
+	<br />
 	<div id="innerwrapper">
 			<div id="pageintro">
                     <h3><asp:label id="lblTitleofSchedule"  Runat="server" 
-						text="Please select the general starting time of the reservation."></asp:label></h3>
+						text="Available Reservation Times"></asp:label></h3>
+					<p>Please select the general starting time of the reservation.</p>
 					 <p><asp:Label ID="lblTimezone" runat="server" ></asp:Label></p>
                      <p><asp:Label ID="lblUssPolicy" runat="server" ></asp:Label></p>
 					 <p><asp:label id="lblErrorMessage" EnableViewState="False" Visible="False" Runat="server"></asp:label></p>
 			</div>
-			<div id="pagecontent">		
+			<div>		
 			<table>
 			<tr><th>Available Times</th><th>Reservation Details</th></tr>
 			<tr>
 			    <td><iLab:SchedulingControl id="cntrScheduling" runat="server" Hours24="false" BorderColor="black"  
-			    OnAvailableClick="TimePeriod_Click"></iLab:SchedulingControl></td>
+			      ScheduledColor="red" VoidColor="gray" OnAvailableClick="TimePeriod_Click"></iLab:SchedulingControl></td>
 			    <td style="vertical-align:top">
 			        <table style="vertical-align:top">
 			            <tr style="vertical-align:top">
