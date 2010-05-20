@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -47,32 +48,19 @@ namespace JavaScriptPopups
 
         }
         #endregion
-
+        // This routine will create a javascript block to be executed on the client.
         protected void popupDate_changed(Object Src, EventArgs E)
         {
+            StringBuilder buf = new StringBuilder();
+            ClientScriptManager cs = Page.ClientScript;
+            buf.Append("setDate('");
+            buf.Append(dateParam + "','");
+            buf.AppendLine(calDate.SelectedDate.ToString(culture.DateTimeFormat.ShortDatePattern) + "');");
            
-            // This routine will create a javascript block to be executed on the client.
-            string jScript;
-            jScript = "<script>";
-
-            // Write the selected data back to the caller
-            switch (dateParam)
-            {
-                case "start":
-                    jScript += "window.opener.document.forms(0).txtStartDate.value = '";
-                    break;
-                case "end":
-                    jScript += "window.opener.document.forms(0).txtEndDate.value = '";
-                    break;
-                default:
-                    break;
-            }
-            jScript += calDate.SelectedDate.ToString(culture.DateTimeFormat.ShortDatePattern) + "';";
-
             // close the popup calendar
-            jScript += "self.close()";
-            jScript += "</" + "script>";
-            RegisterClientScriptBlock("DateChangedBlock", jScript);
+            buf.AppendLine("self.close()");
+            
+            cs.RegisterStartupScript(this.GetType(), "dayClick", buf.ToString(), true);
         }
 
     }

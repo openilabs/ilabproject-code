@@ -11,6 +11,16 @@ Date.....: 3/12/2005
 		<meta name="CODE_LANGUAGE" content="C#" />
 		<meta name="vs_defaultClientScript" content="JavaScript" />
 		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5" />
+		<script type="text/javascript">
+		<!--
+		 function setDate(type,targetDate) {
+            if(type== 'start')
+                window.opener.document.forms[0].txtStartDate.value = targetDate;
+            if(type== 'end')
+                window.opener.document.forms[0].txtEndDate.value = targetDate;
+          }
+          -->
+          </script>
 	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
