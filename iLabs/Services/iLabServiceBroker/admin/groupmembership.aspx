@@ -27,21 +27,23 @@ Please see license.txt in top level directory for full license.
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Group Membership</h1>
-						<p>Add or remove group memberships by selecting at least one user or group and at 
-							least one new target group to contain the selected user or group.
-						</p>
+						<p>To copy or move users from one group to another, open the group in the left window and select users. In the right window select the 
+						target group or groups. If multiple target groups are selected the selected users will be copied to all groups.</p>
+						<p>To remove users from a group or groups  expand the groups tree in the left window and select the users, users will only be removed from
+						the groups where they are selected. If a user is removed from all groups the user will be added to the orphan group.</p>
+						<p>When the page is first displayed the tree on the left groups with sub-groups are expanded, groups that only have users will need to be expanded to display the users.</p>
 						<!-- Group Membership Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
 						<asp:label id="lblResponse" Visible="False" Runat="server"></asp:label>
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
-						<div id="messagebox-right">
+						<!-- <div id="messagebox-right">
 							<h4>Instructions</h4>
 							<p>Select the user/group you want to transfer from "Users and Groups" box. Select 
 								the group you want to move it under from the "Target Groups" box. Click the 
 								Copy/Move button."
 							</p>
-						</div>
+						</div> -->
 						<div class="simpleform">
 							<label for="searchfor">Search by username or groupname</label><br/>
 							<asp:textbox id="txtSearchfor" Runat="server"></asp:textbox><asp:button id="btnGo" Runat="server" CssClass="button" Text="Go"></asp:button>
@@ -66,7 +68,9 @@ Please see license.txt in top level directory for full license.
 								<tr>
 									<td style="WIDTH: 300px">
 										<!--Check to see if default style can be set from the css -->
-										<asp:TreeView   id="agentsTreeView" runat="server" cssClass="treeView" SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet" ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
+										<asp:TreeView   id="agentsTreeView" runat="server" cssClass="treeView" 
+										ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"
+										SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet"></asp:TreeView>
 									</td>
 									<td class="buttonstyle"><asp:ImageButton ID="ibtnCopyTo" Runat="server" Width="74" Height="22" CssClass="buttonstyle" ImageUrl="../img/copy-btn.gif"
 											AlternateText="Copy To"></asp:ImageButton><!--img src="../img/copy-btn.gif" alt="Copy to" width="74" height="22" class="buttonstyle"--><br/>
@@ -77,7 +81,9 @@ Please see license.txt in top level directory for full license.
 									</td>
 									<td style="WIDTH: 310px">
 										<!-- Check to see if default style can be set from the css -->
-										<asp:TreeView id="groupsTreeView" runat="server"  cssClass="treeView" SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor=BlueViolet ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"></asp:TreeView>
+										<asp:TreeView id="groupsTreeView" runat="server"  cssClass="treeView"
+										ForeColor="black" style="font-family:verdana,arial,helvetica;font-size:10px"
+										SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet"></asp:TreeView>
 										<div></div>
 									</td>
 								</tr>

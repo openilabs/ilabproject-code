@@ -6,6 +6,7 @@
  */
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -57,9 +58,9 @@ namespace iLabs.ServiceBroker.admin
 			//
 			InitializeComponent();
 			base.OnInit(e);
-			this.ibtnCopyTo.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnCopyTo_Click);
-			this.ibtnMoveTo.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnMoveTo_Click);
-			this.ibtnRemove.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnRemove_Click);
+			this.ibtnCopyTo.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnCopyCB_Click);
+			this.ibtnMoveTo.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnMoveCB_Click);
+			this.ibtnRemove.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnRemoveCB_Click);
 			
 		}
 		
@@ -84,18 +85,18 @@ namespace iLabs.ServiceBroker.admin
 			{
                 int rootID = wrapper.GetGroupIDWrapper(Group.ROOT);
 				TreeNode rootNodeAgents = new TreeNode();
-                rootNodeAgents.Text = "ROOT";                
+                rootNodeAgents.Text = "ROOT";
                 rootNodeAgents.Value = rootID.ToString();
                 rootNodeAgents.ImageUrl = "../img/GrantImages/root.gif";
                 rootNodeAgents.Expanded = true;
-                //rootNodeAgents.SelectAction = TreeNodeSelectAction.None;
+                rootNodeAgents.SelectAction = TreeNodeSelectAction.None;
 
                 TreeNode rootNodeGroups = new TreeNode();
 				rootNodeGroups.Text = "ROOT";
 				rootNodeGroups.Value = rootID.ToString();
 				rootNodeGroups.ImageUrl = "../img/GrantImages/root.gif";
 				rootNodeGroups.Expanded = true;
-                //rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
+                rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
 
 			
 				//nodes under root node (all these are groups)
@@ -114,15 +115,19 @@ namespace iLabs.ServiceBroker.admin
 				{
 					if (g.groupID!=0)
 					{
-						TreeNode newNodeAgents = new TreeNode(g.groupName,g.groupID.ToString(),
-						    "../img/GrantImages/Folder.gif");
-                        //newNodeAgents.SelectAction = TreeNodeSelectAction.None;
+						
                         TreeNode newNodeGroups = new TreeNode(g.groupName, g.groupID.ToString(),
                             "../img/GrantImages/Folder.gif");
-                        //newNodeGroups.SelectAction = TreeNodeSelectAction.None;
+                        newNodeGroups.ShowCheckBox = true;
+                        newNodeGroups.SelectAction = TreeNodeSelectAction.None;
+                        rootNodeGroups.ChildNodes.Add(newNodeGroups);
+                        TreeNode newNodeAgents = new TreeNode(g.groupName, g.groupID.ToString(),
+                            "../img/GrantImages/Folder.gif");
+                        newNodeAgents.Expanded = true;
+                        newNodeAgents.SelectAction = TreeNodeSelectAction.None;
 						AddAgentsRecursively(newNodeAgents, newNodeGroups);
 						rootNodeAgents.ChildNodes.Add(newNodeAgents);
-						rootNodeGroups.ChildNodes.Add(newNodeGroups);
+						
 					}
 				}
 				agentsTreeView.Nodes.Add(rootNodeAgents);
@@ -156,21 +161,29 @@ namespace iLabs.ServiceBroker.admin
 				{
 					TreeNode childNode = new TreeNode(u.userName, u.userID.ToString(),
 					    "../img/GrantImages/user.gif");
-                    //childNode.SelectAction = TreeNodeSelectAction.None;
+                    childNode.ShowCheckBox = true;
+                    childNode.SelectAction = TreeNodeSelectAction.None;
+                    childNode.Expanded = false;
 					nAgents.ChildNodes.Add(childNode);
 				}
 
 				//might want to sort arraylist here -- works without sorting
+                if (childGroupsList == null || childGroupsList.Length < 1)
+                {
+                    nAgents.Expanded = false;
+                }
 				foreach (Group g in childGroupsList)
 				{
 					if (g.groupID>0)
 					{
 						TreeNode childNode = new TreeNode(g.groupName,g.groupID.ToString(),
                             "../img/GrantImages/Folder.gif");
-                        //childNode.SelectAction = TreeNodeSelectAction.None;
+                        childNode.SelectAction = TreeNodeSelectAction.None;
+                        childNode.Collapse();
                         TreeNode groupChildNode = new TreeNode(g.groupName, g.groupID.ToString(),
                             "../img/GrantImages/Folder.gif");
-                        //groupChildNode.SelectAction = TreeNodeSelectAction.None;
+                        groupChildNode.ShowCheckBox = true;
+                        groupChildNode.SelectAction = TreeNodeSelectAction.None;
 						this.AddAgentsRecursively(childNode, groupChildNode);
 						nAgents.ChildNodes.Add(childNode);
 						nGroups.ChildNodes.Add(groupChildNode);
@@ -616,6 +629,255 @@ namespace iLabs.ServiceBroker.admin
 				}
 			}
 		}
+
+        private void ibtnRemoveCB_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            lblResponse.Visible = false;
+            lblResponse.Text = "";
+            StringBuilder message = new StringBuilder();
+            List<int> parentIDs = new List<int>();
+            
+            TreeNodeCollection agentNodes = agentsTreeView.CheckedNodes;
+            if (agentNodes == null || agentNodes.Count < 1)
+            {
+                string msg = "Error: You must select agents to remove.";
+                lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                lblResponse.Visible = true;
+                return;
+            }
+            message.Append(removeAgentNodes(agentNodes, ref parentIDs));
+
+            //Refresh tree views
+            agentsTreeView.Nodes.Clear();
+            groupsTreeView.Nodes.Clear();
+            this.BuildTrees();
+
+            //expand the user tree to show the state of the parent group
+            foreach (int parentID in parentIDs)
+            {
+                ExpandNode(agentsTreeView.Nodes, parentID);
+            }
+
+        }
+       
+
+         private void ibtnCopyCB_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            lblResponse.Visible = false;
+            lblResponse.Text = "";
+            copyAgents(false);
+        }
+
+        private void ibtnMoveCB_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            lblResponse.Visible = false;
+            lblResponse.Text = "";
+            copyAgents(true);
+        }
+
+
+        private string removeAgentNodes(TreeNodeCollection agentNodes, ref List<int> parentIDs)
+        {
+            StringBuilder msg = new StringBuilder();
+            List<int> agents = new List<int>();
+            foreach (TreeNode agentNode in agentNodes)
+            {
+                int memberID = Convert.ToInt32(agentNode.Value);
+                string memberName = agentNode.Text;
+                int parentID = Convert.ToInt32(agentNode.Parent.Value);
+                string parentName = agentNode.Parent.Text;
+
+                // Note that because of the business logic you may not remove built-in groups
+                if (memberName.Equals(Group.ROOT)
+                    || (memberID == parentID)
+                    || (memberName.Equals(Group.NEWUSERGROUP))
+                    || (memberName.Equals(Group.ORPHANEDGROUP))
+                    || (memberName.Equals(Group.SUPERUSER)))
+                {
+                    // if they're trying to remove the ROOT, superUser etc.
+                    if (memberID != parentID)
+                    {
+                        msg.Append("The '" + memberName + "' group cannot be removed from the system.<br />");
+                    }
+                    else //if parent=groupname
+                    {
+                        msg.Append("'" + memberName + "'  cannot be removed from itself.<br />");
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        //Does anyone want functionality to send email once a user has been moved to a new group.
+                        //This can get annoying, so maybe it should be configurable in web.config
+                        // If yes.. then put code in here  - CV, 2/15/05
+                        //Logic for this is as follows - if user get email address, otherwise get email addresses of all users in a group (GetUserIDsRecursively call?)
+
+                        //if it has removed all the members
+                        if (wrapper.RemoveMembersFromGroupWrapper(new int[] { memberID }, parentID).Length == 0)
+                        {
+                            if (!agents.Contains(memberID))
+                                agents.Add(memberID);
+                            if (!parentIDs.Contains(parentID))
+                                parentIDs.Add(memberID);
+                            lblResponse.Visible = true;
+                            msg.Append("'" + memberName + "' was successfully removed from '" + parentName + "'.<br />");
+                        }
+                    }
+                    catch (Exception removeEx)
+                    {
+                        msg.Append("ERROR: removing '" + memberName + "' from '" + parentName + "'. Exception: " + removeEx.Message + "<br />");
+                    }
+                }
+            } // END foreach agent
+
+            foreach (int id in agents)
+            {
+                int[] parents = wrapper.ListGroupsForAgentWrapper(id);
+                if ((parents == null) || (parents.Length == 0))
+                {
+                    wrapper.AddMemberToGroupWrapper(id, InternalAdminDB.SelectGroupID(Group.ORPHANEDGROUP));
+                }
+            }
+            return msg.ToString();
+        }
+
+        private void copyAgents(bool move)
+        {
+            StringBuilder msg = new StringBuilder();
+            List<int> expandIDs = new List<int>();
+            lblResponse.Visible = false;
+            TreeNodeCollection agentNodes = agentsTreeView.CheckedNodes;
+            TreeNodeCollection groupNodes = groupsTreeView.CheckedNodes;
+            if (agentNodes == null || agentNodes.Count < 1 || groupNodes == null || groupNodes.Count < 1)
+            {
+                msg.Append("Error: You must check at least one item from each list");
+                lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
+                lblResponse.Visible = true;
+                return;
+            }
+            foreach (TreeNode agentNode in agentNodes)
+            {
+                int count = 0;
+                bool status = false;
+                int agentID = Convert.ToInt32(agentNode.Value);
+                string agentName = agentNode.Text;
+
+                //Now get the ID of the Parent group
+                TreeNode parentNode = (TreeNode)agentNode.Parent;
+                Group parentGroup = wrapper.GetGroupsWrapper(new int[] { Convert.ToInt32(parentNode.Value) })[0];
+
+                foreach (TreeNode groupNode in groupNodes)
+                {
+                    int destinationID = Convert.ToInt32(groupNode.Value);
+                    string destinationName = groupNode.Text;
+
+
+                    // Note that because of the business logic, no agent can be moved to the ROOT node.
+                    // The business logic says that agents cannot simultaneuosly exist under the ROOT node
+                    // and under some other group node.
+                    if (agentName.Equals(Group.ROOT)
+                       || (agentID == destinationID)
+                       || agentName.Equals(Group.NEWUSERGROUP)
+                       || agentName.Equals(Group.ORPHANEDGROUP)
+                       || agentName.Equals(Group.SUPERUSER))
+                    {
+                        msg.Append("'ERROR: You may not copy/move " + agentName + "' to '" + destinationName + "'<br />");
+                    }
+                    else
+                    {
+
+                        try
+                        {
+                            if (wrapper.AddMemberToGroupWrapper(agentID, destinationID))
+                            {
+                                count++;
+                                if (!expandIDs.Contains(destinationID))
+                                    expandIDs.Add(destinationID);
+                                msg.Append("'" + agentName + "' was successfully added to '" + destinationName + "'<br />");
+
+                                //send email message to moved user/group if given access from a request group
+                                if ((parentGroup.groupType.Equals(GroupType.REQUEST)) && (wrapper.GetAssociatedGroupIDWrapper(parentGroup.GroupID) == destinationID))
+                                {
+                                    MailMessage mail = new MailMessage();
+
+                                    string email = "";
+                                    if (InternalAuthorizationDB.IsAgentUser(agentID))
+                                    {
+                                        email = wrapper.GetUsersWrapper(new int[] { agentID })[0].email;
+                                    }
+                                    else
+                                    {
+                                        email = wrapper.GetGroupsWrapper(new int[] { agentID })[0].email;
+                                    }
+                                    mail.To = email;
+                                    mail.From = registrationMailAddress;
+
+                                    mail.Subject = "[iLabs] Request to join '" + destinationName + "' approved";
+                                    mail.Body = "You have been given permission to access the '" + destinationName + "' group.";
+                                    mail.Body += "\n\r\n\r";
+                                    mail.Body += "Login with the username and password that you registered with to use the lab.";
+                                    mail.Body += "\n\r\n\r";
+                                    mail.Body += "-------------------------------------------------\n\r";
+                                    mail.Body += "This is an automatically generated message. ";
+                                    mail.Body += "DO NOT reply to the sender. \n\n";
+                                    //mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
+                                    SmtpMail.SmtpServer = "127.0.0.1";
+                                    try
+                                    {
+                                        SmtpMail.Send(mail);
+                                        msg.Append(" An email has been sent confirming the move.<br />");
+
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        // Report detailed SMTP Errors
+                                        StringBuilder smtpErrorMsg = new StringBuilder();
+                                        smtpErrorMsg.Append("Exception: " + ex.Message);
+                                        //check the InnerException
+                                        if (ex.InnerException != null)
+                                            smtpErrorMsg.Append("<br>Inner Exceptions:");
+                                        while (ex.InnerException != null)
+                                        {
+                                            smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                                            ex = ex.InnerException;
+                                        }
+                                        msg.Append(" However an error occurred while sending email to the member." + ". Exception: " + smtpErrorMsg.ToString() + "<br />");
+
+                                    }
+                                } //End Send Mail
+                            }
+                            else
+                            {
+                                msg.Append("'ERROR: adding " + agentName + "' to '" + destinationName + "'<br />");
+                            }
+                        } // END try Add member
+                        catch (Exception addEx)
+                        {
+                            msg.Append("Error: Adding " + agentName + "' to '" + destinationName + "' Exception: " + addEx.Message + "<br />");
+                        }
+                    }
+                } 
+            } // END Agents
+            if (move) // Made at least one copy
+            {
+                msg.Append(removeAgentNodes(agentNodes, ref expandIDs));
+            }
+            //Refresh tree views
+            agentsTreeView.Nodes.Clear();
+            groupsTreeView.Nodes.Clear();
+            this.BuildTrees();
+
+            //expand the user tree to show the state of the destination group
+            //& select the node that was just moved
+                foreach(int id in expandIDs){
+            ExpandNode(agentsTreeView.Nodes, id);
+                }
+            lblResponse.Text = Utilities.FormatConfirmationMessage(msg.ToString());
+            lblResponse.Visible = true;
+        }
+
+       
 
 	}
 }
