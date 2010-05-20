@@ -73,9 +73,9 @@ namespace iLabs.Scheduling.UserSide
             btnRemoveReservation.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this reservation?')== false) return false;");
             hiddenPopupOnMakeRev.Attributes.Add("onpropertychange", Page.GetPostBackEventReference(btnReserve));
 
-            lblDescription.Text = "Select the date that you would like to schedule a reservation."
+            lblDescription.Text = "Select the number of days and start date you would like to view for available reservations."
                           + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
-            calDate.SelectionMode = CalendarSelectionMode.Day;
+            //calDate.SelectionMode = CalendarSelectionMode.Day;
             if (!IsPostBack)
             {
                 if (Request.QueryString["refresh"] != null && Session["coupon"] != null)
@@ -490,6 +490,7 @@ namespace iLabs.Scheduling.UserSide
             DateTime current = DateTime.UtcNow; 
             DateTime startTime;
             DateTime endTime;
+            int days = Convert.ToInt32(ddlDays.SelectedValue);
             
             if(targetDay < current){
                 if(targetDay.AddDays(1) <current){
@@ -501,17 +502,21 @@ namespace iLabs.Scheduling.UserSide
                 else{
                     startTime = new DateTime(current.Year,current.Month,current.Day,current.Hour,
                         current.Minute,0,0,current.Kind);
-                    endTime = targetDay.AddDays(1);
                 }
             }else{
                 startTime = targetDay;
-                endTime = startTime.AddDays(1);
+               
             }
+            //if (calDate.SelectionMode == CalendarSelectionMode.Day)
+            //    endTime = startTime.AddDays(1);
+            //else
+            endTime = DateUtil.SpecifyUTC(calDate.SelectedDate).AddMinutes(-userTZ).AddDays(days);
             calDate.SelectedDates.Clear();
             ClientScriptManager cs = Page.ClientScript;
-            //   
+            // 
+            int pageWidth = 50 + (100 * days) + 50 + 450;//HourColum, days, spacer, text 
             string js =
-            "PopupReserve('" + DateUtil.ToUtcString(startTime) + "', '" + DateUtil.ToUtcString(endTime) + "', 630,700);";
+            "PopupReserve('" + DateUtil.ToUtcString(startTime) + "', '" + DateUtil.ToUtcString(endTime) + "', " + pageWidth +",700);";
             cs.RegisterStartupScript(this.GetType(), "dayClick", js, true);
             return;
             //string url = "SelectTimePeriods.aspx?start=" + DateUtil.ToUtcString(startTime) + "&end=" + DateUtil.ToUtcString(endTime);

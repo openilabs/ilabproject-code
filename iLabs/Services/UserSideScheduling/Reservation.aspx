@@ -1,4 +1,4 @@
-<%@ Page language="c#" Inherits="iLabs.Scheduling.UserSide.Reservation" CodeFile="Reservation.aspx.cs" %>
+<%@ Page language="c#" Inherits="iLabs.Scheduling.UserSide.Reservation" CodeFile="Reservation.aspx.cs"  ValidateRequest="false" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="NavBarReg" Src="NavBarReg.ascx" %>
@@ -38,15 +38,28 @@
 						<asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label>
 					</div>
 		<div id="pagecontent">
-		<div class="simpleform">
+		<!--< div class="simpleform"> -->
 		<table>
-		<tr><th>Select the day you would like to reserve time.</th></tr>
-		<tr><td>
-		    <asp:Calendar ID="calDate"   OnSelectionChanged="calDayChanged"  Runat="server" 
-		    TodayDayStyle-BackColor="Aquamarine" TodayDayStyle-BorderColor="Black" TodayDayStyle-BorderStyle="Solid"  TodayDayStyle-BorderWidth="1" />
-		</td></tr>
+		<tr><th align="center">&nbsp;&nbsp;Number of Days&nbsp;&nbsp;</th><th align="center">&nbsp;&nbsp;Start Date&nbsp;&nbsp;</th></tr>
+		<tr>
+		    <td align="center" valign="top"><asp:DropDownList ID="ddlDays" runat="server">
+		        <asp:ListItem Value="1"> 1 </asp:ListItem>
+                <asp:ListItem Value="2"> 2 </asp:ListItem>
+                <asp:ListItem Value="3"> 3 </asp:ListItem>
+                <asp:ListItem Value="4"> 4 </asp:ListItem>
+                <asp:ListItem Value="5"> 5 </asp:ListItem>
+                <asp:ListItem Value="6"> 6 </asp:ListItem>
+                <asp:ListItem Value="7"> 7 </asp:ListItem>
+		        </asp:DropDownList>
+		    </td>
+		    <td align="center" valign="top">
+		        <asp:Calendar ID="calDate"   OnSelectionChanged="calDayChanged"   SelectionMode="Day" Runat="server" 
+		        TodayDayStyle-BackColor="Aquamarine" TodayDayStyle-BorderColor="Black" TodayDayStyle-BorderStyle="Solid"  TodayDayStyle-BorderWidth="1" />
+		    </td>
+		    
+		</tr>
 		</table>
-		</div>
+		<!-- </div> -->
 		<div class="simpleform">
 			<br/>
 			<table>
