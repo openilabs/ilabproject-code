@@ -38,13 +38,14 @@ INSERT INTO Functions (Function_Name, Description) VALUES ('MANAGE USS GROUP', '
 INSERT INTO Functions (Function_Name, Description) VALUES ('REQUEST RESERVATION','Request Reservation');
 
 /* GROUP_TYPES */
-INSERT INTO Group_Types(description) VALUES ('Regular Group');
-INSERT INTO Group_Types(description) VALUES ('Request Group');
-INSERT INTO Group_Types(description) VALUES ('Course Staff Group');
-INSERT INTO Group_Types(description) VALUES ('Service Administration Group');
-DBCC CHECKIDENT (Group_Types, RESEED, -1) ;
-INSERT INTO Group_Types(description) VALUES ('Non-existent Group');
-DBCC CHECKIDENT (Group_Types, RESEED, 3) ;
+SET IDENTITY_INSERT Group_Types ON
+INSERT INTO Group_Types(Group_Type_ID, description) VALUES (0,'Non-existent Group');
+INSERT INTO Group_Types(Group_Type_ID, description) VALUES (1,'Regular Group');
+INSERT INTO Group_Types(Group_Type_ID, description) VALUES (2,'Request Group');
+INSERT INTO Group_Types(Group_Type_ID, description) VALUES (3,'Course Staff Group');
+INSERT INTO Group_Types(Group_Type_ID, description) VALUES (4,'Service Administration Group');
+INSERT INTO Group_Types(Group_Type_ID, description) VALUES (5,'Built-in Group');
+SET IDENTITY_INSERT Group_Types OFF
 
 /* GROUPS & CORRESPONDING AGENTS*/
 BEGIN
@@ -53,24 +54,24 @@ DECLARE @Parent_Group_ID NUMERIC
 
 INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('ROOT', 1);
 SELECT @Agent_ID = (SELECT ident_current('Agents'));
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID, 'ROOT','Root Group', 1);
+INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID, 'ROOT','Root Group', 5);
 
 INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('NewUserGroup', 1);
 SELECT @Agent_ID = (SELECT ident_current('Agents'));
 SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT');
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID, 'NewUserGroup','New registered users who have not been moved to any group yet', 1);
+INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID, 'NewUserGroup','New registered users who have not been moved to any group yet', 5);
 INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
 
 INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('OrphanedUserGroup', 1);
 SELECT @Agent_ID = (SELECT ident_current('Agents'));
 SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT');
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'OrphanedUserGroup','Users who no longer belong to any group',1);
+INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'OrphanedUserGroup','Users who no longer belong to any group',5);
 INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
 
 INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('SuperUserGroup', 1);
 SELECT @Agent_ID = (SELECT ident_current('Agents'));
 SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT');
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'SuperUserGroup','Administrators',1);
+INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'SuperUserGroup','Administrators',5);
 INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
 
 DBCC CHECKIDENT (AGENTS, RESEED, -1) ;

@@ -89,7 +89,12 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Groups_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Groups] DROP CONSTRAINT FK_Groups_Groups
 GO
-
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_LabServer_To_Client_Agent]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Lab_Server_To_Client_Map] DROP CONSTRAINT FK_LabServer_To_Client_Agent
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_LabServer_To_Client_Client]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Lab_Server_To_Client_Map] DROP CONSTRAINT FK_LabServer_To_Client_Client
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_System_Messages_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[System_Messages] DROP CONSTRAINT FK_System_Messages_Groups
 GO
@@ -1044,7 +1049,20 @@ ALTER TABLE [dbo].[Lab_Clients] ADD
 	) ON UPDATE CASCADE 
 GO
 
-
+ALTER TABLE [dbo].[Lab_Server_To_Client_Map] ADD
+	CONSTRAINT [FK_LabServer_To_Client_Agent] FOREIGN KEY 
+	(
+		[Agent_ID]
+	) REFERENCES [dbo].[ProcessAgent] (
+		[Agent_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE ,
+	CONSTRAINT [FK_LabServer_To_Client_Client] FOREIGN KEY 
+	(
+		[Client_ID]
+	) REFERENCES [dbo].[Lab_Clients] (
+		[Client_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE 
+GO
 
 ALTER TABLE [dbo].[Principals] ADD 
 	CONSTRAINT [FK_Principals_Authentication_Types] FOREIGN KEY 

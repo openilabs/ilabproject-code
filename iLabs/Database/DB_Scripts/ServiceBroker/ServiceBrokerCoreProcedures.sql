@@ -1301,7 +1301,7 @@ AS
 	select @messageTypeID = (select message_type_id from message_types 
 							where upper(description) = upper(@messageType))
 	insert into System_Messages (message_type_id, to_be_displayed, agent_id, client_ID, group_id, 
-		message_body, message_title, date_created,last_modified)
+		message_title, message_body, date_created,last_modified)
 		values (@messageTypeID, @toBeDisplayed, @agentID, @clientID, @groupID, @messageTitle, @messageBody,
 			getUtcdate(),getUtcdate())
 	
@@ -3188,7 +3188,7 @@ SET ANSI_NULLS OFF
 GO
 
 /****** Object:  Stored Procedure dbo.RetrieveSystemMessages    Script Date: 5/18/2005 4:17:56 PM ******/
-
+--DROP PROCEDURE RetrieveSystemMessages
 CREATE PROCEDURE RetrieveSystemMessages
 /*Retrieves by message type and group */
 	@messageType varchar(256),
@@ -3200,11 +3200,63 @@ AS
 	
 	select @messageTypeID = (select message_type_id from message_types 
 						where upper(description) = upper(@messageType))
-	
+	IF @agentID >0 AND @clientID >0 AND @groupID > 0
+	BEGIN
 	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and group_ID=@groupID and agent_ID=@agentID and client_ID =@clientID
+	END
+	ELSE IF @agentID >0 AND @clientID >0 
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+			and agent_ID=@agentID and client_ID =@clientID
+	END
+	ELSE IF @agentID >0 AND @groupID > 0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+			and group_ID=@groupID and agent_ID=@agentID
+	END
+	ELSE IF @clientID >0 AND @groupID > 0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+			and group_ID=@groupID and client_ID =@clientID
+	END
+	
+	ELSE IF @agentID >0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+			and agent_ID=@agentID
+	END
+	ELSE IF @clientID >0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+			and client_ID =@clientID
+	END
+	ELSE IF @groupID > 0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+			and group_ID=@groupID
+	END
+	ELSE
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+	END
+
 GO
 
 SET QUOTED_IDENTIFIER ON 
