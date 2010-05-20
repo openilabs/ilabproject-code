@@ -11,6 +11,7 @@
 	<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/xhtml-11"/>
     <style type="text/css">@import url( css/main.css );  @import url( css/scheduling.css ); 
  */
+
 #define noStyle
 
 using System;
@@ -38,7 +39,9 @@ namespace iLabs.Controls.Scheduling
         TimeSpan minTOD;
         TimeSpan minDuration;
         TimeSpan tzSpan;
-    
+
+        int minHour = 0;
+        int maxHour = 24;
         int numCols;
         CultureInfo culture;
         List<TimePeriod> periods = new List<TimePeriod>();
@@ -139,6 +142,19 @@ namespace iLabs.Controls.Scheduling
             {
                 return maxTOD;
             }
+            set
+            {
+                maxTOD = value;
+                if (maxTOD.Hours == 0)
+                {
+                    maxHour = 24;
+                }
+                else
+                {
+                    if (maxTOD.TotalHours != (double)maxTOD.Hours)
+                        maxHour = maxTOD.Hours + 1;
+                }
+            }
      
         }
         public TimeSpan MinTOD
@@ -147,7 +163,28 @@ namespace iLabs.Controls.Scheduling
             {
                 return minTOD;
             }
+            set
+            {
+                minTOD = value;
+                minHour = minTOD.Hours;
+            }
   
+        }
+        public int MaxHour
+        {
+            get
+            {
+                return maxHour;
+            }
+
+        }
+        public int MinHour
+        {
+            get
+            {
+                return minHour;
+            }
+
         }
         public TimeSpan MinDuration
         {
@@ -313,9 +350,8 @@ namespace iLabs.Controls.Scheduling
             output.AddAttribute("id", ID);
             output.AddAttribute("class", scheduleTableClass);
             output.AddAttribute("cols",(NumDays + 1).ToString());
-            
-            //output.AddAttribute("width", scheduleWidth);
-//#if useStyle 
+         
+#if useStyle 
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
@@ -324,10 +360,9 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("border-right", "1px");
             output.AddStyleAttribute("border-left", "1px");
             output.AddStyleAttribute("border-bottom", "1px");     
-//#endif
+#endif
             //output.AddStyleAttribute("position", "relative");
             output.RenderBeginTag("table");
-            //output.WriteLine();
             
             // <tr> Table contents
             output.AddAttribute("id", "trTableContents");
@@ -337,11 +372,9 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
 #endif
             output.RenderBeginTag("tr"); //Single row
-            //output.WriteLine();
-
             int offset = 1;
+
             // hours cell
-           
             renderHoursTable(output,offset);
             offset += hourWidth;
 
@@ -353,19 +386,17 @@ namespace iLabs.Controls.Scheduling
             }
            
             output.RenderEndTag(); // </tr> Table Contents
-            //output.WriteLine();
             output.RenderEndTag();   // </table>
-            //output.WriteLine("<!- End Scheduling  Table -->");
+            output.WriteLine("<!- End Scheduling  Table -->");
         }
 
 
         private void renderHoursTable(HtmlTextWriter output, int offset)
         {
             output.AddAttribute("id", "tdHourCell");
-            output.AddStyleAttribute("background-color", "blue");
+            //output.AddStyleAttribute("background-color", "blue");
 #if useStyle
             //output.AddStyleAttribute("width", hourWidth + "px");
-          
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
@@ -383,10 +414,8 @@ namespace iLabs.Controls.Scheduling
             output.WriteLine();
             output.WriteLine("<!- Hour Table -->");
             output.AddAttribute("class", hourTableClass);
-            output.AddStyleAttribute("width", hourWidth + "px");
+           
 #if useStyle
-           
-           
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
@@ -395,12 +424,12 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("border-right", "1px");
             output.AddStyleAttribute("border-left", "0px");
             output.AddStyleAttribute("border-bottom", "1px");
-             output.AddStyleAttribute("text-align", "right");
+            output.AddStyleAttribute("text-align", "right");
 #endif
             output.RenderBeginTag("table");
-            output.WriteLine();
-            output.RenderBeginTag("tr");
+            output.Write("<tr>");
             output.AddStyleAttribute("height", HeaderHeight * 2 + "px");
+            output.AddStyleAttribute("width", hourWidth + "px");
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -408,10 +437,10 @@ namespace iLabs.Controls.Scheduling
             output.RenderBeginTag("th");
             output.Write("&nbsp;");
             output.RenderEndTag();
-            output.RenderEndTag();
-            output.WriteLine();
+            output.WriteLine("</tr>");
+          
             
-            for (int i = minTOD.Hours; i < (int) maxTOD.TotalHours; i++)
+            for (int i = MinHour; i < (int) MaxHour; i++)
             {
                 renderHourCell(output, i);
             }
@@ -441,15 +470,14 @@ namespace iLabs.Controls.Scheduling
 
             //output.AddStyleAttribute("top", top + "px");
             output.AddStyleAttribute("height", calcHeight(HourHeight) + "px");
-            output.AddStyleAttribute("background-color", "Yellow");
+            //output.AddStyleAttribute("background-color", "Yellow");
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
-
             output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
 #endif
             output.RenderBeginTag("th");
-          
+
             bool am = (hour / 12) == 0;
             if (!hours24)
             {
@@ -457,7 +485,6 @@ namespace iLabs.Controls.Scheduling
                 if (hour == 0)
                     hour = 12;
             }
-
             output.Write(hour);
             output.Write("<span style='font-size:10px; '>&nbsp;");
             if (hours24)
@@ -471,7 +498,7 @@ namespace iLabs.Controls.Scheduling
                 else
                     output.Write("PM");
             }
-            output.Write("</span>");
+            output.Write("</span>&nbsp;");
             output.RenderEndTag();
             output.WriteLine("</tr>");
             return HourHeight;
@@ -491,7 +518,6 @@ namespace iLabs.Controls.Scheduling
             output.RenderBeginTag("td");
             // <table>
             output.AddAttribute("class", dayTableClass);
-            //output.AddStyleAttribute("width", columnWidth + "px");
 #if useStyle
             output.AddStyleAttribute("width", columnWidth + "px");
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
@@ -505,16 +531,10 @@ namespace iLabs.Controls.Scheduling
 #endif
             output.RenderBeginTag("table");
 
-            //output.Write("<tr>");
-            //output.AddStyleAttribute("height", "1px");
-            //output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(timeBorderColor));
-            //output.RenderBeginTag("td");
-            //output.RenderEndTag();
-            //output.WriteLine("</tr>");
-
             //Day Header 
             output.Write("<tr>");
             output.AddStyleAttribute("height", headerHeight*2 + "px");
+            output.AddStyleAttribute("width", columnWidth + "px");
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -533,7 +553,6 @@ namespace iLabs.Controls.Scheduling
             {
                 renderTimePeriods(output, day, periods);
             }
-           
             output.RenderEndTag();
             output.RenderEndTag();
         }
@@ -667,8 +686,6 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(availableColor));
             output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(availableColor));
             output.AddStyleAttribute("cursor", "hand");
-            
-          
             if(lastCell)
                 output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
             else
@@ -787,41 +804,64 @@ namespace iLabs.Controls.Scheduling
             {
                 return;
             }
-
             base.PerformDataBinding(schedulingData);
-
+            TimeSpan oneDay = TimeSpan.FromDays(1);
+            MinTOD = TimeSpan.Zero;
+            MaxTOD = oneDay;
             // Verify data exists.
             if (schedulingData != null)
             {
 
-                TimeSpan tmpTS;
-                TimeSpan oneDay = TimeSpan.FromDays(1);
-                maxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
-                minTOD = oneDay;
-
-                foreach (ITimeBlock tb in schedulingData)
+                if (NumDays == 1)
                 {
-                    tmpTS = tb.Start.AddMinutes(userTZ).TimeOfDay;
-                    if (minTOD > tmpTS)
-                        minTOD = tmpTS;
-                    tmpTS = tmpTS.Add(TimeSpan.FromSeconds(tb.Duration));
-                    if (tmpTS.TotalHours < 24)
+                    TimeSpan tmpTS;
+                    TimeSpan tmpMinTOD = oneDay;
+                    TimeSpan tmpMaxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
+                    //tmpMinTOD = startTime.Add(TimeSpan.FromMinutes(userTZ)).TimeOfDay;
+                    // tmpMaxTOD = endTime.Add(TimeSpan.FromMinutes(userTZ)).TimeOfDay;
+                    //if (tmpMaxTOD.Hours < 24)
+                    //{
+                    //    if (tmpMaxTOD.TotalHours > maxTOD.Hours)
+                    //    {
+                    //        tmpMaxTOD = TimeSpan.FromHours(maxTOD.Hours + 1.0);
+                    //    }
+                    //}
+
+
+
+                    //DateTime localEnd = endTime.Subtract(TimeSpan.FromMinutes(userTZ));
+                    //localStart.
+                    //TimeSpan tmpTS;
+                    //TimeSpan oneDay = TimeSpan.FromDays(1);
+                    //maxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
+                    //minTOD = oneDay;
+
+                    foreach (ITimeBlock tb in schedulingData)
                     {
-                        if (maxTOD < tmpTS)
+                        tmpTS = tb.Start.AddMinutes(userTZ).TimeOfDay;
+                        if (tmpMinTOD > tmpTS)
+                            tmpMinTOD = tmpTS;
+                        tmpTS = tmpTS.Add(TimeSpan.FromSeconds(tb.Duration));
+                        if (tmpTS.TotalHours < 24)
                         {
-                            maxTOD = tmpTS;
+                            if (tmpMaxTOD < tmpTS)
+                            {
+                                tmpMaxTOD = tmpTS;
+                            }
+                        }
+                        else if (tmpTS.TotalHours == 24)
+                        {
+                            tmpMaxTOD = tmpTS;
+                        }
+                        else
+                        {
+                            tmpMinTOD = TimeSpan.Zero;
+                            tmpMaxTOD = TimeSpan.FromHours(24);
+                            break;
                         }
                     }
-                    else if (tmpTS.TotalHours == 24)
-                    {
-                        maxTOD = tmpTS;
-                    }
-                    else
-                    {
-                        minTOD = TimeSpan.Zero;
-                        maxTOD = TimeSpan.FromHours(24);
-                        break;
-                    }
+                    MinTOD = tmpMinTOD;
+                    MaxTOD = tmpMaxTOD;
                 }
                 if (bindReservations)
                 { // should be Reservations
@@ -856,8 +896,7 @@ namespace iLabs.Controls.Scheduling
             }
             else
             {
-                minTOD = TimeSpan.Zero;
-                maxTOD = TimeSpan.FromHours(24);
+                
                 periods = new List<TimePeriod>();
                 periods.Add(new TimePeriod(StartTime, EndTime, 0));
             }
