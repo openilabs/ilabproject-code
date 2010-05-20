@@ -128,14 +128,12 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
 									<asp:ListItem Value="system">system</asp:ListItem>
 								</asp:radiobuttonlist></fieldset> <%}%>
 							<label for="messagetype">Select the groupname
-									<%if (Session["GroupName"].ToString().Equals(iLabs.ServiceBroker.Administration.Group.SUPERUSER)) {%>, lab, or system<%}%></label>
-							<br>
-							<asp:dropdownlist CssClass="i18n" id="ddlMessageTarget" Runat="server" Width="248px"></asp:dropdownlist><asp:button id="btnGo" Runat="server" Text="Go" CssClass="button" onclick="btnGo_Click"></asp:button>
-						</div>
+									<%if (Session["GroupName"].ToString().Equals(iLabs.ServiceBroker.Administration.Group.SUPERUSER)) {%>, lab, or system<%}%></label>&nbsp;<br>
+							<asp:dropdownlist CssClass="i18n" id="ddlMessageTarget" Runat="server" Width="300px"></asp:dropdownlist>&nbsp;&nbsp;<asp:button id="btnGo" Runat="server" Text="Go" CssClass="button" onclick="btnGo_Click"></asp:button></div>
 						<div>&nbsp;</div>
 						<div class="simpleform"><label for="selectmessage">Select message</label>
 							<br>
-							<asp:listbox cssClass="i18n" id="lbxSelectMessage" Runat="server" AutoPostBack="True" Width="288px" Height="346px" onselectedindexchanged="lbxSelectMessage_SelectedIndexChanged"></asp:listbox>
+							<asp:listbox cssClass="i18n" id="lbxSelectMessage" Runat="server" AutoPostBack="True" Width="400px" Height="346px" onselectedindexchanged="lbxSelectMessage_SelectedIndexChanged"></asp:listbox>
 						</div>
 						<p>&nbsp;</p>
 					</div> <!-- end pagecontent div -->

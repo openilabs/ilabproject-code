@@ -130,7 +130,7 @@ namespace iLabs.ServiceBroker.admin
 
 				for (int i =0;i <msg.Length ; i++)
 				{
-					lbxSelectMessage.Items .Add(new ListItem(msg[i].messageTitle + " / (" + msg[i].lastModified.ToString () +")", msg[i].messageID.ToString () ));
+					lbxSelectMessage.Items .Add(new ListItem(msg[i].messageTitle + " / (" + DateUtil.ToUserTime(msg[i].lastModified,culture,userTZ) +")", msg[i].messageID.ToString () ));
 				}
 			}
 			catch(Exception ex)
@@ -192,7 +192,7 @@ namespace iLabs.ServiceBroker.admin
 						foreach(Group gr in groups)
 						{
 							//if(!gr.groupName.EndsWith ("request"))
-							if ((gr.groupID>0)&&(!gr.groupName.Equals(Group.ROOT))&&(!gr.groupName.Equals(Group.SUPERUSER))&&(!gr.groupName.Equals(Group.NEWUSERGROUP))&&(!gr.groupName.Equals(Group.ORPHANEDGROUP)))
+                            if ((gr.groupID > 0) && gr.GroupType.Equals(GroupType.REGULAR) && (!gr.groupName.Equals(Group.ROOT)) && (!gr.groupName.Equals(Group.SUPERUSER)) && (!gr.groupName.Equals(Group.NEWUSERGROUP)) && (!gr.groupName.Equals(Group.ORPHANEDGROUP)))
 								ddlMessageTarget.Items .Add(new ListItem(gr.groupName,gr.groupID.ToString()));
 						}
 					}
@@ -455,7 +455,7 @@ namespace iLabs.ServiceBroker.admin
 						break;
 				}
 			}
-			msg.lastModified = DateTime.Now;
+			msg.lastModified = DateTime.UtcNow;
 			msg.messageTitle = txtMessageTitle.Text ;
 			msg.messageBody = txtMessageBody.Text ;
 			msg.toBeDisplayed = cbxDisplayMessage.Checked ;
@@ -464,12 +464,12 @@ namespace iLabs.ServiceBroker.admin
 			{
 				try
 				{
-					msg.messageID =wrapper.AddSystemMessageWrapper(msg.messageType, msg.toBeDisplayed, msg.groupID, msg.clientID,msg.agentID, msg.messageBody, msg.messageTitle);
+                    msg.messageID = wrapper.AddSystemMessageWrapper(msg.messageType, msg.toBeDisplayed, msg.groupID, msg.clientID, msg.agentID, msg.messageTitle, msg.messageBody);
 
 					BuildMsgListBox(rbtnSelectType.SelectedValue);
 					
 					txtMessageID.Text = msg.messageID.ToString();
-					txtLastModified.Text = msg.lastModified.ToString();
+					txtLastModified.Text = DateUtil.ToUserTime(msg.lastModified,culture,userTZ);
 					string cmsg = "Message '"+msg.messageTitle+"' has been created.";
                     lblResponse.Text = Utilities.FormatConfirmationMessage(cmsg);
 					lblResponse.Visible = true;
@@ -488,7 +488,7 @@ namespace iLabs.ServiceBroker.admin
 				try 
 				{
 					wrapper.ModifySystemMessageWrapper(msg.messageID, msg.messageType, msg.toBeDisplayed, msg.groupID, msg.clientID, msg.agentID, msg.messageBody, msg.messageTitle);
-					txtLastModified.Text = msg.LastModified.ToString ();
+                    txtLastModified.Text = DateUtil.ToUserTime(msg.lastModified, culture, userTZ); ;
 
 					//update record in list box
 					//this crashes when updating something that hasn't been selected
@@ -515,7 +515,7 @@ namespace iLabs.ServiceBroker.admin
 			string msg = txtMessageBody.Text.Replace("'", "");
 			
 			string script = @"<script language='javascript'>window.open('messagePreviewPopup.aspx?msg="+ Server.UrlEncode(msg)+"&amp;title="+ Server.UrlEncode(txtMessageTitle.Text) +
-				   "&amp;date="+ Server.UrlEncode(txtLastModified.Text) + "','_blank','scrollbars=yes,resizable=yes,width=450,height=300')</script>";
+                   "&amp;date=" + Server.UrlEncode(txtLastModified.Text) + "','_blank','scrollbars=yes,resizable=yes,width=450,height=300')</script>";
             Page.RegisterStartupScript("MessagePreview",script);
 		}
 	}
