@@ -3,21 +3,22 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
+<html>
 <!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
 <!-- $Id: myClientList.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
-	<HEAD>
+	<head>
 		<title>MIT iLab Service Broker - My Labs</title>
-		<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
-		<meta content="C#" name="CODE_LANGUAGE">
-		<meta content="JavaScript" name="vs_defaultClientScript">
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
+		<meta content="C#" name="CODE_LANGUAGE"/>
+		<meta content="JavaScript" name="vs_defaultClientScript"/>
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema"/>
 		<style type="text/css"> @import url( css/main.css );  </style>
-	</HEAD>
+		
+	</head>
 	<body>
 		<form id="manyLabs" method="post" runat="server">
 			<a name="top"></a>
@@ -25,7 +26,7 @@ Please see license.txt in top level directory for full license.
 				
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
 				<uc1:userNav id="UserNav1" runat="server"></uc1:userNav>	
-				<br clear="all">
+				<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>My Labs
@@ -37,15 +38,12 @@ Please see license.txt in top level directory for full license.
 						<div id="messagebox-right">
 							<h3>Messages for
 								<asp:Label ID="lblGroupNameSystemMessage" Runat="server"></asp:Label></h3>
-						
-							<h3></h3>
 							<asp:repeater id="repSystemMessage" runat="server">
 								<ItemTemplate>
-									<p class="message">
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %>
-									</p>
+								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>
+									<p class="message"><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %></p>
 									<p class="date">Date Posted:
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "LastModified")) %>
+										<%# userFormatTime((DateTime)(DataBinder.GetPropertyValue(Container.DataItem, "LastModified"))) %>
 									</p>
 								</ItemTemplate>
 							</asp:repeater>
@@ -71,10 +69,10 @@ Please see license.txt in top level directory for full license.
 							<p class="lab"><strong><a href="samplelab.html">Lab 4 </a></strong>- description</p>-->
 						</div>
 					</div>
-					<br clear="all"> <!-- end pagecontent div -->
+					<br clear="all"/> <!-- end pagecontent div -->
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>
 			</div>
 		</form>
 	</body>
-</HTML>
+</html>

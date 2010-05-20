@@ -39,11 +39,10 @@ Please see license.txt in top level directory for full license.
 							<h3><asp:label id="lblGroupNameSystemMessage" Runat="server"></asp:label></h3>
 							<asp:repeater id="repSystemMessage" runat="server">
 								<ItemTemplate>
-									<p class="message">
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %>
-									</p>
+								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>
+									<p class="message"><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %></p>
 									<p class="date">Date Posted:
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "LastModified")) %>
+										<%# userFormatTime((DateTime) DataBinder.GetPropertyValue(Container.DataItem, "LastModified")) %>
 									</p>
 								</ItemTemplate>
 							</asp:repeater></div>

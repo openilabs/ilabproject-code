@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -21,6 +22,7 @@ using System.Web.Security;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.Internal;
+using iLabs.UtilLib;
 
 namespace iLabs.ServiceBroker.iLabSB
 {
@@ -31,6 +33,8 @@ namespace iLabs.ServiceBroker.iLabSB
 	{
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 		protected LabClient[] lcList = null;
+        public CultureInfo culture;
+        public int userTZ;
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -45,6 +49,8 @@ namespace iLabs.ServiceBroker.iLabSB
 				}
 
 			}
+            userTZ = Convert.ToInt32(Session["UserTZ"]);
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
 			// This doesn't work - is it possible to stick an int array in the session?
 			//int[] lcIDList = (int[])(Session["LabClientList"]);
 
@@ -65,17 +71,20 @@ namespace iLabs.ServiceBroker.iLabSB
             if (messagesList != null && messagesList.Count > 0)
             {
                 messagesList.Sort(SystemMessage.CompareDateDesc);
-                //messagesList.Reverse();
                 repSystemMessage.DataSource = messagesList;
                 repSystemMessage.DataBind();
             }
-
             else
             {
                 lblGroupNameSystemMessage.Text += "<p>No Messages at this time</p>";
             }
 		}
-
+      
+            public string userFormatTime(DateTime dt)
+            {
+                return iLabs.UtilLib.DateUtil.ToUserTime(dt, culture, userTZ);
+            }   
+		
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
 		{

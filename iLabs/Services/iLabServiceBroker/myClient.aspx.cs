@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.SessionState;
@@ -62,11 +63,15 @@ namespace iLabs.ServiceBroker.iLabSB
         DateTime startExecution;
         long duration = -1;
         bool autoLaunch = false;
+        protected CultureInfo culture;
+        protected int userTZ;
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
             int groupID = 0;
             string groupName = null;
+            userTZ = Convert.ToInt32(Session["UserTZ"]);
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
 
             if (Session["GroupID"] != null && Session["GroupID"].ToString().Length > 0)
@@ -342,7 +347,10 @@ namespace iLabs.ServiceBroker.iLabSB
 
         }
         #endregion
-
+        public string userFormatTime(DateTime dt)
+        {
+            return iLabs.UtilLib.DateUtil.ToUserTime(dt, culture, userTZ);
+        }   
 
         private void urlEmail_Click(object sender, System.EventArgs e)
         {
