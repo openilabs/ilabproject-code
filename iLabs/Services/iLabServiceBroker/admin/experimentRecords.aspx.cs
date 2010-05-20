@@ -305,8 +305,12 @@ namespace iLabs.ServiceBroker.admin
 
             try
             {
-                wrapper.SaveExperimentAnnotationWrapper(Int32.Parse(txtExperimentID.Text), txtAnnotation.Text);
-
+                wrapper.SaveExperimentAnnotationWrapper(Int64.Parse(txtExperimentID.Text), txtAnnotation.Text);
+                LongTag[] updateEXP = DataStorageAPI.RetrieveExperimentTags(new long[] { Convert.ToInt64(txtExperimentID.Text) },
+                    userTZ, culture, true, true, true, false, false, false, true, false);
+                if(updateEXP.Length == 1){
+                    lbxSelectExperiment.Items.FindByValue(txtExperimentID.Text).Text = updateEXP[0].tag;
+                }
                 lblResponse.Text = Utilities.FormatConfirmationMessage("Annotation saved for experiment ID " + txtExperimentID.Text);
                 lblResponse.Visible = true;
             }
