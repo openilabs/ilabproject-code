@@ -14,7 +14,7 @@ Date.....: 3/12/2005
 	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
-			<asp:Calendar ID="calDate" OnSelectionChanged="popupDate_changed" Runat="server" />
+			<asp:Calendar ID="calDate" OnSelectionChanged="popupDate_changed"  SelectionMode="DayWeek"  Runat="server" />
 		</form>
 	</body>
 </html>
