@@ -222,7 +222,7 @@ namespace iLabs.ServiceBroker.iLabSB
            // cList.Add(new Criterion("Record_Count", ">", "0"));
 
             long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userID,groupID, cList.ToArray());
-            LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture);
+            LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture, false, false, true, false, true, false, true, false);
 
             for (int i = 0; i < expTags.Length; i++)
             {
@@ -316,9 +316,14 @@ namespace iLabs.ServiceBroker.iLabSB
 		protected void btnSaveAnnotation_Click(object sender, System.EventArgs e)
 		{
 			lblResponse.Visible=false;
-			try
-			{
+			try{
 				wrapper.SaveExperimentAnnotationWrapper(Int32.Parse(txtExperimentID.Text), txtAnnotation.Text);
+                LongTag[] updateEXP = DataStorageAPI.RetrieveExperimentTags( new long[] { Convert.ToInt64(txtExperimentID.Text) },
+                    userTZ, culture, false, false, true, false, true, false, true, false);
+                if (updateEXP.Length == 1)
+                {
+                    lbxSelectExperiment.Items.FindByValue(txtExperimentID.Text).Text = updateEXP[0].tag;
+                }
 
 				lblResponse.Text = Utilities.FormatConfirmationMessage("Annotation saved for experiment ID " + txtExperimentID.Text);
 				lblResponse.Visible = true;
