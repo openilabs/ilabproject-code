@@ -3410,7 +3410,7 @@ namespace iLabs.ServiceBroker.Internal
 						if(myReader["description"] != System.DBNull.Value )
 							sm[i].messageType = (string) myReader["description"];
 						if(myReader["last_modified"] != System.DBNull.Value )
-							sm[i].lastModified = Convert.ToDateTime(myReader["last_modified"]);
+							sm[i].lastModified = DateUtil.SpecifyUTC(Convert.ToDateTime(myReader["last_modified"]));
                         if (myReader["agent_id"] != System.DBNull.Value)
                             sm[i].agentID = Convert.ToInt32(myReader["agent_id"]);
                         if (myReader["group_id"] != System.DBNull.Value)
@@ -3480,7 +3480,7 @@ namespace iLabs.ServiceBroker.Internal
 					else 
 						sm.toBeDisplayed = false;
 					if(myReader["last_modified"] != System.DBNull.Value )
-						sm.lastModified = Convert.ToDateTime(myReader["last_modified"]);
+						sm.lastModified = DateUtil.SpecifyUTC(Convert.ToDateTime(myReader["last_modified"]));
 					if(myReader["message_title"] != System.DBNull.Value )
 						sm.messageTitle = (string) myReader["message_title"];
 
@@ -3542,7 +3542,7 @@ namespace iLabs.ServiceBroker.Internal
 						if(myReader["description"] != System.DBNull.Value )
 							sm.messageType = (string) myReader["description"];
 						if(myReader["last_modified"] != System.DBNull.Value )
-							sm.lastModified = Convert.ToDateTime(myReader["last_modified"]);
+							sm.lastModified = DateUtil.SpecifyUTC(Convert.ToDateTime(myReader["last_modified"]));
                         if (myReader["client_id"] != System.DBNull.Value)
                             sm.clientID = Convert.ToInt32(myReader["client_id"]);
                         if (myReader["group_id"] != System.DBNull.Value)
@@ -3618,7 +3618,7 @@ namespace iLabs.ServiceBroker.Internal
 					else 
 						sm.toBeDisplayed = false;
 					if(myReader["last_modified"] != System.DBNull.Value )
-						sm.lastModified = Convert.ToDateTime(myReader["last_modified"]);
+						sm.lastModified = DateUtil.SpecifyUTC(Convert.ToDateTime(myReader["last_modified"]));
 					if(myReader["message_title"] != System.DBNull.Value )
 						sm.messageTitle= (string) myReader["message_title"];
 
