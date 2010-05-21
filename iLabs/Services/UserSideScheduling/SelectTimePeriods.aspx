@@ -47,10 +47,11 @@
 			</div>
 			<div>		
 			<table>
-			<tr><th>Available Times</th><th>Reservation Details</th></tr>
+			<tr><th>Available Times</th><th style="width:50px;">&nbsp;</th><th style="width:400px;">Reservation Details</th></tr>
 			<tr>
-			    <td><iLab:SchedulingControl id="cntrScheduling" runat="server" Hours24="false" BorderColor="black"  
+			    <td><iLab:SchedulingControl id="cntrScheduling" runat="server" Hours24="false"  ColumnWidth="100" BorderColor="black"  
 			      ScheduledColor="red" VoidColor="gray" OnAvailableClick="TimePeriod_Click"></iLab:SchedulingControl></td>
+			    <td>&nbsp;</td>
 			    <td style="vertical-align:top">
 			        <table style="vertical-align:top">
 			            <tr style="vertical-align:top">
