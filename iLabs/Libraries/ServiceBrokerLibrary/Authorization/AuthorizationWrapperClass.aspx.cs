@@ -2352,7 +2352,7 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="messageBody"></param>
 		/// <param name="messageTitle"></param>
 		/// <returns></returns>
-        public int AddSystemMessageWrapper(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
+        public int AddSystemMessageWrapper(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageTitle, string messageBody)
 		{
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 			string sessionGroupName = Session["GroupName"].ToString();
@@ -2361,7 +2361,7 @@ namespace iLabs.ServiceBroker.Authorization
 			int qID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.groupQualifierTypeID);
 			if((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))			
 			{
-                return Administration.AdministrativeAPI.AddSystemMessage(messageType, toBeDisplayed, groupID, clientID, agentID, messageBody, messageTitle);
+                return Administration.AdministrativeAPI.AddSystemMessage(messageType, toBeDisplayed, groupID, clientID, agentID, messageTitle, messageBody);
 			}
 			else
 				throw new AccessDeniedException("Access denied adding system message.");
