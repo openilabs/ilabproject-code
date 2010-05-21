@@ -19,13 +19,13 @@
 	<div id="outerwrapper">
 		<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
 		<uc1:NavBar id="NavBar1" runat="server"></uc1:NavBar>
-		<br clear="all">
+		<br clear="all" />
 		<div id="innerwrapper">
 		<div id="pageintro">
 						<h1>Manage Time Blocks
 						</h1>
 						<asp:Label ID="lblDescription" runat="server" />
-						</p>
+						
 						<!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
 						<p><asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label></p>
 					    </div>
