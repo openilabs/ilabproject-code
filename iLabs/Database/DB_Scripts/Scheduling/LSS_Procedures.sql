@@ -1532,7 +1532,11 @@ CREATE PROCEDURE ReservationInfo_RetrieveIDByLabServer
 @endTime DateTime
 
 AS
-select R. Reservation_Info_ID from Reservation_Info AS R Join Experiment_Info AS E on (R.Experiment_Info_ID = E.Experiment_Info_ID) where E.Lab_server_GUID = @labServerGUID and R.End_Time>@startTime and R.Start_Time<@endTime ORDER BY R.Start_Time asc
+Create table #expInfo (ids int)
+INSERT INTO #expInf SELECT Experiment_info_ID from Experiment_Info where Lab_Server_GUID = @labServerGUID
+select Reservation_Info_ID from Reservation_Info
+where  Experimment_Info_ID in (SELECT ids from #expInfo) and R.End_Time>@startTime and R.Start_Time<@endTime 
+
 
 
 GO
@@ -1625,56 +1629,49 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-CREATE PROCEDURE ReservationTags_Retrieve
+/****** Object:  Stored Procedure dbo.ReservationTags_Retrieve    Script Date: 5/20/2010 6:39:48 PM ******/
+
+CREATE  PROCEDURE ReservationTags_Retrieve
 @expID int,
-@CREDId int,
+@credID int,
 @start Datetime,
 @end Datetime
  AS
+BEGIN
+Create Table #resids  ( ids int )
 
-if @start != Null and @end != null
+if @expID != null AND @credID != null AND @start != Null and @end != null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where Experiment_Info_ID = @expID and Credential_Set_ID = @credID and End_Time >= @start AND start_time <= @end
+else if @expID = null AND @credID != null AND @start != Null and @end != null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where Credential_Set_ID = @credID and End_Time >= @start AND start_time <= @end
+else if @expID != null AND @credID = null AND @start != Null and @end != null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where Experiment_Info_ID = @expID and End_Time >= @start AND start_time <= @end
+else if @expID = null AND @credID = null AND @start != Null and @end != null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where End_Time >= @start AND start_time <= @end
 
-if @start = @end
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where R.Experiment_Info_ID = IsNull(@expID,R.Experiment_Info_ID) AND R.Credential_Set_ID = IsNull(@credID,R.Credential_Set_ID)
-  AND @start BETWEEN R.start_time AND R.end_Time
-ORDER BY R.Start_Time desc
-else
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where R.Experiment_Info_ID = IsNull(@expID,R.Experiment_Info_ID) AND R.Credential_Set_ID = IsNull(@credID,R.Credential_Set_ID)
-  AND R.End_Time > @start AND R.start_time < @end
-ORDER BY R.Start_Time desc
+else if @expID != null AND @credID != null AND @start = Null and @end = null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where Experiment_Info_ID = @expID and Credential_Set_ID = @credID 
+else if @expID = null AND @credID != null AND @start = Null and @end = null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where Credential_Set_ID = @credID 
+else if @expID != null AND @credID = null AND @start = Null and @end = null 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
+	where Experiment_Info_ID = @expID 
+else 
+	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
 
-ELSE IF @start!= NULL AND @end = NULL
-
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where R.Experiment_Info_ID = IsNull(@expID,R.Experiment_Info_ID) AND R.Credential_Set_ID = IsNull(@credID,R.Credential_Set_ID)
-  AND R.End_Time > @start
-ORDER BY R.Start_Time desc
-
-ELSE IF @start = NULL AND @end != NULL
-
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where R.Experiment_Info_ID = IsNull(@expID,R.Experiment_Info_ID) AND R.Credential_Set_ID = IsNull(@credID,R.Credential_Set_ID)
-  AND R.Start_Time < @end
+select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
+from Reservation_Info R, Experiment_info E, Credential_Sets C
+where R.Reservation_Info_ID IN (Select ids from #resids)
+and R.Experiment_Info_ID = E.Experiment_Info_ID and R.Credential_Set_ID = C.Credential_Set_ID
 ORDER BY R.Start_Time desc
 
-ELSE
-
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where R.Experiment_Info_ID = IsNull(@expID,R.Experiment_Info_ID) AND R.Credential_Set_ID = IsNull(@credID,R.Credential_Set_ID)
-ORDER BY R.Start_Time desc
-
+END
 GO
 
 SET QUOTED_IDENTIFIER OFF 
@@ -1682,10 +1679,6 @@ GO
 SET ANSI_NULLS ON 
 GO
 
-SET QUOTED_IDENTIFIER OFF 
-GO
-SET ANSI_NULLS OFF 
-GO
 
 CREATE PROCEDURE ReservationTags_RetrieveByLabServer
 @guid varchar(50),
@@ -1695,37 +1688,38 @@ CREATE PROCEDURE ReservationTags_RetrieveByLabServer
 
 if @start != NULL AND @end != NULL
 
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where r.Resource_ID in (SELECT Resource_ID from LS_Resources where Lab_Server_Guid = IsNull(@guid,Lab_Server_Guid))
+select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
+from Reservation_Info R, Experiment_Info E, Credential_Sets C 
+where R.Experiment_Info_ID in (SELECT Experiment_Info_ID from Experiment_Info where Lab_Server_Guid = @guid)
   AND R.End_Time > @start AND R.start_time < @end
+AND R.Experiment_Info_ID = E.Experiment_Info_ID AND R.Credential_Set_ID = C.Credential_Set_ID
 ORDER BY R.Start_Time desc
 
 ELSE IF @start!= NULL AND @end = NULL
 
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where r.Resource_ID in (SELECT Resource_ID from LS_Resources where Lab_Server_Guid =  IsNull(@guid,Lab_Server_Guid))
+select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
+from Reservation_Info R, Experiment_Info E, Credential_Sets C 
+where R.Experiment_Info_ID in (SELECT Experiment_Info_ID from Experiment_Info where Lab_Server_Guid = @guid)
   AND R.End_Time > @start
+AND R.Experiment_Info_ID = E.Experiment_Info_ID AND R.Credential_Set_ID = C.Credential_Set_ID
 ORDER BY R.Start_Time desc
+
 
 ELSE IF @start = NULL AND @end != NULL
 
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where r.Resource_ID in (SELECT Resource_ID from LS_Resources where Lab_Server_Guid =  IsNull(@guid,Lab_Server_Guid))
+select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
+from Reservation_Info R, Experiment_Info E, Credential_Sets C 
+where R.Experiment_Info_ID in (SELECT Experiment_Info_ID from Experiment_Info where Lab_Server_Guid = @guid)
   AND R.Start_Time < @end
+AND R.Experiment_Info_ID = E.Experiment_Info_ID AND R.Credential_Set_ID = C.Credential_Set_ID
 ORDER BY R.Start_Time desc
 
 ELSE
 
-select distinct R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
-from Reservation_Info R join Experiment_info E on R.Experiment_Info_ID = E.Experiment_Info_ID, 
-Reservation_Info RI join Credential_Sets C on RI.Credential_set_ID = C.Credential_Set_ID
-where r.Resource_ID in (SELECT Resource_ID from LS_Resources where Lab_Server_Guid =  IsNull(@guid,Lab_Server_Guid))
+select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
+from Reservation_Info R, Experiment_Info E, Credential_Sets C 
+where R.Experiment_Info_ID in (SELECT Experiment_Info_ID from Experiment_Info where Lab_Server_Guid = @guid)
+AND R.Experiment_Info_ID = E.Experiment_Info_ID AND R.Credential_Set_ID = C.Credential_Set_ID
 ORDER BY R.Start_Time desc
 GO
 
