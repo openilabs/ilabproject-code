@@ -573,6 +573,14 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public string messageTitle;
 
+        /// <summary>
+        /// Property for the Message Title.
+        /// This is needed in order for a Repeater object to display the value in the messageTitle field. 
+        /// </summary>
+        public string MessageTitle
+        {
+            get { return messageTitle; }
+        }
 		/// <summary>
 		/// Property for the Message Body.
 		/// This is needed in order for a Repeater object to display the value in the messageBody field. 
@@ -2100,7 +2108,7 @@ namespace iLabs.ServiceBroker.Administration
 		/// <param name="messageBody">The text of the message to be displayed.</param>
 		/// <param name="messageTitle">The title of the message to be displayed.</param>
 		/// <returns></returns>
-        public static int AddSystemMessage(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
+        public static int AddSystemMessage(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageTitle, string messageBody)
 		{
 			SystemMessage sm = new SystemMessage();
 			sm.messageType=messageType;
