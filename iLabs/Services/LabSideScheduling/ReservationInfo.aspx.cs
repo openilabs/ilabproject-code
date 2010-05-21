@@ -269,18 +269,20 @@ namespace iLabs.Scheduling.LabSide
 					if(ddlTimeIs.SelectedIndex==1) //Equal To
 					{
                         start = time1;
-                        end = time1;
+                        end = time1.AddDays(1);
                       
 
 					}
 					else if(ddlTimeIs.SelectedIndex==2) // Before
 					{
+                        start = FactoryDB.MinDbDate;
                         end = time1;
                        
 					}				
 					else if(ddlTimeIs.SelectedIndex==3) // After
 					{
                         start = time1;
+                        end = FactoryDB.MaxDbDate;
                        
 					}
 					else if(ddlTimeIs.SelectedIndex==4) //Between

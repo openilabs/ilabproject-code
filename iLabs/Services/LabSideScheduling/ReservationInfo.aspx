@@ -51,7 +51,7 @@
 											<label for="time">Time</label></th>
 										<td  colspan="3" style="width: 454px"><asp:DropDownList cssClass="i18n" id="ddlTimeIs" runat="server" Width="104px" AutoPostBack="True"  OnSelectedIndexChanged="ddlTimeIs_SelectedIndexChanged">
 				<asp:ListItem Value="select">--Select one--</asp:ListItem>
-				<asp:ListItem Value="equal">equal to</asp:ListItem>
+				<asp:ListItem Value="equal">date</asp:ListItem>
 				<asp:ListItem Value="before">before</asp:ListItem>
 				<asp:ListItem Value="after">after</asp:ListItem>
 				<asp:ListItem Value="between">between</asp:ListItem>
