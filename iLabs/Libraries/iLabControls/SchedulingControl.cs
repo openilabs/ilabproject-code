@@ -40,6 +40,7 @@ namespace iLabs.Controls.Scheduling
         TimeSpan minDuration;
         TimeSpan tzSpan;
 
+        TimeSpan oneDay = TimeSpan.FromDays(1);
         int minHour = 0;
         int maxHour = 24;
         int numCols;
@@ -145,14 +146,16 @@ namespace iLabs.Controls.Scheduling
             set
             {
                 maxTOD = value;
-                if (maxTOD.Hours == 0)
+                if (maxTOD >= oneDay)
                 {
                     maxHour = 24;
                 }
                 else
                 {
-                    if (maxTOD.TotalHours != (double)maxTOD.Hours)
+                    if (maxTOD.TotalHours > maxTOD.Hours)
                         maxHour = maxTOD.Hours + 1;
+                    else
+                        maxHour = maxTOD.Hours;
                 }
             }
      
@@ -170,14 +173,15 @@ namespace iLabs.Controls.Scheduling
             }
   
         }
+
         public int MaxHour
         {
             get
             {
                 return maxHour;
             }
-
         }
+
         public int MinHour
         {
             get
@@ -186,6 +190,7 @@ namespace iLabs.Controls.Scheduling
             }
 
         }
+
         public TimeSpan MinDuration
         {
             get
@@ -440,7 +445,7 @@ namespace iLabs.Controls.Scheduling
             output.WriteLine("</tr>");
           
             
-            for (int i = MinHour; i < (int) MaxHour; i++)
+            for (int i = MinHour; i < MaxHour; i++)
             {
                 renderHourCell(output, i);
             }
@@ -560,7 +565,10 @@ namespace iLabs.Controls.Scheduling
         private void renderTimePeriods(HtmlTextWriter output, DateTime date, IEnumerable periods)
         {
           
-            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.AddHours((int)maxTOD.TotalHours));
+            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.Add(maxTOD));
+            TimeBlock valid;
+            DateTime cur = DateTime.MinValue;
+            DateTime end = DateTime.MinValue;
             if (periods != null)
             {
                 IEnumerator enumTP = null;
@@ -574,7 +582,9 @@ namespace iLabs.Controls.Scheduling
                         renderVoidTime(output, Convert.ToInt32((first.Start - validTime.Start).TotalSeconds));
                     }
                 }
-                catch (Exception ex) { }
+                catch (Exception ex) {
+                    throw ex;
+                }
                 finally
                 {
                     enumTP.Reset();
@@ -584,7 +594,9 @@ namespace iLabs.Controls.Scheduling
                 {
                     if (validTime.Intersects(tp))
                     {
-                        TimeBlock valid = validTime.Intersection(tp);
+                        valid = validTime.Intersection(tp);
+                        cur = valid.Start;
+                        end = valid.End;
                         if (tp.quantum == 0)
                         {
                             renderScheduledTime(output, valid);
@@ -593,8 +605,7 @@ namespace iLabs.Controls.Scheduling
                         {
                             int cellDur = 0;
                             int tDur = valid.Duration;
-                            DateTime cur = valid.Start;
-                            DateTime end = valid.End;
+                            
 
                             while (cur < end)
                             {
@@ -618,6 +629,10 @@ namespace iLabs.Controls.Scheduling
                             }
                         }
                     }
+                } // End of foreach period
+                if (end < validTime.End)
+                {
+                    renderScheduledTime(output, new TimePeriod(end,validTime.End));
                 }
             }
         }
@@ -805,7 +820,7 @@ namespace iLabs.Controls.Scheduling
                 return;
             }
             base.PerformDataBinding(schedulingData);
-            TimeSpan oneDay = TimeSpan.FromDays(1);
+            
             MinTOD = TimeSpan.Zero;
             MaxTOD = oneDay;
             // Verify data exists.
@@ -816,7 +831,7 @@ namespace iLabs.Controls.Scheduling
                 {
                     TimeSpan tmpTS;
                     TimeSpan tmpMinTOD = oneDay;
-                    TimeSpan tmpMaxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
+                    //TimeSpan tmpMaxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
                     //tmpMinTOD = startTime.Add(TimeSpan.FromMinutes(userTZ)).TimeOfDay;
                     // tmpMaxTOD = endTime.Add(TimeSpan.FromMinutes(userTZ)).TimeOfDay;
                     //if (tmpMaxTOD.Hours < 24)
@@ -836,32 +851,47 @@ namespace iLabs.Controls.Scheduling
                     //maxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
                     //minTOD = oneDay;
 
-                    foreach (ITimeBlock tb in schedulingData)
+                    //Check the first timeBlock
+                    IEnumerator eTB = schedulingData.GetEnumerator();
+                    if (eTB.MoveNext())
                     {
-                        tmpTS = tb.Start.AddMinutes(userTZ).TimeOfDay;
+                        tmpTS = (( TimeBlock)eTB.Current).Start.AddMinutes(userTZ).TimeOfDay;
                         if (tmpMinTOD > tmpTS)
+                        {
                             tmpMinTOD = tmpTS;
-                        tmpTS = tmpTS.Add(TimeSpan.FromSeconds(tb.Duration));
-                        if (tmpTS.TotalHours < 24)
-                        {
-                            if (tmpMaxTOD < tmpTS)
-                            {
-                                tmpMaxTOD = tmpTS;
-                            }
+                            MinTOD = tmpMinTOD;
                         }
-                        else if (tmpTS.TotalHours == 24)
-                        {
-                            tmpMaxTOD = tmpTS;
-                        }
-                        else
-                        {
-                            tmpMinTOD = TimeSpan.Zero;
-                            tmpMaxTOD = TimeSpan.FromHours(24);
-                            break;
-                        }
+
                     }
-                    MinTOD = tmpMinTOD;
-                    MaxTOD = tmpMaxTOD;
+                //    //Check all TimeBlocks
+                //    foreach (ITimeBlock tb in schedulingData)
+                //    {
+                //        tmpTS = tb.Start.AddMinutes(userTZ).TimeOfDay;
+                //        if (tmpMinTOD > tmpTS)
+                //            tmpMinTOD = tmpTS;
+                //        //tmpTS = tmpTS.Add(TimeSpan.FromSeconds(tb.Duration));
+                //        //if (tmpTS.TotalHours < 24)
+                //        //{
+                //        //    if (tmpMaxTOD < tmpTS)
+                //        //    {
+                //        //        tmpMaxTOD = tmpTS;
+                //        //    }
+                //        //}
+                //        //else if (tmpTS.TotalHours == 24)
+                //        //{
+                //        //    tmpMaxTOD = tmpTS;
+                //        //}
+                //        //else
+                //        //{
+                //        //    tmpMinTOD = TimeSpan.Zero;
+                //        //    tmpMaxTOD = TimeSpan.FromHours(24);
+                //        //    break;
+                //        //}
+                //    }
+                //    if (tmpMinTOD != oneDay)
+                //    {
+                //        MinTOD = tmpMinTOD;
+                //    }
                 }
                 if (bindReservations)
                 { // should be Reservations
