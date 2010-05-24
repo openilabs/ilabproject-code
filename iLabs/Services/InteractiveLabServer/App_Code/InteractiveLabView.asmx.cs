@@ -25,6 +25,7 @@ using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 
+using iLabs.LabView;
 #if LabVIEW_2009
 using iLabs.LabView.LV2009;
 #endif
