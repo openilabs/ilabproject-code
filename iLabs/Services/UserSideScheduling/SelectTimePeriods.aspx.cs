@@ -34,6 +34,7 @@ namespace iLabs.Scheduling.UserSide
 	/// </summary>
 	public partial class SelectTimePeriods: System.Web.UI.Page
 	{
+        public bool useQuirk = false;
 		 DateTime startTime;
          DateTime endTime;
          string serviceBrokerGuid = null;

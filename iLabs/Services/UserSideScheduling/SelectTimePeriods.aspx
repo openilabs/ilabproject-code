@@ -4,7 +4,6 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Select Time Periods</title>
@@ -13,10 +12,17 @@
 		<meta content="JavaScript" name="vs_defaultClientScript"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/> 
 		<meta name="vs_targetSchema"  content="http://schemas.microsoft.com/intellisense/html-401" />
+		<!-- Default styles -->
 		<style type="text/css">@import url( css/main.css ); @import url( css/scheduling.css );
 		</style>
 		
-
+		<!-- Use these styles to override colors for the different Tscheduling imeBlock classes 
+		<style type="text/css">
+		table .day td[class=available] {	background-color:#88ff88;}
+        table .day td[class=reserved] {	background-color:Blue; }
+        table .day td[class=void] {	background-color:#aaaaaa; }
+        </style>
+        -->
 		<script type="text/javascript">
 		<!--
 		function ReloadParent() 
