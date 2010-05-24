@@ -1,53 +1,53 @@
-#cntrScheduling {  border: solid 2px black; margin:0px 0px 0px 0px;  padding: 0px 0px 0px 0px; text-align: left;  
-	 font-family:Tahoma; font-size: 14px; vertical-align:top
+#cntrScheduling { margin:0px 0px 0px 0px;  padding: 0px 0px 0px 0px;
+	border-style:solid; border-color:Black; border-collapse: separate; border-spacing:  0px;
+	border-width:2px;
+	text-align: left; font-family:Tahoma; font-size: 14px; vertical-align:top
 	 }
 
-table .scheduling { border: outset 0px; 
-             border-collapse: separate;
-             border-spacing:  0px;  border: solid 2px black; margin:0px 0px 0px 0px;  padding: 0px 0px 0px 0px; text-align: left;  
-	 font-family:Tahoma; font-size: 14px; vertical-align:top
+table .scheduling 
+{  margin:0px 0px 0px 0px;  padding: 0px 0px 0px 0px; 
+	border-style:solid; border-color:Black; border-collapse: separate; border-spacing:  0px;
+    border-width:0px 0px 0px 0px;
+    text-align: left; font-family:Tahoma; font-size: 14px; vertical-align:top
 	 }
-	 
-	 
-table .day {border: outset 0px; 
-             border-collapse: separate; border-spacing:  0px; border-right: solid 1px black; border-left:0px;  border-bottom:0px; border-top:0px;
-	margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px; 
+	 	 
+table .day {margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px;
+	border-style:solid; border-color:Black; border-collapse: separate; border-spacing: 0px; 
+	border-width:0px 1px 0px 0px;
 	vertical-align: top;  display:block;  cursor:default; 
-	
 	}
-
-table .day td[class=available] {	background-color:#88ff88; margin:0px; padding:0px; 
-	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
-	vertical-align: top; text-align: left; display:block}
-table .day td[class=reserved] {	background-color:Red; margin:0px; padding:0px; 
-	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
-	vertical-align: top; text-align: left; display:block}
-table .day td[class=void] {	background-color:#aaaaaa; margin:0px; padding:0px; 
+table .day td { margin:0px; padding:0px; 
 	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
 	vertical-align: top; text-align: left; display:block}
 
 table .day th {  margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px; 
-	border-right:0px; border-left:0px;  border-bottom:solid 1px black; border-top:0px;
+	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
 	background-color: #ECE9D8; text-align:center; display:block
 	}
-
+table .day td[class=available] {	background-color:#88ff88;}
+        table .day td[class=reserved] {	background-color:Red; }
+        table .day td[class=void] {	background-color:#aaaaaa; }
+        
 table.day th div {border: none; margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px 
 	}
 	 
-table.hours { margin:0px; padding:0px; 
-	border: outset 0px; border-collapse: separate; border-spacing:  0px; border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
-	text-align: right; vertical-align: bottom;  display:block;  cursor:default; 
+table.hours { margin:0px 0px 0px 0px; padding: 0px 0px 0px 0px;
+	border-style:solid; border-color:Black; border-collapse: separate; border-spacing: 0px; 
+	border-width:0px 1px 0px 0px;
+	vertical-align: top;  display:block;  cursor:default; 
 	font-family:Tahoma; font-size: 14px
 	}
 	
-table.hours td {margin:0px; padding:0px; 
-	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px; display:block
-	}
-	
+table.hours td { margin:0px; padding:0px; 
+	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
+	vertical-align: top; text-align: left; display:block
+}	
 table.hours th { margin:0px; padding:0px; 
-	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px; display:block;  background-color: #ECE9D8
+	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
+	vertical-align: top; text-align: left; display:block;
+	background-color: #ECE9D8
 	}
 
 table.hours th div {margin:0px; padding:0px; 
-	border-style:solid; border-color:Black; border-width:0px 0px 1px 0px;
+	border-style:solid; border-color:Black; border-width:0px 0px 0px 0px;
 	}
