@@ -33,6 +33,7 @@ namespace iLabs.Controls.Scheduling
    
     public class SchedulingControl : DataBoundControl, IPostBackEventHandler
     {
+        int browserMode = 0;
         DateTime startTime;
         DateTime endTime;
         TimeSpan maxTOD;
@@ -72,7 +73,7 @@ namespace iLabs.Controls.Scheduling
         
         Color availableColor = ColorTranslator.FromHtml("#55ff55");
         Color scheduledColor = ColorTranslator.FromHtml("#ff0000");
-        Color timeBorderColor = ColorTranslator.FromHtml("#000000");
+        //Color timeBorderColor = ColorTranslator.FromHtml("#000000");
         Color voidColor = ColorTranslator.FromHtml("#aaaaaa");
 
         public DateTime StartTime
@@ -311,14 +312,14 @@ namespace iLabs.Controls.Scheduling
                 scheduledColor = value;
             }
         }
-        public Color TimeBorderColor{
-            get {
-                return timeBorderColor;
-            }
-            set{
-                timeBorderColor = value;
-            }
-        }
+        //public Color TimeBorderColor{
+        //    get {
+        //        return timeBorderColor;
+        //    }
+        //    set{
+        //        timeBorderColor = value;
+        //    }
+        //}
         public Color VoidColor{
             get {
                 return voidColor;
@@ -328,6 +329,65 @@ namespace iLabs.Controls.Scheduling
             }
         }
 
+        #endregion
+        #region styleSetting
+
+        private string strHeight(int height)
+        {
+            int h;
+            if (browserMode == 0)
+            {
+                h = height - 1;
+            }
+            else
+            {
+                h = height;
+            }
+            return h.ToString();
+        }
+
+        private int calcHeight(int height)
+        {
+            if(browserMode == 0){
+                return height - 1;
+            }
+            else{
+                return height;
+            }
+        }
+
+        public void setBrowser(string userAgent)
+        {
+            if(userAgent.StartsWith("Mozilla/5.0"))
+            {
+                browserMode = 0;
+            }
+            else if (userAgent.StartsWith("Mozilla/4.0"))// all IE browsers need further checking
+            {
+                if (userAgent.Contains("MSIE 8.0") || userAgent.Contains("compatible; MSIE 7.0"))
+                {
+                    browserMode = 0;
+                }
+                else
+                {
+                    browserMode = 1;
+                }
+            }
+        }
+
+        public string getDocType()
+        {
+            string buf = null;
+            switch(browserMode){
+              case 0:
+                buf = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">";
+                break;
+              default:
+                  buf = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\" >";
+                break;
+            }
+            return buf;
+        }
         #endregion
 
         /// <summary>
@@ -355,17 +415,23 @@ namespace iLabs.Controls.Scheduling
             output.AddAttribute("id", ID);
             output.AddAttribute("class", scheduleTableClass);
             output.AddAttribute("cols",(NumDays + 1).ToString());
+            if (browserMode > 0)
+            {
+                output.AddAttribute("cellpadding", "0px");
+                output.AddAttribute("cellspacing", "0px");
+            }
          
 #if useStyle 
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
-            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(BorderColor));
             output.AddStyleAttribute("border-top", "1px");
             output.AddStyleAttribute("border-right", "1px");
             output.AddStyleAttribute("border-left", "1px");
             output.AddStyleAttribute("border-bottom", "1px");     
 #endif
+            
             //output.AddStyleAttribute("position", "relative");
             output.RenderBeginTag("table");
             
@@ -405,7 +471,7 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
-            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(BorderColor));
             output.AddStyleAttribute("border", "0px");
             //output.AddStyleAttribute("border-top", "0px");
             //output.AddStyleAttribute("border-right", "1px");
@@ -419,12 +485,18 @@ namespace iLabs.Controls.Scheduling
             output.WriteLine();
             output.WriteLine("<!- Hour Table -->");
             output.AddAttribute("class", hourTableClass);
+            if (browserMode > 0)
+            {
+                output.AddAttribute("cellpadding", "0px");
+                output.AddAttribute("cellspacing", "0px");
+                output.AddStyleAttribute("border-left","1px solid " + ColorTranslator.ToHtml(BorderColor));
+            }
            
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
-            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(BorderColor));
             output.AddStyleAttribute("border-top", "0px");
             output.AddStyleAttribute("border-right", "1px");
             output.AddStyleAttribute("border-left", "0px");
@@ -435,6 +507,10 @@ namespace iLabs.Controls.Scheduling
             output.Write("<tr>");
             output.AddStyleAttribute("height", HeaderHeight * 2 + "px");
             output.AddStyleAttribute("width", hourWidth + "px");
+            if (browserMode > 0)
+            {
+                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
+            }
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -457,17 +533,7 @@ namespace iLabs.Controls.Scheduling
 
         }
 
-        private string strHeight(int height)
-        {
-            int h = height -1;
-            return h.ToString();
-        }
-
-        private int calcHeight(int height)
-        {
-
-            return height -1;
-        }
+       
 
         private int renderHourCell(HtmlTextWriter output, int hour)
         {
@@ -475,6 +541,10 @@ namespace iLabs.Controls.Scheduling
 
             //output.AddStyleAttribute("top", top + "px");
             output.AddStyleAttribute("height", calcHeight(HourHeight) + "px");
+            if (browserMode > 0)
+            {
+                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
+            }
             //output.AddStyleAttribute("background-color", "Yellow");
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
@@ -523,12 +593,18 @@ namespace iLabs.Controls.Scheduling
             output.RenderBeginTag("td");
             // <table>
             output.AddAttribute("class", dayTableClass);
+            if (browserMode > 0)
+            {
+                output.AddAttribute("cellpadding", "0px");
+                output.AddAttribute("cellspacing", "0px");
+                output.AddStyleAttribute("border-left", "1px solid " + ColorTranslator.ToHtml(BorderColor));
+            }
 #if useStyle
             output.AddStyleAttribute("width", columnWidth + "px");
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.BorderStyle, "solid");
-            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(timeBorderColor));
+            output.AddStyleAttribute(HtmlTextWriterStyle.BorderColor, ColorTranslator.ToHtml(BorderColor));
             output.AddStyleAttribute("border-top", "0px");
             output.AddStyleAttribute("border-right", "1px");
             output.AddStyleAttribute("border-left", "0px");
@@ -540,6 +616,10 @@ namespace iLabs.Controls.Scheduling
             output.Write("<tr>");
             output.AddStyleAttribute("height", headerHeight*2 + "px");
             output.AddStyleAttribute("width", columnWidth + "px");
+            if (browserMode > 0)
+            {
+                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
+            }
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -645,6 +725,11 @@ namespace iLabs.Controls.Scheduling
            //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
            output.AddAttribute("title", (duration / 60.0).ToString());
            output.AddStyleAttribute("height", calcHeight(height) + "px");
+            if (browserMode > 0)
+            {
+                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
+                output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(voidColor));
+            }
 #if useStyle
            output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
            output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -672,7 +757,11 @@ namespace iLabs.Controls.Scheduling
 #endif
            output.AddAttribute("class", reservedClass);
             output.AddStyleAttribute("height", calcHeight(height) + "px");
-           
+           if (browserMode > 0)
+            {
+                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
+                output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(scheduledColor));
+            }
             output.AddAttribute("title", tb.Start.AddMinutes(userTZ).TimeOfDay.ToString() + " - " + tb.End.AddMinutes(userTZ).TimeOfDay.ToString());
             output.RenderBeginTag("td");
             //if(height > 24)
@@ -694,6 +783,11 @@ namespace iLabs.Controls.Scheduling
             output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, str));
             output.AddAttribute("title", startTime.AddMinutes(userTZ).TimeOfDay.ToString());
             output.AddStyleAttribute("height", calcHeight(height) + "px");
+            if (browserMode > 0)
+            {
+                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
+                output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(availableColor));
+            }
             
 #if useSttyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
@@ -704,7 +798,7 @@ namespace iLabs.Controls.Scheduling
             if(lastCell)
                 output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
             else
-                output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(timeBorderColor));
+                output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
 #endif
             output.RenderBeginTag("td");
             //DateTime end = startTime.AddSeconds(duration);
