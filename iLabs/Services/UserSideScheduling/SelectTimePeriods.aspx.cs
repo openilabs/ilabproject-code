@@ -97,6 +97,7 @@ namespace iLabs.Scheduling.UserSide
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            cntrScheduling.setBrowser(Request.Headers["User-Agent"]);
 			serviceBrokerGuid = Session["serviceBrokerGuid"].ToString();
 			groupName = Session["groupName"].ToString();
             clientGuid = Session["clientGuid"].ToString();
