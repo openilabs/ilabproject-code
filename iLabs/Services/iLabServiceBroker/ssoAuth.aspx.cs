@@ -545,6 +545,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             // USS Not Found
                         }
                     } // End needsScheduling
+                    Session["ClientID"] = client.clientID;
                   //Response.Redirect(Global.FormatRegularURL(Request, "myClient.aspx"), true);
                   Response.Redirect(buf.ToString(), true);
                   } // End if valid client
