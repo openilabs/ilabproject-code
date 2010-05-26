@@ -475,9 +475,14 @@ namespace iLabs.ServiceBroker.iLabSB
                         // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
                         Coupon coupon = issuer.CreateTicket(TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
                              ProcessAgentDB.ServiceGuid, -1, sessionPayload);
-
+                       
+                        /* This is the original batch-redirect using a pop-up */
                         string jScript = @"<script language='javascript'> window.open ('" + lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey + "')</script>";
                         Page.RegisterStartupScript("HTML Client", jScript);
+                        
+                        /* This is the batch-redirect with a simple redirect, this may not work as we need to preserve session-state */
+                        //string redirectURL = lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey;
+                        //Response.Redirect(redirectURL,true);
                     }
                 }
                 // use the Loader script for Batch experiments
@@ -491,7 +496,6 @@ namespace iLabs.ServiceBroker.iLabSB
                     string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
                         + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/applet.aspx" + @"'</script>";
                     ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
-                    //Page.RegisterStartupScript("ReloadFrame", jScript);
                 }
             }
             else
