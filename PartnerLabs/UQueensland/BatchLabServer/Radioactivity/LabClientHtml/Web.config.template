@@ -7,6 +7,12 @@
   
   <appSettings>
 
+    <!-- Path for log files, filename format is the current date of the form YYYYMMDD.log -->
+    <add key="LogFilesPath" value="LogFiles" />
+
+    <!-- Email address to provide feedback on the website -->
+    <add key="FeedbackEmail" value="" />
+
     <!-- ServiceBroker URL - If not specified in the LabClient URL as a query string parameter then it must be specified here. -->
     <add key="ServiceURL" value=""/>
 
@@ -16,12 +22,6 @@
     <!-- When true allows experiments to be submitted without waiting for a previous experiment to complete -
          If not specified in the LabClient URL as a query string parameter then it must be specified here. -->
     <add key="MultiSubmit" value="false" />
-
-    <!-- Path for log files, filename format is the current date of the form YYYYMMDD.log -->
-    <add key="LogFilesPath" value="LogFiles" />
-
-    <!-- Email address to provide feedback on the website -->
-    <add key="FeedbackEmail" value="" />
 
   </appSettings>
 

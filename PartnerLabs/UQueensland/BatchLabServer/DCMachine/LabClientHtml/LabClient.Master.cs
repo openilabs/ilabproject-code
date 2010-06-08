@@ -37,8 +37,9 @@ namespace LabClientHtml
         public const string STRLOG_PhotoUrl = " Photo Url: ";
         public const string STRLOG_LabInfoText = " LabInfo Text: ";
         public const string STRLOG_LabInfoUrl = " LabInfo Url: ";
-        private const string STRLOG_UserHostName = " UserHostName: ";
         private const string STRLOG_UserHostAddress = " UserHostAddress: ";
+        private const string STRLOG_UserHostName = " UserHostName: ";
+        private const string STRLOG_CannotResolveToHostName = " Cannot resolve to HostName!";
 
         #endregion
 
@@ -279,11 +280,18 @@ namespace LabClientHtml
                 // Log the caller's IP address and hostname
                 //
                 HttpRequest httpRequest = this.Request;
-                IPHostEntry ipHostEntry = Dns.GetHostEntry(httpRequest.UserHostAddress);
                 string logMessage = STRLOG_UserHostAddress + httpRequest.UserHostAddress +
-                    Logfile.STRLOG_Spacer + STRLOG_UserHostName + ipHostEntry.HostName;
+                    Logfile.STRLOG_Spacer + STRLOG_UserHostName;
+                try
+                {
+                    IPHostEntry ipHostEntry = Dns.GetHostEntry(httpRequest.UserHostAddress);
+                    logMessage += ipHostEntry.HostName;
+                }
+                catch
+                {
+                    logMessage += STRLOG_CannotResolveToHostName;
+                }
                 Logfile.Write(logMessage);
-
 
                 //
                 // Get query string values - the query string parameters are NOT case-sensensitive (good)
@@ -386,7 +394,7 @@ namespace LabClientHtml
                 LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
 
                 Banner.Title = labClientSession.bannerTitle;
-                Status.Version = STR_Version + labClientSession.statusVersion;
+                Statusbar.Version = STR_Version + labClientSession.statusVersion;
                 Navmenu.PhotoUrl = labClientSession.navmenuPhotoUrl;
                 Feedback.MailtoUrl = labClientSession.mailtoUrl;
             }

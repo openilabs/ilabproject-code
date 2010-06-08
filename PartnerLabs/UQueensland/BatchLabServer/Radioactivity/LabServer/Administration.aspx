@@ -11,7 +11,8 @@
         current state of the experiment queue.
     </p>
     <h4>
-        Experiment Statistics</h4>
+        Experiment Statistics
+    </h4>
     <p>
         Download all experiment statistics stored in the database and present in XML format.
     </p>
@@ -24,7 +25,8 @@
         </tr>
     </table>
     <h4>
-        Experiment Results</h4>
+        Experiment Results
+    </h4>
     <p>
         Download all experiment results stored in the database and present in XML format.
     </p>
@@ -37,7 +39,8 @@
         </tr>
     </table>
     <h4>
-        Experiment Queue</h4>
+        Experiment Queue
+    </h4>
     <p>
         View the current state of the experiment queue and present in XML format.
     </p>

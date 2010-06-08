@@ -6,7 +6,7 @@ namespace LabServer
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            Response.Redirect("Administration.aspx");
+            Response.Redirect("~/Administration.aspx");
         }
     }
 }

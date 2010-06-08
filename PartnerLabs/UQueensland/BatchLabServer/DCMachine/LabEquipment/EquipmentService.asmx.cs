@@ -83,7 +83,6 @@ namespace LabEquipment
         //
         // Local variables
         //
-        private static Logfile.LoggingLevels logLevel = Logfile.LoggingLevels.Unknown;
         public AuthHeader authHeader;
 
         #endregion
@@ -93,22 +92,6 @@ namespace LabEquipment
         public EquipmentService()
         {
             this.authHeader = new AuthHeader();
-
-            //
-            // Determine the logging level for this class
-            //
-            if (logLevel == Logfile.LoggingLevels.Unknown)
-            {
-                try
-                {
-                    logLevel = (Logfile.LoggingLevels)Utilities.GetIntAppSetting(STRLOG_ClassName);
-                }
-                catch
-                {
-                    logLevel = Logfile.LoggingLevels.Minimum;
-                }
-                Logfile.Write(Logfile.STRLOG_LogLevel + logLevel.ToString());
-            }
         }
 
         //---------------------------------------------------------------------------------------//
@@ -119,18 +102,14 @@ namespace LabEquipment
         {
             const string STRLOG_MethodName = "GetLabEquipmentStatus";
 
-            Logfile.WriteCalled(logLevel, STRLOG_ClassName, STRLOG_MethodName);
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
             LabEquipmentStatus labEquipmentStatus = null;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                labEquipmentStatus = new LabEquipmentStatus(false, STRLOG_AccessDenied);
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 //
                 // Pass on to the equipment engine
@@ -138,11 +117,15 @@ namespace LabEquipment
                 LabStatus labStatus = Global.equipmentManager.GetLabEquipmentStatus();
                 labEquipmentStatus = new LabEquipmentStatus(labStatus.online, labStatus.labStatusMessage);
             }
+            else
+            {
+                labEquipmentStatus = new LabEquipmentStatus(false, STRLOG_AccessDenied);
+            }
 
             string logMessage = STRLOG_Online + labEquipmentStatus.online.ToString() +
                 Logfile.STRLOG_Spacer + STRLOG_LabStatusMessage + Logfile.STRLOG_Quote + labEquipmentStatus.statusMessage + Logfile.STRLOG_Quote;
 
-            Logfile.WriteCompleted(logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 
             return labEquipmentStatus;
         }
@@ -155,18 +138,14 @@ namespace LabEquipment
         {
             const string STRLOG_MethodName = "GetTimeUntilReady";
 
-            Logfile.WriteCalled(logLevel, STRLOG_ClassName, STRLOG_MethodName);
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            int timeUntilReady;
+            int timeUntilReady = -1;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                timeUntilReady = -1;
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 // Pass on to the equipment engine
                 timeUntilReady = Global.equipmentManager.GetTimeUntilReady();
@@ -174,7 +153,7 @@ namespace LabEquipment
 
             string logMessage = timeUntilReady.ToString();
 
-            Logfile.WriteCompleted(logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 
             return timeUntilReady;
         }
@@ -187,18 +166,14 @@ namespace LabEquipment
         {
             const string STRLOG_MethodName = "SuspendPowerdown";
 
-            Logfile.WriteCalled(logLevel, STRLOG_ClassName, STRLOG_MethodName);
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            bool success;
+            bool success = false;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                success = false;
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 // Pass on to the equipment engine
                 success = Global.equipmentManager.SuspendPowerdown();
@@ -206,7 +181,7 @@ namespace LabEquipment
 
             string logMessage = success.ToString();
 
-            Logfile.WriteCompleted(logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 
             return success;
         }
@@ -219,18 +194,14 @@ namespace LabEquipment
         {
             const string STRLOG_MethodName = "ResumePowerdown";
 
-            Logfile.WriteCalled(logLevel, STRLOG_ClassName, STRLOG_MethodName);
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            bool success;
+            bool success = false;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                success = false;
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 // Pass on to the equipment engine
                 success = Global.equipmentManager.ResumePowerdown();
@@ -238,7 +209,7 @@ namespace LabEquipment
 
             string logMessage = success.ToString();
 
-            Logfile.WriteCompleted(logLevel, STRLOG_ClassName, STRLOG_MethodName, logMessage);
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 
             return success;
         }
@@ -252,7 +223,7 @@ namespace LabEquipment
         {
             const string STRLOG_MethodName = "ExecuteRequest";
 
-            Logfile.WriteCalled(logLevel, STRLOG_ClassName, STRLOG_MethodName, xmlRequest);
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName, xmlRequest);
 
             string strXmlResponse;
 
@@ -290,7 +261,7 @@ namespace LabEquipment
                 strXmlResponse = Global.equipmentManager.ExecuteXmlRequest(xmlRequest);
             }
 
-            Logfile.WriteCompleted(logLevel, STRLOG_ClassName, STRLOG_MethodName, strXmlResponse);
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, strXmlResponse);
 
             return strXmlResponse;
         }

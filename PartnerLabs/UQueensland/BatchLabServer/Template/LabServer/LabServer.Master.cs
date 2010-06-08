@@ -88,7 +88,7 @@ namespace LabServer
         {
             
             Banner.Title = bannerTitle;
-            Status.Version = STR_Version + statusVersion;
+            Statusbar.Version = STR_Version + statusVersion;
             Navmenu.PhotoUrl = navmenuPhotoUrl;
         }
 

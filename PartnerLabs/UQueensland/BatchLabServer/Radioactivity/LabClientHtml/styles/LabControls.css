@@ -1,17 +1,23 @@
-﻿td.labsetup-label
+﻿/*
+ * LabSetup.ascx
+ */
+#labsetup td
 {
-	width: 80px;
 	text-align: left;
 	vertical-align: middle;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+#labsetup td.label
+{
+	width: 80px;
 	padding-right: 5px;
 }
-td.labsetup-data160px
+#labsetup td.data
 {
-	text-align: left;
 	width: 160px;
 }
-td.labsetup-dataright
+#labsetup td.dataright
 {
-	text-align: left;
 	width: 100%;
 }

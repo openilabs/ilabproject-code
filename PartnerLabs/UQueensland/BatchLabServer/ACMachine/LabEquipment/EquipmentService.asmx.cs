@@ -109,17 +109,17 @@ namespace LabEquipment
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                labEquipmentStatus = new LabEquipmentStatus(false, STRLOG_AccessDenied);
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 //
                 // Pass on to the equipment engine
                 //
                 LabStatus labStatus = Global.equipmentManager.GetLabEquipmentStatus();
                 labEquipmentStatus = new LabEquipmentStatus(labStatus.online, labStatus.labStatusMessage);
+            }
+            else
+            {
+                labEquipmentStatus = new LabEquipmentStatus(false, STRLOG_AccessDenied);
             }
 
             string logMessage = STRLOG_Online + labEquipmentStatus.online.ToString() +
@@ -140,16 +140,12 @@ namespace LabEquipment
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            int timeUntilReady;
+            int timeUntilReady = -1;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                timeUntilReady = -1;
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 // Pass on to the equipment engine
                 timeUntilReady = Global.equipmentManager.GetTimeUntilReady();
@@ -172,16 +168,12 @@ namespace LabEquipment
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            bool success;
+            bool success = false;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                success = false;
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 // Pass on to the equipment engine
                 success = Global.equipmentManager.SuspendPowerdown();
@@ -204,16 +196,12 @@ namespace LabEquipment
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            bool success;
+            bool success = false;
 
             //
             // Check caller access is authorised
             //
-            if (Authorised(authHeader) == false)
-            {
-                success = false;
-            }
-            else
+            if (Authorised(authHeader) == true)
             {
                 // Pass on to the equipment engine
                 success = Global.equipmentManager.ResumePowerdown();

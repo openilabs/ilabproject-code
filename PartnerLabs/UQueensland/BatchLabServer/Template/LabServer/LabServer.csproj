@@ -45,7 +45,7 @@
     <Content Include="Controls\Footer.ascx" />
     <Content Include="Controls\Header.ascx" />
     <Content Include="Controls\Navmenu.ascx" />
-    <Content Include="Controls\Status.ascx" />
+    <Content Include="Controls\Statusbar.ascx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\feedback-gradient.gif" />
@@ -58,7 +58,6 @@
     <Content Include="LabServer.Master" />
     <Content Include="LabServerWebService.asmx" />
     <Content Include="Styles\Controls.css" />
-    <Content Include="Styles\LabControls.css" />
     <Content Include="Styles\LabServer.css" />
     <None Include="Web.config" />
     <Content Include="Web.config.template" />
@@ -106,12 +105,12 @@
     <Compile Include="Controls\Navmenu.ascx.designer.cs">
       <DependentUpon>Navmenu.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Status.ascx.cs">
-      <DependentUpon>Status.ascx</DependentUpon>
+    <Compile Include="Controls\Statusbar.ascx.cs">
+      <DependentUpon>Statusbar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Controls\Status.ascx.designer.cs">
-      <DependentUpon>Status.ascx</DependentUpon>
+    <Compile Include="Controls\Statusbar.ascx.designer.cs">
+      <DependentUpon>Statusbar.ascx</DependentUpon>
     </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>

@@ -1,12 +1,12 @@
 /*
- * LabClient "Master" and "Content" webpage layouts
+ * "Master" and "Content" webpage layouts
  */
 body
 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 9pt;
 	background: #FFFFFF;
 	margin: 1px;
-	font-size : 11px;
 }
 h1, h2, h3, h4
 {
@@ -14,103 +14,60 @@ h1, h2, h3, h4
 }
 h1
 {
-	font-size: 17px;
+	font-size: 16pt;
 }
 h2
 {
-	font-size: 15px;
+	font-size: 14pt;
 }
 h3
 {
-	font-size: 13px;
+	font-size: 12pt;
 }
 h4
 {
-	font-size: 11px;
+	font-size: 10pt;
 }
-table
+#master table
 {
 	width: 100%;
 	border: 0px;
-}
-table,th,td
-{
 	padding: 0px;
 }
-
-td.menu
+#master td.menu
 {
-	width: 200px;
-	vertical-align: top;
 	background-color: #E7ECEF;
-}
-
-td.content
-{
-	width: 100%;
 	vertical-align: top;
-	font-size: 12px;
-	padding: 2px;
-	padding-left: 10px;
-	margin-left: 10px;
-	margin-right: 10px;
+	width: 200px;
 }
-
-td.contentheader
+#master td.content
 {
-	font-family: Arial, Verdana, Helvetica, Sans-Serif;
-	font-size: 160%;
+	margin: 0px;
+	padding: 5px;
+	vertical-align: top;
+	width: 100%;
+}
+#master td.headercontent
+{
+	font-size: 140%;
 	font-weight: bold;
 	color: #333;
 }
+#master td.pagecontent
+{
+	margin: 10px 0px 10px 0px;
+	padding: 0px;
+}
 
 /*
- * Status.aspx, Setup.aspx, Results.aspx
+ * Buttons
  */
-.sectiontitle
-{
-	height: 24px;
-	text-align: left;
-	vertical-align: middle;
-	padding-top: 8px;
-	padding-bottom: 8px;
-	font-weight: bold;
-}
-
-td.label
-{
-	width: 80px;
-	text-align: left;
-	vertical-align: middle;
-	padding-right: 5px;
-}
-
-td.data400px
-{
-	width: 400px;
-}
-
-td.dataright
-{
-	text-align: left;
-	width: 100%;
-}
-
-td.message-data
-{
-	text-align: left;
-	width: 100%;
-	padding-top: 12px;
-	padding-bottom: 12px;
-}
-
 td.button
 {
 	text-align: left;
-	padding-top: 12px;
-	padding-bottom: 12px;
+	padding-top: 10px;
+	padding-bottom: 15px;
 }
-
 .aspbutton
 {
 	width: 72px;
@@ -118,27 +75,75 @@ td.button
 }
 
 /*
- * Setup.aspx
+ * Setup.aspx, Status.aspx, Results.aspx
  */
-.setup-dropdownlist
+th
 {
-	width: 320px;
+	font-size: 10pt;
+	text-align: left;
+	padding: 10px 0px 10px 0px;
 }
-
-td.setup-label
+td.label
 {
 	width: 60px;
 	text-align: left;
 	vertical-align: middle;
-	padding-right: 5px;
+	padding: 5px 5px 5px 0px;
 }
-
-td.setup-description
+td.information
 {
-	height: 24px;
+	width: 100%;
 	text-align: left;
 	vertical-align: middle;
-	padding-top: 12px;
-	padding-right: 5px;
-	padding-bottom: 12px;
+	padding: 5px 0px 5px 0px;
+}
+td.message
+{
+	width: 100%;
+	text-align: left;
+	vertical-align: middle;
+}
+.messagebox
+{
+	background-color: #EEF8E4;
+	border: solid 1px Gray;
+	padding: 10px;
+	width: 100%;
+}
+
+/*
+ * Setup.aspx
+ */
+#setup td.description
+{
+	text-align: left;
+	vertical-align: middle;
+	padding: 5px 5px 5px 0px;
+}
+#setup .dropdownlist
+{
+	width: 160px;
+}
+
+/*
+ * Status.aspx
+ */
+#status
+{
+}
+
+/*
+ * Results.aspx
+ */
+#results
+{
+}
+
+/*
+ * Expired.htm
+ */
+.expired
+{
+	font-size: 12pt;
+	margin: 25px 0px 15px 25px;
 }

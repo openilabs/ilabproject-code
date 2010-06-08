@@ -42,34 +42,8 @@
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Controls\Banner.ascx" />
-    <Content Include="Controls\Feedback.ascx" />
-    <Content Include="Controls\Footer.ascx" />
-    <Content Include="Controls\Header.ascx" />
-    <Content Include="Controls\Navmenu.ascx" />
-    <Content Include="Controls\Status.ascx" />
-    <Content Include="Expired.htm" />
-    <Content Include="Global.asax" />
-    <Content Include="Home.aspx" />
-    <Content Include="Images\dcmachine.jpg" />
-    <Content Include="Images\feedback-gradient.gif" />
-    <Content Include="Images\gradient.gif" />
-    <Content Include="Images\level2-arrow.gif" />
-    <Content Include="Images\level2-underline.gif" />
-    <Content Include="Images\mit-blackred-footer1.gif" />
-    <Content Include="Images\uq-logo.gif" />
     <Content Include="LabClient.aspx" />
-    <Content Include="LabClient.Master" />
-    <Content Include="LabControls\LabResults.ascx" />
-    <Content Include="LabControls\LabSetup.ascx" />
-    <Content Include="Results.aspx" />
-    <Content Include="Setup.aspx" />
-    <Content Include="Status.aspx" />
-    <Content Include="Styles\Controls.css" />
-    <Content Include="Styles\LabClient.css" />
-    <Content Include="Styles\LabControls.css" />
     <None Include="Web.config" />
-    <Content Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\Banner.ascx.cs">
@@ -100,12 +74,12 @@
     <Compile Include="Controls\Header.ascx.designer.cs">
       <DependentUpon>Header.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Controls\Status.ascx.cs">
-      <DependentUpon>Status.ascx</DependentUpon>
+    <Compile Include="Controls\Statusbar.ascx.cs">
+      <DependentUpon>Statusbar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Controls\Status.ascx.designer.cs">
-      <DependentUpon>Status.ascx</DependentUpon>
+    <Compile Include="Controls\Statusbar.ascx.designer.cs">
+      <DependentUpon>Statusbar.ascx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -179,6 +153,35 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Applets\TimeOfDayResults.jar" />
+    <Content Include="Controls\Banner.ascx" />
+    <Content Include="Controls\Feedback.ascx" />
+    <Content Include="Controls\Footer.ascx" />
+    <Content Include="Controls\Header.ascx" />
+    <Content Include="Controls\Statusbar.ascx" />
+    <Content Include="Expired.htm" />
+    <Content Include="Global.asax" />
+    <Content Include="Home.aspx" />
+    <Content Include="Images\feedback-gradient.gif" />
+    <Content Include="Images\gradient.gif" />
+    <Content Include="Images\level2-arrow.gif" />
+    <Content Include="Images\level2-underline.gif" />
+    <Content Include="Images\mit-blackred-footer1.gif" />
+    <Content Include="Images\sundial.jpg" />
+    <Content Include="Images\uq-logo.gif" />
+    <Content Include="LabClient.Master" />
+    <Content Include="Controls\Navmenu.ascx" />
+    <Content Include="LabControls\LabResults.ascx" />
+    <Content Include="LabControls\LabSetup.ascx" />
+    <Content Include="Results.aspx" />
+    <Content Include="Setup.aspx" />
+    <Content Include="Status.aspx" />
+    <Content Include="Styles\Controls.css" />
+    <Content Include="Styles\LabClient.css" />
+    <Content Include="Styles\LabControls.css" />
+    <Content Include="Web.config.template" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\LabLibraries\LibraryLabClient\LibraryLabClient.csproj">
       <Project>{28EB1E05-AD5E-4702-B4F5-FE79B43FD0D3}</Project>
       <Name>LibraryLabClient</Name>
@@ -187,9 +190,6 @@
       <Project>{7266AE91-D308-40AC-947C-486745471E84}</Project>
       <Name>LibraryLab</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Applets\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v9.0\WebApplications\Microsoft.WebApplication.targets" Condition="" />

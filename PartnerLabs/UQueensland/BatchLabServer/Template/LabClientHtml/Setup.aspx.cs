@@ -14,49 +14,23 @@ namespace LabClientHtml
         //
         // String constants
         //
+        private const string STR_SpecificationValid = "Specification is valid. ";
+        private const string STR_SubmissionSuccessful = "Submission was successful. ";
         private const string STR_ExperimentNo = "Experiment #";
         private const string STR_HasBeenSubmitted = " has been submitted.";
         private const string STR_ExperimentNos = "Experiments #";
         private const string STR_HaveBeenSubmitted = " have been submitted.";
+        private const string STRWTR_ExecutionTimeWillBe = " Execution time will be ";
+        private const string STRWTR_ExecutionTimeIs = " Execution time is ";
+        private const string STRWTR_MinutesAnd = "{0} minute{1} and ";
+        private const string STRWTR_Seconds = "{0} second{1}.";
 
         //
         // String constants for error messages
         //
         private const string STRERR_NullConfiguration = "Configuration is null!";
-
-        #endregion
-
-        #region Properties
-
-        private string Message
-        {
-            get { return this.lblMessage.Text; }
-            set
-            {
-                this.lblMessage.ForeColor = Color.Black;
-                this.lblMessage.Text = value;
-            }
-        }
-
-        private string MessageError
-        {
-            get { return this.lblMessage.Text; }
-            set
-            {
-                this.lblMessage.ForeColor = Color.Red;
-                this.lblMessage.Text = value;
-            }
-        }
-
-        private string MessageFailure
-        {
-            get { return this.lblMessage.Text; }
-            set
-            {
-                this.lblMessage.ForeColor = Color.Blue;
-                this.lblMessage.Text = value;
-            }
-        }
+        private const string STRERR_ValidationFailed = "Failed to validate experiment!";
+        private const string STRERR_SubmissionFailed = "Failed to submit experiment!";
 
         #endregion
 
@@ -76,6 +50,11 @@ namespace LabClientHtml
         protected void Page_Load(object sender, EventArgs e)
         {
             //
+            // Hide message box
+            //
+            this.ShowMessageNormal(string.Empty);
+
+            //
             // Update local variables
             //
             labSetup.XmlNodeConfiguration = Master.XmlNodeConfiguration;
@@ -88,13 +67,6 @@ namespace LabClientHtml
                 //
                 PopulatePageControls();
             }
-            else
-            {
-                //
-                // It is a postback. A button on this page has been clicked to post back information.
-                //
-                this.Message = null;
-            }
 
             //
             // Check if an experiment has been submitted
@@ -106,16 +78,16 @@ namespace LabClientHtml
                     int[] submittedIDs = (int[])Session[Consts.STRSSN_SubmittedIDs];
                     if (submittedIDs.Length == 1 && submittedIDs[0] > 0)
                     {
-                        this.Message = STR_ExperimentNo + submittedIDs[0].ToString() + STR_HasBeenSubmitted;
+                        this.ShowMessage(STR_ExperimentNo + submittedIDs[0].ToString() + STR_HasBeenSubmitted);
                     }
                     else if (submittedIDs.Length > 1)
                     {
-                        string submittedIds = "";
+                        string submittedIds = string.Empty;
                         for (int i = 0; i < submittedIDs.Length; i++)
                         {
                             submittedIds += submittedIDs[i].ToString() + " ";
                         }
-                        this.Message = STR_ExperimentNos + submittedIds + STR_HaveBeenSubmitted;
+                        this.ShowMessage(STR_ExperimentNos + submittedIds + STR_HaveBeenSubmitted);
                     }
                 }
             }
@@ -129,7 +101,7 @@ namespace LabClientHtml
                         //
                         // Experiment has been submitted but not checked
                         //
-                        this.Message = STR_ExperimentNo + submittedID.ToString() + STR_HasBeenSubmitted;
+                        this.ShowMessage(STR_ExperimentNo + submittedID.ToString() + STR_HasBeenSubmitted);
                         btnSubmit.Enabled = false;
                     }
                 }
@@ -137,6 +109,146 @@ namespace LabClientHtml
         }
 
         //-------------------------------------------------------------------------------------------------//
+
+        protected void ddlExperimentSetups_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //
+            // Cannot do anything without a configuration
+            //
+            if (Master.XmlNodeConfiguration == null)
+            {
+                return;
+            }
+
+            // Update page controls for the selected index
+            UpdatePageControls();
+
+            //
+            // Tell LabSetup control that a different setup has been selected
+            //
+            XmlNodeList xmlNodeList = XmlUtilities.GetXmlNodeList(Master.XmlNodeConfiguration, Consts.STRXML_setup, false);
+            labSetup.XmlNodeSelectedSetup = xmlNodeList.Item(ddlExperimentSetups.SelectedIndex);
+            labSetup.ddlExperimentSetups_SelectedIndexChanged(sender, e);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected void btnValidate_Click1(object sender, EventArgs e)
+        {
+            try
+            {
+                // Build the XML specification string
+                string xmlSpecification = this.BuildSpecification();
+
+                //
+                // Validate the experiment specification
+                //
+                ValidationReport validationReport = Master.ServiceBroker.Validate(xmlSpecification);
+                if (validationReport.accepted)
+                {
+                    // Specification was accepted
+                    ShowMessageNormal(STR_SpecificationValid + FormatValidation((int)validationReport.estRuntime));
+                }
+                else
+                {
+                    // Specification was rejected
+                    this.ShowMessageError(validationReport.errorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                // LabServer error
+                Logfile.WriteError(ex.Message);
+                this.ShowMessageFailure(STRERR_ValidationFailed);
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected void btnSubmit_Click1(object sender, EventArgs e)
+        {
+            //
+            // Check if an experiment has already been submitted. The Submit button's
+            // enable state gets set when page is loaded.
+            //
+            if (btnSubmit.Enabled == false)
+            {
+                return;
+            }
+
+            try
+            {
+                // Build the XML specification string
+                string xmlSpecification = this.BuildSpecification();
+
+                //
+                // Submit the experiment specification
+                //
+                SubmissionReport submissionReport = Master.ServiceBroker.Submit(xmlSpecification);
+                if (submissionReport.vReport.accepted == true)
+                {
+                    //
+                    // Submission was accepted
+                    //
+                    ShowMessageNormal(STR_SubmissionSuccessful +
+                        FormatSubmission(submissionReport.experimentID, (int)submissionReport.vReport.estRuntime));
+
+                    //
+                    // Update session with submitted experiment ID
+                    //
+                    if (Master.MultiSubmit == true)
+                    {
+                        // Add experiment ID to the list in the session
+                        if (Session[Consts.STRSSN_SubmittedIDs] != null)
+                        {
+                            // Get the list of submitted experiment IDs
+                            int[] submittedIDs = (int[])Session[Consts.STRSSN_SubmittedIDs];
+
+                            // Create a bigger array and copy submitted experiment IDs
+                            int[] newSubmittedIDs = new int[submittedIDs.Length + 1];
+                            submittedIDs.CopyTo(newSubmittedIDs, 0);
+
+                            // Add the experiment ID to the bigger array
+                            newSubmittedIDs[submittedIDs.Length] = submissionReport.experimentID;
+
+                            // Save experiment IDs in the session
+                            Session[Consts.STRSSN_SubmittedIDs] = newSubmittedIDs;
+                        }
+                        else
+                        {
+                            // Create an array and add the experiment ID
+                            int[] submittedIDs = new int[1];
+                            submittedIDs[0] = submissionReport.experimentID;
+
+                            // Save experiment IDs in the session
+                            Session[Consts.STRSSN_SubmittedIDs] = submittedIDs;
+                        }
+                    }
+                    else
+                    {
+                        // Save experiment ID in the session
+                        Session[Consts.STRSSN_SubmittedID] = submissionReport.experimentID;
+
+                        // Update buttons
+                        btnValidate.Enabled = false;
+                        btnSubmit.Enabled = false;
+                    }
+                }
+                else
+                {
+                    // Submission was rejected
+                    this.ShowMessageError(submissionReport.vReport.errorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                // LabServer error
+                Logfile.WriteError(ex.Message);
+                this.ShowMessageFailure(STRERR_SubmissionFailed);
+            }
+        }
+
+        //=================================================================================================//
 
         private void PopulatePageControls()
         {
@@ -202,201 +314,6 @@ namespace LabClientHtml
             lblSetupDescription.Text = XmlUtilities.GetXmlValue(xmlNodeSetup, Consts.STRXML_description, false);
         }
 
-        //-------------------------------------------------------------------------------------------------//
-
-        protected void ddlExperimentSetups_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //
-            // Cannot do anything without a configuration
-            //
-            if (Master.XmlNodeConfiguration == null)
-            {
-                return;
-            }
-
-            // Update page controls for the selected index
-            UpdatePageControls();
-
-            //
-            // Tell LabSetup control that a different setup has been selected
-            //
-            XmlNodeList xmlNodeList = XmlUtilities.GetXmlNodeList(Master.XmlNodeConfiguration, Consts.STRXML_setup, false);
-            labSetup.XmlNodeSelectedSetup = xmlNodeList.Item(ddlExperimentSetups.SelectedIndex);
-            labSetup.ddlExperimentSetups_SelectedIndexChanged(sender, e);
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        protected void btnValidate_Click1(object sender, EventArgs e)
-        {
-            try
-            {
-                // Build the XML specification string
-                string xmlSpecification = this.BuildSpecification();
-
-                // Validate the experiment specification
-                ValidationReport validationReport = Master.ServiceBroker.Validate(xmlSpecification);
-
-                //
-                // Check if specification was accepted
-                //
-                if (validationReport.accepted)
-                {
-                    string message = "Specification is valid. ";
-
-                    // Get runtime in minutes and seconds
-                    int minutes = (int)validationReport.estRuntime / 60;
-                    int seconds = (int)validationReport.estRuntime - (minutes * 60);
-
-                    // Display expected runtime
-                    string plural = null;
-                    message += "Execution time will be ";
-                    if (minutes > 0)
-                    {
-                        // Display minutes
-                        plural = (minutes == 1) ? "" : "s";
-                        message += minutes.ToString() + " minute" + plural + " and ";
-                    }
-                    // Display seconds
-                    plural = (seconds == 1) ? "" : "s";
-                    message += seconds.ToString() + " second" + plural + ".";
-
-                    // Specification was accepted
-                    this.Message = message;
-                }
-                else
-                {
-                    // Specification was rejected
-                    this.MessageError = validationReport.errorMessage;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    this.MessageFailure = ex.InnerException.Message;
-                }
-                else
-                {
-                    this.MessageFailure = ex.Message;
-                }
-            }
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        protected void btnSubmit_Click1(object sender, EventArgs e)
-        {
-            //
-            // Check if an experiment has already been submitted. The Submit button's
-            // enable state gets set when page is loaded.
-            //
-            if (btnSubmit.Enabled == false)
-            {
-                return;
-            }
-
-            //
-            // Submit experiment specification
-            //
-            try
-            {
-                // Build the XML specification string
-                string xmlSpecification = this.BuildSpecification();
-
-                // Submit the experiment specification
-                SubmissionReport submissionReport = Master.ServiceBroker.Submit(xmlSpecification);
-                WaitEstimate wait = submissionReport.wait;
-
-                // Check that the specification was accepted ok
-                if (submissionReport.vReport.accepted == true)
-                {
-                    // Get experiment number
-                    int experimentID = submissionReport.experimentID;
-
-                    string message = "Submission successful. " +
-                        "Experiment is #" + experimentID.ToString() + ". ";
-
-                    // Get runtime in minutes and seconds
-                    int minutes = (int)submissionReport.vReport.estRuntime / 60;
-                    int seconds = (int)submissionReport.vReport.estRuntime - (minutes * 60);
-
-                    // Display accepted message and runtime
-                    string plural = null;
-                    message += "Execution time is ";
-                    if (minutes > 0)
-                    {
-                        // Display minutes
-                        plural = (minutes == 1) ? "" : "s";
-                        message += minutes.ToString() + " minute" + plural + " and ";
-                    }
-                    // Display seconds
-                    plural = (seconds == 1) ? "" : "s";
-                    message += seconds.ToString() + " second" + plural + ".";
-
-                    // Submission was accepted
-                    this.Message = message;
-
-                    //
-                    // Experiment has been submitted successfully
-                    //
-                    if (Master.MultiSubmit == true)
-                    {
-                        // Add experiment ID to the list in the session
-                        if (Session[Consts.STRSSN_SubmittedIDs] != null)
-                        {
-                            // Get the list of submitted experiment IDs
-                            int[] submittedIDs = (int[])Session[Consts.STRSSN_SubmittedIDs];
-
-                            // Create a bigger array and copy submitted experiment IDs
-                            int[] newSubmittedIDs = new int[submittedIDs.Length + 1];
-                            submittedIDs.CopyTo(newSubmittedIDs, 0);
-
-                            // Add the experiment ID to the bigger array
-                            newSubmittedIDs[submittedIDs.Length] = experimentID;
-
-                            // Save experiment IDs in the session
-                            Session[Consts.STRSSN_SubmittedIDs] = newSubmittedIDs;
-                        }
-                        else
-                        {
-                            // Create an array and add the experiment ID
-                            int[] submittedIDs = new int[1];
-                            submittedIDs[0] = experimentID;
-
-                            // Save experiment IDs in the session
-                            Session[Consts.STRSSN_SubmittedIDs] = submittedIDs;
-                        }
-                    }
-                    else
-                    {
-                        // Save experiment ID in the session
-                        Session[Consts.STRSSN_SubmittedID] = experimentID;
-
-                        // Update buttons
-                        btnValidate.Enabled = false;
-                        btnSubmit.Enabled = false;
-                    }
-                }
-                else
-                {
-                    // Submission was rejected
-                    this.MessageError = submissionReport.vReport.errorMessage;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.InnerException != null)
-                {
-                    this.MessageFailure = ex.InnerException.Message;
-                }
-                else
-                {
-                    this.MessageFailure = ex.Message;
-                }
-            }
-        }
-
         //---------------------------------------------------------------------------------------//
 
         private string BuildSpecification()
@@ -426,5 +343,112 @@ namespace LabClientHtml
 
             return xmlSpecification.ToString();
         }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessage(string message)
+        {
+            message = message.Trim();
+            lblMessage.Text = message;
+            lblMessage.Visible = (message.Length > 0);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageNormal(string message)
+        {
+            lblMessage.ForeColor = Color.Black;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageError(string message)
+        {
+            lblMessage.ForeColor = Color.Red;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageFailure(string message)
+        {
+            lblMessage.ForeColor = Color.Blue;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatValidation(int seconds)
+        {
+            int minutes = seconds / 60;
+            seconds -= minutes * 60;
+
+            string message = string.Empty;
+
+            try
+            {
+                StringWriter sw = new StringWriter();
+
+                sw.Write(STRWTR_ExecutionTimeWillBe);
+                if (minutes > 0)
+                {
+                    // Display minutes
+                    sw.Write(STRWTR_MinutesAnd, minutes.ToString(), FormatPlural(minutes));
+                }
+                // Display seconds
+                sw.Write(STRWTR_Seconds, seconds.ToString(), FormatPlural(seconds));
+
+                message = sw.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                Logfile.WriteError(ex.Message);
+            }
+
+            return message;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatSubmission(int experimentID, int seconds)
+        {
+            int minutes = seconds / 60;
+            seconds -= minutes * 60;
+
+            string message = string.Empty;
+
+            try
+            {
+                StringWriter sw = new StringWriter();
+
+                sw.Write(STRWTR_ExecutionTimeIs);
+                if (minutes > 0)
+                {
+                    // Display minutes
+                    sw.Write(STRWTR_MinutesAnd, minutes.ToString(), FormatPlural(minutes));
+                }
+                // Display seconds
+                sw.Write(STRWTR_Seconds, seconds.ToString(), FormatPlural(seconds));
+
+                message = sw.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                Logfile.WriteError(ex.Message);
+            }
+
+            return message;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatPlural(int value)
+        {
+            return (value == 1) ? string.Empty : "s";
+        }
+
     }
 }

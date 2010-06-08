@@ -1,9 +1,9 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="Footer.ascx.cs" Inherits="LabServer.Controls.Footer" %>
-<table cols="1" cellspacing="0">
+<table id="footer" cols="1" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td class="footer">
+        <td>
             <a href="http://www.mit.edu/" target="_blank">
-                <asp:Image ID="imgFooter" runat="server" ImageUrl="../images/mit-blackred-footer1.gif"
+                <asp:Image ID="imgFooter" runat="server" ImageUrl="~/images/mit-blackred-footer1.gif"
                     Width="334px" Height="36px" /></a>
         </td>
     </tr>

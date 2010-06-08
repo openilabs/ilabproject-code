@@ -10,7 +10,7 @@
           <NativeDebugging>False</NativeDebugging>
           <SQLDebugging>False</SQLDebugging>
           <PublishCopyOption>RunFiles</PublishCopyOption>
-          <PublishTargetLocation>C:\Visual Studio 2008\LabServer\Radioactivity\Published\LabClientHtml\</PublishTargetLocation>
+          <PublishTargetLocation>C:\Visual Studio 2008\LabServer\TimeOfDay\Published\LabClientHtml\</PublishTargetLocation>
           <PublishDeleteAllFiles>True</PublishDeleteAllFiles>
           <PublishCopyAppData>False</PublishCopyAppData>
           <ExternalProgram>

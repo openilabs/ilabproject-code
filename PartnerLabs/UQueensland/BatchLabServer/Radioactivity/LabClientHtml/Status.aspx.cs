@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.IO;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -16,15 +17,30 @@ namespace LabClientHtml
         #region Class Constants and Variables
 
         //
+        // String constants
+        //
+        private const string STR_Online = "Online";
+        private const string STR_Offline = "Offline";
+        private const string STR_ExperimentNumber = "Experiment #";
+        private const string STR_Spacer = " - ";
+        private const string STR_HasBeenCancelled = " has been cancelled.";
+        private const string STR_CouldNotBeCancelled = " could not be cancelled!";
+        private const string STRWTR_TimeRemainingIs = " Time remaining is ";
+        private const string STRWTR_QueueLengthAndWaitTimeIs = "Queue length is {0} and wait time is ";
+        private const string STRWTR_QueuePositionAndRunIn = "Queue position is {0} and it will run in ";
+        private const string STRWTR_MinutesAnd = "{0} minute{1} and ";
+        private const string STRWTR_Seconds = "{0} second{1}.";
+
+        //
         // String constants for error messages
         //
-        private const string STRERR_InvalidExperimentNumber = "Experiment number is invalid!";
-        private const string STRERR_NoExperimentNumber = "Experiment number is not specified!";
-        private const string STRERR_GetExperimentStatusFailed = "Failed to get experiment status!\r\n";
+        private const string STRERR_ExperimentNumberNotSpecified = "Experiment number is not specified!";
+        private const string STRERR_ExperimentNumberInvalid = "Experiment number is invalid!";
+        private const string STRERR_GetExperimentStatusFailed = "Failed to get experiment status!";
 
         #endregion
 
-        //---------------------------------------------------------------------------------------//
+        //-------------------------------------------------------------------------------------------------//
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -39,6 +55,11 @@ namespace LabClientHtml
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //
+            // Hide message box
+            //
+            this.ShowMessageNormal(string.Empty);
+
             if (!IsPostBack)
             {
                 //
@@ -117,95 +138,44 @@ namespace LabClientHtml
 
         //-------------------------------------------------------------------------------------------------//
 
-        private void ShowExperimentMessageNormal(string message)
-        {
-            lblExperimentStatusMsg.ForeColor = Color.Black;
-            lblExperimentStatusMsg.Text = message;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        private void ShowExperimentMessageError(string message)
-        {
-            lblExperimentStatusMsg.ForeColor = Color.Red;
-            lblExperimentStatusMsg.Text = message;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
         protected void btnRefresh_Click1(object sender, EventArgs e)
         {
             //
             // Get the LabServer status and display
             //
-            bool online = false;
-            string message = null;
             try
             {
-                //
-                // Get the lab status
-                //
                 LabStatus labStatus = Master.ServiceBroker.GetLabStatus();
-
-                online = labStatus.online;
-                message = labStatus.labStatusMessage;
-
-                if (online == true)
+                if (labStatus.online == true)
                 {
-                    // Get the queue length
-                    WaitEstimate waitEstimate = Master.ServiceBroker.GetEffectiveQueueLength();
-
-                    //
-                    // Display queue length
-                    //
-                    int queueLength = waitEstimate.effectiveQueueLength;
-                    string plural = (queueLength == 1) ? "" : "s";
-                    message += " - There ";
-                    message += (queueLength == 1) ? "is " : "are ";
-                    message += queueLength.ToString() + " experiment" + plural + " queued.";
-
-                    //
-                    // Display queue wait estimate
-                    //
-                    if (queueLength > 0)
-                    {
-                        int waitTime = (int)waitEstimate.estWait;
-                        int minutes = waitTime / 60;
-                        int seconds = waitTime - (minutes * 60);
-                        plural = null;
-                        message += " Queue wait time is ";
-                        if (minutes > 0)
-                        {
-                            // Display minutes
-                            plural = (minutes == 1) ? "" : "s";
-                            message += minutes.ToString() + " minute" + plural + " and ";
-                        }
-                        // Display seconds
-                        plural = (seconds == 1) ? "" : "s";
-                        message += seconds.ToString() + " second" + plural + ".";
-                    }
-
                     //
                     // Display lab status
                     //
                     lblOnline.ForeColor = Color.Green;
-                    lblOnline.Text = "Online";
+                    lblOnline.Text = STR_Online;
+
+                    //
+                    // Display the queue length and wait time
+                    //
+                    WaitEstimate waitEstimate = Master.ServiceBroker.GetEffectiveQueueLength();
+                    lblLabServerStatusMsg.Text = labStatus.labStatusMessage + STR_Spacer +
+                        this.FormatQueueLengthWait(waitEstimate.effectiveQueueLength, (int)waitEstimate.estWait);
                 }
                 else
                 {
+                    //
+                    // Display lab status and message
+                    //
                     lblOnline.ForeColor = Color.Red;
-                    lblOnline.Text = "Offline";
+                    lblOnline.Text = STR_Offline;
+                    lblLabServerStatusMsg.Text = labStatus.labStatusMessage;
                 }
-
-                //
-                // Display lab status message
-                //
-                lblLabServerStatusMsg.Text = message;
             }
             catch (Exception ex)
             {
                 // LabServer error
-                lblLabServerStatusMsg.Text = ex.Message;
+                Logfile.WriteError(ex.Message);
+                lblLabServerStatusMsg.Text = STRERR_GetExperimentStatusFailed;
             }
         }
 
@@ -217,7 +187,7 @@ namespace LabClientHtml
             // Get the experiment ID
             //
             int experimentID = ParseExperimentNumber(txbExperimentID.Text);
-            if (experimentID < 0)
+            if (experimentID <= 0)
             {
                 return;
             }
@@ -244,65 +214,26 @@ namespace LabClientHtml
             //
             // Display the status code
             //
-            string message = "Experiment #" + experimentID.ToString() + " is " + statusCode.ToString() + ".";
-            ShowExperimentMessageNormal(message);
+            ShowMessageNormal(STR_ExperimentNumber + experimentID.ToString() + STR_Spacer + statusCode.ToString());
 
             if (statusCode == StatusCodes.Running)
             {
                 //
                 // Experiment is currently running, display time remaining
                 //
-                int timeRemaining = (int)Decimal.Round((decimal)labExperimentStatus.statusReport.estRemainingRuntime);
-                int minutes = timeRemaining / 60;
-                int seconds = timeRemaining - (minutes * 60);
-
-                //
-                // Display experiment status and remaining time
-                //
-                string plural = null;
-                message += " Time remaining is ";
-                if (minutes > 0)
-                {
-                    // Display minutes
-                    plural = (minutes == 1) ? "" : "s";
-                    message += minutes.ToString() + " minute" + plural + " and ";
-                }
-                // Display seconds
-                plural = (seconds == 1) ? "" : "s";
-                message += seconds.ToString() + " second" + plural + ".";
+                int seconds = (int)Decimal.Round((decimal)labExperimentStatus.statusReport.estRemainingRuntime);
+                ShowMessageNormal(this.FormatTimeRemaining(seconds));
             }
-
             else if (statusCode == StatusCodes.Waiting)
             {
                 //
                 // Experiment is waiting to run, get queue position (zero-based)
                 //
-                int queuePosition = labExperimentStatus.statusReport.wait.effectiveQueueLength;
-                int queueWaitTime = (int)Decimal.Round((decimal)labExperimentStatus.statusReport.wait.estWait);
-                if (queueWaitTime < 0)
-                {
-                    queueWaitTime = 0;
-                }
-
-                int minutes = queueWaitTime / 60;
-                int seconds = queueWaitTime - (minutes * 60);
-
-                //
-                // Display experiment status and queue wait time
-                //
-                string plural = null;
-                message += " Queue position is " + queuePosition.ToString() + ". It will run in ";
-                if (minutes > 0)
-                {
-                    // Display minutes
-                    plural = (minutes == 1) ? "" : "s";
-                    message += minutes.ToString() + " minute" + plural + " and ";
-                }
-                // Display seconds
-                plural = (seconds == 1) ? "" : "s";
-                message += seconds.ToString() + " second" + plural + " .";
+                int position = labExperimentStatus.statusReport.wait.effectiveQueueLength;
+                int seconds = (int)Decimal.Round((decimal)labExperimentStatus.statusReport.wait.estWait);
+                seconds = (seconds < 0) ? 0 : seconds;
+                ShowMessageNormal(this.FormatQueuePosition(position, seconds));
             }
-
             else if (statusCode == StatusCodes.Completed || statusCode == StatusCodes.Failed || statusCode == StatusCodes.Cancelled)
             {
                 //
@@ -418,9 +349,6 @@ namespace LabClientHtml
                 }
             }
 
-            // Display experiment status
-            ShowExperimentMessageNormal(message);
-
             // Clear the LabServer status
             lblLabServerStatusMsg.Text = null;
         }
@@ -455,56 +383,197 @@ namespace LabClientHtml
                 //
                 // Display cancel status
                 //
-                string message = "Experiment #" + experimentNo.ToString();
+                string message = STR_ExperimentNumber + experimentNo.ToString();
                 if (cancelled == true)
                 {
-                    ShowExperimentMessageNormal(message + " has been cancelled.");
+                    ShowMessageNormal(message + STR_HasBeenCancelled);
                 }
                 else
                 {
-                    ShowExperimentMessageError(message + " could not be cancelled!");
+                    ShowMessageError(message + STR_CouldNotBeCancelled);
                 }
             }
             catch (Exception ex)
             {
-                ShowExperimentMessageError(ex.Message);
+                ShowMessageError(ex.Message);
             }
+        }
+
+        //=================================================================================================//
+
+        private void ShowMessage(string message)
+        {
+            message = message.Trim();
+            lblExpStatMessage.Text = message;
+            lblExpStatMessage.Visible = (message.Length > 0);
         }
 
         //-------------------------------------------------------------------------------------------------//
 
-        private int ParseExperimentNumber(string strNumber)
+        private void ShowMessageNormal(string message)
+        {
+            lblExpStatMessage.ForeColor = Color.Black;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageError(string message)
+        {
+            lblExpStatMessage.ForeColor = Color.Red;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private int ParseExperimentNumber(string strExperimentNo)
         {
             //
             // Get the experiment number
             //
-            int experimentNo = -1;
+            int experimentNo = 0;
             try
             {
+                //
                 // Check if experiment number is entered
-                if (txbExperimentID.Text.Trim().Length == 0)
+                //
+                if (strExperimentNo.Trim().Length == 0)
                 {
-                    throw new ArgumentException(STRERR_NoExperimentNumber);
+                    throw new ArgumentException(STRERR_ExperimentNumberNotSpecified);
                 }
 
+                //
                 // Determine the experiment number
-                experimentNo = Int32.Parse(strNumber);
+                //
+                try
+                {
+                    experimentNo = Int32.Parse(strExperimentNo);
+                }
+                catch
+                {
+                    throw new ArgumentException(STRERR_ExperimentNumberInvalid);
+                }
 
-                // Check that experiment number is greater than 0
+                //
+                // Check that experiment ID is greater than 0
+                //
                 if (experimentNo <= 0)
                 {
-                    throw new ArithmeticException(STRERR_InvalidExperimentNumber);
+                    throw new ArgumentException(STRERR_ExperimentNumberInvalid);
                 }
-
-                // Experiment number is valid
-                ShowExperimentMessageNormal(null);
             }
             catch (Exception ex)
             {
-                ShowExperimentMessageError(ex.Message);
+                ShowMessageError(ex.Message);
             }
 
             return experimentNo;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatTimeRemaining(int seconds)
+        {
+            int minutes = seconds / 60;
+            seconds -= minutes * 60;
+
+            string message = string.Empty;
+
+            try
+            {
+                StringWriter sw = new StringWriter();
+
+                sw.Write(STRWTR_TimeRemainingIs);
+                if (minutes > 0)
+                {
+                    // Display minutes
+                    sw.Write(STRWTR_MinutesAnd, minutes.ToString(), FormatPlural(minutes));
+                }
+                // Display seconds
+                sw.Write(STRWTR_Seconds, seconds.ToString(), FormatPlural(seconds));
+
+                message = sw.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                Logfile.WriteError(ex.Message);
+            }
+
+            return message;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatQueueLengthWait(int length, int seconds)
+        {
+            int minutes = seconds / 60;
+            seconds -= minutes * 60;
+
+            string message = string.Empty;
+
+            try
+            {
+                StringWriter sw = new StringWriter();
+
+                sw.Write(STRWTR_QueueLengthAndWaitTimeIs, length.ToString());
+                if (minutes > 0)
+                {
+                    // Display minutes
+                    sw.Write(STRWTR_MinutesAnd, minutes.ToString(), FormatPlural(minutes));
+                }
+                // Display seconds
+                sw.Write(STRWTR_Seconds, seconds.ToString(), FormatPlural(seconds));
+
+                message = sw.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                Logfile.WriteError(ex.Message);
+            }
+
+            return message;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatQueuePosition(int position, int seconds)
+        {
+            int minutes = seconds / 60;
+            seconds -= minutes * 60;
+
+            string message = string.Empty;
+
+            try
+            {
+                StringWriter sw = new StringWriter();
+
+                sw.Write(STRWTR_QueuePositionAndRunIn, position.ToString());
+                if (minutes > 0)
+                {
+                    // Display minutes
+                    sw.Write(STRWTR_MinutesAnd, minutes.ToString(), FormatPlural(minutes));
+                }
+                // Display seconds
+                sw.Write(STRWTR_Seconds, seconds.ToString(), FormatPlural(seconds));
+
+                message = sw.ToString();
+            }
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                Logfile.WriteError(ex.Message);
+            }
+
+            return message;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private string FormatPlural(int value)
+        {
+            return (value == 1) ? string.Empty : "s";
         }
 
     }

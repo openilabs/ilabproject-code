@@ -2,7 +2,7 @@
     Inherits="LabClientHtml.LabClientMaster" %>
 
 <%@ Register TagPrefix="uc" TagName="Banner" Src="~/Controls/Banner.ascx" %>
-<%@ Register TagPrefix="uc" TagName="Status" Src="~/Controls/Status.ascx" %>
+<%@ Register TagPrefix="uc" TagName="Statusbar" Src="~/Controls/Statusbar.ascx" %>
 <%@ Register TagPrefix="uc" TagName="Header" Src="~/Controls/Header.ascx" %>
 <%@ Register TagPrefix="uc" TagName="Navmenu" Src="~/Controls/Navmenu.ascx" %>
 <%@ Register TagPrefix="uc" TagName="Feedback" Src="~/Controls/Feedback.ascx" %>
@@ -18,7 +18,7 @@
 </head>
 <body>
     <form id="form1" runat="server">
-    <table cols="2" cellspacing="0">
+    <table id="master" cols="2" border="0" cellspacing="0" cellpadding="0">
         <tr>
             <td colspan="2">
                 <uc:Banner ID="Banner" runat="server" />
@@ -26,25 +26,26 @@
         </tr>
         <tr>
             <td colspan="2">
-                <uc:Status ID="Status" runat="server" />
+                <uc:Statusbar ID="Statusbar" runat="server" />
             </td>
         </tr>
         <tr>
             <td class="menu">
                 <uc:Navmenu ID="Navmenu" runat="server" />
             </td>
-            <td valign="top">
-                <table cellspacing="5">
+            <td class="content">
+                <table cols="1" border="0" cellspacing="0" cellpadding="0">
                     <tr>
-                        <td>
+                        <td class="headercontent">
                             <uc:Header ID="Header" runat="server" />
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
-                            </asp:ContentPlaceHolder>
-                            <p />
+                            <div id="pagecontent">
+                                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                                </asp:ContentPlaceHolder>
+                            </div>
                         </td>
                     </tr>
                 </table>
@@ -58,11 +59,6 @@
         <tr>
             <td colspan="2">
                 <uc:Footer ID="Footer" runat="server" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <asp:Label ID="lblErrorMessages" runat="server"></asp:Label>&nbsp;
             </td>
         </tr>
     </table>

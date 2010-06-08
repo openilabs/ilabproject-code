@@ -16,8 +16,8 @@ namespace LabClientHtml
         //
         // String constants
         //
-        private const string STR_InvalidExperimentNumber = "Experiment number is invalid!";
-        private const string STR_NoExperimentNumber = "Experiment number is not specified!";
+        private const string STR_ExperimentNumber = "Experiment #";
+        private const string STR_Spacer = " - ";
 
         private const string STR_ExperimentInformation = "Experiment Information";
         private const string STR_CsvExperimentInformation = "---Experiment Information---";
@@ -35,7 +35,7 @@ namespace LabClientHtml
 
         private const string STR_ErrorMessage = "Error Message";
 
-        private const string STR_SwTblBegin = "<table cols=\"3\" cellpadding=\"5\">";
+        private const string STR_SwTblBegin = "<table cols=\"3\" cellpadding=\"3\">";
         private const string STR_SwTblHdrArgument = "<tr align=\"left\"><th colspan=\"3\"><nobr>{0}</nobr></th></tr>";
         private const string STR_SwTblArgument = "<tr><td><nobr>{0}:</nobr></td><td><nobr>{1}</nobr></td><td width=\"100%\">&nbsp;</td></tr>";
         private const string STR_SwTblBlankRow = "<tr><td colspan=\"3\">&nbsp;</td></tr>";
@@ -50,6 +50,13 @@ namespace LabClientHtml
             "{4}\r\n" +
             "<strong>Could not load the applet!</strong>\r\n" +
             "</applet>\r\n";
+
+        //
+        // String constants for exception messages
+        //
+        private const string STRERR_ExperimentNumberNotSpecified = "Experiment number is not specified!";
+        private const string STRERR_ExperimentNumberInvalid = "Experiment number is invalid!";
+        private const string STRERR_IncorrectExperimentType = "Incorrect experiment type: ";
 
         #endregion
 
@@ -68,6 +75,11 @@ namespace LabClientHtml
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            //
+            // Hide message box
+            //
+            this.ShowMessageNormal(string.Empty);
+
             if (!IsPostBack)
             {
                 //
@@ -140,39 +152,6 @@ namespace LabClientHtml
                     }
                 }
             }
-            else
-            {
-                //
-                // It is a postback. A button on this page has been clicked to post back information.
-                //
-
-                // Clear message
-                ShowMessageNormal(null);
-            }
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        private void ShowMessageNormal(string message)
-        {
-            lblResultMessage.ForeColor = Color.Black;
-            lblResultMessage.Text = message;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        private void ShowMessageWarning(string message)
-        {
-            lblResultMessage.ForeColor = Color.Blue;
-            lblResultMessage.Text = message;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        private void ShowMessageError(string message)
-        {
-            lblResultMessage.ForeColor = Color.Red;
-            lblResultMessage.Text = message;
         }
 
         //-------------------------------------------------------------------------------------------------//
@@ -189,37 +168,11 @@ namespace LabClientHtml
             btnDisplay.Visible = false;
 
             //
-            // Get the experiment number
+            // Get the experiment ID
             //
-            int experimentID = 0;
-            try
+            int experimentID = ParseExperimentNumber(txbExperimentID.Text);
+            if (experimentID <= 0)
             {
-                // Check if experiment number is entered
-                if (txbExperimentID.Text.Trim().Length == 0)
-                {
-                    throw new ArgumentException();
-                }
-
-                // Determine the experiment ID
-                experimentID = Int32.Parse(txbExperimentID.Text);
-
-                // Check that experiment ID is greater than 0
-                if (experimentID <= 0)
-                {
-                    throw new Exception();
-                }
-
-                // Experiment number is valid
-                ShowMessageNormal(null);
-            }
-            catch (ArgumentException)
-            {
-                ShowMessageError(STR_NoExperimentNumber);
-                return;
-            }
-            catch (Exception)
-            {
-                ShowMessageError(STR_InvalidExperimentNumber);
                 return;
             }
 
@@ -242,16 +195,17 @@ namespace LabClientHtml
                     errorMessage = resultReport.errorMessage;
                     experimentResults = resultReport.experimentResults;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    // LabServer error
+                    Logfile.WriteError(ex.Message);
                     statusCode = StatusCodes.Unknown;
                 }
 
                 //
                 // Display the status code
                 //
-                string message = "Experiment #" + experimentID.ToString() + " - " + statusCode.ToString();
-                ShowMessageNormal(message);
+                ShowMessageNormal(STR_ExperimentNumber + experimentID.ToString() + STR_Spacer + statusCode.ToString());
 
                 if (statusCode != StatusCodes.Unknown && experimentResults != null)
                 {
@@ -270,8 +224,7 @@ namespace LabClientHtml
                         //
                         // Wrong experiment type
                         //
-                        errorMessage = "Experiment type is not '" + Master.Title + "'";
-                        ShowMessageWarning(errorMessage);
+                        ShowMessageWarning(STRERR_IncorrectExperimentType + Master.Title);
                         return;
                     }
 
@@ -376,13 +329,94 @@ namespace LabClientHtml
             }
         }
 
+        //=================================================================================================//
+
+        private void ShowMessage(string message)
+        {
+            message = message.Trim();
+            lblResultMessage.Text = message;
+            lblResultMessage.Visible = (message.Length > 0);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageNormal(string message)
+        {
+            lblResultMessage.ForeColor = Color.Black;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageWarning(string message)
+        {
+            lblResultMessage.ForeColor = Color.Blue;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void ShowMessageError(string message)
+        {
+            lblResultMessage.ForeColor = Color.Red;
+            ShowMessage(message);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private int ParseExperimentNumber(string strExperimentNo)
+        {
+            //
+            // Get the experiment number
+            //
+            int experimentNo = 0;
+            try
+            {
+                //
+                // Check if experiment number is entered
+                //
+                if (strExperimentNo.Trim().Length == 0)
+                {
+                    throw new ArgumentException(STRERR_ExperimentNumberNotSpecified);
+                }
+
+                //
+                // Determine the experiment number
+                //
+                try
+                {
+                    experimentNo = Int32.Parse(strExperimentNo);
+                }
+                catch
+                {
+                    throw new ArgumentException(STRERR_ExperimentNumberInvalid);
+                }
+
+                //
+                // Check that experiment ID is greater than 0
+                //
+                if (experimentNo <= 0)
+                {
+                    throw new ArgumentException(STRERR_ExperimentNumberInvalid);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowMessageError(ex.Message);
+            }
+
+            return experimentNo;
+        }
+
         //-------------------------------------------------------------------------------------------------//
 
         private string BuildTableResult(ResultInfo resultInfo, StatusCodes statusCode, string errorMessage)
         {
-            StringWriter sw = new StringWriter();
+            string strTableResult = string.Empty;
+
             try
             {
+                StringWriter sw = new StringWriter();
                 sw.WriteLine(STR_SwTblBegin);
 
                 //
@@ -434,22 +468,27 @@ namespace LabClientHtml
                 }
 
                 sw.WriteLine(STR_SwTblEnd);
+
+                strTableResult = sw.ToString();
             }
             catch (Exception ex)
             {
                 Logfile.WriteError(ex.Message);
             }
 
-            return sw.ToString();
+            return strTableResult;
         }
 
         //-------------------------------------------------------------------------------------------------//
 
         private string BuildCsvResult(ResultInfo resultInfo)
         {
-            StringWriter sw = new StringWriter();
+            string strCsvResult = string.Empty;
+
             try
             {
+                StringWriter sw = new StringWriter();
+
                 //
                 // Experiment information
                 //
@@ -486,34 +525,41 @@ namespace LabClientHtml
 
                 string csvResults = labResults.CreateResultsString(resultInfo, STR_SwCsvArgument);
                 sw.Write(csvResults);
+
+                strCsvResult = sw.ToString();
             }
             catch (Exception ex)
             {
                 Logfile.WriteError(ex.Message);
             }
 
-            return sw.ToString();
+            return strCsvResult;
         }
 
         //-------------------------------------------------------------------------------------------------//
 
         private string BuildAppletParams(ResultInfo resultInfo)
         {
-            StringWriter sw = new StringWriter();
+            string strAppletParams = string.Empty;
+
             try
             {
+                StringWriter sw = new StringWriter();
+
                 // Experiment specification
                 sw.Write(labResults.CreateSpecificationString(resultInfo, STR_SwAppletArgument));
 
                 // Experiment results
                 sw.Write(labResults.CreateResultsString(resultInfo, STR_SwAppletArgument));
+
+                strAppletParams = sw.ToString();
             }
             catch (Exception ex)
             {
                 Logfile.WriteError(ex.Message);
             }
 
-            return sw.ToString();
+            return strAppletParams;
         }
 
         //-------------------------------------------------------------------------------------------------//

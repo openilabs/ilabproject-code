@@ -39,6 +39,7 @@
   </serialLcd>
   <radiationCounter>
     <type>ST360</type>
+    <!--<type>Physics</type>-->
     <execTimeAdjustment>
       <duration>1.2</duration>
     </execTimeAdjustment>

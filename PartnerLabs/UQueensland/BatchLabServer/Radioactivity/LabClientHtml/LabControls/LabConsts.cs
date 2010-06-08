@@ -9,6 +9,7 @@ namespace LabClientHtml.LabControls
         //
         public const string STRXML_SetupId_RadioactivityVsTime = "RadioactivityVsTime";
         public const string STRXML_SetupId_RadioactivityVsDistance = "RadioactivityVsDistance";
+        public const string STRXML_SetupId_RadioactivityVsAbsorber = "RadioactivityVsAbsorber";
         public const string STRXML_SetupId_SimActivityVsTime = "SimActivityVsTime";
         public const string STRXML_SetupId_SimActivityVsDistance = "SimActivityVsDistance";
         public const string STRXML_SetupId_SimActivityVsTimeNoDelay = "SimActivityVsTimeNoDelay";

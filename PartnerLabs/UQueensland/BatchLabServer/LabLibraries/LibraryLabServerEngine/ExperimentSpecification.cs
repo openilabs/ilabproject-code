@@ -24,7 +24,8 @@ namespace Library.LabServerEngine
         //
         private const string STRERR_LabConfiguration = "labConfiguration";
         private const string STRERR_XmlSpecification = "xmlSpecification";
-        private const string STRERR_SetupIdInvalid = "Setup ID is invalid!";
+        protected const string STRERR_SetupIdInvalid = "Setup ID is invalid!";
+        protected const string STRERR_EquipmentServiceNotAvailable = "EquipmentService is not available!";
 
         //
         // Local variables
@@ -152,6 +153,11 @@ namespace Library.LabServerEngine
                 int executionTime = -1;
                 if (this.SetupId.Equals(Consts.STRXML_SetupId_EquipmentGeneric))
                 {
+                    if (this.equipmentServiceProxy == null)
+                    {
+                        throw new ArgumentException(STRERR_EquipmentServiceNotAvailable, this.setupId);
+                    }
+
                     DriverEquipmentGeneric driver = new DriverEquipmentGeneric(this.equipmentServiceProxy, this.labConfiguration);
                     executionTime = driver.GetExecutionTime(this);
                 }
