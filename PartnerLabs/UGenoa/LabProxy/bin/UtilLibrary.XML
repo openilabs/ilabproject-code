@@ -1,0 +1,308 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>UtilLibrary</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.UtilLib.XmlQueryDoc">
+            <summary>
+            A wrapped XPathDocument.
+            </summary>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.Query(System.String)">
+            <summary>
+            Returns the values within the queried element, only should be used with a single element without children as only the text is returned.
+            </summary>
+            <param name="xpathexpr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.Found(System.String)">
+            <summary>
+            Test to see if the requested node is found.
+            </summary>
+            <param name="xpathexpr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.Select(System.String)">
+            <summary>
+            Create a node interator to select nodes and move through them (read-only)
+            </summary>
+            <param name="xpathexpr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.GetTopName">
+            <summary>
+            This does not work
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.LocalName(System.String)">
+            <summary>
+            This does not work
+            </summary>
+            <param name="xpathexpr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.DisplayTree(System.Xml.XPath.XPathNavigator)">
+            <summary>
+            Walks the XPathNavigator tree recursively
+            </summary>
+            <param name="myXPathNavigator"></param>
+        </member>
+        <member name="M:iLabs.UtilLib.XmlQueryDoc.Format(System.Xml.XPath.XPathNavigator)">
+            <summary>
+            Format the output
+            </summary>
+            <param name="myXPathNavigator"></param>
+        </member>
+        <member name="T:iLabs.UtilLib.CRC_1952">
+            <summary>
+            Computes CRC32 data checksum.
+            The actual CRC32 algorithm is described in RFC 1952
+            (GZIP file format specification version 4.3), this is also
+            the specuification for the algorithm used in java.util.zip.
+            streams.
+            </summary>
+        </member>
+        <member name="M:iLabs.UtilLib.CRC_1952.reset">
+            <summary>
+            Clears the current checksum.
+            </summary>
+        </member>
+        <member name="M:iLabs.UtilLib.CRC_1952.updateCRC(System.UInt64,System.Byte[],System.Int32)">
+            <summary>
+            Update a running crc with the bytes buf[0..len-1] and return
+            the updated crc. The crc should be initialized to zero. Pre- and
+            post-conditioning (one's complement) is performed within this
+            function so it shouldn't be done by the caller.
+            </summary>
+            <param name="crc"></param>
+            <param name="buf"></param>
+            <param name="len"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.CRC_1952.crc(System.Byte[],System.Int32)">
+            <summary>
+            Return the CRC of the bytes buf[0..len-1].
+            </summary>
+            <param name="buf"></param>
+            <param name="len"></param>
+            <returns></returns>
+        </member>
+        <member name="P:iLabs.UtilLib.CRC_1952.Checksum">
+            <summary>
+            Returns the current checksum value.
+            </summary>
+        </member>
+        <member name="T:iLabs.UtilLib.DateUtil">
+            <summary>
+            A collection of date utilities mostly used to convert to and from UTC and User time.
+            </summary>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.ParseUserToUtc(System.String,System.Globalization.CultureInfo,System.Int32)">
+            <summary>
+            Parses a local format DateTime String and converts it to a UTC DaterTime object.
+            </summary>
+            <param name="dateStr">The User based localized dat string</param>
+            <param name="culture">CultureInfo used to provide DateTime formats, usually derived from the browser.</param>
+            <param name="tz">Difference in minutes from GMT, based on the user's browser concept of time. See JavaScript.</param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.ParseUtc(System.String)">
+            <summary>
+            Parses a UTC generic format('o') date string and creates a DateTime with UTC specified.
+            </summary>
+            <param name="dateStr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.ToUtcString(System.DateTime)">
+            <summary>
+            Outputs a 'o' formated UTC string
+            </summary>
+            <param name="dt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.ToUserTime(System.DateTime,System.Globalization.CultureInfo,System.Int32)">
+            <summary>
+            Assumes a UTC time and returns a culture specific string for specified timezone
+            </summary>
+            <param name="dt">DataTime object normally, UTC based but checked for local type</param>
+            <param name="culture">CultureInfo used to format the resulting string</param>
+            <param name="tz">Difference in minutes from GMT, derived from Browser concept of tinme . See JavaScript</param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.ToUserDate(System.DateTime,System.Globalization.CultureInfo,System.Int32)">
+            <summary>
+            Assumes a UTC time and returns a culture specific string for specified timezone
+            </summary>
+            <param name="dt">DataTime object normally, UTC based but checked for local type</param>
+            <param name="culture">CultureInfo used to format the resulting string</param>
+            <param name="tz">Difference in minutes from GMT, derived from Browser concept of tinme . See JavaScript</param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.SpecifyUTC(System.DateTime)">
+            <summary>
+            Forces the internal DateTime type to UTC, does not convert the value.
+            </summary>
+            <param name="date"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.ParseCulture(System.String)">
+            <summary>
+            Parses the string returns the cultureInfo for the first vaild culture in the string, on an error it returns 'en-us'.
+            </summary>
+            <param name="languageStr"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.IsValidTimeSpan(System.DateTime,System.Int64)">
+            <summary>
+            Checks that the current time is after the startTime and within the duration in seconds. If duration is -1 true if now is greater than start. 
+            </summary>
+            <param name="start"></param>
+            <param name="duration"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.DateUtil.SecondsRemaining(System.DateTime,System.Int64)">
+            <summary>
+            Returns the number of seconds remaing before the end of the time span.
+            </summary>
+            <param name="start"></param>
+            <param name="secondsDuration"></param>
+            <returns></returns>
+        </member>
+        <member name="P:iLabs.UtilLib.DateUtil.LocalTzOffset">
+            <summary>
+            Returns the local UTC timezone offset in minutes
+            </summary>
+        </member>
+        <member name="T:iLabs.UtilLib.ChecksumUtil">
+            <summary>
+            Provides Blob access and checksum utility methods.
+            </summary>
+        </member>
+        <member name="M:iLabs.UtilLib.ChecksumUtil.ComputeCRC32(System.String)">
+            <summary>
+            Computes the CRC32 checksum of a file using the file path. 
+            The actual CRC32 algorithm is described in RFC 1952
+            (GZIP file format specification version 4.3), this is also
+            the specification for the algorithm used in java.util.zip.
+            </summary>
+            <param name="filePath">the physical path of the file on the ESS</param>
+            <returns>the string form of the calculated CRC32 checksum</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.ChecksumUtil.ComputeCRC32(System.Byte[])">
+            <summary>
+            Computes the CRC32 checksum of a file using the data array
+            The actual CRC32 algorithm is described in RFC 1952
+            (GZIP file format specification version 4.3), this is also
+            the specification for the algorithm used in java.util.zip.
+            </summary>
+            <param name="data">the array of data</param>
+            <returns>the string form of the calculated CRC32 checksum</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.ChecksumUtil.ComputeMD5(System.String)">
+            <summary>
+            Computes the MD5 hash of a file using the file path
+            </summary>
+            <param name="filePath">the physical path of the file on the ESS</param>
+            <returns>the string form of the calculated MD5 hash</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.ChecksumUtil.ComputeMD5(System.Byte[])">
+            <summary>
+            Computes the MD5 hash of a file using the data array
+            </summary>
+            <param name="data">the array of data</param>
+            <returns>the string form of the calculated MD5 hash</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.ArrayListToStringArray(System.Collections.ArrayList)">
+            <summary>
+            Utility to convert an ArrayList of strings to an array.
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.ArrayListToIntArray(System.Collections.ArrayList)">
+            <summary>
+            Utility to convert an ArrayList of ints to an array.
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.ArrayListToLongArray(System.Collections.ArrayList)">
+            <summary>
+            Utility to convert an ArrayList of longs to an array.
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.ToCSV(System.Int32[])">
+            <summary>
+            A utility to pass an array of ints as a CSV string
+            </summary>
+            <param name="values"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.ToCSV(System.Int64[])">
+            <summary>
+             A utility to pass an array of longs as a CSV string
+            </summary>
+            <param name="values"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.FormatErrorMessage(System.String)">
+            <summary>
+            Standard formatting for error messages.
+            </summary>
+            <param name="msgText">The error message text.</param>
+            <returns>Error message text surrounded by appropriate div and paragraph tags.</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.FormatWarningMessage(System.String)">
+            <summary>
+            Standard formatting for warning messages.
+            </summary>
+            <param name="msgText">The error message text.</param>
+            <returns>Error message text surrounded by appropriate div and paragraph tags.</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.FormatConfirmationMessage(System.String)">
+            <summary>
+            Standard formatting for general confirmation messages.
+            </summary>
+            <param name="msgText">The message text.</param>
+            <returns>Message text surrounded by appropriate div and paragraph tags.</returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.ExportUrlPath(System.Uri)">
+            <summary>
+            Formats a Uri  ( URL class ) into a fully specified URL path, with out any query parameters.
+            To be used to export URL's to other services.
+            </summary>
+            <param name="url"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.UtilLib.Utilities.MakeGuid">
+            <summary>
+            Simple Guid generator, wraps Microsoft GUID and formats the string as all uppercase with dashes.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:iLabs.UtilLib.iLabGlobal">
+            <summary>
+            static class to provide release tags.
+            </summary>
+        </member>
+        <member name="P:iLabs.UtilLib.iLabGlobal.Revision">
+            <summary>
+            Returns the date and svn revision last set, still not auto setting..... 
+            </summary>
+        </member>
+        <member name="P:iLabs.UtilLib.iLabGlobal.Release">
+            <summary>
+            returns a release string specified in iLabGlobal
+            </summary>
+        </member>
+        <member name="P:iLabs.UtilLib.iLabGlobal.BuildDate">
+            <summary>
+            returns the build date of the release, this currently is not set automaticly.
+            </summary>
+        </member>
+    </members>
+</doc>

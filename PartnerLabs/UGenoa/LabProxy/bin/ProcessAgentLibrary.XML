@@ -1,0 +1,815 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProcessAgentLibrary</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.Ticketing.TicketUtil">
+            <summary>
+            Summary description for Ticketing.
+            </summary>
+        </member>
+        <member name="T:iLabs.Ticketing.BasicTicketLoadFactory">
+            <summary>
+            Base for TicketLoadFactory, singleton 
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.BasicTicketLoadFactory.indentation">
+            <summary>
+            level of indentation of xml document produced
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.BasicTicketLoadFactory.#ctor">
+            <summary>
+            protected constructor
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.BasicTicketLoadFactory.instance">
+            <summary>
+            singleton instance
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.BasicTicketLoadFactory.writeTicketLoad(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Constructs the ticket payload.
+            </summary>
+            <param name="rootElement"></param>
+            <param name="ticketType"></param>
+            <param name="keyValueDictionary"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.#ctor">
+            <summary>
+            protected constructor
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.TicketLoadFactory.instance">
+            <summary>
+            singleton instance
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.createAuthenticateSBPayload">
+            Authetication tickets
+            
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.createRedeemSessionPayload(System.Int32,System.Int32,System.Int32)">
+            service broker tickets
+            
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.createAdministerESSPayload">
+            ESS tickets
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.createAdministerUSSPayload(System.Int32)">
+            USS tickets
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.createAdministerLSSPayload(System.Int32)">
+            LSS tickets
+        </member>
+        <member name="M:iLabs.Ticketing.TicketLoadFactory.createAdministerLSPayload(System.Int32)">
+            *
+        </member>
+        <member name="M:iLabs.Core.FactoryDB.GetConnection">
+            <summary>
+            Creates an unopened connection to the database, should return a DbConnection.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.FactoryDB.CreateParameter(System.Data.Common.DbCommand,System.String,System.Data.DbType,System.Int32)">
+            <summary>
+            Convenience method to create a parameter
+            </summary>
+            <param name="cmd"></param>
+            <param name="name"></param>
+            <param name="type">DbType</param>
+            <param name="maxSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.FactoryDB.CreateParameter(System.Data.Common.DbCommand,System.String,System.Object,System.Data.DbType)">
+            <summary>
+             Convenience method to create a parameter, minimal value checking is done
+            </summary>
+            <param name="cmd"></param>
+            <param name="name"></param>
+            <param name="value">If null or DBNull.Value, param.Value set to DBNull.Value, zero length strings are not converted to DBNull, 
+            DateTime values are checked and adjusted to Database min or max if needed.</param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.FactoryDB.CreateParameter(System.Data.Common.DbCommand,System.String,System.Object,System.Data.DbType,System.Int32)">
+            <summary>
+             Convenience method to create a parameter, minimal value checking is done
+            </summary>
+            <param name="cmd"></param>
+            <param name="name"></param>
+            <param name="value">If null or DBNull.Value, param.Value set to DBNull.Value, zero length strings are not converted to DBNull, 
+            DateTime values are checked and adjusted to Database min or max if needed.</param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="T:iLabs.Ticketing.TicketRemover">
+            <summary>
+            Thread that queries for expired Tickets, and perform clean-up of the database.
+            This is a simple database clean-up no requests to the service broker are generated.
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketRemover.Run">
+            <summary>
+            Run waits until the delay has timed out then processes the 
+            expired tickets, before starting to wait again.
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketRemover.ProcessTickets">
+            <summary>
+            Queries the Ticket table, for any 'Expired' tickets trys to delete the Ticket. Then checks to 
+            see if any of the ticket coupons are no longer needed and removes them.
+            </summary>
+        </member>
+        <member name="T:iLabs.Core.ProcessAgentInfo">
+            <summary>
+            Summary description for ProcessAgentInfo.
+            </summary>
+        </member>
+        <member name="F:iLabs.Core.ProcessAgentInfo.agentId">
+            <summary>
+            The local database primary key for the processAgent entry
+            </summary>
+        </member>
+        <member name="F:iLabs.Core.ProcessAgentInfo.agentName">
+            <summary>
+            A meaningful human readable name for the service, does not need to be unique.
+            </summary>
+        </member>
+        <member name="F:iLabs.Core.ProcessAgentInfo.agentGuid">
+            <summary>
+            The globally unique identifier for the service, this may not be modified.
+            </summary>
+        </member>
+        <member name="F:iLabs.Core.ProcessAgentInfo.identIn">
+            <summary>
+            The coupon for incoming messages from the specified processagent to this local service
+            </summary>
+        </member>
+        <member name="F:iLabs.Core.ProcessAgentInfo.identOut">
+            <summary>
+            The coupon for messages from this local service to the specified processAgent
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentInfo.#ctor(System.Int32,System.String,System.String,System.Int32,System.String,System.String,System.String,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            
+            </summary>
+            <param name="id"></param>
+            <param name="guid">The globally unique identifier for the service, this may not be modified.</param>
+            <param name="name"></param>
+            <param name="type"></param>
+            <param name="codeBase"></param>
+            <param name="servicePage"></param>
+            <param name="inCoupon">The coupon for incoming messages from the processagent to the local service</param>
+            <param name="outCoupon">The coupon for messages from the local service to this processAgent</param>
+        </member>
+        <member name="T:iLabs.Core.ProcessAgentDB">
+            <summary>
+            Provides database access and table to object marshalling.
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RefreshServiceAgent">
+            <summary>
+            Loads the static varable serviceAgent with the processAgent's ProcessAgent data.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.SetDomainGuid(System.String)">
+            <summary>
+            Inserts or updates the domain ServiceBroker record in the database.
+            </summary>
+            <param name="guid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetServiceURL">
+            <summary>
+             This agent's Web Service URL
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.AuthenticateCoupon(iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Check that the coupon is in the database.
+            </summary>
+            <param name="coupon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.AuthenticateCoupon(System.Data.Common.DbConnection,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Check that the coupon is in the database.
+            </summary>
+            <param name="connection">an open connection</param>
+            <param name="coupon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.InsertCoupon(iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Inserts a coupon in the database
+            </summary>
+            <param name="coupon"></param>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.InsertCoupon(System.Data.Common.DbConnection,System.Int64,System.String,System.String)">
+            <summary>
+            Insert a coupon into the database
+            </summary>
+            <param name="couponID"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.CancelCoupon(iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Mark the coupon as cancelled, if the coupon is found and 
+            not already cancelled any tickets in the Ticket collection are also cancelled.
+            </summary>
+            <param name="coupon"></param>
+            <returns><code>true</code> if the coupon is found, is not currently cancelled and cancelation completed </returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetCoupon(System.Int64,System.String)">
+            <summary>
+            Retrieve a coupon from the database given its id and issuer
+            </summary>
+            <param name="couponID"></param>
+            <param name="issuerGuid"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetCoupon(System.Data.Common.DbConnection,System.Int64,System.String)">
+            <summary>
+            Retrieve a coupon from the database given its id and issuerGuid.
+            </summary>
+            <param name="connection"></param>
+            <param name="issuerGuid"></param>
+            <param name="couponID"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found or has been cancelled</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetIdentityInCoupon(System.String)">
+            <summary>
+            Get the expected incoming Identity coupon for the specified agent.
+            </summary>
+            <param name="agentGUID"></param>
+            <returns>The coupon or null</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetIdentityOutCoupon(System.String)">
+            <summary>
+            Get the Identity coupon to be used in outgoing messages to the specified agent.
+            </summary>
+            <param name="agentGUID"></param>
+            <returns>The coupon or null</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.AuthenticateAgentHeader(iLabs.DataTypes.SoapHeaderTypes.AgentAuthHeader)">
+            <summary>
+            Checks the AgentAuthHeader to make sure the coupon matches the local IdentityIn Coupon for the specified agent.
+            </summary>
+            <param name="agentHeader"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RetrieveAndVerify(iLabs.DataTypes.TicketingTypes.Coupon,System.String)">
+            <summary>
+            Retrieves ticket from local database or the SB. Ticket type is needed to retrieve ticket from SB, 
+            </summary>
+            <param name="coupon">operation coupon sent by the Process Agent</param>
+            <param name="ticketType">type of the ticket to be retrieved</param>
+            <returns>Retrieved ticket</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.CancelTicket(iLabs.DataTypes.TicketingTypes.Ticket)">
+            <summary>
+            Mark the ticket as cancelled in the DB, this cancels the local copy of the ticket if found.
+            Should not be directly called but as the result of a successful RequestTicketCancellation call.
+            </summary>
+            <param name="ticket"></param>
+            <returns><code>true</code> if the ticket has been cancelled successfully</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.CancelTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <summary>
+            Mark the ticket as cancelled in the DB, this cancels the local copy of the ticket if found.
+            Should not be directly called but as the result of a successful RequestTicketCancellation call.
+            </summary>
+            <param name="coupon"></param>
+            <param name="type"></param>
+            <param name="redeemerGUID"></param>
+            <returns><code>true</code> if the ticket has been cancelled successfully</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.DeleteTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <summary>
+            Delete the ticket from the DB, this deletes the local copy of the ticket if found.
+            Should not be directly called but as the result of a successful RequestTicketCancellation call.
+            </summary>
+            <param name="coupon"></param>
+            <param name="type"></param>
+            <param name="redeemerGUID"></param>
+            <returns><code>true</code> if the ticket has been cancelled successfully</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.InsertTicket(iLabs.DataTypes.TicketingTypes.Ticket)">
+            <summary>
+            Insert a ticket in the Ticket table
+            </summary>
+            <param name="ticket"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RetrieveTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <summary>
+            Retrieve a ticket from the database. ProcessAgent version
+            The triple (couponID, redeemerID, type) uniquely identifies the ticket.
+            Note the ProcessAgent must store the tickets, a null return is a valid value.
+            </summary>
+            <param name="coupon"></param>
+            <param name="type"></param>
+            <param name="redeemerGUID"></param>
+            <returns>Retrieved Ticket, or null if  the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RetrieveTicketsByType(System.String)">
+            <summary>
+            Retrieve all the tickets of a certain type from the database 
+            </summary>
+            <param name="ticketType"></param>
+            <returns>Array of ticket objects</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RetrieveTickets(iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Retrieve all the tickets that belong to the given coupon
+            </summary>
+            <param name="ticketType"></param>
+            <returns>Array of ticket objects</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RetrieveTicketTypes">
+            <summary>
+            Retrieve all the ticket types present in the DB
+            </summary>
+            <returns>Array of ticket type objects</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.ProcessExpiredTickets">
+            <summary>
+            Finds all expired and not cancelled tickets in the Ticket table and deletes them.
+            IF the ticket's coupon no longer has any tickets the coupon is deleted. This should
+            only process tickets that have a valid duration.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.SetIdentCoupons(System.String,System.Int64,System.Int64,System.String)">
+            <summary>
+            Set the coupon id of the identification in coupon in the record of the process agent
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.SetIdentInCouponID(System.String,System.Int64)">
+            <summary>
+            Set the coupon id of the identification in coupon in the record of the process agent
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.SetIdentOutCouponID(System.String,System.Int64)">
+            <summary>
+            Set the coupon id of the identification in coupon in the record of the process agent
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTags">
+            <summary>
+            Return all processAgent tags, agentName is the tag, local processAgent ID is the id.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsForDomain(System.String)">
+            <summary>
+            Return all processAgent tags for the specified domain, agentName is the tag.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsWithType">
+            <summary>
+            Return all ProcessAgent tags with Type appended to the agent name.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsWithTypeForDomain(System.String)">
+            <summary>
+            Return all ProcessAgent tags from the specified domain with Type
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTag(System.String)">
+            <summary>
+            Return the ProcessAgent Tag, with type, for the specified processAgentID.
+            </summary>
+            <param name="paIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagWithType(System.String)">
+            <summary>
+            Return the ProcessAgent Tag, with type, for the specified processAgentID.
+            </summary>
+            <param name="paIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagWithType(System.Int32)">
+            <summary>
+            Return the ProcessAgent Tag, with type, for the specified processAgentID.
+            </summary>
+            <param name="paIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsWithType(System.Int32[])">
+            <summary>
+            Return the ProcessAgent Tags, with type, for the specified processAgentIDs.
+            </summary>
+            <param name="paIds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsByType(System.Int32)">
+            <summary>
+            return tags for all aprocessAgents of typeID
+            </summary>
+            <param name="typeID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsByType(System.Int32[])">
+            <summary>
+            Returns all ProcessAgent tags for the specified typeIDs.
+            </summary>
+            <param name="typeIDs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsByType(System.String)">
+            <summary>
+            Return all ProcessAgent tags for the specified type.
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentTagsByType(System.String,System.String)">
+            <summary>
+            Return all ProcessAgent tags for the specified type and domain.
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.ProcessAgentTypeExists(System.String)">
+            <summary>
+            Check that an agent type exits in the database.
+            </summary>
+            <param name="processAgentType"></param>
+            <returns><code>true</code> if processAgentType is a name of a static process agent type in the database</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.readProcessAgent(System.Data.Common.DbDataReader)">
+            <summary>
+            Copies the standard agent select results into a ProcessAgent object
+            </summary>
+            <param name="dataReader"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgents">
+            <summary>
+            Retrieve all process agent records from the database
+            </summary>
+            <param name="guid">The Guid id of the static process agent</param>
+            <returns>Object that represents the retrieved static process agent</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentsByType(System.String)">
+            <summary>
+            Retrieve all the process agents of a given type from the database
+            </summary>
+            <returns>Array of objects that represent the retrieved static process agents</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgent(System.Int32)">
+            <summary>
+            Retrieve a process agent record from the database by it's local ID
+            </summary>
+            <param name="guid">The Guid id of the static process agent</param>
+            <returns>Object that represents the retrieved static process agent</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgent(System.Data.Common.DbConnection,System.Int32)">
+            <summary>
+            Retrieve a process agent record from the database by it's local ID
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgent(System.String)">
+            <summary>
+            Retrieve a process agent record from the database, by it's Guid
+            </summary>
+            <param name="guid">The Guid id of the static process agent</param>
+            <returns>Object that represents the retrieved static process agent</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.InsertProcessAgent(System.String,System.String,System.String,System.String,System.String,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            The process agent will not be created if the parameter processAgentType is not the valid name 
+            of a process agent type
+            </summary>
+            <param name="guid"></param>
+            <param name="name"></param>
+            <param name="processAgentType"></param>
+            <param name="issuerGuid"></param>
+            <param name="codeBaseUrl"></param>
+            <param name="webServiceUrl"></param>
+            <param name="inCoupon">Optional, null if from outside the current domain</param>
+            <param name="outCoupon">Optional, null if from outside the current domain</param>
+            <returns>The internal database ID of the static process agent created, or null if it cannot be created</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.InsertProcessAgent(System.Data.Common.DbConnection,System.String,System.String,System.String,System.String,System.String,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Inserts the database record for a ProcessAgent, the Identity coupons should already be in the database,
+            except in the case when the original service broker record is being created.
+            The process agent will not be created if the parameter processAgentType is not the valid name 
+            of a process agent type.
+            </summary>
+            <param name="connection"></param>
+            <param name="guid"></param>
+            <param name="name"></param>
+            <param name="processAgentType"></param>
+            <param name="issuerGuid"></param>
+            <param name="codeBaseUrl"></param>
+            <param name="webServiceUrl"></param>
+            <param name="inCoupon"></param>
+            <param name="outCoupon"></param>
+            <returns>An int status flag, negative numbers are errors</returns>
+            <exception>Throws DbException</exception>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetSelfProcessAgent">
+            <summary>
+            Retrieve this process agent's record from the database
+            </summary>
+            <returns>Object that represents the retrieved static process agent</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.SelfRegisterProcessAgent(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            A specialized method to create or modify the ProcessAgent's ProcessAgent Record.
+            This record is only used internally, if an existing record has 'self' set  to '1', 
+            the record will be updated or a new record will be created.
+            Both agent and domain guids 
+            may be the same the same. Registering the domainServer will overwrite the domainGuid.
+            THis method should not be called after a domainServer has been registed.
+            </summary>
+            <param name="guid"></param>
+            <param name="name"></param>
+            <param name="processAgentType"></param>
+            <param name="domainGuid"></param>
+            <param name="applicationURL"></param>
+            <param name="webserviceURL"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.SelfRegisterProcessAgent(System.Data.Common.DbConnection,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            A specialized method to create or modify the ProcessAgent's ProcessAgent Record.
+            This record is only used internally, has agent_ID of '1', and both agent and domain guids 
+            may be the same the same. Registering the domainServer will overwrite the domainGuid.
+            THis method should not be called after a domainServer has been registed.
+            </summary>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.ProcessAgentTypeExists(System.Data.Common.DbConnection,System.String)">
+            <summary>
+            Check that a processagent type exisits in the database.
+            </summary>
+            <param name="processAgentType"></param>
+            <returns><code>true</code> if processAgentType is a name of a static process agent type in the database</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentID(System.String)">
+            <summary>
+            Retrieve a agent's local ID given a string guid.
+            </summary>
+            <param name="guidStr"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetServiceURL(System.String)">
+            <summary>
+            Retrieve a agents serviceURL given a string guid.
+            </summary>
+            <param name="guidStr"></param>
+            <returns>Web Service URL, or null if the agent can not be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetServiceURL(System.Int32)">
+            <summary>
+            Retrieve a agents serviceURL given the local ID.
+            </summary>
+            <param name="id"></param>
+            <returns>Web Service URL, or null if the agent can not be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfo(System.Int32)">
+            <summary>
+            Retrieve a agents information given an id.
+            </summary>
+            <param name="id"></param>
+            <returns>agentInfo, or null if the agent</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfo(System.String)">
+            <summary>
+            Retrieve a agentInfo given a string guid.
+            </summary>
+            <param name="guidStr"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfoByInCoupon(System.Int64,System.String)">
+            <summary>
+            Retrieve a agentInfo given a string guid.
+            </summary>
+            <param name="guidStr"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfos">
+            <summary>
+            Retrieve all agentInfos.
+            </summary>
+            <param name="guidStr"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfos(System.String)">
+            <summary>
+            Retrieve agentInfos given a string agent type.
+            </summary>
+            <param name="type">the type of agent</param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfos(System.Int32[])">
+            <summary>
+            Retrieve agentInfos given an array of agent IDs.
+            </summary>
+            <param name="IDs"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentInfosForDomain(System.String)">
+            <summary>
+            Retrieve agentInfos given an array of agent IDs.
+            </summary>
+            <param name="IDs"></param>
+            <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentIDsByType(System.Int32)">
+            <summary>
+            Retrieve an array of processAgent IDs given an agent typeID.
+            </summary>
+            <param name="IDs"></param>
+            <returns>array of IDs</returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.GetProcessAgentIDsByType(System.Int32[])">
+            <summary>
+            Returns all ProcessAgent tags for the specified typeIDs.
+            </summary>
+            <param name="typeIDs"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Core.ProcessAgentDB.RetireProcessAgent(System.String,System.String,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="domainGuid"></param>
+            <param name="serviceGuid"></param>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="P:iLabs.Core.ProcessAgentDB.ServiceAgent">
+            <summary>
+            this serviceAgent, null if selfRecord has not been saved to database.
+            </summary>
+        </member>
+        <member name="P:iLabs.Core.ProcessAgentDB.ServiceGuid">
+            <summary>
+            this serviceAgent's Guid, null if selfRecord has not been saved to database.
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.TicketTypes.ticketTypes">
+            <summary>
+            static array of ticket types that exist in the DB
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketTypes.TicketTypeExists(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <returns><code>true</code> if a ticket type with called <code>name</code> exists, <code>false</code> otherwise</returns>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketTypes.IsAdministerPAType(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="typeName"></param>
+            <returns><code>true</code> if the argument is a ticket type that is a derived type of the type ADMINISTER_PA, false otherwise</returns>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketTypes.IsManagePAType(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="typeName"></param>
+            <returns><code>true</code> if the argument is a ticket type that is a derived type of the type MANAGE_PA, false otherwise</returns>
+        </member>
+        <member name="F:iLabs.Ticketing.TicketType.ticketTypeId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.TicketType.name">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.TicketType.shortDescription">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.Ticketing.TicketType.isAbstract">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketType.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketType.#ctor(System.Int32,System.String,System.String,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="ticketTypeId"></param>
+            <param name="name"></param>
+            <param name="shortDescription"></param>
+        </member>
+        <member name="M:iLabs.Ticketing.TicketType.ToString">
+            <summary>
+            
+            </summary>
+            <returns>A string desctiption of the ticket type</returns>
+        </member>
+        <member name="T:iLabs.Web.WS_ILabCore">
+            <summary>
+            WS_ILabCore provides a base WebService implementation of all of the ProcessAgent required Web Service Methods.
+            </summary>
+            
+        </member>
+        <member name="F:iLabs.Web.WS_ILabCore.brokerAuthHeader">
+            <summary>
+            Instantiated to recieve soap header objects in SOAP requests
+            </summary>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.GetServiceTime">
+            <summary>
+            Get the processAgent's local time, this is not in UTC.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.GetStatus">
+            <summary>
+            Generate a statusReort.
+            </summary>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.StatusNotification(iLabs.DataTypes.ProcessAgentTypes.StatusNotificationReport)">
+            <summary>
+            Process the statusNotificationReport. Currently no processing has been specified.
+            </summary>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.CancelTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <summary>
+            Try to delete a cached ticket.
+            If the receiver is a serviceBroker and is not the redeemer the call needs to be repackaged and forwarded to the redeemer.
+            Each ProcessAgent type may need to override this method depending on the ticket type.
+            </summary>
+            <param name="coupon">collection coupon</param>
+            <param name="type">ticket type</param>
+            <param name="redeemer">the ticket redeemer</param>
+            <returns>return true if deleted or not found</returns>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.InstallDomainCredentials(iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Install the calling services credentials on this processAgent.
+            </summary>
+            <param name="service">The calling processAgents immutable information</param>
+            <param name="inIdentCoupon">The coupon that will authorize messages from the service</param>
+            <param name="outIdentCoupon">The coupon to be used when contacting the service</param>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.ModifyDomainCredentials(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Modify the specified services Domain credentials on this static process agent. 
+            Agent_guid is key to the service to be modified. The agentAuthorizationHeader must use the old values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.ModifyProcessAgent(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String)">
+            <summary>
+            Informs this processAgent that it should modify all references to a specific processAent. 
+            This is used to propagate modifications, The agentGuid must remain the same.
+            </summary>
+            <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+            <param name="serviceGuid">The guid of the service</param>
+            <param name="state">The retired state to be set</param>
+            <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        </member>
+        <member name="M:iLabs.Web.WS_ILabCore.RetireProcessAgent(System.String,System.String,System.Boolean)">
+            <summary>
+            Informs a processAgent that it should retire/un-retire all references to a specific processAent. 
+            This may be used to propigate retire calls.
+            </summary>
+            <param name="domainGuid">The guid of the services domain ServiceBroker</param>
+            <param name="serviceGuid">The guid of the service</param>
+            <param name="state">The retired state to be set, true sets retired.</param>
+            <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
+        </member>
+    </members>
+</doc>

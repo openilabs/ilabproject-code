@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://ilab.mit.edu/iLabs/Services" elementFormDefault="qualified" targetNamespace="http://ilab.mit.edu/iLabs/Services" id="schema2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import namespace="http://ilab.mit.edu/iLabs/type" />
+  <xs:element name="ModifyDomainCredentials">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="originalGuid" type="xs:string" />
+        <xs:element xmlns:q1="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q1:agent" />
+        <xs:element minOccurs="0" maxOccurs="1" name="extra" type="xs:string" />
+        <xs:element xmlns:q2="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q2:inCoupon" />
+        <xs:element xmlns:q3="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q3:outCoupon" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ModifyDomainCredentialsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="ModifyDomainCredentialsResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ModifyProcessAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="originalGuid" type="xs:string" />
+        <xs:element xmlns:q4="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q4:agent" />
+        <xs:element minOccurs="0" maxOccurs="1" name="extra" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ModifyProcessAgentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="ModifyProcessAgentResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetireProcessAgent">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="domainGuid" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="serviceGuid" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="state" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetireProcessAgentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="RetireProcessAgentResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelTicket">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q5:coupon" />
+        <xs:element minOccurs="0" maxOccurs="1" name="type" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="redeemer" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CancelTicketResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="CancelTicketResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetServiceTime">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="GetServiceTimeResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="GetServiceTimeResult" type="xs:dateTime" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetStatus">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="GetStatusResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q6="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q6:GetStatusResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StatusNotification">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q7="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q7:report" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="StatusNotificationResponse">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="InstallDomainCredentials">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q8="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q8:service" />
+        <xs:element xmlns:q9="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q9:inIdentCoupon" />
+        <xs:element xmlns:q10="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q10:outIdentCoupon" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InstallDomainCredentialsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q11:InstallDomainCredentialsResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveDomainCredentials">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="domainGuid" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="serviceGuid" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RemoveDomainCredentialsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="RemoveDomainCredentialsResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Register">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="registerGuid" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="info" type="tns:ArrayOfServiceDescription" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfServiceDescription">
+    <xs:sequence>
+      <xs:element xmlns:q12="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="unbounded" name="ServiceDescription" nillable="true" type="q12:ServiceDescription" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RegisterResponse">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="SaveClientData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="name" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="itemValue" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SaveClientDataResponse">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="LoadClientData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="name" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LoadClientDataResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="LoadClientDataResult" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteClientData">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="name" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DeleteClientDataResponse">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="ListClientDataItems">
+    <xs:complexType />
+  </xs:element>
+  <xs:element name="ListClientDataItemsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="ListClientDataItemsResult" type="tns:ArrayOfString" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfString">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="OpenExperiment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentId" type="xs:long" />
+        <xs:element minOccurs="1" maxOccurs="1" name="duration" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OpenExperimentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="1" name="OpenExperimentResult" type="q13:StorageStatus" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AgentCloseExperiment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q14="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q14:coupon" />
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentId" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AgentCloseExperimentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q15="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="1" name="AgentCloseExperimentResult" type="q15:StorageStatus" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ClientCloseExperiment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentId" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ClientCloseExperimentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q16="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="1" name="ClientCloseExperimentResult" type="q16:StorageStatus" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetrieveExperimentIds">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="carray" type="tns:ArrayOfCriterion" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfCriterion">
+    <xs:sequence>
+      <xs:element xmlns:q17="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="unbounded" name="Criterion" nillable="true" type="q17:Criterion" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RetrieveExperimentIdsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="RetrieveExperimentIdsResult" type="tns:ArrayOfLong" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfLong">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="long" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RetrieveExperiment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentID" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetrieveExperimentResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q18="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="1" name="RetrieveExperimentResult" type="q18:Experiment" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetrieveExperimentSummary">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="carray" type="tns:ArrayOfCriterion" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetrieveExperimentSummaryResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="RetrieveExperimentSummaryResult" type="tns:ArrayOfExperimentSummary" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfExperimentSummary">
+    <xs:sequence>
+      <xs:element xmlns:q19="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="unbounded" name="ExperimentSummary" nillable="true" type="q19:ExperimentSummary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RetrieveExperimentRecords">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentID" type="xs:long" />
+        <xs:element minOccurs="0" maxOccurs="1" name="carray" type="tns:ArrayOfCriterion" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RetrieveExperimentRecordsResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="RetrieveExperimentRecordsResult" type="tns:ArrayOfExperimentRecord" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="ArrayOfExperimentRecord">
+    <xs:sequence>
+      <xs:element xmlns:q20="http://ilab.mit.edu/iLabs/type" minOccurs="0" maxOccurs="unbounded" name="ExperimentRecord" nillable="true" type="q20:ExperimentRecord" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="RequestExperimentAccess">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentID" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RequestExperimentAccessResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q21="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q21:RequestExperimentAccessResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetAnnotation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentID" type="xs:int" />
+        <xs:element minOccurs="0" maxOccurs="1" name="annotation" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetAnnotationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="SetAnnotationResult" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAnnotation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="experimentID" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetAnnotationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="GetAnnotationResult" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RevokeReservation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="serviceBrokerGuid" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="userName" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="groupName" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="labServerGuid" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="labClientGuid" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:dateTime" />
+        <xs:element minOccurs="1" maxOccurs="1" name="endTime" type="xs:dateTime" />
+        <xs:element minOccurs="0" maxOccurs="1" name="message" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RevokeReservationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="RevokeReservationResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddTicket">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q22="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q22:coupon" />
+        <xs:element minOccurs="0" maxOccurs="1" name="type" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="redeemerGuid" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="duration" type="xs:long" />
+        <xs:element minOccurs="0" maxOccurs="1" name="payload" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddTicketResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q23="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q23:AddTicketResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateTicket">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" name="type" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="redeemerGuid" type="xs:string" />
+        <xs:element minOccurs="1" maxOccurs="1" name="duration" type="xs:long" />
+        <xs:element minOccurs="0" maxOccurs="1" name="payload" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreateTicketResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q24="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q24:CreateTicketResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RedeemTicket">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q25="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q25:coupon" />
+        <xs:element minOccurs="0" maxOccurs="1" name="type" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="redeemerGuid" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RedeemTicketResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q26="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q26:RedeemTicketResult" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RequestTicketCancellation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q27="http://ilab.mit.edu/iLabs/type" minOccurs="1" maxOccurs="1" ref="q27:coupon" />
+        <xs:element minOccurs="0" maxOccurs="1" name="type" type="xs:string" />
+        <xs:element minOccurs="0" maxOccurs="1" name="redeemerGuid" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="RequestTicketCancellationResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="RequestTicketCancellationResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

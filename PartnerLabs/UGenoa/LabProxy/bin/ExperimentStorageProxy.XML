@@ -1,0 +1,800 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExperimentStorageProxy</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.Proxies.ESS.ExperimentStorageProxy">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.#ctor">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CloseExperiment(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginCloseExperiment(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndCloseExperiment(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CloseExperimentAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CloseExperimentAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteExperiment(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginDeleteExperiment(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndDeleteExperiment(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteExperimentAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteExperimentAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.OpenExperiment(System.Int64,System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginOpenExperiment(System.Int64,System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndOpenExperiment(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.OpenExperimentAsync(System.Int64,System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.OpenExperimentAsync(System.Int64,System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetIdleTime(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetIdleTime(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetIdleTime(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetIdleTimeAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetIdleTimeAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentStatus(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetExperimentStatus(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetExperimentStatus(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentStatusAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentStatusAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.SetExperimentStatus(System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginSetExperimentStatus(System.Int64,System.Int32,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndSetExperimentStatus(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.SetExperimentStatusAsync(System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.SetExperimentStatusAsync(System.Int64,System.Int32,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecord(System.Int64,System.String,System.String,System.Boolean,System.String,iLabs.DataTypes.StorageTypes.RecordAttribute[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginAddRecord(System.Int64,System.String,System.String,System.Boolean,System.String,iLabs.DataTypes.StorageTypes.RecordAttribute[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndAddRecord(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecordAsync(System.Int64,System.String,System.String,System.Boolean,System.String,iLabs.DataTypes.StorageTypes.RecordAttribute[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecordAsync(System.Int64,System.String,System.String,System.Boolean,System.String,iLabs.DataTypes.StorageTypes.RecordAttribute[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecords(System.Int64,iLabs.DataTypes.StorageTypes.ExperimentRecord[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginAddRecords(System.Int64,iLabs.DataTypes.StorageTypes.ExperimentRecord[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndAddRecords(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecordsAsync(System.Int64,iLabs.DataTypes.StorageTypes.ExperimentRecord[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecordsAsync(System.Int64,iLabs.DataTypes.StorageTypes.ExperimentRecord[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecord(System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetRecord(System.Int64,System.Int32,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetRecord(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAsync(System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAsync(System.Int64,System.Int32,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecords(System.Int64,iLabs.DataTypes.Criterion[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetRecords(System.Int64,iLabs.DataTypes.Criterion[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetRecords(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordsAsync(System.Int64,iLabs.DataTypes.Criterion[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordsAsync(System.Int64,iLabs.DataTypes.Criterion[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperiment(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetExperiment(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetExperiment(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentIDs(System.Int64[],iLabs.DataTypes.Criterion[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetExperimentIDs(System.Int64[],iLabs.DataTypes.Criterion[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetExperimentIDs(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentIDsAsync(System.Int64[],iLabs.DataTypes.Criterion[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentIDsAsync(System.Int64[],iLabs.DataTypes.Criterion[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddAttributes(System.Int64,System.Int32,iLabs.DataTypes.StorageTypes.RecordAttribute[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginAddAttributes(System.Int64,System.Int32,iLabs.DataTypes.StorageTypes.RecordAttribute[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndAddAttributes(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddAttributesAsync(System.Int64,System.Int32,iLabs.DataTypes.StorageTypes.RecordAttribute[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddAttributesAsync(System.Int64,System.Int32,iLabs.DataTypes.StorageTypes.RecordAttribute[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributes(System.Int64,System.Int32,System.Int32[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetRecordAttributes(System.Int64,System.Int32,System.Int32[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetRecordAttributes(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesAsync(System.Int64,System.Int32,System.Int32[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesAsync(System.Int64,System.Int32,System.Int32[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesByName(System.Int64,System.Int32,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetRecordAttributesByName(System.Int64,System.Int32,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetRecordAttributesByName(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesByNameAsync(System.Int64,System.Int32,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesByNameAsync(System.Int64,System.Int32,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteRecordAttributes(System.Int64,System.Int32,System.Int32[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginDeleteRecordAttributes(System.Int64,System.Int32,System.Int32[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndDeleteRecordAttributes(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteRecordAttributesAsync(System.Int64,System.Int32,System.Int32[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteRecordAttributesAsync(System.Int64,System.Int32,System.Int32[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddBlobToRecord(System.Int64,System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginAddBlobToRecord(System.Int64,System.Int64,System.Int32,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndAddBlobToRecord(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddBlobToRecordAsync(System.Int64,System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.AddBlobToRecordAsync(System.Int64,System.Int64,System.Int32,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CancelBlobStorage(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginCancelBlobStorage(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndCancelBlobStorage(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CancelBlobStorageAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CancelBlobStorageAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CreateBlob(System.Int64,System.String,System.Int32,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginCreateBlob(System.Int64,System.String,System.Int32,System.String,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndCreateBlob(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CreateBlobAsync(System.Int64,System.String,System.Int32,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CreateBlobAsync(System.Int64,System.String,System.Int32,System.String,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobAssociation(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetBlobAssociation(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetBlobAssociation(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobAssociationAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobAssociationAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobExperiment(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetBlobExperiment(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetBlobExperiment(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobExperimentAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobExperimentAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobs(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetBlobs(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetBlobs(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsForRecord(System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetBlobsForRecord(System.Int64,System.Int32,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetBlobsForRecord(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsForRecordAsync(System.Int64,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsForRecordAsync(System.Int64,System.Int32,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobStatus(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetBlobStatus(System.Int64,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetBlobStatus(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobStatusAsync(System.Int64)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobStatusAsync(System.Int64,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobImportProtocols">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetSupportedBlobImportProtocols(System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetSupportedBlobImportProtocols(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobImportProtocolsAsync">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobImportProtocolsAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobExportProtocols">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetSupportedBlobExportProtocols(System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetSupportedBlobExportProtocols(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobExportProtocolsAsync">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobExportProtocolsAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedChecksumAlgorithms">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginGetSupportedChecksumAlgorithms(System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndGetSupportedChecksumAlgorithms(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedChecksumAlgorithmsAsync">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedChecksumAlgorithmsAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobAccess(System.Int64,System.String,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginRequestBlobAccess(System.Int64,System.String,System.Int32,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndRequestBlobAccess(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobAccessAsync(System.Int64,System.String,System.Int32)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobAccessAsync(System.Int64,System.String,System.Int32,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobStorage(System.Int64,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.BeginRequestBlobStorage(System.Int64,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.EndRequestBlobStorage(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobStorageAsync(System.Int64,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobStorageAsync(System.Int64,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.ESS.ExperimentStorageProxy.CancelAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.CloseExperimentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteExperimentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.OpenExperimentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetIdleTimeCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentStatusCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.SetExperimentStatusCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecordCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.AddRecordsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetExperimentIDsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.AddAttributesCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetRecordAttributesByNameCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.DeleteRecordAttributesCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.AddBlobToRecordCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.CancelBlobStorageCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.CreateBlobCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobAssociationCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobExperimentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobsForRecordCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetBlobStatusCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobImportProtocolsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedBlobExportProtocolsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.GetSupportedChecksumAlgorithmsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobAccessCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.ESS.ExperimentStorageProxy.RequestBlobStorageCompleted">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.CloseExperimentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.CloseExperimentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.CloseExperimentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.DeleteExperimentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.DeleteExperimentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.DeleteExperimentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.OpenExperimentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.OpenExperimentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.OpenExperimentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetIdleTimeCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetIdleTimeCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetIdleTimeCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetExperimentStatusCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetExperimentStatusCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetExperimentStatusCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.SetExperimentStatusCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.SetExperimentStatusCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.SetExperimentStatusCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddRecordCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddRecordCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.AddRecordCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddRecordsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddRecordsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.AddRecordsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetRecordCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetRecordsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetExperimentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetExperimentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetExperimentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetExperimentIDsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetExperimentIDsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetExperimentIDsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddAttributesCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddAttributesCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.AddAttributesCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordAttributesCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordAttributesCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetRecordAttributesCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordAttributesByNameCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetRecordAttributesByNameCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetRecordAttributesByNameCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.DeleteRecordAttributesCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.DeleteRecordAttributesCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.DeleteRecordAttributesCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddBlobToRecordCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.AddBlobToRecordCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.AddBlobToRecordCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.CancelBlobStorageCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.CancelBlobStorageCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.CancelBlobStorageCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.CreateBlobCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.CreateBlobCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.CreateBlobCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobAssociationCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobAssociationCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetBlobAssociationCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobExperimentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobExperimentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetBlobExperimentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetBlobsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobsForRecordCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobsForRecordCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetBlobsForRecordCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobStatusCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetBlobStatusCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetBlobStatusCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetSupportedBlobImportProtocolsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetSupportedBlobImportProtocolsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetSupportedBlobImportProtocolsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetSupportedBlobExportProtocolsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetSupportedBlobExportProtocolsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetSupportedBlobExportProtocolsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetSupportedChecksumAlgorithmsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.GetSupportedChecksumAlgorithmsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.GetSupportedChecksumAlgorithmsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.RequestBlobAccessCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.RequestBlobAccessCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.RequestBlobAccessCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.RequestBlobStorageCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.ESS.RequestBlobStorageCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.ESS.RequestBlobStorageCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TicketIssuerProxy</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.Proxies.Ticketing.TicketIssuerProxy">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.#ctor">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.AddTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Int64,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.BeginAddTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Int64,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.EndAddTicket(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.AddTicketAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Int64,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.AddTicketAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Int64,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.CreateTicket(System.String,System.String,System.Int64,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.BeginCreateTicket(System.String,System.String,System.Int64,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.EndCreateTicket(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.CreateTicketAsync(System.String,System.String,System.Int64,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.CreateTicketAsync(System.String,System.String,System.Int64,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.RedeemTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.BeginRedeemTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.EndRedeemTicket(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.RedeemTicketAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.RedeemTicketAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.RequestTicketCancellation(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.BeginRequestTicketCancellation(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.EndRequestTicketCancellation(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.RequestTicketCancellationAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.RequestTicketCancellationAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.Ticketing.TicketIssuerProxy.CancelAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.Ticketing.TicketIssuerProxy.AddTicketCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.Ticketing.TicketIssuerProxy.CreateTicketCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.Ticketing.TicketIssuerProxy.RedeemTicketCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.Ticketing.TicketIssuerProxy.RequestTicketCancellationCompleted">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.AddTicketCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.AddTicketCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.Ticketing.AddTicketCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.CreateTicketCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.CreateTicketCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.Ticketing.CreateTicketCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.RedeemTicketCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.RedeemTicketCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.Ticketing.RedeemTicketCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.RequestTicketCancellationCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.Ticketing.RequestTicketCancellationCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.Ticketing.RequestTicketCancellationCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+    </members>
+</doc>

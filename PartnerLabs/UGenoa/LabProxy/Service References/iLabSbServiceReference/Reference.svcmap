@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="612e8d61-4522-4830-ba70-1262c341a6e4" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="schema3.xsd" MetadataType="Schema" ID="db752185-4323-4e68-a218-429dbd55dae2" SourceId="1" SourceUrl="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?schema=schema3" />
+    <MetadataFile FileName="iLabServiceBroker.disco" MetadataType="Disco" ID="e580b570-d055-4b85-b834-60d98802e946" SourceId="1" SourceUrl="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?disco" />
+    <MetadataFile FileName="iLabServiceBroker.wsdl" MetadataType="Wsdl" ID="90092e68-9a23-4bb0-b364-7c565fe0e32a" SourceId="1" SourceUrl="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?wsdl=wsdl1" />
+    <MetadataFile FileName="schema1.xsd" MetadataType="Schema" ID="16e9b5da-c28c-4423-947f-46219c0aa260" SourceId="1" SourceUrl="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?schema=schema1" />
+    <MetadataFile FileName="schema2.xsd" MetadataType="Schema" ID="6c6173c3-6d3b-4958-9198-851ec733de04" SourceId="1" SourceUrl="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?schema=schema2" />
+    <MetadataFile FileName="iLabServiceBroker1.wsdl" MetadataType="Wsdl" ID="fbb1c14e-5193-4eb3-9fb7-6b5398045997" SourceId="1" SourceUrl="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?wsdl" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

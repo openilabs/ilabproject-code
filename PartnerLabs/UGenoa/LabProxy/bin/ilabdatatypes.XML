@@ -1,0 +1,872 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ilabdatatypes</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.DataTypes.SoapHeaderTypes.InitAuthHeader">
+            <summary>
+            Header type used for the initial registration of domain credentials.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.SoapHeaderTypes.InitAuthHeader.initPasskey">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.DataTypes.SoapHeaderTypes.AuthenticationHeader">
+            <summary>
+            Generic header with a single coupon.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.SoapHeaderTypes.AgentAuthHeader">
+            <summary>
+            Agent authorization
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.SoapHeaderTypes.BrokerAuthHeader">
+            <summary>
+            Broker authorization.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.SoapHeaderTypes.OperationAuthHeader">
+            <summary>
+            Header for operation requests.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.TicketingTypes.Coupon">
+            <summary>
+            Coupons convey passcodes and domain authorization information.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Coupon.couponId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Coupon.issuerGuid">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Coupon.passkey">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.TicketingTypes.Coupon.#ctor">
+            <summary>
+            Default constructor.
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.TicketingTypes.Coupon.#ctor(System.String,System.Int64,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="couponId"></param>
+            <param name="issuerGuid"></param>
+            <param name="passkey"></param>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.ticketId">
+            <summary>
+            Unique ticket ID
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.type">
+            <summary>
+            a string defining the type of ticket
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.couponId">
+            <summary>
+            The ID of the coupon defining which ticket collection this ticket is a member of.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.issuerGuid">
+            <summary>
+            The Ticket issuer
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.sponsorGuid">
+            <summary>
+            Guid of the processAgent requesting the creation of this ticket.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.redeemerGuid">
+            <summary>
+            Guid of the processAgent that will be processing the specified operation.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.creationTime">
+            <summary>
+            Creation time of the ticket stored as UTC
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.duration">
+            <summary>
+            Ticket duration, the number of seconds before the ticket expires. Negative one ( -1 )
+            is used to define a ticket that never expires.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.isCancelled">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.TicketingTypes.Ticket.payload">
+            <summary>
+            The ticket body.
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.TicketingTypes.Ticket.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.TicketingTypes.Ticket.#ctor(System.Int64,System.String,System.Int64,System.String,System.String,System.String,System.DateTime,System.Int64,System.Boolean,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="ticketId"></param>
+            <param name="type"></param>
+            <param name="couponId"></param>
+            <param name="issuerGuid"></param>
+            <param name="sponsorGuid"></param>
+            <param name="redeemerGuid"></param>
+            <param name="createTime"></param>
+            <param name="duration"></param>
+            <param name="isCancelled"></param>
+            <param name="payload"></param>
+        </member>
+        <member name="M:iLabs.DataTypes.TicketingTypes.Ticket.#ctor(System.Int64,System.String,System.Int64,System.String,System.String,System.String,System.Int64,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="ticketId"></param>
+            <param name="type"></param>
+            <param name="couponId"></param>
+            <param name="issuerGuid"></param>
+            <param name="sponsorGuid"></param>
+            <param name="redeemerGuid"></param>
+            <param name="creationTime"></param>
+            <param name="expirationTime"></param>
+            <param name="isCancelled"></param>
+            <param name="payload"></param>
+        </member>
+        <member name="T:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent">
+            <summary>
+            Minimum information about a processAgent. Once in a domain this data should be immutable.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.agentGuid">
+            <summary>
+            The agents Guid - limit to 50 characters
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.agentName">
+            <summary>
+            Human readable name.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.type">
+            <summary>
+            On of the pre-defined types
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.domainGuid">
+            <summary>
+            The domain server Guid - limit to 50 characters, may be null during WebService Calls.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.codeBaseUrl">
+            <summary>
+            The fully qualified URL for the site's root directory
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.webServiceUrl">
+            <summary>
+            The fully qualified URL for the Web Service Page
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.ProcessAgentTypes.ProcessAgent.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.ProcessAgentTypes.DomainCredentials">
+            <summary>
+            Provides a class to contain all parts of a domainCredential set, used to return any changes on a ModifyCredentialSet call.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.DomainCredentials.agent">
+            <summary>
+            The ProcessAgent
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.DomainCredentials.inCoupon">
+            <summary>
+            The coupon that will be used on all incoming messages from the domain server, it may be null.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.DomainCredentials.outCoupon">
+            <summary>
+            The coupon that will be used on all outgoing messages to the domain server, it may be null.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.ProcessAgentTypes.ServiceDescription">
+            <summary>
+            Information about available services.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ServiceDescription.serviceProviderInfo">
+            <summary>
+            An XML-encoded string that describes the services provided by the service provider described by this registry entry.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ServiceDescription.coupon">
+            <summary>
+            An optional coupon that may be used to redeem the described service.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.ProcessAgentTypes.ServiceDescription.consumerInfo">
+            <summary>
+            An optional XML-encoded string that provides information required by the consumer. 
+            This information may be parsed by the consuming site and may be reformated for use.
+            Part of this field may be used by a remote service broker to route the service call.
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.ProcessAgentTypes.ServiceDescription.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.ProcessAgentTypes.ServiceDescription.#ctor(System.String,iLabs.DataTypes.TicketingTypes.Coupon,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="serviceProviderInfo"></param>
+            <param name="coupon"></param>
+            <param name="consumerInfo"></param>
+        </member>
+        <member name="T:iLabs.DataTypes.ProcessAgentTypes.StatusReport">
+            <summary>
+            Report returned after a call to a processAgent's GetStatus method.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.ProcessAgentTypes.StatusNotificationReport">
+            <summary>
+            Information sent to a processAgent via a StatusNotification call. 
+            Currently processing of the notification is not specified. 
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.Criterion">
+            <summary>
+            A triplet used as part of an SQL query.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.Criterion.attribute">
+            <summary>
+            A named attribute
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.Criterion.predicate">
+            <summary>
+            A predicate expressed as a string
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.Criterion.value">
+            <summary>
+            A constant value expressed as a string
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.IntTag">
+            <summary>
+            Utility for storing an int value and user readable string for DDL processing
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.IntTag.id">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.IntTag.tag">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.IntTag.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.LongTag">
+            <summary>
+            Utility for storing a long value and user readable string for DDL processing
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.LongTag.id">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.LongTag.tag">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.LongTag.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StringTag">
+            <summary>
+            Utility for storing a long value and user readable string for DDL processing
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StringTag.id">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StringTag.tag">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:iLabs.DataTypes.StringTag.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StorageTypes.ExperimentRecord">
+            <summary>
+            A single record of an experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.ExperimentRecord.type">
+            <summary>
+            A tag to identify the type of content represented by a record
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.ExperimentRecord.submitter">
+            <summary>
+            optional source of the record
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.ExperimentRecord.sequenceNum">
+            <summary>
+            The ordinal number of this record (starting with 0)
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.ExperimentRecord.timestamp">
+            <summary>
+            A timestamp issued by the ESS when the record is added
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.ExperimentRecord.xmlSearchable">
+            <summary>
+            True if the record's contents field is XML encoded and the contained attributes may be searched
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.ExperimentRecord.contents">
+            <summary>
+            The payload of this record
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StorageTypes.Experiment">
+            <summary>
+            a collection of all experiment records for a single experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Experiment.experimentId">
+            <summary>
+            A unique non-negative long that identifies this experiment on the issueing ServiceBroker
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Experiment.issuerGuid">
+            <summary>
+            The issueing ServiceBroker
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Experiment.records">
+            <summary>
+            The array of records that represents the experiment log
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StorageTypes.ExperimentSummary">
+            <summary>
+            A ServiceBroker data type that models the ServiceBroker's Experiments 
+            table and is designed to provide information about an experiment to requesting clients or services.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StorageTypes.StorageStatus">
+            <summary>
+            A ServiceBroker data type that models the ServiceBroker's Experiments table
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StorageTypes.RecordAttribute">
+            <summary>
+            An optional attribute which may be added to an experiment record.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.RecordAttribute.name">
+            <summary>
+            The attribute name
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.RecordAttribute.value">
+            <summary>
+            The attribute value
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.StorageTypes.Blob">
+            <summary>
+            Byte Large Object, a class to manage BLOBs on the ESS.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.blobId">
+            <summary>
+            The unique ID of this BLOB
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.experimentId">
+            <summary>
+            The ID of the associated Experiment
+            </summary>
+            <remarks>A BLOB must always be associated with an Experiment whether or not it is associated with an ExperimentRecord</remarks>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.recordNumber">
+            <summary>
+            The sequenceNumber of the associated Experiment record
+            </summary>
+            <remarks>A BLOB may be associated with an ExperimentRecord</remarks>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.timestamp">
+            <summary>
+            A timestamp issued by the ESS when the BLOB is created
+            </summary>
+            <remarks>It is independent of the time when the actual download of the BLOB data is requested or completed</remarks>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.description">
+            <summary>
+            A brief description suitable for listing in a table
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.mimeType">
+            <summary>
+            Optional mimeType
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.byteCount">
+            <summary>
+            The length of the actual binary data in bytes
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.checksum">
+            <summary>
+            The string result of the checksum or hashing algorithm
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.StorageTypes.Blob.checksumAlgorithm">
+            <summary>
+            A string designation of a supported checksum algorithm
+            </summary>
+            <remarks>Implementations must support CRC32 at a minimum, but may also support other hashing 
+            or checksum schemes e.g., MD5</remarks>
+        </member>
+        <member name="P:iLabs.DataTypes.SchedulingTypes.ITimeBlock.Start">
+            <summary>
+            the start time of the time block
+            </summary>
+        </member>
+        <member name="P:iLabs.DataTypes.SchedulingTypes.ITimeBlock.End">
+            <summary>
+            the end time of the time block
+            </summary>
+        </member>
+        <member name="P:iLabs.DataTypes.SchedulingTypes.ITimeBlock.Duration">
+            <summary>
+            The duration of the entire span in seconds
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.SchedulingTypes.TimeBlock">
+            <summary>
+            a structure which holds time block
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.SchedulingTypes.TimeBlock.startTime">
+            <summary>
+            the start time of the time block
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.SchedulingTypes.TimeBlock.duration">
+            <summary>
+            The length of the TimeBlock in seconds
+            </summary>
+        </member>
+        <member name="P:iLabs.DataTypes.SchedulingTypes.TimeBlock.Start">
+            <summary>
+            the start time of the time block
+            </summary>
+        </member>
+        <member name="P:iLabs.DataTypes.SchedulingTypes.TimeBlock.End">
+            <summary>
+            the end time of the time block
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.SchedulingTypes.TimePeriod">
+            <remarks/>
+        </member>
+        <member name="F:iLabs.DataTypes.SchedulingTypes.TimePeriod.quantum">
+            <summary>
+            Suggested quantum in minutes, used to schedule a reccurring permission.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.SchedulingTypes.Reservation">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.DataTypes.SchedulingTypes.Reservation.userName">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.ServiceBroker.Services.sbAuthHeader">
+            <summary>
+            This class defines the Service Broker Authentication Header object.  For each Web Method call, an instance of this class, containing the caller's 
+            coupon ID and coupon passkey will be passed in the header of the SOAP Request.
+            </summary>
+        </member>
+        <member name="F:iLabs.ServiceBroker.Services.sbAuthHeader.couponID">
+            <remarks/>
+        </member>
+        <member name="F:iLabs.ServiceBroker.Services.sbAuthHeader.couponPassKey">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.AuthHeader">
+            <summary>
+            This class defines the Authentication Header object.  For each Web Method call, an instance of this class, containing the caller's 
+            server ID and passkey will be passed in the header of the SOAP Request.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.AuthHeader.identifier">
+            <remarks/>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.AuthHeader.passKey">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.ClientSubmissionReport">
+            <summary>
+            The Service Broker uses an instance of this class to gather information
+            returned by in the Lab Server's submission report, in order to forward it
+            to the Client that submitted it.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ClientSubmissionReport.vReport">
+            <summary>
+            A copy of the ValidationReport returned by the Lab Server
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.ValidationReport">ValidationReport Class</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ClientSubmissionReport.experimentID">
+            <summary>
+            A token identifying the experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ClientSubmissionReport.minTimeToLive">
+            <summary>
+            Guaranteed minimum time (in hours, starting now) before this experimentID and associated data will be purged from the lab server. 
+            Forwarded from the Lab Server
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ClientSubmissionReport.wait">
+            <summary>
+            An instance of a WaitEstimate class containing the estimated wait time before this experiment will execute.
+            Forwarded from the Lab Server.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.WaitEstimate">WaitEstimate Class</seealso>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.WaitEstimate">
+            <summary>
+            Information regarding the length of time before a submitted experiment will be executed.
+            This is the structure returned by the GetEffectiveQueueLength method.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.WaitEstimate.effectiveQueueLength">
+            <summary>
+            Number of experiments currently in the execution queue that would run before the hypothetical new experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.WaitEstimate.estWait">
+            <summary>
+            [OPTIONAL, less than zero if not supported]. Estimated wait (in seconds) until the hypothetical new experiment would begin, based on the other experiments currently in the execution queue.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.ExperimentInformation">
+            <summary>
+            The transparent ExperimentInformation object associated with each experiment record contains 
+            all the information about the experiment that is accessible to the Service Broker. 
+            Most of the fields of the ExperimentInformation class are fixed, for example experimentID, effectiveGroupID, userID, etc. 
+            They are permanently set by the time the lab server executes the experiment. 
+            The Service Broker can, however, change the annotation field for the client after experiment execution. 
+            This allows the user to supply a string title or caption to a particular experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.experimentID">
+            <summary>
+            A token identifying the experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.labServerID">
+            <remarks/>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.userID">
+            <remarks/>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.effectiveGroupID">
+            <remarks/>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.submissionTime">
+            <summary>
+            Date/Time the experiment was submitted.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.completionTime">
+            <summary>
+            Date/Time the experiment was completed.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.expirationTime">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.minTimeToLive">
+            <summary>
+            Guaranteed minimum remaining time (in hours) before this experiment's data will be purged from the lab server. 
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.priorityHint">
+            <summary>
+            Indicates a requested priority for the experiment.
+            Possible values range from 20 (highest priority) to -20 (lowest priority); 0 is normal.
+            Priority hints may or may not be considered by the lab server.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.statusCode">
+            <summary>
+            Indicates the status of this experiment.  
+            1: if waiting in the execution queue
+            2: if currently running
+            3: if terminated normally
+            4: if terminated with errors (this includes cancellation by user in mid-execution)
+            5: if cancelled by user before execution had begun
+            6: if unknown labExperimentID.
+            7: if experiment specification not valid
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.validationWarningMessages">
+            <summary>
+            Domain-dependent human-readable text containing non-fatal warnings about the experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.validationErrorMessage">
+            <summary>
+            Domain-dependent human-readable text describing why the experiment specification would not be accepted.
+            Used only in event that the experiment is not accepted by the Lab Server.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.executionWarningMessages">
+            <summary>
+            Domain-dependent human-readable text containing non-fatal warnings about the experiment including runtime warnings. 
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.executionErrorMessage">
+            <summary>
+            [REQUIRED if statusCode == 4]. Domain-dependent human-readable text describing why the experiment terminated abnormally including runtime errors.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.annotation">
+            <summary>
+            Allows the user to apply a string title or caption to a particular experiment
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.xmlResultExtension">
+            <summary>
+            Transparent XML string that defines a set of attribute-value pairs that are set by the Lab Server and read by the Service Broker.
+            This field should conform to XML Schemas defined by the lab server for a particular type of experiment. 
+            The intent is to allow searches for experiments and blobs by attribute, but this capability is not currently implemented.
+            </summary>
+            <preliminary/>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentInformation.xmlBlobExtension">
+            <summary>
+            Transparent XML string that defines a set of attribute-value pairs that are set by the Lab Server and read by the Service Broker.
+            This field should conform to XML Schemas defined by the lab server for a particular type of experiment. 
+            The intent is to allow searches for experiments and blobs by attribute, but this capability is not currently implemented.
+            </summary>
+            <preliminary/>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.ValidationReport">
+            <summary>
+            A structure containing an evaluation from the Lab Server on the validity of the submitted experiment specification.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ValidationReport.accepted">
+            <summary>
+            true if the experiment specification would be (is) accepted for execution. 
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ValidationReport.warningMessages">
+            <summary>
+            Domain-dependent human-readable text containing non-fatal warnings about the experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ValidationReport.errorMessage">
+            <summary>
+            [If accepted == false]. Domain-dependent human-readable text describing why the experiment specification would not be accepted.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ValidationReport.estRuntime">
+            <summary>
+            [OPTIONAL, less than zero if not supported]. Estimated runtime (in seconds of this experiment.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.ResultReport">
+            <summary>
+            Contains the results from (or errors generated by) a previously submitted experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ResultReport.statusCode">
+            <summary>
+            Indicates the status of this experiment.  
+            1: if waiting in the execution queue
+            2: if currently running
+            3: if terminated normally
+            4: if terminated with errors (this includes cancellation by user in mid-execution)
+            5: if cancelled by user before execution had begun
+            6: if unknown labExperimentID. 
+            7: if Specification was not valid
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ResultReport.experimentResults">
+            <summary>
+            [REQUIRED if experimentStatus == 3, 
+            OPTIONAL if experimentStatus == 4].
+            An opaque, domain-dependent set of experiment results.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ResultReport.xmlResultExtension">
+            <summary>
+            [OPTIONAL, null if unused]. A transparent XML string that helps to identify this experiment.  Used for indexing and querying in generic components which can't understand the opaque experimentSpecification and experimentResults.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ResultReport.xmlBlobExtension">
+            <summary>
+            [OPTIONAL, null if unused]. A transparent XML string that helps to identify any blobs saved as part of this experiment's results. 
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ResultReport.warningMessages">
+            <summary>
+            Domain-dependent human-readable text containing non-fatal warnings about the experiment including runtime warnings. 
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ResultReport.errorMessage">
+            <summary>
+            [REQUIRED if experimentStatus == 4]. Domain-dependent human-readable text describing why the experiment terminated abnormally including runtime errors.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.LabExperimentStatus">
+            <summary>
+            Contains information on the status of a previously submitted experiment.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.ExperimentStatus">ExperimentStatus Structure</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.LabExperimentStatus.statusReport">
+            <summary>
+            An instance of an ExperimentStatus class which indicates the status of this experiment.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.ExperimentStatus">ExperimentStatus Structure</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.LabExperimentStatus.minTimetoLive">
+            <summary>
+            Guaranteed minimum remaining time (in hours) before this labExperimentID and associated data will be purged from the lab server. 
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.ExperimentStatus">
+            <summary>
+            Contains information regarding the status of an experiment. 
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.WaitEstimate">WaitEstimate Structure</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentStatus.statusCode">
+            <summary>
+            1: if waiting in the execution queue
+            2: if currently running
+            3: if terminated normally
+            4: if terminated with errors (this includes cancellation by user in mid-execution)
+            5: if cancelled by user before execution had begun
+            6: if unknown experimentID 
+            7: if Specification not valid
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentStatus.wait">
+            <summary>
+            An instance of a WaitEstimate class containing the estimated wait time before this experiment will execute.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.WaitEstimate">WaitEstimate Structure</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentStatus.estRuntime">
+            <summary>
+            [OPTIONAL les than zero if not used]. Estimated runtime (in seconds) of this experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.ExperimentStatus.estRemainingRuntime">
+            <summary>
+            [OPTIONAL less than zero if not used]. Estimated remaining runtime (in seconds) of this experiment, if the experiment is currently running.
+            </summary>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.SubmissionReport">
+            <summary>
+            A report returned to the Service Broker from the Lab Server containing information about a submitted experiment.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.ValidationReport">ValidationReport Structure</seealso>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.WaitEstimate">WaitEstimate Structure</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.SubmissionReport.vReport">
+            <summary>
+            An instance of a ValidationReport class containing an evaluation from the Lab Server on the validity of the submitted experiment specification.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.ValidationReport">ValidationReport Structure</seealso>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.SubmissionReport.labExperimentID">
+            <summary>
+            A token that identifies the experiment.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.SubmissionReport.minTimetoLive">
+            <summary>
+            Guaranteed minimum time (in hours, starting now) before this experimentID and associated data will be purged from the lab server.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.SubmissionReport.wait">
+            <summary>
+            An instance of a WaitEstimate class.
+            Contains information regarding the length of time before a submitted experiment will be executed.
+            </summary>
+            <seealso cref="T:iLabs.DataTypes.BatchTypes.WaitEstimate">WaitEstimate Structure</seealso>
+        </member>
+        <member name="T:iLabs.DataTypes.BatchTypes.LabStatus">
+            <summary>
+            Provides information regarding the status of a Lab Server, 
+            such as whether or not it is online and accepting experiments.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.LabStatus.online">
+            <summary>
+            true if lab is accepting experiments.
+            </summary>
+        </member>
+        <member name="F:iLabs.DataTypes.BatchTypes.LabStatus.labStatusMessage">
+            <summary>
+            Domain-dependent human-readable text describing status of lab server.
+            </summary>
+        </member>
+    </members>
+</doc>

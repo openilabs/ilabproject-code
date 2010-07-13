@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TicketIssuerLibrary</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.TicketIssuer.TicketIssuerDB">
+            <summary>
+            Interface for the DB Layer class
+            </summary>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.AuthenticateIssuedCoupon(System.Int64,System.String)">
+            <summary>
+            Verifies that an issued  coupon corresponding to the argument exists, and is not cancelled
+            </summary>
+            <param name="coupon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.AuthenticateIssuedCoupon(iLabs.DataTypes.TicketingTypes.Coupon)">
+            <summary>
+            Verifies that an issued  coupon corresponding to the argument exists, and is not cancelled
+            </summary>
+            <param name="coupon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.CreateCoupon(System.Data.Common.DbConnection)">
+            <summary>
+            Create a new coupon in the issued_Coupon Table, the coupon is assigned 
+            a generated passkey and the service GUID. 
+            </summary>
+            <returns>Created Coupon</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.CreateCoupon(System.Data.Common.DbConnection,System.String)">
+            <summary>
+            Create a new coupon in the issued_Coupon Table, the coupon is assigned 
+            a generated passkey and the service GUID. 
+            </summary>
+            <returns>Created Coupon</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.GetIssuedCoupon(System.Int64)">
+            <summary>
+            Checks the IssuedCoupon table and constructs a full Coupon if an 
+            Issued coupon is found and is not cancelled.
+            </summary>
+            <param name="connection"></param>
+            <param name="couponID"></param>
+            <returns>Coupon if found,  null if cancelled or not found</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.GetIssuedCoupon(System.Data.Common.DbConnection,System.Int64)">
+            <summary>
+            Checks the IssuedCoupon table and constructs a full Coupon if an 
+            Issued coupon is found and is not cancelled.
+            </summary>
+            <param name="connection"></param>
+            <param name="couponID"></param>
+            <returns>Coupon if found,  null if cancelled or not found</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.GetIssuedCouponCollectionCount(System.Int64)">
+            <summary>
+            Counts the number of tickets remaining in the coupon collection, returns -1 on error;
+            </summary>
+            <param name="couponID"></param>
+            <returns>the ticket count, -1 on error</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.AddTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.String,System.Int64,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="coupon"></param>
+            <param name="type"></param>
+            <param name="redeemerGuid"></param>
+            <param name="sponsorGuid"></param>
+            <param name="expiration"></param>
+            <param name="payload"></param>
+            <returns>The added Ticket, or null of the ticket cannot be added</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.CreateTicket(System.String,System.String,System.String,System.Int64,System.String)">
+            <summary>
+            Creates a new coupon and adds a new ticket to it.
+            </summary>
+            <param name="redeemerInfo"></param>
+            <param name="ticketType"></param>
+            <param name="expiration"></param>
+            <param name="payload"></param>
+            <returns>Coupon corresponding to the created Ticket</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.CancelIssuedTicket(iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Ticket)">
+            <summary>
+            Mark the ticket as cancelled in the DB
+            </summary>
+            <param name="ticket"></param>
+            <returns></returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.RetrieveIssuedTicketCoupon(System.String,System.String,System.String)">
+            <summary>
+            Retrieve a ticket coupon from the database.
+            The triple (type,redeemerGuid,sponsorGuid) identifies the ticket.
+            </summary>
+            <param name="typeType"></param>
+            <param name="redeemerGuid"></param>
+            <param name="sponsorGuid"></param>
+            <returns>Retrieved Coupon, or null if  the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.RetrieveTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <summary>
+            Retrieve a ticket from the database. TicketIssuerDB version
+            The triple (couponID, redeemerID, type) uniquely identifies the ticket.
+            If the ticket was issued here try the issuedTickets,
+            Note the ProcessAgent must store the tickets, a null return is a valid value.
+            </summary>
+            <param name="coupon"></param>
+            <param name="redeemerGUID"></param>
+            <param name="type"></param>
+            <returns>Retrieved Ticket, or null if  the ticket cannot be found</returns>
+        </member>
+        <member name="M:iLabs.TicketIssuer.TicketIssuerDB.RetrieveIssuedTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <summary>
+            Retrieve a ticket from the database.
+            The triple (couponID, redeemerID, type) uniquely identifies the ticket.
+            </summary>
+            <param name="coupon"></param>
+            <param name="redeemerID"></param>
+            <param name="type"></param>
+            <returns>Retrieved Ticket, or null if  the ticket cannot be found</returns>
+        </member>
+    </members>
+</doc>

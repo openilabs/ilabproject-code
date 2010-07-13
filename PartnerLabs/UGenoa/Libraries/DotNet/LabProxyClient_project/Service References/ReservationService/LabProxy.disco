@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="http://remlab-esng.dibe.unige.it/LPS_MIT/LabProxy.asmx?wsdl" docRef="http://remlab-esng.dibe.unige.it/LPS_MIT/LabProxy.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="http://remlab-esng.dibe.unige.it/LPS_MIT/LabProxy.asmx" xmlns:q1="http://ilab.mit.edu/iLabs/Services" binding="q1:LabProxySoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://remlab-esng.dibe.unige.it/LPS_MIT/LabProxy.asmx" xmlns:q2="http://ilab.mit.edu/iLabs/Services" binding="q2:IProcessAgent" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://remlab-esng.dibe.unige.it/LPS_MIT/LabProxy.asmx" xmlns:q3="http://ilab.mit.edu/iLabs/Services" binding="q3:LabProxySoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://remlab-esng.dibe.unige.it/LPS_MIT/LabProxy.asmx" xmlns:q4="http://ilab.mit.edu/iLabs/Services" binding="q4:IProcessAgent1" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

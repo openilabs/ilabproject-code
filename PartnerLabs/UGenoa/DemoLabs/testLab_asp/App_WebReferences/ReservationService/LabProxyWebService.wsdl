@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://ilab.mit.edu/iLabs/ProxyService/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://ilab.mit.edu/iLabs/ProxyService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This is a webservice to get information of the reservation made within the ISA.</wsdl:documentation>
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://ilab.mit.edu/iLabs/ProxyService/">
+      <s:element name="GetReservationInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="passkey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="labServerTime" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetReservationInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetReservationInfoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetReservationInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:GetReservationInfo" />
+  </wsdl:message>
+  <wsdl:message name="GetReservationInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:GetReservationInfoResponse" />
+  </wsdl:message>
+  <wsdl:portType name="LabProxyWebServiceSoap">
+    <wsdl:operation name="GetReservationInfo">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Returns information about the reservation.</wsdl:documentation>
+      <wsdl:input message="tns:GetReservationInfoSoapIn" />
+      <wsdl:output message="tns:GetReservationInfoSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="LabProxyWebServiceSoap" type="tns:LabProxyWebServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetReservationInfo">
+      <soap:operation soapAction="http://ilab.mit.edu/iLabs/ProxyService/GetReservationInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="LabProxyWebServiceSoap12" type="tns:LabProxyWebServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetReservationInfo">
+      <soap12:operation soapAction="http://ilab.mit.edu/iLabs/ProxyService/GetReservationInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="LabProxyWebService">
+    <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">This is a webservice to get information of the reservation made within the ISA.</wsdl:documentation>
+    <wsdl:port name="LabProxyWebServiceSoap" binding="tns:LabProxyWebServiceSoap">
+      <soap:address location="http://remlab-esng.dibe.unige.it/LabProxy/LabProxyWebService.asmx" />
+    </wsdl:port>
+    <wsdl:port name="LabProxyWebServiceSoap12" binding="tns:LabProxyWebServiceSoap12">
+      <soap12:address location="http://remlab-esng.dibe.unige.it/LabProxy/LabProxyWebService.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

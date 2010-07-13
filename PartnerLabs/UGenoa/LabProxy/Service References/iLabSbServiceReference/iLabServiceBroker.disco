@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx?wsdl" docRef="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q1="http://ilab.mit.edu" binding="q1:IBatchSB" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q2="http://ilab.mit.edu/iLabs/Services" binding="q2:IProcessAgent" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q3="http://ilab.mit.edu/iLabs/Services" binding="q3:IServiceBroker" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q4="http://ilab.mit.edu/iLabs/Services" binding="q4:ITicketIssuer" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q5="http://ilab.mit.edu" binding="q5:IBatchSB1" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q6="http://ilab.mit.edu/iLabs/Services" binding="q6:IProcessAgent1" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q7="http://ilab.mit.edu/iLabs/Services" binding="q7:IServiceBroker1" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx" xmlns:q8="http://ilab.mit.edu/iLabs/Services" binding="q8:ITicketIssuer1" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>

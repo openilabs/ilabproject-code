@@ -1,0 +1,275 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProcessAgentProxy</name>
+    </assembly>
+    <members>
+        <member name="T:iLabs.Proxies.PAgent.ProcessAgentProxy">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.#ctor">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.GetServiceTime">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginGetServiceTime(System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndGetServiceTime(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.GetServiceTimeAsync">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.GetServiceTimeAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.GetStatus">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginGetStatus(System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndGetStatus(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.GetStatusAsync">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.GetStatusAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.StatusNotification(iLabs.DataTypes.ProcessAgentTypes.StatusNotificationReport)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginStatusNotification(iLabs.DataTypes.ProcessAgentTypes.StatusNotificationReport,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndStatusNotification(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.StatusNotificationAsync(iLabs.DataTypes.ProcessAgentTypes.StatusNotificationReport)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.StatusNotificationAsync(iLabs.DataTypes.ProcessAgentTypes.StatusNotificationReport,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.InstallDomainCredentials(iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginInstallDomainCredentials(iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndInstallDomainCredentials(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.InstallDomainCredentialsAsync(iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.InstallDomainCredentialsAsync(iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyDomainCredentials(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginModifyDomainCredentials(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndModifyDomainCredentials(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyDomainCredentialsAsync(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyDomainCredentialsAsync(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,iLabs.DataTypes.TicketingTypes.Coupon,iLabs.DataTypes.TicketingTypes.Coupon,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RemoveDomainCredentials(System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginRemoveDomainCredentials(System.String,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndRemoveDomainCredentials(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RemoveDomainCredentialsAsync(System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RemoveDomainCredentialsAsync(System.String,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyProcessAgent(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginModifyProcessAgent(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndModifyProcessAgent(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyProcessAgentAsync(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyProcessAgentAsync(System.String,iLabs.DataTypes.ProcessAgentTypes.ProcessAgent,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RetireProcessAgent(System.String,System.String,System.Boolean)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginRetireProcessAgent(System.String,System.String,System.Boolean,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndRetireProcessAgent(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RetireProcessAgentAsync(System.String,System.String,System.Boolean)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RetireProcessAgentAsync(System.String,System.String,System.Boolean,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.CancelTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginCancelTicket(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndCancelTicket(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.CancelTicketAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.CancelTicketAsync(iLabs.DataTypes.TicketingTypes.Coupon,System.String,System.String,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.Register(System.String,iLabs.DataTypes.ProcessAgentTypes.ServiceDescription[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.BeginRegister(System.String,iLabs.DataTypes.ProcessAgentTypes.ServiceDescription[],System.AsyncCallback,System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.EndRegister(System.IAsyncResult)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RegisterAsync(System.String,iLabs.DataTypes.ProcessAgentTypes.ServiceDescription[])">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.RegisterAsync(System.String,iLabs.DataTypes.ProcessAgentTypes.ServiceDescription[],System.Object)">
+            <remarks/>
+        </member>
+        <member name="M:iLabs.Proxies.PAgent.ProcessAgentProxy.CancelAsync(System.Object)">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.GetServiceTimeCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.GetStatusCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.StatusNotificationCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.InstallDomainCredentialsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyDomainCredentialsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.RemoveDomainCredentialsCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.ModifyProcessAgentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.RetireProcessAgentCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.CancelTicketCompleted">
+            <remarks/>
+        </member>
+        <member name="E:iLabs.Proxies.PAgent.ProcessAgentProxy.RegisterCompleted">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.GetServiceTimeCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.GetServiceTimeCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.GetServiceTimeCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.GetStatusCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.GetStatusCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.GetStatusCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.StatusNotificationCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.InstallDomainCredentialsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.InstallDomainCredentialsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.InstallDomainCredentialsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.ModifyDomainCredentialsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.ModifyDomainCredentialsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.ModifyDomainCredentialsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.RemoveDomainCredentialsCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.RemoveDomainCredentialsCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.RemoveDomainCredentialsCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.ModifyProcessAgentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.ModifyProcessAgentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.ModifyProcessAgentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.RetireProcessAgentCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.RetireProcessAgentCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.RetireProcessAgentCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.CancelTicketCompletedEventHandler">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.CancelTicketCompletedEventArgs">
+            <remarks/>
+        </member>
+        <member name="P:iLabs.Proxies.PAgent.CancelTicketCompletedEventArgs.Result">
+            <remarks/>
+        </member>
+        <member name="T:iLabs.Proxies.PAgent.RegisterCompletedEventHandler">
+            <remarks/>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="http://remlab-esng.dibe.unige.it/LabProxy/LabProxyWebService.asmx?wsdl" docRef="http://remlab-esng.dibe.unige.it/LabProxy/LabProxyWebService.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="http://remlab-esng.dibe.unige.it/LabProxy/LabProxyWebService.asmx" xmlns:q1="http://ilab.mit.edu/iLabs/ProxyService/" binding="q1:LabProxyWebServiceSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="http://remlab-esng.dibe.unige.it/LabProxy/LabProxyWebService.asmx" xmlns:q2="http://ilab.mit.edu/iLabs/ProxyService/" binding="q2:LabProxyWebServiceSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>
