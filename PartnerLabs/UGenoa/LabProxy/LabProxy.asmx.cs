@@ -60,6 +60,24 @@ namespace iLabs.LabProxy
         public string GetReservationInfo(string passkey, string labServerTime)
         {
             DateTime timeNow = DateTime.Now;
+
+            
+            #region calculate time diff between SB and labproxy (could be done with local time??)
+            //webservice to get SB time
+            string ProxyWebService = "http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx";
+
+            ProcessAgentClient test = new ProcessAgentClient(new BasicHttpBinding(),
+               new EndpointAddress(ProxyWebService));
+
+            timeNow = test.GetServiceTime();
+
+            // convert result to xml
+            XmlDocument payload = new XmlDocument();
+            payload.LoadXml(payloadStr);
+            TimeSpan timeDifferenceLSLPR = timeLabServer - timeNow;
+
+            #endregion
+
             DateTime timeLabServer = Convert.ToDateTime(labServerTime);
 
             string payloadStr = "";
@@ -84,23 +102,6 @@ namespace iLabs.LabProxy
                 SqlCommand cmd = new SqlCommand(strSQL, con);
                 cmd.Parameters.AddWithValue("@passkey", passkey);
                 payloadStr = Convert.ToString(cmd.ExecuteScalar());
-
-                #endregion
-
-                //webservice to get SB time
-                #region calculate time diff between SB and labproxy (could be done with local time??)
-
-                string ProxyWebService = "http://black.dibe.unige.it/iLabServiceBroker/iLabServiceBroker.asmx";
-
-                ProcessAgentClient test = new ProcessAgentClient(new BasicHttpBinding(),
-                   new EndpointAddress(ProxyWebService));
-
-                timeNow = test.GetServiceTime();
-
-                // convert result to xml
-                XmlDocument payload = new XmlDocument();
-                payload.LoadXml(payloadStr);
-                TimeSpan timeDifferenceLSLPR = timeLabServer - timeNow;
 
                 #endregion
 
