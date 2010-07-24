@@ -15,11 +15,13 @@ namespace LabClientHtml.LabControls
         //
         private const string STR_Source = "Source";
         private const string STR_Absorber = "Absorber";
+        private const string STR_AbsorberList = "Absorber List";
         private const string STR_Distance = "Distance (mm)";
         private const string STR_DistanceList = "Distance List (mm)";
         private const string STR_Duration = "Duration (secs)";
         private const string STR_Trials = "Trials";
-        private const string STR_CountsAt = "Counts @ ";
+        private const string STR_CountsAtDistance = "Counts at distance";
+        private const string STR_CountsForAbsorber = "Counts for absorber";
         private const string STR_Millimetres = "mm";
 
         #endregion
@@ -48,32 +50,54 @@ namespace LabClientHtml.LabControls
                 // Write the source name
                 sw.WriteLine(swArgument, STR_Source, resultInfo.sourceName);
 
-                // Write the absorber name
-                sw.WriteLine(swArgument, STR_Absorber, resultInfo.absorberName);
+                //
+                // Create a CSV string of absorbers from the absorber list
+                //
+                string csvAbsorbers = string.Empty;
+                for (int i = 0; i < resultInfo.absorbers.Length; i++)
+                {
+                    if (i > 0)
+                    {
+                        csvAbsorbers += LabConsts.CHR_CsvSplitter.ToString();
+                    }
+                    csvAbsorbers += resultInfo.absorbers[i].ToString();
+                }
+
+                // Write the absorbers
+                if (resultInfo.absorbers.Length > 1)
+                {
+                    // Write as an absorber list
+                    sw.WriteLine(swArgument, STR_AbsorberList, csvAbsorbers);
+                }
+                else
+                {
+                    // Write as a single absorber
+                    sw.WriteLine(swArgument, STR_Absorber, csvAbsorbers);
+                }
 
                 //
                 // Create a CSV string of distances from the distance list
                 //
-                string strDistances = string.Empty;
+                string csvDistances = string.Empty;
                 for (int i = 0; i < resultInfo.distances.Length; i++)
                 {
                     if (i > 0)
                     {
-                        strDistances += ",";
+                        csvDistances += LabConsts.CHR_CsvSplitter.ToString();
                     }
-                    strDistances += resultInfo.distances[i].ToString();
+                    csvDistances += resultInfo.distances[i].ToString();
                 }
 
                 // Write the distances
                 if (resultInfo.distances.Length > 1)
                 {
                     // Write as a distance list
-                    sw.WriteLine(swArgument, STR_DistanceList, strDistances);
+                    sw.WriteLine(swArgument, STR_DistanceList, csvDistances);
                 }
                 else
                 {
                     // Write as a single distance
-                    sw.WriteLine(swArgument, STR_Distance, strDistances);
+                    sw.WriteLine(swArgument, STR_Distance, csvDistances);
                 }
 
                 // Write the duration
@@ -105,23 +129,51 @@ namespace LabClientHtml.LabControls
             StringWriter sw = new StringWriter();
             try
             {
-                for (int i = 0; i < resultInfo.datavectors.GetLength(0); i++)
+                if (resultInfo.setupId.Equals(LabConsts.STRXML_SetupId_RadioactivityVsAbsorber) == true)
                 {
-                    //
-                    // Create a CSV string of radioactivity counts from the data vector
-                    //
-                    string strDistances = string.Empty;
-                    for (int j = 0; j < resultInfo.datavectors.GetLength(1); j++)
-                    {
-                        if (j > 0)
-                        {
-                            strDistances += LabConsts.CHR_CsvSplitter;
-                        }
-                        strDistances += resultInfo.datavectors[i, j].ToString();
-                    }
+                    sw.WriteLine(swArgument, STR_CountsForAbsorber, string.Empty);
 
-                    // Write the string of counts also showing the distance
-                    sw.WriteLine(swArgument, STR_CountsAt + resultInfo.distances[i].ToString() + STR_Millimetres, strDistances);
+                    for (int i = 0; i < resultInfo.datavectors.GetLength(0); i++)
+                    {
+                        //
+                        // Create a CSV string of radioactivity counts from the data vector
+                        //
+                        string csvCounts = string.Empty;
+                        for (int j = 0; j < resultInfo.datavectors.GetLength(1); j++)
+                        {
+                            if (j > 0)
+                            {
+                                csvCounts += LabConsts.CHR_CsvSplitter.ToString();
+                            }
+                            csvCounts += resultInfo.datavectors[i, j].ToString();
+                        }
+
+                        // Write the string of counts showing the absorber
+                        sw.WriteLine(swArgument, resultInfo.absorbers[i], csvCounts);
+                    }
+                }
+                else
+                {
+                    sw.WriteLine(swArgument, STR_CountsAtDistance, string.Empty);
+
+                    for (int i = 0; i < resultInfo.datavectors.GetLength(0); i++)
+                    {
+                        //
+                        // Create a CSV string of radioactivity counts from the data vector
+                        //
+                        string csvCounts = string.Empty;
+                        for (int j = 0; j < resultInfo.datavectors.GetLength(1); j++)
+                        {
+                            if (j > 0)
+                            {
+                                csvCounts += LabConsts.CHR_CsvSplitter.ToString();
+                            }
+                            csvCounts += resultInfo.datavectors[i, j].ToString();
+                        }
+
+                        // Write the string of counts showing the distance
+                        sw.WriteLine(swArgument, resultInfo.distances[i].ToString() + STR_Millimetres, csvCounts);
+                    }
                 }
             }
             catch (Exception ex)

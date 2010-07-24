@@ -153,7 +153,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Applets\TimeOfDayResults.jar" />
     <Content Include="Controls\Banner.ascx" />
     <Content Include="Controls\Feedback.ascx" />
     <Content Include="Controls\Footer.ascx" />
@@ -162,12 +161,15 @@
     <Content Include="Expired.htm" />
     <Content Include="Global.asax" />
     <Content Include="Home.aspx" />
+    <Content Include="Images\ceit_logo.gif" />
     <Content Include="Images\feedback-gradient.gif" />
     <Content Include="Images\gradient.gif" />
     <Content Include="Images\level2-arrow.gif" />
     <Content Include="Images\level2-underline.gif" />
     <Content Include="Images\mit-blackred-footer1.gif" />
-    <Content Include="Images\sundial.jpg" />
+    <Content Include="Images\radioactivity.jpg" />
+    <Content Include="Images\Radioactivity1.png" />
+    <Content Include="Images\Radioactivity2.png" />
     <Content Include="Images\uq-logo.gif" />
     <Content Include="LabClient.Master" />
     <Content Include="Controls\Navmenu.ascx" />
@@ -190,6 +192,9 @@
       <Project>{7266AE91-D308-40AC-947C-486745471E84}</Project>
       <Name>LibraryLab</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Applets\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v9.0\WebApplications\Microsoft.WebApplication.targets" Condition="" />

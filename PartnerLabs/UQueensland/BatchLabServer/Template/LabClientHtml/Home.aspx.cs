@@ -38,17 +38,17 @@ namespace LabClientHtml
                 //
                 // Update lab info text and Url if specified
                 //
-                string labinfoText = Master.LabinfoText;
-                string labinfoUrl = Master.LabinfoUrl;
-                if (labinfoText != null && labinfoText.Length > 0 &&
-                    labinfoUrl != null && labinfoUrl.Length > 0)
+                string labInfoText = Master.LabinfoText;
+                string labInfoUrl = Master.LabInfoUrl;
+                if (labInfoText != null && labInfoText.Length > 0 &&
+                    labInfoUrl != null && labInfoUrl.Length > 0)
                 {
                     //
                     // Update hyperlink on webpage
                     //
                     lblMoreInfo.Text = STR_ForMoreInfoSee;
-                    lnkMoreInfo.Text = labinfoText;
-                    lnkMoreInfo.NavigateUrl = labinfoUrl;
+                    lnkMoreInfo.Text = labInfoText;
+                    lnkMoreInfo.NavigateUrl = labInfoUrl;
                 }
 
                 //

@@ -4,6 +4,9 @@
   <navmenuPhoto>
     <image>~/images/Radioactivity1.png</image>
   </navmenuPhoto>
+  <labCamera>
+    <url>http://openilabs.ilab.uq.edu.au/LabCameras/Radioactivity1.htm</url>
+  </labCamera>
   <labInfo>
     <text />
     <url />
@@ -100,7 +103,7 @@
     </vdnRepeat>
     <vdnTotaltime>
       <minimum>1</minimum>
-      <maximum>750</maximum>
+      <maximum>900</maximum>
     </vdnTotaltime>
   </validation>
   <experimentSpecification>

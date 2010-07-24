@@ -25,15 +25,20 @@ namespace LabClientHtml.LabControls
                 //
 
                 //
-                // Get the source and absorber names
+                // Get the source name
                 //
                 resultInfo.sourceName = XmlUtilities.GetXmlValue(this.xmlNodeExperimentResult, LabConsts.STRXML_sourceName, true);
-                resultInfo.absorberName = XmlUtilities.GetXmlValue(this.xmlNodeExperimentResult, LabConsts.STRXML_absorberName, true);
+
+                //
+                // Get the absorber list into a one dimension array
+                //
+                string csvString = XmlUtilities.GetXmlValue(this.xmlNodeExperimentResult, LabConsts.STRXML_absorberName, true);
+                resultInfo.absorbers = csvString.Split(new char[] { LabConsts.CHR_CsvSplitter });
 
                 //
                 // Get the distance list into a one dimension array
                 //
-                string csvString = XmlUtilities.GetXmlValue(this.xmlNodeExperimentResult, LabConsts.STRXML_distance, true);
+                csvString = XmlUtilities.GetXmlValue(this.xmlNodeExperimentResult, LabConsts.STRXML_distance, true);
                 string[] csvStringSplit = csvString.Split(new char[] { LabConsts.CHR_CsvSplitter });
                 resultInfo.distances = new int[csvStringSplit.Length];
                 for (int i = 0; i < csvStringSplit.Length; i++)

@@ -4,7 +4,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}</ProjectGuid>
+    <ProjectGuid>{06A1B1CF-B943-462E-9920-B95B176400F9}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -47,6 +47,7 @@
     <Content Include="Controls\Statusbar.ascx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Images\ceit_logo.gif" />
     <Content Include="Images\feedback-gradient.gif" />
     <Content Include="Images\gradient.gif" />
     <Content Include="Images\level2-arrow.gif" />

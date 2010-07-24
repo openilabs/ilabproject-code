@@ -162,6 +162,7 @@
     <Content Include="Expired.htm" />
     <Content Include="Global.asax" />
     <Content Include="Home.aspx" />
+    <Content Include="Images\ceit_logo.gif" />
     <Content Include="Images\feedback-gradient.gif" />
     <Content Include="Images\gradient.gif" />
     <Content Include="Images\level2-arrow.gif" />

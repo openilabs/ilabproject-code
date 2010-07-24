@@ -4,6 +4,9 @@
   <navmenuPhoto>
     <image>~/images/generic_content32.jpg</image>
   </navmenuPhoto>
+  <labCamera>
+    <url />
+  </labCamera>
   <labInfo>
     <text />
     <url />

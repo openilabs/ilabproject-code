@@ -14,19 +14,19 @@ h1, h2, h3, h4
 }
 h1
 {
-	font-size: 16pt;
+	font-size: 160%;
 }
 h2
 {
-	font-size: 14pt;
+	font-size: 140%;
 }
 h3
 {
-	font-size: 12pt;
+	font-size: 120%;
 }
 h4
 {
-	font-size: 10pt;
+	font-size: 100%;
 }
 #master table
 {
@@ -79,7 +79,6 @@ td.button
  */
 th
 {
-	font-size: 10pt;
 	text-align: left;
 	padding: 10px 0px 10px 0px;
 }
@@ -122,7 +121,7 @@ td.message
 }
 #setup .dropdownlist
 {
-	width: 160px;
+	width: 320px;
 }
 
 /*
@@ -135,8 +134,25 @@ td.message
 /*
  * Results.aspx
  */
-#results
+#results td
 {
+	text-align: left;
+	vertical-align: middle;
+	padding: 5px 5px 5px 0px;
+}
+#results td.label
+{
+	padding-right: 5px;
+	padding-bottom: 0px;
+}
+#results td.dataright
+{
+	padding-bottom: 0px;
+	width: 100%;
+}
+#results td.button
+{
+	padding-bottom: 10px;
 }
 
 /*
@@ -144,6 +160,6 @@ td.message
  */
 .expired
 {
-	font-size: 12pt;
+	font-size: 120%;
 	margin: 25px 0px 15px 25px;
 }

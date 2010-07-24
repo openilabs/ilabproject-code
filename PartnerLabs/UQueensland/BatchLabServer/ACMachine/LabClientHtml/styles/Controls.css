@@ -43,19 +43,14 @@
 {
 	vertical-align: middle;
 }
-#header td.arrow
+.header-title
 {
-	width: 28px;
-	height: 28px;
-}
-#header td.title
-{
-	font-size: 16pt;
+	font-size: 140%;
 	font-weight: bold;
 	color: #333;
-	padding-left: 10px;
+	padding-left: 5px;
 	text-align: left;
-	width: 100%;
+	vertical-align: top;
 }
 
 /*
@@ -105,7 +100,7 @@
 #feedback td
 {
 	font-size: 90%;
-	height: 21px;
+	height: 19px;
 	background-color: #BDC2C2;
 	border-top: 1px solid #FFF;
 	text-align: right;
@@ -123,5 +118,18 @@
  */
 #footer td
 {
-	background-color: #72726b;
+	/*background-color: #E7ECEF;*/
+	border-bottom: solid 1px Silver;
+}
+#footer td.ceit-logo
+{
+	/*background-color: #FFFFFF;*/
+}
+#footer td.spacer
+{
+	width: 100%;
+}
+#footer td.mit-logo
+{
+	text-align: right;
 }

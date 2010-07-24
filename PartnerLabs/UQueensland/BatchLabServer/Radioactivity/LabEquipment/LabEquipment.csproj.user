@@ -6,11 +6,10 @@
           <StartPageUrl>EquipmentService.asmx</StartPageUrl>
           <StartAction>SpecificPage</StartAction>
           <AspNetDebugging>True</AspNetDebugging>
-          <SilverlightDebugging>False</SilverlightDebugging>
           <NativeDebugging>False</NativeDebugging>
           <SQLDebugging>False</SQLDebugging>
           <PublishCopyOption>RunFiles</PublishCopyOption>
-          <PublishTargetLocation>C:\Visual Studio 2008\LabServer\Radioactivity\Published\LabEquipment\</PublishTargetLocation>
+          <PublishTargetLocation>D:\Visual Studio 2008\BatchLabServer\Radioactivity\Published\LabEquipment\</PublishTargetLocation>
           <PublishDeleteAllFiles>True</PublishDeleteAllFiles>
           <PublishCopyAppData>True</PublishCopyAppData>
           <ExternalProgram>

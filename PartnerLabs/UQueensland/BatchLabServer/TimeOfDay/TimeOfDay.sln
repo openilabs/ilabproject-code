@@ -6,14 +6,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabClientHtml", "LabClientH
 		{AB654DB1-33F6-4DBB-8ECA-39D82E77C249} = {AB654DB1-33F6-4DBB-8ECA-39D82E77C249}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabServer", "LabServer\LabServer.csproj", "{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{533B83FC-6352-4DB4-AE7C-5E64751DD6C8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyServiceBroker", "..\LabLibraries\DummyServiceBroker\DummyServiceBroker.csproj", "{AB654DB1-33F6-4DBB-8ECA-39D82E77C249}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51} = {C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryLabClient", "..\LabLibraries\LibraryLabClient\LibraryLabClient.csproj", "{28EB1E05-AD5E-4702-B4F5-FE79B43FD0D3}"
 EndProject
@@ -29,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabEquipment", "LabEquipmen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryLabEquipmentEngine", "..\LabLibraries\LibraryLabEquipmentEngine\LibraryLabEquipmentEngine.csproj", "{84F5CAB3-521B-4B51-919D-4B9021027122}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabServer", "LabServer\LabServer.csproj", "{06A1B1CF-B943-462E-9920-B95B176400F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,10 +36,6 @@ Global
 		{0615931B-59ED-4906-9E5D-987282328F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0615931B-59ED-4906-9E5D-987282328F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0615931B-59ED-4906-9E5D-987282328F25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C3268EE9-FD28-46C4-9447-5DFE7DAF4A51}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB654DB1-33F6-4DBB-8ECA-39D82E77C249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB654DB1-33F6-4DBB-8ECA-39D82E77C249}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB654DB1-33F6-4DBB-8ECA-39D82E77C249}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -75,6 +68,10 @@ Global
 		{84F5CAB3-521B-4B51-919D-4B9021027122}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84F5CAB3-521B-4B51-919D-4B9021027122}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84F5CAB3-521B-4B51-919D-4B9021027122}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06A1B1CF-B943-462E-9920-B95B176400F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06A1B1CF-B943-462E-9920-B95B176400F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06A1B1CF-B943-462E-9920-B95B176400F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06A1B1CF-B943-462E-9920-B95B176400F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

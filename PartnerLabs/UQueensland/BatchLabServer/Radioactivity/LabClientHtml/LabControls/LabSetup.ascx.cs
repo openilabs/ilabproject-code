@@ -59,15 +59,6 @@ namespace LabClientHtml.LabControls
 
         //-------------------------------------------------------------------------------------------------//
 
-        private void ClearPageControls()
-        {
-            txbDistanceList.Text = null;
-            txbDuration.Text = null;
-            txbRepeat.Text = null;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
         private void PopulatePageControls()
         {
             //
@@ -81,10 +72,24 @@ namespace LabClientHtml.LabControls
             //
             // Populate dropdown lists, etc. and select default selection, etc.
             //
+            PopulateSources();
+            PopulateAbsorbers();
+            PopulateDistances();
 
+            //
+            // Update controls for selected setup
+            //
+            UpdatePageControls();
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private void PopulateSources()
+        {
             //
             // Get a list of all sources and add to the dropdownlist
             //
+            ddlSources.Items.Clear();
             XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_sources, false);
             XmlNodeList xmlNodeList = XmlUtilities.GetXmlNodeList(xmlNode, LabConsts.STRXML_source, false);
             for (int i = 0; i < xmlNodeList.Count; i++)
@@ -92,26 +97,38 @@ namespace LabClientHtml.LabControls
                 XmlNode xmlNodeTemp = xmlNodeList.Item(i);
 
                 string sourceName = XmlUtilities.GetXmlValue(xmlNodeTemp, LabConsts.STRXML_name, false);
-                ddlSource.Items.Add(sourceName);
+                ddlSources.Items.Add(sourceName);
             }
+        }
 
+        //-------------------------------------------------------------------------------------------------//
+
+        private void PopulateAbsorbers()
+        {
             //
             // Get a list of all absorbers and add to the dropdownlist
             //
-            xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_absorbers, false);
-            xmlNodeList = XmlUtilities.GetXmlNodeList(xmlNode, LabConsts.STRXML_absorber, false);
+            ddlAbsorbers.Items.Clear();
+            XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_absorbers, false);
+            XmlNodeList xmlNodeList = XmlUtilities.GetXmlNodeList(xmlNode, LabConsts.STRXML_absorber, false);
             for (int i = 0; i < xmlNodeList.Count; i++)
             {
                 XmlNode xmlNodeTemp = xmlNodeList.Item(i);
 
                 string absorberName = XmlUtilities.GetXmlValue(xmlNodeTemp, LabConsts.STRXML_name, false);
-                ddlAbsorber.Items.Add(absorberName);
+                ddlAbsorbers.Items.Add(absorberName);
             }
+        }
 
+        //-------------------------------------------------------------------------------------------------//
+
+        private void PopulateDistances()
+        {
             //
             // Get a list of distances and add to the dropdownlist
             //
-            xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_distances, true);
+            ddlDistances.Items.Clear();
+            XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_distances, true);
             if (xmlNode != null)
             {
                 // Get minimum distance
@@ -130,15 +147,10 @@ namespace LabClientHtml.LabControls
                 {
                     for (int i = minimum; i <= maximum; i += stepsize)
                     {
-                        ddlDistance.Items.Add(i.ToString());
+                        ddlDistances.Items.Add(i.ToString());
                     }
                 }
             }
-
-            //
-            // Update controls for selected setup
-            //
-            UpdatePageControls();
         }
 
         //-------------------------------------------------------------------------------------------------//
@@ -154,26 +166,6 @@ namespace LabClientHtml.LabControls
             }
 
             //
-            // Set default selection for source
-            //
-            XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_sources, true);
-            string defaultSource = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
-            if (defaultSource.Length > 0)
-            {
-                ddlSource.SelectedValue = defaultSource;
-            }
-
-            //
-            // Set default selection for absorber
-            //
-            xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_absorbers, true);
-            string defaultAbsorber = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
-            if (defaultAbsorber.Length > 0)
-            {
-                ddlAbsorber.SelectedValue = defaultAbsorber;
-            }
-
-            //
             // Get the ID of the selected setup
             //
             string setupId = XmlUtilities.GetXmlValue(this.xmlNodeSelectedSetup, Consts.STRXMLPARAM_id, false);
@@ -186,34 +178,164 @@ namespace LabClientHtml.LabControls
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsTimeNoDelay))
             {
                 //
+                // Set default selection for source
+                //
+                XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_sources, true);
+                string defaultSource = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
+                if (defaultSource.Length > 0)
+                {
+                    ddlSources.SelectedValue = defaultSource;
+                }
+
+                //
+                // Set default selection for absorber
+                //
+                xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_absorbers, true);
+                string defaultAbsorber = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
+                if (defaultAbsorber.Length > 0)
+                {
+                    ddlAbsorbers.SelectedValue = defaultAbsorber;
+                }
+
+                //
                 // Hide DistanceList controls
                 //
-                lblDistanceList.Visible = false;
-                btnDistanceListAdd.Visible = false;
-                btnDistanceListClear.Visible = false;
-                txbDistanceList.Visible = false;
+                //lblSelectedDistances.Visible = false;
+                btnSelectedDistancesAdd.Visible = false;
+                //btnSelectedDistancesClear.Visible = false;
+                //ddlSelectedDistances.Visible = false;
+                trDistanceList.Visible = false;
+
+                //
+                // Hide AbsorberList controls
+                //
+                //lblSelectedAbsorbers.Visible = false;
+                btnSelectedAbsorbersAdd.Visible = false;
+                //btnSelectedAbsorbersClear.Visible = false;
+                //ddlSelectedAbsorbers.Visible = false;
+                trAbsorberList.Visible = false;
 
                 //
                 // Set default distance
                 //
-                ddlDistance.SelectedValue = XmlUtilities.GetXmlValue(this.xmlNodeSelectedSetup, LabConsts.STRXML_distance, true);
+                ddlDistances.SelectedValue = XmlUtilities.GetXmlValue(this.xmlNodeSelectedSetup, LabConsts.STRXML_distance, true);
             }
             else if (setupId.Equals(LabConsts.STRXML_SetupId_RadioactivityVsDistance) ||
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsDistance) ||
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsDistanceNoDelay))
             {
                 //
-                // Show DistanceList controls
+                // Set default selection for source
                 //
-                lblDistanceList.Visible = true;
-                btnDistanceListAdd.Visible = true;
-                btnDistanceListClear.Visible = true;
-                txbDistanceList.Visible = true;
+                XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_sources, true);
+                string defaultSource = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
+                try
+                {
+                    ddlSources.SelectedValue = defaultSource;
+                }
+                catch
+                {
+                }
 
                 //
-                // Set default distance list
+                // Set default selection for absorber
                 //
-                txbDistanceList.Text = XmlUtilities.GetXmlValue(this.xmlNodeSelectedSetup, LabConsts.STRXML_distance, true);
+                xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_absorbers, true);
+                string defaultAbsorber = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
+                try
+                {
+                    ddlAbsorbers.SelectedValue = defaultAbsorber;
+                }
+                catch
+                {
+                }
+
+                //
+                // Show DistanceList controls
+                //
+                //lblSelectedDistances.Visible = true;
+                btnSelectedDistancesAdd.Visible = true;
+                btnSelectedDistancesAdd.Enabled = true;
+                //btnSelectedDistancesClear.Visible = true;
+                //ddlSelectedDistances.Visible = true;
+                trDistanceList.Visible = true;
+
+                //
+                // Hide AbsorberList controls
+                //
+                //lblSelectedAbsorbers.Visible = false;
+                btnSelectedAbsorbersAdd.Visible = false;
+                //btnSelectedAbsorbersClear.Visible = false;
+                //ddlSelectedAbsorbers.Visible = false;
+                trAbsorberList.Visible = false;
+
+                //
+                // Set default selected distance list
+                //
+                string csvDistances = XmlUtilities.GetXmlValue(this.xmlNodeSelectedSetup, LabConsts.STRXML_distance, true);
+                string[] csvDistancesSplit = csvDistances.Split(new char[] { LabConsts.CHR_CsvSplitter });
+                for (int i = 0; i < csvDistancesSplit.Length; i++)
+                {
+                    try
+                    {
+                        ddlDistances.SelectedValue = csvDistancesSplit[i].Trim();
+                        btnSelectedDistancesAdd_Click(this, new EventArgs());
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+            else if (setupId.Equals(LabConsts.STRXML_SetupId_RadioactivityVsAbsorber))
+            {
+                //
+                // Set default selection for source
+                //
+                XmlNode xmlNode = XmlUtilities.GetXmlNode(this.xmlNodeConfiguration, LabConsts.STRXML_sources, true);
+                string defaultSource = XmlUtilities.GetXmlValue(xmlNode, LabConsts.STRXMLPARAM_default, true);
+                try
+                {
+                    ddlSources.SelectedValue = defaultSource;
+                }
+                catch
+                {
+                }
+
+                //
+                // Set default selected absorber list
+                //
+                string csvAbsorbers = XmlUtilities.GetXmlValue(this.xmlNodeSelectedSetup, LabConsts.STRXML_absorberName, true);
+                string[] csvAbsorbersSplit = csvAbsorbers.Split(new char[] { LabConsts.CHR_CsvSplitter });
+                for (int i = 0; i < csvAbsorbersSplit.Length; i++)
+                {
+                    try
+                    {
+                        ddlAbsorbers.SelectedValue = csvAbsorbersSplit[i].Trim();
+                        btnSelectedAbsorbersAdd_Click(this, new EventArgs());
+                    }
+                    catch
+                    {
+                    }
+                }
+
+                //
+                // Hide DistanceList controls
+                //
+                //lblSelectedDistances.Visible = false;
+                btnSelectedDistancesAdd.Visible = false;
+                //btnSelectedDistancesClear.Visible = false;
+                //ddlSelectedDistances.Visible = false;
+                trDistanceList.Visible = false;
+
+                //
+                // Show AbsorberList controls
+                //
+                //lblSelectedAbsorbers.Visible = true;
+                btnSelectedAbsorbersAdd.Visible = true;
+                btnSelectedAbsorbersAdd.Enabled = true;
+                //btnSelectedAbsorbersClear.Visible = true;
+                //ddlSelectedAbsorbers.Visible = true;
+                trAbsorberList.Visible = true;
             }
 
             //
@@ -258,11 +380,18 @@ namespace LabClientHtml.LabControls
 
         public void ddlExperimentSetups_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //
             // Clear page controls before selecting another setup
-            ClearPageControls();
+            //
+            ddlSelectedAbsorbers.Items.Clear();
+            ddlSelectedDistances.Items.Clear();
+            txbDuration.Text = string.Empty;
+            txbRepeat.Text = string.Empty;
 
+            //
             // Update page controls for the selected index
-            UpdatePageControls();
+            //
+            PopulatePageControls();
         }
 
         //---------------------------------------------------------------------------------------//
@@ -272,19 +401,53 @@ namespace LabClientHtml.LabControls
             //
             // Fill in specification information only for selected setup
             //
-            XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_sourceName, ddlSource.SelectedValue, false);
-            XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_absorberName, ddlAbsorber.SelectedValue, false);
             if (setupId.Equals(LabConsts.STRXML_SetupId_RadioactivityVsTime) ||
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsTime) ||
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsTimeNoDelay))
             {
-                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_distance, ddlDistance.SelectedValue, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_sourceName, ddlSources.SelectedValue, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_absorberName, ddlAbsorbers.SelectedValue, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_distance, ddlDistances.SelectedValue, false);
             }
             else if (setupId.Equals(LabConsts.STRXML_SetupId_RadioactivityVsDistance) ||
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsDistance) ||
                 setupId.Equals(LabConsts.STRXML_SetupId_SimActivityVsDistanceNoDelay))
             {
-                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_distance, txbDistanceList.Text, false);
+                //
+                // Create CSV string of distances
+                //
+                string csvDistances = string.Empty;
+                for (int i = 0; i < ddlSelectedDistances.Items.Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        csvDistances += LabConsts.CHR_CsvSplitter.ToString();
+                    }
+                    csvDistances += ddlSelectedDistances.Items[i].Text;
+                }
+
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_sourceName, ddlSources.SelectedValue, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_absorberName, ddlAbsorbers.SelectedValue, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_distance, csvDistances, false);
+            }
+            else if (setupId.Equals(LabConsts.STRXML_SetupId_RadioactivityVsAbsorber))
+            {
+                //
+                // Create CSV string of absorbers
+                //
+                string csvAbsorbers = string.Empty;
+                for (int i = 0; i < ddlSelectedAbsorbers.Items.Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        csvAbsorbers += LabConsts.CHR_CsvSplitter.ToString();
+                    }
+                    csvAbsorbers += ddlSelectedAbsorbers.Items[i].Text;
+                }
+
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_sourceName, ddlSources.SelectedValue, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_absorberName, csvAbsorbers, false);
+                XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_distance, ddlDistances.SelectedValue, false);
             }
             XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_duration, txbDuration.Text, false);
             XmlUtilities.SetXmlValue(xmlNodeSpecification, LabConsts.STRXML_repeat, txbRepeat.Text, false);
@@ -294,101 +457,72 @@ namespace LabClientHtml.LabControls
 
         //-------------------------------------------------------------------------------------------------//
 
-        protected void btnDistanceListAdd_Click(object sender, EventArgs e)
+        protected void btnSelectedDistancesAdd_Click(object sender, EventArgs e)
         {
-            // Check if distance list is empty
-            string strDistanceList = txbDistanceList.Text.Trim();
-            if (strDistanceList.Length == 0)
+            //
+            // Add distance to the selected list and remove from available list
+            //
+            if (ddlDistances.Items.Count > 0)
             {
-                // Add value to list and return
-                txbDistanceList.Text = ddlDistance.SelectedValue;
-                return;
-            }
-
-            string strValue = ddlDistance.SelectedValue;
-
-            // Split the distance list csv string
-            string[] strSplit = strDistanceList.Split(new char[] { ',' });
-
-            // Check that the selected distance doesn't exist in the list
-            for (int i = 0; i < strSplit.Length; i++)
-            {
-                if (strSplit[i].Equals(strValue) == true)
-                {
-                    // Already in the list
-                    return;
-                }
+                ddlSelectedDistances.Items.Add(ddlDistances.Text);
+                ddlDistances.Items.Remove(ddlDistances.Text);
             }
 
             //
-            // Selected distance doesn't exist in the list yet.
-            // Add to comma-seperated value string in sorted order
+            // Disable Add button if no more distances to select
             //
-            try
+            if (ddlDistances.Items.Count == 0)
             {
-                string csvString = "";
-
-                // Convert the selected distance to a number
-                int value = Convert.ToInt16(strValue);
-
-                // Find index to insert selected distance
-                int index = 0;
-                while (index < strSplit.Length)
-                {
-                    // Convert the current distance to a number and compare
-                    int listValue = Convert.ToInt16(strSplit[index]);
-                    if (value < listValue)
-                    {
-                        break;
-                    }
-
-                    // Try next one
-                    index++;
-                }
-
-                //
-                // Create csv string
-                //
-                for (int i = 0; i < index; i++)
-                {
-                    if (i > 0)
-                    {
-                        csvString += ",";
-                    }
-                    int listValue = Convert.ToInt16(strSplit[i]);
-                    csvString += listValue.ToString();
-                }
-
-                //
-                // Insert selected value into the csv string
-                //
-                if (index > 0)
-                {
-                    csvString += ",";
-                }
-                csvString += value.ToString();
-
-                for (int i = index; i < strSplit.Length; i++)
-                {
-                    csvString += ",";
-
-                    int listValue = Convert.ToInt16(strSplit[i]);
-                    csvString += listValue.ToString();
-                }
-
-                // csv string is complete
-                txbDistanceList.Text = csvString;
-            }
-            catch
-            {
+                btnSelectedDistancesAdd.Enabled = false;
             }
         }
 
         //-------------------------------------------------------------------------------------------------//
 
-        protected void btnDistanceListClear_Click(object sender, EventArgs e)
+        protected void btnSelectedDistancesClear_Click(object sender, EventArgs e)
         {
-            txbDistanceList.Text = null;
+            //
+            // Clear the list of selected distances, enable the Add button
+            // and repopulate the list of available distances
+            //
+            ddlSelectedDistances.Items.Clear();
+            btnSelectedDistancesAdd.Enabled = true;
+            PopulateDistances();
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected void btnSelectedAbsorbersAdd_Click(object sender, EventArgs e)
+        {
+            //
+            // Add absorber to the selected list and remove from available list
+            //
+            if (ddlAbsorbers.Items.Count > 0)
+            {
+                ddlSelectedAbsorbers.Items.Add(ddlAbsorbers.Text);
+                ddlAbsorbers.Items.Remove(ddlAbsorbers.Text);
+            }
+
+            //
+            // Disable Add button if no more absorbers to select
+            //
+            if (ddlAbsorbers.Items.Count == 0)
+            {
+                btnSelectedAbsorbersAdd.Enabled = false;
+            }
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected void btnSelectedAbsorbersClear_Click(object sender, EventArgs e)
+        {
+            //
+            // Clear the list of selected absorbers, enable the Add button
+            // and repopulate the list of available absorbers
+            //
+            ddlSelectedAbsorbers.Items.Clear();
+            btnSelectedAbsorbersAdd.Enabled = true;
+            PopulateAbsorbers();
         }
 
     }

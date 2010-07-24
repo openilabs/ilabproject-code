@@ -1,65 +1,80 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="LabSetup.ascx.cs" Inherits="LabClientHtml.LabControls.LabSetup" %>
-<table cols="2">
+<table id="labsetup" cols="3" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td class="labsetup-label">
+        <td class="label">
             Source:
         </td>
-        <td class="labsetup-dataright">
-            <asp:DropDownList ID="ddlSource" runat="server" Width="140px">
+        <td class="dataright" colspan="2">
+            <asp:DropDownList ID="ddlSources" runat="server" Width="140px">
             </asp:DropDownList>
         </td>
     </tr>
     <tr>
-        <td class="labsetup-label">
+        <td class="label">
             Absorber:
         </td>
-        <td class="labsetup-dataright">
-            <asp:DropDownList ID="ddlAbsorber" runat="server" Width="140px">
+        <td class="data">
+            <asp:DropDownList ID="ddlAbsorbers" runat="server" Width="140px">
             </asp:DropDownList>
         </td>
+        <td class="dataright">
+            <asp:Button ID="btnSelectedAbsorbersAdd" runat="server" Text="Add" CssClass="aspbutton"
+                OnClick="btnSelectedAbsorbersAdd_Click" />
+        </td>
     </tr>
-</table>
-<table cols="3">
+    <tr id="trAbsorberList" runat="server">
+        <td class="label">
+            <asp:Label ID="lblSelectedAbsorbers" runat="server" Text="Absorber&nbsp;List:"></asp:Label>
+        </td>
+        <td class="data">
+            <asp:DropDownList ID="ddlSelectedAbsorbers" runat="server" Width="140px">
+            </asp:DropDownList>
+        </td>
+        <td class="dataright">
+            <asp:Button ID="btnSelectedAbsorbersClear" runat="server" Text="Clear" CssClass="aspbutton"
+                OnClick="btnSelectedAbsorbersClear_Click" />
+        </td>
+    </tr>
     <tr>
-        <td class="labsetup-label">
+        <td class="label">
             Distance:
         </td>
-        <td class="labsetup-data160px">
-            <asp:DropDownList ID="ddlDistance" runat="server" Width="66px">
-            </asp:DropDownList>&nbsp;(mm)
+        <td class="data">
+            <asp:DropDownList ID="ddlDistances" runat="server" Width="66px">
+            </asp:DropDownList>
+            &nbsp;(mm)
         </td>
-        <td class="labsetup-dataright">
-            <asp:Button ID="btnDistanceListAdd" runat="server" Text="Add" CssClass="aspbutton"
-                OnClick="btnDistanceListAdd_Click" />
+        <td class="dataright">
+            <asp:Button ID="btnSelectedDistancesAdd" runat="server" Text="Add" CssClass="aspbutton"
+                OnClick="btnSelectedDistancesAdd_Click" />
+        </td>
+    </tr>
+    <tr id="trDistanceList" runat="server">
+        <td class="label">
+            <asp:Label ID="lblSelectedDistances" runat="server" Text="Distance&nbsp;List:"></asp:Label>
+        </td>
+        <td class="data">
+            <asp:DropDownList ID="ddlSelectedDistances" runat="server" Width="66px">
+            </asp:DropDownList>
+        </td>
+        <td class="dataright">
+            <asp:Button ID="btnSelectedDistancesClear" runat="server" Text="Clear" CssClass="aspbutton"
+                OnClick="btnSelectedDistancesClear_Click" />
         </td>
     </tr>
     <tr>
-        <td class="labsetup-label">
-            <asp:Label ID="lblDistanceList" runat="server" Text="Distance&nbsp;List:"></asp:Label>
-        </td>
-        <td class="labsetup-data160px">
-            <asp:TextBox ID="txbDistanceList" runat="server" Width="134px" ReadOnly="true"></asp:TextBox>
-        </td>
-        <td class="labsetup-dataright">
-            <asp:Button ID="btnDistanceListClear" runat="server" Text="Clear" CssClass="aspbutton"
-                OnClick="btnDistanceListClear_Click" />
-        </td>
-    </tr>
-</table>
-<table cols="2">
-    <tr>
-        <td class="labsetup-label">
+        <td class="label">
             Duration:
         </td>
-        <td class="labsetup-dataright">
+        <td class="dataright" colspan="2">
             <asp:TextBox ID="txbDuration" runat="server" Width="60px"></asp:TextBox>&nbsp;(secs)
         </td>
     </tr>
     <tr>
-        <td class="labsetup-label">
+        <td class="label">
             Trials:
         </td>
-        <td class="labsetup-dataright">
+        <td class="dataright" colspan="2">
             <asp:TextBox ID="txbRepeat" runat="server" Width="60px"></asp:TextBox>
         </td>
     </tr>

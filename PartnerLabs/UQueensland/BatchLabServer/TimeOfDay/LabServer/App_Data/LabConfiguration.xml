@@ -4,6 +4,9 @@
   <navmenuPhoto>
     <image>~/images/sundial.jpg</image>
   </navmenuPhoto>
+  <labCamera>
+    <url />
+  </labCamera>
   <labInfo>
     <text>UQ iLab Projects - Time-Of-Day</text>
     <url>http://icampus.uq.edu.au/projects/ilab/_batch_timeofday/index.php</url>

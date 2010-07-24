@@ -10,7 +10,7 @@
           <NativeDebugging>False</NativeDebugging>
           <SQLDebugging>False</SQLDebugging>
           <PublishCopyOption>RunFiles</PublishCopyOption>
-          <PublishTargetLocation>C:\Visual Studio 2008\LabServer\TimeOfDay\Published\LabClientHtml\</PublishTargetLocation>
+          <PublishTargetLocation>D:\Visual Studio 2008\BatchLabServer\ACMachine\Published\LabClientHtml\</PublishTargetLocation>
           <PublishDeleteAllFiles>True</PublishDeleteAllFiles>
           <PublishCopyAppData>False</PublishCopyAppData>
           <ExternalProgram>

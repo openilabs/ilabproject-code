@@ -5,8 +5,7 @@
 {
 	text-align: left;
 	vertical-align: middle;
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding: 0px 0px 5px 0px;
 }
 #labsetup td.label
 {
@@ -16,6 +15,7 @@
 #labsetup td.data
 {
 	width: 160px;
+	padding-right: 5px;
 }
 #labsetup td.dataright
 {

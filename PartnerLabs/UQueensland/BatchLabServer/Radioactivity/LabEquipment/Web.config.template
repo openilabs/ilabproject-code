@@ -24,7 +24,7 @@
     <add key="LogCallerIdPasskey" value="false"/>
 
     <!-- XML Equipment configuration filename -->
-    <add key="XmlEquipmentConfigFilename" value="" />
+    <add key="XmlEquipmentConfigFilename" value="App_Data\EquipmentConfig.xml" />
 
   </appSettings>
 

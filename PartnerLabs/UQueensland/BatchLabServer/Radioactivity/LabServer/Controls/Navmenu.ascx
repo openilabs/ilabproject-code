@@ -13,7 +13,7 @@
     <tr>
         <td>
             <ul>
-                <li runat="server"><a href="~/Administration.aspx" runat="server">&#187; Administration</a></li>
+                <li runat="server"><a href="~/Administration.aspx" runat="server">&#187;&nbsp;Administration</a></li>
             </ul>
         </td>
     </tr>

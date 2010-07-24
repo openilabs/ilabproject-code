@@ -40,8 +40,8 @@
     <Content Include="App_Data\EquipmentConfig.xml" />
     <Content Include="EquipmentService.asmx" />
     <Content Include="Global.asax" />
-    <Content Include="Web.config.template" />
     <None Include="Web.config" />
+    <Content Include="Web.config.template" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EquipmentService.asmx.cs">

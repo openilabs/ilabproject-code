@@ -48,6 +48,7 @@
     <Content Include="Controls\Statusbar.ascx" />
     <Content Include="Default.aspx" />
     <Content Include="Global.asax" />
+    <Content Include="Images\ceit_logo.gif" />
     <Content Include="Images\feedback-gradient.gif" />
     <Content Include="Images\generic_content32.jpg" />
     <Content Include="Images\gradient.gif" />

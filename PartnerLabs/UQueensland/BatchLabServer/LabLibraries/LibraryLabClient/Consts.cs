@@ -38,6 +38,7 @@ namespace Library.LabClient
         public const string STRXMLPARAM_title = "@title";
         public const string STRXMLPARAM_version = "@version";
         public const string STRXML_navmenuPhoto_image = "navmenuPhoto/image";
+        public const string STRXML_labCamera_url = "labCamera/url";
         public const string STRXML_labInfo_text = "labInfo/text";
         public const string STRXML_labInfo_url = "labInfo/url";
         public const string STRXML_configuration = "configuration";

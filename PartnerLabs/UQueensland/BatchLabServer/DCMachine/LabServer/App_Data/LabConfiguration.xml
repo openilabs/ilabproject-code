@@ -4,9 +4,12 @@
   <navmenuPhoto>
     <image>~/images/dcmachine.jpg</image>
   </navmenuPhoto>
+  <labCamera>
+    <url>http://openilabs.ilab.uq.edu.au/LabCameras/DCMachine1.htm</url>
+  </labCamera>
   <labInfo>
-    <text>UQ iLab Projects - DC Machine</text>
-    <url></url>
+    <text />
+    <url />
   </labInfo>
   <configuration>
     <setup id="VoltageVsSpeed">

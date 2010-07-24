@@ -37,6 +37,7 @@ namespace LabClientHtml
         public const string STRLOG_PhotoUrl = " Photo Url: ";
         public const string STRLOG_LabInfoText = " LabInfo Text: ";
         public const string STRLOG_LabInfoUrl = " LabInfo Url: ";
+        public const string STRLOG_LabCameraUrl = " LabCamera Url: ";
         private const string STRLOG_UserHostAddress = " UserHostAddress: ";
         private const string STRLOG_UserHostName = " UserHostName: ";
         private const string STRLOG_CannotResolveToHostName = " Cannot resolve to HostName!";
@@ -84,7 +85,7 @@ namespace LabClientHtml
                 if (Session[Consts.STRSSN_LabClient] != null)
                 {
                     LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
-                    return labClientSession.labinfoText;
+                    return labClientSession.labInfoText;
                 }
                 else
                 {
@@ -93,14 +94,30 @@ namespace LabClientHtml
             }
         }
 
-        public string LabinfoUrl
+        public string LabInfoUrl
         {
             get
             {
                 if (Session[Consts.STRSSN_LabClient] != null)
                 {
                     LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
-                    return labClientSession.labinfoUrl;
+                    return labClientSession.labInfoUrl;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public string LabCameraUrl
+        {
+            get
+            {
+                if (Session[Consts.STRSSN_LabClient] != null)
+                {
+                    LabClientSession labClientSession = (LabClientSession)Session[Consts.STRSSN_LabClient];
+                    return labClientSession.labCameraUrl;
                 }
                 else
                 {
@@ -396,6 +413,7 @@ namespace LabClientHtml
                 Banner.Title = labClientSession.bannerTitle;
                 Statusbar.Version = STR_Version + labClientSession.statusVersion;
                 Navmenu.PhotoUrl = labClientSession.navmenuPhotoUrl;
+                Navmenu.CameraUrl = labClientSession.labCameraUrl;
                 Feedback.MailtoUrl = labClientSession.mailtoUrl;
             }
         }
@@ -432,14 +450,16 @@ namespace LabClientHtml
                 labClientSession.bannerTitle = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXMLPARAM_title, false);
                 labClientSession.statusVersion = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXMLPARAM_version, false);
                 labClientSession.navmenuPhotoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_navmenuPhoto_image, false);
-                labClientSession.labinfoText = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_text, true);
-                labClientSession.labinfoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_url, true);
+                labClientSession.labCameraUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labCamera_url, true);
+                labClientSession.labInfoText = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_text, true);
+                labClientSession.labInfoUrl = XmlUtilities.GetXmlValue(xmlNodeLabConfiguration, Consts.STRXML_labInfo_url, true);
 
                 Logfile.Write(STRLOG_Title + labClientSession.bannerTitle);
                 Logfile.Write(STRLOG_Version + labClientSession.statusVersion);
                 Logfile.Write(STRLOG_PhotoUrl + labClientSession.navmenuPhotoUrl);
-                Logfile.Write(STRLOG_LabInfoText + labClientSession.labinfoText);
-                Logfile.Write(STRLOG_LabInfoUrl + labClientSession.labinfoUrl);
+                Logfile.Write(STRLOG_LabCameraUrl + labClientSession.labCameraUrl);
+                Logfile.Write(STRLOG_LabInfoText + labClientSession.labInfoText);
+                Logfile.Write(STRLOG_LabInfoUrl + labClientSession.labInfoUrl);
 
                 //
                 // These are mandatory

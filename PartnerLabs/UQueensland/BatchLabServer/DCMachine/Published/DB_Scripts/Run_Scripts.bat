@@ -1,5 +1,5 @@
 @echo off
-set myDatabase=DCMachine_LabServer
+set myDatabase=LabServer
 if %1.==. goto runScripts
 set myDatabase=%1
 

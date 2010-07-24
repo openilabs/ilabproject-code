@@ -4,9 +4,12 @@
   <navmenuPhoto>
     <image>~/images/acmachine.jpg</image>
   </navmenuPhoto>
+  <labCamera>
+    <url>http://openilabs.ilab.uq.edu.au/LabCameras/ACMachine1.htm</url>
+  </labCamera>
   <labInfo>
-    <text>UQ iLab Projects - AC Machine</text>
-    <url></url>
+    <text />
+    <url />
   </labInfo>
   <configuration>
     <setup id="NoLoad">

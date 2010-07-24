@@ -6,7 +6,7 @@ namespace LabClientHtml.LabControls
     public class ResultInfo : ExperimentResultInfo
     {
         public string sourceName;
-        public string absorberName;
+        public string[] absorbers;
         public int[] distances;
         public int duration;
         public int repeat;

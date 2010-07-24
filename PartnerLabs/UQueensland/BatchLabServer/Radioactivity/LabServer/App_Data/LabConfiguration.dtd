@@ -1,15 +1,15 @@
-<!ELEMENT labConfiguration (navmenuPhoto, labInfo, configuration, validation, experimentSpecification, experimentResult, resultsApplet)>
+<!ELEMENT labConfiguration (navmenuPhoto, labCamera, labInfo, configuration, validation, experimentSpecification, experimentResult, resultsApplet)>
 <!ATTLIST labConfiguration title CDATA #REQUIRED version CDATA #REQUIRED>
 
 <!ELEMENT navmenuPhoto (image)>
-<!ELEMENT image (#PCDATA)>
-
+<!ELEMENT labCamera (url)>
 <!ELEMENT labInfo (text, url)>
+<!ELEMENT image (#PCDATA)>
 <!ELEMENT text (#PCDATA)>
 <!ELEMENT url (#PCDATA)>
 
 <!ELEMENT configuration (setup+, sources, absorbers, distances)>
-<!ELEMENT setup (name, description, distance, duration, repeat)>
+<!ELEMENT setup (name, description, absorberName*, distance, duration, repeat)>
 <!ATTLIST setup id CDATA #REQUIRED>
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT description (p*)>

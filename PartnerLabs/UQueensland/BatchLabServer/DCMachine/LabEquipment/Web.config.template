@@ -24,7 +24,7 @@
     <add key="LogCallerIdPasskey" value="false"/>
 
     <!-- XML Equipment configuration filename -->
-    <add key="XmlEquipmentConfigFilename" value="" />
+    <add key="XmlEquipmentConfigFilename" value="App_Data\EquipmentConfig.xml" />
 
     <!-- Logging level: where 0=Minimum, 1=Low, 2=Medium, 3=High, 4=Maximum and 5=Debug -->
     <add key="LoggingLevel" value="4" />
