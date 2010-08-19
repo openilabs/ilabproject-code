@@ -2,22 +2,22 @@
 <div id="navbar"><div id="nav">
 		<ul class="navlist" id="ulAdminNavList" runat="server">
 			<li>
-				<A class="first" href="../home.aspx">Home</A>
+				<A class="first" href="../home.aspx">Home</A></li>
 			<li>
-				<A id="aMyGroups" runat="server" href="../myGroups.aspx">My Groups</A>
+				<A id="aMyGroups" runat="server" href="../myGroups.aspx">My Groups</A></li>
 			<li>
-				<A id="aMyLabs" runat="server" href="../myLabs.aspx">My Labs</A>
+				<A id="aMyLabs" runat="server" href="../myLabs.aspx">My Labs</A></li>
 			<li>
 				<A id="aManageServices" runat="server" href="manageServices.aspx">Services 
-					&amp; Clients</A>
+					&amp; Clients</A></li>
 			<li>
-				<A id="aManageUsers" href="manageUsers.aspx" runat="server">Users &amp; Groups</A>
+				<A id="aManageUsers" href="manageUsers.aspx" runat="server">Users &amp; Groups</A></li>
 			<li>
-				<A id="aGrants" runat="server" href="grants.aspx">Grants</A>
+				<A id="aGrants" runat="server" href="grants.aspx">Grants</A></li>
 			<li>
-				<A id="aMappings" runat="server" href="adminResourceMappings.aspx">Resource Mappings</A>
+				<A id="aMappings" runat="server" href="adminResourceMappings.aspx">Resource Mappings</A></li>
 			<li>
-				<A id="aExperimentRecords" runat="server" href="experimentRecords.aspx">Records</A>
+				<A id="aExperimentRecords" runat="server" href="experimentRecords.aspx">Records</A></li>
 			<li>
 				<A id="aMessages" class="last" runat="server" href="messages.aspx">Messages</A></li>
 		</ul>
@@ -40,8 +40,7 @@
 			<li>
 				<A id="aNav3ManageLabClients" runat="server" href="manageLabClients.aspx">Manage Lab Clients</A></li>
 			<li>
-				<A id="aNav3ManageLabs" runat="server" href="Registration.aspx">Cross-domain Registration</A>
-			</li>
+				<A id="aNav3ManageLabs" runat="server" href="Registration.aspx">Cross-domain Registration</A></li>
 		</ul>
 		<ul id="ulNav3UsersGroups" runat="server" class="navlist3">
 			<!-- Users and Groups navigation -->
@@ -52,8 +51,7 @@
 					Groups</A></li>
 			<li>
 				<A id="aNav3GroupMembership" runat="server" href="groupMembership.aspx">Group 
-					Membership</A>
-			</li>
+					Membership</A></li>
 		</ul>
 		<ul id="ulNav3Records" runat="server" class="navlist3">
 			<li>

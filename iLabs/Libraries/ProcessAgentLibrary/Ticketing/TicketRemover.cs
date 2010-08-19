@@ -32,7 +32,7 @@ namespace iLabs.Ticketing
         
 		public TicketRemover()
 		{
-            Utilities.WriteLog("TicketRemover created");
+           Logger.WriteLine("TicketRemover created");
 			theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -41,7 +41,7 @@ namespace iLabs.Ticketing
 
         public TicketRemover(int delay){
             waitTime = delay;
-            Utilities.WriteLog("TicketRemover created");
+           Logger.WriteLine("TicketRemover created");
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -92,7 +92,7 @@ namespace iLabs.Ticketing
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("TicketRemover: " + e.Message + ": " + Utilities.DumpException(e));
+               Logger.WriteLine("TicketRemover: " + e.Message + ": " + Utilities.DumpException(e));
             }
         }
 

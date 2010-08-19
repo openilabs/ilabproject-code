@@ -53,12 +53,12 @@ namespace iLabs.LabServer.LabView
                 Session["returnURL"] = returnTarget;
             
 
-            Utilities.WriteLog("LVPortal: " + Request.Url.ToString());
+           Logger.WriteLine("LVPortal: " + Request.Url.ToString());
 
             // this should be the Experiment Coupon data
             if (!(passkey != null && passkey != "" && coupon_Id != null && coupon_Id != "" && issuerGUID != null && issuerGUID != ""))
             {
-                Utilities.WriteLog("LVPortal: " + "AccessDenied missing Experiment credentials");
+               Logger.WriteLine("LVPortal: " + "AccessDenied missing Experiment credentials");
                 Response.Redirect("AccessDenied.aspx?text=missing+Experiment+credentials.", true);
             }
             

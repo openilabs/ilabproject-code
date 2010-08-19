@@ -283,8 +283,10 @@ namespace iLabs.ServiceBroker.admin
                     //IntTag[] ussTag = ticketing.GetProcessAgentTags(id);
                     btnRegisterUSS.Visible = false;
                     btnDissociateUSS.Visible = true;
+                    
                     ddlAssociatedUSS.SelectedValue = ussId.ToString();
                     ddlAssociatedUSS.Enabled = false;
+                    //}
                 }
 
                 else

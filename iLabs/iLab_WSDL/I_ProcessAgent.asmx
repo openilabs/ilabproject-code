@@ -46,7 +46,7 @@ public abstract class I_ProcessAgent  : System.Web.Services.WebService {
     /// Get the services local DateTime.
     /// </summary>
     /// <returns></returns>
-    [WebMethod(Description = "Get the services local DateTime."),
+    [WebMethod(Description = "Get the services local DateTime. This is not UTC"),
     SoapDocumentMethod(Binding = "IProcessAgent")]
     public abstract DateTime GetServiceTime();
    

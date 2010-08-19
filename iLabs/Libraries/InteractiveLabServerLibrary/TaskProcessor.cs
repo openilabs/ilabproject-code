@@ -41,7 +41,7 @@ namespace iLabs.LabServer.Interactive
         
 		public TaskProcessor()
 		{
-            Utilities.WriteLog("TaskProcessor created");
+           Logger.WriteLine("TaskProcessor created");
             tasks = new List<LabTask>();
             dataManagers = new Dictionary<long, DataSourceManager>();
            
@@ -162,7 +162,7 @@ namespace iLabs.LabServer.Interactive
             count++;
             if (count >= 10000)
             {
-                Utilities.WriteLog("ProcessTasks");
+               Logger.WriteLine("ProcessTasks");
                 count = 0;
             }
 
@@ -176,7 +176,7 @@ namespace iLabs.LabServer.Interactive
                     { // task has expired
                         try
                         {
-                            Utilities.WriteLog("Found expired task: " + task.taskID);
+                           Logger.WriteLine("Found expired task: " + task.taskID);
                             
                             if (toBeRemoved == null)
                                 toBeRemoved = new List<LabTask>();
@@ -186,7 +186,7 @@ namespace iLabs.LabServer.Interactive
 
                         catch (Exception e1)
                         {
-                            Utilities.WriteLog("ProcessTasks Expired: exception:" + e1.Message + e1.StackTrace);
+                           Logger.WriteLine("ProcessTasks Expired: exception:" + e1.Message + e1.StackTrace);
                         }
 
                     }
@@ -201,7 +201,7 @@ namespace iLabs.LabServer.Interactive
                         }
                         catch (Exception e2)
                         {
-                            Utilities.WriteLog("ProcessTasks Status: " + e2.Message);
+                           Logger.WriteLine("ProcessTasks Status: " + e2.Message);
                         }
                     }
                 }

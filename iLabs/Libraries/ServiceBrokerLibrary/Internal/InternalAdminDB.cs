@@ -898,7 +898,7 @@ namespace iLabs.ServiceBroker.Internal
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("Error getting clientID: " + e.Message);
+               Logger.WriteLine("Error getting clientID: " + e.Message);
             }
             finally
             {
@@ -2072,9 +2072,19 @@ namespace iLabs.ServiceBroker.Internal
 			DbConnection myConnection = FactoryDB.GetConnection();
 			DbCommand myCommand = FactoryDB.CreateCommand("AddUserSession", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID", us.userID,DbType.Int32));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@groupID", us.groupID,DbType.Int32));
+            DbParameter paramGroup = FactoryDB.CreateParameter(myCommand,"@groupID",DbType.Int32);
+            //if(us.groupID >0)
+                paramGroup.Value = us.groupID;
+            //else
+            //    paramGroup.Value =DBNull.Value;
+			myCommand.Parameters.Add( paramGroup);
+             DbParameter paramClient = FactoryDB.CreateParameter(myCommand,"@clientID", DbType.Int32);
+            //if(us.clientID >0)
+                paramClient.Value = us.clientID;
+            //else
+            //    paramClient.Value =DBNull.Value;
+            myCommand.Parameters.Add(paramClient);
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@tzOffset", us.tzOffset,DbType.Int32));
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sessionKey", us.sessionKey,DbType.AnsiString,512));
 			
@@ -2096,16 +2106,25 @@ namespace iLabs.ServiceBroker.Internal
         /// <summary>
         /// to insert a user session record. returns a database generated session id.
         /// </summary>
-        public static bool ModifyUserSession(long sessionID,int groupID,int clientID, int tzOffset, string sessionKey)
+        public static bool ModifyUserSession(long sessionID,int groupID,int clientID, string sessionKey)
         {
 
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("ModifyUserSession", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sessionID", sessionID,DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@tzOffset", tzOffset, DbType.Int32));
+            DbParameter paramGroup = FactoryDB.CreateParameter(myCommand, "@groupID", DbType.Int32);
+            //if (groupID > 0)
+                paramGroup.Value = groupID;
+            //else
+            //    paramGroup.Value = DBNull.Value;
+            myCommand.Parameters.Add(paramGroup);
+            DbParameter paramClient = FactoryDB.CreateParameter(myCommand, "@clientID", DbType.Int32);
+            //if (clientID > 0)
+                paramClient.Value = clientID;
+            //else
+                //paramClient.Value = DBNull.Value;
+            myCommand.Parameters.Add(paramClient);
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sessionKey", sessionKey, DbType.AnsiString,512));
 
             try
@@ -3219,10 +3238,22 @@ namespace iLabs.ServiceBroker.Internal
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@messageType", sm.messageType, DbType.AnsiString,100 ));
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@messageTitle", sm.messageTitle, DbType.String,256 ));
+            
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@toBeDisplayed", sm.toBeDisplayed,DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientID", sm.clientID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@agentID", sm.agentID, DbType.Int32));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@groupID",sm.groupID, DbType.Int32));
+            
+            if(sm.clientID >0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", sm.clientID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", null, DbType.Int32));
+            if(sm.agentID >0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", sm.agentID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", null, DbType.Int32));
+            if(sm.groupID >0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", sm.groupID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", null, DbType.Int32));
+           
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@messageBody", sm.messageBody, DbType.String,3000));	
 
 			try
@@ -3256,9 +3287,18 @@ namespace iLabs.ServiceBroker.Internal
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageType", sm.messageType, DbType.AnsiString,100));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageTitle", sm.messageTitle, DbType.String,256));
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@toBeDisplayed", sm.toBeDisplayed, DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", sm.clientID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", sm.agentID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", sm.groupID, DbType.Int32));
+            if (sm.clientID > 0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", sm.clientID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", null, DbType.Int32));
+            if (sm.agentID > 0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", sm.agentID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", null, DbType.Int32));
+            if (sm.groupID > 0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", sm.groupID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", null, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageBody", sm.messageBody, DbType.String));	
 
 			try
@@ -3434,6 +3474,67 @@ namespace iLabs.ServiceBroker.Internal
 			
 			return sm;
 		}
+        public static SystemMessage[] SelectSystemMessagesForGroup(int groupID)
+        {
+            ArrayList groups = new ArrayList();
+
+            //int[] groups = InternalAuthorizationDB.ListAgentParents(groupID);
+            AuthorizationUtilities.GetAgentAncestors(groupID, groups);
+            if(!groups.Contains(groupID))
+                groups.Add(groupID);
+            List<SystemMessage> systemMessages = new List<SystemMessage>();
+            if (groups != null && groups.Count > 0)
+            {
+                DbConnection myConnection = FactoryDB.GetConnection();
+                DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessagesForGroup", myConnection);
+                myCommand.CommandType = CommandType.StoredProcedure;
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupIds", Utilities.ToCSV(Utilities.ArrayListToIntArray(groups)), DbType.AnsiString, 4000));
+                try
+                {
+                    myConnection.Open();
+
+                    // get systemMessage info from table system_messages
+                    DbDataReader myReader = myCommand.ExecuteReader();
+                    while (myReader.Read())
+                    {
+                        SystemMessage sm = new SystemMessage();
+                        sm.messageType = "Group";
+                        if (myReader["system_message_id"] != System.DBNull.Value)
+                            sm.messageID = Convert.ToInt32(myReader["system_message_id"]);
+
+                        if (myReader["message_body"] != System.DBNull.Value)
+                            sm.messageBody = (string)myReader["message_body"];
+                        byte tbd = 0;
+                        if (myReader["to_be_displayed"] != System.DBNull.Value)
+                        {
+                            tbd = Convert.ToByte(myReader["to_be_displayed"]);
+                        }
+                        if (tbd == 1)
+                            sm.toBeDisplayed = true;
+                        else
+                            sm.toBeDisplayed = false;
+                        if (myReader["last_modified"] != System.DBNull.Value)
+                            sm.lastModified = DateUtil.SpecifyUTC(Convert.ToDateTime(myReader["last_modified"]));
+                        if (myReader["message_title"] != System.DBNull.Value)
+                            sm.messageTitle = (string)myReader["message_title"];
+
+                        systemMessages.Add(sm);
+
+                    }
+                    myReader.Close();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Exception thrown SelectSystemMessages", ex);
+                }
+                finally
+                {
+                    myConnection.Close();
+                }
+            }
+            return systemMessages.ToArray();
+        }
+        
 
 		/// <summary>
 		/// to retrieve system message metadata for systemMessages specified by messageType and group and labServerID
@@ -3446,9 +3547,19 @@ namespace iLabs.ServiceBroker.Internal
 			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessages", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageType", messageType, DbType.AnsiString,100));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
+            DbParameter client = FactoryDB.CreateParameter(myCommand, "@clientID", DbType.Int32);
+            if (clientID > 0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", null, DbType.Int32));
+            if (agentID > 0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", null, DbType.Int32));
+            if (groupID > 0)
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
+            else
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", null, DbType.Int32));
             
 			try 
 			{

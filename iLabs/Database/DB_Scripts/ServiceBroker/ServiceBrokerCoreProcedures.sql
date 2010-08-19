@@ -652,6 +652,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveSy
 drop procedure [dbo].[RetrieveSystemMessageByIDForAdmin]
 GO
 
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveSystemMessagesForGroup]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[RetrieveSystemMessagesForGroup]
+GO
+
 /****** Object:  Stored Procedure dbo.RetrieveSystemMessages    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[RetrieveSystemMessages]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[RetrieveSystemMessages]
@@ -757,6 +762,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SaveUserSe
 drop procedure [dbo].[SaveUserSessionEndTime]
 GO
 
+/****** Object:  Stored Procedure dbo.SelectSessionHistory    Script Date: 5/18/2005 4:17:55 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SelectSessionHistory]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[SelectSessionHistory]
+GO
 /****** Object:  Stored Procedure dbo.SelectAllUserSessions    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[SelectAllUserSessions]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[SelectAllUserSessions]
@@ -1383,13 +1392,18 @@ GO
 CREATE PROCEDURE AddUserSession
 	@userID int,
 	@groupID int,
+	@clientID int,
 	@tzOffset int,
 	@sessionKey varchar(512)
 AS 
-	insert into user_sessions (modify_time,user_id, effective_group_id,TZ_Offset, session_key)
-		values (getutcdate(), @userID, @groupID, @tzOffset, @sessionKey )
+	DECLARE @sessionID bigint;
+	insert into user_sessions (modify_Time, user_ID, Effective_group_ID,  client_ID, TZ_Offset, session_key)
+		values (getutcdate(), @userID, @groupID, @clientID, @tzOffset, @sessionKey )
 	
-	select ident_current('user_sessions')
+	select @sessionID =  ident_current('user_sessions')
+	insert into Session_History (session_ID,Group_ID,Client_ID, Session_Key)
+		values ( @sessionID,@groupID,@clientID,@sessionKey);
+	select @sessionID
 return
 GO
 
@@ -1402,14 +1416,16 @@ CREATE PROCEDURE ModifyUserSession
 	@sessionID bigint,
 	@groupID int,
 	@clientID int,
-	@tzOffset int,
 	@sessionKey varchar(512)
 AS 
-	update user_sessions set modify_time =getutcdate(), effective_group_id = @groupID,
- 		client_ID=@clientID,TZ_Offset=@tzOffset,session_Key=@sessionKey WHERE session_ID = @sessionID
+	update user_sessions set modify_Time = GETUTCDATE(),Effective_Group_ID=@groupID,
+	client_ID=@clientID,session_Key=@sessionKey
+	where session_ID= @sessionID
+	insert into session_history (session_ID,Group_ID,Client_ID, session_key)
+		values (@sessionID,@groupID,@clientID, @sessionKey)
 	
 	
-return @@rowcount
+return 1
 GO
 
 SET QUOTED_IDENTIFIER ON 
@@ -3053,7 +3069,7 @@ GO
 CREATE PROCEDURE RetrieveLabClientIDs
 AS
 	select client_id
-	from lab_clients
+	from lab_clients where client_ID > 0
 GO
 
 SET QUOTED_IDENTIFIER OFF 
@@ -3187,10 +3203,20 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+CREATE PROCEDURE RetrieveSystemMessagesForGroup
+	@groupIds varchar(4000)
+AS
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages
+	where to_be_displayed =1 
+		and group_ID in (select * from [dbo].[toIntArray](@groupIds))
+order by last_modified DESC
+go
+
 /****** Object:  Stored Procedure dbo.RetrieveSystemMessages    Script Date: 5/18/2005 4:17:56 PM ******/
 --DROP PROCEDURE RetrieveSystemMessages
 CREATE PROCEDURE RetrieveSystemMessages
-/*Retrieves by message type and group */
+/*Retrieves by message type and options */
 	@messageType varchar(256),
 	@agentID int,
 	@clientID int,
@@ -3206,6 +3232,7 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and group_ID=@groupID and agent_ID=@agentID and client_ID =@clientID
+	order by last_modified DESC
 	END
 	ELSE IF @agentID >0 AND @clientID >0 
 	BEGIN
@@ -3213,6 +3240,7 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and agent_ID=@agentID and client_ID =@clientID
+	order by last_modified DESC
 	END
 	ELSE IF @agentID >0 AND @groupID > 0
 	BEGIN
@@ -3220,6 +3248,7 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and group_ID=@groupID and agent_ID=@agentID
+	order by last_modified DESC
 	END
 	ELSE IF @clientID >0 AND @groupID > 0
 	BEGIN
@@ -3227,6 +3256,7 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and group_ID=@groupID and client_ID =@clientID
+	order by last_modified DESC
 	END
 	
 	ELSE IF @agentID >0
@@ -3235,6 +3265,7 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and agent_ID=@agentID
+	order by last_modified DESC
 	END
 	ELSE IF @clientID >0
 	BEGIN
@@ -3242,6 +3273,7 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and client_ID =@clientID
+	order by last_modified DESC
 	END
 	ELSE IF @groupID > 0
 	BEGIN
@@ -3249,12 +3281,14 @@ AS
 	from system_messages sm
 	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
 			and group_ID=@groupID
+	order by last_modified DESC
 	END
 	ELSE
 	BEGIN
 	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
 	from system_messages sm
-	where sm.message_type_id=@messageTypeID and to_be_displayed =1 
+	where sm.message_type_id=@messageTypeID and to_be_displayed =1
+	order by last_modified DESC 
 	END
 
 GO
@@ -3277,10 +3311,71 @@ AS
 	
 	select @messageTypeID = (select message_type_id from message_types 
 						where upper(description) = upper(@messageType))
-	
+	IF @agentID >0 AND @clientID >0 AND @groupID > 0
+	BEGIN
 	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
 	from system_messages sm
-	where sm.message_type_id=@messageTypeID	and group_ID=@groupID and agent_ID=@agentID and client_ID = @clientID
+	where sm.message_type_id=@messageTypeID
+			and group_ID=@groupID and agent_ID=@agentID and client_ID =@clientID
+	order by last_modified DESC
+	END
+	ELSE IF @agentID >0 AND @clientID >0 
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID
+			and agent_ID=@agentID and client_ID =@clientID
+	order by last_modified DESC
+	END
+	ELSE IF @agentID >0 AND @groupID > 0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID 
+			and group_ID=@groupID and agent_ID=@agentID
+	order by last_modified DESC
+	END
+	ELSE IF @clientID >0 AND @groupID > 0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID 
+			and group_ID=@groupID and client_ID =@clientID
+	order by last_modified DESC
+	END
+	
+	ELSE IF @agentID >0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID 
+			and agent_ID=@agentID
+	order by last_modified DESC
+	END
+	ELSE IF @clientID >0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID 
+			and client_ID =@clientID
+	order by last_modified DESC
+	END
+	ELSE IF @groupID > 0
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID 
+			and group_ID=@groupID
+	order by last_modified DESC
+	END
+	ELSE
+	BEGIN
+	select system_message_ID, message_body, to_be_displayed, last_modified, message_title
+	from system_messages sm
+	where sm.message_type_id=@messageTypeID
+	order by last_modified DESC 
+	END
+
 GO
 
 SET QUOTED_IDENTIFIER OFF 
@@ -3499,6 +3594,20 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS OFF 
 GO
+CREATE PROCEDURE SelectSessionHistory
+AS
+select s.Session_ID,u.User_name, h.modify_time,g.Group_Name, c.Lab_Client_Name,s.Session_Start_Time,s.Session_End_Time,h.Session_key
+from user_sessions s, session_history h, Users u, Groups g, Lab_Clients c
+where s.session_id = h.session_id and s.user_ID = u.user_id and h.group_ID = g.Group_ID and h.CLient_ID = c.client_ID
+order by s.session_id, h.modify_time
+
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
 
 /****** Object:  Stored Procedure dbo.SelectAllUserSessions    Script Date: 5/18/2005 4:17:57 PM ******/
 

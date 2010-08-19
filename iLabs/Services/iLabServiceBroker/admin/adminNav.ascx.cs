@@ -40,11 +40,16 @@ namespace iLabs.ServiceBroker.admin
 			// LabServers & Clients
 			// Grants
 
-			if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
-			{
-				aManageServices.Visible = false;
-				aGrants.Visible = false;
-			}
+            if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
+            {
+                aManageServices.Visible = false;
+                aGrants.Visible = false;
+                aMyLabs.Visible = true;
+            }
+            else
+            {
+                aMyLabs.Visible = false;
+            }
 
 			// Get the current page name w/o path name or slashes
 			currentPage = Request.Url.Segments[Request.Url.Segments.Length -1];

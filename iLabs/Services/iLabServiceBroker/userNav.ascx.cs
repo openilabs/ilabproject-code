@@ -86,7 +86,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		private void SetNavList()
 		{
             // check that this user has admin privilidges, in which case, the manageUsers page should be sent to it.
-			object adminState = Session["IsAdmin"];
+            object adminState = Session["IsAdmin"];
 			liNavlistAdmin.Visible = ((adminState != null) && Convert.ToBoolean(adminState));
 
             // check that this user has service admin privilidges, in which case, the adminServices page should be sent to it.
@@ -96,24 +96,26 @@ namespace iLabs.ServiceBroker.iLabSB
 			// Do not show Labs or Experiments if Effective Group has not been specified
 			if (Session["GroupID"] !=null)
 			{
-				if ( !((bool)adminState) && !((bool)serviceAdminState))
+				if ((bool)adminState)
 				{
-					liNavlistMyLabs.Visible = true;
-					liNavlistExperiments.Visible = true;
-                    //liNavlistSchedule.Visible = true;
-				}
-				else
-				{
-					liNavlistMyLabs.Visible = false;
+                    liNavlistMyLabs.Visible = !(Session["GroupName"].ToString().Equals(Group.SUPERUSER));
 					liNavlistExperiments.Visible = false;
-                    //liNavlistSchedule.Visible = false;
 				}
+                else if ((bool)serviceAdminState)
+                {
+                    liNavlistMyLabs.Visible = false;
+                    liNavlistExperiments.Visible = false;
+                }
+                else
+                {
+                    liNavlistMyLabs.Visible = true;
+                    liNavlistExperiments.Visible = true;
+                }
 			}
 			else
 			{
 				liNavlistMyLabs.Visible = false;
 				liNavlistExperiments.Visible = false;
-                //liNavlistSchedule.Visible = false;
 			}
 
 			// Only show the groups page if the user has more than one lab
@@ -147,8 +149,17 @@ namespace iLabs.ServiceBroker.iLabSB
 					// it looks as though it is the page to be linked to.
 					aHome.Attributes.Add("class", "first");
 					aMyLabs.Attributes.Add("class", "topactive");
+                    liNavlistExperiments.Visible = true;
 					aMyAccount.Attributes.Add("class", "last");
 					break;
+                case "myClientList.aspx":
+                    //Note: the myLabs page determines which clients a user/group can access,
+                    // then redirects to myClient.aspx. So myLabs.aspx is never displayed, though
+                    // it looks as though it is the page to be linked to.
+                    aHome.Attributes.Add("class", "first");
+                    aMyLabs.Attributes.Add("class", "topactive");
+                    aMyAccount.Attributes.Add("class", "last");
+                    break;
 				case "myExperiments.aspx":
 					aHome.Attributes.Add("class", "first");
 					aMyExperiments.Attributes.Add("class", "topactive");

@@ -33,9 +33,11 @@ namespace iLabs.ServiceBroker.admin
 	public partial class manageUser : System.Web.UI.Page
 	{
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-		
+        int defaultGroupID;
+
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+            defaultGroupID = wrapper.GetGroupIDWrapper(ServiceBroker.Administration.Group.NEWUSERGROUP);
 			if (Session["UserID"]==null)
 				Response.Redirect("../login.aspx");
 			
@@ -43,9 +45,14 @@ namespace iLabs.ServiceBroker.admin
 			btnSaveChanges.Enabled=true;
 			
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('This will remove the user from the groups and subgroups it belongs to. Are you sure you want to remove this user?')== false) return false;");
-
-			if (!Session["GroupName"].ToString().Equals(ServiceBroker.Administration.Group.SUPERUSER))
-			{
+            if (Convert.ToBoolean(Session["IsAdmin"]))
+            {
+                if (Session["GroupName"].ToString().Contains("-admin"))
+                {
+                    defaultGroupID = AdministrativeAPI.GetAssociatedGroupID(Convert.ToInt32(Session["GroupID"]));
+                }
+            }
+            else{
 				txtPassword.Enabled = false;
 				txtConfirmPassword.Enabled = false;
 				txtPassword.BackColor = Color.Silver;
@@ -518,7 +525,8 @@ namespace iLabs.ServiceBroker.admin
 					}
 					else
 					{
-						if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))
+                        if (Convert.ToBoolean(Session["IsAdmin"]))
+						//if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))
 						{
 							//Password checks
 							if(txtPassword.Text.CompareTo("")==0 )
@@ -546,7 +554,7 @@ namespace iLabs.ServiceBroker.admin
 						//Add User
 						int userID= wrapper.AddUserWrapper(txtUsername.Text, txtUsername.Text, AuthenticationType.NativeAuthentication,
 							txtFirstName.Text, txtLastName.Text, txtEmail.Text,strAffiliation, "No reason specified - User added through Administrative interface",
-							"", wrapper.GetGroupIDWrapper(ServiceBroker.Administration.Group.NEWUSERGROUP), cbxLockAccount.Checked);
+							"", defaultGroupID, cbxLockAccount.Checked);
 
 						//Set Password - Can only change password if you're superuser
 						if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))

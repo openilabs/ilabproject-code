@@ -763,7 +763,7 @@ namespace iLabs.Core
                     }
 
                 }
-                Utilities.WriteLog("DeleteTicket: ticketCount=" + status + " \tcouponCount=" + ccount);
+               Logger.WriteLine("DeleteTicket: ticketCount=" + status + " \tcouponCount=" + ccount);
             }
             
             catch (DbException e)
@@ -1192,7 +1192,7 @@ namespace iLabs.Core
 
                 if (tickets.Count > 0)
                 {
-                    Utilities.WriteLog("ProcessExpiredTickets: expired count = " + tickets.Count);
+                   Logger.WriteLine("ProcessExpiredTickets: expired count = " + tickets.Count);
                     cmd = connection.CreateCommand();
                     cmd.CommandText = "DeleteTicketByID";
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -1255,13 +1255,13 @@ namespace iLabs.Core
                     }
                 }
                 transaction.Commit();
-                Utilities.WriteLog("ProcessExpiredTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
+               Logger.WriteLine("ProcessExpiredTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
 
             }
             catch (Exception e)
             {
                 transaction.Rollback();
-                Utilities.WriteLog("ProcessExpiredTickets:  transaction Failed - Rollback- ticketCount=" + ticketCount + " \tcouponCount=" + couponCount +"\n" + e.Message);
+               Logger.WriteLine("ProcessExpiredTickets:  transaction Failed - Rollback- ticketCount=" + ticketCount + " \tcouponCount=" + couponCount +"\n" + e.Message);
             }
             finally
             {
@@ -1504,7 +1504,7 @@ namespace iLabs.Core
                     }
                     catch (Exception e)
                     {
-                        Utilities.WriteLog("InstallDomainCredentials: Error on systemSupport - " + e.Message);
+                       Logger.WriteLine("InstallDomainCredentials: Error on systemSupport - " + e.Message);
                     }
                 }
             }
@@ -3506,12 +3506,12 @@ namespace iLabs.Core
                 ProcessAgentInfo paInfo = GetProcessAgentInfo(originalGuid);
                 if (paInfo == null)
                 {
-                    Utilities.WriteLog("modifyDomainCredentials: The specified processAgent is unknown.");
+                   Logger.WriteLine("modifyDomainCredentials: The specified processAgent is unknown.");
                     return status;
                 }
                 if (paInfo.retired)
                 {
-                    Utilities.WriteLog("modifyDomainCredentials: The specified processAgent is retired.");
+                   Logger.WriteLine("modifyDomainCredentials: The specified processAgent is retired.");
                     throw new Exception("modifyDomainCredentials: The specified processAgent is retired.");
                 }
                 status = UpdateProcessAgent(paInfo.agentId,agent.agentGuid, agent.agentName, agent.type,

@@ -99,7 +99,7 @@ namespace iLabs.Web
         /// Get the processAgent's local time, this is not in UTC.
         /// </summary>
         /// <returns></returns>
-        [WebMethod,
+        [WebMethod(Description="Get the service's local time, this is not in UTC."),
        SoapDocumentMethod(Binding = "IProcessAgent")]
         public DateTime GetServiceTime()
         {
@@ -123,7 +123,7 @@ namespace iLabs.Web
             StatusReport status = new StatusReport();
             status.online = true;
             status.serviceGuid = ProcessAgentDB.ServiceGuid;
-            //status.payload = "Optional payload";
+            status.payload = iLabGlobal.Release;
             return status;
         }
 
@@ -313,13 +313,13 @@ namespace iLabs.Web
                         {
                             dbTicketing.SetDomainGuid(service.agentGuid);
                             ProcessAgentDB.RefreshServiceAgent();
-                            Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
+                           Logger.WriteLine("InstallDomainCredentials: " + service.codeBaseUrl);
                             agent = ProcessAgentDB.ServiceAgent;
 
                         }
                         else
                         {
-                            Utilities.WriteLog("Error InstallDomainCredentials: " + service.codeBaseUrl);
+                           Logger.WriteLine("Error InstallDomainCredentials: " + service.codeBaseUrl);
                             throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
                         }
                     }
@@ -337,12 +337,12 @@ namespace iLabs.Web
 
                         if (pid > 0)
                         {
-                            Utilities.WriteLog("InstallDomainCredentials: " + service.codeBaseUrl);
+                           Logger.WriteLine("InstallDomainCredentials: " + service.codeBaseUrl);
                             agent = ProcessAgentDB.ServiceAgent;                           
                         }
                         else
                         {
-                            Utilities.WriteLog("Error InstallDomainCredentials: " + service.codeBaseUrl);
+                           Logger.WriteLine("Error InstallDomainCredentials: " + service.codeBaseUrl);
                             throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
                         }
                     }
@@ -350,7 +350,7 @@ namespace iLabs.Web
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("Error on InstallDomainCredentials: " + Utilities.DumpException(e));
+               Logger.WriteLine("Error on InstallDomainCredentials: " + Utilities.DumpException(e));
                 throw;
             }
             return agent;

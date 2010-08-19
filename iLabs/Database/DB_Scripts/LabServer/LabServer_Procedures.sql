@@ -169,8 +169,8 @@ CREATE PROCEDURE InsertLabApp
 @rev nvarchar (50),
 @page nvarchar (256),
 @title nvarchar (256),
-@description nvarchar (2000),
-@comment nvarchar (256),
+@description ntext,
+@comment ntext,
 @width int,
 @height int,
 @type int,
@@ -178,8 +178,8 @@ CREATE PROCEDURE InsertLabApp
 @port int,
 @contact nvarchar (256),
 @cgi nvarchar (512),
-@datasource nvarchar (2000),
-@extra nvarchar (2000)
+@datasource ntext,
+@extra ntext
 
 AS
  INSERT INTO LabApp (width, height, type, port, appGuid,appKey, server, path,
@@ -207,8 +207,8 @@ CREATE PROCEDURE ModifyLabApp
 @rev nvarchar (50),
 @page nvarchar (256),
 @title nvarchar (256),
-@description nvarchar (2000),
-@comment nvarchar (256),
+@description ntext,
+@comment ntext,
 @width int,
 @height int,
 @type int,
@@ -216,8 +216,8 @@ CREATE PROCEDURE ModifyLabApp
 @port int,
 @contact nvarchar (256),
 @cgi nvarchar (512),
-@datasource nvarchar (2000),
-@extra nvarchar (2000)
+@datasource ntext,
+@extra ntext
 
 AS
  UPDATE LabApp set width=@width, height=@height, type=@type,port=@port, appGuid=@guid, appKey=@appKey,

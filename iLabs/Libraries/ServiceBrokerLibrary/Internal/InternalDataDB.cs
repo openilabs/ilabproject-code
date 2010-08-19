@@ -868,7 +868,7 @@ namespace iLabs.ServiceBroker.Internal
                 }
                 catch (Exception e)
                 {
-                    Utilities.WriteLog("Error: " + e.Message);
+                   Logger.WriteLine("Error: " + e.Message);
                     throw;
                 }
                 finally
@@ -1074,7 +1074,7 @@ namespace iLabs.ServiceBroker.Internal
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("UpdateExperimentStatus: " + e.Message);
+               Logger.WriteLine("UpdateExperimentStatus: " + e.Message);
             }
             finally
             {

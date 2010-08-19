@@ -81,6 +81,7 @@ namespace iLabs.LabView.LV82
             string durationStr = expDoc.Query("ExecuteExperimentPayload/duration");
             string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
             string userName = expDoc.Query("ExecuteExperimentPayload/userName");
+            string expIDstr = expDoc.Query("ExecuteExperimentPayload/experimentID");
 
             if ((startStr != null) && (startStr.Length > 0))
             {
@@ -89,6 +90,10 @@ namespace iLabs.LabView.LV82
             if ((durationStr != null) && (durationStr.Length > 0) && !(durationStr.CompareTo("-1") == 0))
             {
                 duration = Convert.ToInt64(durationStr);
+            }
+            if ((expIDstr != null) && (expIDstr.Length > 0))
+            {
+                experimentID = Convert.ToInt64(expIDstr);
             }
 
 
@@ -111,7 +116,7 @@ namespace iLabs.LabView.LV82
 
             // log the experiment for debugging
 
-            Utilities.WriteLog("Experiment: " + experimentID + " Start: " + DateUtil.ToUtcString(startTime) + " \tduration: " + duration);
+           Logger.WriteLine("Experiment: " + experimentID + " Start: " + DateUtil.ToUtcString(startTime) + " \tduration: " + duration);
             long statusSpan = DateUtil.SecondsRemaining(startTime, duration);
 
 
@@ -137,7 +142,7 @@ namespace iLabs.LabView.LV82
             {
                 status = -1;
                 string err = "Unable to Find: " + appInfo.path + @"\" + appInfo.application;
-                Utilities.WriteLog(err);
+               Logger.WriteLine(err);
                 throw new Exception(err);
             }
             // Get qualifiedName
@@ -147,7 +152,7 @@ namespace iLabs.LabView.LV82
 
             status = lvi.GetVIStatus(vi);
 
-            Utilities.WriteLog("CreateLabTask - " + qualName + ": VIstatus: " + status);
+           Logger.WriteLine("CreateLabTask - " + qualName + ": VIstatus: " + status);
             switch (status)
             {
                 case -10:
@@ -188,14 +193,14 @@ namespace iLabs.LabView.LV82
             try
             {
                 lvi.SetBounds(vi, 0, 0, appInfo.width, appInfo.height);
-                Utilities.WriteLog("SetBounds: " + appInfo.application);
+               Logger.WriteLine("SetBounds: " + appInfo.application);
             }
             catch (Exception sbe)
             {
-                Utilities.WriteLog("SetBounds exception: " + Utilities.DumpException(sbe));
+               Logger.WriteLine("SetBounds exception: " + Utilities.DumpException(sbe));
             }
             lvi.SubmitAction("unlockvi", lvi.qualifiedName(vi));
-            Utilities.WriteLog("unlockvi Called: ");
+           Logger.WriteLine("unlockvi Called: ");
 
 
             // Set up in-memory and database task control structures
@@ -285,7 +290,7 @@ namespace iLabs.LabView.LV82
 
         public override eStatus Expire()
         {
-            Utilities.WriteLog("Task expired: " + taskID);
+           Logger.WriteLine("Task expired: " + taskID);
             
             Close();
             status |= eStatus.Expired;
@@ -322,7 +327,7 @@ namespace iLabs.LabView.LV82
                         }
                         catch (Exception ce)
                         {
-                            Utilities.WriteLog("Trying StatusVI: " + ce.Message);
+                           Logger.WriteLine("Trying StatusVI: " + ce.Message);
                         }
                     }
 
@@ -336,7 +341,7 @@ namespace iLabs.LabView.LV82
                     if (stopStatus != 0)
                     { //VI found but no stop control
                         vi.Abort();
-                        Utilities.WriteLog("Expire: AbortVI() called because no stop control");
+                       Logger.WriteLine("Expire: AbortVI() called because no stop control");
                     }
 
                     // Also required for LV 8.2.0 and 7.1, force disconnection of RemotePanel
@@ -345,7 +350,7 @@ namespace iLabs.LabView.LV82
                     vi = null;
 
                 }
-                Utilities.WriteLog("TaskID = " + taskID + " has expired");
+               Logger.WriteLine("TaskID = " + taskID + " has expired");
                 dbService.SetTaskStatus(taskID, (int)eStatus.Expired);
                 status = eStatus.Closed;
                
@@ -367,7 +372,7 @@ namespace iLabs.LabView.LV82
 
                     if ((sbs == null) || (sbs.Length < 1))
                     {
-                        Utilities.WriteLog("Can not retrieve ServiceBroker!");
+                       Logger.WriteLine("Can not retrieve ServiceBroker!");
                         throw new Exception("Can not retrieve ServiceBroker!");
                     }
                     ProcessAgentInfo domainSB = null;
@@ -381,7 +386,7 @@ namespace iLabs.LabView.LV82
                     }
                     if (domainSB == null)
                     {
-                        Utilities.WriteLog("Can not retrieve ServiceBroker!");
+                       Logger.WriteLine("Can not retrieve ServiceBroker!");
                         throw new Exception("Can not retrieve ServiceBroker!");
                     }
                     InteractiveSBProxy iuProxy = new InteractiveSBProxy();
@@ -390,7 +395,7 @@ namespace iLabs.LabView.LV82
                     iuProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
                     iuProxy.Url = sbs[0].webServiceUrl;
                     StorageStatus storageStatus = iuProxy.AgentCloseExperiment(expCoupon, experimentID);
-                    Utilities.WriteLog("AgentCloseExperiment status: " + storageStatus.status + " records: " + storageStatus.recordCount);
+                   Logger.WriteLine("AgentCloseExperiment status: " + storageStatus.status + " records: " + storageStatus.recordCount);
 
 
                     // currently RequestTicketCancellation always returns false
@@ -403,17 +408,17 @@ namespace iLabs.LabView.LV82
                     if (ticketingInterface.RequestTicketCancellation(expCoupon, TicketTypes.EXECUTE_EXPERIMENT, ProcessAgentDB.ServiceGuid))
                     {
                         dbService.CancelTicket(expCoupon, TicketTypes.EXECUTE_EXPERIMENT, ProcessAgentDB.ServiceGuid);
-                        Utilities.WriteLog("Canceled ticket: " + expCoupon.couponId);
+                       Logger.WriteLine("Canceled ticket: " + expCoupon.couponId);
                     }
                     else
                     {
-                        Utilities.WriteLog("Unable to cancel ticket: " + expCoupon.couponId);
+                       Logger.WriteLine("Unable to cancel ticket: " + expCoupon.couponId);
                     }
                 }
             }
             catch (Exception e1)
             {
-                Utilities.WriteLog("ProcessTasks Expired: exception:" + e1.Message + e1.StackTrace);
+               Logger.WriteLine("ProcessTasks Expired: exception:" + e1.Message + e1.StackTrace);
             }
             finally
             {
@@ -458,7 +463,7 @@ namespace iLabs.LabView.LV82
                             }
                             catch (Exception ce2)
                             {
-                                Utilities.WriteLog("Status: " + ce2.Message);
+                               Logger.WriteLine("Status: " + ce2.Message);
                                 throw;
                             }
                             finally
@@ -471,7 +476,7 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("ProcessTasks Status: " + e.Message);
+               Logger.WriteLine("ProcessTasks Status: " + e.Message);
             }
             return status;
         }

@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Web;
 using System.Web.SessionState;
 
+using iLabs.Core;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
@@ -26,11 +27,11 @@ namespace iLabs.LabServer.TimeOfDay
             if (ConfigurationManager.AppSettings["logPath"] != null
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
-                Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
+                Logger.LogPath = ConfigurationManager.AppSettings["logPath"];
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine(iLabGlobal.Release);
+               Logger.WriteLine("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
 
@@ -41,10 +42,16 @@ namespace iLabs.LabServer.TimeOfDay
 		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
-            Utilities.WriteLog("");
-            Utilities.WriteLog("#############################################################################");
-            Utilities.WriteLog("");
-            Utilities.WriteLog("TOD Application_Start: starting");
+            if (ConfigurationManager.AppSettings["logPath"] != null
+              && ConfigurationManager.AppSettings["logPath"].Length > 0)
+            {
+                Logger.LogPath = ConfigurationManager.AppSettings["logPath"];
+                Logger.WriteLine("");
+                Logger.WriteLine("#############################################################################");
+                Logger.WriteLine(iLabGlobal.Release);
+                Logger.WriteLine("TOD Application_Start: starting");
+            }
+            ProcessAgentDB.RefreshServiceAgent();
             ticketRemover = new TicketRemover();
 		}
  

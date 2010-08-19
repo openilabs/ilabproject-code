@@ -574,7 +574,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
                         ex = ex.InnerException;
                     }
-                    Utilities.WriteLog(smtpErrorMsg.ToString());
+                   Logger.WriteLine(smtpErrorMsg.ToString());
                 }
             }
         }
@@ -1437,7 +1437,7 @@ EnableSession = true)]
                             smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
                             ex = ex.InnerException;
                         }
-                        Utilities.WriteLog(smtpErrorMsg.ToString());
+                       Logger.WriteLine(smtpErrorMsg.ToString());
                        
                     }
                     status = true;

@@ -18,10 +18,12 @@ using System.Web.Security;
 using System.Web;
 using System.Web.SessionState;
 
+using iLabs.Core;
 using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.Internal;
+using iLabs.ServiceBroker.Mapping;
 using iLabs.ServiceBroker;
 using iLabs.UtilLib;
 
@@ -40,11 +42,11 @@ namespace iLabs.ServiceBroker.iLabSB
             if (ConfigurationManager.AppSettings["logPath"] != null
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
-                Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
+               Logger.LogPath = ConfigurationManager.AppSettings["logPath"];
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine("");
+               Logger.WriteLine("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
 
@@ -58,18 +60,20 @@ namespace iLabs.ServiceBroker.iLabSB
 			string path = ConfigurationSettings.AppSettings["logPath"];
             if (path != null && path.Length > 0)
             {
-                Utilities.LogPath = path;
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("ISB Application_Start: starting");
+               Logger.LogPath = path;
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine(iLabGlobal.Release);
+               Logger.WriteLine("ISB Application_Start: starting");
             }
+            ProcessAgentDB.RefreshServiceAgent();
 			// The AuthCache class is defined in the Authorization
 			AuthCache.GrantSet = InternalAuthorizationDB.RetrieveGrants();
 			AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
 			AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
 			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
+            ResourceMapManager.Refresh();
             ticketRemover = new SBTicketRemover();
 		}
  
@@ -87,7 +91,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     SessionInfo info = AdministrativeAPI.GetSessionInfo(sesID);
                     if (info != null)
                     {
-                        AdministrativeAPI.SetSessionKey(sesID, Session.SessionID);
+                        AdministrativeAPI.ModifyUserSession(sesID, info.groupID,info.clientID, Session.SessionID);
                         Session["SessionID"] = sesID;
                         Session["UserID"] = info.userID;
                         int[] myGrps = AdministrativeAPI.ListNonRequestGroupsForAgent(info.userID);
@@ -178,7 +182,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
             if (ticketRemover != null)
                 ticketRemover.Stop();
-            Utilities.WriteLog("ISB Application_End:");
+           Logger.WriteLine("ISB Application_End:");
 
             HttpRuntime runtime = (HttpRuntime)typeof(System.Web.HttpRuntime).InvokeMember("_theRuntime",
                                                                                             BindingFlags.NonPublic

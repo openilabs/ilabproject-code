@@ -12,6 +12,13 @@ INSERT INTO Client_Types(description) VALUES ('Batch Redirect');
 INSERT INTO Client_Types(description) VALUES ('Interactive Applet');
 INSERT INTO Client_Types(description) VALUES ('Interactive Redirect');
 
+/* DEFAULT CLIENT */
+SET IDENTITY_INSERT Lab_Clients ON
+INSERT INTO Lab_Clients(Client_ID, Client_Type_ID, NeedsScheduling, NeedsESS, IsReentrant, Loader_Script,Client_GUID, Lab_Client_Name)
+values (0,1,0,0,0,' ','0','No Client');
+SET IDENTITY_INSERT Lab_Clients OFF
+DBCC CHECKIDENT (Lab_Clients, RESEED);
+
 /* FUNCTIONS */
 INSERT INTO Functions (Function_Name, Description) VALUES ('addMember', 'allows one to add members to a group');
 INSERT INTO Functions (Function_Name, Description) VALUES ('administerGroup', 'allows one to administer a group');
@@ -46,8 +53,15 @@ INSERT INTO Group_Types(Group_Type_ID, description) VALUES (3,'Course Staff Grou
 INSERT INTO Group_Types(Group_Type_ID, description) VALUES (4,'Service Administration Group');
 INSERT INTO Group_Types(Group_Type_ID, description) VALUES (5,'Built-in Group');
 SET IDENTITY_INSERT Group_Types OFF
+DBCC CHECKIDENT (GROUP_TYPES, RESEED);
 
 /* GROUPS & CORRESPONDING AGENTS*/
+SET IDENTITY_INSERT Agents ON
+INSERT INTO Agents (Agent_ID,Agent_Name, Is_Group) VALUES (0,'Group not assigned', 1);
+INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (0, 'Group not assigned','If a groupID does not exist. This is an illegal group.',0);
+SET IDENTITY_INSERT Agents OFF
+DBCC CHECKIDENT (AGENTS, RESEED);
+
 BEGIN
 DECLARE @Agent_ID NUMERIC
 DECLARE @Parent_Group_ID NUMERIC
@@ -74,20 +88,13 @@ SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT'
 INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'SuperUserGroup','Administrators',5);
 INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
 
-DBCC CHECKIDENT (AGENTS, RESEED, -1) ;
-INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('Group not assigned', 1);
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (0, 'Group not assigned','If a groupID does not exist. This is an illegal group.',0);
+DBCC CHECKIDENT (AGENTS, RESEED);
+
 END
 
 UPDATE GROUPS SET associated_group_id = 0
 DBCC CHECKIDENT (AGENTS, RESEED, 10) ;
 
-/* LAB_SERVERS */
-
---DBCC CHECKIDENT (LAB_SERVERS, RESEED, 0) ;
---INSERT INTO Lab_Servers (GUID, Lab_Server_Name, Web_Service_URL, description, contact_first_name, contact_last_name, contact_email) VALUES (0,'Unknown Lab Server', 'none', 'This is to generate an id for a non-existent or unknown lab server, which can then be used as a foreign key in other tables such as System_Messages', 'ilab', 'ilab', 'ilab-debug@mit.edu');
-
---DBCC CHECKIDENT (LAB_SERVERS, RESEED) ;
 
 
 /* MESSAGE_TYPES */
@@ -116,7 +123,7 @@ INSERT INTO Qualifiers(Qualifier_Type_ID, Qualifier_Reference_ID, Qualifier_Name
 INSERT INTO Qualifiers(Qualifier_Type_ID, Qualifier_Reference_ID, Qualifier_Name) VALUES (1, 0,'ROOT');
 
 BEGIN
-DECLARE @GroupReference NUMERIC
+DECLARE @GroupReference int
 
 SELECT  @GroupReference = (SELECT Group_ID FROM Groups where Group_Name='SuperUserGroup')
 INSERT INTO Qualifiers(Qualifier_Type_ID, Qualifier_Reference_ID, Qualifier_Name) VALUES (5,@GroupReference ,'SuperUserGroup'); 
@@ -130,11 +137,18 @@ INSERT INTO Qualifiers(Qualifier_Type_ID, Qualifier_Reference_ID, Qualifier_Name
 DBCC CHECKIDENT (QUALIFIERS, RESEED, 100) ;
 
 END
-
+BEGIN
+DECLARE @qualID int
+DECLARE @parentid INT 
 /* Orphaned User group is a member of New User Group */
-INSERT INTO Qualifier_Hierarchy (Qualifier_ID, Parent_Qualifier_ID) VALUES (4, 3);
+SELECT @qualID =(select qualifier_id from Qualifiers where qualifier_name = 'OrphanedUserGroup')
+SELECT @parentid =(select qualifier_id from Qualifiers where qualifier_name = 'NewUserGroup')
+INSERT INTO Qualifier_Hierarchy (Qualifier_ID, Parent_Qualifier_ID) VALUES (@qualID, @parentid)
 /*Super User group is a member of Root */
-INSERT INTO Qualifier_Hierarchy (Qualifier_ID, Parent_Qualifier_ID) VALUES (2, 1);
+SELECT @qualID =(select qualifier_id from Qualifiers where qualifier_name = 'SuperUserGroup')
+SELECT @parentid =(select qualifier_id from Qualifiers where qualifier_name = 'ROOT')
+INSERT INTO Qualifier_Hierarchy (Qualifier_ID, Parent_Qualifier_ID) VALUES (@qualID, @parentid)
+END
 
 /* USERS & CORRESPONDING AGENTS & PRINCIPALS */
 /* Default SuperUser password is ilab */
@@ -160,6 +174,7 @@ INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (6,'GRO
 INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (7,'RESOURCE_TYPE', 'Resource Type');
 
 SET IDENTITY_INSERT ResourceMappingTypes OFF
+DBCC CHECKIDENT (ResourceMappingTypes, RESEED);
 GO
 
 /*ReSourceMapTypes*/

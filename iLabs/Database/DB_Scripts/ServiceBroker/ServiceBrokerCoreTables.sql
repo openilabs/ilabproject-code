@@ -32,10 +32,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Blobs_A
 ALTER TABLE [dbo].[Blobs_Access] DROP CONSTRAINT FK_Blobs_Access_Experiment_Blobs
 GO
 
-//if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Coupons_Experiments]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-//ALTER TABLE [dbo].[Coupons] DROP CONSTRAINT FK_Coupons_Experiments
-//GO
-
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ExperimentCoupon_Coupon]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[ExperimentCoupon] DROP CONSTRAINT FK_ExperimentCoupon_Coupon
 GO
@@ -71,19 +67,19 @@ ALTER TABLE [dbo].[Agent_Hierarchy] DROP CONSTRAINT FK_Agent_Hierarchy_Groups
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_ESS]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_ESS
+ALTER TABLE [dbo].[Experiments] DROP CONSTRAINT FK_Experiments_ESS
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_LS]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_LS
+ALTER TABLE [dbo].[Experiments] DROP CONSTRAINT FK_Experiments_LS
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_Clients]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_Clients
+ALTER TABLE [dbo].[Experiments] DROP CONSTRAINT FK_Experiments_Clients
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_Users]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_Users
+ALTER TABLE [dbo].[Experiments] DROP CONSTRAINT FK_Experiments_Users
 GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Experiment_Information] DROP CONSTRAINT FK_Experiments_Groups
+ALTER TABLE [dbo].[Experiments] DROP CONSTRAINT FK_Experiments_Groups
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Groups_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
@@ -103,6 +99,15 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Se
 ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Sessions_Groups
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_SessionHistory_Session]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Session_History] DROP CONSTRAINT FK_SessionHistory_Session
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_SessionHistory_Group]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Session_History] DROP CONSTRAINT FK_SessionHistory_Group
+GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_SessionHistory_Client]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Session_History] DROP CONSTRAINT FK_SessionHistory_Client
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Client_Info_Lab_Clients]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Client_Info] DROP CONSTRAINT FK_Client_Info_Lab_Clients
 GO
@@ -220,6 +225,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Experiment
 drop table [dbo].[Experiment_Records]
 GO
 
+/****** Object:  Table [dbo].[ExperimentCoupon]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ExperimentCoupon]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[ExperimentCoupon]
+GO
 /****** Object:  Table [dbo].[Experiments]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Experiments]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Experiments]
@@ -258,6 +267,16 @@ GO
 /****** Object:  Table [dbo].[Lab_Servers]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Lab_Servers]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Lab_Servers]
+GO
+
+/****** Object:  Table [dbo].[Lab_SSessions]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Lab_Sessions]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Lab_Sessions]
+GO
+
+/****** Object:  Table [dbo].[Lab_Session_To_Experiment]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Lab_Session_To_Experiment]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Lab_Session_To_Experiment]
 GO
 
 /****** Object:  Table [dbo].[Message_Types]    Script Date: 8/30/2005 4:07:53 PM ******/
@@ -304,13 +323,15 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[User_Sessions]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[User_Sessions]
 GO
+/****** Object:  Table [dbo].[Session_History]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Session_History]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Session_History]
+GO
 
 /****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Users]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Users]
 GO
-
-
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ResourceMappingValues_ResourceMappingKeys]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[ResourceMappingValues] DROP CONSTRAINT FK_ResourceMappingValues_ResourceMappingKeys
@@ -511,7 +532,7 @@ CREATE TABLE [dbo].[Lab_Sessions] (
 ) ON [PRIMARY]
 GO
 
-CREATE TABLE [dbo].[LabSession_To_Experiment](
+CREATE TABLE [dbo].[Lab_Session_To_Experiment](
 	[LabSession_ID] [bigint],
 	[experiment_id] [bigint]
 ) ON [PRIMARY]
@@ -617,6 +638,16 @@ CREATE TABLE [dbo].[ResourceMappingResourceTypes] (
 ) ON [PRIMARY]
 GO
 
+/****** Object:  Table [dbo].[Session_History]    Script Date: 8/30/2005 4:08:00 PM ******/
+CREATE TABLE [dbo].[Session_History] (
+	[Session_ID] [bigint] NOT NULL ,
+	[Modify_Time] [datetime] NOT NULL DEFAULT GETUTCDATE(),
+	[Group_ID] [int] NOT NULL ,
+	[Client_ID] [int] NOT NULL ,
+	[Session_Key] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+) ON [PRIMARY]
+GO
+
 /****** Object:  Table [dbo].[System_Messages]    Script Date: 8/30/2005 4:07:59 PM ******/
 CREATE TABLE [dbo].[System_Messages] (
 	[System_Message_ID] [int] IDENTITY (1, 1) NOT NULL ,
@@ -637,14 +668,14 @@ GO
 /****** Object:  Table [dbo].[User_Sessions]    Script Date: 8/30/2005 4:08:00 PM ******/
 CREATE TABLE [dbo].[User_Sessions] (
 	[Session_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
-	[Modify_Time] [datetime] NOT NULL ,
+	[Modify_Time] [datetime] NOT NULL , /* Deprecated */
 	[User_ID] [int] NOT NULL ,
-	[Effective_Group_ID] [int] NOT NULL ,
-	[Client_ID] [int] NULL ,
+	[Effective_Group_ID] [int] NULL , /* Current group see also Session_History */
+	[Client_ID] [int] NULL , /* Current client see also Session_History */
 	[Session_Start_Time] [datetime] NOT NULL ,
 	[Session_End_Time] [datetime] NULL ,
 	[TZ_Offset] [int] NOT NULL CONSTRAINT [DF_User_Sessions_tz_Offset] DEFAULT (0),
-	[Session_Key] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Session_Key] [varchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL /* Current key see also Session_History */
 ) ON [PRIMARY]
 GO
 
@@ -901,6 +932,7 @@ ALTER TABLE [dbo].[User_Sessions] ADD
 	CONSTRAINT [DF_User_Sessions_Login_Time] DEFAULT (getUtcdate()) FOR [Session_Start_Time]
 GO
 
+
 ALTER TABLE [dbo].[Users] ADD 
 	CONSTRAINT [DF_Users_Date_Created] DEFAULT (getUtcdate()) FOR [Date_Created],
 	CONSTRAINT [DF_Users_Lock_User] DEFAULT (0) FOR [Lock_User]
@@ -949,8 +981,8 @@ ALTER TABLE [dbo].[Client_Items] ADD
 	CONSTRAINT [FK_Client_Items_Users] FOREIGN KEY 
 	(
 		[User_ID]
-	) REFERENCES [dbo].[Users] (
-		[User_ID]
+	) REFERENCES [dbo].[Agents] (
+		[Agent_ID]
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
 GO
 
@@ -1144,6 +1176,25 @@ ALTER TABLE [dbo].[User_Sessions] ADD
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
 GO
 
-
+ALTER TABLE [dbo].[Session_History] ADD 
+	CONSTRAINT [FK_SessionHistory_Session] FOREIGN KEY 
+	(
+		[Session_ID]
+	) REFERENCES [dbo].[User_Sessions] (
+		[Session_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE ,
+	CONSTRAINT [FK_SessionHistory_Group] FOREIGN KEY 
+	(
+		[Group_ID]
+	) REFERENCES [dbo].[Groups] (
+		[Group_ID]
+	) ON DELETE NO ACTION  ON UPDATE NO ACTION ,
+	CONSTRAINT [FK_SessionHistory_Client] FOREIGN KEY 
+	(
+		[Client_ID]
+	) REFERENCES [dbo].[Lab_Clients] (
+		[Client_ID]
+	) ON DELETE NO ACTION  ON UPDATE NO ACTION 
+GO
 
 

@@ -176,7 +176,7 @@ namespace iLabs.ServiceBroker.admin
             }
             catch (Exception ex)
             {
-                Utilities.WriteLog("Error in cross-Register: " + ex.Message);
+               Logger.WriteLine("Error in cross-Register: " + ex.Message);
                 throw;
             }
 

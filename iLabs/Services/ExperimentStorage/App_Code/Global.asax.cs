@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Web;
 using System.Web.SessionState;
+
+using iLabs.Core;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
@@ -25,11 +27,11 @@ namespace iLabs.ExpStorage.ESS
             if (ConfigurationManager.AppSettings["logPath"] != null
                && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
-                Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
+               Logger.LogPath = ConfigurationManager.AppSettings["logPath"];
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine("");
+               Logger.WriteLine("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
         }
 
@@ -43,12 +45,13 @@ namespace iLabs.ExpStorage.ESS
             string path = ConfigurationSettings.AppSettings["logPath"];
             if (path != null && path.Length > 0)
             {
-                Utilities.LogPath = path;
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("ESS Application_Start: starting");
+               Logger.LogPath = path;
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine(iLabGlobal.Release);
+               Logger.WriteLine("ESS Application_Start: starting");
             }
+            ProcessAgentDB.RefreshServiceAgent();
             ticketRemover = new TicketRemover();
 
 		}

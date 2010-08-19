@@ -1262,7 +1262,7 @@ namespace iLabs.Scheduling.LabSide
                                 smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
                                 ex = ex.InnerException;
                             }
-                            Utilities.WriteLog(smtpErrorMsg.ToString());
+                           Logger.WriteLine(smtpErrorMsg.ToString());
                         }
                     }
                 }
@@ -1463,7 +1463,7 @@ namespace iLabs.Scheduling.LabSide
                                         smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
                                         ex = ex.InnerException;
                                     }
-                                    Utilities.WriteLog(smtpErrorMsg.ToString());
+                                   Logger.WriteLine(smtpErrorMsg.ToString());
                                 }
                             }
                         }

@@ -316,6 +316,7 @@ namespace iLabs.Controls
         Table tblMain;
         TableRow trRowPasskey;
         TableRow trDomainSB;
+        TableRow trDomainGuid;
   
         Label lblTitle;
         Label lblResponse;
@@ -327,6 +328,7 @@ namespace iLabs.Controls
         Label lblInfoUrl;
         Label lblServiceGuid;
         Label lblDomainServer;
+        Label lblDomainGuid;
         Label lblOutPassKey;
         Label lblDescription;
         Label lblContactInfo;
@@ -338,6 +340,7 @@ namespace iLabs.Controls
         TextBox txtInfoUrl;
         TextBox txtServiceGuid;
         TextBox txtDomainServer;
+        TextBox txtDomainGuid;
         TextBox txtOutPasskey;
         TextBox txtDescription;
         TextBox txtContactInfo;
@@ -397,7 +400,7 @@ namespace iLabs.Controls
          //                   lblResponse.Visible = true;
          //                   btnGuid.Enabled = true;
          //                   btnGuid.Visible = true;
-         //                   Utilities.WriteLog("administration: DomainServerNotFound");
+         //                  Logger.WriteLine("administration: DomainServerNotFound");
          //                   SetFormMode(false);
          //               }
          //           }
@@ -552,7 +555,7 @@ namespace iLabs.Controls
                         lblResponse.Visible = true;
                         btnGuid.Enabled = true;
                         btnGuid.Visible = true;
-                        Utilities.WriteLog("administration: DomainServerNotFound");
+                       Logger.WriteLine("administration: DomainServerNotFound");
                         SetFormMode(false);
                     }
                 }
@@ -759,12 +762,13 @@ namespace iLabs.Controls
                         dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
                            txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
                     }
+                    ProcessAgentDB.RefreshServiceAgent();
                 }
             }
             catch (Exception ex)
             {
                 Exception ex2 = new Exception("Error in  selfRegistration.modify()", ex);
-                Utilities.WriteLog(Utilities.DumpException(ex2));
+               Logger.WriteLine(Utilities.DumpException(ex2));
                 throw ex2;
             }
         }
@@ -825,6 +829,7 @@ namespace iLabs.Controls
                 //DisplayForm();
                 lblResponse.Text = Utilities.FormatConfirmationMessage("Self registration has completed!");
                 lblResponse.Visible = true;
+                ProcessAgentDB.RefreshServiceAgent();
             }
         }
 
@@ -880,7 +885,7 @@ namespace iLabs.Controls
             catch (Exception ex)
             {
                 Exception ex2 = new Exception("Error in  selfRegistration.modify()", ex);
-                Utilities.WriteLog(Utilities.DumpException(ex2));
+               Logger.WriteLine(Utilities.DumpException(ex2));
                 throw ex2;
             }
             clearForm();
@@ -896,6 +901,7 @@ namespace iLabs.Controls
             txtCodebaseUrl.Text = "";
             txtServiceUrl.Text = "";
             txtDomainServer.Text = "";
+            txtDomainGuid.Text = "";
             txtOutPasskey.Text = "";
             txtDescription.Text = "";
             txtInfoUrl.Text = "";
@@ -1157,12 +1163,35 @@ namespace iLabs.Controls
             txtDomainServer = new TextBox();
             txtDomainServer.ApplyStyle(txtBoxStyle);
             txtDomainServer.Text = DomainServer;
+            txtDomainServer.Enabled = false;
             td.Controls.Add(txtDomainServer);
             trDomainSB.Cells.Add(th);
             trDomainSB.Cells.Add(td);
             tblMain.Rows.Add(trDomainSB);
 
             trDomainSB.Visible = (AgentType == ProcessAgentType.SERVICE_BROKER || AgentType == ProcessAgentType.BATCH_SERVICE_BROKER) ? false :true;
+
+            trDomainGuid = new TableRow();
+            trDomainGuid.ID = "trDomainGuid";
+            th = new TableHeaderCell();
+            lblDomainGuid = new Label();
+            lblDomainGuid.ID = "lblDomainGuid";
+            lblDomainGuid.Text = "Domain Guid";
+            th.Controls.Add(lblDomainGuid);
+
+            td = new TableCell();
+            td.ColumnSpan = 2;
+            txtDomainGuid = new TextBox();
+            txtDomainGuid.ApplyStyle(txtBoxStyle);
+            txtDomainGuid.Text = DomainGuid;
+            txtDomainGuid.Enabled = false;
+            td.Controls.Add(txtDomainGuid);
+            trDomainGuid.Cells.Add(th);
+            trDomainGuid.Cells.Add(td);
+            tblMain.Rows.Add(trDomainGuid);
+
+            trDomainGuid.Visible = (AgentType == ProcessAgentType.SERVICE_BROKER || AgentType == ProcessAgentType.BATCH_SERVICE_BROKER) ? false : true;
+
 
             trRowPasskey = new TableRow();
             th = new TableHeaderCell();

@@ -44,7 +44,7 @@ namespace iLabs.ServiceBroker
         
 		public SBTicketRemover()
 		{
-            Utilities.WriteLog("IssuedTicketRemover created");
+           Logger.WriteLine("IssuedTicketRemover created");
 			
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
@@ -54,7 +54,7 @@ namespace iLabs.ServiceBroker
 
         public SBTicketRemover(int delay){
             waitTime = delay;
-            Utilities.WriteLog("SBTicketRemover created");
+           Logger.WriteLine("SBTicketRemover created");
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -120,7 +120,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("TicketRemover: " + e.Message + ": " + Utilities.DumpException(e));
+               Logger.WriteLine("TicketRemover: " + e.Message + ": " + Utilities.DumpException(e));
             }
         }
 
@@ -132,7 +132,7 @@ namespace iLabs.ServiceBroker
             int couponCount = 0;
             if (ticketList.Count > 0)
             {
-                Utilities.WriteLog("RemoveTickets: expired count = " + ticketList.Count);
+               Logger.WriteLine("RemoveTickets: expired count = " + ticketList.Count);
 
                 
 
@@ -205,7 +205,7 @@ namespace iLabs.ServiceBroker
                         couponCount++;
                     }
                 }
-                Utilities.WriteLog("RemoveTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
+               Logger.WriteLine("RemoveTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
             }
             return ticketCount;
         }

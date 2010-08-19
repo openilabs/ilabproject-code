@@ -16,7 +16,6 @@ using System.Threading;
 
 using iLabs.Core;
 using iLabs.Ticketing;
-
 using iLabs.UtilLib;
 
 using iLabs.LabServer.Interactive;
@@ -56,19 +55,20 @@ namespace iLabs.LabServer.LabView
             if (ConfigurationManager.AppSettings["logPath"] != null
                 && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
-                Utilities.LogPath = ConfigurationManager.AppSettings["logPath"];
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
+               Logger.LogPath = ConfigurationManager.AppSettings["logPath"];
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine("");
+               Logger.WriteLine("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
+            ProcessAgentDB.RefreshServiceAgent();
 			//threadLV = new Thread(new ThreadStart(ThreadProc));
 			//threadLV.Start();
           
 			
             //taskTable = new Hashtable();
             //tasks = new TaskProcessor();
-            Utilities.WriteLog("Global Static ended");
+           Logger.WriteLine("Global Static ended");
 		}
 /*
 		public static LabViewInterface GetLVI()
@@ -88,13 +88,13 @@ namespace iLabs.LabServer.LabView
             string path = ConfigurationSettings.AppSettings["logPath"];
             if (path != null && path.Length > 0)
             {
-                Utilities.LogPath = path;
-                Utilities.WriteLog("");
-                Utilities.WriteLog("#############################################################################");
-                Utilities.WriteLog("");
-                Utilities.WriteLog("Application_Start: starting");
+               Logger.LogPath = path;
+               Logger.WriteLine("");
+               Logger.WriteLine("#############################################################################");
+               Logger.WriteLine(iLabGlobal.Release);
+               Logger.WriteLine("Application_Start: starting");
             }
-            
+            ProcessAgentDB.RefreshServiceAgent();
             //Should load any active tasks and update any expired tasks
             LabDB dbService = new LabDB();
             LabTask[] activeTasks = dbService.GetActiveTasks();
@@ -108,17 +108,17 @@ namespace iLabs.LabServer.LabView
  
 		protected void Session_Start(Object sender, EventArgs e)
 		{
-            Utilities.WriteLog("Session_Start: " + sender.ToString() + " \t : " + e.ToString());
+           Logger.WriteLine("Session_Start: " + sender.ToString() + " \t : " + e.ToString());
             Exception ex = new Exception("Session_Start:");
             string tmp = Utilities.DumpException(ex);
-            Utilities.WriteLog(Utilities.DumpException(ex));
+           Logger.WriteLine(Utilities.DumpException(ex));
 
 		}
 
 		protected void Application_BeginRequest(Object sender, EventArgs e)
 		{
 			// In InteractiveLabView
-            Utilities.WriteLog("Request: " + sender.ToString() + " \t : " + e.ToString());
+           Logger.WriteLine("Request: " + sender.ToString() + " \t : " + e.ToString());
 
 		}
 
@@ -134,18 +134,18 @@ namespace iLabs.LabServer.LabView
 
 		protected void Application_Error(Object sender, EventArgs e)
 		{
-            Utilities.WriteLog("Application_Error: " + sender.ToString() + " \t : " + e.ToString());
+           Logger.WriteLine("Application_Error: " + sender.ToString() + " \t : " + e.ToString());
             Exception ex = new Exception("Application_Error: ");
             string tmp = Utilities.DumpException(ex);
-            Utilities.WriteLog(Utilities.DumpException(ex));
+           Logger.WriteLine(Utilities.DumpException(ex));
 		}
 
 		protected void Session_End(Object sender, EventArgs e)
 		{
-            Utilities.WriteLog("Session_End: " + sender.ToString() + " \t : " + e.ToString());
+           Logger.WriteLine("Session_End: " + sender.ToString() + " \t : " + e.ToString());
             Exception ex = new Exception("Session_End:");
             string tmp = Utilities.DumpException(ex);
-            Utilities.WriteLog(Utilities.DumpException(ex));
+           Logger.WriteLine(Utilities.DumpException(ex));
 
 		}
 		
@@ -155,12 +155,12 @@ namespace iLabs.LabServer.LabView
             if (ticketRemover != null)
                 ticketRemover.Stop();
 			System.Console.WriteLine("Application_End Called:");
-            Utilities.WriteLog("Application_End: closing");
+           Logger.WriteLine("Application_End: closing");
 			
 		}
 		override public void Dispose()
 		{
-            Utilities.WriteLog("GLOBAL:Dispose Called:");
+           Logger.WriteLine("GLOBAL:Dispose Called:");
 			Application_End(this, null);
 			base.Dispose();
 		}

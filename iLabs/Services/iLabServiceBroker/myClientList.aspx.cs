@@ -64,7 +64,7 @@ namespace iLabs.ServiceBroker.iLabSB
             List<SystemMessage> messagesList = new List<SystemMessage>();
             SystemMessage[] groupMessages = null;
             
-            groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP, Convert.ToInt32(Session["GroupID"]), 0, 0);
+            groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
             if (groupMessages != null)
                 messagesList.AddRange(groupMessages);
 
@@ -121,7 +121,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				
 					// Set the LabClient session value and redirect
 					Session["ClientID"] = clientID;
-                    AdministrativeAPI.SetSessionClient(Convert.ToInt64(Session["SessionID"]),clientID);
+                    AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["GroupID"]), clientID, Session.SessionID);
 					Response.Redirect("myClient.aspx");
 				}
 			}

@@ -626,7 +626,7 @@ namespace iLabs.ServiceBroker.admin
             {
                 lblResponse.Visible = true;
                 lblResponse.Text = Utilities.FormatErrorMessage("Cannot Remove User Group. " + exc.GetBaseException());
-                Utilities.WriteLog(exc.Message);
+               Logger.WriteLine(exc.Message);
             }
         }
 
@@ -713,7 +713,7 @@ namespace iLabs.ServiceBroker.admin
             }
             catch (Exception exc)
             {
-                Utilities.WriteLog(exc.Message);
+               Logger.WriteLine(exc.Message);
             }
         }
 

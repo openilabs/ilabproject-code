@@ -121,7 +121,7 @@ namespace iLabs.LabServer.Interactive
             }
             catch (Exception ex)
             {
-                Utilities.WriteLog(ex.Message);
+               Logger.WriteLine(ex.Message);
             }
             finally
             {
@@ -185,7 +185,7 @@ namespace iLabs.LabServer.Interactive
             }
             catch (Exception ex)
             {
-                Utilities.WriteLog(ex.Message);
+               Logger.WriteLine(ex.Message);
             }
             finally
             {
@@ -215,7 +215,7 @@ namespace iLabs.LabServer.Interactive
              }
             catch (Exception ex)
             {
-                Utilities.WriteLog(ex.Message);
+               Logger.WriteLine(ex.Message);
             }
             finally
             {
@@ -242,7 +242,7 @@ namespace iLabs.LabServer.Interactive
             }
             catch (Exception ex)
             {
-                Utilities.WriteLog(ex.Message);
+               Logger.WriteLine(ex.Message);
             }
             finally
             {
@@ -1013,7 +1013,7 @@ update task set status = @status where taskID = @taskID
 					try
 					{
 
-                        Utilities.WriteLog("Found expired task: " + task.taskID);
+                       Logger.WriteLine("Found expired task: " + task.taskID);
 					
 						if(task.data != null)
 						{
@@ -1029,13 +1029,13 @@ update task set status = @status where taskID = @taskID
 								}
 								catch(Exception ce)
 								{
-                                    Utilities.WriteLog("Trying Status: " + ce.Message);
+                                   Logger.WriteLine("Trying Status: " + ce.Message);
 								}
 							}
 							//lvi.submitAction("lockvi",vi);
 							//lvi.submitAction("stopvi",vi);
 						}
-                        Utilities.WriteLog("TaskID = " + task.taskID + " has expired");
+                       Logger.WriteLine("TaskID = " + task.taskID + " has expired");
 						SetTaskStatus(task.taskID,99);
 						Coupon expCoupon = this.GetCoupon(task.couponID,task.issuerGUID);
 						Coupon identCoupon = this.GetIdentityInCoupon (task.issuerGUID);
@@ -1059,13 +1059,13 @@ update task set status = @status where taskID = @taskID
 						}
 						else
 						{
-                            Utilities.WriteLog("Unable to cancel ticket: " + expCoupon.couponId);
+                           Logger.WriteLine("Unable to cancel ticket: " + expCoupon.couponId);
 						}
 					}
 				
 					catch(Exception e1)
 					{
-                        Utilities.WriteLog("ProcessTasks Expired: " + e1.Message);
+                       Logger.WriteLine("ProcessTasks Expired: " + e1.Message);
 					}
 				}
 				else
@@ -1086,7 +1086,7 @@ update task set status = @status where taskID = @taskID
 									}
 									catch(Exception ce2)
 									{
-                                        Utilities.WriteLog("Status: " + ce2.Message);
+                                       Logger.WriteLine("Status: " + ce2.Message);
 									}
 								}
 							}
@@ -1094,7 +1094,7 @@ update task set status = @status where taskID = @taskID
 					}
 					catch(Exception e2)
 					{
-                        Utilities.WriteLog("ProcessTasks Status: " + e2.Message);
+                       Logger.WriteLine("ProcessTasks Status: " + e2.Message);
 					}
 				}
 			}
@@ -1126,7 +1126,7 @@ update task set status = @status where taskID = @taskID
                     status = (LabTask.eStatus)dataReader.GetInt32(0);
                     count++;
                 }
-                Utilities.WriteLog("ExperimentStatus count: " + count);
+               Logger.WriteLine("ExperimentStatus count: " + count);
             }
             catch (DbException e)
             {

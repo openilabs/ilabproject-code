@@ -57,67 +57,81 @@ namespace iLabs.ServiceBroker.iLabSB
         public string passkey = null;
         public string issuerGuid = null;
         public string auto = null;
+        Coupon opCoupon = null;
 
         BrokerDB issuer = new BrokerDB();
 
         DateTime startExecution;
         long duration = -1;
         bool autoLaunch = false;
+        string effectiveGroupName = null;
+        int effectiveGroupID = 0;
         protected CultureInfo culture;
         protected int userTZ;
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
             int groupID = 0;
+            Coupon opCoupon = null;
             string groupName = null;
+            lblResponse.Visible = false;
+
             userTZ = Convert.ToInt32(Session["UserTZ"]);
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
-            lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
-
+            lc = null;
+            if (Session["ClientID"] != null && Session["ClientID"].ToString().Length > 0)
+            {
+                lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
+            }
             if (Session["GroupID"] != null && Session["GroupID"].ToString().Length > 0)
             {
                 groupID = Convert.ToInt32(Session["GroupID"]);
+            }
+            if (groupID > 0 && lc != null)
+            {
+                setEffectiveGroup(groupID, lc.clientID);
             }
             if (Session["GroupName"] != null && Session["GroupName"].ToString().Length > 0)
             {
                 groupName = Session["GroupName"].ToString();
 
                 lblGroupNameTitle.Text = groupName;
-                lblBackToLabs.Text = groupName;
-
-                if (Convert.ToInt32(Session["ClientCount"]) == 1)
-                    lblGroupNameSystemMessage.Text = "Messages for " + groupName;
-                else
-                    lblGroupNameSystemMessage.Text = "Messages for " + lc.clientName;
+                //lblBackToLabs.Text = groupName;
             }
-
             if (!IsPostBack)
             {
+                // retrieve parameters from URL
+                couponId = Request.QueryString["coupon_id"];
+                passkey = Request.QueryString["passkey"];
+                issuerGuid = Request.QueryString["issuer_guid"];
+                if (couponId != null && passkey != null && issuerGuid != null)
+                {
+                    opCoupon = new Coupon(issuerGuid, Int64.Parse(couponId), passkey);
+                }
                 auto = Request.QueryString["auto"];
-                if (auto!= null && auto.Length > 0)
+                if (auto != null && auto.Length > 0)
                 {
                     if (auto.ToLower().Contains("t"))
                     {
                         autoLaunch = true;
                     }
                 }
-                if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
+                if (lc != null)
                 {
-                    // retrieve parameters from URL
-                    couponId = Request.QueryString["coupon_id"];
-                    passkey = Request.QueryString["passkey"];
-                    issuerGuid = Request.QueryString["issuer_guid"];
-
-                    if (lc.needsScheduling)
+                    if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                     {
-                        Coupon opCoupon = null;
-                        if (couponId != null && passkey != null && issuerGuid != null)
-                        {
-                            opCoupon = new Coupon(issuerGuid, Int64.Parse(couponId), passkey);
+                       
 
-                            // First check for an Allow Execution Ticket
-                            Ticket allowExperimentExecutionTicket = issuer.RetrieveTicket(
-                                opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION);
+                        if (lc.needsScheduling)
+                        {
+                           
+                            Ticket allowExperimentExecutionTicket = null;
+                           if(opCoupon != null){
+
+                                // First check for an Allow Execution Ticket
+                                allowExperimentExecutionTicket = issuer.RetrieveTicket(
+                                    opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION);
+                            }
                             if (allowExperimentExecutionTicket == null)
                             {
                                 // Try for a reservation
@@ -127,6 +141,15 @@ namespace iLabs.ServiceBroker.iLabSB
                                 {
                                     ProcessAgent uss = issuer.GetProcessAgent(ussId);
                                     ProcessAgent ls = issuer.GetProcessAgent(lc.labServerIDs[0]);
+
+                                    // check for current reservation
+
+                                    //create a collection & redeemTicket
+                                    string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow);
+                                    if (opCoupon == null)
+                                        opCoupon = issuer.CreateCoupon();
+
+                                    issuer.AddTicket(opCoupon, TicketTypes.REDEEM_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 600, redeemPayload);
 
                                     UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                                     OperationAuthHeader op = new OperationAuthHeader();
@@ -138,25 +161,8 @@ namespace iLabs.ServiceBroker.iLabSB
                                     if (reservation != null)
                                     {
                                         // Find efective group
-                                        string effectiveGroupName = null;
-                                        int effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(groupID, lc.clientID,
-                                            Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
-                                        if (effectiveGroupID == groupID)
-                                        {
-                                            if (Session["groupName"] != null)
-                                            {
-                                                effectiveGroupName = Session["groupName"].ToString();
-                                            }
-                                            else
-                                            {
-                                                effectiveGroupName = AdministrativeAPI.GetGroupName(groupID);
-                                                Session["groupName"] = effectiveGroupName;
-                                            }
-                                        }
-                                        else if (effectiveGroupID > 0)
-                                        {
-                                            effectiveGroupName = AdministrativeAPI.GetGroupName(effectiveGroupID);
-                                        }
+                                        setEffectiveGroup(groupID, lc.clientID);
+                                       
                                         // create the allowExecution Ticket
                                         DateTime start = reservation.Start;
                                         long duration = reservation.Duration;
@@ -182,13 +188,13 @@ namespace iLabs.ServiceBroker.iLabSB
 
                                 //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
 
-                                
+
                                 // Display reenter button if experiment is reentrant & a current experiment exists
                                 if (lc.IsReentrant)
                                 {
 
                                     long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
-                                        Convert.ToInt32(Session["GroupID"]), lc.labServerIDs[0], lc.clientID);
+                                        effectiveGroupID, lc.labServerIDs[0], lc.clientID);
                                     if (ids.Length > 0)
                                     {
                                         btnLaunchLab.Text = "Launch New Experiment";
@@ -230,101 +236,120 @@ namespace iLabs.ServiceBroker.iLabSB
                                 btnLaunchLab.Visible = false;
                             }
                         }
+
+                        else
+                        {
+                            if (autoLaunch)
+                            {
+                                launchLabClient(lc.clientID);
+                                btnLaunchLab.Visible = true;
+                            }
+                            else
+                            {
+                                btnLaunchLab.Visible = true;
+                            }
+                        }
                     }
-                    else
+                    else if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
                     {
                         if (autoLaunch)
                         {
                             launchLabClient(lc.clientID);
+                            btnLaunchLab.Visible = true;
                         }
                         else
                         {
                             btnLaunchLab.Visible = true;
                         }
                     }
+
+
+                    btnSchedule.Visible = lc.needsScheduling;
+                    lblClientName.Text = lc.clientName;
+                    lblVersion.Text = lc.version;
+                    lblLongDescription.Text = lc.clientLongDescription;
+                    lblNotes.Text = lc.notes;
+                    string emailCmd = "mailto:" + lc.contactEmail;
+                    lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
+
+                    btnLaunchLab.Command += new CommandEventHandler(this.btnLaunchLab_Click);
+                    btnLaunchLab.CommandArgument = lc.clientID.ToString();
+
+                    int count = 0;
+
+                    if (lc.clientInfos != null && lc.clientInfos.Length > 0)
+                    {
+                        foreach (ClientInfo ci in lc.clientInfos)
+                        {
+                            if (ci.infoURLName.CompareTo("Documentation") != 0)
+                            {
+                                System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
+                                b.Visible = true;
+                                b.CssClass = "button";
+                                b.Text = ci.infoURLName;
+                                b.CommandArgument = ci.infoURL;
+                                b.CommandName = ci.infoURLName;
+                                b.ToolTip = ci.description;
+                                b.Command += new CommandEventHandler(this.HelpButton_Click);
+                                repClientInfos.Controls.AddAt(count, b);
+                                repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
+                                count += 2;
+                            }
+                        }
+                    }
                 }
-                else if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
+                else
                 {
-                    if (autoLaunch)
-                    {
-                        launchLabClient(lc.clientID);
-                    }
-                    else
-                    {
-                        btnLaunchLab.Visible = true;
-                    }
+                    // No LabClient
+                    btnSchedule.Visible = false;
+                    btnLaunchLab.Visible = false;
+                    string msg = "There are no labs assigned to group: " + Session["GroupName"].ToString() + "!";
+                    lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                    lblResponse.Visible = true;
                 }
-            }
 
 
 
-
-
-            btnSchedule.Visible = lc.needsScheduling;
-            //Session["LoaderScript"] = lc.loaderScript;
-            lblClientName.Text = lc.clientName;
-            lblVersion.Text = lc.version;
-            lblLongDescription.Text = lc.clientLongDescription;
-            lblNotes.Text = lc.notes;
-            string emailCmd = "mailto:" + lc.contactEmail;
-            lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
-
-            btnLaunchLab.Command += new CommandEventHandler(this.btnLaunchLab_Click);
-            btnLaunchLab.CommandArgument = lc.clientID.ToString();
-
-            int count = 0;
-
-            if (lc.clientInfos != null)
-            {
-                foreach (ClientInfo ci in lc.clientInfos)
+                // System_Messages block
+                if (Session["ClientCount"] == null || Convert.ToInt32(Session["ClientCount"]) != 1)
                 {
-                    if (ci.infoURLName.CompareTo("Documentation") != 0)
+                    lblGroupNameSystemMessage.Text = "Messages for " + groupName;
+                }
+                else
+                {
+                    if (lc != null)
                     {
-                        System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
-                        b.Visible = true;
-                        b.CssClass = "button";
-                        b.Text = ci.infoURLName;
-                        b.CommandArgument = ci.infoURL;
-                        b.CommandName = ci.infoURLName;
-                        b.ToolTip = ci.description;
-                        b.Command += new CommandEventHandler(this.HelpButton_Click);
-                        repClientInfos.Controls.AddAt(count, b);
-                        repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
-                        count += 2;
+                        lblGroupNameSystemMessage.Text = "Messages for " + lc.clientName;
                     }
                 }
-            }
+                List<SystemMessage> messagesList = new List<SystemMessage>();
+                SystemMessage[] groupMessages = null;
+                if (Session["ClientCount"] == null || Convert.ToInt32(Session["ClientCount"]) != 1)
+                {
+                    groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
+                    if (groupMessages != null && groupMessages.Length > 0)
+                        messagesList.AddRange(groupMessages);
+                }
+                if (lc != null)
+                {
 
-            List<SystemMessage> messagesList = new List<SystemMessage>();
-            SystemMessage[] groupMessages = null;
-            if (Session["ClientCount"] != null && Convert.ToInt32(Session["ClientCount"]) == 1)
-            {
-                groupMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.GROUP, Convert.ToInt32(Session["GroupID"]), 0, 0);
-                if (groupMessages != null)
-                    messagesList.AddRange(groupMessages);
-            }
-
-            foreach (int labServerID in lc.labServerIDs)
-            {
-                SystemMessage[] labMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServerID);
-                if (labMessages != null)
-                    messagesList.AddRange(labMessages);
-            }
-
-
-            if (messagesList != null && messagesList.Count > 0)
-            {
-                messagesList.Sort(SystemMessage.CompareDateDesc);
-                //messagesList.Reverse();
-                repSystemMessage.DataSource = messagesList;
-                repSystemMessage.DataBind();
-            }
-
-            else
-            {
-
-                lblGroupNameSystemMessage.Text += "</h3><p>No Messages at this time</p><h3>";
-               
+                    foreach (int labServerID in lc.labServerIDs)
+                    {
+                        SystemMessage[] labMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServerID);
+                        if (labMessages != null)
+                            messagesList.AddRange(labMessages);
+                    }
+                }
+                if (messagesList != null && messagesList.Count > 0)
+                {
+                    messagesList.Sort(SystemMessage.CompareDateDesc);
+                    repSystemMessage.DataSource = messagesList;
+                    repSystemMessage.DataBind();
+                }
+                else
+                {
+                    lblGroupNameSystemMessage.Text += "</h3><p>No Messages at this time</p><h3>";
+                }
             }
         }
 
@@ -383,6 +408,62 @@ namespace iLabs.ServiceBroker.iLabSB
             string jScript = @"<script language='javascript'> window.open ('" + docURL + "')</script>";
             Page.RegisterStartupScript("DocsPopup", jScript);
         }
+        /// <summary>
+        /// Utility to set effectiveGroup fields
+        /// </summary>
+        /// <param name="currentGroup"></param>
+        /// <param name="clientID"></param>
+        void setEffectiveGroup(int currentGroup, int clientID)
+        {
+            // Find efective group
+            effectiveGroupName = null;
+            effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(currentGroup, clientID,
+                Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
+            if (effectiveGroupID == currentGroup)
+            {
+                effectiveGroupName = Session["GroupName"].ToString();
+            }
+            else if (effectiveGroupID > 0)
+            {
+                effectiveGroupName = AdministrativeAPI.GetGroupName(effectiveGroupID);
+            }
+        }
+        /// <summary>
+        /// Check that the default operation coupon parameters are part of the loader script
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private string addDefaultParameters(string str)
+        {
+            // check that the default auth tokens are added
+            string loader = str;
+            if (loader.IndexOf("coupon_id=") == -1)
+            {
+                if (loader.IndexOf("?") == -1)
+                    loader += "?";
+                else
+                    loader += "&";
+                loader += "coupon_id=${op:couponId}";
+            }
+            if (loader.IndexOf("passkey=") == -1)
+            {
+                if (loader.IndexOf("?") == -1)
+                    loader += "?";
+                else
+                    loader += "&";
+                loader += "passkey=${op:passkey}";
+            }
+            if (loader.IndexOf("issuer_guid=") == -1)
+            {
+                if (loader.IndexOf("?") == -1)
+                    loader += "?";
+                else
+                    loader += "&";
+                loader += "issuer_guid=${op:issuer}";
+            }
+            return loader;
+        }
+
         private void launchLabClient(int c_id)
         {
             if (Session["UserID"] == null)
@@ -397,113 +478,135 @@ namespace iLabs.ServiceBroker.iLabSB
             LabClient[] clients = AdministrativeAPI.GetLabClients(labIds);
             if (clients.Length > 0)
             {
-                if (clients[0].clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
+
+                // [GeneralTicketing] get lab servers metadata from lab server ids
+                ProcessAgentInfo[] labServers = issuer.GetProcessAgentInfos(clients[0].labServerIDs);
+                if (labServers != null)
                 {
-                    // [GeneralTicketing] get lab servers metadata from lab server ids
-                    ProcessAgentInfo[] labServers = issuer.GetProcessAgentInfos(clients[0].labServerIDs);
-                    if (labServers != null)
+                    message.Append(" LabServer count: " + labServers.Length);
+                    if (labServers.Length > 0)
                     {
-                        message.Append(" LabServer count: " + labServers.Length);
-                        if (labServers.Length > 0)
+                        TicketLoadFactory factory = TicketLoadFactory.Instance();
+                        // 1. Create Coupon for ExperimentCollection
+                        Coupon coupon = issuer.CreateCoupon();
+
+                        iLabProperties properties = new iLabProperties();
+                        properties.Add("sb", ProcessAgentDB.ServiceAgent);
+                        properties.Add("ls", labServers[0]);
+                        properties.Add("op", coupon);
+
+                        Session["ClientID"] = clients[0].clientID;
+
+                        DateTime start = DateTime.UtcNow;
+                        long duration = -1L; // default is never timeout
+
+                        //Check for Scheduling: 
+                        //The scheduling Ticket should exist and been parsed into the session
+                        if (lc.needsScheduling)
+                        {
+                            start = DateUtil.ParseUtc(Session["StartExecution"].ToString());
+                            duration = Convert.ToInt64(Session["Duration"]);
+                        }
+
+                        //payload includes username and current group name & client id.
+                        //ideally this should be encoded in xml  - CV, 7/27/2005
+                        string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]), Convert.ToInt32(Session["GroupID"]),
+                                   Convert.ToInt32(Session["ClientID"]), (string)Session["UserName"], (string)Session["GroupName"]);
+                        // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
+                        issuer.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
+                                     ProcessAgentDB.ServiceGuid, duration, sessionPayload);
+
+                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["GroupID"]), clients[0].clientID, Session.SessionID);
+
+                        if (clients[0].clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                         {
                             // execute the "experiment execution recipe
                             RecipeExecutor executor = RecipeExecutor.Instance();
                             string redirectURL = null;
-                            DateTime start = DateTime.UtcNow;
-                            long duration = -1L; // default is never timeout
 
-                            //Check for Scheduling: 
-                            //The scheduling Ticket should exist and been parsed into the session
-                            if (lc.needsScheduling)
-                            {
-                                start = DateUtil.ParseUtc(Session["StartExecution"].ToString());
-                                duration = Convert.ToInt64(Session["Duration"]);
-                            }
-
-                            redirectURL = executor.ExecuteExperimentExecutionRecipe(labServers[0], clients[0],
+                            // loaderScript not parsed in Recipe
+                           redirectURL = executor.ExecuteExperimentExecutionRecipe(coupon, labServers[0], clients[0],
                             start, duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]),
-                            Convert.ToInt32(Session["GroupID"]), (string)Session["GroupName"]);
+                            effectiveGroupID, effectiveGroupName);
 
+                            // check that the default auth tokens are added
+                            redirectURL = addDefaultParameters(redirectURL);
+                           
                             // Add the return url to the redirect
-                            redirectURL += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);
+                            if (redirectURL.IndexOf("?") == -1)
+                                redirectURL += "?";
+                            else
+                                redirectURL += "&";
+                            redirectURL += "sb_url=" + Utilities.ExportUrlPath(Request.Url);
+                            string tmpUrl = iLabParser.Parse(redirectURL, properties);
 
                             // Now open the lab within the current Window/frame
-                            Response.Redirect(redirectURL, true);
+                            Response.Redirect(tmpUrl, true);
                         }
-                    }
-                }
-                else if (clients[0].clientType == LabClient.INTERACTIVE_APPLET)
-                {
-                    // Note: Currently not supporting Interactive applets
-                    // use the Loader script for Batch experiments
-
-                    Session["LoaderScript"] = clients[0].loaderScript;
-                    Session.Remove("RedirectURL");
-
-                    string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
-                        + "applet.aspx" + @"'</script>";
-                    Page.RegisterStartupScript("ReloadFrame", jScript);
-                }
-
-                // Support for Batch 6.1 Lab Clients
-                else if (clients[0].clientType == LabClient.BATCH_HTML_REDIRECT)
-                {
-                    Session["ClientID"] = clients[0].clientID;
-                    AdministrativeAPI.SetSessionClient(Convert.ToInt64(Session["SessionID"]), clients[0].clientID);
-                    // use the Loader script for Batch experiments
-
-                    //use ticketing & redirect to url in loader script
-
-                    // [GeneralTicketing] retrieve static process agent corresponding to the first
-                    // association lab server */
 
 
-                    // New comments: The HTML Client is not a static process agent, so we don't search for that at the moment.
-                    // Presumably when the interactive SB is merged with the batched, this should check for a static process agent.
-                    // - CV, 7/22/05
-                    {
-                        Session.Remove("LoaderScript");
+                        else if (clients[0].clientType == LabClient.INTERACTIVE_APPLET)
+                        {
 
-                        //payload includes username and effective group name & client id.
-                        //ideally this should be encoded in xml  - CV, 7/27/2005
-                        TicketLoadFactory factory = TicketLoadFactory.Instance();
-                        string userName = (string)Session["UserName"];
-                        string groupName = (string)Session["GroupName"];
+                            // Note: Currently Interactive applets
+                            // use the Loader script for Batch experiments
 
-                        string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]),
-                           Convert.ToInt32(Session["GroupID"]), Convert.ToInt32(Session["ClientID"]), userName, groupName);
-                        // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
-                        Coupon coupon = issuer.CreateTicket(TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
-                             ProcessAgentDB.ServiceGuid, -1, sessionPayload);
-                       
-                        /* This is the original batch-redirect using a pop-up */
-                        string jScript = @"<script language='javascript'> window.open ('" + lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey + "')</script>";
-                        Page.RegisterStartupScript("HTML Client", jScript);
-                        
-                        /* This is the batch-redirect with a simple redirect, this may not work as we need to preserve session-state */
-                        //string redirectURL = lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey;
-                        //Response.Redirect(redirectURL,true);
-                    }
-                }
-                // use the Loader script for Batch experiments
-                else if (clients[0].clientType == LabClient.BATCH_APPLET)
-                {
-                    Session["ClientID"] = clients[0].clientID;
-                    AdministrativeAPI.SetSessionClient(Convert.ToInt64(Session["SessionID"]), clients[0].clientID);
-                    Session["LoaderScript"] = clients[0].loaderScript;
-                    Session.Remove("RedirectURL");
+                            Session["LoaderScript"] = iLabParser.Parse(clients[0].loaderScript, properties);
+                            Session.Remove("RedirectURL");
 
-                    string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
-                        + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/applet.aspx" + @"'</script>";
-                    ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
-                }
+                            string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
+                                + "applet.aspx" + @"'</script>";
+                            Page.RegisterStartupScript("ReloadFrame", jScript);
+                        }
+
+                        // Support for Batch 6.1 Lab Clients
+                        else if (clients[0].clientType == LabClient.BATCH_HTML_REDIRECT)
+                        {
+                            // use the Loader script for Batch experiments
+
+                            //use ticketing & redirect to url in loader script
+
+                            // [GeneralTicketing] retrieve static process agent corresponding to the first
+                            // association lab server */
+
+
+                            // New comments: The HTML Client is not a static process agent, so we don't search for that at the moment.
+                            // Presumably when the interactive SB is merged with the batched, this should check for a static process agent.
+                            // - CV, 7/22/05
+                            {
+                                Session.Remove("LoaderScript");
+
+                                /* This is the original batch-redirect using a pop-up */
+                                // check that the default auth tokens are added
+                                string loader = addDefaultParameters(clients[0].loaderScript);
+                                string jScript = @"<script language='javascript'> window.open ('" + iLabParser.Parse(loader, properties) + "')</script>";
+                                Page.RegisterStartupScript("HTML Client", jScript);
+
+                                /* This is the batch-redirect with a simple redirect, this may not work as we need to preserve session-state */
+                                //string redirectURL = lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey;
+                                //Response.Redirect(redirectURL,true);
+                            }
+                        }
+                        // use the Loader script for Batch experiments
+                        else if (clients[0].clientType == LabClient.BATCH_APPLET)
+                        {
+
+                            Session["LoaderScript"] = iLabParser.Parse(clients[0].loaderScript, properties);
+                            Session.Remove("RedirectURL");
+
+                            string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
+                                + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/applet.aspx" + @"'</script>";
+                            ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
+                        }
+                    } // LabServer count > 0
+                } // labservers != null
             }
             else
             {
                 message.Append(" LabServer = null");
             }
             //lblDebug.Text = message.ToString();
-            Utilities.WriteLog(message.ToString());
+            Logger.WriteLine(message.ToString());
         }
 
         protected void btnLaunchLab_Click(object sender, System.EventArgs e)
@@ -527,23 +630,31 @@ namespace iLabs.ServiceBroker.iLabSB
             {
                 if (client.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                 {
+                    iLabProperties properties = new iLabProperties();
+                    properties.Add("sb",ProcessAgentDB.ServiceAgent);
                     long[] coupIDs = InternalDataDB.RetrieveExperimentCouponIDs(expid);
                     Coupon coupon = brokerDB.GetIssuedCoupon(coupIDs[0]);
+                    if(coupon != null)
+                        properties.Add("op", coupon);
                     // construct the redirect query
+                    ProcessAgentInfo lsInfo = null;
+                    if ((client.labServerIDs != null) && (client.labServerIDs.Length) > 0 && (client.labServerIDs[0] > 0))
+                    {
+                        lsInfo = brokerDB.GetProcessAgentInfo(client.labServerIDs[0]);
+                        if(lsInfo != null)
+                            properties.Add("ls",lsInfo);
+                    }
                     StringBuilder url = new StringBuilder(client.loaderScript.Trim());
+                    // Add the return url to the redirect
                     if (url.ToString().IndexOf("?") == -1)
                         url.Append('?');
                     else
                         url.Append('&');
-                    url.Append("coupon_id=" + coupon.couponId + "&passkey=" + coupon.passkey
-                        + "&issuer_guid=" + brokerDB.GetIssuerGuid());
-
-                    // Add the return url to the redirect
                     url.Append("&sb_url=");
                     url.Append(Utilities.ExportUrlPath(Request.Url));
-
+                    string targetURL = iLabParser.Parse(url,properties);
                     // Now open the lab within the current Window/frame
-                    Response.Redirect(url.ToString(), true);
+                    Response.Redirect(targetURL, true);
                 }
             }
         }
@@ -571,20 +682,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 string lssGuid = issuer.GetProcessAgent(lssId).agentGuid;
 
-                // Find efective group
-                string effectiveGroupName = null;
-                int currentGroup = Convert.ToInt32(Session["GroupID"]);
-                int effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(currentGroup, lc.clientID,
-                    Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
-                if (effectiveGroupID == currentGroup)
-                {
-                    effectiveGroupName = Session["GroupName"].ToString();
-                }
-                else if (effectiveGroupID > 0)
-                {
-                    Group[] effGroup = AdministrativeAPI.GetGroups(new int[] { effectiveGroupID });
-                    effectiveGroupName = effGroup[0].groupName;
-                }
+               
 
                 //Default duration ????
                 long duration = 36000;

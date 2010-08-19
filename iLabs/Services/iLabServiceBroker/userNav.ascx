@@ -33,7 +33,7 @@
 		<!-- This is where the help and logout buttons go. Log out only appears if the user is logged in. -->
 		<ul class="navlist2">
 			<li>
-				<a id="aHelp" runat="server">Help</a>
+				<a id="aHelp" runat="server">Help</a></li>
 			<li>
 				<asp:linkbutton id="lbtnLogout" Runat="server" onclick="lbtnLogout_Click">Log out</asp:linkbutton></li></ul>
 	</div> <!-- end nav2 div -->

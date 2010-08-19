@@ -217,6 +217,7 @@ namespace iLabs.ServiceBroker.admin
 		{
             try
             {
+                ResourceMapManager.Refresh();
                 List<ResourceMapping> mappingsList = ResourceMapManager.Get();
                 repRsrcMappings.DataSource = mappingsList;
                 repRsrcMappings.DataBind();

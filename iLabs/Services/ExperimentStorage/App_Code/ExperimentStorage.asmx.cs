@@ -103,7 +103,7 @@ namespace iLabs.ExpStorage.ESS
             }
             catch (Exception ex)
             {
-                Utilities.WriteLog("DeleteExperiment: " + ex.Message);
+               Logger.WriteLine("DeleteExperiment: " + ex.Message);
                 throw;
             }
             return experimentDeleted;
@@ -206,7 +206,7 @@ namespace iLabs.ExpStorage.ESS
             }
             catch(Exception ex)
             {
-                Utilities.WriteLog("SetExperimentStatuus: " + ex.Message);
+               Logger.WriteLine("SetExperimentStatuus: " + ex.Message);
                 throw;
             }
         }
@@ -273,7 +273,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception ex)
             {
-                Utilities.WriteLog("AddRecord: " + ex.Message);
+               Logger.WriteLine("AddRecord: " + ex.Message);
                 throw;
             }
         }
@@ -314,7 +314,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception ex)
             {
-                Utilities.WriteLog("AddRecord: " + ex.Message);
+               Logger.WriteLine("AddRecord: " + ex.Message);
                 throw;
             }
         }
@@ -339,7 +339,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception ex)
             {
-                Utilities.WriteLog("GetRecord: " + ex.Message);
+               Logger.WriteLine("GetRecord: " + ex.Message);
                 throw;
             }
         }
@@ -364,7 +364,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception ex)
             {
-                Utilities.WriteLog("GetRecord: " + ex.Message);
+               Logger.WriteLine("GetRecord: " + ex.Message);
                 throw;
             }
         }
@@ -389,7 +389,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception ex)
             {
-                Utilities.WriteLog("GetRecord: " + ex.Message);
+               Logger.WriteLine("GetRecord: " + ex.Message);
                 throw;
             }
         }
@@ -416,7 +416,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception ex)
             {
-                Utilities.WriteLog("GetExperiment: " + ex.Message);
+               Logger.WriteLine("GetExperiment: " + ex.Message);
                 throw;
             }
         }
@@ -438,7 +438,7 @@ namespace iLabs.ExpStorage.ESS
 
                 catch (Exception ex)
                 {
-                    Utilities.WriteLog("GetExperimentIDs: " + ex.Message);
+                   Logger.WriteLine("GetExperimentIDs: " + ex.Message);
                     throw;
                 }
             }

@@ -173,7 +173,7 @@ namespace iLabs.LabView.LV82
                 }
                 catch (InvalidCastException ivcEx)
                 {
-                    Utilities.WriteLog("Library error: " + ivcEx.Message);
+                   Logger.WriteLine("Library error: " + ivcEx.Message);
                 }
                 buf.Append(vi.Name);
                 qName = buf.ToString(); 
@@ -310,7 +310,7 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(name + " control not found: " + e.Message);
+               Logger.WriteLine(name + " control not found: " + e.Message);
             }
             return status;
         }
@@ -328,7 +328,7 @@ namespace iLabs.LabView.LV82
                 }
                 catch (Exception e)
                 {
-                    Utilities.WriteLog(name + " control not found: " + e.Message);
+                   Logger.WriteLine(name + " control not found: " + e.Message);
                     throw new Exception(name + " control not found:", e);
                 }
             }
@@ -352,7 +352,7 @@ namespace iLabs.LabView.LV82
                 }
                 catch (Exception e)
                 {
-                    Utilities.WriteLog(name + " control not found: " + e.Message);
+                   Logger.WriteLine(name + " control not found: " + e.Message);
                 }
                 if (found)
                 {
@@ -443,12 +443,12 @@ namespace iLabs.LabView.LV82
                     }
                     else
                     {
-                        Utilities.WriteLog(controlName + " control not found: null returned");
+                       Logger.WriteLine(controlName + " control not found: null returned");
                     }
                 }
                 catch (Exception e)
                 {
-                    Utilities.WriteLog(controlName + " control not found: Exception: " + e.Message);
+                   Logger.WriteLine(controlName + " control not found: Exception: " + e.Message);
                 }
                 if (found)
                 {
@@ -470,13 +470,13 @@ namespace iLabs.LabView.LV82
                         vi.SetControlValue(controlName, false);
                         if ((vi.ExecState != ExecStateEnum.eRunning) && (vi.ExecState != ExecStateEnum.eRunTopLevel))
                         {
-                            Utilities.WriteLog("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
+                           Logger.WriteLine("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
                             status = 0;
                         }
                     }
                     catch (Exception ex)
                     {
-                        Utilities.WriteLog("Error: setControl " +controlName +": " + ex.Message);
+                       Logger.WriteLine("Error: setControl " +controlName +": " + ex.Message);
                     }
                 }
             }
@@ -587,7 +587,7 @@ namespace iLabs.LabView.LV82
             catch (Exception e)
             {
                 Exception notFound = new Exception("VI NotFound: " + path + @"\" + name, e);
-                Utilities.WriteLog("VI not Found: " + " Path: " + path + " Name: " + name + " Exception: " + e.Message);
+               Logger.WriteLine("VI not Found: " + " Path: " + path + " Name: " + name + " Exception: " + e.Message);
                 throw notFound;
             }
             return vi;
@@ -617,7 +617,7 @@ namespace iLabs.LabView.LV82
             catch (Exception e)
             {
                 Exception notFound = new Exception("VI Not Found GetVI: " + viName,e);
-                Utilities.WriteLog("VI Not Found GetVI: " + viName + " Exception: " + e.Message);
+               Logger.WriteLine("VI Not Found GetVI: " + viName + " Exception: " + e.Message);
                 throw notFound;
             }
             return vi;
@@ -955,7 +955,7 @@ namespace iLabs.LabView.LV82
 			{
 				message.Append(" ERROR: actionVI not found");
 			}
-            Utilities.WriteLog(message.ToString());
+           Logger.WriteLine(message.ToString());
 			return message.ToString();
 		
 		}
@@ -1031,7 +1031,7 @@ namespace iLabs.LabView.LV82
             {
                 message.Append(" ERROR: RemoteCommandMgr not found");
             }
-            Utilities.WriteLog(message.ToString());
+           Logger.WriteLine(message.ToString());
             return message.ToString();
 
         }
@@ -1109,17 +1109,17 @@ namespace iLabs.LabView.LV82
             //}
             //catch( Exception e1)
             //{
-            //    Utilities.WriteLog("Error: " + viName + " \t" + e1.Message);
+            //   Logger.WriteLine("Error: " + viName + " \t" + e1.Message);
                 try
                 {
                     vi = (VirtualInstrument)viServer.GetVIReference(appDir + viPath + @"\" + viName, "", true, 0);
                     string path = vi.Path;
                     Library library = vi.Library;
-                    Utilities.WriteLog("getILabVI Found VI: " + appDir + viPath + @"\" + viName + " Path = " + path + " Library: '" + library.LocalName + "'");
+                   Logger.WriteLine("getILabVI Found VI: " + appDir + viPath + @"\" + viName + " Path = " + path + " Library: '" + library.LocalName + "'");
                 }
                 catch(Exception e2)
                 {
-                    Utilities.WriteLog("Error: " +  viName + " \t" + e2.Message);
+                   Logger.WriteLine("Error: " +  viName + " \t" + e2.Message);
                 }
            // }
             return vi; 

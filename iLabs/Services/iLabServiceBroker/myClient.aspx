@@ -32,6 +32,7 @@ Please see license.txt in top level directory for full license.
 						</h1>
 						<h2>Group:
 							<asp:label id="lblGroupNameTitle" Runat="server"></asp:label></h2>
+							<asp:Label ID="lblResponse" runat="server" Visible="False"></asp:Label>
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
@@ -41,9 +42,7 @@ Please see license.txt in top level directory for full license.
 								<ItemTemplate>
 								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>
 									<p class="message"><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %></p>
-									<p class="date">Date Posted:
-										<%# userFormatTime((DateTime) DataBinder.GetPropertyValue(Container.DataItem, "LastModified")) %>
-									</p>
+									<p class="date">Date Posted:<%# userFormatTime((DateTime) DataBinder.GetPropertyValue(Container.DataItem, "LastModified")) %></p>
 								</ItemTemplate>
 							</asp:repeater></div>
 						<!-- Div id "singlelab" is displayed if only one client is available. Otherwise, div class "group" is displayed, which has a list of available labs. -->
@@ -72,13 +71,7 @@ Please see license.txt in top level directory for full license.
 							    <asp:button id="btnSchedule" Runat="server" CssClass="button" Text="Schedule/Redeem Session" onclick="btnSchedule_Click" Visible="false" Width="170px"></asp:button>&nbsp;
                             </p>
 							<asp:repeater id="repClientInfos" runat="server"></asp:repeater></div>
-						<!-- This is only displayed if the user came from My Groups -->
-						<% if(Session["ClientCount"] != null){if (Convert.ToInt32(Session["ClientCount"])>1) { %>
-						<p><a href="myClientList.aspx">« Back to Labs in
-								'<asp:Label ID="lblBackToLabs" Runat="server"></asp:Label>'
-							</a>
-						</p>
-						<%}}%>
+						
 					</div>
 					<br clear="all" />
 					<!-- end pagecontent div --></div>

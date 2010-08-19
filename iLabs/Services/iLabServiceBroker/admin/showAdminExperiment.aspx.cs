@@ -49,7 +49,7 @@ namespace iLabs.ServiceBroker.admin
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            Utilities.WriteLog("showAdminExperiment");
+           Logger.WriteLine("showAdminExperiment");
         }
 
         #region Web Form Designer generated code

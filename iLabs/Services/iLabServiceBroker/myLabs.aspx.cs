@@ -48,8 +48,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				else if (labClientIDList.Length ==1)
 				{
 					// get the lab client
-					int clientID = labClientIDList[0];
-					Session["ClientID"]= clientID;
+                    Session["ClientID"] = labClientIDList[0];
 					Response.Redirect("myClient.aspx");
 				}
 				else if (labClientIDList.Length ==0)

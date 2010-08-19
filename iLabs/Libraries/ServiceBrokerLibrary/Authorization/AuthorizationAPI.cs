@@ -114,20 +114,7 @@ namespace iLabs.ServiceBroker.Authorization
 
 	}
 
-	/// <summary>
-	/// Structure which holds information pertaining to Agents (Users or Groups). 
-	/// This is an internal structure and isn't specified in the API.
-	/// </summary>
-	public struct Agent
-	{
-		public int id;
-		public string type;
-		public string name;
-
-		public const string userType = "User";
-		public const string groupType = "Group";
-	}
-
+	
 	public struct Function 
 	{
 		public string function;

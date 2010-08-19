@@ -54,12 +54,9 @@ Please see license.txt in top level directory for full license.
 							</asp:Label>
 							<asp:Repeater id="repSystemMessage" runat="server">
 								<ItemTemplate>
-									<p class="message">
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %>
-									</p>
-									<p class="date">Date Posted:
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "LastModified")) %>
-									</p>
+								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>
+									<p class="message"><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %></p>
+									<p class="date">Date Posted:<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "LastModified")) %></p>
 								</ItemTemplate>
 							</asp:Repeater>
 						</div>

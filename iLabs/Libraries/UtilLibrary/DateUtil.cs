@@ -218,7 +218,7 @@ namespace iLabs.UtilLib
             }
             catch(Exception e)
             {
-                Utilities.WriteLog("Error parsing LanguageString: " + languageStr + "Exception: " + e.Message);
+                Logger.WriteLine("Error parsing LanguageString: " + languageStr + "Exception: " + e.Message);
                 culture = new CultureInfo("en-us");
             }
             return culture;

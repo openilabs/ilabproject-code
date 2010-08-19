@@ -28,16 +28,30 @@ using iLabs.ServiceBroker;
 
 namespace iLabs.ServiceBroker.Administration
 {
+    /// <summary>
+    /// lass which holds information pertaining to Agents (Users or Groups). 
+    /// This is an internal structure and isn't specified in the API.
+    /// </summary>
+    public class Agent
+    {
+        public int id;
+        public string type;
+        public string name;
+
+        public const string userType = "User";
+        public const string groupType = "Group";
+    }
+
 
 	/// <summary>
-	/// The User struct possesses a number of fixed fields, the 
+	/// The User class possesses a number of fixed fields, the 
     /// common denominator of all possible user descriptions. 
     /// But it will also possess a field that implements an XML-based 
     /// extension mechanism. This field should conform to an XML schema 
     /// registered with the Service Broker, and implementation specific 
     /// elements and attributes that can be coded in the XML Extension String.
 	/// </summary>
-	public struct User
+	public class User
 	{
 		/// <summary>
 		/// The integer ID of the User.
@@ -95,9 +109,9 @@ namespace iLabs.ServiceBroker.Administration
 
 
 	/// <summary>
-	/// Structure containing information pertaining to a Lab Client.
+	/// Class containing information pertaining to a Lab Client.
 	/// </summary>
-	public struct LabClient
+	public class LabClient
 	{
         /// <summary>
         /// A string limited to 50 characters used for identification across domains, 
@@ -146,7 +160,7 @@ namespace iLabs.ServiceBroker.Administration
 		public string notes;
 
 		/// <summary>
-		/// An HTML fragment that will be embedded on a Service Broker generated page 
+		/// An HTML fragment or URL that will be 
         /// executed by the user’s web browser to launch the client. 
 		/// </summary>
 		public string loaderScript;
@@ -242,9 +256,9 @@ namespace iLabs.ServiceBroker.Administration
 	}
 
 	/// <summary>
-	/// A structure containing information associated with a particular Lab Client.
+	/// A class containing information associated with a particular Lab Client.
 	/// </summary>
-	public struct ClientInfo
+	public class ClientInfo
 	{
 		/// <summary>
 		/// The integer ID of the ClientInfo record.
@@ -321,7 +335,7 @@ namespace iLabs.ServiceBroker.Administration
 	/// <summary>
 	/// A structure containing information pertaining to a particular group.
 	/// </summary>
-	public struct Group
+	public class Group
 	{
 		/// <summary>
 		/// The integer ID of the group. Must be unique in a namespace shared with User instances.
@@ -474,10 +488,10 @@ namespace iLabs.ServiceBroker.Administration
   
 	
 	/// <summary>
-	/// A structure containing information pertaining to the User Session.
+	/// A class containing information pertaining to the User Session.
     /// Primary use is for log-in reporting.
 	/// </summary>
-	public struct UserSession
+	public class UserSession
 	{
 		/// <summary>
 		/// The long integer Session ID.
@@ -524,9 +538,9 @@ namespace iLabs.ServiceBroker.Administration
 	}
 
 	/// <summary>
-	/// A structure which holds System Messages.
+	/// A class which holds System Messages.
 	/// </summary>
-	public struct SystemMessage
+	public class SystemMessage
 	{
 		/// <summary>
 		/// The integer ID of the message.
@@ -628,10 +642,10 @@ namespace iLabs.ServiceBroker.Administration
     {
         public int Compare(object o1, object o2)
         {
-            DateTime date1 = ((SystemMessage)o1).lastModified;
-            DateTime date2 = ((SystemMessage)o2).lastModified;
+            //DateTime date1 = ((SystemMessage)o1).lastModified;
+            //DateTime date2 = ((SystemMessage)o2).lastModified;
 
-            return date1.CompareTo(date2);
+            return ((SystemMessage)o1).lastModified.CompareTo(((SystemMessage)o2).lastModified);
         }
     }
 
@@ -2157,6 +2171,10 @@ namespace iLabs.ServiceBroker.Administration
 			InternalAdminDB.UpdateSystemMessage(sm);
 		}
 
+        public static SystemMessage[] SelectSystemMessagesForGroup(int groupID)
+        {
+            return InternalAdminDB.SelectSystemMessagesForGroup(groupID);
+        }
 		/// <summary>
 		/// Retrieve system messages specified by a combination of messageType and groupID or labServerID.
 		/// </summary>
@@ -2192,11 +2210,11 @@ namespace iLabs.ServiceBroker.Administration
 			return InternalAdminDB.InsertUserSession (us);
 		}
 
-        public static bool ModifyUserSession(long sessionID, int effectiveGroupID, int clientID, int tzOffset,string sessionKey)
+        public static bool ModifyUserSession(long sessionID, int effectiveGroupID, int clientID, string sessionKey)
         {
-            return InternalAdminDB.ModifyUserSession(sessionID,effectiveGroupID,clientID,tzOffset,sessionKey);
+            return InternalAdminDB.ModifyUserSession(sessionID,effectiveGroupID,clientID,sessionKey);
         }
-
+/*
         public static bool SetSessionGroup(long sessionID, int groupID)
         {
             return InternalAdminDB.SetSessionGroup(sessionID, groupID);        
@@ -2210,6 +2228,7 @@ namespace iLabs.ServiceBroker.Administration
         {
             return InternalAdminDB.SetSessionKey(sessionID, key);
         }
+ */
         public static bool SetSessionTimeZone(long sessionID, int tzOffset)
         {
             return InternalAdminDB.SetSessionTimeZone(sessionID, tzOffset);

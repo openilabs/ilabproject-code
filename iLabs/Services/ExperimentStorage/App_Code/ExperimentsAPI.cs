@@ -49,7 +49,7 @@ namespace iLabs.ExpStorage
                 StorageStatus status = GetExperimentStatus(myConnection, sbExperimentId, sbGuid);
                 if (status == null)
                 {
-                    experimentId = CreateExperiment(myConnection, duration, sbExperimentId, sbGuid);
+                    experimentId = CreateExperiment(myConnection, duration, sbExperimentId, sbGuid, StorageStatus.OPEN);
                     code = StorageStatus.OPEN;
                 }
                 else
@@ -74,7 +74,7 @@ namespace iLabs.ExpStorage
             return code;
         }
 
-        public long CreateExperiment(DbConnection myConnection, long duration, long sbExperimentId, string sbGuid)
+        public long CreateExperiment(DbConnection myConnection, long duration, long sbExperimentId, string sbGuid, int status)
         {
             long experimentId = -1;
 
@@ -93,6 +93,7 @@ namespace iLabs.ExpStorage
             {
                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@scheduledClose", null, DbType.DateTime));
             }
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@status", status, DbType.Int32));
             try
             {
                 experimentId = Convert.ToInt64(myCommand.ExecuteScalar());
@@ -242,7 +243,7 @@ namespace iLabs.ExpStorage
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("GetExperimentStatus: " + e.Message);
+               Logger.WriteLine("GetExperimentStatus: " + e.Message);
                 throw;
             }
 
@@ -416,7 +417,7 @@ namespace iLabs.ExpStorage
             }
             //sql.AppendLine(")");
             DbConnection connection = FactoryDB.GetConnection();
-            Utilities.WriteLog(sql.ToString());
+           Logger.WriteLine(sql.ToString());
             DbCommand myCommand = FactoryDB.CreateCommand(sql.ToString(), connection);
 
 

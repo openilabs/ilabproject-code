@@ -1586,7 +1586,7 @@ namespace iLabs.ServiceBroker
                  
             catch (Exception ex)
             {
-                Utilities.WriteLog(ex.Message);
+               Logger.WriteLine(ex.Message);
                 throw;
             }
             finally{
@@ -2141,7 +2141,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
             finally
             {
@@ -2168,7 +2168,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
             finally
             {
@@ -2222,7 +2222,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
             finally
             {
@@ -2249,7 +2249,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
             finally
             {
@@ -2275,7 +2275,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
             finally
             {
@@ -2300,7 +2300,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
             finally
             {
@@ -2329,7 +2329,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog(e.Message);
+               Logger.WriteLine(e.Message);
             }
 
             finally

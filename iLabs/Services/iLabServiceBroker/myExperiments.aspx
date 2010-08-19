@@ -101,7 +101,7 @@ Please see license.txt in top level directory for full license.
                                                         Select Experiment</label><br />
                                                     <asp:listbox cssClass="i18n" ID="lbxSelectExperiment" runat="server" Width="430px" Height="156px"
                                                         AutoPostBack="True" OnSelectedIndexChanged="lbxSelectExperiment_SelectedIndexChanged">
-                                                    </asp:ListBox>
+                                                    </asp:listbox>
                                                 </div>
                                             </td>
                                         </tr>

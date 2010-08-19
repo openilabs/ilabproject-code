@@ -70,7 +70,11 @@ namespace iLabs.ServiceBroker.iLabSB
                             Session["GroupID"] = ((Group)nonRequestGroups[0]).groupID;
                             Session["GroupName"] = ((Group)nonRequestGroups[0]).groupName;
                             Session["GroupCount"] = 1;
-                            AdministrativeAPI.SetSessionGroup(Convert.ToInt64(Session["SessionID"]), ((Group)nonRequestGroups[0]).groupID);
+
+                            int client = 0;
+                            if(Session["ClientID"] != null)
+                                client = Convert.ToInt32(Session["ClientID"]);
+                            AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]),((Group)nonRequestGroups[0]).groupID, client, Session.SessionID);
                             PageRedirect((Group)nonRequestGroups[0]);
                         }
                     
@@ -188,7 +192,13 @@ namespace iLabs.ServiceBroker.iLabSB
 					// Set the GroupID session value and redirect
 					Session["GroupID"] = groupID;
 					Session["GroupName"]= ((Group)nonRequestGroups[e.Item.ItemIndex]).groupName;
-                    AdministrativeAPI.SetSessionGroup(Convert.ToInt64(Session["SessionID"]), groupID);
+                    int client = 0;
+                    Session.Remove("ClientID");
+                    Session.Remove("ClientCount");
+                    //if (Session["ClientID"] != null)
+                    ///    client = Convert.ToInt32(Session["ClientID"]);
+                    AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), groupID, client, Session.SessionID);
+                            
 					PageRedirect ((Group)nonRequestGroups[e.Item.ItemIndex]);
 				}
 			}

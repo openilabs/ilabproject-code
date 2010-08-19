@@ -64,7 +64,7 @@ namespace iLabs.ServiceBroker
         /// <param name="groupID"></param>
         /// <param name="groupName"></param>
         /// <returns>The redirect url where the user should be redirected, with the coupon appended to it</returns>
-        public string ExecuteExperimentExecutionRecipe(ProcessAgentInfo labServer, LabClient client,
+        public string ExecuteExperimentExecutionRecipe(Coupon coupon, ProcessAgentInfo labServer, LabClient client,
             DateTime startExecution, long duration, int userTZ, int userID, int groupID, string groupName)
         {
             
@@ -96,8 +96,7 @@ namespace iLabs.ServiceBroker
 
             }
 
-            // 1. Create Coupon for ExperimentCollection
-            Coupon coupon = brokerDB.CreateCoupon();
+           // 1. Coupon creation moved to launch client
 
             //
             // 2. create ServiceBroker experiment record and get corresponding experiment id
@@ -160,22 +159,13 @@ namespace iLabs.ServiceBroker
             brokerDB.AddTicket(coupon, 
                       TicketTypes.EXECUTE_EXPERIMENT, labServer.agentGuid, labServer.agentGuid, ticketDuration, payload);
 
-            // 4.C Create sessionRedemption Ticket
-            string sessionPayload = factory.createRedeemSessionPayload(userID, groupID,client.clientID);
-            brokerDB.AddTicket(coupon,
-                      TicketTypes.REDEEM_SESSION, brokerDB.GetIssuerGuid(), brokerDB.GetIssuerGuid(), ticketDuration, sessionPayload);
+            
 
-            // construct the redirect query
-            StringBuilder url = new StringBuilder(client.loaderScript.Trim());
-            if (url.ToString().IndexOf("?") == -1)
-                url.Append('?');
-            else
-                url.Append('&');
-            url.Append("coupon_id=" + coupon.couponId + "&passkey=" + coupon.passkey
-                + "&issuer_guid=" + brokerDB.GetIssuerGuid());            
-
-            //return the appended url
-            return url.ToString();
+            // 5. construct the redirect query. Note this is now done in the myClient page
+           
+            string url = client.loaderScript.Trim();
+            return url;
+         
         }
 
 
@@ -202,8 +192,6 @@ namespace iLabs.ServiceBroker
 
                 //the SB is the sponsor of the scheduling ticket
                 //string sponsorId = issuer.GetIssuerGuid();
-
-             
 
                 string payload1 = factory.createScheduleSessionPayload(username, groupName, issuer.GetIssuerGuid(),
                     labServerGuid, clientGuid, labClientName, labClientVersion, userTZ);

@@ -12,7 +12,7 @@ namespace iLabs.UtilLib
         static private string date = "$Date$";
         static private string revision = "$Revision$";
         //static private string release = "$ilab:Release$";
-	static private string release = "Release 3.0.3";
+	static private string release = "Release 3.0.4 RC3 merge with trunk";
         static private string buildDate = "$ilab:BuildDate$";
         /// <summary>
         /// Returns the date and svn revision last set, still not auto setting..
@@ -36,7 +36,7 @@ namespace iLabs.UtilLib
         }
 
         /// <summary>
-        /// returns the build date of the release, this currently is not set automaticly.
+        /// returns the build date of the release, this currently is not set automaticl on each commit.
         /// </summary>
         public static string BuildDate
         {

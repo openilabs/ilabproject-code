@@ -15,7 +15,7 @@ INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VAL
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (9,' BLS', 'BATCH LAB SERVER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (16,' ESS', 'EXPERIMENT STORAGE SERVER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (32,' USS', 'SCHEDULING SERVER');
-INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID,  Short_Name,Description) VALUES (64,' LSS', 'LAB SCHEDULING SERVER');
+INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (64,' LSS', 'LAB SCHEDULING SERVER');
 
 SET IDENTITY_INSERT ProcessAgent_Type OFF
 

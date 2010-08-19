@@ -309,7 +309,7 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("VI Not Found GetVI: " + viName + " " + msg.ToString());
+               Logger.WriteLine("VI Not Found GetVI: " + viName + " " + msg.ToString());
             }
             return vi;
         }

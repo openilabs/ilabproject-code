@@ -181,9 +181,11 @@ namespace iLabs.ServiceBroker.iLabSB
 				sb.Append("User Browser Agent: "+ Request.UserAgent +"\n\r");
 				sb.Append("User Platform: "+ Request.Browser.Platform+"\n\r");
 				sb.Append("URL used to access page: "+ Request.Url+"\n\r");
-				sb.Append("Machine Name: " + Server.MachineName+"\n\r");
-				
-				sb.Append("Server Type: " + Server.GetType() + "\n\r"); 
+                sb.Append("Machine Name: " + Server.MachineName + "\n\r");
+                sb.Append("Server Type: " + Server.GetType() + "\n\r");
+                sb.Append("Site URL: " + ProcessAgentDB.ServiceAgent.codeBaseUrl + "\n\r");
+                sb.Append("Site GUID: " + ProcessAgentDB.ServiceAgent.agentGuid + "\n\r");
+                sb.Append("iLab Release: " + iLabGlobal.Release + "\n\r");
 				
 				if(excep != null)
 				{

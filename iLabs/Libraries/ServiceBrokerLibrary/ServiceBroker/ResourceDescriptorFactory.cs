@@ -147,7 +147,7 @@ namespace iLabs.ServiceBroker
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("Create clientDescriptor: " + e.Message);
+               Logger.WriteLine("Create clientDescriptor: " + e.Message);
             }
             return null;
         }

@@ -536,12 +536,13 @@ namespace iLabs.ServiceBroker.admin
 
 		private void ibtnRemove_Click(object sender, System.Web.UI.ImageClickEventArgs e)
 		{
+            StringBuilder msg = new StringBuilder();
 			lblResponse.Visible=false;
 			TreeNode agentNode = agentsTreeView.SelectedNode;
             TreeNode groupNode = groupsTreeView.SelectedNode;
             if(agentNode == null || groupNode == null){
-                string msg = "Error: You must select an item from each list";
-				lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                msg.Append("Error: You must select an item from each list");
+				lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
 				lblResponse.Visible = true;
                 return;
             }
@@ -560,18 +561,16 @@ namespace iLabs.ServiceBroker.admin
 				(memberName.Equals(Group.SUPERUSER)))
 			{
 				// if they're trying to transfer the ROOT, superUser etc.
-				lblResponse.Visible=true;
-				string msg = "";
-				
 				if (memberID != parentID)
 				{
-					msg = "The '"+memberName + "' group cannot be removed from the system.";
+					msg.Append( "The '"+memberName + "' group cannot be removed from the system.");
 				}
 				else //if parent=groupname
 				{
-					msg = "'"+memberName + "'  cannot be removed from itself.";
+					msg.Append("'"+memberName + "'  cannot be removed from itself.");
 				}
-				lblResponse.Text=Utilities.FormatErrorMessage(msg);
+				lblResponse.Text=Utilities.FormatErrorMessage(msg.ToString());
+                lblResponse.Visible = true;
 			}
 			else
 			{
@@ -586,8 +585,8 @@ namespace iLabs.ServiceBroker.admin
 					if(wrapper.RemoveMembersFromGroupWrapper(new int[] {memberID}, parentID).Length==0)
 					{
 						lblResponse.Visible=true;
-						string msg = "'"+memberName + "' was successfully removed from '" + parentName+"'.";
-						lblResponse.Text=Utilities.FormatConfirmationMessage(msg);
+						msg.Append("'"+memberName + "' was successfully removed from '" + parentName+"'.");
+						lblResponse.Text=Utilities.FormatConfirmationMessage(msg.ToString());
 					
 						//Refresh tree views
 						agentsTreeView.Nodes.Clear();
@@ -601,7 +600,7 @@ namespace iLabs.ServiceBroker.admin
 					else 
 					{
 						lblResponse.Visible=true;
-						string msg = "";
+						
 
 						int[] parents = wrapper.ListGroupsForAgentWrapper(memberID);
 						ArrayList parentList = new ArrayList(parents);
@@ -609,23 +608,23 @@ namespace iLabs.ServiceBroker.admin
 						{
 							if (parentName.Equals(Group.ROOT))
 								// then it's only parent was ROOT & it cannot be removed here
-								msg = "The only group '"+memberName+"' belongs to is ROOT. It cannot be removed from ROOT using the 'Group Membership' functionality. Use the 'Delete' functionality in the User/Groups pages instead.";
+								msg.Append("The only group '"+memberName+"' belongs to is ROOT. It cannot be removed from ROOT using the 'Group Membership' functionality. Use the 'Delete' functionality in the User/Groups pages instead.");
 							else
-								msg="'"+memberName+"' could not be removed from '"+parentName+"'";
+								msg.Append("'"+memberName+"' could not be removed from '"+parentName+"'");
 						}
 						else
 							// remove member failed because the member was not part of the group
-							msg = "'"+memberName + "' does not belong to '"+ parentName+"' and cannot be removed from it.";
+							msg.Append("'"+memberName + "' does not belong to '"+ parentName+"' and cannot be removed from it.");
 
 						
-						lblResponse.Text=Utilities.FormatErrorMessage(msg);
+						lblResponse.Text=Utilities.FormatErrorMessage(msg.ToString());
 					}
 				}
 				catch(Exception ex)
 				{
 					lblResponse.Visible=true;
-					string msg = "Exception thrown when trying to remove '" + memberName + "' from '" + parentName+"'. "+ex.Message+". " +ex.GetBaseException();
-					lblResponse.Text=Utilities.FormatErrorMessage(msg);
+					msg.Append("Exception thrown when trying to remove '" + memberName + "' from '" + parentName+"'. "+ex.Message+". " +ex.GetBaseException());
+					lblResponse.Text=Utilities.FormatErrorMessage(msg.ToString());
 				}
 			}
 		}
@@ -646,7 +645,10 @@ namespace iLabs.ServiceBroker.admin
                 return;
             }
             message.Append(removeAgentNodes(agentNodes, ref parentIDs));
-
+            if(message.Length > 0){
+                lblResponse.Text = Utilities.FormatConfirmationMessage(message.ToString());
+                lblResponse.Visible = true;
+            }
             //Refresh tree views
             agentsTreeView.Nodes.Clear();
             groupsTreeView.Nodes.Clear();

@@ -902,7 +902,7 @@ namespace iLabs.ServiceBroker.admin
                 }
                 catch(Exception ex)
                 {
-                    Utilities.WriteLog("Modify Service: " + ex.Message);
+                   Logger.WriteLine("Modify Service: " + ex.Message);
                     lblErrorMessage.Visible = true;
                     lblErrorMessage.Text = Utilities.FormatErrorMessage("Process Agent " + txtServiceName.Text + " cannot be modified.");
                     return;
@@ -1210,7 +1210,7 @@ namespace iLabs.ServiceBroker.admin
                 }
                 catch(Exception ex)
                 {
-                    Utilities.WriteLog(ex.Message);
+                   Logger.WriteLine(ex.Message);
                 }
                 btnAssociateLSS.Text = "Disassociate";
                 btnAssociateLSS.CommandName = "disassociate";

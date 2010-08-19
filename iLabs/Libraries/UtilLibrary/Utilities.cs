@@ -11,20 +11,7 @@ namespace iLabs.UtilLib
     public class Utilities
     {
 
-        public static TraceSwitch traceSwitch = new TraceSwitch("defaultTrace", "Trace switch used by default");
-
-        // Make this a property
-        private static string logPath = null;
-
-        public static string LogPath{
-            get{
-                return logPath;
-            }
-            set
-            {
-                logPath = value;
-            }
-        }
+    
         /// <summary>
         /// Utility to convert an ArrayList of strings to an array.
         /// </summary>
@@ -202,17 +189,7 @@ namespace iLabs.UtilLib
             buf.Append("\n");
             return ex.InnerException;
         }
-
-        public static void WriteLog(string str)
-        {
-            if (logPath != null && logPath.Length >0)
-            {
-                System.IO.StreamWriter writer = new System.IO.StreamWriter(logPath, true);
-                writer.WriteLine(DateTime.Now.ToString() + ": \t" + str);
-                writer.Close();
-            }
-            Trace.WriteLine(DateTime.Now.ToString() + ": \t" + str);
-        }
+ 
 
         /// <summary>
         /// Formats a Uri  ( URL class ) into a fully specified URL path, with out any query parameters.
@@ -416,13 +393,13 @@ namespace iLabs.UtilLib
 
     public class PolicyParser
     {
-      
+
         public static string GenerateRule(string[] fields, string[] properties)
         {
-            string rule=null;
+            string rule = null;
             for (int i = 0; i < fields.Length; i++)
             {
-                 rule =rule + fields[i] + "," + properties[i]+",";
+                rule = rule + fields[i] + "," + properties[i] + ",";
             }
             return rule;
         }
@@ -430,18 +407,17 @@ namespace iLabs.UtilLib
         public static string getProperty(string rule, string field)
         {
             string[] parts = rule.Split(',');
-            for (int i = 0; i < parts.Length; i++ )
+            for (int i = 0; i < parts.Length; i++)
             {
                 if (parts[i].Equals(field))
                 {
-                    return parts[i+1];
+                    return parts[i + 1];
                 }
             }
-                
-                    return null;
+
+            return null;
         }
     }
-
 
   
 }

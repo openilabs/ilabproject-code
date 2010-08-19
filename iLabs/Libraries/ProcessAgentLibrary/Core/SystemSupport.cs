@@ -94,7 +94,7 @@ namespace iLabs.Core
             }
             catch (Exception e)
             {
-                Utilities.WriteLog("SystemSupport.ToXML(): " + e.Message);
+               Logger.WriteLine("SystemSupport.ToXML(): " + e.Message);
             }
             return null;
         }
