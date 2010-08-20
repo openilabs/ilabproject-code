@@ -145,7 +145,7 @@ namespace iLabs.ServiceBroker.admin
 					aExperimentRecords.Attributes.Add("class", "topactive");
 					ulNav3Records.Visible = true;
 					aNav3ExperimentRecords.Attributes.Add("class", "nav3active");
-					aNav3LoginRecords.Attributes.Add("class", "last");
+					aNav3SessionHistory.Attributes.Add("class", "last");
 					break;
                 case "showAdminExperiment.aspx":
 
@@ -155,7 +155,7 @@ namespace iLabs.ServiceBroker.admin
                     //ulNav3Records.Visible = true;
                     //ulNav3Records.Visible = true;
                     //aNav3ExperimentRecords.Attributes.Add("class", "nav3active");
-                    aNav3LoginRecords.Attributes.Add("class", "last");
+                    aNav3SessionHistory.Attributes.Add("class", "last");
                     break;
 
 					//  Nav3 level
@@ -164,7 +164,7 @@ namespace iLabs.ServiceBroker.admin
                     ulNav3Records.Visible = true;
                     aNav3SBinfo.Attributes.Add("class", "first");
                     aNav3SBinfo.Attributes.Add("class", "nav3active");
-                    aNav3LoginRecords.Attributes.Add("class", "last");
+                    aNav3SessionHistory.Attributes.Add("class", "last");
                     break;
 
                 case "sbReport.aspx":
@@ -172,7 +172,7 @@ namespace iLabs.ServiceBroker.admin
                     ulNav3Records.Visible = true;
                     aNav3SBinfo.Attributes.Add("class", "first");
                     aNav3Reports.Attributes.Add("class", "nav3active");
-                    aNav3LoginRecords.Attributes.Add("class", "last");
+                    aNav3SessionHistory.Attributes.Add("class", "last");
                     break;
 
 				case "loginRecords.aspx":
@@ -181,9 +181,17 @@ namespace iLabs.ServiceBroker.admin
                     aNav3SBinfo.Attributes.Add("class", "first");
                     //aNav3LoginRecords.Attributes.Add("class", "last");
 					aNav3LoginRecords.Attributes.Add("class", "nav3active");
+                    aNav3SessionHistory.Attributes.Add("class", "last");
                     
 					break;
+                case "sessionHistory.aspx":
+                    aExperimentRecords.Attributes.Add("class", "topactive");
+                    ulNav3Records.Visible = true;
+                    aNav3SBinfo.Attributes.Add("class", "first");
+                    //aNav3LoginRecords.Attributes.Add("class", "last");
+                    aNav3SessionHistory.Attributes.Add("class", "nav3active");
 
+                    break;
 					// Nav Level
 				case "messages.aspx":
 					aMessages.Attributes.Add("class", "topactive");

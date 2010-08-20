@@ -57,8 +57,8 @@ DBCC CHECKIDENT (GROUP_TYPES, RESEED);
 
 /* GROUPS & CORRESPONDING AGENTS*/
 SET IDENTITY_INSERT Agents ON
-INSERT INTO Agents (Agent_ID,Agent_Name, Is_Group) VALUES (0,'Group not assigned', 1);
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (0, 'Group not assigned','If a groupID does not exist. This is an illegal group.',0);
+INSERT INTO Agents (Agent_ID,Agent_Name, Is_Group) VALUES (0,'No Group', 1);
+INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (0, 'No Group','If a groupID does not exist. This is an illegal group.',0);
 SET IDENTITY_INSERT Agents OFF
 DBCC CHECKIDENT (AGENTS, RESEED);
 

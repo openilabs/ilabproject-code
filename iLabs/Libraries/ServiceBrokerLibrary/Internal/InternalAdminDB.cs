@@ -2486,6 +2486,126 @@ namespace iLabs.ServiceBroker.Internal
 
 			return userSessions;
 		}
+
+        /// <summary>
+        /// to select all the sessions of a given user
+        /// </summary>
+        public static DataSet SelectSessionHistory(int userID, int groupID, DateTime timeAfter, DateTime timeBefore)
+        {
+
+//            select s.Session_ID,u.User_name, h.modify_time,g.Group_Name, c.Lab_Client_Name,s.Session_Start_Time,s.Session_End_Time,h.Session_key
+//from user_sessions s, session_history h, Users u, Groups g, Lab_Clients c
+//where s.session_id = h.session_id and s.user_ID = u.user_id and h.group_ID = g.Group_ID and h.CLient_ID = c.client_ID
+//order by s.session_id, h.modify_time
+            int orderCode = 0;
+            //UserSession[] userSessions = null;
+            //ArrayList sessions = new ArrayList();
+            DataSet ds = new DataSet();
+            DataTable dt = new DataTable("sessionHistory");
+            StringBuilder sqlQuery = new StringBuilder("select s.Session_ID,u.User_name,s.Session_Start_Time,s.Session_End_Time, h.modify_time,");
+            sqlQuery.Append("g.Group_Name, c.Lab_Client_Name,h.Session_key from user_sessions s, session_history h, Users u, Groups g, Lab_Clients c");
+            
+            StringBuilder sqlWhere = new StringBuilder(" where s.session_id = h.session_id and s.user_ID = u.user_id and h.group_ID = g.Group_ID and h.CLient_ID = c.client_ID");
+           
+ 
+            if (userID != -1)
+            {
+                sqlWhere.Append(" AND s.user_ID = ");
+                sqlWhere.Append(userID);
+                orderCode = 1;
+            }
+            if (groupID != -1)
+            {
+    //            select ah.agent_ID, ag.is_group, ag.agent_name
+    //from   agent_hierarchy ah, agents ag
+    //where ah.parent_group_ID = @groupID and ah.agent_id=ag.agent_id
+
+                sqlWhere.Append(" AND s.user_ID in (select ah.agent_ID from agent_hierarchy ah, agents ag ");
+                sqlWhere.Append(" where ah.parent_group_ID = ");
+                sqlWhere.Append(groupID);
+                sqlWhere.Append(" AND ag.is_group = 0 )");
+               // orderCode |= 2;
+            }
+
+            if (timeBefore.CompareTo(DateTime.MinValue) != 0)
+            {
+
+                sqlWhere.Append(" AND session_start_time <= '");
+                sqlWhere.Append(timeBefore);
+                sqlWhere.Append("'");
+                //orderCode |= 4;
+            }
+
+            if (timeAfter.CompareTo(DateTime.MinValue) != 0)
+            {
+
+                sqlWhere.Append(" AND session_start_time >= '");
+                sqlWhere.Append(timeAfter);
+                sqlWhere.Append("'");
+              //orderCode |= 4;
+            }
+
+             StringBuilder sqlOrder = new StringBuilder();
+           if(orderCode == 1)
+               sqlOrder.Append(" ORDER BY s.Session_ID,s.Session_Start_Time, h.modify_time ");
+           else
+                sqlOrder.Append(" ORDER BY u.User_name,s.Session_ID,s.Session_Start_Time, h.modify_time ");
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = myConnection.CreateCommand();
+            myCommand.CommandText = sqlQuery.ToString() + sqlWhere.ToString() + sqlOrder.ToString();
+            myCommand.CommandType = CommandType.Text;
+
+
+            //			DbConnection myConnection = FactoryDB.GetConnection();
+            //			DbCommand myCommand = FactoryDB.CreateCommand("SelectAllUserSessions", myConnection);
+            //			myCommand.CommandType = CommandType.StoredProcedure;
+            //			myCommand.Parameters .Add(new DbParameter ("@userID",userID));
+            //			myCommand.Parameters .Add(new DbParameter ("@groupID",groupID));
+            //			myCommand.Parameters .Add(new DbParameter ("@TimeAfter",timeAfter));
+            //			myCommand.Parameters .Add(new DbParameter ("@TimeBefore",timeBefore));
+
+            try
+            {
+                myConnection.Open();
+
+                // get session info from table user_sessions
+                DbDataReader myReader = myCommand.ExecuteReader();
+               
+                ds.Tables.Add(dt);
+                dt.BeginLoadData();
+                dt.Load(myReader);
+                dt.EndLoadData();
+                //while (myReader.Read())
+                //{
+                //    UserSession us = new UserSession();
+                //    us.sessionID = Convert.ToInt64(myReader["session_id"]); //casting to (long) didn't work
+                //    if (myReader["session_start_time"] != System.DBNull.Value)
+                //        us.sessionStartTime = DateUtil.SpecifyUTC((DateTime)myReader["session_start_time"]);
+                //    if (myReader["session_end_time"] != System.DBNull.Value)
+                //        us.sessionEndTime = DateUtil.SpecifyUTC((DateTime)myReader["session_end_time"]);
+                //    if (myReader["user_id"] != System.DBNull.Value)
+                //        us.userID = Convert.ToInt32(myReader["user_id"]);
+                //    if (myReader["effective_group_id"] != System.DBNull.Value)
+                //        us.groupID = Convert.ToInt32(myReader["effective_group_id"]);
+                //    if (myReader["session_key"] != System.DBNull.Value)
+                //        us.sessionKey = ((string)myReader["session_key"]);
+
+                //    sessions.Add(us);
+
+                //}
+                myReader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in selecting user session", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return ds;
+        }
 		
 		// Will probably need new methods for user sessions by group and by time
 

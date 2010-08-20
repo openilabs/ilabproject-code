@@ -57,12 +57,14 @@
 			<li>
 				<a id="aNav3SBinfo" runat="server" href="sbStats.aspx">Service Broker Information</a></li>
 			<li>
-				<a id="aNav3Reports" runat="server" href="sbReport.aspx">Reports</a></li>
+				<a id="aNav3Reports" runat="server" href="sbReport.aspx">Groups</a></li>
 			<li>
-				<A id="aNav3ExperimentRecords" runat="server" href="experimentRecords.aspx">Experiment 
-					Records</A></li>
+				<A id="aNav3ExperimentRecords" runat="server" href="experimentRecords.aspx">Experiments</A></li>
 			<li>
-				<A id="aNav3LoginRecords" runat="server" href="loginRecords.aspx">Log-in Records</A>
+				<A id="aNav3LoginRecords" runat="server" href="loginRecords.aspx">Log-ins</A>
+			</li>
+			<li>
+				<A id="aNav3SessionHistory" runat="server" href="sessionHistory.aspx">Session History</A>
 			</li>
 		</ul>
 	</div> <!-- end nav3 div -->

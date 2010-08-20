@@ -459,7 +459,8 @@ namespace iLabs.Controls
                 else
                 {
                     message.Append("The self Registration information has not been saved to the database.");
-                    message.Append(" Displaying default values from Web.Config. Please modify & save.");
+                    message.Append(" Displaying default values from Web.Config. Please modify & save.<br/>");
+                    message.Append(" You should use the fully qualified hostname or IP adress inplace of the default 'localhost'.");
 
                     // Need to call selfRegister
                     AgentType = ConfigurationManager.AppSettings["serviceType"];
@@ -701,10 +702,34 @@ namespace iLabs.Controls
                         error = true;
                         message.Append(" You must enter the base URL for the Web Site<br/>");
                     }
+                    else if (txtCodebaseUrl.Text.Contains("localhost"))
+                    {
+                        error = true;
+                        message.Append(" You must not use localhost in a codebase URL, if you must test on the local machine please use '127.0.0.1'.<br/>");
+                    }
                     if (!(txtServiceUrl.Text != null && txtServiceUrl.Text.Length > 0))
                     {
                         error = true;
-                        message.Append(" You must enter full URL of the Web Service page<br/>");
+                        message.Append(" You must enter the web Ssrvice URL for the Web Site<br/>");
+                    }
+                    else if (txtServiceUrl.Text.Contains("localhost"))
+                    {
+                        error = true;
+                        message.Append(" You must not use localhost in a web service URL, if you must test only on the local machine please use '127.0.0.1'.<br/>");
+                    }
+                    else
+                    { // Test for valid webService URL
+                        ProcessAgentProxy paProxy = new ProcessAgentProxy();
+                        paProxy.Url = txtServiceUrl.Text.Trim();
+                        try
+                        {
+                            DateTime serTime = paProxy.GetServiceTime();
+                        }
+                        catch
+                        {
+                                error = true;
+                                message.Append(" There is an error with the web service URL: " + txtServiceUrl.Text.Trim() + " Please check that it is valid and the web service is configured correctly.<br/>");
+                        }
                     }
                     if (error)
                     {
@@ -758,7 +783,7 @@ namespace iLabs.Controls
                     else
                     {
                         dbTicketing.SelfRegisterProcessAgent(ProcessAgentDB.ServiceAgent.agentGuid, txtServiceName.Text, AgentType,
-                                null, txtCodebaseUrl.Text, txtServiceUrl.Text);
+                                null, txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
                         dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
                            txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
                     }
@@ -805,12 +830,35 @@ namespace iLabs.Controls
                 error = true;
                 message.Append(" You must enter the base URL for the Web Site<br/>");
             }
+            else if (txtCodebaseUrl.Text.Contains("localhost"))
+            {
+                error = true;
+                message.Append(" You must not use localhost in a codebase URL, if you must test on the local machine please use '127.0.0.1'.<br/>");
+            }
             if (!(txtServiceUrl.Text != null && txtServiceUrl.Text.Length > 0))
             {
                 error = true;
                 message.Append(" You must enter full URL of the Web Service page<br/>");
             }
-
+            else if (txtServiceUrl.Text.Contains("localhost"))
+            {
+                error = true;
+                message.Append(" You must not use localhost in a web service URL, if you must test only on the local machine please use '127.0.0.1'.<br/>");
+            }
+            else
+            { // Test for valid webService URL
+                ProcessAgentProxy paProxy = new ProcessAgentProxy();
+                paProxy.Url = txtServiceUrl.Text.Trim();
+                try
+                {
+                    DateTime serTime = paProxy.GetServiceTime();
+                }
+                catch
+                {
+                    error = true;
+                    message.Append(" There is an error with the web service URL: " + txtServiceUrl.Text.Trim() + " Please check that it is valid and the web service is configured correctly.<br/>");
+                }
+            }
             if (error)
             {
                 lblResponse.Text = Utilities.FormatErrorMessage(message.ToString());
@@ -822,7 +870,7 @@ namespace iLabs.Controls
                 // Check if domain is set if so only update mutable Fields
                 dbTicketing.SelfRegisterProcessAgent(txtServiceGuid.Text,
                     txtServiceName.Text, lblServiceType.Text, null,
-                    txtCodebaseUrl.Text, txtServiceUrl.Text);
+                    txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
                 dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
                             txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
 
