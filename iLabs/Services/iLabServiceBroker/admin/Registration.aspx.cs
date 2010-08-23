@@ -74,6 +74,7 @@ namespace iLabs.ServiceBroker.admin
                 labClients = wrapper.GetLabClientsWrapper(labClientIDs);
                 foreach (LabClient lc in labClients)
                 {
+                    if ((lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0) && (lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0))
                     ddlClient.Items.Add(new ListItem(lc.clientName, lc.clientID.ToString()));
                 }
             }

@@ -319,8 +319,8 @@ namespace iLabs.Web
                         }
                         else
                         {
-                           Logger.WriteLine("Error InstallDomainCredentials: " + service.codeBaseUrl);
-                            throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                           Logger.WriteLine("Error InstallDomainCredentials: " + service.webServiceUrl);
+                            throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.webServiceUrl);
                         }
                     }
                 }
@@ -342,15 +342,15 @@ namespace iLabs.Web
                         }
                         else
                         {
-                           Logger.WriteLine("Error InstallDomainCredentials: " + service.codeBaseUrl);
-                            throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                           Logger.WriteLine("Error InstallDomainCredentials: " + service.webServiceUrl);
+                            throw new Exception("Error Installing DomainCredentials on: " + ProcessAgentDB.ServiceAgent.webServiceUrl);
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-               Logger.WriteLine("Error on InstallDomainCredentials: " + Utilities.DumpException(e));
+                Logger.WriteLine("Error on InstallDomainCredentials: " + service.webServiceUrl + Utilities.DumpException(e));
                 throw;
             }
             return agent;
