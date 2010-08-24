@@ -1,7 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
-<%@ Page language="c#" CodeFile="register.aspx.cs" AutoEventWireup="false" Inherits="iLabs.ServiceBroker.iLabSB.register" EnableEventValidation="true" %>
+<%@ Page language="c#" CodeFile="register.aspx.cs" Inherits="iLabs.ServiceBroker.iLabSB.register" EnableEventValidation="false" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html>
 	<head>
