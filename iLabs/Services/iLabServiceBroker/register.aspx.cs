@@ -153,51 +153,56 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		private void btnSubmit_Click(object sender, System.EventArgs e)
 		{
+            bool error = false;
+            lblResponse.Text = "";
+            lblResponse.Visible = false;
+            StringBuilder msg = new StringBuilder();
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
             string userName = null;
 			if(txtUsername.Text == "" || txtFirstName.Text == "" || txtLastName.Text == "" || txtEmail.Text == "" || txtPassword.Text == "" || txtConfirmPassword.Text == "")
 			{
-				lblResponse.Text = Utilities.FormatErrorMessage("You must enter a Username, first name, last name, email and password.");
-				lblResponse.Visible = true;
-				return;
+                msg.Append("You must enter a Username, first name, last name, email and password.<br/>");
+                error = true;
+				
 			}
 			if(txtPassword.Text != txtConfirmPassword.Text )
 			{
-				lblResponse.Text = Utilities.FormatErrorMessage("Password fields don't match, please reenter.");
-				lblResponse.Visible = true;
+				msg.Append("Password fields don't match, please reenter.<br/>");
+                error = true;
 				txtPassword.Text = null;
 				txtConfirmPassword.Text = null;
-				return;
 			}
             userName = txtUsername.Text.Trim();
             int curUser = AdministrativeAPI.GetUserID(userName);
             if (curUser > 0)
             {
-                lblResponse.Text = Utilities.FormatErrorMessage("The username you entered is already registered. Please check to see if you have a forgotten password, or choose another username.");
-                lblResponse.Visible = true;
+                msg.Append("The username you entered is already registered. Please check to see if you have a forgotten password, or choose another username.<br/>");
+                error = true;
                 txtPassword.Text = null;
                 txtConfirmPassword.Text = null;
-                return;
             }
 			if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
 				if (ddlAffiliation.SelectedIndex < 1)
 				{
-					lblResponse.Text = Utilities.FormatErrorMessage("Please select an affiliation.");
-					lblResponse.Visible = true;
-					return;
+					msg.Append("Please select an affiliation.<br/>");
+                    error = true;
 				}
 			}
 			else
 			{
 				if (txtAffiliation.Text == "")
 				{
-					lblResponse.Text = Utilities.FormatErrorMessage("Please enter an affiliation.");
-					lblResponse.Visible = true;
-					return;
+					msg.Append("Please enter an affiliation.<br/>");
+					error = true;
 				}
 			}
-
+            if (error)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
+                lblResponse.Visible = true;
+                return;
+            }
 
 			try
 			{
@@ -251,16 +256,19 @@ namespace iLabs.ServiceBroker.iLabSB
                     {
                         userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
                             affiliation, reason, "", AdministrativeUtilities.GetGroupRequestGroup(initialGroup), false);
+                        msg.Append("Added user: " + userName + " into request group ");
                     }
                     else
                     {
                         userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
                             affiliation, reason, "", initialGroup, false);
+                        msg.Append("Added user: " + userName + " ");
                     }
                 }
 				catch(Exception ex)
 				{
-					lblResponse.Text = Utilities.FormatErrorMessage("User could not be added. " + ex.Message + "<br>Please notify " + supportMailAddress);
+                    msg.Append("Exception adding user! User could not be added. " + ex.Message + "<br/>Please notify " + supportMailAddress);
+					lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
 					lblResponse.Visible = true;
 					return;
 				}
@@ -296,7 +304,9 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
                     catch (Exception ge)
                     {
-                        lblResponse.Text = Utilities.FormatErrorMessage(ge.Message);
+                        msg.Append("Error trying group Items: " + ge.Message + "<br/>");
+                        error = true;
+                        //lblResponse.Text = Utilities.FormatErrorMessage(ge.Message);
                     }
 					// email registration
                     StringBuilder message = new StringBuilder();
@@ -342,7 +352,7 @@ namespace iLabs.ServiceBroker.iLabSB
 					{
 						// Report detailed SMTP Errors
 						string smtpErrorMsg;
-						smtpErrorMsg = "Exception: " + ex.Message;
+						smtpErrorMsg = "SMTP Error-Exception: " + ex.Message;
 						//check the InnerException
 						if (ex.InnerException != null)
 							smtpErrorMsg += "<br>Inner Exceptions:";
@@ -352,26 +362,36 @@ namespace iLabs.ServiceBroker.iLabSB
 							ex = ex.InnerException;
 						}
 
-						string msg;
-						msg = "Your request has been submitted, but the system was unable to send the notification email. Please cut & paste this entire message, and send it to " + registrationMailAddress;
-						msg += "<br><br>" + mail.Subject + "<br>" + mail.Body;
-						msg += "<br><br>" + smtpErrorMsg;
-						lblResponse.Text = Utilities.FormatErrorMessage(msg);
-						lblResponse.Visible = true;
+						
+						msg.Append("Your request has been submitted, but the system was unable to send the notification email. Please cut & paste this entire message, and send it to " + registrationMailAddress);
+						msg.Append("<br><br>" + mail.Subject + "<br>" + mail.Body);
+						msg.Append("<br><br>" + smtpErrorMsg);
+						error = true;
 					}
 				}
 				else
 				{
-					lblResponse.Text = Utilities.FormatErrorMessage("Your ID has been taken. Please choose a different user ID.");
-					lblResponse.Visible = true;
+					msg.Append("Your ID has been taken. Please choose a different user ID.<br/>");
+					error = true;
 				}
 				// moved 2 statements into if block which sets user ID to the session - Karim
 			}
 			catch (Exception ex)
 			{
-				lblResponse.Text = Utilities.FormatErrorMessage("Error registering this user. Please report to an administrator at " + supportMailAddress + ".<br>" + ex.Message);
-				lblResponse.Visible = true;
+                msg.Append("Error registering this user. Please report to an administrator at " + supportMailAddress + ".<br>" + ex.Message + "<br/>");
+				error = true;
 			}
+            if (error)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
+                lblResponse.Visible = true;
+            }
+            else if (msg.Length > 0)
+            {
+                lblResponse.Text = Utilities.FormatConfirmationMessage(msg.ToString());
+                lblResponse.Visible = true;
+            }
+
 		}
 
 
