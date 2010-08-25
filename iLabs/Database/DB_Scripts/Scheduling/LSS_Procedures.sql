@@ -1533,9 +1533,9 @@ CREATE PROCEDURE ReservationInfo_RetrieveIDByLabServer
 
 AS
 Create table #expInfo (ids int)
-INSERT INTO #expInf SELECT Experiment_info_ID from Experiment_Info where Lab_Server_GUID = @labServerGUID
+INSERT INTO #expInfo SELECT Experiment_info_ID from Experiment_Info where Lab_Server_GUID = @labServerGUID
 select Reservation_Info_ID from Reservation_Info
-where  Experimment_Info_ID in (SELECT ids from #expInfo) and R.End_Time>@startTime and R.Start_Time<@endTime 
+where  Experiment_Info_ID in (SELECT ids from #expInfo) and End_Time>@startTime and Start_Time<@endTime 
 
 
 

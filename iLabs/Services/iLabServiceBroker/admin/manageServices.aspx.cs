@@ -451,7 +451,7 @@ namespace iLabs.ServiceBroker.admin
         protected void displayService(int agentId)
         {
             ProcessAgentInfo agent = brokerDB.GetProcessAgentInfo(agentId);
-           
+            bool localDomain = true;
             if (agent != null)
             {
                 if (agent.retired)
@@ -473,7 +473,7 @@ namespace iLabs.ServiceBroker.admin
                     }
                     else
                     {
-                   
+                        localDomain = false;
                         ProcessAgent remote = brokerDB.GetProcessAgent(agent.domainGuid);
                         txtDomainServer.Text = remote.agentName;
                     }
@@ -496,31 +496,6 @@ namespace iLabs.ServiceBroker.admin
                     txtLocation.Text = "";
                 }
 
-
-                //Hashtable resources = brokerDB.GetResourceStringTags(agentId, ResourceMappingTypes.PROCESS_AGENT);
-                //if (resources != null)
-                //{
-                //    if (resources.ContainsKey("Description"))
-                //        txtServiceDescription.Text = ((IntTag)resources["Description"]).tag;
-                //    else
-                //        txtServiceDescription.Text = "";
-
-                //    if (resources.ContainsKey("Info URL"))
-                //        txtInfoURL.Text = ((IntTag)resources["Info URL"]).tag;
-                //    else
-                //        txtInfoURL.Text = "";
-
-                //    if (resources.ContainsKey("Contact Email"))
-                //        txtContactEmail.Text = ((IntTag)resources["Contact Email"]).tag;
-                //    else
-                //        txtContactEmail.Text = "";
-                //}
-                //else
-                //{
-                //    txtServiceDescription.Text = "";
-                //    txtInfoURL.Text = "";
-                //    txtContactEmail.Text = "";
-                //}
                 if (agent.agentType.Equals(ProcessAgentType.AgentType.BATCH_LAB_SERVER))
                 {
                     cbxDoBatch.Checked = true;
@@ -549,7 +524,7 @@ namespace iLabs.ServiceBroker.admin
                     if (!agent.agentType.Equals(ProcessAgentType.AgentType.SERVICE_BROKER)
                     && !agent.agentType.Equals(ProcessAgentType.AgentType.REMOTE_SERVICE_BROKER)
                     && !agent.agentType.Equals(ProcessAgentType.AgentType.EXPERIMENT_STORAGE_SERVER)
-                    && agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                    && localDomain)
                     {
                         // Admin Group List
 
@@ -606,12 +581,17 @@ namespace iLabs.ServiceBroker.admin
                         //ddlAdminGroup.Visible = false;
                         //lblAdminGroup.Visible = false;
                     }
-                    if (agent.agentType.Equals(ProcessAgentType.AgentType.LAB_SERVER) && agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                    if (agent.agentType.Equals(ProcessAgentType.AgentType.LAB_SERVER))
                     {
                         trAssociate.Visible = true;
-                        trManage.Visible = true;
                         CheckAssociatedLSSForLS(agentId);
-
+                        trManage.Visible = true;
+                        if (!localDomain)
+                        {
+                            ddlLSS.Enabled = false;
+                            btnAssociateLSS.Visible = false;
+                            trManage.Visible = false;
+                        }
                     }
                     else
                     {

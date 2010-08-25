@@ -267,7 +267,8 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
 				catch(Exception ex)
 				{
-                    msg.Append("Exception adding user! User could not be added. " + ex.Message + "<br/>Please notify " + supportMailAddress);
+                    msg.Append("Exception adding user! User could not be added.<br/>Please notify " + supportMailAddress +"<br/>");
+                    msg.Append(Utilities.DumpException(ex));
 					lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
 					lblResponse.Visible = true;
 					return;
@@ -378,7 +379,8 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 			catch (Exception ex)
 			{
-                msg.Append("Error registering this user. Please report to an administrator at " + supportMailAddress + ".<br>" + ex.Message + "<br/>");
+                msg.Append("Error registering this user. Please report to an administrator at " + supportMailAddress + ".<br/>");
+                msg.Append(Utilities.DumpException(ex) + "<br/>");
 				error = true;
 			}
             if (error)
