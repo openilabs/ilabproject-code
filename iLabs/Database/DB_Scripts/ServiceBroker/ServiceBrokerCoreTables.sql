@@ -386,9 +386,9 @@ GO
 
 /****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Agents] (
+	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
 	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Is_Group] [bit] NOT NULL ,
-	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL 
+	[Is_Group] [bit] NOT NULL 
 ) ON [PRIMARY]
 GO
 
@@ -505,17 +505,16 @@ CREATE TABLE [dbo].[Lab_Clients] (
 	[NeedsScheduling] [bit] NOT NULL,
 	[NeedsESS] [bit] NOT NULL,
 	[IsReentrant] [bit] NOT NULL,
-	[Loader_Script] [nvarchar](2000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Date_Created] [datetime] NOT NULL,
 	[Long_Description] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Client_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Lab_Client_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Loader_Script] [nvarchar](2000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Contact_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Short_Description] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Version] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Contact_First_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Contact_Last_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Date_Created] [datetime] NOT NULL ,
-	[Client_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Lab_Client_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	
+	[Contact_Last_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[Notes] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
@@ -780,6 +779,10 @@ ALTER TABLE [dbo].[Lab_Clients] WITH NOCHECK ADD
 	CONSTRAINT [PK_LabClients] PRIMARY KEY  CLUSTERED 
 	(
 		[Client_ID]
+	)  ON [PRIMARY],
+	CONSTRAINT [IX_Lab_Clients] UNIQUE  NONCLUSTERED 
+	(
+		[Client_Guid]
 	)  ON [PRIMARY] 
 GO
 
