@@ -74,11 +74,22 @@ namespace iLabs.ServiceBroker.admin
                 labClients = wrapper.GetLabClientsWrapper(labClientIDs);
                 foreach (LabClient lc in labClients)
                 {
+                    // Check that the client is not a 6.1 Batch client and that it is from this domain
                     if ((lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0) && (lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0))
-                    ddlClient.Items.Add(new ListItem(lc.clientName, lc.clientID.ToString()));
+                    {
+                        if ((lc.labServerIDs.Length > 0) && (lc.labServerIDs[0] > 0))
+                        {
+                            ProcessAgent ls = brokerDb.GetProcessAgent(lc.labServerIDs[0]);
+                            if (ls != null && ls.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                            {
+                                ddlClient.Items.Add(new ListItem(lc.clientName, lc.clientID.ToString()));
+                            }
+                        }
+                    }
                 }
             }
         }
+
         protected void ddlServiceBroker_SelectedIndexChanged(object sender, EventArgs e)
         {
             lblResponse.Visible = false;
