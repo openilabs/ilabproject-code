@@ -96,7 +96,7 @@ namespace iLabs.ServiceBroker.admin
 					aNav3ManageLabClients.Attributes.Add("class", "nav3active");
 					aNav3ManageLabs.Attributes.Add("class", "last");
 					break;
-				case "Registration.aspx":
+				case "crossRegistration.aspx":
 					aManageServices.Attributes.Add("class", "topactive");
 					ulNav3Labs.Visible = true;
                     aNav3ServiceBrokerInfo.Attributes.Add("class", "first");

@@ -40,7 +40,7 @@
 			<li>
 				<A id="aNav3ManageLabClients" runat="server" href="manageLabClients.aspx">Manage Lab Clients</A></li>
 			<li>
-				<A id="aNav3ManageLabs" runat="server" href="Registration.aspx">Cross-domain Registration</A></li>
+				<A id="aNav3ManageLabs" runat="server" href="crossRegistration.aspx">Cross-domain Registration</A></li>
 		</ul>
 		<ul id="ulNav3UsersGroups" runat="server" class="navlist3">
 			<!-- Users and Groups navigation -->

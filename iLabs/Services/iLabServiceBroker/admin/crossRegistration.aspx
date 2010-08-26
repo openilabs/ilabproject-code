@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Registration.aspx.cs" Inherits="iLabs.ServiceBroker.admin.CrossRegistration" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="crossRegistration.aspx.cs" Inherits="iLabs.ServiceBroker.admin.CrossRegistration" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="../banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
