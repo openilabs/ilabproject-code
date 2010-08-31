@@ -27,7 +27,8 @@ Please see license.txt in top level directory for full license.
 			    <uc1:adminNav id="AdminNav1" runat="server"></uc1:adminNav>
 			    <br clear="all" />
 				<div id="innerwrapper">
-					<iLab:RegisterSelf id="selfReg"  runat="server" AgentType="SERVICE BROKER" ></iLab:RegisterSelf>
+					<iLab:RegisterSelf id="selfReg"  runat="server" AgentType="SERVICE BROKER"  MaxGuidLength="35" 
+					GuidWarning="To support batch lab servers ServiceBroker GUIDs MaxLength is: "></iLab:RegisterSelf>
 				</div><!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>
 			</div>

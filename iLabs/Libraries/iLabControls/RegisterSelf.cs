@@ -641,23 +641,35 @@ namespace iLabs.Controls
            AgentGuid = Utilities.MakeGuid();
            txtServiceGuid.Text = AgentGuid;
         }
+        protected Byte[] parseToUTF8(string str){
+             UTF8Encoding utf8 = new UTF8Encoding(false, true);
+                Byte[] bytes = null;
+                try
+                {
+                    bytes = utf8.GetBytes(str);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("There are illegal characters in the string.",e);
+                }
+            return bytes;
+        }
 
         protected bool checkGuid()
         {
             bool status = false;
             StringBuilder buf = new StringBuilder();
-            if (txtServiceGuid.Text == null || txtServiceGuid.Text.Length == 0){
+            if (txtServiceGuid.Text == null || txtServiceGuid.Text.Trim().Length == 0)
+            {
                 throw new Exception("You must enter a GUID string!");
             }else{
-                UTF8Encoding utf8 = new UTF8Encoding(false, true);
                 Byte[] bytes = null;
-                try
-                {
-                    bytes = utf8.GetBytes(txtServiceGuid.Text);
+                try{
+                    
+                    bytes = parseToUTF8(txtServiceGuid.Text.Trim());
                 }
-                catch (Exception e)
-                {
-                    throw new Exception("There are illegal characters in the GUID string.",e);
+                catch(Exception e){
+                    throw new Exception("Error on GUID string: " + e.Message);
                 }
                 if(bytes.Length > maxGuidLength){
                     throw new Exception("The GUID string has too many characters. Max length is " + maxGuidLength);
@@ -782,8 +794,11 @@ namespace iLabs.Controls
                     }
                     else
                     {
+                        string tmpGuid = null;
+                        if(AgentType == ProcessAgentType.SERVICE_BROKER)
+                            tmpGuid = ProcessAgentDB.ServiceAgent.agentGuid;
                         dbTicketing.SelfRegisterProcessAgent(ProcessAgentDB.ServiceAgent.agentGuid, txtServiceName.Text, AgentType,
-                                null, txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
+                                tmpGuid, txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
                         dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
                            txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
                     }
@@ -868,9 +883,13 @@ namespace iLabs.Controls
             else
             {
                 // Check if domain is set if so only update mutable Fields
-                dbTicketing.SelfRegisterProcessAgent(txtServiceGuid.Text,
+                dbTicketing.SelfRegisterProcessAgent(txtServiceGuid.Text.Trim(),
                     txtServiceName.Text, lblServiceType.Text, null,
                     txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
+                if (AgentType == ProcessAgentType.SERVICE_BROKER)
+                {
+                    dbTicketing.SetDomainGuid(txtServiceGuid.Text.Trim());
+                }
                 dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
                             txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
 

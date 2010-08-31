@@ -88,19 +88,19 @@ ALTER TABLE [dbo].[IssuedTicket] ADD
 		[Coupon_ID]
 	) REFERENCES [dbo].[IssuedCoupon] (
 		[Coupon_ID]
-	) ON DELETE CASCADE  ON UPDATE CASCADE ,
+	) ON DELETE CASCADE,
 	CONSTRAINT [FK_IssuedTicket_Sponsor] FOREIGN KEY 
 	(
 		[Sponsor_GUID]
 	) REFERENCES [dbo].[ProcessAgent] (
 		[Agent_GUID]
-	),
+	)ON DELETE CASCADE,
 	CONSTRAINT [FK_IssuedTicket_Redeemer] FOREIGN KEY 
 	(
 		[Redeemer_GUID]
 	) REFERENCES [dbo].[ProcessAgent] (
 		[Agent_GUID]
-	),
+	)ON DELETE NO ACTION,
 	CONSTRAINT [FK_IssuedTicket_Ticket_Type] FOREIGN KEY 
 	(
 		[Ticket_Type_ID]

@@ -224,8 +224,12 @@ namespace iLabs.ServiceBroker.iLabSB
         {
             // if the remote process agent is a Service Broker, register it as a remote service broker
             if (service.type.Equals(ProcessAgentType.SERVICE_BROKER))
+            {
                 service.type = ProcessAgentType.REMOTE_SERVICE_BROKER;
+            }
+            //else{
             return base.installDomainCredentials(service, inIdentCoupon, outIdentCoupon);
+
 
         }
 /*

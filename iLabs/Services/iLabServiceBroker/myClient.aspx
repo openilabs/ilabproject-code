@@ -37,14 +37,23 @@ Please see license.txt in top level directory for full license.
 					<!-- end pageintro div -->
 					<div id="pagecontent">
 						<div id="messagebox-right">
-							<h3><asp:label id="lblGroupNameSystemMessage" Runat="server"></asp:label></h3>
-							<asp:repeater id="repSystemMessage" runat="server">
+						    <h3><asp:label id="lblServerSystemMessage" Runat="server"></asp:label></h3>
+							<asp:repeater id="repServerMessage" runat="server">
 								<ItemTemplate>
 								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>
 									<p class="message"><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %></p>
 									<p class="date">Date Posted:<%# userFormatTime((DateTime) DataBinder.GetPropertyValue(Container.DataItem, "LastModified")) %></p>
 								</ItemTemplate>
-							</asp:repeater></div>
+							</asp:repeater>
+							<h3><asp:label id="lblGroupNameSystemMessage" Runat="server"></asp:label></h3>
+							<asp:repeater id="repGroupMessage" runat="server">
+								<ItemTemplate>
+								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>
+									<p class="message"><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %></p>
+									<p class="date">Date Posted:<%# userFormatTime((DateTime) DataBinder.GetPropertyValue(Container.DataItem, "LastModified")) %></p>
+								</ItemTemplate>
+							</asp:repeater>
+						</div>
 						<!-- Div id "singlelab" is displayed if only one client is available. Otherwise, div class "group" is displayed, which has a list of available labs. -->
 						<div class="singlelab-left">
 							<h3>Lab Client:

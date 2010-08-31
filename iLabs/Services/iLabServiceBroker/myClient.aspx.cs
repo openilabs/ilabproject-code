@@ -311,45 +311,50 @@ namespace iLabs.ServiceBroker.iLabSB
 
 
                 // System_Messages block
-                if (Session["ClientCount"] == null || Convert.ToInt32(Session["ClientCount"]) != 1)
-                {
-                    lblGroupNameSystemMessage.Text = "Messages for " + groupName;
-                }
-                else
-                {
-                    if (lc != null)
-                    {
-                        lblGroupNameSystemMessage.Text = "Messages for " + lc.clientName;
-                    }
-                }
-                List<SystemMessage> messagesList = new List<SystemMessage>();
+               
                 SystemMessage[] groupMessages = null;
-                if (Session["ClientCount"] == null || Convert.ToInt32(Session["ClientCount"]) != 1)
+                SystemMessage[] serverMessages = null;
+                groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
+                if (lc != null && lc.labServerIDs[0] > 0)
                 {
-                    groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
-                    if (groupMessages != null && groupMessages.Length > 0)
-                        messagesList.AddRange(groupMessages);
+                    serverMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, lc.labServerIDs[0]);
                 }
-                if (lc != null)
+                if ((groupMessages == null || groupMessages.Length == 0) && (serverMessages == null || serverMessages.Length == 0))
                 {
 
-                    foreach (int labServerID in lc.labServerIDs)
-                    {
-                        SystemMessage[] labMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServerID);
-                        if (labMessages != null)
-                            messagesList.AddRange(labMessages);
-                    }
-                }
-                if (messagesList != null && messagesList.Count > 0)
-                {
-                    messagesList.Sort(SystemMessage.CompareDateDesc);
-                    repSystemMessage.DataSource = messagesList;
-                    repSystemMessage.DataBind();
+                    lblGroupNameSystemMessage.Text += "No Messages at this time!";
+                    lblGroupNameSystemMessage.Visible = true;
+                    lblServerSystemMessage.Visible = false;
                 }
                 else
                 {
-                    lblGroupNameSystemMessage.Text += "</h3><p>No Messages at this time</p><h3>";
+                    if (groupMessages != null && groupMessages.Length > 0)
+                    {
+                        //lblGroupNameSystemMessage.Text = "Messages for " + groupName;
+                        lblGroupNameSystemMessage.Text = "Group Messages:";
+                        lblGroupNameSystemMessage.Visible = true;
+                        repGroupMessage.DataSource = groupMessages;
+                        repGroupMessage.DataBind();
+                    }
+                    else
+                    {
+                        lblGroupNameSystemMessage.Visible = false;
+                    }
+
+                    if (serverMessages != null && serverMessages.Length > 0)
+                    {
+                        //lblGroupNameSystemMessage.Text = "Messages for " + groupName;
+                        lblServerSystemMessage.Text = "Client/Server Messages:";
+                        lblServerSystemMessage.Visible = true;
+                        repServerMessage.DataSource = serverMessages;
+                        repServerMessage.DataBind();
+                    }
+                    else
+                    {
+                        lblServerSystemMessage.Visible = false;
+                    }
                 }
+               
             }
         }
 

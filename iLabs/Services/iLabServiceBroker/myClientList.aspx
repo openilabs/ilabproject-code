@@ -36,8 +36,7 @@ Please see license.txt in top level directory for full license.
 					</div> <!-- end pageintro div -->
 					<div id="pagecontent">
 						<div id="messagebox-right">
-							<h3>Messages for
-								<asp:Label ID="lblGroupNameSystemMessage" Runat="server"></asp:Label></h3>
+							<h3><asp:Label ID="lblGroupNameSystemMessage" Runat="server"></asp:Label></h3>
 							<asp:repeater id="repSystemMessage" runat="server">
 								<ItemTemplate>
 								    <h4><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageTitle")) %></h4>

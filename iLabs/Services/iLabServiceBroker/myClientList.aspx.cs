@@ -61,22 +61,19 @@ namespace iLabs.ServiceBroker.iLabSB
 			repLabs.DataSource = lcList;
 			repLabs.DataBind();
 
-            List<SystemMessage> messagesList = new List<SystemMessage>();
+         
             SystemMessage[] groupMessages = null;
-            
             groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
-            if (groupMessages != null)
-                messagesList.AddRange(groupMessages);
-
-            if (messagesList != null && messagesList.Count > 0)
+          
+            if (groupMessages != null && groupMessages.Length > 0)
             {
-                messagesList.Sort(SystemMessage.CompareDateDesc);
-                repSystemMessage.DataSource = messagesList;
+                lblGroupNameSystemMessage.Text = "Group Messages:";
+                repSystemMessage.DataSource = groupMessages;
                 repSystemMessage.DataBind();
             }
             else
             {
-                lblGroupNameSystemMessage.Text += "<p>No Messages at this time</p>";
+                lblGroupNameSystemMessage.Text = "No Messages at this time!";
             }
 		}
       
