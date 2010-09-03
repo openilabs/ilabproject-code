@@ -43,6 +43,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Experiment
 drop procedure [dbo].[ExperimentInfo_Modify]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ExperimentInfo_ModifyCore]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ExperimentInfo_ModifyCore]
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ExperimentInfo_ModifyLabServer]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[ExperimentInfo_ModifyLabServer]
 GO
@@ -559,6 +563,27 @@ select @@rowcount
 
 RETURN
 
+CREATE PROCEDURE ExperimentInfo_ModifyCore
+
+@experimentInfoID int,
+@labClientGUID varchar(50),
+@labServerGUID varchar(50),
+@labServerName nvarchar(256),
+@labClientVersion nvarchar(50),
+@labClientName nvarchar(256),
+@providerName nvarchar(256)
+
+
+ AS
+
+update Experiment_Info set Lab_Client_GUID=@labClientGUID,Lab_Server_GUID=@labServerGUID, 
+Lab_Server_Name=@labServerName, Lab_Client_Version=@labClientVersion,Lab_Client_Name=@labClientName, 
+Provider_Name=@providerName
+where Experiment_Info_ID=@experimentInfoID
+
+select @@rowcount
+
+RETURN
 
 GO
 SET QUOTED_IDENTIFIER OFF 
