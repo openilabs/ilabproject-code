@@ -856,7 +856,7 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="earlyArriveTime"></param>
         /// <returns></returns>true if modified successfully, falso otherwise
         public static bool ModifyExperimentInfo(int experimentInfoID, string labServerGuid, string labServerName,
-            string labClientGuid, string labClientName, string labClientVersion, string providerNameLimited)
+            string labClientGuid, string labClientName, string labClientVersion, string providerName)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();

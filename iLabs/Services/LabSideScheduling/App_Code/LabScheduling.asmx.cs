@@ -439,6 +439,7 @@ namespace iLabs.Scheduling.LabSide
             string clientGuid, string clientName, string clientVersion,
             string providerName)
         {
+            bool status = false;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 int id = LSSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
@@ -450,9 +451,9 @@ namespace iLabs.Scheduling.LabSide
                 }
                 else
                 {
-                    id = LSSSchedulingAPI.ModifyExperimentInfo(labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName);
+                    status = LSSSchedulingAPI.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName);
                 }
-                return (id > 0)? 1:0;
+                return (status)? 1:0;
             }
             else
                 return 0;
@@ -469,14 +470,11 @@ namespace iLabs.Scheduling.LabSide
             int id = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (id > 0)
             {
-                LssExperimentInfo[] exps = DBManager.GetExperimentInfos(new int[] { id });
-                if (exps != null && exps.Length > 0)
-                {
+                
                     if (DBManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName,
-                        clientVersion, providerName, null,
-                        exps[0].prepareTime, exps[0].recoverTime, exps[0].minimumTime, exps[0].earlyArriveTime))
+                        clientVersion, providerName))
                         status++;
-                }
+                
             }
             return status;
         }
