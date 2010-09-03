@@ -374,10 +374,15 @@ namespace iLabs.Web
             return status;
         }
 
-
+        /// <summary>
+        /// This only registers the ProviderInfo systemSupport block(s)
+        /// </summary>
+        /// <param name="registerGuid"></param>
+        /// <param name="info"></param>
         protected virtual void register(string registerGuid, ServiceDescription[] info)
         {
-            StringBuilder message = new StringBuilder("Register called on " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
+            StringBuilder message = new StringBuilder();
+            message.AppendLine("Register called on " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
 
             if (info != null && info.Length > 0)
             {
@@ -388,34 +393,37 @@ namespace iLabs.Web
                     {
                         coupon = sd.coupon;
                     }
-                    XmlQueryDoc xdoc = new XmlQueryDoc(sd.serviceProviderInfo);
-                    string descriptorType = xdoc.GetTopName();
-                    if (descriptorType.Equals("systemSupport"))
+                    if (sd.serviceProviderInfo != null && sd.serviceProviderInfo.Length > 0)
                     {
-                        SystemSupport ss = SystemSupport.Parse(xdoc);
-                        if (ss.agentGuid != null && ss.agentGuid.Length > 0)
+                        XmlQueryDoc xdoc = new XmlQueryDoc(sd.serviceProviderInfo);
+                        string descriptorType = xdoc.GetTopName();
+                        if (descriptorType.Equals("systemSupport"))
                         {
-                            int id = dbTicketing.GetProcessAgentID(ss.agentGuid);
-                            if (id > 0)
+                            SystemSupport ss = SystemSupport.Parse(xdoc);
+                            if (ss.agentGuid != null && ss.agentGuid.Length > 0)
                             {
-                                dbTicketing.SaveSystemSupport(ss.agentGuid, ss.contactEmail, ss.bugEmail,
-                                    ss.infoUrl, ss.description, ss.location);
-                                if (sd.consumerInfo != null && sd.consumerInfo.CompareTo("requestSystemSupport") == 0)
+                                int id = dbTicketing.GetProcessAgentID(ss.agentGuid);
+                                if (id > 0)
                                 {
-                                    ProcessAgentInfo paInfo = dbTicketing.GetProcessAgentInfo(ss.agentGuid);
-                                    if (paInfo != null)
+                                    dbTicketing.SaveSystemSupport(ss.agentGuid, ss.contactEmail, ss.bugEmail,
+                                        ss.infoUrl, ss.description, ss.location);
+                                    if (sd.consumerInfo != null && sd.consumerInfo.CompareTo("requestSystemSupport") == 0)
                                     {
-                                        SystemSupport mySS = dbTicketing.RetrieveSystemSupport(ProcessAgentDB.ServiceGuid);
-                                        if (mySS != null)
+                                        ProcessAgentInfo paInfo = dbTicketing.GetProcessAgentInfo(ss.agentGuid);
+                                        if (paInfo != null)
                                         {
-                                            ServiceDescription[] values = new ServiceDescription[1];
-                                            values[0] = new ServiceDescription(mySS.ToXML(), null, null);
-                                            ProcessAgentProxy proxy = new ProcessAgentProxy();
-                                            proxy.Url = paInfo.webServiceUrl;
-                                            proxy.AgentAuthHeaderValue = new AgentAuthHeader();
-                                            proxy.AgentAuthHeaderValue.coupon = paInfo.identOut;
-                                            proxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                            proxy.Register(registerGuid, values);
+                                            SystemSupport mySS = dbTicketing.RetrieveSystemSupport(ProcessAgentDB.ServiceGuid);
+                                            if (mySS != null)
+                                            {
+                                                ServiceDescription[] values = new ServiceDescription[1];
+                                                values[0] = new ServiceDescription(mySS.ToXML(), null, null);
+                                                ProcessAgentProxy proxy = new ProcessAgentProxy();
+                                                proxy.Url = paInfo.webServiceUrl;
+                                                proxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                                proxy.AgentAuthHeaderValue.coupon = paInfo.identOut;
+                                                proxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                                proxy.Register(registerGuid, values);
+                                            }
                                         }
                                     }
                                 }
