@@ -386,19 +386,38 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="labClientName"></param>
         /// <param name="labClientVersion"></param>
 		/// <param name="providerName"></para
-		/// <param name="prepareTime"></param>
-		/// <param name="recoverTime"></param>
-		/// <param name="minimumTime"></param>
-		/// <param name="earlyArriveTime"></param>
 		/// <returns></returns>true if modified successfully, falso otherwise
         public static bool ModifyExperimentInfo(int experimentInfoID, string labServerGuid, string labServerName,
-             string labClientGuid, string labClientName, string labClientVersion, string providerName, 
-            string contactEmail, int prepareTime, int recoverTime, int minimumTime, int earlyArriveTime)
+             string labClientGuid, string labClientName, string labClientVersion, string providerName)
 		{
             bool i = DBManager.ModifyExperimentInfo(experimentInfoID, labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion,
-                providerName, contactEmail,prepareTime, recoverTime, minimumTime, earlyArriveTime);
+                providerName);
 		    return i;
 		}
+
+        /// <summary>
+        /// update the data fields for the experiment information specified by the experimentInfoID
+        /// </summary>
+        /// <param name="experimentInfoID"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labServerName"></param>
+        /// <param name="labClientName"></param>
+        /// <param name="labClientVersion"></param>
+        /// <param name="providerName"></para
+        /// <param name="prepareTime"></param>
+        /// <param name="recoverTime"></param>
+        /// <param name="minimumTime"></param>
+        /// <param name="earlyArriveTime"></param>
+        /// <returns></returns>true if modified successfully, falso otherwise
+        public static bool ModifyExperimentInfo(int experimentInfoID, string labServerGuid, string labServerName,
+             string labClientGuid, string labClientName, string labClientVersion, string providerName,
+            string contactEmail, int prepareTime, int recoverTime, int minimumTime, int earlyArriveTime)
+        {
+            bool i = DBManager.ModifyExperimentInfo(experimentInfoID, labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion,
+                providerName, contactEmail, prepareTime, recoverTime, minimumTime, earlyArriveTime);
+            return i;
+        }
+
 
         /// <summary>
         /// get the labserver name according to the labserver ID
@@ -450,9 +469,9 @@ namespace iLabs.Scheduling.LabSide
 			 * !------------------------------------------------------------------------------!
 			 */
 
-        public static int CheckForLSResource(string guid, string name)
+        public static int CheckForLSResource(string labServerGuid, string labServerName)
         {
-            return DBManager.CheckForLSResource(guid, name);
+            return DBManager.CheckForLSResource(labServerGuid, labServerName);
         }
         public static LSResource GetLSResource(int id)
         {

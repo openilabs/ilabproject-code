@@ -441,9 +441,17 @@ namespace iLabs.Scheduling.LabSide
         {
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
-                int id = LSSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
-                    clientVersion, providerName,null, 0, 0, 0, 0);
-                int ok = LSSSchedulingAPI.CheckForLSResource(labServerGuid, labServerName);
+                int id = LSSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+                if (id <= 0)
+                {
+                    id = LSSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
+                        clientVersion, providerName, null, 1, 0, 0, 0);
+                    int ok = LSSSchedulingAPI.CheckForLSResource(labServerGuid, labServerName);
+                }
+                else
+                {
+                    id = LSSSchedulingAPI.ModifyExperimentInfo(labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName);
+                }
                 return (id > 0)? 1:0;
             }
             else

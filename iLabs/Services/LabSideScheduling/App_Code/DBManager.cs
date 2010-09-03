@@ -841,6 +841,69 @@ namespace iLabs.Scheduling.LabSide
 			return uIDs;			
 		}
 
+        /// <summary>
+        /// update the data fields for the experiment information specified by the experimentInfoID
+        /// </summary>
+        /// <param name="experimentInfoID"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labServerName"></param>
+        /// <param name="labClientVersion"></param>
+        /// <param name="labClientName"></param>
+        /// <param name="providerName"></param>
+        /// <param name="prepareTime"></param>
+        /// <param name="recoverTime"></param>
+        /// <param name="minimumTime"></param>
+        /// <param name="earlyArriveTime"></param>
+        /// <returns></returns>true if modified successfully, falso otherwise
+        public static bool ModifyExperimentInfo(int experimentInfoID, string labServerGuid, string labServerName,
+            string labClientGuid, string labClientName, string labClientVersion, string providerNameLimited)
+        {
+            //create a connection
+            DbConnection connection = FactoryDB.GetConnection();
+            //create a command
+            //command executes the "ModifyExperimentInfo" store procedure
+            DbCommand cmd = FactoryDB.CreateCommand("ExperimentInfo_ModifyCore", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@experimentInfoID", experimentInfoID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labClientGUID", labClientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGUID", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerName", labServerName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labClientVersion", labClientVersion, DbType.String, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labClientName", labClientName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@providerName", providerName, DbType.String, 256));
+            
+
+            bool i = false;
+
+            // execute the command
+            try
+            {
+                connection.Open();
+                int m = 0;
+                Object ob = cmd.ExecuteScalar();
+                if (ob != null && ob != System.DBNull.Value)
+                {
+                    m = Int32.Parse(ob.ToString());
+                }
+                if (m != 0)
+                {
+                    i = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add Modify Experiment Infomation", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return i;
+
+        }
+
+
 		/// <summary>
 		/// update the data fields for the experiment information specified by the experimentInfoID
 		/// </summary>
@@ -1217,14 +1280,14 @@ namespace iLabs.Scheduling.LabSide
 			 * !------------------------------------------------------------------------------!
 			 */
 
-        public static int CheckForLSResource(string guid, string labServerName){
+        public static int CheckForLSResource(string labServerGuid, string labServerName){
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
             //create a command
             DbCommand cmd = FactoryDB.CreateCommand("Resource_AddGetID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@guid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@guid", labServerGuid, DbType.AnsiString, 50));
             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", labServerName, DbType.String,256));
             
             int i = -1;
