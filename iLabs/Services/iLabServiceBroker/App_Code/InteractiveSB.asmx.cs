@@ -325,7 +325,15 @@ namespace iLabs.ServiceBroker.iLabSB
                 throw new ArgumentNullException("Register called without any ServiceDescriptions");
             }
 
-            base.register(registerGuid, info);
+            try
+            {
+                base.register(registerGuid, info);
+            }
+            catch (Exception e)
+            {
+                message.AppendLine("Error in base.register" + Utilities.DumpException(e));
+                throw new Exception(message.ToString(), e);
+            }
             bool hasProvider = false;
             bool hasConsumer = false;
             string ns = "";
@@ -336,7 +344,7 @@ namespace iLabs.ServiceBroker.iLabSB
             ProcessAgentInfo ls = null;
             ProcessAgentInfo lss = null;
             ProcessAgentInfo uss = null;
-            LabClient labClient;
+            LabClient labClient = null;
             GroupCredential credential = null;
             try
             {
@@ -427,116 +435,112 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
                         else if (descriptorType.Equals("systemSupport"))
                         {
-                            SystemSupport ss = SystemSupport.Parse(xdoc);
-                            if (ss.agentGuid != null && ss.agentGuid.Length > 0)
-                            {
-                                int id = brokerDB.GetProcessAgentID(ss.agentGuid);
-                                if (id > 0)
-                                {
-                                    brokerDB.SaveSystemSupport(ss.agentGuid, ss.contactEmail, ss.bugEmail,
-                                        ss.infoUrl, ss.description, ss.location);
-                                    message.AppendLine("Adding SystemSupport information for " + ss.agentGuid);
-                                }
-                            }
+                            // Already handled in base.register
+                          
                         }
                         // Add Relationships: LSS, LS Client
                     } // end of ServiceProvider
                     if (info[i].consumerInfo != null && info[i].consumerInfo.Length > 0)
                     {
-                        if (!hasConsumer)
-                            message.AppendLine("Consumer Info:");
-                        hasConsumer = true;
-                        XmlQueryDoc xdoc = new XmlQueryDoc(info[i].consumerInfo);
-                        string descriptorType = xdoc.GetTopName();
-                        if (descriptorType.Equals("processAgentDescriptor"))
+                          // requestSystemSupport Handled by base register & there is no xml dcument
+                        if (info[i].consumerInfo.CompareTo("requestSystemSupport") != 0)
                         {
-                            string paGuid = xdoc.Query("/processAgentDescriptor/agentGuid");
-                            ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(paGuid);
-                            if (paInfo == null)
+                            message.AppendLine("Consumer Info: " + info[i].consumerInfo);
+                            //if (!hasConsumer)
+                            //    message.AppendLine("Consumer Info: " + info[i].consumerInfo);
+                            hasConsumer = true;
+                            XmlQueryDoc xdoc = new XmlQueryDoc(info[i].consumerInfo);
+                            string descriptorType = xdoc.GetTopName();
+                            if (descriptorType.Equals("processAgentDescriptor"))
                             {
-                                // Not in database
-                                paInfo = rFactory.LoadProcessAgent(xdoc, ref message);
-                                message.Append("Loaded new ");
-                            }
-                            else
-                            {
-                                message.Append("Reference to existing ");
-                                if (paInfo.retired)
+                                string paGuid = xdoc.Query("/processAgentDescriptor/agentGuid");
+                                ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(paGuid);
+                                if (paInfo == null)
                                 {
-                                    throw new Exception("The ProcessAgent is retired");
+                                    // Not in database
+                                    paInfo = rFactory.LoadProcessAgent(xdoc, ref message);
+                                    message.Append("Loaded new ");
+                                }
+                                else
+                                {
+                                    message.Append("Reference to existing ");
+                                    if (paInfo.retired)
+                                    {
+                                        throw new Exception("The ProcessAgent is retired");
+                                    }
+                                }
+
+                                if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SCHEDULING_SERVER)
+                                {
+                                    lss = paInfo;
+                                    message.AppendLine("LSS: " + paGuid);
+                                }
+                                else if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SERVER)
+                                {
+                                    ls = paInfo;
+                                    message.AppendLine("LS: " + paGuid);
+                                }
+                                else if (paInfo.agentType == ProcessAgentType.AgentType.SCHEDULING_SERVER)
+                                {
+                                    uss = paInfo;
+                                    message.AppendLine("USS: " + paGuid);
+                                    if (lss != null)
+                                    {
+                                        if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                                        {
+                                            message.AppendLine("Registering USSinfo on LSS: " + lss.agentName);
+                                            LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                                            lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                            lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
+                                            lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                            lssProxy.Url = lss.webServiceUrl;
+                                            lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, coupon);
+                                        }
+                                        else
+                                        {
+                                            message.AppendLine("LSS is not from this domain");
+                                        }
+                                    }
+                                }
+
+                            }
+                            else if (descriptorType.Equals("clientDescriptor"))
+                            {
+                                int newClientId = -1;
+                                string clientGuid = xdoc.Query("/clientDescriptor/clientGuid");
+                                int clientId = AdministrativeAPI.GetLabClientID(clientGuid);
+                                if (clientId > 0)
+                                {
+                                    // Already in database
+                                    message.Append(" Attempt to Register a LabClient that is already in the database. ");
+                                    message.AppendLine(" GUID: " + clientGuid);
+                                }
+                                else
+                                {
+                                    clientId = rFactory.LoadLabClient(xdoc, ref message);
+                                    message.AppendLine("Adding Lab Client GUID: " + clientGuid);
                                 }
                             }
-
-                            if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SCHEDULING_SERVER)
+                            else if (descriptorType.Equals("credentialDescriptor"))
                             {
-                                lss = paInfo;
-                                message.AppendLine("LSS: " + paGuid);
-                            }
-                            else if (paInfo.agentType == ProcessAgentType.AgentType.LAB_SERVER)
-                            {
-                                ls = paInfo;
-                                message.AppendLine("LS: " + paGuid);
-                            }
-                            else if (paInfo.agentType == ProcessAgentType.AgentType.SCHEDULING_SERVER)
-                            {
-                                uss = paInfo;
-                                message.AppendLine("USS: " + paGuid);
+                                credential = rFactory.ParseCredential(xdoc, ref message);
                                 if (lss != null)
                                 {
                                     if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                                     {
-                                        message.AppendLine("Registering USSinfo on LSS: " + lss.agentName);
+                                        message.AppendLine("Registering Group Credentials on LSS: " + lss.agentName);
+                                        message.AppendLine("Group:  " + credential.groupName + " DomainServer: " + credential.domainServerName);
                                         LabSchedulingProxy lssProxy = new LabSchedulingProxy();
                                         lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                                         lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
                                         lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
                                         lssProxy.Url = lss.webServiceUrl;
-                                        lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, coupon);
+                                        lssProxy.AddCredentialSet(credential.domainGuid, credential.domainServerName, credential.groupName, credential.ussGuid);
                                     }
                                     else
                                     {
                                         message.AppendLine("LSS is not from this domain");
                                     }
-                                }
-                            }
-
-                        }
-                        else if (descriptorType.Equals("clientDescriptor"))
-                        {
-                            int newClientId = -1;
-                            string clientGuid = xdoc.Query("/clientDescriptor/clientGuid");
-                            int clientId = AdministrativeAPI.GetLabClientID(clientGuid);
-                            if (clientId > 0)
-                            {
-                                // Already in database
-                                message.Append(" Attempt to Register a LabClient that is already in the database. ");
-                                message.AppendLine(" GUID: " + clientGuid);
-                            }
-                            else
-                            {
-                                clientId = rFactory.LoadLabClient(xdoc, ref message);
-                                message.AppendLine("Adding Lab Client GUID: " + clientGuid);
-                            }
-                        }
-                        else if (descriptorType.Equals("credentialDescriptor"))
-                        {
-                            credential = rFactory.ParseCredential(xdoc, ref message);
-                            if (lss != null)
-                            {
-                                if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
-                                {
-                                    message.AppendLine("Registering Group Credentials on LSS: " + lss.agentName);
-                                    message.AppendLine("Group:  " + credential.groupName + " DomainServer: " + credential.domainServerName);
-                                    LabSchedulingProxy lssProxy = new LabSchedulingProxy();
-                                    lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
-                                    lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
-                                    lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                    lssProxy.Url = lss.webServiceUrl;
-                                    lssProxy.AddCredentialSet(credential.domainGuid, credential.domainServerName, credential.groupName, credential.ussGuid);
-                                }
-                                else
-                                {
-                                    message.AppendLine("LSS is not from this domain");
                                 }
                             }
                         }
@@ -546,7 +550,8 @@ namespace iLabs.ServiceBroker.iLabSB
             catch (Exception ex)
             {
                 message.Append("Exception in Register: " + Utilities.DumpException(ex));
-                throw;
+
+                throw new Exception(message.ToString(),ex);
             }
             finally
             {
@@ -578,7 +583,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
                         ex = ex.InnerException;
                     }
-                   Logger.WriteLine(smtpErrorMsg.ToString());
+                    Logger.WriteLine(smtpErrorMsg.ToString());
                 }
             }
         }
