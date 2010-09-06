@@ -40,10 +40,10 @@
     <Content Include="App_Data\LabConfiguration.dtd" />
     <Content Include="App_Data\LabConfiguration1.xml" />
     <Content Include="App_Data\LabConfiguration2.xml" />
-    <Content Include="App_Data\LabConfiguration2_NoAbsorbers.xml" />
+    <None Include="App_Data\LabConfiguration2_NoAbsorbers.xml" />
     <Content Include="App_Data\SimulationConfig1.xml" />
-    <Content Include="App_Data\SimulationConfig2.xml" />
-    <Content Include="App_Data\SimulationConfig2_NoAbsorbers.xml" />
+    <None Include="App_Data\SimulationConfig2.xml" />
+    <None Include="App_Data\SimulationConfig2_NoAbsorbers.xml" />
     <Content Include="Controls\Banner.ascx" />
     <Content Include="Controls\Feedback.ascx" />
     <Content Include="Controls\Footer.ascx" />

@@ -6,7 +6,6 @@
           <StartPageUrl>LabClient.aspx?serviceURL=http://localhost:8081/ServiceBrokerService.asmx&amp;labServerID=8C0BA543419E4d4ab340d449acd3e057&amp;MultiSubmit=true&amp;couponID=12345&amp;passkey=qwerty</StartPageUrl>
           <StartAction>SpecificPage</StartAction>
           <AspNetDebugging>True</AspNetDebugging>
-          <SilverlightDebugging>False</SilverlightDebugging>
           <NativeDebugging>False</NativeDebugging>
           <SQLDebugging>False</SQLDebugging>
           <PublishCopyOption>RunFiles</PublishCopyOption>

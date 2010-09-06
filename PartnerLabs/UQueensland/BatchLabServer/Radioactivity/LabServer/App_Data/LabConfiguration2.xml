@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <!--<!DOCTYPE labConfiguration SYSTEM "LabConfiguration.dtd">-->
-<labConfiguration title="Radioactivity #2" version="3.1">
+<labConfiguration title="Radioactivity #2" version="3.2">
   <navmenuPhoto>
     <image>~/images/Radioactivity2.png</image>
   </navmenuPhoto>
+  <labCamera>
+    <url>http://openilabs.ilab.uq.edu.au/LabCameras/Radioactivity2.htm</url>
+  </labCamera>
   <labInfo>
     <text />
     <url />
@@ -14,6 +17,7 @@
       <description>
         <p>Measure radioactivity over time at a fixed distance from the source.</p>
       </description>
+      <absorberName>None</absorberName>
       <distance>30</distance>
       <duration>5</duration>
       <repeat>3</repeat>
@@ -23,43 +27,28 @@
       <description>
         <p>Measure radioactivity at various distances from the source.</p>
       </description>
+      <absorberName>None</absorberName>
       <distance>20,25,30,40,65</distance>
       <duration>5</duration>
       <repeat>3</repeat>
     </setup>
-    <setup id="SimActivityVsTime">
-      <name>Radioactivity over Time (Simulated)</name>
+    <setup id="RadioactivityVsAbsorber">
+      <name>Radioactivity versus Absorber</name>
       <description>
-        <p>Measure radioactivity over time at a fixed distance from a simulated source.</p>
+        <p>Measure radioactivity through various absorbers at a fixed distance from the source.</p>
       </description>
-      <distance>20</distance>
+      <absorberName>None,Paper,Aluminium Sheet,Lead Sheet</absorberName>
+      <distance>10</distance>
       <duration>5</duration>
       <repeat>3</repeat>
     </setup>
-    <setup id="SimActivityVsDistance">
-      <name>Radioactivity versus Distance (Simulated)</name>
+    <setup id="RadioactivityVsAbsorber">
+      <name>Radioactivity versus Absorber (Foils)</name>
       <description>
-        <p>Measure radioactivity at various distances from a simulated source.</p>
+        <p>Measure radioactivity through various absorbers at a fixed distance from the source.</p>
       </description>
-      <distance>20,25,30,40,65</distance>
-      <duration>5</duration>
-      <repeat>3</repeat>
-    </setup>
-    <setup id="SimActivityVsTimeNoDelay">
-      <name>Radioactivity over Time (Simulated - No delays)</name>
-      <description>
-        <p>Measure radioactivity over time at a fixed distance from a simulated source. Equipment operation delays are not included.</p>
-      </description>
-      <distance>20</distance>
-      <duration>5</duration>
-      <repeat>3</repeat>
-    </setup>
-    <setup id="SimActivityVsDistanceNoDelay">
-      <name>Radioactivity versus Distance (Simulated - No delays)</name>
-      <description>
-        <p>Measure radioactivity at various distances from a simulated source. Equipment operation delays are not included.</p>
-      </description>
-      <distance>20,25,30,40,65</distance>
+      <absorberName>None,Alum.Foil x1,Alum.Foil x2,Alum.Foil x4,Alum.Foil x8,Alum.Foil x16,Alum.Foil x32,Alum.Foil x64,Alum.Foil x???</absorberName>
+      <distance>10</distance>
       <duration>5</duration>
       <repeat>3</repeat>
     </setup>
@@ -70,7 +59,7 @@
       </source>
       <source>
         <name>Strontium-90</name>
-        <location>A</location>
+        <location>C</location>
       </source>
     </sources>
     <absorbers default="None">
@@ -79,68 +68,68 @@
         <location>A</location>
       </absorber>
       <absorber>
-        <name>Nothing</name>
+        <name>Paper</name>
         <location>B</location>
       </absorber>
       <absorber>
-        <name>Ziltch</name>
+        <name>Aluminium Sheet</name>
         <location>C</location>
       </absorber>
       <absorber>
-        <name>Nought</name>
+        <name>Lead Sheet</name>
         <location>D</location>
       </absorber>
       <absorber>
-        <name>Empty</name>
+        <name>Alum.Foil x1</name>
         <location>E</location>
       </absorber>
       <absorber>
-        <name>Void</name>
+        <name>Alum.Foil x2</name>
         <location>F</location>
       </absorber>
       <absorber>
-        <name>Zippo</name>
+        <name>Alum.Foil x4</name>
         <location>G</location>
       </absorber>
       <absorber>
-        <name>Not a thing</name>
+        <name>Alum.Foil x8</name>
         <location>H</location>
       </absorber>
       <absorber>
-        <name>Still nothing</name>
+        <name>Alum.Foil x16</name>
         <location>I</location>
       </absorber>
       <absorber>
-        <name>Nonexistent</name>
+        <name>Alum.Foil x32</name>
         <location>J</location>
       </absorber>
       <absorber>
-        <name>Diddly squat</name>
+        <name>Alum.Foil x64</name>
         <location>K</location>
       </absorber>
       <absorber>
-        <name>Blank</name>
+        <name>Alum.Foil x???</name>
         <location>L</location>
       </absorber>
       <absorber>
-        <name>Null</name>
+        <name>Lead Rod</name>
         <location>M</location>
       </absorber>
       <absorber>
-        <name>Vacant</name>
+        <name>Aluminium Rod</name>
         <location>N</location>
       </absorber>
     </absorbers>
     <distances>
-      <minimum>20</minimum>
-      <maximum>100</maximum>
+      <minimum>10</minimum>
+      <maximum>90</maximum>
       <stepsize>5</stepsize>
     </distances>
   </configuration>
   <validation>
     <vdnDistance>
-      <minimum>19</minimum>
-      <maximum>95</maximum>
+      <minimum>10</minimum>
+      <maximum>90</maximum>
     </vdnDistance>
     <vdnDuration>
       <minimum>1</minimum>
@@ -152,7 +141,7 @@
     </vdnRepeat>
     <vdnTotaltime>
       <minimum>1</minimum>
-      <maximum>750</maximum>
+      <maximum>1200</maximum>
     </vdnTotaltime>
   </validation>
   <experimentSpecification>

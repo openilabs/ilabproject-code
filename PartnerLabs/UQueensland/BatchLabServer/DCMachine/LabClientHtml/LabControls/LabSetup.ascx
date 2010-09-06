@@ -1,12 +1,12 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="LabSetup.ascx.cs" Inherits="LabClientHtml.LabControls.LabSetup" %>
-<table cols="2">
+<table id="labsetup" cols="2" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td colspan="2" class="sectiontitle">
+        <th colspan="2">
             <asp:Label ID="lblParamsTitle" runat="server" Text="Label"></asp:Label>
-        </td>
+        </th>
     </tr>
     <tr>
-        <td class="setup-label">
+        <td class="label">
             Minimum:
         </td>
         <td class="dataright">
@@ -16,7 +16,7 @@
         </td>
     </tr>
     <tr>
-        <td class="setup-label">
+        <td class="label">
             Maximum:
         </td>
         <td class="dataright">
@@ -26,7 +26,7 @@
         </td>
     </tr>
     <tr>
-        <td class="setup-label">
+        <td class="label">
             <nobr>
                 Step Size:</nobr>
         </td>

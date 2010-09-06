@@ -17,6 +17,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryLab", "..\LabLibrari
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILabEquipment", "ILabEquipment\ILabEquipment.csproj", "{1B01C162-4D77-4190-A253-9A8A1194E4E6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Wsdl", "Wsdl", "{33BDCF36-BC8E-499E-A16A-ACB2917A4035}"
+	ProjectSection(SolutionItems) = preProject
+		Wsdl\IEquipmentService.asmx.wsdl = Wsdl\IEquipmentService.asmx.wsdl
+		Wsdl\ILabServerWebService.asmx.wsdl = Wsdl\ILabServerWebService.asmx.wsdl
+		Wsdl\IServiceBrokerService.asmx.wsdl = Wsdl\IServiceBrokerService.asmx.wsdl
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
