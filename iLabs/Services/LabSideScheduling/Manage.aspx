@@ -7,7 +7,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>ExperimentInfoManagement</title>
+		<title>Manage ExperimentInfo</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR" />
 		<meta content="C#" name="CODE_LANGUAGE" />
 		<meta content="JavaScript" name="vs_defaultClientScript" />

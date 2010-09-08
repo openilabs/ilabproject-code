@@ -57,7 +57,7 @@
 			<li>
 				<a id="aNav3SBinfo" runat="server" href="sbStats.aspx">Service Broker Information</a></li>
 			<li>
-				<a id="aNav3Reports" runat="server" href="sbReport.aspx">Groups</a></li>
+				<a id="aNav3Reports" runat="server" href="sbReport.aspx">Reports</a></li>
 			<li>
 				<A id="aNav3ExperimentRecords" runat="server" href="experimentRecords.aspx">Experiments</A></li>
 			<li>

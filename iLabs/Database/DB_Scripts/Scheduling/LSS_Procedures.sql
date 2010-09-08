@@ -521,9 +521,8 @@ CREATE PROCEDURE ExperimentInfo_Delete
 AS
 
 delete from Experiment_Info where Experiment_Info_ID= @experimentInfoID
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -533,7 +532,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS OFF 
 GO
-
 
 CREATE PROCEDURE ExperimentInfo_Modify
 
@@ -560,8 +558,20 @@ Minimum_Time=@minimumTime, Early_Arrive_Time=@earlyArriveTime
 where Experiment_Info_ID=@experimentInfoID
 
 select @@rowcount
-
 RETURN
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+
 
 CREATE PROCEDURE ExperimentInfo_ModifyCore
 
@@ -573,7 +583,6 @@ CREATE PROCEDURE ExperimentInfo_ModifyCore
 @labClientName nvarchar(256),
 @providerName nvarchar(256)
 
-
  AS
 
 update Experiment_Info set Lab_Client_GUID=@labClientGUID,Lab_Server_GUID=@labServerGUID, 
@@ -584,8 +593,8 @@ where Experiment_Info_ID=@experimentInfoID
 select @@rowcount
 
 RETURN
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -606,11 +615,9 @@ CREATE PROCEDURE ExperimentInfo_ModifyLabServer
 update Experiment_Info set Lab_Server_GUID=@labServerGUID, Lab_Server_Name=@labServerName
 where Lab_Server_GUID = @originalGuid
 select @@rowcount
-
 RETURN
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -629,9 +636,8 @@ AS
 select Lab_Client_GUID, Lab_Server_GUID, Lab_Server_Name, Lab_Client_Version, Lab_Client_Name,
 Provider_Name, Contact_Email, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time 
 from Experiment_Info where Experiment_Info_ID=@experimentInfoID
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -651,9 +657,8 @@ AS
 select Lab_Client_GUID, Lab_Server_GUID, Lab_Server_Name, Lab_Client_Version, Lab_Client_Name,
 Provider_Name, Contact_Email, Prepare_Time, Recover_Time, Minimum_Time, Early_Arrive_Time 
 from Experiment_Info where Experiment_Info_ID=@experimentInfoID
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -664,7 +669,6 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
-
 CREATE PROCEDURE ExperimentInfo_RetrieveIDByExperiment
 
 @clientGuid varchar(50),
@@ -674,9 +678,8 @@ AS
 
 select Experiment_Info_ID from Experiment_Info 
 where Lab_Client_Guid=@clientGuid and Lab_Server_Guid=@labServerGuid
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -838,9 +841,8 @@ update LSS_Policy set Credential_Set_ID = @credentialSetID,Experiment_Info_ID=@e
 select @@rowcount
 
 return
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -858,9 +860,8 @@ CREATE PROCEDURE LSSPolicy_RetrieveByID
 AS
 
 select [Rule], Experiment_Info_ID, Credential_Set_ID from LSS_Policy where LSS_Policy_ID=@lssPolicyID
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -877,9 +878,8 @@ CREATE PROCEDURE LSSPolicy_RetrieveIDsByExperiment
 AS
 
 select LSS_Policy_ID from LSS_Policy where Experiment_Info_ID=@experimentInfoID
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -898,9 +898,8 @@ CREATE PROCEDURE LabServer_RetrieveName
 AS
 
 select DISTINCT Lab_Server_Name from Experiment_Info where Lab_Server_GUID = @labServerGUID
-
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -921,8 +920,8 @@ AS
 
 insert into Permitted_Experiments(Experiment_Info_ID, Recurrence_ID) values (@experimentInfoID, @recurrenceID)
 select ident_current('Permitted_Experiments')
-
 GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
