@@ -446,7 +446,7 @@ namespace iLabs.Scheduling.LabSide
                 if (id <= 0)
                 {
                     id = LSSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
-                        clientVersion, providerName, null, 1, 0, 0, 0);
+                        clientVersion, providerName, null, 0, 0, 1, 0);
                     int ok = LSSSchedulingAPI.CheckForLSResource(labServerGuid, labServerName);
                 }
                 else
