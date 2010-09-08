@@ -84,17 +84,11 @@ namespace iLabs.ServiceBroker.admin
 			try
 			{
                 int rootID = wrapper.GetGroupIDWrapper(Group.ROOT);
-				TreeNode rootNodeAgents = new TreeNode();
-                rootNodeAgents.Text = "ROOT";
-                rootNodeAgents.Value = rootID.ToString();
-                rootNodeAgents.ImageUrl = "../img/GrantImages/root.gif";
+                TreeNode rootNodeAgents = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
                 rootNodeAgents.Expanded = true;
                 rootNodeAgents.SelectAction = TreeNodeSelectAction.None;
 
-                TreeNode rootNodeGroups = new TreeNode();
-				rootNodeGroups.Text = "ROOT";
-				rootNodeGroups.Value = rootID.ToString();
-				rootNodeGroups.ImageUrl = "../img/GrantImages/root.gif";
+                TreeNode rootNodeGroups = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
 				rootNodeGroups.Expanded = true;
                 rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
 
@@ -104,7 +98,11 @@ namespace iLabs.ServiceBroker.admin
 				// as opposed to doing it in an AddAgentsRecursively(RootNode) call
 				// This reduces the no. of database calls, made from isAgentUser
 				int[] gIDs = AdministrativeAPI.ListSubgroupIDs (rootID);
-				Group[] gList = wrapper.GetGroupsWrapper(gIDs);
+				Group[] groups = wrapper.GetGroupsWrapper(gIDs);
+                List<Group> gList = new List<Group>();
+                gList.AddRange(groups);
+                gList.Sort();
+               
 
 				// might want to do some sorting of the Groups List here -- works without sorting
 
@@ -153,9 +151,15 @@ namespace iLabs.ServiceBroker.admin
 				int[] childUserIDs = wrapper.ListUserIDsInGroupWrapper(Convert.ToInt32(nAgents.Value));
 				int[] childGroupIDs = wrapper.ListSubgroupIDsWrapper(Convert.ToInt32(nAgents.Value));
 
-				User[] childUsersList = wrapper.GetUsersWrapper(childUserIDs);
-				Group[] childGroupsList = wrapper.GetGroupsWrapper(childGroupIDs);
-			
+				User[] usersList = wrapper.GetUsersWrapper(childUserIDs);
+                List<User> childUsersList = new List<User>();
+                childUsersList.AddRange(usersList);
+                childUsersList.Sort();
+
+				Group[] groupsList = wrapper.GetGroupsWrapper(childGroupIDs);
+                List<Group> childGroupsList = new List<Group>();
+                childGroupsList.AddRange(groupsList);
+                childGroupsList.Sort();
 				//might want to sort arraylist here -- works without sorting
 				foreach (User u in childUsersList)
 				{
@@ -168,7 +172,7 @@ namespace iLabs.ServiceBroker.admin
 				}
 
 				//might want to sort arraylist here -- works without sorting
-                if (childGroupsList == null || childGroupsList.Length < 1)
+                if (childGroupsList == null || childGroupsList.Count< 1)
                 {
                     nAgents.Expanded = false;
                 }
@@ -213,6 +217,25 @@ namespace iLabs.ServiceBroker.admin
 				ExpandNode(n.ChildNodes, nodeID);
 			}
 		}
+        private void ExpandNodes(TreeNodeCollection nodes, int[] nodeIDs)
+        {
+            foreach (TreeNode n in nodes)
+            {
+                int nID = Convert.ToInt32(n.Value);
+                foreach (int nodeID in nodeIDs)
+                {
+                    if (nID == nodeID)
+                    {
+                        n.Expanded = true;
+                        TreeNode parent = (TreeNode)n.Parent;
+                        //parent.Expanded = true;
+                        if (!parent.Text.Equals("ROOT"))
+                            ExpandParent(parent);
+                    }
+                }
+                ExpandNodes(n.ChildNodes, nodeIDs);
+            }
+        }
 
 		private void ExpandParent(TreeNode n)
 		{

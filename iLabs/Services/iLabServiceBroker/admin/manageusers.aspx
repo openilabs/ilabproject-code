@@ -25,8 +25,7 @@ Please see license.txt in top level directory for full license.
 			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:adminnav id="AdminNav1" runat="server"></uc1:adminnav><br clear="all">
 				<div id="innerwrapper">
 					<div id="pageintro">
-						<h1>Manage Users
-						</h1>
+						<h1>Manage Users</h1>
 						<p>Add or modify a User below.</p>
 						<!-- Errormessage should appear here:-->
 						<!--div class="errormessage"--><asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label>
@@ -44,23 +43,23 @@ Please see license.txt in top level directory for full license.
 									<tr>
 										<th>
 											<label for="username">Username</label></th>
-										<td><asp:textbox id="txtUsername" Runat="server"></asp:textbox></td>
+										<td><asp:textbox id="txtUsername" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
 										<th>
 											<label for="firstname">First Name </label>
 										</th>
-										<td><asp:textbox id="txtFirstName" Runat="server"></asp:textbox></td>
+										<td><asp:textbox id="txtFirstName" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
 										<th>
 											<label for="lastname">Last Name</label></th>
-										<td><asp:textbox id="txtLastName" Runat="server"></asp:textbox></td>
+										<td><asp:textbox id="txtLastName" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
 										<th>
 											<label for="email">Email</label></th>
-										<td><asp:textbox id="txtEmail" Runat="server"></asp:textbox></td>
+										<td><asp:textbox id="txtEmail" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
 										<th>
@@ -68,11 +67,6 @@ Please see license.txt in top level directory for full license.
 										<td>
 											<% if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true")){ %>
 											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server" Width="171px"></asp:dropdownlist>
-											<!--select name="affiliation" id="affiliation">
-												<option value="0" selected>-- Make selection --</option>
-												<option>item 1</option>
-												<option>item 2</option>
-											</select-->
 											<% }else{ %>
 											<asp:textbox id="txtAffiliation" Runat="server"></asp:textbox>
 											<% } %>
@@ -102,19 +96,20 @@ Please see license.txt in top level directory for full license.
 								</table>
 							</div>
 						</div>
-						<div class="simpleform"><label for="searchby">Search by</label><asp:dropdownlist CssClass="i18n" id="ddlSearchBy" Runat="server" Width="200">
+						<div class="simpleform"><label for="searchby">Search by:&nbsp;&nbsp;</label><asp:dropdownlist CssClass="i18n" id="ddlSearchBy" Runat="server" Width="243px">
 								<asp:ListItem Value="-- select one --">-- select one --</asp:ListItem>
 								<asp:ListItem Value="Username">Username</asp:ListItem>
 								<asp:ListItem Value="Last Name">Last Name</asp:ListItem>
 								<asp:ListItem Value="First Name">First Name</asp:ListItem>
 								<asp:ListItem Value="Group">Group</asp:ListItem>
 							</asp:dropdownlist>
-							<br>
-							<asp:textbox id="txtSearchBy" Runat="server"></asp:textbox><asp:button id="btnSearch" Runat="server" Text="Go" CssClass="button" onclick="btnSearch_Click"></asp:button></div>
+							<br/><br/>
+							<asp:textbox id="txtSearchBy" Runat="server" Width="303px"></asp:textbox>&nbsp;&nbsp;<asp:button id="btnSearch" Runat="server" Text="Search" CssClass="button" onclick="btnSearch_Click"></asp:button>
+						</div>
 						<div>&nbsp;</div>
 						<div class="simpleform"><label for="selectauser">Select a User (Last Name, First Name - 
 								Username)</label><br>
-							<asp:listbox cssClass="i18n" id="lbxSelectUser" Runat="server" Width="256px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectUser_SelectedIndexChanged"></asp:listbox></div>
+							<asp:listbox cssClass="i18n" id="lbxSelectUser" Runat="server" Width="380px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectUser_SelectedIndexChanged" Height="310px"></asp:listbox></div>
 					</div>
 					<br clear="all">
 					<!-- end pagecontent div --></div>

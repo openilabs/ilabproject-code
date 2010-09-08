@@ -51,7 +51,7 @@ namespace iLabs.ServiceBroker.Administration
     /// registered with the Service Broker, and implementation specific 
     /// elements and attributes that can be coded in the XML Extension String.
 	/// </summary>
-	public class User
+	public class User : IComparable
 	{
 		/// <summary>
 		/// The integer ID of the User.
@@ -105,6 +105,10 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public string xmlExtension;
 
+        public int CompareTo(object obj)
+        {
+            return this.userName.CompareTo(((User)obj).userName);
+        }
 	}
 
 
@@ -335,7 +339,7 @@ namespace iLabs.ServiceBroker.Administration
 	/// <summary>
 	/// A structure containing information pertaining to a particular group.
 	/// </summary>
-	public class Group
+	public class Group : IComparable
 	{
 		/// <summary>
 		/// The integer ID of the group. Must be unique in a namespace shared with User instances.
@@ -431,7 +435,16 @@ namespace iLabs.ServiceBroker.Administration
 		public const string SUPERUSER = "SuperUserGroup";
 		//public const int SUPERUSER_ID = 4;
 
-	}
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.groupName.CompareTo(((Group)obj).GroupName);
+        }
+
+        #endregion
+    }
 
     public class GroupInfo
     {

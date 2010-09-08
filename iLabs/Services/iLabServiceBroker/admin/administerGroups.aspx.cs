@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -32,7 +33,7 @@ namespace iLabs.ServiceBroker.admin
 	
 		protected string actionCmd = "Edit";
 		protected string target;
-		protected ArrayList groupList;
+		protected List<Group> groupList;
 		protected int associatedGroup = 0;
 
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass ();
@@ -67,7 +68,7 @@ namespace iLabs.ServiceBroker.admin
 			try
 			{
 				int[] groupIDs = wrapper.ListGroupIDsWrapper();
-				groupList = new ArrayList();
+				groupList = new List<Group>();
 				Group [] groups = wrapper.GetGroupsWrapper(groupIDs);
 				foreach(Group g in groups)
 				{
@@ -80,6 +81,7 @@ namespace iLabs.ServiceBroker.admin
 
                             groupList.Add(g);
 				}
+                groupList.Sort();
 				repGroups.DataSource=groupList;
 				repGroups.DataBind();
 			}
