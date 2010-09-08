@@ -97,7 +97,7 @@ Please see license.txt in top level directory for full license.
 							</div>
 						</div>
 						<div class="simpleform"><label for="searchby">Search by:&nbsp;&nbsp;</label><asp:dropdownlist CssClass="i18n" id="ddlSearchBy" Runat="server" Width="243px">
-								<asp:ListItem Value="-- select one --">-- select one --</asp:ListItem>
+								<asp:ListItem Value="Select All">Select All</asp:ListItem>
 								<asp:ListItem Value="Username">Username</asp:ListItem>
 								<asp:ListItem Value="Last Name">Last Name</asp:ListItem>
 								<asp:ListItem Value="First Name">First Name</asp:ListItem>

@@ -320,139 +320,143 @@ namespace iLabs.ServiceBroker.admin
 				btnSaveChanges.CssClass="buttongray";
 
 			// If an option is not selected in the "Search by" drop down list
-			if(ddlSearchBy.SelectedIndex<1)
+			if(ddlSearchBy.SelectedIndex<0)
 			{
 				lblResponse.Text = Utilities.FormatErrorMessage("Select a search criterion.");
 				lblResponse.Visible = true; 
 			}
-			else
-			{
-				//if blank entry
-				if(txtSearchBy.Text == "")
-				{
-					lblResponse.Text = Utilities.FormatErrorMessage("Enter the text you want to search for.");
-					lblResponse.Visible = true; 
-				}
-				else
-				{
-					ArrayList foundUsers = new ArrayList();
-					string option = ddlSearchBy.SelectedItem.Text;
-						
-					int[] userIDs = wrapper.ListUserIDsWrapper ();
-					User[] users = wrapper.GetUsersWrapper(userIDs);
+            else if (ddlSearchBy.SelectedIndex == 0)
+            {
+                BuildUserListBox();
+            }
+            else
+            {
+                //if blank entry
+                if (txtSearchBy.Text == "")
+                {
+                    lblResponse.Text = Utilities.FormatErrorMessage("Enter the text you want to search for.");
+                    lblResponse.Visible = true;
+                }
+                else
+                {
+                    ArrayList foundUsers = new ArrayList();
+                    string option = ddlSearchBy.SelectedItem.Text;
 
-					switch (option)
-					{
-						case "Username":
-						{
-							foreach(User u in users)
-							{
-								if (WildCardMatch(txtSearchBy.Text,u.userName))
-									//if (! foundUsers.Contains(u))
-									foundUsers.Add(u);
-							}
-						}
-							break;
-						case "First Name":
-						{
-							foreach(User u in users)
-							{
-								if (WildCardMatch(txtSearchBy.Text,u.firstName))
-									foundUsers.Add(u);
-							}
-						}
-							break;
-						case "Last Name":
-						{
-							foreach(User u in users)
-							{
-								if (WildCardMatch(txtSearchBy.Text,u.lastName))
-									foundUsers.Add(u);
-							}
-						}
-							break;
-						case "Group":
-						{
-							//Get a list of the groups from the database
-							int[] groupIDs = wrapper.ListGroupIDsWrapper ();
-							ServiceBroker.Administration.Group[] groups = wrapper.GetGroupsWrapper(groupIDs);
+                    int[] userIDs = wrapper.ListUserIDsWrapper();
+                    User[] users = wrapper.GetUsersWrapper(userIDs);
 
-							//Find the relevant groups using the wild card search
-							ArrayList foundGroups = new ArrayList();
-							foreach(ServiceBroker.Administration.Group g in groups)
-							{
-								if (WildCardMatch(txtSearchBy.Text,g.groupName))
-									foundGroups.Add(g);
-							}
-							
-							//if the group exists in the database
-							ArrayList foundUserIDs = new ArrayList();
-							if (foundGroups.Count>0)
-							{
-								foreach (ServiceBroker.Administration.Group foundg in foundGroups)
-								{
-									//Get the list of users in the group
-									int[] userIDsForGroup=wrapper.ListUserIDsInGroupRecursivelyWrapper(foundg.groupID);
+                    switch (option)
+                    {
+                        case "Username":
+                            {
+                                foreach (User u in users)
+                                {
+                                    if (WildCardMatch(txtSearchBy.Text, u.userName))
+                                        //if (! foundUsers.Contains(u))
+                                        foundUsers.Add(u);
+                                }
+                            }
+                            break;
+                        case "First Name":
+                            {
+                                foreach (User u in users)
+                                {
+                                    if (WildCardMatch(txtSearchBy.Text, u.firstName))
+                                        foundUsers.Add(u);
+                                }
+                            }
+                            break;
+                        case "Last Name":
+                            {
+                                foreach (User u in users)
+                                {
+                                    if (WildCardMatch(txtSearchBy.Text, u.lastName))
+                                        foundUsers.Add(u);
+                                }
+                            }
+                            break;
+                        case "Group":
+                            {
+                                //Get a list of the groups from the database
+                                int[] groupIDs = wrapper.ListGroupIDsWrapper();
+                                ServiceBroker.Administration.Group[] groups = wrapper.GetGroupsWrapper(groupIDs);
 
-									//Put this in the foundUserID ArrayList
-									foreach (int userID in userIDsForGroup)
-										if (! foundUserIDs.Contains(userID))
-										foundUserIDs.Add(userID);
-								}
-							
-								//if the group contains users
-								if (foundUserIDs.Count > 0)
-								{
-									User[] userArray=wrapper.GetUsersWrapper(Utilities.ArrayListToIntArray(foundUserIDs));
-									BuildUserListBox(userArray);
-								}
-								else //no users exist in the group
-								{
-									string msg = "No users exist in group "+txtSearchBy.Text+ "." ;
-									lblResponse.Text = Utilities.FormatErrorMessage(msg);
-									lblResponse.Visible=true;
-								}
-							}
-							else //groupID < 0, group doesn't exist
-							{
-								string msg = "The group "+txtSearchBy.Text+" does not exist.";
-								lblResponse.Text = Utilities.FormatErrorMessage(msg);
-								lblResponse.Visible = true; 
-							}
-						}
-							break;
-					} //end switch
+                                //Find the relevant groups using the wild card search
+                                ArrayList foundGroups = new ArrayList();
+                                foreach (ServiceBroker.Administration.Group g in groups)
+                                {
+                                    if (WildCardMatch(txtSearchBy.Text, g.groupName))
+                                        foundGroups.Add(g);
+                                }
 
-					if (option.CompareTo("Group")!=0)
-					{
-						if (foundUsers.Count>0)
-						{
-							// if only one record found
-							if (foundUsers.Count==1)
-							{
-								/* Need to rebuild the listbox, incase of multiple searches.
-								 * The results of a search are displayed in the list box 
-								 * & hence if one needs to do a 2nd search, the list has to be rebuilt.
-								 */
-								BuildUserListBox();
-								User foundUser = (User) foundUsers[0];
-								lbxSelectUser.Items.FindByValue(foundUser.userID.ToString()).Selected = true;
-								DisplayUserInfo(foundUser);	
-							}
-							else
-							{
-								BuildUserListBox(foundUsers);
-							}
-						}
-						else // no users found
-						{
-							string msg = "The user "+txtSearchBy.Text+" does not exist.";
-							lblResponse.Text = Utilities.FormatErrorMessage(msg);
-							lblResponse.Visible = true; 
-						}
-					}// end if option !group
-				}
-			}
+                                //if the group exists in the database
+                                ArrayList foundUserIDs = new ArrayList();
+                                if (foundGroups.Count > 0)
+                                {
+                                    foreach (ServiceBroker.Administration.Group foundg in foundGroups)
+                                    {
+                                        //Get the list of users in the group
+                                        int[] userIDsForGroup = wrapper.ListUserIDsInGroupRecursivelyWrapper(foundg.groupID);
+
+                                        //Put this in the foundUserID ArrayList
+                                        foreach (int userID in userIDsForGroup)
+                                            if (!foundUserIDs.Contains(userID))
+                                                foundUserIDs.Add(userID);
+                                    }
+
+                                    //if the group contains users
+                                    if (foundUserIDs.Count > 0)
+                                    {
+                                        User[] userArray = wrapper.GetUsersWrapper(Utilities.ArrayListToIntArray(foundUserIDs));
+                                        BuildUserListBox(userArray);
+                                    }
+                                    else //no users exist in the group
+                                    {
+                                        string msg = "No users exist in group " + txtSearchBy.Text + ".";
+                                        lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                                        lblResponse.Visible = true;
+                                    }
+                                }
+                                else //groupID < 0, group doesn't exist
+                                {
+                                    string msg = "The group " + txtSearchBy.Text + " does not exist.";
+                                    lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                                    lblResponse.Visible = true;
+                                }
+                            }
+                            break;
+                    } //end switch
+
+                    if (option.CompareTo("Group") != 0)
+                    {
+                        if (foundUsers.Count > 0)
+                        {
+                            // if only one record found
+                            if (foundUsers.Count == 1)
+                            {
+                                /* Need to rebuild the listbox, incase of multiple searches.
+                                 * The results of a search are displayed in the list box 
+                                 * & hence if one needs to do a 2nd search, the list has to be rebuilt.
+                                 */
+                                BuildUserListBox();
+                                User foundUser = (User)foundUsers[0];
+                                lbxSelectUser.Items.FindByValue(foundUser.userID.ToString()).Selected = true;
+                                DisplayUserInfo(foundUser);
+                            }
+                            else
+                            {
+                                BuildUserListBox(foundUsers);
+                            }
+                        }
+                        else // no users found
+                        {
+                            string msg = "The user " + txtSearchBy.Text + " does not exist.";
+                            lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                            lblResponse.Visible = true;
+                        }
+                    }// end if option !group
+                }
+            }
 		}
 	
 		protected void btnSaveChanges_Click(object sender, System.EventArgs e)
