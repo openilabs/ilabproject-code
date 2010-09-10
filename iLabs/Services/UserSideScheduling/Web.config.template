@@ -25,8 +25,15 @@
     <add key="codebaseURL" value="http://localhost/UserSideScheduling"/>
     <add key="serviceURL" value="http://localhost/UserSideScheduling/UserScheduling.asmx"/>
     <add key="defaultPasskey" value="USS"/>
-    <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
-    <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
+  
+  <!-- email address where various reports are sent -->
+  <add key="genericFromMailAddress" value="donotreply@localhost"/>
+  <!--this for the centralized bug tracking system at MIT. 
+	      Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
+  <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
+
+  <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
+  <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
 
   <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
   <add key="logPath" value=""/>

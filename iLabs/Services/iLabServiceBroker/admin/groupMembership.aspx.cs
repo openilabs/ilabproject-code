@@ -700,6 +700,10 @@ namespace iLabs.ServiceBroker.admin
             copyAgents(true);
         }
 
+        protected void btnSearch_Click(object sender, System.EventArgs e)
+        {
+        }
+
 
         private string removeAgentNodes(TreeNodeCollection agentNodes, ref List<int> parentIDs)
         {

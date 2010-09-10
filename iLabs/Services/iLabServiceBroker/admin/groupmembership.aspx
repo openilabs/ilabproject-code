@@ -32,27 +32,23 @@ Please see license.txt in top level directory for full license.
 						<p>To remove users from a group or groups  expand the groups tree in the left window and select the users, users will only be removed from
 						the groups where they are selected. If a user is removed from all groups the user will be added to the orphan group.</p>
 						<p>When the page is first displayed the tree on the left groups with sub-groups are expanded, groups that only have users will need to be expanded to display the users.</p>
-						<!-- Group Membership Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
+						<!-- Group Membership Error message here: -->
 						<asp:label id="lblResponse" Visible="False" Runat="server"></asp:label>
-					</div>
-					<!-- end pageintro div -->
+					</div><!-- end pageintro div -->
 					<div id="pagecontent">
-						<!-- <div id="messagebox-right">
-							<h4>Instructions</h4>
-							<p>Select the user/group you want to transfer from "Users and Groups" box. Select 
-								the group you want to move it under from the "Target Groups" box. Click the 
-								Copy/Move button."
-							</p>
-						</div> -->
-						<div class="simpleform">
-							<label for="searchfor">Search by username or groupname</label><br/>
-							<asp:textbox id="txtSearchfor" Runat="server"></asp:textbox><asp:button id="btnGo" Runat="server" CssClass="button" Text="Go"></asp:button>
-							<!--input name="searchfor" type="text" id="searchfor" size="20"--> <!--input name="Submit" type="submit" class="button" value="Go"-->
+						<!--
+						<div class="simpleform"><label for="searchby">Search by:&nbsp;&nbsp;</label><asp:dropdownlist CssClass="i18n" id="ddlSearchBy" Runat="server" Width="243px">
+								<asp:ListItem Value="-- select one --">-- select one --</asp:ListItem>
+								<asp:ListItem Value="Username">Username</asp:ListItem>
+								<asp:ListItem Value="Last Name">Last Name</asp:ListItem>
+								<asp:ListItem Value="First Name">First Name</asp:ListItem>
+								<asp:ListItem Value="Group">Group</asp:ListItem>
+							</asp:dropdownlist>
+							<br/><br/>
+							<asp:textbox id="txtSearchBy" Runat="server" Width="303px"></asp:textbox>&nbsp;&nbsp;<asp:button id="btnSearch" Runat="server" Text="Search" CssClass="button" onclick="btnSearch_Click"></asp:button>
 						</div>
+						-->
 						<div class="simpleform">
-							<div>&nbsp;</div>
-							<div>&nbsp;</div>
-							<div>&nbsp;</div>
 							<table>
 								<tr>
 									<th class="top">

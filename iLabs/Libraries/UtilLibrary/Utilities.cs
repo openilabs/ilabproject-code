@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace iLabs.UtilLib
@@ -220,6 +221,12 @@ namespace iLabs.UtilLib
             return guid.ToString("D").ToUpper();
         }
 
+        public static bool WildCardMatch(string searchString, string compareString)
+        {
+            Regex regex = new Regex(searchString, RegexOptions.IgnoreCase);
+
+            return regex.IsMatch(compareString);
+        }
 
         /// <summary>
         /// This method insures that critical values are present in web.config. 
