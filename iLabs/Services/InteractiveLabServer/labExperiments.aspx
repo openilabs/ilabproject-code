@@ -78,13 +78,13 @@ Please see license.txt in top level directory for full license.
 												<th style="width: 480px">
 													<label for="applicationPath">Path</label></th>
 												<td style="width: 484px"><asp:textbox id="txtApplicationPath" Runat="server" Width="360px" 
-												ToolTip="The absolute path to the application without a trailing seperator"></asp:textbox></td>
+												ToolTip="The absolute path to the application directory, without a trailing seperator"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
 													<label for="application">Application</label></th>
 												<td style="width: 484px"><asp:textbox id="txtApplication" Runat="server" Width="360px"
-												ToolTip="The application file name including file type extension"></asp:textbox></td>
+												ToolTip="The application Application file name including file type extension"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 480px">
