@@ -74,7 +74,8 @@ namespace iLabs.ServiceBroker.iLabSB
 			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
             ResourceMapManager.Refresh();
-            ticketRemover = new SBTicketRemover();
+            ticketRemover = new SBTicketRemover(60000);
+            ticketRemover.ProcessIssuedTickets();
 		}
  
 		protected void Session_Start(Object sender, EventArgs e)

@@ -35,8 +35,8 @@ namespace iLabs.ServiceBroker
 	{
         private Thread theThread;
         // waitTime in milliseconds
-        private int waitTime = 3600000; // default is once an hour
-        //private int waitTime = 300000; // 5 minutes for debugging
+        //private int waitTime = 3600000; // once an hour
+        private int waitTime = 600000; // 10 minutes - current default
         //private int waitTime = 60000; // 1 minute for debugging
         //private int count = 0;  // Was used to output a log message every N times
         private bool go = true;
@@ -44,7 +44,7 @@ namespace iLabs.ServiceBroker
         
 		public SBTicketRemover()
 		{
-           Logger.WriteLine("IssuedTicketRemover created");
+            Logger.WriteLine("SBTicketRemover created waitTime = " + waitTime);
 			
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
@@ -54,7 +54,7 @@ namespace iLabs.ServiceBroker
 
         public SBTicketRemover(int delay){
             waitTime = delay;
-           Logger.WriteLine("SBTicketRemover created");
+            Logger.WriteLine("SBTicketRemover created waitTime = " + waitTime);
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -67,6 +67,7 @@ namespace iLabs.ServiceBroker
         /// </summary>
         public void Run()
         {
+            Logger.WriteLine("SBTicketRemover Starting Run");
             while (go)
             {
                 // Wait the delay amount
@@ -79,6 +80,7 @@ namespace iLabs.ServiceBroker
                 paDB.ProcessExpiredTickets();
                 
             }
+            Logger.WriteLine("SBTicketRemover Exiting Run");
         }
 
         public void Start()
@@ -205,7 +207,7 @@ namespace iLabs.ServiceBroker
                         couponCount++;
                     }
                 }
-               Logger.WriteLine("RemoveTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
+               Logger.WriteLine("SB RemoveTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
             }
             return ticketCount;
         }

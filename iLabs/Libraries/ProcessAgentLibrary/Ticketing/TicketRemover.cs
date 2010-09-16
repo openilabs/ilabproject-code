@@ -25,14 +25,14 @@ namespace iLabs.Ticketing
 	{
         private Thread theThread;
         // waitTime in milliseconds
-        private int waitTime = 3600000; // Default is once an hour
-        //private int waitTime = 300000; // Every 5 minutes for Debugging
+        //private int waitTime = 3600000; // Default is once an hour
+        private int waitTime = 600000; // Every 10 minutes
         private bool go = true;
  
         
 		public TicketRemover()
 		{
-           Logger.WriteLine("TicketRemover created");
+           Logger.WriteLine("TicketRemover created waitTime = " + waitTime);
 			theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -41,7 +41,7 @@ namespace iLabs.Ticketing
 
         public TicketRemover(int delay){
             waitTime = delay;
-           Logger.WriteLine("TicketRemover created");
+            Logger.WriteLine("TicketRemover created waitTime = " + waitTime);
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();
@@ -89,6 +89,8 @@ namespace iLabs.Ticketing
                 //Need to move all processing into ProcessAgentDB
                 ProcessAgentDB agentDB = new ProcessAgentDB();
                 int expiredCount = agentDB.ProcessExpiredTickets();
+                if (expiredCount > 0)
+                    Logger.WriteLine("TicketRemover: removed " + " expiredCount expired tickets");
             }
             catch (Exception e)
             {
