@@ -845,6 +845,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
                 
                     Session["SessionID"] = AdministrativeAPI.InsertUserSession(userID, 0, uTZ, Session.SessionID.ToString()).ToString();
+                    Object tst = Session["SessionID"];
                     HttpCookie cookie = new HttpCookie(ConfigurationManager.AppSettings["isbAuthCookieName"], Session["SessionID"].ToString());
                     Response.AppendCookie(cookie);
                     divLogin.Visible = false;
@@ -889,7 +890,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 Session.Remove("ClientID");
                 Session.Remove("ClientCount");
             }
-            AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["Session_ID"]), group_ID, client_ID,
+            AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), group_ID, client_ID,
                 Session.SessionID.ToString());
         }
     }
