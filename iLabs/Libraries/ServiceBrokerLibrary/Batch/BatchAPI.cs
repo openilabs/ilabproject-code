@@ -65,15 +65,14 @@ namespace iLabs.ServiceBroker.Batch
 
                             // This operation should happen within the Wrapper
                             BrokerDB brokerDB = new BrokerDB();
-                            //ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(expSum.essID);
-                            //Coupon opCoupon = ticketIssuer.GetEssOpCoupon(expSum.experimentID,TicketTypes.RETRIEVE_RECORDS,
-                            //Coupon opCoupon = ticketIssuer.GetEssOpCoupon(ess,TicketTypes.RETRIEVE_RECORDS,expSum.experimentID,60);
+                            ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(expSum.essID);
+                            Coupon opCoupon = brokerDB.GetEssOpCoupon( expSum.experimentID, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
                             
-                            //ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                            //OperationAuthHeader header = new OperationAuthHeader();
-                            //header.coupon = opCoupon;
-                            //essProxy.Url = ess.webServiceUrl;
-                            //essProxy.OperationAuthHeaderValue = header;
+                            ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                            OperationAuthHeader header = new OperationAuthHeader();
+                            header.coupon = opCoupon;
+                            essProxy.Url = ess.webServiceUrl;
+                            essProxy.OperationAuthHeaderValue = header;
                             Criterion errors = new Criterion("type", "like", "*Message");
                             Criterion extensions = new Criterion("type", "like", "*Extension");
                             Criterion [] criteria = new Criterion[] {errors,extensions };
