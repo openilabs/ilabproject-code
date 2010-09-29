@@ -410,6 +410,8 @@ namespace iLabs.Controls
             if (!Page.IsPostBack)
             {
                 StringBuilder message = new StringBuilder();
+                
+
                 ProcessAgent pai = dbTicketing.GetSelfProcessAgent();// ProcessAgentDB.ServiceAgent;
                 if (pai != null)
                 {
@@ -495,113 +497,116 @@ namespace iLabs.Controls
         }
 
 
-        protected void DisplayFormXX()
-        {
+        //protected void DisplayFormXX()
+        //{
            
-            clearForm();
-            StringBuilder message = new StringBuilder();
-            ProcessAgent pai = dbTicketing.GetSelfProcessAgent();// ProcessAgentDB.ServiceAgent;
-            if (pai != null)
-            {
-                lblServiceType.Text = pai.type;
-                txtServiceName.Text = pai.agentName;
-                hdnServiceName.Value = pai.agentName;
-                txtServiceGuid.Text = pai.agentGuid;
+        //    clearForm();
+        //    StringBuilder message = new StringBuilder();
+        //    ProcessAgent pai = dbTicketing.GetSelfProcessAgent();// ProcessAgentDB.ServiceAgent;
+        //    if (pai != null)
+        //    {
+        //        lblServiceType.Text = pai.type;
+        //        txtServiceName.Text = pai.agentName;
+        //        hdnServiceName.Value = pai.agentName;
+        //        txtServiceGuid.Text = pai.agentGuid;
 
-                txtCodebaseUrl.Text = pai.codeBaseUrl;
-                hdnCodebaseUrl.Value = pai.codeBaseUrl;
-                txtServiceUrl.Text = pai.webServiceUrl;
-                hdnServiceUrl.Value = pai.webServiceUrl;
+        //        txtCodebaseUrl.Text = pai.codeBaseUrl;
+        //        hdnCodebaseUrl.Value = pai.codeBaseUrl;
+        //        txtServiceUrl.Text = pai.webServiceUrl;
+        //        hdnServiceUrl.Value = pai.webServiceUrl;
 
-                SystemSupport ss = dbTicketing.RetrieveSystemSupport(pai.agentGuid);
-                txtDescription.Text = ss.description;
-                txtInfoUrl.Text = ss.infoUrl;
-                txtContactInfo.Text = ss.contactEmail;
-                txtBugEmail.Text = ss.bugEmail;
-                txtLocation.Text = ss.location;
-                btnModify.Enabled = true;
-                btnModify.Visible = true;
+        //        SystemSupport ss = dbTicketing.RetrieveSystemSupport(pai.agentGuid);
+        //        txtDescription.Text = ss.description;
+        //        txtInfoUrl.Text = ss.infoUrl;
+        //        txtContactInfo.Text = ss.contactEmail;
+        //        txtBugEmail.Text = ss.bugEmail;
+        //        txtLocation.Text = ss.location;
+        //        btnModify.Enabled = true;
+        //        btnModify.Visible = true;
                
-                btnSave.Enabled = false;
-                btnSave.Visible = false;
-                if (AgentType.Equals(ProcessAgentType.SERVICE_BROKER))
-                {
-                    trDomainSB.Visible = false;
-                    IntTag[] pas = dbTicketing.GetProcessAgentTags();
-                    // If additional processAgents are registered the Fields may not be modified
-                    SetFormMode(pas != null && pas.Length > 1);
-                }
-                else
-                {
-                    // Check to see if a ServiceBroker is registered
-                    trDomainSB.Visible = true;
-                    ProcessAgentInfo sbInfo = dbTicketing.GetServiceBrokerInfo();
-                    if (sbInfo != null)
-                    {
+        //        btnSave.Enabled = false;
+        //        btnSave.Visible = false;
+        //        if (AgentType.Equals(ProcessAgentType.SERVICE_BROKER))
+        //        {
+        //            trDomainSB.Visible = false;
+        //            IntTag[] pas = dbTicketing.GetProcessAgentTags();
+        //            // If additional processAgents are registered the Fields may not be modified
+        //            SetFormMode(pas != null && pas.Length > 1);
+        //        }
+        //        else
+        //        {
+        //            // Check to see if a ServiceBroker is registered
+        //            trDomainSB.Visible = true;
+        //            ProcessAgentInfo sbInfo = dbTicketing.GetServiceBrokerInfo();
+        //            if (sbInfo != null)
+        //            {
 
-                        txtDomainServer.Text = sbInfo.ServiceUrl;
+        //                txtDomainServer.Text = sbInfo.ServiceUrl;
 
-                        // May not modify any fields that define the service since
-                        // It is registered with its domainServiceBroker
+        //                // May not modify any fields that define the service since
+        //                // It is registered with its domainServiceBroker
 
-                        SetFormMode(true);
+        //                SetFormMode(true);
 
-                    }
-                    else
-                    {
-                        // May modify fields that define the service since
-                        // It is not registered registered with a domainServiceBroker
-                        message.Append("A domain ServiceBroker has not been registered!");
-                        lblResponse.Text = Utilities.FormatWarningMessage(message.ToString());
-                        lblResponse.Visible = true;
-                        btnGuid.Enabled = true;
-                        btnGuid.Visible = true;
-                       Logger.WriteLine("administration: DomainServerNotFound");
-                        SetFormMode(false);
-                    }
-                }
+        //            }
+        //            else
+        //            {
+        //                // May modify fields that define the service since
+        //                // It is not registered registered with a domainServiceBroker
+        //                message.Append("A domain ServiceBroker has not been registered!");
+        //                lblResponse.Text = Utilities.FormatWarningMessage(message.ToString());
+        //                lblResponse.Visible = true;
+        //                btnGuid.Enabled = true;
+        //                btnGuid.Visible = true;
+        //               Logger.WriteLine("administration: DomainServerNotFound");
+        //                SetFormMode(false);
+        //            }
+        //        }
 
-            }
-            else
-            {
-                message.Append("The self Registration information has not been saved to the database.");
-                message.Append(" Displaying default values from Web.Config. Please modify & save.");
-                btnSave.Visible = true;
-                btnModify.Visible = false;
+        //    }
+        //    else
+        //    {
+        //        message.Append("The self Registration information has not been saved to the database.");
+        //        message.Append(" Displaying default values from Web.Config. Please modify & save.");
+        //        btnSave.Visible = true;
+        //        btnModify.Visible = false;
                 
-                // Need to call selfRegister
-                //lblServiceType.Text = ConfigurationManager.AppSettings["serviceType"];
-                lblServiceType.Text = AgentType;
-                string serviceGUID = ConfigurationManager.AppSettings["serviceGUID"];
-                if (serviceGUID != null)
-                    txtServiceGuid.Text = serviceGUID;
+        //        // Need to call selfRegister
+        //        //lblServiceType.Text = ConfigurationManager.AppSettings["serviceType"];
+        //        lblServiceType.Text = AgentType;
+        //        string serviceGUID = ConfigurationManager.AppSettings["serviceGUID"];
+        //        if (serviceGUID != null)
+        //            txtServiceGuid.Text = serviceGUID;
 
-                string serviceURL = ConfigurationManager.AppSettings["serviceURL"];
-                if (serviceURL != null)
-                    txtServiceUrl.Text = serviceURL;
+        //        string serviceURL = ConfigurationManager.AppSettings["serviceURL"];
+        //        if (serviceURL != null)
+        //            txtServiceUrl.Text = serviceURL;
 
-                string serviceName = ConfigurationManager.AppSettings["serviceName"];
-                if (serviceName != null)
-                    txtServiceName.Text = serviceName;
+        //        string serviceName = ConfigurationManager.AppSettings["serviceName"];
+        //        if (serviceName != null)
+        //            txtServiceName.Text = serviceName;
 
-                string codebaseURL = ConfigurationManager.AppSettings["codebaseURL"];
-                if (codebaseURL != null)
-                    txtCodebaseUrl.Text = codebaseURL;
-                lblResponse.Text = Utilities.FormatWarningMessage(message.ToString());
-                lblResponse.Visible = true;
+        //        string codebaseURL = ConfigurationManager.AppSettings["codebaseURL"];
+        //        if (codebaseURL != null)
+        //            txtCodebaseUrl.Text = codebaseURL;
+        //        lblResponse.Text = Utilities.FormatWarningMessage(message.ToString());
+        //        lblResponse.Visible = true;
 
-                btnGuid.Enabled = true;
-                btnGuid.Visible = true;
+        //        btnGuid.Enabled = true;
+        //        btnGuid.Visible = true;
 
-                btnModify.Enabled = false;
-                btnModify.Visible = false;
+        //        btnModify.Enabled = false;
+        //        btnModify.Visible = false;
 
-                btnSave.Enabled = true;
-                btnSave.Visible = true;
-            }
-            txtOutPasskey.Text = ConfigurationManager.AppSettings["defaultPasskey"];
+        //        btnSave.Enabled = true;
+        //        btnSave.Visible = true;
+        //    }
+        //    txtOutPasskey.Text = ConfigurationManager.AppSettings["defaultPasskey"];
+        //    txtOutPasskey.ToolTip = "The default passkey must be modified in the web.config file!";
+        //    txtOutPasskey.Enabled = false;
+        //    txtOutPasskey.ReadOnly = true;
 
-        }
+        //}
 
         protected void SetFormMode(bool hasDomain)
         {
@@ -1272,6 +1277,10 @@ namespace iLabs.Controls
             txtOutPasskey = new TextBox();
             txtOutPasskey.ApplyStyle(txtBoxStyle);
             txtOutPasskey.Text = ConfigurationManager.AppSettings["defaultPasskey"];
+            txtOutPasskey.Enabled = false;
+            txtOutPasskey.ReadOnly = true;
+            txtOutPasskey.ToolTip = "Default passkey may only be modified by editing the web.config file.";
+            
             td.Controls.Add(txtOutPasskey);
             td2 = new TableCell();
             td2.ApplyStyle(s3);
