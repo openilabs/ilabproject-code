@@ -55,74 +55,81 @@ namespace iLabs.Scheduling.UserSide
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
              dateF = DateUtil.DateTime24(culture);
             // Load the Group list box
-            if (!IsPostBack)
-            {
-                if (Session["couponID"] == null || Request.QueryString["coupon_id"] != null)
-                    couponID = Request.QueryString["coupon_id"];
-                else
-                    couponID = Session["couponID"].ToString();
+             if (!IsPostBack)
+             {
+                 if (Session["couponID"] == null || Request.QueryString["coupon_id"] != null)
+                     couponID = Request.QueryString["coupon_id"];
+                 else
+                     couponID = Session["couponID"].ToString();
 
-                if (Session["passkey"] == null || Request.QueryString["passkey"] != null)
-                    passkey = Request.QueryString["passkey"];
-                else
-                    passkey = Session["passkey"].ToString();
+                 if (Session["passkey"] == null || Request.QueryString["passkey"] != null)
+                     passkey = Request.QueryString["passkey"];
+                 else
+                     passkey = Session["passkey"].ToString();
 
-                if (Session["issuerID"] == null || Request.QueryString["issuer_guid"] != null)
-                    issuerID = Request.QueryString["issuer_guid"];
-                else
-                    issuerID = Session["issuerID"].ToString();
+                 if (Session["issuerID"] == null || Request.QueryString["issuer_guid"] != null)
+                     issuerID = Request.QueryString["issuer_guid"];
+                 else
+                     issuerID = Session["issuerID"].ToString();
 
-                if (Session["sbUrl"] == null || Request.QueryString["sb_url"] != null)
-                    sbUrl = Request.QueryString["sb_url"];
-                else
-                    sbUrl = Session["sbUrl"].ToString();
+                 if (Session["sbUrl"] == null || Request.QueryString["sb_url"] != null)
+                     sbUrl = Request.QueryString["sb_url"];
+                 else
+                     sbUrl = Session["sbUrl"].ToString();
+                 if (Session["userTZ"] != null)
+                     userTZ = Convert.ToInt32(Session["userTZ"]);
+                 bool unauthorized = false;
 
-                bool unauthorized = false;
+                 if (couponID != null && passkey != null && issuerID != null)
+                 {
+                     try
+                     {
+                         Coupon coupon = new Coupon(issuerID, long.Parse(couponID), passkey);
 
-                if (couponID != null && passkey != null && issuerID != null)
-                {
-                    try
-                    {
-                        Coupon coupon = new Coupon(issuerID, long.Parse(couponID), passkey);
+                         ProcessAgentDB dbTicketing = new ProcessAgentDB();
+                         Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.MANAGE_USS_GROUP);
+                         XmlDocument payload = new XmlDocument();
+                         payload.LoadXml(ticket.payload);
+                         if (ticket.IsExpired() || ticket.isCancelled)
+                         {
+                             unauthorized = true;
+                             Response.Redirect("Unauthorized.aspx", false);
+                         }
 
-                        ProcessAgentDB dbTicketing = new ProcessAgentDB();
-                        Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.MANAGE_USS_GROUP);
-                        XmlDocument payload = new XmlDocument();
-                        payload.LoadXml(ticket.payload);
-                        if (ticket.IsExpired() || ticket.isCancelled)
-                        {
-                            unauthorized = true;
-                            Response.Redirect("Unauthorized.aspx", false);
-                        }
+                         Session["couponID"] = couponID;
+                         Session["passkey"] = passkey;
+                         Session["issuerID"] = issuerID;
+                         Session["sbUrl"] = sbUrl;
+                         userTZ = Convert.ToInt32(payload.GetElementsByTagName("userTZ")[0].InnerText);
+                         Session["userTZ"] = userTZ;
+                     }
 
-                        Session["couponID"] = couponID;
-                        Session["passkey"] = passkey;
-                        Session["issuerID"] = issuerID;
-                        Session["sbUrl"] = sbUrl;
-                        userTZ = Convert.ToInt32(payload.GetElementsByTagName("userTZ")[0].InnerText);
-                    }
+                     catch (Exception ex)
+                     {
+                         unauthorized = true;
+                         Response.Redirect("Unauthorized.aspx", false);
+                     }
+                 }
 
-                    catch (Exception ex)
-                    {
-                        unauthorized = true;
-                        Response.Redirect("Unauthorized.aspx", false);
-                    }
-                }
+                 else
+                 {
+                     unauthorized = true;
+                     Response.Redirect("Unauthorized.aspx", false);
+                 }
 
-                else
-                {
-                    unauthorized = true;
-                    Response.Redirect("Unauthorized.aspx", false);
-                }
-
-                if (!unauthorized)
-                {
-                    lblDescription.Text = "Select criteria for the reservations to be displayed."
-                           + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0;
-                    LoadGroupListBox();
-                    LoadExperimentListBox();
-                }
-            }
+                 if (!unauthorized)
+                 {
+                     lblDescription.Text = "Select criteria for the reservations to be displayed."
+                            + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0  + "&nbsp;&nbsp; and use a 24 hour clock.";
+                     lblFormat.Text = dateF;
+                     LoadGroupListBox();
+                     LoadExperimentListBox();
+                 }
+             }
+             else
+             {
+                 userTZ = userTZ = Convert.ToInt32(Session["userTZ"]);
+             }
 
 			if (ddlTimeIs.SelectedIndex!=4)
 			{

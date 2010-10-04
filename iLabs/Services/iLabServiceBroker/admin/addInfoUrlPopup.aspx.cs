@@ -10,6 +10,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -45,12 +46,15 @@ namespace iLabs.ServiceBroker.admin
 			labClientIDs = new int[1];
 			labClientIDs[0] = labClientID;
 			labClients = wrapper.GetLabClientsWrapper(labClientIDs);
-
-			clientInfos = labClients[0].clientInfos;
-			if (clientInfos.Length == 0)
-			{
-				clientInfos = new ClientInfo[1];
-			}
+            if (labClients != null && labClients.Length > 0 && labClients[0] != null)
+            {
+                clientInfos = labClients[0].clientInfos;
+            }
+            if (clientInfos.Length == 0)
+            {
+                clientInfos = new ClientInfo[1];
+                clientInfos[0] = new ClientInfo();
+            }
 
 			if(!IsPostBack)
 			{
@@ -108,7 +112,7 @@ namespace iLabs.ServiceBroker.admin
 
 			foreach(ClientInfo ci in lc.clientInfos)
 			{
-				if (!ci.infoURLName.ToUpper().Equals("DOCUMENTATION"))
+				if (ci != null && !ci.infoURLName.ToUpper().Equals("DOCUMENTATION"))
 					clientInfosList.Add(ci);	
 			}
 
@@ -268,12 +272,24 @@ namespace iLabs.ServiceBroker.admin
 		
 		private void LoadListBox()
 		{
-			lbxChangeOrder.Items.Clear();
-			for (int i=0; i< clientInfos.Length; i++)
-			{
-				if ((!(clientInfos[i].infoURLName==null))&&(!clientInfos[i].infoURLName.ToUpper().Equals("DOCUMENTATION")))
-				lbxChangeOrder.Items.Add(new ListItem(clientInfos[i].infoURLName+" - "+clientInfos[i].description, i.ToString()));
-			}
+            if (clientInfos != null && clientInfos.Length > 0)
+            {
+                lbxChangeOrder.Items.Clear();
+                for (int i = 0; i < clientInfos.Length; i++)
+                {
+                    if (clientInfos[i] != null)
+                    {
+                        if ((clientInfos[i].infoURLName != null) && (clientInfos[i].infoURLName.Length > 0)
+                            && (!clientInfos[i].infoURLName.ToUpper().Equals("DOCUMENTATION")))
+                        {
+                            StringBuilder buf = new StringBuilder(clientInfos[i].infoURLName);
+                            if (clientInfos[i].description != null && clientInfos[i].description.Length > 0)
+                                buf.Append(" - " + clientInfos[i].description);
+                            lbxChangeOrder.Items.Add(new ListItem(buf.ToString(), i.ToString()));
+                        }
+                    }
+                }
+            }
 		}
 
 		/// <summary>

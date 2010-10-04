@@ -610,20 +610,22 @@ namespace iLabs.ServiceBroker.Internal
 					int count=1;
 					foreach (ClientInfo c in lc.clientInfos ) 
 					{
-						//if (c != null) - this doesn't work because ClientInfo is a struct
-						if ((c.infoURL!=null)&&(c.infoURL.CompareTo("")!=0))
-						{
-							myCommand.Parameters["@infoURL"].Value = c.infoURL;
-							myCommand.Parameters["@infoName"].Value = c.infoURLName;
-							myCommand.Parameters["@description"].Value = c.description;
-							myCommand.Parameters["@displayOrder"].Value = count;
-							//myCommand.Parameters["@displayOrder"].Value = c.displayOrder;
+                        if (c != null)
+                        {
+                            if ((c.infoURL != null) && (c.infoURL.CompareTo("") != 0))
+                            {
+                                myCommand.Parameters["@infoURL"].Value = c.infoURL;
+                                myCommand.Parameters["@infoName"].Value = c.infoURLName;
+                                myCommand.Parameters["@description"].Value = c.description;
+                                myCommand.Parameters["@displayOrder"].Value = count;
+                                //myCommand.Parameters["@displayOrder"].Value = c.displayOrder;
 
-							int i = myCommand.ExecuteNonQuery();
-						
-							if (i!=0)
-								count+=1;
-						}
+                                int i = myCommand.ExecuteNonQuery();
+
+                                if (i != 0)
+                                    count += 1;
+                            }
+                        }
 					}
 				}
 
@@ -738,20 +740,22 @@ namespace iLabs.ServiceBroker.Internal
 					int count=1;
 					foreach (ClientInfo c in lc.clientInfos ) 
 					{
-						//if (c != null) - this doesn't work since ClientInfo is a struct
-						if ((c.infoURL!=null)&&(c.infoURL.CompareTo("")!=0))
-						{
-							myCommand.Parameters["@infoURL"].Value = c.infoURL;
-							myCommand.Parameters["@infoName"].Value = c.infoURLName;
-							myCommand.Parameters["@description"].Value = c.description;
-							myCommand.Parameters["@displayOrder"].Value = count;
-							//myCommand.Parameters["@displayOrder"].Value = c.displayOrder;
+                        if (c != null)
+                        {
+                            if ((c.infoURL != null) && (c.infoURL.CompareTo("") != 0))
+                            {
+                                myCommand.Parameters["@infoURL"].Value = c.infoURL;
+                                myCommand.Parameters["@infoName"].Value = c.infoURLName;
+                                myCommand.Parameters["@description"].Value = c.description;
+                                myCommand.Parameters["@displayOrder"].Value = count;
+                                //myCommand.Parameters["@displayOrder"].Value = c.displayOrder;
 
-							int x = myCommand.ExecuteNonQuery();
-						
-							if (x!=0)
-								count+=1;
-						}
+                                int x = myCommand.ExecuteNonQuery();
+
+                                if (x != 0)
+                                    count++;
+                            }
+                        }
 					}
 				}
 

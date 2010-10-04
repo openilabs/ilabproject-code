@@ -65,7 +65,7 @@
 									
 										<tr>
 									<th>
-										<label for= "format">mm/dd/yyyy hh:mm</label></th>
+										<asp:Label id="lblFormat" runat="server" for= "format"></asp:Label></th>
 									<td style="WIDTH: 143px"><asp:textbox id="txtTime1" Runat="server"></asp:textbox>
 										<!--input name="textfield" type="text" size="10"--></td>
 									<td style="WIDTH: 78px"><asp:textbox id="txtTime2" Runat="server" ReadOnly="true"  BackColor="Lavender"></asp:textbox>
