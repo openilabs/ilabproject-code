@@ -265,28 +265,12 @@ namespace iLabs.ServiceBroker.admin
                 }
                 if (ussId > 0)
                 {
-                    //ResourceMappingValue [] ussValues = new ResourceMappingValue[2];
-                    //ussValues[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER);
-                    ////valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussId));
-                    //ussValues[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-                    //    TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION));
-                    //ResourceMappingValue[] valuesForKey = (ResourceMappingValue[])valuesList.ToArray((new ResourceMappingValue()).GetType());
-
-                    //foreach (DictionaryEntry entry in mappingsTable)
-                    //{
-                    //    if (ticketing.EqualMappingValues((ResourceMappingValue[])entry.Value, valuesForKey))
-                    //        (int)entry.Key;
-                    //}
-
-
-                    //int[] id = { ticketing.GetProcessAgentID(uss.agentGuid) };
-                    //IntTag[] ussTag = ticketing.GetProcessAgentTags(id);
+                   
                     btnRegisterUSS.Visible = false;
                     btnDissociateUSS.Visible = true;
                     
                     ddlAssociatedUSS.SelectedValue = ussId.ToString();
                     ddlAssociatedUSS.Enabled = false;
-                    //}
                 }
 
                 else
@@ -531,6 +515,7 @@ namespace iLabs.ServiceBroker.admin
 			if ((txtDocURL.Text!=null)&&(txtDocURL.Text.Trim()!=""))
 			{
 				clientInfos = new ClientInfo[1];
+                clientInfos[0] = new ClientInfo();
 				clientInfos[0].infoURL=txtDocURL.Text;
 				clientInfos[0].infoURLName="Documentation";
 				clientInfos[0].description="Link to documentation";
@@ -694,8 +679,6 @@ namespace iLabs.ServiceBroker.admin
 
 		private void RefreshClientInfoRepeater()
 		{
-            //LoadFormFields();
-
 			// refresh the array of LabClient objects from the database.
 			// This insures that any changed ClientInfo arrays (one per LabClient Object)
 			// are retrieved.
@@ -873,12 +856,6 @@ namespace iLabs.ServiceBroker.admin
                                     // this domain
                                     //Add USS on LSS
 
-
-                                    //string lssPayload = factory.createAdministerLSSPayload(Convert.ToInt32(Session["UserTZ"]));
-                                    //long duration = 60; //seconds for the LSS to redeem the ticket of this coupon and Add LSS Info
-                                    //ticketing.AddTicket(lssCoupon, TicketTypes.ADMINISTER_LSS, lss.agentGuid,
-                                    //    ticketing.ServiceGuid(), duration, lssPayload);
-
                                     LabSchedulingProxy lssProxy = new LabSchedulingProxy();
                                     lssProxy.Url = lss.webServiceUrl;
                                     lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
@@ -894,8 +871,6 @@ namespace iLabs.ServiceBroker.admin
                                     int remoteSbId = ticketing.GetProcessAgentID(lss.domainGuid);
                                     message.AppendLine(RegistrationSupport.RegisterClientUSS(remoteSbId, null, lss.agentId, null, labServer.agentId,
                                         ussCoupon, uss.agentId, null, lc.clientID));
-
-                                   
                                 }
                                 //ADD LSS on USS
                                 string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["UserTZ"]));
@@ -970,15 +945,12 @@ namespace iLabs.ServiceBroker.admin
                 ResourceMappingValue[] values = (ResourceMappingValue[])valuesList.ToArray((new ResourceMappingValue()).GetType());
                 ResourceMapping newMapping = ticketing.AddResourceMapping(key, values);
 
-
-
                 // add mapping to qualifier list
                 int qualifierType = Qualifier.resourceMappingQualifierTypeID;
                 string name = ticketing.ResourceMappingToString(newMapping);
                 int qualId = AuthorizationAPI.AddQualifier(newMapping.MappingID, qualifierType, name, Qualifier.ROOT);
 
                 // No Grant required for ESS
-
                 Session["ClientEssMappingID"] = newMapping.MappingID;
 
                 btnRegisterESS.Visible = false;
