@@ -395,9 +395,11 @@ namespace iLabs.ServiceBroker.admin
 			// Also, there is no obvious way to handle multiple lines here.
 			foreach(ClientInfo ci in lc.clientInfos)
 			{
-				if (ci.infoURLName.ToUpper().Equals("DOCUMENTATION"))
-					txtDocURL.Text = ci.infoURL;
-				break;
+                if (ci.infoURLName.ToUpper().Equals("DOCUMENTATION"))
+                {
+                    txtDocURL.Text = ci.infoURL;
+                    break;
+                }
 			}
 
 			txtNotes.Text = lc.notes;

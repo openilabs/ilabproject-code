@@ -120,11 +120,8 @@ namespace iLabs.ServiceBroker.iLabSB
                 {
                     if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                     {
-                       
-
                         if (lc.needsScheduling)
                         {
-                           
                             Ticket allowExperimentExecutionTicket = null;
                            if(opCoupon != null){
 
@@ -135,7 +132,6 @@ namespace iLabs.ServiceBroker.iLabSB
                             if (allowExperimentExecutionTicket == null)
                             {
                                 // Try for a reservation
-
                                 int ussId = issuer.FindProcessAgentIdForClient(lc.clientID, ProcessAgentType.SCHEDULING_SERVER);
                                 if (ussId > 0)
                                 {
@@ -281,8 +277,8 @@ namespace iLabs.ServiceBroker.iLabSB
                     {
                         foreach (ClientInfo ci in lc.clientInfos)
                         {
-                            if (ci.infoURLName.CompareTo("Documentation") != 0)
-                            {
+                            //if (ci.infoURLName.CompareTo("Documentation") != 0)
+                            //{
                                 System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
                                 b.Visible = true;
                                 b.CssClass = "button";
@@ -294,7 +290,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 repClientInfos.Controls.AddAt(count, b);
                                 repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
                                 count += 2;
-                            }
+                           // }
                         }
                     }
                 }
