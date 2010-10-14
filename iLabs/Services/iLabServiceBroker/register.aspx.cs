@@ -254,8 +254,9 @@ namespace iLabs.ServiceBroker.iLabSB
 					// user the admin API call directly instead
                     if ((useRequestGroups) && (initialGroup != newUserGroupID))
                     {
+                        initialGroup = AdministrativeUtilities.GetGroupRequestGroup(initialGroup);
                         userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
-                            affiliation, reason, "", AdministrativeUtilities.GetGroupRequestGroup(initialGroup), false);
+                            affiliation, reason, "",initialGroup, false);
                         msg.Append("Added user: " + userName + " into request group ");
                     }
                     else
@@ -284,6 +285,12 @@ namespace iLabs.ServiceBroker.iLabSB
 					//wrapper.SetNativePasswordWrapper (userID, txtPassword.Text );
 
 					FormsAuthentication.SetAuthCookie(userName , false);
+                    Session["UserID"] = userID;
+                    Session["UserName"] = userName;
+                    Session["UserTZ"] = Request.Params["userTZ"];
+                    Session["SessionID"] = AdministrativeAPI.InsertUserSession(userID, initialGroup, Convert.ToInt32(Request.Params["userTZ"]), Session.SessionID.ToString()).ToString();
+                    HttpCookie cookie = new HttpCookie(ConfigurationManager.AppSettings["isbAuthCookieName"], Session["SessionID"].ToString());
+                    Response.AppendCookie(cookie);
                     try
                     {
                         // Check for GroupItems, since the user may not be in the target group at this time

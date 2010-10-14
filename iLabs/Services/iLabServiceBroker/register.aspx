@@ -20,6 +20,16 @@ Please see license.txt in top level directory for full license.
 	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
+		<script language="javascript" >
+        var visitortime = new Date();
+        document.write('<input type="hidden" name="userTZ" id="userTZ"');
+        if(visitortime) {
+            document.write('value="' + -visitortime.getTimezoneOffset() + '">');
+        }
+        else {
+            document.write('value="JavaScript not Date() enabled">');
+        }
+    </script>
 			<a name="top"></a>
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>

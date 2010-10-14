@@ -15,7 +15,6 @@
     <!-- the database connection information 
     NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
     <add key="sqlConnection"  value="data source=(local);initial catalog=iLab_ISB;Integrated Security=SSPI" />
-    
     <!-- Data provider specifies the database engine, default is for Microsoft sqlServer-->
     <add key="DatabaseProvider" value="System.Data.SqlClient" />
    
@@ -45,16 +44,23 @@
     <add key="bugReportOptions" value="System-wide error,Login,Group Issues,Grant Issues,UserInterface,Business logic"/>
     
     <!-- ServiceBroker Specific Keys -->
+    <!-- REGISTRATION Keys -->
     <!-- if TRUE a drop-down list will be used for affliation selection and display.
 		If TRUE you must specify the affiliationOptions as a comma delimited string. 
 		If False a TextBox will be used for affiliation input.-->
     <add key="useAffiliationDDL" value="true"/>
     <add key="affiliationOptions" value="-- Make selection --,Student,Faculty/Staff,Guest,Other"/>
-   
+
+    <!-- Option to select from a list of groups or to specify a specific initial group, 
+    NOTE: these must both be changed -->
+    <add key="chooseGroups" value="true"/>
+    <!-- <add key="initialGroup" value=""/> -->
+
     <!-- if true, the requestGroup page will add users to a special "request" group.
 		They must then be added to the real group by an administrator.
-		if false, user may add themselves directly to a group from the requestGroup page. -->
+		if false and chooseGroups is true, user may add themselves directly to a group from the requestGroup page. -->
     <add key="adminRequestGroup" value="true"/>
+    <add key="useRequestGroup" value="true"/>
     
     <!-- Cookie support for applets needed for .Net 2.0. This should only need to be changed if you host more than one SB per machine -->
     <add key="isbAuthCookieName" value="isbAuth" />
