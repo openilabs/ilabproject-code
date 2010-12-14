@@ -58,6 +58,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 			if(! IsPostBack)
 			{
+                lblRevision.Text = "<!-- Revision: " + iLabGlobal.Release + " -->";
 				if (userID != -1) //user logged in
 				{
 					lblUserName.Visible = false;

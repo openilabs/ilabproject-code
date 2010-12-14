@@ -10,7 +10,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: help.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
 		<meta content="C#" name="CODE_LANGUAGE">
 		<meta content="JavaScript" name="vs_defaultClientScript">
@@ -24,6 +24,7 @@ Please see license.txt in top level directory for full license.
 			<a name="top"></a>
 			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all">
 				<div id="innerwrapper">
+				<asp:Label ID="lblRevision" runat="server" />
 					<div id="pageintro">
 						<h1>Help</h1>
 						<p>On this page you can read the <A href="#faqs">FAQ's</A>, <A href="#help">Request 
