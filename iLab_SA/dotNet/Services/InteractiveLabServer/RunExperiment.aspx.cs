@@ -85,7 +85,7 @@ namespace iLabs.LabServer.LabView
 			thePanel.height= height;
             if(duration > 0){
                 RegisterStartupScript("timer", LabUtils.TimerScript(startStr, duration, tz,
-                    DateUtil.ParseCulture(Request.Headers["Accept-Language"]),returnURL,1000,"txtTimeRemaining"));
+                    DateUtil.ParseCulture(Request.Headers["Accept-Language"]),returnURL,1000));
             }
 						
             /* Use Session payload vs. URL params to validate
