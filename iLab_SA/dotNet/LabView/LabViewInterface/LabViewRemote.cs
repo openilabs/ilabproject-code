@@ -23,7 +23,11 @@ using iLabs.UtilLib;
 // Specify the LabView application version and application via these resources
 using CWDataServer;
 using CWDSLib;
+#if LabVIEW_2010
+using LabVIEW.lv2010;
 
+namespace iLabs.LabView.LV2010
+#endif
 #if LabVIEW_2009
 using LabVIEW.lv2009;
 

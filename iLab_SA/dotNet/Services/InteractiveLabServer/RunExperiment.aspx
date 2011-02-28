@@ -25,30 +25,19 @@ Please see license.txt in top level directory for full license.
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1><asp:label id="lblExperimentTitle" Runat="server"><% =title %></asp:label></h1>
-						<asp:label id="lblDescription" Runat="server"></asp:Label>
-					</div>
-					<!-- end pageintro div -->
+						<asp:label id="lblDescription" Runat="server"></asp:label>
+					</div><!-- end pageintro div -->
 					<div id="pagecontent">
 					<p><asp:HyperLink id="lnkBackSB" Text="Back to InteractiveSB" runat="server" ></asp:HyperLink></p>
 						<uc1:lvpanel id="thePanel" Runat="Server"> </uc1:lvpanel>
-						<div id="messagebox-right">
-							<h3><asp:label id="lblGroupNameSystemMessage" Runat="server"></asp:label></h3>
-							<asp:repeater id="repSystemMessage" runat="server">
-								<ItemTemplate>
-									<p class="message">
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "MessageBody")) %>
-									</p>
-									<p class="date">Date Posted:
-										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "LastModified")) %>
-									</p>
-								</ItemTemplate>
-							</asp:repeater>
-						</div> <!-- End messagebox-right -->
-						<!-- Div id "singlelab" is displayed if only one client is available. Otherwise, div class "group" is displayed, which has a list of available labs. -->
-					</div>
+						
+					</div><!-- end pagecontent div -->
 					<br clear="all">
-					<!-- end pagecontent div --></div>
-				<!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
+					<p/>
+					<asp:Label runat="server" ID="lblTime">Time Remaining:&nbsp;&nbsp;&nbsp;&nbsp;</asp:Label><asp:TextBox ID="txtTimeRemaining" runat="server"  ReadOnly="true" Width="200px"/>
+				</div><!-- end innerwrapper div -->
+				<div><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
+			</div>
 		</form>
 	</body>
 </HTML>

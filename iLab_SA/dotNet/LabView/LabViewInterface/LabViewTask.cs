@@ -29,6 +29,11 @@ using iLabs.UtilLib;
 //using iLabs.Ticketing;
 using iLabs.LabServer.Interactive;
 
+#if LabVIEW_2010
+using LabVIEW.lv2010;
+
+namespace iLabs.LabView.LV2010
+#endif
 #if LabVIEW_2009
 using LabVIEW.lv2009;
 

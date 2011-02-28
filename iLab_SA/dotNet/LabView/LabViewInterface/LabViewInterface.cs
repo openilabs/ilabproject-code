@@ -27,6 +27,11 @@ using CWDataServer;
 using CWDSLib;
 using iLabs.LabView;
 
+#if LabVIEW_2010
+using LabVIEW.lv2010;
+namespace iLabs.LabView.LV2010
+{
+#endif
 #if LabVIEW_2009
 using LabVIEW.lv2009;
 namespace iLabs.LabView.LV2009
@@ -44,7 +49,7 @@ namespace iLabs.LabView.LV82
 #endif
 
 
-	/// <summary>
+/// <summary>
 	/// Summary description for LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
 	/// As the Application will require the automatic loading of several VI's this implementation should be 
 	/// somewhat faster and simpler than using the standard LabVIEW exe. Also hope to make the Interface 
@@ -67,6 +72,9 @@ namespace iLabs.LabView.LV82
         {
             try
             {
+#if LabVIEW_2010
+                lvVersion = "LabVIEW 2010";
+#endif
 #if LabVIEW_2009
                 lvVersion = "LabVIEW 2009";
 #endif
@@ -1372,6 +1380,9 @@ namespace iLabs.LabView.LV82
  */
 
     }
+#if LabVIEW_2010
+}
+#endif
 #if LabVIEW_2009
 }
 #endif

@@ -26,6 +26,9 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 
 using iLabs.LabView;
+#if LabVIEW_2010
+using iLabs.LabView.LV2010;
+#endif
 #if LabVIEW_2009
 using iLabs.LabView.LV2009;
 #endif

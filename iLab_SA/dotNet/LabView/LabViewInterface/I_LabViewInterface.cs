@@ -15,6 +15,10 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
+#if LabVIEW_2010
+using LabVIEW.lv2010;
+namespace iLabs.LabView.LV2010
+#endif
 #if LabVIEW_2009
 using LabVIEW.lv2009;
 namespace iLabs.LabView.LV2009

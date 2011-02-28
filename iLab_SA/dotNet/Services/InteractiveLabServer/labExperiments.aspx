@@ -39,117 +39,116 @@ Please see license.txt in top level directory for full license.
 						<p><asp:HyperLink id="lnkBackSB" Text="Back to InteractiveSB" runat="server" ></asp:HyperLink></p>	
 						<div class="simpleform">
 						    <form id="appInfo" action="" method="post" name="appInfo">
-									<table style="WIDTH: 564px; HEIGHT: 460px" cellSpacing="0" cellPadding="5" border="0">
+									<table  cellSpacing="0" cellPadding="5" border="0">
 										<TBODY>
 											<tr>
-												<th style="width: 480px">
+												<th style="width: 140px">
 													<label for="appName">Lab Application</label></th>
-												<td style="width: 484px"><asp:dropdownlist cssClass="i18n" id="ddlApplications" Runat="server" Width="360px" onselectedindexchanged="ddlApplications_SelectedIndexChanged" AutoPostBack="True"></asp:dropdownlist></td>
+												<td style="width: 484px"><asp:dropdownlist cssClass="i18n" id="ddlApplications" Runat="server" Width="480px" onselectedindexchanged="ddlApplications_SelectedIndexChanged" AutoPostBack="True"></asp:dropdownlist></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th >
 													<label for="title">Title</label></th>
-												<td style="width: 484px"><asp:textbox id="txtTitle" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtTitle" Runat="server" Width="480px"></asp:textbox></td>
 											</tr>
 											<tr>
 									            <th>
 										            <label for="ClientGuid">Client GUID</label></th>
-									            <td><asp:textbox id="txtClientGuid" Runat="server"  Width="260px"
+									            <td><asp:textbox id="txtClientGuid" Runat="server"  Width="380px"
 									            ToolTip="You must enter a GUID and it must match the client GUID on the ServiceBroker"></asp:textbox>&nbsp;&nbsp;&nbsp;<asp:Button ID="btnGuid" runat="server" Text="Make Guid" OnClick="btnGuid_Click" /></td>
 								            </tr>
 								            <tr runat="server">
-												<th style="width: 480px">
+												<th>
 													<label for="version">Version</label></th>
-												<td style="width: 484px"><asp:textbox id="txtVersion" Runat="server" Width="360px"
+												<td><asp:textbox id="txtVersion" Runat="server" Width="480px"
 												ToolTip="You must enter a version string" ></asp:textbox></td>
 											</tr>
 											<tr id="Tr1" runat="server">
-												<th style="width: 480px">
+												<th>
 													<label for="version">Revision</label></th>
-												<td style="width: 484px"><asp:textbox id="txtRev" Runat="server" Width="360px"
-												 ToolTip="You may specify the LabVIEW release in this field. Legal values are 8.2, 8.6 or 2009"></asp:textbox></td>
+												<td><asp:textbox id="txtRev" Runat="server" Width="480px"
+												 ToolTip="You may specify the LabVIEW release in this field. Legal values are 8.2, 8.6, 2009 or 2010"></asp:textbox></td>
 											</tr><tr runat="server">
-												<th style="width: 480px">
+												<th>
 													<label for="applicationKey">Application Key</label></th>
-												<td style="width: 484px"><asp:textbox id="txtAppKey" Runat="server" Width="360px"
+												<td><asp:textbox id="txtAppKey" Runat="server" Width="480px"
 												ToolTip="The app value used in the loader script to select this application"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="applicationPath">Path</label></th>
-												<td style="width: 484px"><asp:textbox id="txtApplicationPath" Runat="server" Width="360px" 
+												<td><asp:textbox id="txtApplicationPath" Runat="server" Width="480px" 
 												ToolTip="The absolute path to the application directory, without a trailing seperator"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="application">Application</label></th>
-												<td style="width: 484px"><asp:textbox id="txtApplication" Runat="server" Width="360px"
+												<td><asp:textbox id="txtApplication" Runat="server" Width="480px"
 												ToolTip="The application Application file name including file type extension"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="webPageUrl">Web Page URL</label></th>
-												<td style="width: 484px"><asp:textbox id="txtPageUrl" Runat="server" Width="360px"
+												<td><asp:textbox id="txtPageUrl" Runat="server" Width="480px"
 												ToolTip="The URL used to display the client"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="width">Application URL</label></th>
-												<td style="width: 484px"><asp:textbox id="txtURL" Runat="server" Width="360px"
+												<td><asp:textbox id="txtURL" Runat="server" Width="480px"
 												ToolTip="The URL used execute the client, for LabVIEW it is the LabVIEW Web Server"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="width">Width</label></th>
-												<td style="width: 484px"><asp:textbox id="txtWidth" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtWidth" Runat="server" Width="480px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="height">Height</label></th>
-												<td style="width: 484px"><asp:textbox id="txtHeigth" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtHeigth" Runat="server" Width="480px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="dataSources">Data Sources </label></th>
-												<td style="width: 484px"><asp:textbox id="txtDataSources" Runat="server" Width="360px"
+												<td><asp:textbox id="txtDataSources" Runat="server" Width="480px"
 												ToolTip="A comma delimited list of dataSource URLs with optional record type"></asp:textbox></td>
 											</tr>		
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="server">Server</label></th>
-												<td style="width: 484px"><asp:textbox id="txtServer" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtServer" Runat="server" Width="480px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="port">Port</label></th>
-												<td style="width: 484px"><asp:textbox id="txtPort" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtPort" Runat="server" Width="48px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="contactemail">Contact Email </label></th>
-												<td style="width: 484px"><asp:textbox id="txtContactEmail" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtContactEmail" Runat="server" Width="480px"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="description">Description</label></th>
-												<td style="width: 484px"><asp:textbox id="txtDescription" Runat="server" Columns="20" Rows="5" TextMode="MultiLine"
-														Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtDescription" Runat="server" Width="480px" Rows="5" TextMode="MultiLine"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="infoUrl">Info URL </label></th>
-												<td style="width: 484px"><asp:textbox id="txtInfoUrl" Runat="server" Width="360px"
+												<td><asp:textbox id="txtInfoUrl" Runat="server" Width="480px"
 												ToolTip="An optional URL to information about the lab"></asp:textbox></td>
 											</tr>
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="comment">Comment</label></th>
-												<td style="width: 484px"><asp:textbox id="txtComment" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtComment" Runat="server" Width="480px"></asp:textbox></td>
 											</tr> 
 											<tr>
-												<th style="width: 480px">
+												<th>
 													<label for="port">Extra Data</label></th>
-												<td style="width: 484px"><asp:textbox id="txtExtra" Runat="server" Width="360px"></asp:textbox></td>
+												<td><asp:textbox id="txtExtra" Runat="server" Width="480px"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th colSpan="2">
