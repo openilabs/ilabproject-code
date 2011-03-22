@@ -98,6 +98,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 lblGroupNameTitle.Text = groupName;
                 //lblBackToLabs.Text = groupName;
             }
+
             if (!IsPostBack)
             {
                 // retrieve parameters from URL
@@ -116,198 +117,8 @@ namespace iLabs.ServiceBroker.iLabSB
                         autoLaunch = true;
                     }
                 }
-                if (lc != null)
-                {
-                    if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
-                    {
-                        if (lc.needsScheduling)
-                        {
-                            Ticket allowExperimentExecutionTicket = null;
-                           if(opCoupon != null){
-
-                                // First check for an Allow Execution Ticket
-                                allowExperimentExecutionTicket = issuer.RetrieveTicket(
-                                    opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION);
-                            }
-                            if (allowExperimentExecutionTicket == null)
-                            {
-                                // Try for a reservation
-                                int ussId = issuer.FindProcessAgentIdForClient(lc.clientID, ProcessAgentType.SCHEDULING_SERVER);
-                                if (ussId > 0)
-                                {
-                                    ProcessAgent uss = issuer.GetProcessAgent(ussId);
-                                    ProcessAgent ls = issuer.GetProcessAgent(lc.labServerIDs[0]);
-
-                                    // check for current reservation
-
-                                    //create a collection & redeemTicket
-                                    string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow);
-                                    if (opCoupon == null)
-                                        opCoupon = issuer.CreateCoupon();
-
-                                    issuer.AddTicket(opCoupon, TicketTypes.REDEEM_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 600, redeemPayload);
-
-                                    UserSchedulingProxy ussProxy = new UserSchedulingProxy();
-                                    OperationAuthHeader op = new OperationAuthHeader();
-                                    op.coupon = opCoupon;
-                                    ussProxy.Url = uss.webServiceUrl;
-                                    ussProxy.OperationAuthHeaderValue = op;
-                                    Reservation reservation = ussProxy.RedeemReservation(ProcessAgentDB.ServiceGuid, Session["UserName"].ToString(), ls.agentGuid, lc.clientGuid);
-
-                                    if (reservation != null)
-                                    {
-                                        // Find efective group
-                                        setEffectiveGroup(groupID, lc.clientID);
-                                       
-                                        // create the allowExecution Ticket
-                                        DateTime start = reservation.Start;
-                                        long duration = reservation.Duration;
-                                        string payload = TicketLoadFactory.Instance().createAllowExperimentExecutionPayload(
-                                            start, duration, effectiveGroupName);
-                                        DateTime tmpTime = start.AddTicks(duration * TimeSpan.TicksPerSecond);
-                                        DateTime utcNow = DateTime.UtcNow;
-                                        long ticketDuration = (tmpTime.Ticks - utcNow.Ticks) / TimeSpan.TicksPerSecond;
-                                        allowExperimentExecutionTicket = issuer.AddTicket(opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION,
-                                                ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, ticketDuration, payload);
-                                    }
-                                }
-                            }
-                            if (allowExperimentExecutionTicket != null)
-                            {
-                                XmlDocument payload = new XmlDocument();
-                                payload.LoadXml(allowExperimentExecutionTicket.payload);
-                                startExecution = DateUtil.ParseUtc(payload.GetElementsByTagName("startExecution")[0].InnerText);
-                                duration = Int64.Parse(payload.GetElementsByTagName("duration")[0].InnerText);
-
-                                Session["StartExecution"] = DateUtil.ToUtcString(startExecution);
-                                Session["Duration"] = duration;
-
-                                //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
-
-
-                                // Display reenter button if experiment is reentrant & a current experiment exists
-                                if (lc.IsReentrant)
-                                {
-
-                                    long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
-                                        effectiveGroupID, lc.labServerIDs[0], lc.clientID);
-                                    if (ids.Length > 0)
-                                    {
-                                        btnLaunchLab.Text = "Launch New Experiment";
-                                        btnLaunchLab.Visible = true;
-                                        pReenter.Visible = true;
-                                        btnReenter.Visible = true;
-                                        btnReenter.CommandArgument = ids[0].ToString();
-                                    }
-                                    else
-                                    {
-
-                                        pReenter.Visible = false;
-                                        btnReenter.Visible = false;
-                                        btnLaunchLab.Text = "Launch Lab";
-                                        if (autoLaunch)
-                                        {
-                                            launchLabClient(lc.clientID);
-                                        }
-                                        else
-                                        {
-                                            btnLaunchLab.Visible = true;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if (autoLaunch)
-                                    {
-                                        launchLabClient(lc.clientID);
-                                    }
-                                    else
-                                    {
-                                        btnLaunchLab.Visible = true;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                btnLaunchLab.Visible = false;
-                            }
-                        }
-
-                        else
-                        {
-                            if (autoLaunch)
-                            {
-                                launchLabClient(lc.clientID);
-                                btnLaunchLab.Visible = true;
-                            }
-                            else
-                            {
-                                btnLaunchLab.Visible = true;
-                            }
-                        }
-                    }
-                    else if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
-                    {
-                        if (autoLaunch)
-                        {
-                            launchLabClient(lc.clientID);
-                            btnLaunchLab.Visible = true;
-                        }
-                        else
-                        {
-                            btnLaunchLab.Visible = true;
-                        }
-                    }
-
-
-                    btnSchedule.Visible = lc.needsScheduling;
-                    lblClientName.Text = lc.clientName;
-                    lblVersion.Text = lc.version;
-                    lblLongDescription.Text = lc.clientLongDescription;
-                    lblNotes.Text = lc.notes;
-                    string emailCmd = "mailto:" + lc.contactEmail;
-                    lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
-
-                    btnLaunchLab.Command += new CommandEventHandler(this.btnLaunchLab_Click);
-                    btnLaunchLab.CommandArgument = lc.clientID.ToString();
-
-                    int count = 0;
-
-                    if (lc.clientInfos != null && lc.clientInfos.Length > 0)
-                    {
-                        foreach (ClientInfo ci in lc.clientInfos)
-                        {
-                            //if (ci.infoURLName.CompareTo("Documentation") != 0)
-                            //{
-                                System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
-                                b.Visible = true;
-                                b.CssClass = "button";
-                                b.Text = ci.infoURLName;
-                                b.CommandArgument = ci.infoURL;
-                                b.CommandName = ci.infoURLName;
-                                b.ToolTip = ci.description;
-                                b.Command += new CommandEventHandler(this.HelpButton_Click);
-                                repClientInfos.Controls.AddAt(count, b);
-                                repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
-                                count += 2;
-                           // }
-                        }
-                    }
-                }
-                else
-                {
-                    // No LabClient
-                    btnSchedule.Visible = false;
-                    btnLaunchLab.Visible = false;
-                    string msg = "There are no labs assigned to group: " + Session["GroupName"].ToString() + "!";
-                    lblResponse.Text = Utilities.FormatErrorMessage(msg);
-                    lblResponse.Visible = true;
-                }
-
-
-
                 // System_Messages block
-               
+
                 SystemMessage[] groupMessages = null;
                 SystemMessage[] serverMessages = null;
                 groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
@@ -350,9 +161,201 @@ namespace iLabs.ServiceBroker.iLabSB
                         lblServerSystemMessage.Visible = false;
                     }
                 }
-               
             }
+            if (lc != null)
+            {
+                if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
+                {
+                    if (lc.needsScheduling)
+                    {
+                        Ticket allowExperimentExecutionTicket = null;
+                        if (opCoupon != null)
+                        {
+
+                            // First check for an Allow Execution Ticket
+                            allowExperimentExecutionTicket = issuer.RetrieveTicket(
+                                opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION);
+                        }
+                        if (allowExperimentExecutionTicket == null)
+                        {
+                            // Try for a reservation
+                            int ussId = issuer.FindProcessAgentIdForClient(lc.clientID, ProcessAgentType.SCHEDULING_SERVER);
+                            if (ussId > 0)
+                            {
+                                ProcessAgent uss = issuer.GetProcessAgent(ussId);
+                                ProcessAgent ls = issuer.GetProcessAgent(lc.labServerIDs[0]);
+
+                                // check for current reservation
+
+                                //create a collection & redeemTicket
+                                string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow);
+                                if (opCoupon == null)
+                                    opCoupon = issuer.CreateCoupon();
+
+                                issuer.AddTicket(opCoupon, TicketTypes.REDEEM_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 600, redeemPayload);
+
+                                UserSchedulingProxy ussProxy = new UserSchedulingProxy();
+                                OperationAuthHeader op = new OperationAuthHeader();
+                                op.coupon = opCoupon;
+                                ussProxy.Url = uss.webServiceUrl;
+                                ussProxy.OperationAuthHeaderValue = op;
+                                Reservation reservation = ussProxy.RedeemReservation(ProcessAgentDB.ServiceGuid, Session["UserName"].ToString(), ls.agentGuid, lc.clientGuid);
+
+                                if (reservation != null)
+                                {
+                                    // Find efective group
+                                    setEffectiveGroup(groupID, lc.clientID);
+
+                                    // create the allowExecution Ticket
+                                    DateTime start = reservation.Start;
+                                    long duration = reservation.Duration;
+                                    string payload = TicketLoadFactory.Instance().createAllowExperimentExecutionPayload(
+                                        start, duration, effectiveGroupName);
+                                    DateTime tmpTime = start.AddTicks(duration * TimeSpan.TicksPerSecond);
+                                    DateTime utcNow = DateTime.UtcNow;
+                                    long ticketDuration = (tmpTime.Ticks - utcNow.Ticks) / TimeSpan.TicksPerSecond;
+                                    allowExperimentExecutionTicket = issuer.AddTicket(opCoupon, TicketTypes.ALLOW_EXPERIMENT_EXECUTION,
+                                            ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, ticketDuration, payload);
+                                }
+                            }
+                        }
+                        if (allowExperimentExecutionTicket != null)
+                        {
+                            XmlDocument payload = new XmlDocument();
+                            payload.LoadXml(allowExperimentExecutionTicket.payload);
+                            startExecution = DateUtil.ParseUtc(payload.GetElementsByTagName("startExecution")[0].InnerText);
+                            duration = Int64.Parse(payload.GetElementsByTagName("duration")[0].InnerText);
+
+                            Session["StartExecution"] = DateUtil.ToUtcString(startExecution);
+                            Session["Duration"] = duration;
+
+                            //groupId = payload.GetElementsByTagName("groupID")[0].InnerText;
+
+
+                            // Display reenter button if experiment is reentrant & a current experiment exists
+                            if (lc.IsReentrant)
+                            {
+
+                                long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
+                                    effectiveGroupID, lc.labServerIDs[0], lc.clientID);
+                                if (ids.Length > 0)
+                                {
+                                    btnLaunchLab.Text = "Launch New Experiment";
+                                    btnLaunchLab.Visible = true;
+                                    pReenter.Visible = true;
+                                    btnReenter.Visible = true;
+                                    btnReenter.CommandArgument = ids[0].ToString();
+                                }
+                                else
+                                {
+
+                                    pReenter.Visible = false;
+                                    btnReenter.Visible = false;
+                                    btnLaunchLab.Text = "Launch Lab";
+                                    if (autoLaunch)
+                                    {
+                                        launchLabClient(lc.clientID);
+                                    }
+                                    else
+                                    {
+                                        btnLaunchLab.Visible = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (autoLaunch)
+                                {
+                                    launchLabClient(lc.clientID);
+                                }
+                                else
+                                {
+                                    btnLaunchLab.Visible = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            btnLaunchLab.Visible = false;
+                        }
+                    }
+
+                    else
+                    {
+                        if (autoLaunch)
+                        {
+                            launchLabClient(lc.clientID);
+                            btnLaunchLab.Visible = true;
+                        }
+                        else
+                        {
+                            btnLaunchLab.Visible = true;
+                        }
+                    }
+                }
+                else if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
+                {
+                    if (autoLaunch)
+                    {
+                        launchLabClient(lc.clientID);
+                        btnLaunchLab.Visible = true;
+                    }
+                    else
+                    {
+                        btnLaunchLab.Visible = true;
+                    }
+                }
+
+
+                btnSchedule.Visible = lc.needsScheduling;
+                lblClientName.Text = lc.clientName;
+                lblVersion.Text = lc.version;
+                lblLongDescription.Text = lc.clientLongDescription;
+                lblNotes.Text = lc.notes;
+                string emailCmd = "mailto:" + lc.contactEmail;
+                lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
+
+                btnLaunchLab.Command += new CommandEventHandler(this.btnLaunchLab_Click);
+                btnLaunchLab.CommandArgument = lc.clientID.ToString();
+
+                int count = 0;
+
+                if (lc.clientInfos != null && lc.clientInfos.Length > 0)
+                {
+                    foreach (ClientInfo ci in lc.clientInfos)
+                    {
+                        //if (ci.infoURLName.CompareTo("Documentation") != 0)
+                        //{
+                        System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
+                        b.Visible = true;
+                        b.CssClass = "button";
+                        b.Text = ci.infoURLName;
+                        b.CommandArgument = ci.infoURL;
+                        b.CommandName = ci.infoURLName;
+                        b.ToolTip = ci.description;
+                        b.Command += new CommandEventHandler(this.HelpButton_Click);
+                        repClientInfos.Controls.AddAt(count, b);
+                        repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
+                        count += 2;
+                        // }
+                    }
+                }
+            }
+            else
+            {
+                // No LabClient
+                btnSchedule.Visible = false;
+                btnLaunchLab.Visible = false;
+                string msg = "There are no labs assigned to group: " + Session["GroupName"].ToString() + "!";
+                lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                lblResponse.Visible = true;
+            }
+
+
+
+           
         }
+        
 
         #region Web Form Designer generated code
         override protected void OnInit(EventArgs e)
