@@ -78,15 +78,11 @@ namespace iLabs.ServiceBroker
                 settings.NewLineOnAttributes = true;
                 settings.CheckCharacters = true;
 
-
                 XmlWriter xmlWriter = XmlWriter.Create(stringBuilder, settings);
-
 
                 // write root element
                 xmlWriter.WriteStartElement("clientDescriptor");
                 //xmlWriter.WriteAttributeString("xmlns", "ns", null, nameSpace);
-
-
 
                 if (client.clientGuid != null && client.clientGuid.Length > 0)
                     xmlWriter.WriteElementString("clientGuid", client.clientGuid);
@@ -109,32 +105,34 @@ namespace iLabs.ServiceBroker
                     xmlWriter.WriteElementString("contactLastName", client.contactLastName);
                 if (client.loaderScript != null && client.loaderScript.Length > 0)
                     xmlWriter.WriteElementString("loaderScript", client.loaderScript);
+                if (client.documentationURL != null && client.documentationURL.Length > 0)
+                    xmlWriter.WriteElementString("documentationUrl", client.documentationURL);
                 xmlWriter.WriteElementString("needsScheduling", client.needsScheduling.ToString());
                 xmlWriter.WriteElementString("needsESS", client.needsESS.ToString());
                 xmlWriter.WriteElementString("isReentrant", client.IsReentrant.ToString());
                 if (client.notes != null && client.notes.Length > 0)
                     xmlWriter.WriteElementString("notes", client.notes);
-                if (client.labServerIDs != null && client.labServerIDs.Length > 0)
+                ProcessAgentInfo[] labServers = AdministrativeAPI.GetLabServersForClient(client.clientID);
+                if (labServers != null && labServers.Length > 0)
                 {
                     xmlWriter.WriteStartElement("labServers");
-                    for (int i = 0; i < client.labServerIDs.Length; i++)
+                    for (int i = 0; i < labServers.Length; i++)
                     {
-                        ProcessAgent server = brokerDb.GetProcessAgent(client.labServerIDs[i]);
-                        if (server != null)
+                        if (labServers[i] != null)
                         {
                             xmlWriter.WriteStartElement("labServer");
-                            xmlWriter.WriteAttributeString("guid", server.agentGuid);
+                            xmlWriter.WriteAttributeString("guid", labServers[i].agentGuid);
                             xmlWriter.WriteEndElement();
                         }
-
                     }
                     xmlWriter.WriteEndElement();
 
                 }
-                if (client.clientInfos != null && client.clientInfos.Length > 0)
+                ClientInfo[] clientInfos = AdministrativeAPI.ListClientInfos(client.clientID);
+                if (clientInfos != null && clientInfos.Length > 0)
                 {
                     xmlWriter.WriteStartElement("clientInfos");
-                    foreach (ClientInfo i in client.clientInfos)
+                    foreach (ClientInfo i in clientInfos)
                     {
                         WriteClientInfo(xmlWriter, i);
                     }
@@ -303,6 +301,7 @@ namespace iLabs.ServiceBroker
             string contactFirstName = xdoc.Query("/clientDescriptor/contactFirstName");
             string contactLastName = xdoc.Query("/clientDescriptor/contactLastName");
             string loaderScript = xdoc.Query("/clientDescriptor/loaderScript");
+            string documentationURL = xdoc.Query("/clientDescriptor/documentationUrl");
             string tmp = xdoc.Query("/clientDescriptor/needsScheduling");
             bool needsScheduling = Convert.ToBoolean(tmp);
             tmp = xdoc.Query("/clientDescriptor/needsESS");
@@ -313,27 +312,28 @@ namespace iLabs.ServiceBroker
 
             // Insert the Client, Qualifier is created internally
             int newClientId = AdministrativeAPI.AddLabClient(guid, name, version, shortDescription,
-                longDescription, notes, loaderScript, type, null, contactEmail, contactFirstName, contactLastName, needsScheduling, needsESS, isReentrant, null);
+                longDescription, type, loaderScript, documentationURL,
+                contactEmail, contactFirstName, contactLastName,notes, needsESS, needsScheduling, isReentrant);
+            
             // parse the LabServer list
-            ArrayList labServers = new ArrayList();
             XPathNodeIterator iter = xdoc.Select("/clientDescriptor/labServers/*");
             if (iter != null && iter.Count > 0)
             {
+                int order = 0;
                 while (iter.MoveNext())
                 {
                     string lsGuid = iter.Current.GetAttribute("guid", ns);
                     int serverID = brokerDb.GetProcessAgentID(lsGuid);
                     if (serverID > 0)
                     {
-                        labServers.Add(serverID);
+                        AdministrativeAPI.LabServerClient_Insert(serverID, newClientId, order);
+                        order++;
                     }
-
                 }
             }
 
             // deal with resources 
             iter = xdoc.Select("/clientDescriptor/clientInfos/*");
-            ArrayList clientItems = new ArrayList();
             if (iter != null && iter.Count > 0)
             {
                 while (iter.MoveNext())
@@ -343,102 +343,83 @@ namespace iLabs.ServiceBroker
                     clientInfo.infoURLName = iter.Current.GetAttribute("infoUrlName", ns);
                     clientInfo.description = iter.Current.GetAttribute("description", ns);
                     clientInfo.displayOrder = Int32.Parse(iter.Current.GetAttribute("displayOrder", ns));
-                    clientItems.Add(clientInfo);
+                    AdministrativeAPI.InsertLabClientInfo(newClientId, clientInfo.infoURL, clientInfo.infoURLName,
+                        clientInfo.description, clientInfo.displayOrder);
                 }
             }
           
             message.Append(" Registered a new LabClient. ");
             message.AppendLine(" GUID: " + guid + " -> " + name);
-
-            if (labServers.Count > 0 || clientItems.Count > 0)
-            {
-                int[] servers = new int[labServers.Count];
-                for (int j = 0; j < labServers.Count; j++)
-                {
-                    servers[j] = (int)labServers[j];
-                }
-                ClientInfo[] infos = new ClientInfo[clientItems.Count];
-                for (int k = 0; k < clientItems.Count; k++)
-                {
-                    infos[k] = (ClientInfo)clientItems[k];
-                }
-
-                AdministrativeAPI.ModifyLabClient(newClientId, name, version, shortDescription,
-                longDescription, notes, loaderScript, type, servers, contactEmail, contactFirstName,
-                contactLastName, needsScheduling, needsESS, isReentrant, infos);
-            }
-
             return newClientId;
         }
     
 
-        public string writeClientXml(string nameSpace, string rootElement,
-            Dictionary<string, object> keyValueDictionary,
-             int[] servers, ClientInfo[] infos)
-        {
-            try
-            {
-                XmlWriterSettings settings = new XmlWriterSettings();
-                settings.Indent = true;
-                settings.OmitXmlDeclaration = true;
-                settings.NewLineOnAttributes = true;
-                settings.CheckCharacters = true;
+        //public string writeClientXml(string nameSpace, string rootElement,
+        //    Dictionary<string, object> keyValueDictionary,
+        //     int[] servers, ClientInfo[] infos)
+        //{
+        //    try
+        //    {
+        //        XmlWriterSettings settings = new XmlWriterSettings();
+        //        settings.Indent = true;
+        //        settings.OmitXmlDeclaration = true;
+        //        settings.NewLineOnAttributes = true;
+        //        settings.CheckCharacters = true;
 
-                StringBuilder stringBuilder = new StringBuilder();
-                XmlWriter xmlWriter = XmlWriter.Create(stringBuilder, settings);
+        //        StringBuilder stringBuilder = new StringBuilder();
+        //        XmlWriter xmlWriter = XmlWriter.Create(stringBuilder, settings);
                
+        //        // write root element
+        //        xmlWriter.WriteStartElement(rootElement);
+        //        //xmlWriter.WriteAttributeString("xmlns", "ns", null, nameSpace);
 
-                // write root element
-                xmlWriter.WriteStartElement(rootElement);
-                //xmlWriter.WriteAttributeString("xmlns", "ns", null, nameSpace);
+        //        foreach (string s in keyValueDictionary.Keys)
+        //        {
+        //            xmlWriter.WriteStartElement(s);
+        //            object value = new object();
+        //            keyValueDictionary.TryGetValue(s, out value);
+        //            xmlWriter.WriteString(value.ToString());
+        //            xmlWriter.WriteEndElement();
+        //        }
+        //        if(servers != null && servers.Length > 0){
+        //            xmlWriter.WriteStartElement("labServers");
+        //            for (int i = 0; i < servers.Length; i++)
+        //            {
+        //                ProcessAgent server = brokerDb.GetProcessAgent(servers[i]);
+        //                if (server != null)
+        //                {
+        //                    xmlWriter.WriteStartElement("serverGuid");
+        //                    xmlWriter.WriteString(server.agentGuid);
+        //                    xmlWriter.WriteEndElement();
+        //                }
 
-                foreach (string s in keyValueDictionary.Keys)
-                {
-                    xmlWriter.WriteStartElement(s);
-                    object value = new object();
-                    keyValueDictionary.TryGetValue(s, out value);
-                    xmlWriter.WriteString(value.ToString());
-                    xmlWriter.WriteEndElement();
-                }
-                if(servers != null && servers.Length > 0){
-                    xmlWriter.WriteStartElement("labServers");
-                    for (int i = 0; i < servers.Length; i++)
-                    {
-                        ProcessAgent server = brokerDb.GetProcessAgent(servers[i]);
-                        if (server != null)
-                        {
-                            xmlWriter.WriteStartElement("serverGuid");
-                            xmlWriter.WriteString(server.agentGuid);
-                            xmlWriter.WriteEndElement();
-                        }
+        //            }
+        //            xmlWriter.WriteEndElement();
 
-                    }
-                    xmlWriter.WriteEndElement();
+        //        }
+        //        if (infos != null && infos.Length > 0)
+        //        {
+        //            xmlWriter.WriteStartElement("clientResources");
+        //            foreach (ClientInfo i in infos)
+        //            {
+        //                WriteClientInfo(xmlWriter, i);
+        //            }
+        //            xmlWriter.WriteEndElement();
 
-                }
-                if (infos != null && infos.Length > 0)
-                {
-                    xmlWriter.WriteStartElement("clientResources");
-                    foreach (ClientInfo i in infos)
-                    {
-                        WriteClientInfo(xmlWriter, i);
-                    }
-                    xmlWriter.WriteEndElement();
+        //        }
 
-                }
+        //        xmlWriter.WriteEndElement();
+        //        xmlWriter.Flush();
+        //        return stringBuilder.ToString();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //        Console.WriteLine(e.StackTrace);
+        //    }
 
-                xmlWriter.WriteEndElement();
-                xmlWriter.Flush();
-                return stringBuilder.ToString();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
-
-            return null;
-        }
+        //    return null;
+        //}
 
         protected void WriteClientInfo(XmlWriter xmlWriter, ClientInfo info)
         {

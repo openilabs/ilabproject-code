@@ -17,6 +17,8 @@
     <add key="sqlConnection"  value="data source=(local);initial catalog=iLab_ISB;Integrated Security=SSPI" />
     <!-- Data provider specifies the database engine, default is for Microsoft sqlServer-->
     <add key="DatabaseProvider" value="System.Data.SqlClient" />
+    <add key="RecaptchaPublicKey" value="6LcLF8ISAAAAAMhwOM1ipf9N1Kh_obO1VG0PwCQB"/>
+    <add key="RecaptchaPrivateKey" value="6LcLF8ISAAAAALHhc_wOQibhl3jIc5gf9MUKvOw_"/>
    
     <add key="serviceType" value="SERVICE BROKER"/>
     <!-- The name of the Service displayed for the user, please change -->

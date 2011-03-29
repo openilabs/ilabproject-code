@@ -14,23 +14,71 @@ namespace iLabs.Core
         static private DateTime minDbDate;
         static private DateTime maxDbDate;
         static private DbProviderFactory theFactory;
+
         static FactoryDB(){
+            // try to read connection and provider strings from the app settings
+            try
+            {
+                connectionStr = ConfigurationManager.AppSettings["sqlConnection"];
+            }
+            catch (ConfigurationErrorsException ce)
+            {
+                connectionStr = null;
+            }
+            try
+            {
+                providerStr = ConfigurationManager.AppSettings["databaseProvider"];
+            }
+            catch (ConfigurationErrorsException pe)
+            {
+                connectionStr = null;
+            }
+            // Should group this with th providerString processing only sqlServer for now
             minDbDate = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             maxDbDate = new DateTime(9999, 12, 31, 23, 59, 59, DateTimeKind.Utc);
-            // read connection string from the app settings
-            connectionStr = ConfigurationManager.AppSettings["sqlConnection"];
-            if (connectionStr == null || connectionStr.Equals(""))
-            {
-                throw new NoNullAllowedException(" The connection string is not specified, check configuration");
-            }
-            providerStr = ConfigurationManager.AppSettings["databaseProvider"];
-            if (providerStr == null || providerStr.Equals(""))
-            {
-                throw new NoNullAllowedException(" The database provider is not specified, check configuration");
-            }
-            theFactory = DbProviderFactories.GetFactory(providerStr);
 
+            if (providerStr != null && !providerStr.Equals(""))
+            {
 
+                theFactory = DbProviderFactories.GetFactory(providerStr);
+            }
+            else
+            {
+                theFactory = null;
+            }
+        }
+
+        public static string ConnectionStr
+        {
+            get
+            {
+                return connectionStr;
+            }
+            set
+            {
+                connectionStr = value;
+            }
+        }
+
+        public static string ProviderStr
+        {
+            get
+            {
+                return providerStr;
+            }
+            set
+            {
+                if (value == null || value.Equals(""))
+                {
+                    providerStr = null;
+                    theFactory = null;
+                }
+                else
+                {
+                    providerStr = value;
+                    theFactory = DbProviderFactories.GetFactory(providerStr);
+                }
+            }
         }
 
         /// <summary>
@@ -42,15 +90,14 @@ namespace iLabs.Core
             DbConnection connection = null;
             if (connectionStr == null || connectionStr.Equals(""))
             {
-                // read connection string from the app settings
-                connectionStr = ConfigurationManager.AppSettings["sqlConnection"];
-                if (connectionStr == null || connectionStr.Equals(""))
-                {
                     throw new NoNullAllowedException(" The connection string is not specified, check configuration");
-                }
             }
             // Replace with Connection constructor for the Database used
             // create an DbConnection
+            if (theFactory == null)
+            {
+                throw new NoNullAllowedException(" The DBprovider string is not specified, check configuration");
+            }
             connection = theFactory.CreateConnection();
             connection.ConnectionString =connectionStr;
             return connection;

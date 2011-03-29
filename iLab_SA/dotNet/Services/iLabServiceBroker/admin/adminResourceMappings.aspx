@@ -104,7 +104,7 @@ Please see license.txt in top level directory for full license.
                                                     <br />
 						                            <asp:textbox id="value_StringText" Runat="server" Width="293px"></asp:textbox>
 						                            <asp:dropdownlist CssClass="i18n" id="value_TicketTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged"></asp:dropdownlist><asp:dropdownlist id="value_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="value_TicketType_SelectedIndexChanged">
-                                                    </asp:DropDownList><br />
+                                                    </asp:dropdownlist><br />
                                                     <asp:TextBox ID="value_ResourceTypeText" runat="server" Width="293px"></asp:TextBox></td>						                          
 						                    </tr>						                    
 						                    <tr>
@@ -172,7 +172,7 @@ Please see license.txt in top level directory for full license.
 											                                    </asp:Label>    
 											                            </td>
 											                            <td rowspan="2" width="110">
-												                            <asp:Button ID="btnRemove" Runat="server" Text="Remove" CommandName="Remove" CssClass="button"></asp:Button>
+												                            <asp:Button ID="btnRemove" Runat="server" Text="Remove" CommandName="Remove" CssClass="button" OnClick="btnRemove_Click"></asp:Button>
 											                            </td>
 										                            </tr>
 										                            <tr>

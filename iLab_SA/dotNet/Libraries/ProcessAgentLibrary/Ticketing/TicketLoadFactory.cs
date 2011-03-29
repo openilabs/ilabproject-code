@@ -151,6 +151,21 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.SCHEDULE_SESSION, keyValueDictionary);
         }
 
+        public string makeReservationPayload(string authGuid, string userName, string groupName,
+           string labServerGUID, string clientGuid, string ussURL)
+        {
+            string rootElemt = "MakeReservationPayload";
+            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            keyValueDictionary.Add("authGuid", authGuid);
+            keyValueDictionary.Add("userName", userName);
+            keyValueDictionary.Add("groupName", groupName);
+            keyValueDictionary.Add("labServerGuid", labServerGUID);
+            keyValueDictionary.Add("clientGuid", clientGuid);
+            keyValueDictionary.Add("ussURL", ussURL);
+          
+            return writeTicketLoad(rootElemt, TicketTypes.SCHEDULE_SESSION, keyValueDictionary);
+        }
+
 
         public string createRedeemReservationPayload(DateTime startTime,DateTime endTime)
         {

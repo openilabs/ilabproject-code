@@ -34,7 +34,8 @@ input.buttongray
 input.noneditable, 
 textarea.noneditable 
 {
-	background-color: #eee;
+	color: #000;
+	background-color: #888;
 }
 
 .i18n
@@ -602,33 +603,42 @@ DIV.errormessage p
 /* Info Message Styles */	
 DIV.infomessage {
 	background: #6FC url(../img/tick-icon-sm.gif) no-repeat;
+	min-height: 40px;
 	}
 	
 
 /* End Info Message Styles */
 /* Warning Message Styles */	
 DIV.warningmessage {
-	background: #CF6 url(../img/alert-icon-sm.gif) no-repeat;
+	background: #FE6 url(../img/alert-icon-sm.gif) no-repeat;
+	min-height: 40px;
 	}
 
 /* End warning Message Styles */	
 /* Error Message Styles */	
 DIV.errormessage {
-	background: #CF6 url(../img/alert-icon-sm.gif) no-repeat;
+	background: #F86 url(../img/error-icon-.gif) no-repeat;
+	min-height: 50px;
 }
 
+/* Info Message Styles */	
+#pageintro .infomessage, #pagecontent .infomessage {
+	background: #6FC url(../img/tick-icon-sm.gif) no-repeat;
+	min-height: 40px;
+	}
 	
-
 /* End Info Message Styles */
 /* Warning Message Styles */	
 #pageintro .warningmessage, #pagecontent .warningmessage {
-	background: #CF6 url(../img/alert-icon-sm.gif) no-repeat;
+	background: #FF6 url(../img/alert-icon-sm.gif) no-repeat;
+	min-height: 40px;
 	}
 
 /* End warning Message Styles */	
 /* Error Message Styles */	
 #pageintro .errormessage, #pagecontent .errormessage {
-	background: #CF6 url(../img/alert-icon-sm.gif) no-repeat;
+	background: #FF9191 url(../img/error-icon.gif) no-repeat;
+	min-height: 50px;
 }
 
 /* End Error Message Styles */

@@ -140,13 +140,13 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public string version;
 
-		/// <summary>
-		/// An array of ClientInfo structures containing (potentially) multiple 
-        /// instances of information associated with this clientID. Information 
-        /// such as the client name and the URL of an information page are maintained.
-		/// </summary>
-		/// <seealso cref="ClientInfo">ClientInfo Structure</seealso>
-		public ClientInfo[] clientInfos;
+        ///// <summary>
+        ///// An array of ClientInfo structures containing (potentially) multiple 
+        ///// instances of information associated with this clientID. Information 
+        ///// such as the client name and the URL of an information page are maintained.
+        ///// </summary>
+        ///// <seealso cref="ClientInfo">ClientInfo Structure</seealso>
+        //public ClientInfo[] clientInfos;
 
 		/// <summary>
 		/// A brief description of the client suitable for listing in a GUI. 
@@ -157,6 +157,11 @@ namespace iLabs.ServiceBroker.Administration
 		/// A longer more descriptive text explaining the purpose of the client. 
 		/// </summary>
 		public string clientLongDescription;
+
+        /// <summary>
+        ///An optional URL that references user documentation for the client.
+        /// </summary>
+        public string documentationURL;
 
 		/// <summary>
 		/// An arbitrary piece of text that will be visible to students using the client.
@@ -178,11 +183,11 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public string clientType;
 
-		/// <summary>
-		/// An array of labServerIDs specifying the ordered list of lab servers 
-        /// accessed by this client. 
-		/// </summary>
-		public int[] labServerIDs;
+        ///// <summary>
+        ///// An array of labServerIDs specifying the ordered list of lab servers 
+        ///// accessed by this client. 
+        ///// </summary>
+        //public int[] labServerIDs;
 
 		/// <summary>
 		/// The first name of the party responsible for the maintenance of the client.  
@@ -269,6 +274,11 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public int clientInfoID;
 
+        /// <summary>
+        /// The client that this info relates to.
+        /// </summary>
+        public int clientID;
+
 		/// <summary>
 		/// The URL of an info page for this Client.
 		/// </summary>
@@ -316,6 +326,11 @@ namespace iLabs.ServiceBroker.Administration
 		{
 			get{ return description; } 
 		}
+
+        public int ClientInfoID
+        {
+            get { return clientInfoID; }
+        }
 	}
 
    public class ExperimentAdminInfo
@@ -811,120 +826,7 @@ namespace iLabs.ServiceBroker.Administration
 
 
 		///*********************** LAB SERVERS **************************///
-        /*
-                /// <summary>
-                /// Registers the lab server identified by labServerName with the Service Broker.
-                /// After this call users can submit experiments to the designated Lab Server.
-                /// </summary>
-                /// <param name="labServerName">A name for the lab server meaningful to humans; it is not required to be unique on the Service Broker instance.</param>
-                /// <param name="labServerGUID">The GUID by which lab server identifies itself in web service calls.</param>
-                /// <param name="webServiceURL">The URL for the lab server's web service interface.</param>
-                /// <param name="labServerDescription">A brief description of the lab suitable for listing in a GUI.</param>
-                /// <param name="labInfoURL">The URL of a lab information page, often hosted by the lab server.</param>
-                /// <param name="contactEmail">The email address of the party responsible for the maintenance of the lab server.</param>
-                /// <param name="contactFirstName">The first name of the party responsible for the maintenance of the lab server.</param>
-                /// <param name="contactLastName">The last name of the party responsible for the maintenance of the lab server.</param>
-                /// <returns>The unique ID which identifies the lab server internally to the Service Broker.</returns>
-                public static int AddLabServer (string labServerName, string labServerGUID, string webServiceURL, string labServerDescription, string labInfoURL, string contactEmail, string contactFirstName, string contactLastName)
-                {
-                    LabServer ls = new LabServer ();
-                    ls.labServerName = labServerName;
-                    ls.labServerGUID = labServerGUID;
-                    ls.webServiceURL = webServiceURL;
-                    ls.labServerDescription = labServerDescription;
-                    ls.labInfoURL = labInfoURL;
-                    ls.contactEmail = contactEmail;
-                    ls.contactFirstName = contactFirstName;
-                    ls.contactLastName = contactLastName;
-			
-                    // if an exception is thrown, return false, otherwise true
-                    try 
-                    {
-                        //Insert the lab server into the database
-                        ls.labServerID = InternalAdminDB.InsertLabServer (ls);
-
-                        try
-                        {
-                            //Add the labserver to the Qualifiers & Qualifier_Hierarchy table
-                            Authorization.Authorization .AddQualifier (ls.labServerID, Authorization.Qualifier .labServerQualifierTypeID , ls.labServerName, Qualifier.ROOT);
-                        }
-                        catch (Exception ex)
-                        {
-                            // rollback lab server insertion
-                            InternalAdminDB.DeleteLabServers(new int[]{ls.labServerID});
-
-                            throw;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
-
-                    return ls.labServerID;
-                }
-
-                /// <summary>
-                /// Unregisters the lab servers identified by labServerIDs with the service Broker. 
-                /// After this call users can no longer submit experiments to the designated lab servers.
-                /// </summary>
-                /// <param name="labServerIDs">An array of IDs identifying the lab servers to be unregistered.</param>
-                /// <returns>An array of labServerIDs for the lab servers that were not successfully removed, i.e. those for which the operation failed.</returns>
-                public static int[] RemoveLabServers( int[] labServerIDs)
-                {
-                    try
-                    {
-                        //return removed labServers from Lab_server table
-                        int[] lsIDs = InternalAdminDB.DeleteLabServers (labServerIDs);
-
-                        return lsIDs;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
-
-                    //Note: The qualifiers pertaining to the lab server are automatically
-                    //deleted in the 'DeleteLabServer' database method. This preserves consistency
-                    //and gets rid of unnecessary rollback mechanisms that would otherwise have
-                    //to be implemented. - CV, 4/29/05
-                }
-
-                /// <summary>
-                /// Modifies the information pertaining to the lab server registered under labServerID.
-                /// </summary>
-                /// <param name="labServerID">The ID of the lab server whose information will be modified.</param>
-                /// <param name="labServerName">A name for the lab server meaningful to humans; it is not required to be unique on the Service Broker instance, but probably should be; if NULL, then the previous value will not be changed.</param>
-                /// <param name="labServerGUID">The GUID by which lab server indentifies itself in web service calls.</param>
-                /// <param name="webServiceURL">The new URL for the lab server's web service interface; if NULL, then the previous value will not be changed.</param>
-                /// <param name="labServerDescription">A brief description of the lab suitable for listing in a GUI; if NULL, then the previous value will not be changed.</param>
-                /// <param name="labInfoURL">The URL of the lab information page, often hosted by the lab server; if NULL, the the previous value will not be changed.</param>
-                /// <param name="contactEmail">The email consumerInfo of the party responsible for the maintenance of the lab server; if NULL, then the previous value will not be changed.</param>
-                /// <param name="contactFirstName">The first name of the party responsible for the maintenance of the lab server; if NULL, then the previous value will not be changed.</param>
-                /// <param name="contactLastName">The last name of the party responsible for the maintenance of the lab server; if NULL, then the previous value will not be changed.</param>
-                public static void ModifyLabServer (int labServerID, string labServerName, string labServerGUID, string webServiceURL, string labServerDescription, string labInfoURL, string contactEmail, string contactFirstName, string contactLastName)
-                {
-                    LabServer ls = new LabServer ();
-                    ls.labServerID = labServerID;
-                    ls.webServiceURL = webServiceURL;
-                    ls.labServerGUID=labServerGUID;
-                    ls.labServerDescription = labServerDescription;
-                    ls.labInfoURL = labInfoURL;
-                    ls.labServerName = labServerName;
-                    ls.contactEmail = contactEmail;
-                    ls.contactFirstName = contactFirstName;
-                    ls.contactLastName = contactLastName;
-                    try 
-                    {
-                        //Modify lab server database call
-                        InternalAdminDB.UpdateLabServer (ls);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw;
-                    }
-                }
-        */
+ 
         /// <summary>
         /// Lists the IDs of all lab servers registered with the Service Broker.
         /// </summary>
@@ -933,89 +835,7 @@ namespace iLabs.ServiceBroker.Administration
         {
             return new ProcessAgentDB().GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.LAB_SERVER);
         }
-/*
-		/// <summary>
-		/// Generates and installs a new passkey that will be used to authenticate web service calls made by the remote server identified by labServerID.
-		/// The passkey returned must be conveyed out of band to the administrator of the remote server.
-		/// </summary>
-		/// <param name="labServerID">The ID of the (lab) server for which the passkey will be generated.</param>
-		/// <returns>The passkey authenticating the remote server.</returns>
-		/// <seealso cref="GetIncomingServerPasskey">GetIncomingServerPasskey</seealso>
-		public static string GenerateIncomingServerPasskey(int labServerID)
-		{
-			// Random rand = new Random ();  // dynamic seeds
-			// string key = rand.Next ().ToString ();
 
-			// Changed from random number to a GUID - CF 1/21/2005
-			string key = Guid.NewGuid().ToString("N");  // with no "-" in Guid string 
-
-			try
-			{
-				InternalAdminDB.UpdateLSIncomingPasskey (labServerID, key);
-			}
-			catch (Exception ex)
-			{
-				throw;
-			}
-			return key;
-		}
-
-		/// <summary>
-		/// Retrieves a previously generated passkey to authenticate web service calls made by the remote server identified by labServerID.
-		/// </summary>
-		/// <param name="labServerID">The ID of the (lab) server for which the passkey will be retrieved.</param>
-		/// <returns>The passkey authenticating the remote server.</returns>
-		/// <seealso cref="GenerateIncomingServerPasskey">GenerateIncomingServerPasskey</seealso>
-		public static string GetIncomingServerPasskey(int labServerID)
-		{
-			string incomingKey = "";
-			try
-			{
-				incomingKey = InternalAdminDB.selectSBIncomingPasskey (labServerID);
-			}
-			catch(Exception ex)
-			{	
-				throw;
-			}
-			return incomingKey;
-		}
-
-		/// <summary>
-		/// Installs a per lab server passkey that authenticates this service broker.
-		/// </summary>
-		/// <param name="labServerID">The ID of the lab server for which the passkey will be installed.</param>
-		/// <param name="passkey">The passkey or token that this Service Broker must present on each web service call to gain access to the lab server.</param>
-		public static void RegisterOutgoingServerPasskey(int labServerID, string passkey)
-		{
-			try 
-			{
-				InternalAdminDB.UpdateLSOutgoingPasskey (labServerID, passkey);
-			}
-			catch (Exception ex)
-			{
-				throw;
-			}
-		}
-
-		/// <summary>
-		/// Retrieve a previously registered passkey that this service broker must present on each web service call to gain access to the lab server identified by labServerID.
-		/// </summary>
-		/// <param name="labServerID">The ID of the (lab) server for which the passkey will be retrieved.</param>
-		/// <returns>The passkey for the remote server.</returns>
-		public static string GetOutgoingServerPasskey(int labServerID)
-		{
-			string outgoingKey = "";
-			try
-			{
-				outgoingKey = InternalAdminDB.selectSBOutgoingPasskey (labServerID);
-			}
-			catch(Exception ex)
-			{	
-				throw;
-			}
-			return outgoingKey;
-		}
-*/
 
 		///*********************** LAB CLIENTS **************************///
 		
@@ -1026,51 +846,41 @@ namespace iLabs.ServiceBroker.Administration
         /// <param name="guid">A string limited to 50 characters used for identification across domains, do not modifiy except at creation.</param>
 		/// <param name="clientName">A name for the client application meaningful to humans; it is not required to be unique on the Service Broker.</param>
 		/// <param name="version">The version number of the client software; each new version must receive a new clientID.</param>
-		/// <param name="notes">An arbitrary piece of text that will be visible to students using the client.</param>
-		/// <param name="loaderScript">An HTML fragment that will be embedded on a Service Broker generated page executed by the user's web browser to launch the client.</param>
 		/// <param name="clientShortDescription">A brief description of the client suitable for listing in a GUI.</param>
 		/// <param name="clientLongDescription">A longer more descriptive text explaining the purpose of the client.</param>
-		/// <param name="clientType">A string identifying the client type.</param>
-		/// <param name="labServerIDs">An array of labServerIDs specifying the ordered list of lab servers accessed by this client.</param>
+        /// <param name="clientType">A string identifying the client type.</param>
+        /// <param name="loaderScript">An HTML fragment that will be embedded on a Service Broker generated page executed by the user's web browser to launch the client.</param>
+        /// <param name="documentationURL">An optional URL to user documentation for the client.</param>
         /// <param name="contactEmail">The email address of the party responsible for the maintenance of the client.</param>
 		/// <param name="contactFirstName">The first name of the party responsible for the maintenance of the client.</param>
 		/// <param name="contactLastName">The last name of the party responsible for the maintenance of the client.</param>
-		///<param name="clientInfos">An array of ClientInfo structures containing multiple instances of information associated with this clientID. Information such as the client name and the URL of an information page are maintained. It this value is NULL, the previous value will not be changed.</param>
-		/// <returns>The unique clientID which identifies the client software internally to the Service Broker. >0 was successfully registered; -1 otherwise</returns>
-        public static int AddLabClient(string guid, string clientName, string version, string clientShortDescription, string clientLongDescription, string notes, string loaderScript, string clientType, int[] labServerIDs, string contactEmail, string contactFirstName, string contactLastName, bool needsScheduling, bool needsESS, bool isReentrant, ClientInfo[] clientInfos)
+		/// <param name="notes">An arbitrary piece of text that will be visible to students using the client.</param>
+        /// <param name="needsESS"></param>
+        /// <param name="needsScheduling"></param>
+        /// <param name="isReentrant"></param>
+        /// <returns>The unique int clientID which identifies the client software internally to the Service Broker. >0 was successfully registered; -1 otherwise</returns>
+        public static int AddLabClient(string guid, string clientName, string version, string clientShortDescription, string clientLongDescription,
+            string clientType, string loaderScript, string documentationURL, string contactEmail, string contactFirstName, string contactLastName,
+            string notes, bool needsESS, bool needsScheduling, bool isReentrant)
 		{
-			LabClient lc = new LabClient ();
-            lc.clientGuid = guid;
-			lc.clientName = clientName;
-			lc.version = version;
-			lc.notes=notes;
-			lc.clientShortDescription=clientShortDescription;
-			lc.clientLongDescription=clientLongDescription;
-			lc.loaderScript=loaderScript;
-			lc.labServerIDs = labServerIDs;
-			lc.contactEmail = contactEmail;
-			lc.contactFirstName = contactFirstName;
-			lc.contactLastName = contactLastName;
-            lc.needsScheduling = needsScheduling;
-            lc.needsESS = needsESS;
-            lc.IsReentrant = isReentrant;
-			lc.clientInfos=clientInfos;
-			lc.clientType= clientType;
-
+            int clientID = -1;
+			
 			try
 			{
 				//Insert the lab client into the database
-				lc.clientID = InternalAdminDB.InsertLabClient (lc);
+                clientID = InternalAdminDB.InsertLabClient(guid, clientName, version,  clientShortDescription, clientLongDescription,
+                    clientType, loaderScript, documentationURL, contactEmail, contactFirstName, contactLastName,
+                    notes, needsESS, needsScheduling, isReentrant);
 
 				try
 				{
 					//Add the lab client to the Qualifiers & Qualifiers Hierarchy Table
-					Authorization.AuthorizationAPI .AddQualifier (lc.clientID, Authorization.Qualifier .labClientQualifierTypeID, lc.clientName, Qualifier.ROOT);
+					AuthorizationAPI.AddQualifier (clientID, Qualifier.labClientQualifierTypeID, clientName, Qualifier.ROOT);
 				}
 				catch (Exception ex)
 				{
 					// rollback lab client insertion
-					InternalAdminDB.DeleteLabClients(new int[]{lc.clientID});
+					InternalAdminDB.DeleteLabClients(new int[]{clientID});
 
 					throw;
 				}
@@ -1080,11 +890,16 @@ namespace iLabs.ServiceBroker.Administration
 				throw;
 			}
 
-			return lc.clientID;
+			return clientID;
 		}
 
 		/// <summary>
 		/// Unregisters the lab clients identified by labClientIDs with the service broker; after this call users can no longer load the specified clients.
+        /// Note: The qualifiers pertaining to the lab server are automatically
+        /// deleted in the 'DeleteLabServer' database method. This preserves consistency
+        /// and gets rid of unnecessary rollback mechanisms that would otherwise have
+        /// to be implemented. - CV, 4/29/05
+        ///  ClientItems and LabServerClients are also deleted (PHB 11/12/2010)
 		/// </summary>
 		/// <param name="labClientIDs">The IDs identifying the lab clients to be unregistered.</param>
 		/// <returns>An array of LabClientIDs for the lab clients that were not successfully removed, i.e. those for which the operation failed.</returns>
@@ -1105,47 +920,38 @@ namespace iLabs.ServiceBroker.Administration
 			//deleted in the 'DeleteLabServer' database method. This preserves consistency
 			//and gets rid of unnecessary rollback mechanisms that would otherwise have
 			//to be implemented. - CV, 4/29/05
+            // ClientItems and LabServerClients are also deleted (PHB 11/12/2010)
 		}
 
 		/// <summary>
 		/// Modifies the information pertaining to the client registered under the ID clientID.
 		/// </summary>
 		/// <param name="clientID">The unique ID which identifies the lab client whose information will be removed.</param>
+        /// <param name="clientGuid"></param>
 		/// <param name="clientName">A name for the client application meaningful to humans; it is not required to be unique on the Service Broker instance, but probably should be; if NULL, the the previous value will not be changed.</param>
-		/// <param name="version">The version number of the client software; if NULL, the previous value will not be changed.</param>
-		/// <param name="clientShortDescription">A brief description of the client suitable for listing in a GUI; if NULL, then the previous value will not be changed.</param>
+        /// <param name="version">The version number of the client software; if NULL, the previous value will not be changed.</param>
+        /// <param name="clientShortDescription">A brief description of the client suitable for listing in a GUI; if NULL, then the previous value will not be changed.</param>
 		/// <param name="clientLongDescription">A longer more descriptive text explaining the purpose of the client; if NULL, then the previous value will not be changed.</param>
-		/// <param name="notes">An arbitrary piece of text that will be visible to students using the client; if NULL, then the previous value will not be changed.</param>
+        /// <param name="clientType">A string identifying the client type.</param>
 		/// <param name="loaderScript">An HTML fragment that will be enbedded on the Service Broker generated page executed by the user's web browser to launch the client; if  NULL, then the previous value will not be changed.</param>
-		/// <param name="clientType">A string identifying the client type.</param>
-		/// <param name="labServerIDs">An array of labServerIDs specifying the ordered list of lab servers accessed by this client; if NULL, then the previous value will not be changed.</param>
+        /// <param name="documentationURL">An optional URL to user documentation for the client.</param>
         /// <param name="contactEmail">The email address of the party responsible for the maintenance of the client; if NULL, the previous value will not be changed.</param>
 		/// <param name="contactFirstName">The first name of the party responsible for the maintenance of the client; if NULL, the previous value will not be changed.</param>
 		/// <param name="contactLastName">The last name of the party responsible for the maintenance of the client; if NULL, the previous value will not be changed.</param>
-		/// <param name="clientInfos">An array of ClientInfo structures containing multiple instances of information associated with this clientID. Information such as the client name and the URL of the information page are maintained. If this value is Null, the previous value will not be changed.</param>
-        public static void ModifyLabClient(int clientID, string clientName, string version, string clientShortDescription, string clientLongDescription, string notes, string loaderScript, string clientType, int[] labServerIDs, string contactEmail, string contactFirstName, string contactLastName, bool needsScheduling, bool needsESS, bool isReentrant, ClientInfo[] clientInfos)
+        /// <param name="notes">An arbitrary piece of text that will be visible to students using the client; if NULL, then the previous value will not be changed.</param>
+        /// <param name="needsESS"></param>
+        /// <param name="needsScheduling"></param>
+        /// <param name="isReentrant"></param>
+        public static void ModifyLabClient(int clientID, string clientGuid, string clientName, string version, 
+            string clientShortDescription, string clientLongDescription, string clientType, string loaderScript, 
+            string documentationURL, string contactEmail, string contactFirstName, string contactLastName,
+             string notes, bool needsESS, bool needsScheduling, bool isReentrant)
 		{
-			LabClient lc = new LabClient ();
-			lc.clientID = clientID;
-			lc.clientName = clientName;
-			lc.version = version;
-			lc.clientShortDescription = clientShortDescription;
-			lc.clientLongDescription = clientLongDescription;
-			lc.notes = notes;
-		    lc.loaderScript = loaderScript;
-			lc.clientType = clientType;
-			lc.labServerIDs = labServerIDs;
-			lc.contactEmail = contactEmail;
-			lc.contactFirstName = contactFirstName;
-			lc.contactLastName = contactLastName;
-            lc.needsScheduling = needsScheduling;
-            lc.needsESS = needsESS;
-            lc.IsReentrant = isReentrant;
-			lc.clientInfos=clientInfos;
-
 			try
 			{
-				InternalAdminDB.UpdateLabClient (lc);
+                InternalAdminDB.UpdateLabClient(clientID, clientGuid, clientName, version, clientShortDescription, clientLongDescription,
+                    clientType, loaderScript, documentationURL, contactEmail, contactFirstName, contactLastName, notes, 
+                    needsESS, needsScheduling, isReentrant);
 			}			
 			catch(Exception e)
 			{
@@ -1163,6 +969,15 @@ namespace iLabs.ServiceBroker.Administration
 		}
 
         /// <summary>
+        /// Get tags for all labClients.
+        /// </summary>
+        /// <returns></returns>
+        public static IntTag[] GetLabClientTags()
+        {
+            return InternalAdminDB.SelectLabClientTags();
+        }
+
+        /// <summary>
         /// Returns a labClient.
         /// </summary>
         /// <param name="labClientIDs">The IDs identifying the registered lab clients whose information is to be retrieved.</param>
@@ -1172,6 +987,7 @@ namespace iLabs.ServiceBroker.Administration
             return InternalAdminDB.SelectLabClient(labClientID);
         }
 
+       
         /// <summary>
         /// Returns a labClient.
         /// </summary>
@@ -1210,10 +1026,67 @@ namespace iLabs.ServiceBroker.Administration
         {
             return InternalAdminDB.GetLabClientGUID(id);
         }
-        public static int CountServerClients(int groupID, int labServerID){
-            return InternalAdminDB.CountServerClients(groupID, labServerID);
-    }
 
+        /********* ClientInfo **************/
+
+        public static int DeleteLabClientInfo(int clientID)
+        {
+            return InternalAdminDB.DeleteLabClientInfo(clientID);
+        }
+        public static int DeleteLabClientInfo(int clientID, int infoID)
+        {
+            return InternalAdminDB.DeleteLabClientInfo(clientID, infoID);
+        }
+        public static int InsertLabClientInfo(int clientID, string url, string name, string description, int displayOrder)
+        {
+            return InternalAdminDB.InsertLabClientInfo(clientID, url, name, description, displayOrder);
+        }
+
+        public static ClientInfo[] ListClientInfos(int clientID)
+        {
+            return InternalAdminDB.ListClientInfos(clientID);
+        }
+
+        public static int UpdateLabClientInfo(int clientInfoID, int clientID, string url, string name, string description, int displayOrder)
+        {
+            return InternalAdminDB.UpdateLabClientInfo(clientInfoID, clientID, url, name, description, displayOrder);
+        }
+        public static int UpdateLabClientInfoOrder( int[] infoIDs)
+        {
+            return InternalAdminDB.UpdateLabClientInfoOrder(infoIDs);
+        }
+
+        /**********  LabServer Client Mapping  ***/
+
+        public static int CountServerClients(int groupID, int labServerID)
+        {
+            return InternalAdminDB.CountServerClients(groupID, labServerID);
+        }
+
+        public static int LabServerClient_Insert(int labServerID, int clientID, int displayOrder)
+        {
+            int status = -1;
+            return InternalAdminDB.LabServerClientInsert(labServerID, clientID, displayOrder);
+        }
+
+        public static int LabServerClient_Delete(int labServerID, int clientID)
+        {
+            int status = -1;
+            return InternalAdminDB.LabServerClientDelete(labServerID, clientID);
+        }
+        public static int LabServerClient_Update(int labServerID, int clientID, int displayOrder)
+        {
+            int status = -1;
+            return InternalAdminDB.LabServerClientUpdate(labServerID, clientID, displayOrder);
+        }
+        public static ProcessAgentInfo[] GetLabServersForClient(int clientID)
+        {
+            return InternalAdminDB.GetLabServersForClient(clientID);
+        }
+        public static int[] GetLabServerIDsForClient(int clientID)
+        {
+            return InternalAdminDB.GetLabServerIDsForClient(clientID);
+        }
         ///*********************** CLIENT ITEMS **************************///
 
 
@@ -2253,7 +2126,7 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		/// <param name="sessionID">The user's session ID.</param>
 		/// <returns>The user's session end time for the session referenced by sessionID.</returns>
-		public static DateTime SaveUserSessionEndTime(long sessionID)
+		public static bool SaveUserSessionEndTime(long sessionID)
 		{
 			return InternalAdminDB.SaveUserSessionEndTime (sessionID);
 		}

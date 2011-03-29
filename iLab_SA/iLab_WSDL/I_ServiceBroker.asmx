@@ -199,5 +199,21 @@ EnableSession = true)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract bool RevokeReservation(string serviceBrokerGuid, string userName,string groupName,string labServerGuid, string labClientGuid,
         DateTime startTime, DateTime endTime, string message);
+
+
+    /// <summary>
+    /// Request authorization for the specified types of access, for the specified group and optional user
+    /// </summary>
+    /// <param name="types">an array of the ticket types requested</param>
+    /// <param name="duration">minimum duration of the created tickets</param>
+    /// <param name="group">group name on the ticketIssuer service, may in the future support validation from the service making the request</param>
+    /// <param name="user">User name on the ticketIssuer service, may in the future support validation from the service making the request, may be null</param>
+    /// <param name="serviceGuid">May be null</param>
+    /// <param name="clientGuid">May be null</param>
+    /// <returns>An operationCoupon or null</returns>
+    [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, server and  client.")]
+    [SoapDocumentMethod(Binding = "IServiceBroker")]
+    [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+    public abstract Coupon RequestAuthorization(string[] types, long duration, string group, string user, string serviceGuid, string clientGuid);
     }
 

@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: assocLabServersPopup.aspx.cs,v 1.8 2007/05/16 19:07:16 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;
@@ -38,23 +38,18 @@ namespace iLabs.ServiceBroker.admin
 
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 		int labClientID;
-		int[] labClientIDs;
-		LabClient[] labClients;
-
-		int[] labServerIDs;
+        int[] labServerIDs;
+		LabClient labClient;
 		ProcessAgentInfo[] AssocLabServers;
-
 		ProcessAgentInfo[] AvailLabServers;
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			if (Session["UserID"]==null)
 				Response.Redirect("../login.aspx");
-
+            if(Request.Params["lc"] != null)
 			labClientID = int.Parse(Request.Params["lc"]);
-			labClientIDs = new int[1];
-			labClientIDs[0] = labClientID;
-			labClients = wrapper.GetLabClientsWrapper(labClientIDs);
+			labClient = AdministrativeAPI.GetLabClient(labClientID);
 
 			// Get Available Lab Servers
             BrokerDB brokerDB = new BrokerDB();
@@ -64,10 +59,10 @@ namespace iLabs.ServiceBroker.admin
 			AvailLabServers = wrapper.GetProcessAgentInfosWrapper(serverIDs);
 
 			/// Get Associated Lab Servers (i.e. associated to a specified Lab Client)			
-			AssocLabServers = wrapper.GetProcessAgentInfosWrapper(labClients[0].labServerIDs);
+			AssocLabServers = AdministrativeAPI.GetLabServersForClient(labClient.clientID);
 
 			// Current Lab Client name
-			lblLabClient.Text = labClients[0].clientName;
+			lblLabClient.Text = labClient.clientName;
 
 			// Error Message
 			divErrorMessage.Visible = false;
@@ -75,6 +70,7 @@ namespace iLabs.ServiceBroker.admin
 
 			if(!IsPostBack)
 			{
+                btnSaveChanges.Enabled = false;
 				LoadListBoxes();
 			}
 		}
@@ -117,9 +113,9 @@ namespace iLabs.ServiceBroker.admin
 			// Create empty List Items in the Associated Lab Server list box.
 			// These have to be pre-created (can't just use the Add method) in order
 			// to preserve the display order in the list box.
-			for (i=0; i<AssocLabServers.Length; i++)
+			foreach (ProcessAgentInfo assoc in AssocLabServers)
 			{
-				lbxAssociated.Items.Add(new ListItem());
+				lbxAssociated.Items.Add(new ListItem(assoc.webServiceUrl,assoc.agentId.ToString()));
 			}
 
 			bool associated;
@@ -145,26 +141,12 @@ namespace iLabs.ServiceBroker.admin
 					i ++;
 				}
 
-				if(associated)
-				{
-					//Write to Associated Listbox if already associated.
-
-					// An indexing scheme is used here in order to preserve the display order
-					// of the associated items. Without this, they would appear in the list box
-					// in the order they arrived during the iteration through the available lab servers.
-					lbxAssociated.Items[i].Text = si.webServiceUrl;
-					lbxAssociated.Items[i].Value = si.agentId.ToString();
-
-				}
-				else
+				if(!associated)
 				{
 					//Write to Available Listbox if not associated
-                    if(!si.retired)
-					    lbxAvailable.Items.Add(new ListItem(si.webServiceUrl, si.agentId.ToString()));
+					lbxAvailable.Items.Add(new ListItem(si.webServiceUrl, si.agentId.ToString()));
 				}
-
 			}
-
 		}
 
 		/// <summary>
@@ -185,6 +167,7 @@ namespace iLabs.ServiceBroker.admin
 
 				lbxAssociated.SelectedIndex = -1;
 				lbxAssociated.Items.Add(li);
+                btnSaveChanges.Enabled = true;
 			}
 		}
 
@@ -203,6 +186,7 @@ namespace iLabs.ServiceBroker.admin
 
                 //lbxAssociated.SelectedIndex = 0;
 				lbxAssociated.Items.Remove(li);
+                btnSaveChanges.Enabled = true;
 				
 				lbxAvailable.SelectedIndex = -1;
 				lbxAvailable.Items.Add(li);
@@ -221,11 +205,9 @@ namespace iLabs.ServiceBroker.admin
 			if ( (i = lbxAssociated.SelectedIndex) >0 ) 
 			{
 				ListItem li1 = lbxAssociated.Items[i];
-				ListItem li2 = lbxAssociated.Items[i-1];
 				lbxAssociated.Items.Remove(li1);
-				lbxAssociated.Items.Remove(li2);
 				lbxAssociated.Items.Insert(i-1,li1);
-				lbxAssociated.Items.Insert(i,li2);
+                btnSaveChanges.Enabled = true;
 			}
 		
 		}
@@ -242,11 +224,9 @@ namespace iLabs.ServiceBroker.admin
 			if (i >= 0 && i < lbxAssociated.Items.Count-1) 
 			{
 				ListItem li1=lbxAssociated.Items[i];
-				ListItem li2=lbxAssociated.Items[i+1];
 				lbxAssociated.Items.Remove(li1);
-				lbxAssociated.Items.Remove(li2);
-				lbxAssociated.Items.Insert(i,li1);
-				lbxAssociated.Items.Insert(i,li2);
+				lbxAssociated.Items.Insert(i+1,li1);
+                btnSaveChanges.Enabled = true;
 			}
 		}
 
@@ -274,9 +254,9 @@ namespace iLabs.ServiceBroker.admin
 				// First delete all "uselabserver" grants for the groups that can access the old set of lab servers
 				foreach (int groupID in groupIDs)
 				{
-					foreach (int labServerID in labClients[0].labServerIDs)
+					foreach (ProcessAgentInfo pa in AssocLabServers)
 					{
-						int qID = AuthorizationAPI.GetQualifierID(labServerID, Qualifier.labServerQualifierTypeID);
+						int qID = AuthorizationAPI.GetQualifierID(pa.agentId, Qualifier.labServerQualifierTypeID);
 						int[] oldLSGrants = AuthorizationAPI.FindGrants(groupID, Function.useLabServerFunctionType,qID);
 						foreach (int oldGrant in oldLSGrants)
 							oldUseLSGrants.Add(oldGrant);
@@ -286,13 +266,13 @@ namespace iLabs.ServiceBroker.admin
 				// remove all the grants
 				int[] unremovedGrants = AuthorizationAPI.RemoveGrants(Utilities.ArrayListToIntArray(oldUseLSGrants));
 
-				//Change the labclient's list of lab servers
-                wrapper.ModifyLabClientWrapper(labClientID, labClients[0].clientName, labClients[0].version, 
-                    labClients[0].clientShortDescription, labClients[0].clientLongDescription, 
-                    labClients[0].notes, labClients[0].loaderScript, labClients[0].clientType, 
-                    labServerIDs, labClients[0].contactEmail, labClients[0].contactFirstName, 
-                    labClients[0].contactLastName, labClients[0].needsScheduling, labClients[0].needsESS,
-                    labClients[0].IsReentrant, labClients[0].clientInfos);
+                ////Change the labclient's list of lab servers
+                //wrapper.ModifyLabClientWrapper(labClientID, labClient.clientName, labClient.version, 
+                //    labClient.clientShortDescription, labClient.clientLongDescription, 
+                //    labClient.notes, labClient.loaderScript, labClient.clientType, 
+                //    labServerIDs, labClient.contactEmail, labClient.contactFirstName, 
+                //    labClient.contactLastName, labClient.needsScheduling, labClient.needsESS,
+                //    labClient.IsReentrant, labClient.clientInfos);
 				
 				// Create the javascript which will cause a page refresh event to fire on the popup's parent page
 				string jScript;
@@ -312,7 +292,8 @@ namespace iLabs.ServiceBroker.admin
 				}
 
 				lblResponse.Visible = true;
-				lblResponse.Text = Utilities.FormatConfirmationMessage("The labclient '"+labClients[0]+"' has successfully been modified.");
+				lblResponse.Text = Utilities.FormatConfirmationMessage("The labclient '"+labClient+"' has successfully been modified.");
+                btnSaveChanges.Enabled = false;
 			}
 			catch (Exception ex)
 			{

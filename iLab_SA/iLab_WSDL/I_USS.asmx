@@ -27,9 +27,27 @@ using iLabs.DataTypes.SchedulingTypes;
         public OperationAuthHeader opHeader = new OperationAuthHeader();
         public AgentAuthHeader agentAuthHeader = new AgentAuthHeader();
 
+        
+        /// <summary>
+        /// Retrieve available time periods(local time of LSS) This is a pas-through method that gets the information from the LSS.
+        /// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="groupName"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="startTime"></param>the local time of LSS
+        /// <param name="endTime"></param>the local time of LSS
+        /// <returns></returns>return an array of time periods (local time), each of the time periods is longer than the experiment's minimum time 
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+        public abstract TimePeriod[] RetrieveAvailableTimePeriods(string serviceBrokerGuid, string groupName,
+            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime);
+       
+        
+        
         /// <summary>
         /// Returns all resevations that match the search criteria.
-        
         /// </summary>
         /// <param name="serviceBrokerGuid">The User's SB</param>
         /// <param name="userName">User Name</param>
@@ -43,7 +61,27 @@ using iLabs.DataTypes.SchedulingTypes;
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract Reservation[] ListReservations(string serviceBrokerGuid, string userName,
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime);
-        
+       
+        /// <summary>
+        /// Add a reservation for a lab server for thew specified user, client and time. 
+        /// If the reservation is confirmed by the LSS, the reservation will be added to the USS.
+        /// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="userName"></param>
+        /// <param name="groupName"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labClientGuid"></param>
+        /// <param name="startTime">UTC</param>
+        /// <param name="endTime">UTC</param>
+        /// <returns>Returns a message of succes or a simple description of the reason for failure.</returns>
+        [WebMethod(Description = "Add a reservation for a lab server for the specified user, client and time. "
+        + "If the reservation is confirmed by the LSS, the reservation will be added to the USS.")]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+        public abstract string AddReservation(string serviceBrokerGuid, string userName, string groupName,
+            string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime);
+		
 		/// <summary>
 		/// Remove all the reservations for a lab server covered by the revocation time. 
         /// Mail is sent to each of the owners of the removed reservations, via a request to the ServiceBroker.

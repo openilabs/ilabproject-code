@@ -1,3 +1,6 @@
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 /****** created by Charu. Last Modified 1/29/2004 *****/
 
 /****** IMPORTANT - PLEASE READ ALL THE INSTRUCTIONS BEFORE YOU RUN THIS SCRIPT ******/

@@ -46,6 +46,7 @@ using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker.Internal;
+using iLabs.ServiceBroker.Mapping;
 using iLabs.Ticketing;
 using iLabs.TicketIssuer;
 using iLabs.UtilLib;
@@ -761,8 +762,6 @@ namespace iLabs.ServiceBroker.iLabSB
         }
 
 
-
-
         //////////////////////////////////////////////////////
         ///// BATCH SERVICE BROKER TO LAB SERVER API     /////
         //////////////////////////////////////////////////////
@@ -866,6 +865,81 @@ namespace iLabs.ServiceBroker.iLabSB
 
             return DataStorageAPI.ListClientItems(clientID, userID);
         }
+
+        
+        /// <summary>
+        /// Request authorization for the specified types of access, for the specified group and optional user. At this time remote SB's are not supported.
+        /// </summary>
+        /// <param name="types">An array of requested ticket types</param>
+        /// <param name="duration">minimum duration of the created tickets</param>
+        /// <param name="groupName">group name on the ticketIssuer service, may in the future support validation from the service making the request</param>
+        /// <param name="userName">User name on the ticketIssuer service, may in the future support validation from the service making the request, may be null</param>
+        /// <param name="serviceGuid">May be null</param>
+        /// <param name="clientGuid">May be null</param>
+        /// <returns>An operationCoupon or null</returns>
+        [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, server and  client.")]
+        [SoapDocumentMethod(Binding = "IServiceBroker")]
+        [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        public Coupon RequestAuthorization(string[] types, long duration, string group, string user, string serviceGuid, string clientGuid)
+        {
+            
+            Coupon coupon = null;
+            BrokerDB brokerDB = new BrokerDB();
+            //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
+            //{
+                if (ProcessAgentDB.ServiceGuid.CompareTo(agentAuthHeader.coupon.issuerGuid) == 0)
+                {
+                    if (types != null && types.Length > 0)
+                    {
+                        int userID = -1;
+                        int groupID = -1;
+                        int lcID = AdministrativeAPI.GetLabClientID(clientGuid);
+                        int lsID = brokerDB.GetProcessAgentID(serviceGuid);
+                        int lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                        int ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, lcID, ProcessAgentType.SCHEDULING_SERVER);
+                        ProcessAgent lss = brokerDB.GetProcessAgent(lssID);
+                        ProcessAgent uss = brokerDB.GetProcessAgent(ussID);
+                        ProcessAgent ess = null;
+                        TicketLoadFactory factory = TicketLoadFactory.Instance();
+
+                        foreach (string str in types)
+                        {
+                            switch (str)
+                            {
+                                case TicketTypes.CREATE_EXPERIMENT:
+                                    break;
+                                case TicketTypes.EXECUTE_EXPERIMENT:
+                                    break;
+                                case TicketTypes.ALLOW_EXPERIMENT_EXECUTION:
+                                    break;
+                                case TicketTypes.RETRIEVE_RECORDS:
+                                    break;
+                                case TicketTypes.STORE_RECORDS:
+                                    break;
+                                case TicketTypes.SCHEDULE_SESSION:
+                                    // Create the Authority's SCHEDULE_SESSION ticket
+                                    string payloadUss = factory.makeReservationPayload(ProcessAgentDB.ServiceGuid, user, group, serviceGuid, clientGuid, uss.webServiceUrl);
+                                    coupon = brokerDB.CreateTicket(TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, duration, payloadUss);
+                                    // Create the USS to LSS REQUEST_RESERVATION Ticket
+                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, duration, null);
+                                    // Create the USS to LSS
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, duration, null);
+                                    break;
+                                case TicketTypes.REDEEM_RESERVATION:
+                                    break;
+                                case TicketTypes.REVOKE_RESERVATION:
+                                    break;
+                                default:
+                                    break;
+                            }
+                         
+                        }
+                    }
+                }
+            //}
+            return coupon;
+        }
+
         
 
         /////////////////////////////////////////////////////////////////////
@@ -883,8 +957,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <returns></returns>
         [WebMethod(Description = "Opens an Experiment on the ServiceBroker, if an ESS is "
         + "associated with this experiment the ESS experiment record is configured so that ExperimentRecords "
-        + "or BLOBs can be written to the ESS.",
-        EnableSession = true)]
+        + "or BLOBs can be written to the ESS.", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public StorageStatus OpenExperiment(long experimentId, long duration)

@@ -463,11 +463,11 @@ namespace iLabs.ServiceBroker.iLabSB
               {
                     DateTime start = DateTime.UtcNow;
                     long duration = 36000L; // default is ten hours
-                    ProcessAgentInfo labServer = null;
-
-                    if (client.labServerIDs.Length > 0)
+                    ProcessAgentInfo[] labServers = null;
+                    labServers = AdministrativeAPI.GetLabServersForClient(clientID);
+                    if (labServers.Length > 0)
                     {
-                        labServer = issuer.GetProcessAgentInfo(client.labServerIDs[0]);
+                        //labServer = labServers[0];
                     }
                     else
                     {

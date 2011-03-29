@@ -1,4 +1,7 @@
-﻿if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Agent_Hierarchy_Agents]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+﻿-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Agent_Hierarchy_Agents]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Agent_Hierarchy] DROP CONSTRAINT FK_Agent_Hierarchy_Agents
 GO
 

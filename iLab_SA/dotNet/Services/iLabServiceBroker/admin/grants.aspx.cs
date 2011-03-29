@@ -473,7 +473,7 @@ namespace iLabs.ServiceBroker.admin
 							lblResponse.Visible = true;
 							string msg = "The grant {" + agentName + ", " +  functionType + ", " +qualifierName + "} was successfully removed.";
 							lblResponse.Text = Utilities.FormatConfirmationMessage(msg);
-
+                           
                             // The deleted grants remain highlighted.
 						}
 						catch (Exception ex)

@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -27,15 +28,13 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class addInfoUrlPopup : System.Web.UI.Page
 	{
-		//The error message div tab
-
-		
 		int labClientID;
-		int[] labClientIDs;
-		LabClient[] labClients;
-		ClientInfo[] clientInfos;
-		ArrayList clientInfosList = new ArrayList();
-        AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+		string clientName;
+		//ClientInfo[] clientInfos;
+		List<ClientInfo> clientInfoList;
+        ClientInfo currentInfo = null;
+
+        //AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -43,29 +42,32 @@ namespace iLabs.ServiceBroker.admin
 				Response.Redirect("../login.aspx");
 
 			labClientID = int.Parse(Request.Params["lc"]);
-			labClientIDs = new int[1];
-			labClientIDs[0] = labClientID;
-			labClients = wrapper.GetLabClientsWrapper(labClientIDs);
-            if (labClients != null && labClients.Length > 0 && labClients[0] != null)
-            {
-                clientInfos = labClients[0].clientInfos;
-            }
-            if (clientInfos.Length == 0)
-            {
-                clientInfos = new ClientInfo[1];
-                clientInfos[0] = new ClientInfo();
-            }
-
+            ClientInfo[] clientInfos = AdministrativeAPI.ListClientInfos(labClientID);
+            clientInfoList = new List<ClientInfo>();
+            
+            if (clientInfos != null && clientInfos.Length > 0)
+                clientInfoList.AddRange(clientInfos);
+            //clientName = AdministrativeAPI.GetLabClientName(labClientID);
+          
+            //// Add the JavaScript code to the page.
+            //if (!ClientScript.IsClientScriptBlockRegistered("ValueChanged"))
+            //{
+            //    StringBuilder jsBuf = new StringBuilder();
+            //    jsBuf.AppendLine("<script language='javascript'> function ValueChanged() {");
+            //    jsBuf.AppendLine("document.getElementById('btnSaveInfoChanges').disabled = false; }</script>");
+            //    ClientScript.RegisterClientScriptBlock(this.GetType(), "ValueChanged", jsBuf.ToString());
+            //}
 			if(!IsPostBack)
 			{
-				RefreshClientInfoRepeater();
+                lblLabClient.Text = AdministrativeAPI.GetLabClientName(labClientID);
+                RefreshClientInfoRepeater();
 				ClearFormFields();
 				LoadListBox();
+               
 			}
-			
-			// Current Lab Client name
-			lblLabClient.Text = labClients[0].clientName;
-			
+            //txtInfoname.Attributes.Add("onchange", "ValueChanged");
+            //txtUrl.Attributes.Add("onchange", "ValueChanged");
+            //txtDesc.Attributes.Add("onchange", "ValueChanged");
 			// Error Message
 			divErrorMessage.Visible = false;
 
@@ -101,30 +103,20 @@ namespace iLabs.ServiceBroker.admin
 			// refresh the array of LabClient objects from the database.
 			// This insures that any changed ClientInfo arrays (one per LabClient Object)
 			// are retrieved.
-			labClientIDs = new int[1];
-			labClientIDs[0] = labClientID;
-			labClients = wrapper.GetLabClientsWrapper(labClientIDs);
 
-			LabClient lc = new LabClient();
-			lc = labClients[0];
-
-			clientInfosList.Clear();
-
-			foreach(ClientInfo ci in lc.clientInfos)
-			{
-				if (ci != null && !ci.infoURLName.ToUpper().Equals("DOCUMENTATION"))
-					clientInfosList.Add(ci);	
-			}
-
-			repClientInfo.DataSource = clientInfosList;
+            ClientInfo[] clientInfos = AdministrativeAPI.ListClientInfos(labClientID);
+            if (clientInfoList == null)
+            {
+                clientInfoList = new List<ClientInfo>();
+            }
+            else
+                clientInfoList.Clear();
+            if (clientInfos != null && clientInfos.Length > 0)
+                clientInfoList.AddRange(clientInfos);
+           
+            repClientInfo.DataSource = clientInfoList;
 			repClientInfo.DataBind();
 
-			// update public clientInfos object
-			clientInfos = lc.clientInfos;
-			if (clientInfos.Length == 0)
-			{
-				clientInfos = new ClientInfo[1];
-			}
 		}
 
 		/// <summary>
@@ -135,32 +127,38 @@ namespace iLabs.ServiceBroker.admin
 		/// <param name="e"></param>
 		private void repClientInfo_ItemCommand(object source, System.Web.UI.WebControls.RepeaterCommandEventArgs e)
 		{
-			//int clientInfoID = ((ClientInfo)(e.Item.DataItem)).clientInfoID;
+          
 			int clientInfoID = Convert.ToInt32(e.CommandArgument);
 			int index=0;
-			for (index=0;index<=clientInfos.Length;index++)
-				if ((clientInfos[index].clientInfoID==clientInfoID))
+            for (index = 0; index < clientInfoList.Count; index++)
+            {
+				if ((clientInfoList[index].clientInfoID==clientInfoID))
 					break;
-			if(e.CommandName == "Edit")
-			{
-				LoadFormFields(index);
+            }
+			if(e.CommandName == "Edit"){
+			
+				LoadFormFields(clientInfoList[index]);
 			}
 			else if(e.CommandName == "Remove")
 			{
-				RemoveClientInfo(index);
+				RemoveClientInfo(clientInfoID);
+                RefreshClientInfoRepeater();
 			}
+            
 		}
 
 		/// <summary>
 		/// Loads the fields in the Info Edit Box with information
 		/// from the selected record, to prepare for editing.
 		/// </summary>
-		private void LoadFormFields(int index)
+		private void LoadFormFields(ClientInfo clientInfo)
 		{
-			txtDesc.Text = clientInfos[index].description;
-			txtUrl.Text = clientInfos[index].infoURL;
-			txtInfoname.Text = clientInfos[index].infoURLName;
-			hiddenClientInfoIndex.Value = index.ToString();
+			txtDesc.Text = clientInfo.description;
+			txtUrl.Text = clientInfo.infoURL;
+			txtInfoname.Text = clientInfo.infoURLName;
+			hdnClientInfoID.Value = clientInfo.ClientInfoID.ToString();
+            hdnDisplayOrder.Value = clientInfo.displayOrder.ToString();
+            btnSaveInfoChanges.Enabled = true;
 		}
 
 		/// <summary>
@@ -175,74 +173,53 @@ namespace iLabs.ServiceBroker.admin
 			// keeps track of current clientInfos index. New record should
 			// have and index that is one higher than the highest current index.
 			// Array Length property is not zero-based, hence equality here.
-			hiddenClientInfoIndex.Value = clientInfos.Length.ToString();
+			hdnClientInfoID.Value = "0";
+            btnSaveInfoChanges.Enabled = false;
 		}
 
 		protected void btnNew_Click(object sender, System.EventArgs e)
 		{
 			ClearFormFields();
+            btnSaveInfoChanges.Enabled = true;
 		}
 
 		protected void btnSaveInfoChanges_Click(object sender, System.EventArgs e)
 		{
-			int index;
-			index = int.Parse(hiddenClientInfoIndex.Value);
+			int id = int.Parse(hdnClientInfoID.Value);
 			
 		// Set the correct element of the clientInfos array to the values from the text boxes
-			if (index == clientInfos.Length)
+            if (id == 0)
 			{
-				// new addition
-				// create a new ClientInfo object
-				ClientInfo newClientInfo = new ClientInfo();
-				newClientInfo.description = txtDesc.Text;
-				newClientInfo.infoURL = txtUrl.Text;
-				newClientInfo.infoURLName = txtInfoname.Text;
-
-				ClientInfo[] enlargedClientInfos;
-				enlargedClientInfos = new ClientInfo[index +1];
-				for (int i=0; i<index; i++)
-				{
-					enlargedClientInfos[i] = clientInfos[i];
-				}
-				// Add the new ClientInfo object
-				enlargedClientInfos[index] = newClientInfo;
-
-				// Set the clientInfos object to the new expanded object
-				clientInfos = enlargedClientInfos;
+                int newID = AdministrativeAPI.InsertLabClientInfo(labClientID, txtUrl.Text, txtInfoname.Text, txtDesc.Text, clientInfoList.Count);
+                RefreshClientInfoRepeater();
+                LoadListBox();
+                btnSaveInfoChanges.Enabled = false;
+                //btnSaveOrderChanges.Enabled = true;
+				
 			}
 			else
 			{
-				// modify existing clientInfo
-				clientInfos[index].description = txtDesc.Text;
-				clientInfos[index].infoURL = txtUrl.Text;
-				clientInfos[index].infoURLName = txtInfoname.Text;
+                int order = int.Parse(hdnDisplayOrder.Value);
+                AdministrativeAPI.UpdateLabClientInfo(id, labClientID, txtUrl.Text, txtInfoname.Text, txtDesc.Text, order);
+                RefreshClientInfoRepeater();
+                LoadListBox();
+				
 			}
 
 			//Save the LabClient object with the updated clientInfos array
-			UpdateLabClientInfo(clientInfos);
+            //UpdateLabClientInfo(clientInfoList);
 		
 		}
 
-		private void RemoveClientInfo(int index)
+		private void RemoveClientInfo(int infoID)
 		{
-			ClientInfo[] shrunkClientInfos;
-			int offset;
-			offset = 0;
-			shrunkClientInfos = new ClientInfo[clientInfos.Length -1];
-			for (int i=0; i < shrunkClientInfos.Length; i++)
-			{
-				if (i == index)
-				{
-					offset += 1;
-				}
-				shrunkClientInfos[i] = clientInfos[i + offset];
-			}
-
-			// Set the clientInfos object to the new smaller object
-			clientInfos = shrunkClientInfos;
-
-			//Save the LabClient object with the updated clientInfos array
-			UpdateLabClientInfo(shrunkClientInfos);
+            int count = AdministrativeAPI.DeleteLabClientInfo(labClientID, infoID);
+            if (count > 0)
+            {
+                RefreshClientInfoRepeater();
+                LoadListBox();
+                btnSaveOrderChanges.Enabled = true;
+            }
 
 		}
 
@@ -272,24 +249,24 @@ namespace iLabs.ServiceBroker.admin
 		
 		private void LoadListBox()
 		{
-            if (clientInfos != null && clientInfos.Length > 0)
+            if (clientInfoList != null && clientInfoList.Count > 0)
             {
                 lbxChangeOrder.Items.Clear();
-                for (int i = 0; i < clientInfos.Length; i++)
+                for (int i = 0; i < clientInfoList.Count; i++)
                 {
-                    if (clientInfos[i] != null)
+                    if (clientInfoList[i] != null)
                     {
-                        if ((clientInfos[i].infoURLName != null) && (clientInfos[i].infoURLName.Length > 0)
-                            && (!clientInfos[i].infoURLName.ToUpper().Equals("DOCUMENTATION")))
+                        if ((clientInfoList[i].infoURLName != null) && (clientInfoList[i].infoURLName.Length > 0))
                         {
-                            StringBuilder buf = new StringBuilder(clientInfos[i].infoURLName);
-                            if (clientInfos[i].description != null && clientInfos[i].description.Length > 0)
-                                buf.Append(" - " + clientInfos[i].description);
-                            lbxChangeOrder.Items.Add(new ListItem(buf.ToString(), i.ToString()));
+                            StringBuilder buf = new StringBuilder(clientInfoList[i].infoURLName);
+                            if (clientInfoList[i].description != null && clientInfoList[i].description.Length > 0)
+                                buf.Append(" - " + clientInfoList[i].description);
+                            lbxChangeOrder.Items.Add(new ListItem(buf.ToString(), clientInfoList[i].clientInfoID.ToString()));
                         }
                     }
                 }
             }
+            btnSaveOrderChanges.Enabled = false;
 		}
 
 		/// <summary>
@@ -303,11 +280,9 @@ namespace iLabs.ServiceBroker.admin
 			if ( (i = lbxChangeOrder.SelectedIndex) >0 ) 
 			{
 				ListItem li1 = lbxChangeOrder.Items[i];
-				ListItem li2 = lbxChangeOrder.Items[i-1];
-				lbxChangeOrder.Items.Remove(li1);
-				lbxChangeOrder.Items.Remove(li2);
+                lbxChangeOrder.Items.RemoveAt(i);
 				lbxChangeOrder.Items.Insert(i-1,li1);
-				lbxChangeOrder.Items.Insert(i,li2);
+                btnSaveOrderChanges.Enabled = true;
 			}
 		}
 
@@ -321,12 +296,10 @@ namespace iLabs.ServiceBroker.admin
 			int i=lbxChangeOrder.SelectedIndex;
 			if (i >= 0 && i < lbxChangeOrder.Items.Count-1) 
 			{
-				ListItem li1=lbxChangeOrder.Items[i];
-				ListItem li2=lbxChangeOrder.Items[i+1];
-				lbxChangeOrder.Items.Remove(li1);
-				lbxChangeOrder.Items.Remove(li2);
-				lbxChangeOrder.Items.Insert(i,li1);
-				lbxChangeOrder.Items.Insert(i,li2);
+                ListItem li1 = lbxChangeOrder.Items[i];
+                lbxChangeOrder.Items.RemoveAt(i);
+                lbxChangeOrder.Items.Insert(i + 1, li1);
+                btnSaveOrderChanges.Enabled = true;
 			}
 		}
 
@@ -337,18 +310,16 @@ namespace iLabs.ServiceBroker.admin
 		/// <param name="e"></param>
 		protected void btnSaveOrderChanges_Click(object sender, System.EventArgs e)
 		{
-			ClientInfo[] newClientInfos = new ClientInfo[clientInfos.Length];
-			for (int i=0; i < newClientInfos.Length; i++)
+			int[] infoIDs = new int[clientInfoList.Count];
+			for (int i=0; i < infoIDs.Length; i++)
 			{
-				if (i<lbxChangeOrder.Items.Count)
-				//Take the index out of the value in the list box, where it has been preserved.
-				newClientInfos[i] = clientInfos[int.Parse(lbxChangeOrder.Items[i].Value)];
-				else
-					newClientInfos[i]=clientInfos[i];
+				//Take the infoID out of the value in the list box, where it has been preserved.
+                infoIDs[i] = int.Parse(lbxChangeOrder.Items[i].Value);
 			}
-
 			//Save the LabClient object with the updated clientInfos array
-			UpdateLabClientInfo(newClientInfos);		
+            AdministrativeAPI.UpdateLabClientInfoOrder(infoIDs);
+            RefreshClientInfoRepeater();
+            btnSaveOrderChanges.Enabled = false;
 		}
 
 		/// <summary>
@@ -361,11 +332,12 @@ namespace iLabs.ServiceBroker.admin
 		{
 			try
 			{
-                wrapper.ModifyLabClientWrapper(labClientID, labClients[0].clientName, labClients[0].version, 
-                    labClients[0].clientShortDescription, labClients[0].clientLongDescription, labClients[0].notes, 
-                    labClients[0].loaderScript, labClients[0].clientType, labClients[0].labServerIDs,
-                    labClients[0].contactEmail, labClients[0].contactFirstName, labClients[0].contactLastName,
-                    labClients[0].needsScheduling, labClients[0].needsESS, labClients[0].IsReentrant, clientInfos);
+                int count = 0;
+                foreach (ClientInfo info in clientInfos)
+                {
+                    AdministrativeAPI.UpdateLabClientInfo(info.clientInfoID, info.clientID, info.infoURL, info.infoURLName, info.description, count);
+                    count++;
+                }
 				// Create the javascript which will cause a page refresh event to fire on the popup's parent page
 				string jScript;
 				jScript = "<script language=javascript> window.opener.Form1.hiddenPopupOnSave.value='1';";

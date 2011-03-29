@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Copyright (c) 2011 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
  * $Id: help.aspx.cs,v 1.5 2007/02/16 22:50:36 pbailey Exp $
@@ -18,6 +18,8 @@ using System.Web.UI.HtmlControls;
 using System.Web.Security;
 using System.Web.Mail;
 using System.Text;
+
+using Recaptcha;
 
 using iLabs.Core;
 using iLabs.DataTypes.ProcessAgentTypes;
@@ -55,10 +57,11 @@ namespace iLabs.ServiceBroker.iLabSB
 				userID = Convert.ToInt32(Session["UserID"]);
 				currentUser = wrapper.GetUsersWrapper(new int[] {userID})[0];
 			}
-
+            //recaptcha.PublicKey = "6LcLF8ISAAAAAMhwOM1ipf9N1Kh_obO1VG0PwCQB";
+            //recaptcha.PrivateKey = "6LcLF8ISAAAAALHhc_wOQibhl3jIc5gf9MUKvOw_";
 			if(! IsPostBack)
 			{
-                lblRevision.Text = "<!-- Revision: " + iLabGlobal.Release + " -->";
+                
 				if (userID != -1) //user logged in
 				{
 					lblUserName.Visible = false;
@@ -119,20 +122,26 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		private void btnRequestHelp_Click(object sender, System.EventArgs e)
 		{
+            if (!recaptcha.IsValid)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage("You must respond to the security question!");
+                lblResponse.Visible = true;
+                return;
+            }
 			if((userID == -1) && (txtEmail.Text.Length == 0))
 			{
-                lblResponse.Text = "<div class=errormessage><p>Please enter an email address, so that we can respond to you.</p></div>";
+                lblResponse.Text = Utilities.FormatErrorMessage("Please enter an email address, so that we can respond to you.");
 				lblResponse.Visible = true;
 			}
 
 			else if(ddlHelpType.SelectedItem.Text.CompareTo("") == 0)
 			{
-				lblResponse.Text = "<div class=errormessage><p>Please select the type of help you need.</p></div>";
+				lblResponse.Text = Utilities.FormatErrorMessage("Please select the type of help you need.");
 				lblResponse.Visible = true;
 			}
 			else if (txtProblem.Text == "")
 			{
-				lblResponse.Text = "<div class=errormessage><p>Enter a description of the problem!</p></div>";
+				lblResponse.Text = Utilities.FormatErrorMessage("Enter a description of the problem!");
 				lblResponse.Visible = true;
 			}
 			else

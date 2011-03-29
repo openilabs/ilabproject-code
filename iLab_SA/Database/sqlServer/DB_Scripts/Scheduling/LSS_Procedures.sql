@@ -1,3 +1,5 @@
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[CredentialSet_Add]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[CredentialSet_Add]

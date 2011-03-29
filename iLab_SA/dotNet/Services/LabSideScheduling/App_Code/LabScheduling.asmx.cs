@@ -251,7 +251,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 // Ticket retrievedTicket = ticketRetrieval.RetrieveAndVerify(opCoupon, type, "LAB SCHEDULING SERVER");
 
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
+                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
 
                 DateTime startTimeUTC = startTime.ToUniversalTime();
                 DateTime endTimeUTC = endTime.ToUniversalTime();

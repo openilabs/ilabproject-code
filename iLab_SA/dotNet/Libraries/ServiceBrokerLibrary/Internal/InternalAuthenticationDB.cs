@@ -39,7 +39,7 @@ namespace iLabs.ServiceBroker.Internal
 			int userID=-1;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("CreateNativePrincipal", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("NativePrincipal_Create", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userName",userName,DbType.String,256));
 			try
@@ -64,7 +64,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int[] DeleteNativePrincipals (int[] userIDs)
 		{
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteNativePrincipal", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("NativePrincipal_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",null,DbType.Int32));
 
@@ -111,7 +111,7 @@ namespace iLabs.ServiceBroker.Internal
 			int[] userIDs;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveNativePrincipals", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("NativePrincipals_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -154,7 +154,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SaveNativePassword", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("NativePassword_Update", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",userID,DbType.Int32));
@@ -188,7 +188,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveNativePassword", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("NativePassword_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",userID,DbType.Int32));

@@ -76,6 +76,12 @@ namespace iLabs.ServiceBroker.admin
                 txtApplicationURL.BackColor = disabled;
                 txtDomainServer.ReadOnly = true;
                 txtDomainServer.BackColor = disabled;
+                txtLSS.ReadOnly = true;
+                txtLSS.BackColor = disabled;
+                txtLSS.Visible = false;
+                txtManageLSS.ReadOnly = true;
+                txtManageLSS.BackColor = disabled;
+                txtManageLSS.Visible = false;
                 // Get list of services
                 InitializeDropDown();
                 //Put in availabe admin groups
@@ -89,41 +95,14 @@ namespace iLabs.ServiceBroker.admin
                 trAdminGroup.Visible = false;
                 trAssociate.Visible = false;
                 trManage.Visible = false;
-                //lblAssociate.Visible = false;
-                //ddlLSS.Visible = false;
-                //btnAssociateLSS.Visible = false;
+                txtLSS.Visible = false;
+
                 Session.Remove("LS_LSSmapID");
                 Session.Remove("DomainGuid");
                
             }
             //else // Do any stuff that needs to be done on Postback PageOpen calls
-            //{
-                
-            //}
-/*
-            // Get System Messages on all OpenPage calls
-            ArrayList messagesList = new ArrayList();
-            SystemMessage[] messages = wrapper.GetSystemMessagesWrapper("System", 0, 0);
-            foreach (SystemMessage message in messages)
-            {
-                messagesList.Add(message);
-            }
-
-            messagesList.Sort(new DateComparer());
-            messagesList.Reverse();
-
-            if (messagesList.Count == 0)
-            {
-                SystemMessage noMessage = new SystemMessage();
-                noMessage.messageBody = "No Messages at this time";
-                noMessage.lastModified = DateTime.Now;
-                messagesList.Add(noMessage);
-            }
-
-            repSystemMessage.DataSource = messagesList;
-            repSystemMessage.DataBind();
-            */
-           
+            
 
             // Reset error/confirmation message
             lblErrorMessage.Visible = false;
@@ -155,7 +134,7 @@ namespace iLabs.ServiceBroker.admin
         private void IntializeAdminGroupList()
         {
             ddlAdminGroup.Items.Clear();
-            ListItem liHeaderAdminGroup = new ListItem("---No Admin Group---", "-1");
+            ListItem liHeaderAdminGroup = new ListItem("--- No Admin Group ---", "0");
             ddlAdminGroup.Items.Add(liHeaderAdminGroup);
 
             int[] groupIDs = AdministrativeAPI.ListAdminGroupIDs();
@@ -178,7 +157,7 @@ namespace iLabs.ServiceBroker.admin
         private void IntializeManageLSSList()
         {
             ddlManageLSS.Items.Clear();
-            ListItem liHeaderAdminGroup = new ListItem("---No Management Group---", "-1");
+            ListItem liHeaderAdminGroup = new ListItem("--- No Management Group ---", "0");
             ddlManageLSS.Items.Add(liHeaderAdminGroup);
 
             int[] groupIDs = AdministrativeAPI.ListAdminGroupIDs();
@@ -198,77 +177,8 @@ namespace iLabs.ServiceBroker.admin
             }
         }
 
-
-        private int CheckAssociatedLSSForLS(int lsId)
-        {
-            int lssId = 0;
-            ddlLSS.ClearSelection();
-            ddlLSS.SelectedIndex = 0;
-            ddlLSS.BackColor = enabled;
-            ddlLSS.Enabled = true;
-            ddlManageLSS.ClearSelection();
-            ddlManageLSS.SelectedIndex = 0;
-            ddlManageLSS.BackColor = enabled;
-            ddlManageLSS.Enabled = true;
-            ResourceMappingValue[] values = new ResourceMappingValue[2];
-            values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.LAB_SCHEDULING_SERVER);
-            values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-                TicketTypes.GetTicketType(TicketTypes.MANAGE_LAB));
-
-            List<ResourceMapping> maps = ResourceMapManager.Find(new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, lsId), values);
-            if (maps != null && maps.Count > 0)
-            {
-                foreach (ResourceMapping rm in maps)
-                {
-                    for (int i = 0; i < rm.values.Length; i++)
-                    {
-                        if (rm.values[i].Type == ResourceMappingTypes.PROCESS_AGENT)
-                        {
-                            lssId = (int)rm.values[i].Entry;
-                            ddlLSS.ClearSelection();
-                            ddlLSS.SelectedValue = lssId.ToString();
-                            ddlLSS.Enabled = false;
-                            ddlLSS.BackColor = disabled;
-                            btnAssociateLSS.Text = "Disassociate";
-                            btnAssociateLSS.CommandName = "disassociate";
-                            Session["LS_LSSmapID"] = rm.MappingID;
-
-
-                            // Find any manageLab grants
-                            int qualID = AuthorizationAPI.GetQualifierID(rm.MappingID, Qualifier.resourceMappingQualifierTypeID);
-                            Grant[] grants = AuthorizationAPI.GetGrants(AuthorizationAPI.FindGrants(-1, Function.manageLAB, qualID));
-                            foreach (Grant g in grants)
-                            {
-                                if (ddlManageLSS.Items.FindByValue(g.agentID.ToString()) != null)
-                                {
-                                    ddlManageLSS.ClearSelection();
-                                    ddlManageLSS.Items.FindByValue(g.agentID.ToString()).Selected = true;
-                                    ddlManageLSS.Enabled = false;
-                                    ddlManageLSS.BackColor = disabled;
-                                    break;
-                                }
-
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-            
-            else
-            {
-                ddlLSS.Enabled = true;
-                ddlLSS.SelectedIndex = 0;
-                ddlLSS.BackColor = enabled;
-                Session.Remove("LS_LSSmapID");
-                btnAssociateLSS.Text = "Associate";
-                btnAssociateLSS.CommandName = "associate";
-                ddlManageLSS.Enabled = true;
-            }
-
-            return lssId;
-
-        }
+     
+      
 
         /// <summary>
         /// Clears the Lab Server dropdown and reloads it from the array of Service objects
@@ -290,7 +200,7 @@ namespace iLabs.ServiceBroker.admin
 
             //Put in availabe LSS
             ddlLSS.Items.Clear();
-            ListItem liHeaderLss = new ListItem("---Select Lab Side Scheduling Server---", "-1");
+            ListItem liHeaderLss = new ListItem("--- select Lab Side Scheduling Server ---", "0");
             ddlLSS.Items.Add(liHeaderLss);
             IntTag[] lsses = brokerDB.GetProcessAgentTagsByType(ProcessAgentType.LAB_SCHEDULING_SERVER);
             foreach (IntTag lss in lsses)
@@ -333,10 +243,13 @@ namespace iLabs.ServiceBroker.admin
             
             //lblAdminGroup.Visible = isDisplay;
             //ddlAdminGroup.Visible = isDisplay;
-            trAdminGroup.Visible = isDisplay;
             btnRegister.Visible = !isDisplay;
-            btnAdminURLs.Visible = isDisplay;
             btnSaveChanges.Visible = isDisplay;
+            trAdminGroup.Visible = false;
+            trAssociate.Visible = false;
+            
+            btnAdminURLs.Visible = isDisplay;
+            
         }
 
         /// <summary>
@@ -389,11 +302,10 @@ namespace iLabs.ServiceBroker.admin
         /// </summary>
         private void ClearFormFields()
         {
+            cbxDoBatch.Checked = false;
             txtServiceName.Text = "";
             txtServiceGUID.Text = "";
-
             txtServiceType.Text = "";
-            SetInputMode(false);
             txtWebServiceURL.Text = "";
             txtServiceDescription.Text = "";
             txtApplicationURL.Text = "";
@@ -405,15 +317,16 @@ namespace iLabs.ServiceBroker.admin
             txtOutPassKey.Text = "";
             txtBatchPassIn.Text = "";
             txtBatchPassOut.Text = "";
-            ddlAdminGroup.ClearSelection();
+            txtLSS.Text = "";
+            txtManageLSS.Text = "";
+            ddlAdminGroup.SelectedIndex = 0;
+            ddlLSS.ClearSelection();
+            ddlManageLSS.ClearSelection();
             trAdminGroup.Visible = false;
             trAssociate.Visible = false;
             trManage.Visible = false;
-            ddlLSS.ClearSelection();
-            //ddlLSS.Visible = false;
-            //lblAssociate.Visible = false;
-           
-            //btnAssociateLSS.Visible = false;
+  
+            SetInputMode(false);
            
         }
 
@@ -426,183 +339,285 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="e"></param>
         protected void ddlService_SelectedIndexChanged(object sender, System.EventArgs e)
         {
-            cbxDoBatch.Checked = false;
             int id = Convert.ToInt32(ddlService.SelectedValue);
-            if (id == 0)
-            // prepare for a new record
-            {
-                ClearFormFields();
-                //if(cbxDoBatch.Checked){
-                //    SetBatchInputMode(false);
-                //}
-                //else{
-                //    SetInputMode(false);
-                //}
-                ClearButtonScripts();
-            }
-            else
-            //retrieve an existing record
-            {
-
-                displayService(id);
-            }
+            displayService(id);
         }
 
         protected void displayService(int agentId)
         {
-            ProcessAgentInfo agent = brokerDB.GetProcessAgentInfo(agentId);
-            bool localDomain = true;
-            if (agent != null)
+           // bool isBatchAuth = false;
+            ClearFormFields();
+            ClearButtonScripts();
+            if (agentId > 0)
             {
-                if (agent.retired)
+                ProcessAgentInfo agent = brokerDB.GetProcessAgentInfo(agentId);
+                int domainStatus = 0;
+                if (agent != null)
                 {
-                    ClearFormFields();
-                    throw new Exception("The requested service is retired");
-                }
-                txtServiceName.Text = agent.agentName;
-                txtServiceType.Text = ProcessAgentType.ToTypeName(agent.agentType);
-                
-                txtServiceGUID.Text = agent.agentGuid;
-                txtWebServiceURL.Text = agent.webServiceUrl;
-                txtApplicationURL.Text = agent.codeBaseUrl;
-                if (agent.domainGuid != null)
-                {
-                    if (agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
-                    {
-                        txtDomainServer.Text = ProcessAgentDB.ServiceAgent.agentName;
+                    if (agent.retired){
+                        throw new Exception("The requested service is retired");
                     }
-                    else
+                    
+                    txtServiceName.Text = agent.agentName;
+                    txtServiceType.Text = ProcessAgentType.ToTypeName(agent.agentType);
+
+                    txtServiceGUID.Text = agent.agentGuid;
+                    txtWebServiceURL.Text = agent.webServiceUrl;
+                    txtApplicationURL.Text = agent.codeBaseUrl;
+                    if (agent.domainGuid != null)
                     {
-                        localDomain = false;
-                        ProcessAgent remote = brokerDB.GetProcessAgent(agent.domainGuid);
-                        txtDomainServer.Text = remote.agentName;
-                    }
-                }
-                Session["DomainGuid"] = agent.domainGuid;
-
-                SystemSupport ss = brokerDB.RetrieveSystemSupport(agentId);
-                if(ss != null){
-                    txtServiceDescription.Text = ss.description;
-                    txtInfoURL.Text = ss.infoUrl;
-                    txtContactEmail.Text = ss.contactEmail;
-                    txtBugEmail.Text = ss.bugEmail;
-                    txtLocation.Text = ss.location;
-                }
-                else{
-                    txtServiceDescription.Text = "";
-                    txtInfoURL.Text = "";
-                    txtContactEmail.Text = "";
-                    txtBugEmail.Text = "";
-                    txtLocation.Text = "";
-                }
-
-                if (agent.agentType.Equals(ProcessAgentType.AgentType.BATCH_LAB_SERVER))
-                {
-                    cbxDoBatch.Checked = true;
-                   
-                    SetBatchInputMode(true);
-                    if (agent.identIn != null)
-                    {
-                        txtBatchPassIn.Text = agent.identIn.passkey;
-                    }
-                    else
-                    {
-                        txtBatchPassIn.Text = "";
-                    }
-                    if (agent.identOut != null)
-                    {
-                        txtBatchPassOut.Text = agent.identOut.passkey;
-                    }
-                    else
-                    {
-                        txtBatchPassOut.Text = "";
-                    }
-                }
-                else
-                {
-                    SetInputMode(true);
-                    if (!agent.agentType.Equals(ProcessAgentType.AgentType.SERVICE_BROKER)
-                    && !agent.agentType.Equals(ProcessAgentType.AgentType.REMOTE_SERVICE_BROKER)
-                    && !agent.agentType.Equals(ProcessAgentType.AgentType.EXPERIMENT_STORAGE_SERVER)
-                    && localDomain)
-                    {
-                        // Admin Group List
-
-                        trAdminGroup.Visible = true;
-
-                        string warningMessage = null;
-
-                        int qualifierTypeID = Qualifier.ToTypeID(ProcessAgentType.ToTypeName(agent.agentType));
-                        int qualifierID = AuthorizationAPI.GetQualifierID(agentId, qualifierTypeID);
-
-                        string grantFunction = GetGrantFunction(txtServiceType.Text);
-
-                        // Get all grants for the function and qualifier ( theService )
-                        //Ideally, there should only be one group that has the "Administer" function on a particular Process Agent
-                        //for now, take the first element of the array
-                        int[] grantIDs = wrapper.FindGrantsWrapper(-1, grantFunction, qualifierID);
-                        if (grantIDs.Length > 0)
+                        if (agent.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                         {
-                            Grant[] grants = wrapper.GetGrantsWrapper(grantIDs);
-                            int adminGroupID = grants[0].agentID;
-                            if (adminGroupID > 0)
-                            {
-                                ddlAdminGroup.SelectedValue = adminGroupID.ToString();
-                            }
-                            else
-                            {
-                                if (ddlAdminGroup.Items.Count > 0)
-                                    ddlAdminGroup.SelectedIndex = 0;
-                                else ddlAdminGroup.ClearSelection();
-                            }
-
-                            if (grantIDs.Length > 1)
-                            {
-                                warningMessage = "NOTE: It seems that several Admin Groups are associated with this "
-                                    + "process agent. Returning the first one.";
-                                lblErrorMessage.Visible = true;
-                                Utilities.FormatErrorMessage(warningMessage);
-                            }
+                            txtDomainServer.Text = ProcessAgentDB.ServiceAgent.agentName;
+                            Session["DomainGuid"] = agent.domainGuid;
+                            domainStatus = 1;
                         }
                         else
                         {
-                            if (ddlAdminGroup.Items.Count > 0)
-                                ddlAdminGroup.SelectedIndex = 0;
-                            else ddlAdminGroup.ClearSelection();
+                            ProcessAgent remote = brokerDB.GetProcessAgent(agent.domainGuid);
+                            txtDomainServer.Text = remote.agentName;
+                            Session["DomainGuid"] = remote.domainGuid;
+                            domainStatus = 2;
                         }
+                    }
+                    else{
+                    Session.Remove("DomainGuid");
                     }
 
-                    else
+                    SystemSupport ss = brokerDB.RetrieveSystemSupport(agentId);
+                    if (ss != null)
                     {
-                        trAdminGroup.Visible = false;
-                        //ddlAdminGroup.SelectedIndex = 0;
-                        //ddlAdminGroup.Enabled = false;
-                        //ddlAdminGroup.BackColor = disabled;
-                        //ddlAdminGroup.Visible = false;
-                        //lblAdminGroup.Visible = false;
+                        txtServiceDescription.Text = ss.description;
+                        txtInfoURL.Text = ss.infoUrl;
+                        txtContactEmail.Text = ss.contactEmail;
+                        txtBugEmail.Text = ss.bugEmail;
+                        txtLocation.Text = ss.location;
                     }
-                    if (agent.agentType.Equals(ProcessAgentType.AgentType.LAB_SERVER))
+                    
+                    if (agent.agentType.Equals(ProcessAgentType.AgentType.BATCH_LAB_SERVER))
                     {
-                        trAssociate.Visible = true;
-                        CheckAssociatedLSSForLS(agentId);
-                        trManage.Visible = true;
-                        if (!localDomain)
+                        cbxDoBatch.Checked = true;
+                        SetBatchInputMode(true);
+                        if (agent.identIn != null)
                         {
-                            ddlLSS.Enabled = false;
-                            btnAssociateLSS.Visible = false;
-                            trManage.Visible = false;
+                            txtBatchPassIn.Text = agent.identIn.passkey;
+                        }
+                        else
+                        {
+                            txtBatchPassIn.Text = "";
+                        }
+                        if (agent.identOut != null)
+                        {
+                            txtBatchPassOut.Text = agent.identOut.passkey;
+                        }
+                        else
+                        {
+                            txtBatchPassOut.Text = "";
                         }
                     }
                     else
                     {
-                        trAssociate.Visible = false;
-                        trManage.Visible = false;
+                        SetInputMode(true);
+
+                        // IF has Admin group
+                        if (!agent.agentType.Equals(ProcessAgentType.AgentType.SERVICE_BROKER)
+                        && !agent.agentType.Equals(ProcessAgentType.AgentType.REMOTE_SERVICE_BROKER)
+                        && !agent.agentType.Equals(ProcessAgentType.AgentType.EXPERIMENT_STORAGE_SERVER)
+                        && domainStatus < 2)
+                        {
+                            // Admin Group List
+
+                            trAdminGroup.Visible = true;
+
+                            string warningMessage = null;
+
+                            int qualifierTypeID = Qualifier.ToTypeID(ProcessAgentType.ToTypeName(agent.agentType));
+                            int qualifierID = AuthorizationAPI.GetQualifierID(agentId, qualifierTypeID);
+
+                            string grantFunction = GetGrantFunction(txtServiceType.Text);
+
+                            // Get all grants for the function and qualifier ( theService )
+                            //Ideally, there should only be one group that has the "Administer" function on a particular Process Agent
+                            //for now, take the first element of the array
+                            int[] grantIDs = wrapper.FindGrantsWrapper(-1, grantFunction, qualifierID);
+                            if (grantIDs.Length > 0)
+                            {
+                                Grant[] grants = wrapper.GetGrantsWrapper(grantIDs);
+                                int adminGroupID = grants[0].agentID;
+                                if (adminGroupID > 0)
+                                {
+                                    ddlAdminGroup.SelectedValue = adminGroupID.ToString();
+                                }
+                                else
+                                {
+                                    if (ddlAdminGroup.Items.Count > 0)
+                                        ddlAdminGroup.SelectedIndex = 0;
+                                    else ddlAdminGroup.ClearSelection();
+                                }
+
+                                if (grantIDs.Length > 1)
+                                {
+                                    warningMessage = "NOTE: It seems that several Admin Groups are associated with this "
+                                        + "process agent. Returning the first one.";
+                                    lblErrorMessage.Visible = true;
+                                    Utilities.FormatErrorMessage(warningMessage);
+                                }
+                            }
+                            else
+                            {
+                               ddlAdminGroup.SelectedIndex = 0;
+                            }
+                        }
+
+                        else
+                        {
+                            trAdminGroup.Visible = false;
+                            ddlAdminGroup.SelectedIndex = 0;
+                            
+                        }
+                        if (agent.agentType.Equals(ProcessAgentType.AgentType.LAB_SERVER))
+                        {
+                            DisplayAssociatedLSSForLS(agentId, domainStatus);
+                        }
                     }
+                    SetBtnScripts(agent.agentGuid, ProcessAgentType.ToTypeName(agent.agentType));
+                }
+            }
+        }
+
+        private int DisplayAssociatedLSSForLS(int lsId, int domainStatus)
+        {
+            int numClients = AdministrativeAPI.CountServerClients(0, lsId);
+            int lssId = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsId, ProcessAgentType.LAB_SCHEDULING_SERVER);
+            int manageId = 0;
+            trAssociate.Visible = true;
+            trManage.Visible = false;
+
+            if (ddlLSS.Items.FindByValue(lssId.ToString()) != null)
+            {
+                ddlLSS.SelectedValue = lssId.ToString();
+            }
+            if (ddlLSS.SelectedIndex > 0)
+            {
+                txtLSS.Text = ddlLSS.SelectedItem.Text;
+            }
+            else
+            {
+                txtLSS.Text = "";
+            }
+
+            if (domainStatus < 2)
+            {
+                tdBtnAssociateLSS.ColSpan = 2;
+                trManage.Visible = true;
+                //ResourceMapManager.
+                ResourceMappingValue[] values = new ResourceMappingValue[2];
+                values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
+                    TicketTypes.GetTicketType(TicketTypes.MANAGE_LAB));
+
+                List<ResourceMapping> maps = ResourceMapManager.Find(new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, lsId), values);
+                if (maps != null && maps.Count > 0)
+                {
+                    foreach (ResourceMapping rm in maps)
+                    {
+                        for (int i = 0; i < rm.values.Length; i++)
+                        {
+                            if (rm.values[i].Type == ResourceMappingTypes.PROCESS_AGENT)
+                            {
+                                lssId = (int)rm.values[i].Entry;
+                                Session["LS_LSSmapID"] = rm.MappingID;
+                                if (domainStatus < 2)
+                                {
+                                    // Find any manageLab grants
+                                    int qualID = AuthorizationAPI.GetQualifierID(rm.MappingID, Qualifier.resourceMappingQualifierTypeID);
+                                    Grant[] grants = AuthorizationAPI.GetGrants(AuthorizationAPI.FindGrants(-1, Function.manageLAB, qualID));
+                                    foreach (Grant g in grants)
+                                    {
+                                        manageId = g.agentID;
+                                        if (manageId > 0)
+                                            break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (ddlManageLSS.Items.FindByValue(manageId.ToString()) != null)
+                {
+                    ddlManageLSS.SelectedValue = manageId.ToString();
+                }
+                if (ddlManageLSS.SelectedIndex > 0)
+                {
+                    txtManageLSS.Text = ddlManageLSS.SelectedItem.Text;
+                    btnAssociateLSS.Text = "Dissociate";
+                }
+                else
+                {
+                    txtManageLSS.Text = "";
+                    btnAssociateLSS.Text = "Associate";
+                    btnAssociateLSS.Enabled = true;
+                }
+            }
+            else // remote domain
+            {
+                tdBtnAssociateLSS.ColSpan = 1;
+            }
+            if (lssId > 0 && manageId > 0)
+            {
+                btnAssociateLSS.Text = "Disassociate";
+                btnAssociateLSS.CommandName = "disassociate";
+                txtLSS.Visible = true;
+                ddlLSS.Visible = false;
+                if (domainStatus < 2)
+                {
+                    txtManageLSS.Visible = true;
+                    ddlManageLSS.Visible = false;
+                    txtManageLSS.ToolTip = "";
                 }
 
             }
-            SetBtnScripts(agent.agentGuid,ProcessAgentType.ToTypeName(agent.agentType));
+            else
+            {
+                Session.Remove("LS_LSSmapID");
+                btnAssociateLSS.Text = "Associate";
+                btnAssociateLSS.CommandName = "associate";
+                txtLSS.Visible = false;
+                ddlLSS.Visible = true;
+                ddlLSS.Enabled = true;
+                if (domainStatus < 2)
+                {
+                    txtManageLSS.Visible = false;
+                    ddlManageLSS.Visible = true;
+                    ddlManageLSS.Enabled = true;
+                }
+            }
+            if (numClients > 0)
+            {
+                txtLSS.ToolTip = "You may not modify the scheduling information while there are clients assigned to the server.";
+                btnAssociateLSS.Enabled = false;
+                btnAssociateLSS.ToolTip = "You may not modify the scheduling information while there are clients assigned to the server.";
+              
+                if (domainStatus < 2)
+                {
+                    txtManageLSS.ToolTip = "You may not modify the scheduling information while there are clients assigned to the server.";
+                }
+            }
+            else // No Clients assigned
+            {
+                txtLSS.ToolTip = "";
+                btnAssociateLSS.Enabled = true;
+                btnAssociateLSS.ToolTip = "";
+                if (domainStatus < 2)
+                {
+                    txtManageLSS.ToolTip = "";
+                }
+                
+            }
+            return lssId;
         }
+
 
         protected void btnNew_Click(object sender, System.EventArgs e)
         {
@@ -619,28 +634,33 @@ namespace iLabs.ServiceBroker.admin
         }
 
         /// <summary>
-        /// The Save Button method. If the GUID field is not set to ReadOnly, this method
+        /// The Save Button method. If the ddlService selected value is <= 0, this method
         /// will assume that a new record is being created. Otherwise, it will assume that
-        /// an existing record is being edited.
+        /// an existing record is being edited. Save should only happen if the service is a 6.1 Batch LabServer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         protected void btnSaveChanges_Click(object sender, System.EventArgs e)
         {
-            int agentID = -1;
+            int agentID = Convert.ToInt32(ddlService.SelectedValue);
             ///////////////////////////////////////////////////////////////
             /// ADD a new Service                                     //
             ///////////////////////////////////////////////////////////////
-            if (txtServiceGUID.ReadOnly == false) // add new record
+            if (agentID  <= 0 ) // add new record
             {
-
-               
+                if(cbxDoBatch.Checked){
                 // Add the iLab Service
                 try
                 {
-                    //Coupon inCoupon = brokerDB.CreateCoupon();
-                    //Coupon outCoupon = brokerDB.CreateCoupon();
-                    //agentID = brokerDB.InsertProcessAgent(txtServiceGUID.Text, txtServiceName.Text,txtServiceDescription.Text, txtWebServiceURL.Text, "", txtInfoURL.Text, txtContactEmail.Text, 0f,inCoupon,outCoupon);
+                    Coupon inCoupon  = null;
+                    Coupon outCoupon = null;
+                    if(txtBatchPassIn.Text != null && txtBatchPassIn.Text.Length > 0)
+                        inCoupon = brokerDB.CreateCoupon( txtBatchPassIn.Text);
+                    if(txtBatchPassOut.Text != null && txtBatchPassOut.Text.Length > 0)
+                        outCoupon = brokerDB.CreateCoupon( txtBatchPassOut.Text);
+                    agentID = brokerDB.InsertProcessAgent(txtServiceGUID.Text, txtServiceName.Text, txtServiceType.Text, null,
+                        txtApplicationURL.Text, txtWebServiceURL.Text, inCoupon,outCoupon);
+                    modifySystemSupport(agentID);
                 }
                 catch (AccessDeniedException ex)
                 {
@@ -682,6 +702,15 @@ namespace iLabs.ServiceBroker.admin
                             return;
                         }
                     }
+                }
+                else
+                {
+                    lblErrorMessage.Visible = true;
+                    lblErrorMessage.Visible = true;
+                    lblErrorMessage.Text = "Only saving new Batch lab servers is supported, please use install credentials.";
+                    return;
+                }
+
 
                 }
                 else // cannot create service
@@ -690,14 +719,10 @@ namespace iLabs.ServiceBroker.admin
                     Utilities.FormatErrorMessage(lblErrorMessage.Text = "Cannot create Service: " + txtServiceName.Text + ".");
                 }
 
-                // set dropdown to newly created Lab Server.
-                InitializeDropDown();
-                ddlService.Items.FindByText(txtServiceName.Text).Selected = true;
-
-                SetInputMode(true);
+              
 
             }
-            else // txtServiceGUID.ReadOnly == false // if ReadOnly is true, modify existing record
+            else // ddlService selectedIndex != 0
             {
                 ///////////////////////////////////////////////////////////////
                 /// MODIFY an existing Service                            //
@@ -705,8 +730,6 @@ namespace iLabs.ServiceBroker.admin
 
                 // Save the index
                 int savedSelectedIndex = ddlService.SelectedIndex;
-
-                int agentId = Convert.ToInt32(ddlService.SelectedValue);
                 try
                 {
                     string dGuid = null;
@@ -717,16 +740,16 @@ namespace iLabs.ServiceBroker.admin
                    
                     // Modify the ProcessAgent record
                     wrapper.ModifyProcessAgentWrapper(txtServiceGUID.Text, txtServiceName.Text, txtServiceType.Text,
-                       dGuid,txtApplicationURL.Text, txtWebServiceURL.Text);
+                       dGuid, txtApplicationURL.Text, txtWebServiceURL.Text);
 
-                    // Need to add processing for SystemSupport, replaces esourceMapping for these fields
-                    modifySystemSupport(agentId);
+                    // SystemSupport, replaces resourceMapping for these fields
+                    modifySystemSupport(agentID);
 
                     // Modify coupons if needed
                     if (txtServiceType.Text.Equals(ProcessAgentType.BATCH_LAB_SERVER))
                     {
                         // Modify coupons if needed
-                        ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(agentId);
+                        ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(agentID);
                         if (info.retired)
                         {
                             throw new Exception("The Batch Lab Server is retired");
@@ -816,9 +839,9 @@ namespace iLabs.ServiceBroker.admin
                     {
                         // Get the current Administer grants
                         int qualifierTypeID = Qualifier.ToTypeID(txtServiceType.Text);
-                        int qualifierID = AuthorizationAPI.GetQualifierID(agentId, qualifierTypeID);
+                        int qualifierID = AuthorizationAPI.GetQualifierID(agentID, qualifierTypeID);
                         string grantFunction = GetGrantFunction(txtServiceType.Text);
-
+                        int groupID = 0;
                         // Get all grants for the function and qualifier ( theService )
                         //Ideally, there should only be one group that has the "Administer" function on a particular Process Agent
                         //for now, take the first element of the array
@@ -826,7 +849,7 @@ namespace iLabs.ServiceBroker.admin
 
                         if (ddlAdminGroup.SelectedIndex > 0)
                         {
-                            int groupID = Convert.ToInt32(ddlAdminGroup.SelectedValue);
+                            groupID = Convert.ToInt32(ddlAdminGroup.SelectedValue);
                             bool found = false;
                             List<int> removeGrants = new List<int>();
                             if (grantIDs != null && grantIDs.Length > 0)
@@ -861,24 +884,22 @@ namespace iLabs.ServiceBroker.admin
                                 wrapper.RemoveGrantsWrapper(grantIDs);
                             }
                         }
-                        if (txtServiceType.Text.Equals(ProcessAgentType.LAB_SERVER))
-                        {
-                            trAssociate.Visible = true;
-                            trManage.Visible = true;
-                            CheckAssociatedLSSForLS(agentId);
-                        }
-                        else
-                        {
-                            trAssociate.Visible = false;
-                            trManage.Visible = false;
-                        }
+                        //if (txtServiceType.Text.Equals(ProcessAgentType.LAB_SERVER))
+                        //{
+                        //    trAssociate.Visible = true;
+                        //    trManage.Visible = true;
+                        //    DisplayAssociatedLSSForLS(agentId, domainStatus);
+                        //}
+                        //else
+                        //{
+                        //    trAssociate.Visible = false;
+                        //    trManage.Visible = false;
+                        //}
                     }
                     lblErrorMessage.Visible = true;
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Service " + txtServiceName.Text + " has been modified.");
 
-                    // Reload the Lab Server dropdown
-                    InitializeDropDown();
-                    ddlService.SelectedIndex = savedSelectedIndex;
+                    
                 }
                 catch(Exception ex)
                 {
@@ -889,8 +910,17 @@ namespace iLabs.ServiceBroker.admin
                 }
 
             }
-            if(agentID > 0){
+            if (agentID > 0)
+            {
+                // Reload the Lab Server dropdown
+                InitializeDropDown();
+                ddlService.SelectedValue = agentID.ToString();
                 displayService(agentID);
+            }
+            else
+            {
+                ddlService.SelectedIndex = 0;
+                ClearFormFields();
             }
              
 
@@ -1116,6 +1146,7 @@ namespace iLabs.ServiceBroker.admin
                 {
                     ddlService.Items[0].Selected = true;
                 }
+                ClearFormFields();
             }
         }
 
@@ -1147,92 +1178,97 @@ namespace iLabs.ServiceBroker.admin
 
         protected void btnAssociateLSS_Click(object sender, EventArgs e)
         {
-            if(btnAssociateLSS.CommandName.CompareTo("associate") == 0){
-           
-            try
+            int lsID = 0;
+            int lssID = 0;
+            if (btnAssociateLSS.CommandName.CompareTo("associate") == 0)
             {
-                if (ddlLSS.SelectedIndex == 0)
-                {
-                    lblErrorMessage.Visible = true;
-                    lblErrorMessage.Text = Utilities.FormatErrorMessage("Please select a desired LSS to be associated with the lab server.");
-                    return;
-                }
-                if (ddlManageLSS.SelectedIndex == 0)
-                {
-                    lblErrorMessage.Visible = true;
-                    lblErrorMessage.Text = Utilities.FormatErrorMessage("Please select a group to manage the Lab Server on the lab scheduling server.");
-                    return;
-                }
-                int lsID = Int32.Parse(ddlService.SelectedValue);
-                int lssID = Int32.Parse(ddlLSS.SelectedValue);
-                int manageGroupID = Int32.Parse(ddlManageLSS.SelectedValue);
-                brokerDB.AssociateLSS(lsID,lssID );
+
                 try
                 {
-                    // This has been moved to ManageServices
-                    // This should be only for LS/LSS in the domain
-                    // Add LabServer LSS ManageLab Grant 
-
-                    ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, lsID);
-                    ResourceMappingValue[] values = new ResourceMappingValue[3];
-                    values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.LAB_SCHEDULING_SERVER);
-                    values[1] = new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, lssID);
-                    values[2] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-                        TicketTypes.GetTicketType(TicketTypes.MANAGE_LAB));
-                    List<int> mapIDS = ResourceMapManager.FindMapIds(key, values);
-                    if (mapIDS.Count > 0)
+                    if (ddlLSS.SelectedIndex == 0)
                     {
-                        
-                        int labQualifierID = AuthorizationAPI.GetQualifierID(mapIDS[0], Qualifier.resourceMappingQualifierTypeID);
-                        int labGrantID = wrapper.AddGrantWrapper(manageGroupID, Function.manageLAB, labQualifierID);
+                        lblErrorMessage.Visible = true;
+                        lblErrorMessage.Text = Utilities.FormatErrorMessage("Please select a desired LSS to be associated with the lab server.");
+                        return;
                     }
+                    if (ddlManageLSS.SelectedIndex == 0)
+                    {
+                        lblErrorMessage.Visible = true;
+                        lblErrorMessage.Text = Utilities.FormatErrorMessage("Please select a group to manage the Lab Server on the lab scheduling server.");
+                        return;
+                    }
+                    lsID = Int32.Parse(ddlService.SelectedValue);
+                    lssID = Int32.Parse(ddlLSS.SelectedValue);
+                    int manageGroupID = Int32.Parse(ddlManageLSS.SelectedValue);
+                    brokerDB.AssociateLSS(lsID, lssID);
+                    try
+                    {
+                        // This has been moved to ManageServices
+                        // This should be only for LS/LSS in the domain
+                        // Add LabServer LSS ManageLab Grant 
+
+                        ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, lsID);
+                        ResourceMappingValue[] values = new ResourceMappingValue[3];
+                        values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                        values[1] = new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, lssID);
+                        values[2] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
+                            TicketTypes.GetTicketType(TicketTypes.MANAGE_LAB));
+                        List<int> mapIDS = ResourceMapManager.FindMapIds(key, values);
+                        if (mapIDS.Count > 0)
+                        {
+
+                            int labQualifierID = AuthorizationAPI.GetQualifierID(mapIDS[0], Qualifier.resourceMappingQualifierTypeID);
+                            int labGrantID = wrapper.AddGrantWrapper(manageGroupID, Function.manageLAB, labQualifierID);
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteLine(ex.Message);
+                    }
+                    btnAssociateLSS.Text = "Disassociate";
+                    btnAssociateLSS.CommandName = "disassociate";
+                    ddlLSS.Enabled = false;
+                    ddlLSS.BackColor = disabled;
+                    ddlManageLSS.Enabled = false;
+                    ddlManageLSS.BackColor = disabled;
+                    lblErrorMessage.Visible = true;
+                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Lab-side Scheduling Server \"" + ddlLSS.SelectedItem.Text + "\" succesfully "
+                        + "associated with lab server \"" + ddlService.SelectedItem.Text + "\".");
 
                 }
-                catch(Exception ex)
+                catch
                 {
-                   Logger.WriteLine(ex.Message);
+                    throw;
                 }
-                btnAssociateLSS.Text = "Disassociate";
-                btnAssociateLSS.CommandName = "disassociate";
-                ddlLSS.Enabled = false;
-                ddlLSS.BackColor = disabled;
-                ddlManageLSS.Enabled = false;
-                ddlManageLSS.BackColor = disabled;
-                lblErrorMessage.Visible = true;
-                lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Lab-side Scheduling Server \"" + ddlLSS.SelectedItem.Text + "\" succesfully "
-                    + "associated with lab server \"" + ddlService.SelectedItem.Text + "\".");
-
             }
-            catch
+            else if (btnAssociateLSS.CommandName.CompareTo("disassociate") == 0)
             {
-                throw;
-            }
-            }
-            else if(btnAssociateLSS.CommandName.CompareTo("disassociate") == 0){
                 try
-            {
-                brokerDB.DeleteResourceMapping( (int) Session["LS_LSSmapID"]);
-                Session.Remove("LS_LSSmapID");
+                {
+                    brokerDB.DeleteResourceMapping((int)Session["LS_LSSmapID"]);
+                    Session.Remove("LS_LSSmapID");
 
-                lblErrorMessage.Visible = true;
-                lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Lab-side Scheduling Server \"" + ddlLSS.SelectedItem.Text + "\" succesfully "
-                    + "dissociated from lab server \"" + ddlService.SelectedItem.Text + "\".");
+                    lblErrorMessage.Visible = true;
+                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Lab-side Scheduling Server \"" + ddlLSS.SelectedItem.Text + "\" succesfully "
+                        + "dissociated from lab server \"" + ddlService.SelectedItem.Text + "\".");
 
-                ddlLSS.Enabled = true;
-                ddlLSS.BackColor = enabled;
-                ddlLSS.SelectedIndex = 0;
-                ddlManageLSS.SelectedIndex = 0;
-                ddlManageLSS.Enabled = true;
-                ddlManageLSS.BackColor = enabled;
-                btnAssociateLSS.CommandName = "associate";
-                btnAssociateLSS.Text = "Associate";
-            }
+                    ddlLSS.Enabled = true;
+                    ddlLSS.BackColor = enabled;
+                    ddlLSS.SelectedIndex = 0;
+                    ddlManageLSS.SelectedIndex = 0;
+                    ddlManageLSS.Enabled = true;
+                    ddlManageLSS.BackColor = enabled;
+                    btnAssociateLSS.CommandName = "associate";
+                    btnAssociateLSS.Text = "Associate";
+                }
 
-            catch
-            {
-                throw;
+                catch
+                {
+                    throw;
+                }
             }
-            }
+            displayService(lsID);
         }
 
         protected void cbxDoBatch_Changed(object sender, EventArgs e)
@@ -1254,8 +1290,6 @@ namespace iLabs.ServiceBroker.admin
                 trBatchOut.Visible = false;
                  txtBatchHelp.Visible = false;
             }
-            
-
         }
 
     }

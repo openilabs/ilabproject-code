@@ -1,4 +1,7 @@
+/**8 ServiceBroker Tables ***/
 
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_AdminURLs_ProcessAgent]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[AdminURLs] DROP CONSTRAINT FK_AdminURLs_ProcessAgent
@@ -170,6 +173,7 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Se
 ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Sessions_Users
 GO
 
+/*** DROP TABLES  ***/
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AdminURLs]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[AdminURLs]
@@ -402,7 +406,7 @@ GO
 
 /****** Object:  Table [dbo].[Client_Info]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Client_Info] (
-	[Client_Info_ID] [bigint] IDENTITY (1, 1) NOT NULL ,
+	[Client_Info_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Client_ID] [int] NOT NULL ,
 	[Display_Order] [int] NULL ,
 	[Info_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
@@ -507,15 +511,17 @@ CREATE TABLE [dbo].[Lab_Clients] (
 	[IsReentrant] [bit] NOT NULL,
 	[Date_Created] [datetime] NOT NULL,
 	[Long_Description] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Notes] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Client_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Lab_Client_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Version] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Short_Description] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Loader_Script] [nvarchar](2000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Contact_Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Short_Description] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Version] [nvarchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Contact_First_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Contact_Last_Name] [nvarchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-	[Notes] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Documentation_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 

@@ -48,7 +48,7 @@ namespace iLabs.ServiceBroker.Internal
 			int grantID=-1;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddGrant", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Grant_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", grant.agentID, DbType.Int32));
@@ -81,7 +81,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteGrant", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Grant_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@grantID", null, DbType.Int32));
 
@@ -143,7 +143,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static DataSet RetrieveGrants()
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGrantsTable", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Grants_RetrieveTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
@@ -301,7 +301,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			int qID= -1;
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddQualifier", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Qualifier_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierTypeID", qualifier.qualifierType, DbType.Int32));
@@ -336,7 +336,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int[] DeleteQualifier(int[] qualifierIDs)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteQualifier", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Qualifier_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", 0, DbType.Int32));
@@ -393,7 +393,7 @@ namespace iLabs.ServiceBroker.Internal
 			else
 			{
 				DbConnection myConnection = FactoryDB.GetConnection();
-				DbCommand myCommand = FactoryDB.CreateCommand("AddQualifierHierarchy", myConnection);
+				DbCommand myCommand = FactoryDB.CreateCommand("QualifierHierarchy_Insert", myConnection);
 				myCommand.CommandType = CommandType.StoredProcedure;
 
                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", qualifierID, DbType.Int32));
@@ -427,7 +427,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static bool DeleteQualifierHierarchy(int qualifierID, int parentQualifierID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteQualifierHierarchy", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("QualifierHierarchy_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", qualifierID, DbType.Int32));
@@ -467,7 +467,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static DataSet RetrieveQualifiers()
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveQualifiersTable", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Qualifiers_RetrieveTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
@@ -497,7 +497,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static DataSet RetrieveQualifierHierarchy()
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveQualifierHierarchyTable", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("QualifierHierarchy_RetrieveTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
@@ -651,7 +651,7 @@ namespace iLabs.ServiceBroker.Internal
         {
             int status = 0;
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("ModifyQualifierName", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Qualifier_UpdateName", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierTypeId", qualifierTypeId, DbType.Int32));
@@ -691,7 +691,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static bool IsAgentUser(int agentID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentType", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("AgentType_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			int isGroup = -1;
 
@@ -722,7 +722,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static DataSet RetrieveAgentHierarchy()
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentHierarchyTable", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("AgentHierarchy_RetrieveTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 
@@ -758,7 +758,7 @@ namespace iLabs.ServiceBroker.Internal
 			}
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgent", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Agent_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@agentID",null,DbType.Int32));
 
@@ -811,7 +811,7 @@ namespace iLabs.ServiceBroker.Internal
             List<Int32> aList = new List<Int32>();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUserGroups", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveGroups", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@userID", agentID, DbType.Int32));
@@ -845,7 +845,7 @@ namespace iLabs.ServiceBroker.Internal
 			ArrayList aList = new ArrayList ();
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentGroup", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("AgentGroup_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
@@ -888,7 +888,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static DataSet RetrieveAgents()
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAgentsTable", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Agents_RetrieveTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 

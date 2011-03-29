@@ -1,4 +1,6 @@
-﻿
+﻿-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 /****** Object:  Stored Procedure dbo.AddGrant    Script Date: 5/18/2005 4:17:55 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AddGrant]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[AddGrant]

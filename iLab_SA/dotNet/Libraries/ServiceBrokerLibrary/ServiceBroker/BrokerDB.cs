@@ -42,7 +42,7 @@ namespace iLabs.ServiceBroker
         public ProcessAgentInfo GetExperimentESS(long experimentID)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("getEssInfoForExperiment", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Experiment_Retrieve EssInfo", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", experimentID, DbType.Int64));
             ProcessAgentInfo ess = null;
@@ -206,7 +206,7 @@ namespace iLabs.ServiceBroker
                     throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
 
                 // command executes the "InsertAdminURL" stored procedure
-                DbCommand cmd = FactoryDB.CreateCommand("InsertAdminURL", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("AdminURL_Insert", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
@@ -269,7 +269,7 @@ namespace iLabs.ServiceBroker
             {
 
                 // command executes the "DeleteAdminURLbyID" stored procedure
-                DbCommand cmd = FactoryDB.CreateCommand("DeleteAdminURLbyID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("AdminURL_DeleteByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
@@ -294,7 +294,7 @@ namespace iLabs.ServiceBroker
                     throw new Exception("\"" + ticketType + "\" is not a valid ticket type.");
 
                 // command executes the "InsertAdminURL" stored procedure
-                DbCommand cmd = FactoryDB.CreateCommand("DeleteAdminURL", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("AdminURL_Delete", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
@@ -371,7 +371,7 @@ namespace iLabs.ServiceBroker
             // create sql connection
             DbConnection connection = FactoryDB.GetConnection();
             // command executes the "InsertAdminURL" stored procedure
-            DbCommand cmd = FactoryDB.CreateCommand("ModifyAdminUrlCodebase", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("AdminURL_UpdateCodebase", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameter
@@ -404,7 +404,7 @@ namespace iLabs.ServiceBroker
              // create sql connection
              DbConnection connection = FactoryDB.GetConnection();
             
-             DbCommand cmd = FactoryDB.CreateCommand("GetLoaderScript", connection);
+             DbCommand cmd = FactoryDB.CreateCommand("Client_RetrieveLoaderScript", connection);
              cmd.CommandType = CommandType.StoredProcedure;
 
              // populate parameter
@@ -421,7 +421,7 @@ namespace iLabs.ServiceBroker
                  {
                      loaderScript = loaderScript.Replace(oldCodebase, newCodebase);
 
-                     DbCommand cmd2 = FactoryDB.CreateCommand("SetLoaderScript", connection);
+                     DbCommand cmd2 = FactoryDB.CreateCommand("Client_UpdateLoaderScript", connection);
                      cmd2.CommandType = CommandType.StoredProcedure;
                      cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@id", clientID, DbType.Int32));
                      cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@script", loaderScript, DbType.String,2000));
@@ -509,7 +509,7 @@ namespace iLabs.ServiceBroker
         {
             // create sql command
             // command executes the "RetrieveAdminURLs" stored procedure
-            DbCommand cmd = FactoryDB.CreateCommand("RetrieveAdminURLs", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("AdminURLs_Retrieve", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
@@ -669,7 +669,7 @@ namespace iLabs.ServiceBroker
             DbConnection connection = FactoryDB.GetConnection();
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("GetAdminServiceTags", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ProcesAgent_RetrieveAdminServiceTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                    // populate stored procedure parameters
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupId", groupID,DbType.Int32));
@@ -711,7 +711,7 @@ namespace iLabs.ServiceBroker
             DbConnection connection = FactoryDB.GetConnection();
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("GetAdminProcessAgentTags", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ProcessAgent_RetrieveAdminTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                    // populate stored procedure parameters
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupID", groupID, DbType.Int32));
@@ -749,7 +749,7 @@ namespace iLabs.ServiceBroker
         {
             ArrayList list = new ArrayList();
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("GetProcessAgentAdminGrants", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("ProcessAgent_RetrieveAdminGrants", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -828,7 +828,7 @@ namespace iLabs.ServiceBroker
          
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("InsertResourceMappingKey", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapKey_Insert", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // Get the key type id
@@ -841,7 +841,7 @@ namespace iLabs.ServiceBroker
                 // if the key is a string, add the string to the strings table
                 if (keyType.Equals(ResourceMappingTypes.STRING))
                 {
-                    DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingString", connection);
+                    DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapString_Insert", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
@@ -853,7 +853,7 @@ namespace iLabs.ServiceBroker
                 // if the key is a Resource Type, add the string to the ResourceTypes table
                 else if (keyType.Equals(ResourceMappingTypes.RESOURCE_TYPE))
                 {
-                    DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingResourceType", connection);
+                    DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
 
                     cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@resourceType_Value", key, DbType.String,256));
@@ -892,7 +892,7 @@ namespace iLabs.ServiceBroker
                     // if the value is a string, add the string to the strings table
                     if (valueTypes[i].Equals(ResourceMappingTypes.STRING))
                     {
-                        DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingString", connection);
+                        DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapString_Insert", connection);
                         cmd2.CommandType = CommandType.StoredProcedure;
 
                         // populate parameters
@@ -904,7 +904,7 @@ namespace iLabs.ServiceBroker
                     // if the key is a Resource Type, add the string to the ResourceTypes table
                     else if (valueTypes[i].Equals(ResourceMappingTypes.RESOURCE_TYPE))
                     {
-                        DbCommand cmd2 = FactoryDB.CreateCommand("AddResourceMappingResourceType", connection);
+                        DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                         cmd2.CommandType = CommandType.StoredProcedure;
 
                         cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@resourceType_Value",(string)values[i],DbType.String,256));
@@ -917,7 +917,7 @@ namespace iLabs.ServiceBroker
                     if (valueID == -1)
                         throw new ArgumentException("Value \"" + i + "\" is invalid");
 
-                    cmd = FactoryDB.CreateCommand("InsertResourceMappingValue", connection);
+                    cmd = FactoryDB.CreateCommand("ResourceMapValue_Insert", connection);
                     cmd.CommandType = CommandType.StoredProcedure;
                     //cmd.Parameters.Clear();
 
@@ -996,7 +996,7 @@ namespace iLabs.ServiceBroker
                     AuthorizationAPI.RemoveQualifiers(new int[] { qualifierId });
                 }
 
-                DbCommand cmd = FactoryDB.CreateCommand("DeleteResourceMapping", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMap_Delete", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1059,7 +1059,7 @@ namespace iLabs.ServiceBroker
             try
             {
                 int mapId = -1;
-                DbCommand cmd = FactoryDB.CreateCommand("GetMappingIdByKeyValue", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapId_RetrieveByKeyValue", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1107,7 +1107,7 @@ namespace iLabs.ServiceBroker
         {
             List<int> list = new List<int>();
             DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("GetResourceMapIDsByValue", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ResourceMapIDs_RetrieveByValue", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
@@ -1171,7 +1171,7 @@ namespace iLabs.ServiceBroker
             DbDataReader dataReader = null;
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("GetResourceMappingByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMap_RetrieveByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1252,7 +1252,7 @@ namespace iLabs.ServiceBroker
         {
             // Read mappings from the database            
             DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("GetResourceMappingIDs", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("ResourceMapIDs_Retrieve", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             ResourceMapping mapping = null;
@@ -1350,7 +1350,7 @@ namespace iLabs.ServiceBroker
 
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("GetResourceStringByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapString_RetrieveByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1377,7 +1377,7 @@ namespace iLabs.ServiceBroker
 
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("AddResourceMappingString", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapString_Insert", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1401,7 +1401,7 @@ namespace iLabs.ServiceBroker
             int mappingID = 0;
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("UpdateResourceMappingString", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapString_Update", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1431,7 +1431,7 @@ namespace iLabs.ServiceBroker
 
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("AddResourceMappingResourceType", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1455,7 +1455,7 @@ namespace iLabs.ServiceBroker
 
             try
             {
-                DbCommand cmd = FactoryDB.CreateCommand("GetResourceTypeByID", connection);
+                DbCommand cmd = FactoryDB.CreateCommand("ResourceMapType_RetrieveByID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
@@ -1546,7 +1546,7 @@ namespace iLabs.ServiceBroker
             Hashtable results = null;
 
             DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("GetResourceTypeStrings", connection);   
+            DbCommand cmd = FactoryDB.CreateCommand("ResourceMapTypeStrings_Retrieve", connection);   
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
@@ -2338,6 +2338,228 @@ namespace iLabs.ServiceBroker
             }
 
 
+        }
+*/
+        /*
+        /// <summary>
+        /// This examines the specified parameters and current session state to resove the next action.
+        /// This may only be called after a user is Authenticated.
+        /// </summary>
+        private int ResolveAction(string group_Name, string user_Name, string serviceGuid, string client_Guid,
+            out string message, out User user, out Group group, out ProcessAgentInfo service, out Client client)
+        {
+            int status = -1;    
+            int user_ID = 0;
+            int client_ID = 0;
+            int group_ID = 0;
+           
+            StringBuilder buf = new StringBuilder();
+
+            if (hdnUser.Value != null && hdnUser.Value.Length > 0)
+            {
+                // Check that the specified user & current user match
+                if (hdnUser.Value.ToLower().CompareTo(Session["UserName"].ToString().ToLower()) == 0)
+                {
+                    user_Name = hdnUser.Value;
+                    user_ID = AdministrativeAPI.GetUserID(user_Name);
+                }
+                else
+                {
+                    //logout();
+                    lblMessages.Visible = true;
+                    lblMessages.Text = "You are not the user that was specified!";
+                    return;
+                }
+            }
+            else // User is current user
+            {
+                user_Name = Session["UserName"].ToString();
+                user_ID = Convert.ToInt32(Session["UserID"]);
+            }
+
+            //Get Client_ID
+            if (hdnClient.Value != null && hdnClient.Value.Length > 0)
+            {
+                client_ID = AdministrativeAPI.GetLabClientID(hdnClient.Value);
+                //Session["clientID"] = client_ID;
+            }
+
+            //{ // Note: The existing session client should not be concidered?
+
+            if (hdnGroup.Value != null && hdnGroup.Value.Length > 0)
+            {
+                group_Name = hdnGroup.Value;
+            }
+
+            // Check that the user & is a member of the group
+            if (group_Name != null)
+            {
+                int gid = AdministrativeAPI.GetGroupID(group_Name);
+                if (gid > 0)
+                {
+                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    {
+                        group_ID = gid;
+                        //Session["GroupID"] = group_ID;
+                        //Session["GroupName"] = group_Name;
+                    }
+                    else
+                    {
+                        // user is not a member of the group
+                        group_ID = -1;
+                        group_Name = null;
+
+                    }
+                }
+            }
+
+            // Session and parameters are parsed, do we have enough info to launch
+            int[] clientGroupIDs = null;
+            int[] userGroupIDs = null;
+
+            // Try and resolve any unspecified parameters
+            if (client_ID <= 0 && group_ID <= 0)
+            {
+                userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                Group[] groups = AdministrativeAPI.GetGroups(userGroupIDs);
+                Dictionary<int, int[]> clientMap = new Dictionary<int, int[]>();
+                foreach (Group g in groups)
+                {
+                    if ((g.groupType.CompareTo(GroupType.REGULAR) == 0) && (g.groupName.CompareTo("ROOT") != 0)
+                        && (g.groupName.CompareTo("NewUserGroup") != 0) && (g.groupName.CompareTo("OrphanedUserGroup") != 0)
+                         && (g.groupName.CompareTo("SuperUserGroup") != 0))
+                    {
+                        int[] clientIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                        if (clientIDs != null & clientIDs.Length > 0)
+                        {
+                            clientMap.Add(g.groupID, clientIDs);
+                        }
+                    }
+                }
+                if (clientMap.Count > 1) //more than one group with clients
+                {
+                    modifyUserSession(group_ID, client_ID);
+                    Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+                }
+                if (clientMap.Count == 1) // get the group with clients
+                {
+                    Dictionary<int, int[]>.Enumerator en = clientMap.GetEnumerator();
+                    int gid = -1;
+                    int[] clients = null;
+                    while (en.MoveNext())
+                    {
+                        gid = en.Current.Key;
+                        clients = en.Current.Value;
+                    }
+                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    {
+                        group_ID = gid;
+                        group_Name = AdministrativeAPI.GetGroupName(gid);
+
+
+                        if (clients == null || clients.Length > 1)
+                        {
+                            modifyUserSession(group_ID, client_ID);
+                            Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
+                        }
+                        else
+                        {
+                            client_ID = clients[0];
+                        }
+                    }
+                }
+            }
+
+            else if (client_ID > 0 && group_ID <= 0)
+            {
+                int gid = -1;
+                clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+                if (clientGroupIDs == null || clientGroupIDs.Length == 0)
+                {
+                    modifyUserSession(group_ID, client_ID);
+                    Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+                }
+                else if (clientGroupIDs.Length == 1)
+                {
+                    gid = clientGroupIDs[0];
+                }
+                else
+                {
+                    userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                    int count = 0;
+                    foreach (int ci in clientGroupIDs)
+                    {
+                        foreach (int ui in userGroupIDs)
+                        {
+                            if (ci == ui)
+                            {
+                                count++;
+                                gid = ui;
+                            }
+                        }
+                    }
+                    if (count != 1)
+                    {
+                        gid = -1;
+                    }
+                }
+                if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
+                {
+                    group_ID = gid;
+
+                }
+                else
+                {
+                    modifyUserSession(group_ID, client_ID);
+                }
+            }
+            else if (client_ID <= 0 && group_ID > 0)
+            {
+                int[] clients = AdministrativeUtilities.GetGroupLabClients(group_ID);
+                if (clients == null || clients.Length != 1)
+                {
+                    modifyUserSession(group_ID, client_ID);
+                    Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
+                }
+                else
+                {
+                    client_ID = clients[0];
+                }
+            }
+            if (user_ID > 0 && group_ID > 0 && client_ID > 0)
+            {
+                int gid = -1;
+                clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+                foreach (int g_id in clientGroupIDs)
+                {
+                    if (g_id == group_ID)
+                    {
+                        gid = g_id;
+                        break;
+                    }
+                }
+                if (gid == -1)
+                {
+                    buf.Append("The specified group does not have permission to to run the specified client!");
+                    lblMessages.Visible = true;
+                    lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
+                    return;
+                }
+                if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
+                {
+                    buf.Append("You do not have permission to to run the specified client!");
+                    lblMessages.Visible = true;
+                    lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
+                    return;
+                }
+
+                // is authorized ?
+
+                modifyUserSession(group_ID, client_ID);
+                launchLab(user_ID, group_ID, client_ID);
+
+            }
+            return status;
         }
 */
 

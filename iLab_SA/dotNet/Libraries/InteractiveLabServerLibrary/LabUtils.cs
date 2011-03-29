@@ -24,7 +24,12 @@ namespace iLabs.LabServer.Interactive
             // TODO: Add constructor logic here
             //
         }
-        public static string TimerScript(string utcStr, long duration, int userTZ, CultureInfo culture, string returnURL,int checkEvery)
+        public static string TimerScript(string utcStr, long duration, int userTZ, CultureInfo culture, string returnURL, int checkEvery)
+        {
+            return TimerScript(utcStr, duration, userTZ, culture, returnURL, checkEvery, null);
+        }
+
+        public static string TimerScript(string utcStr, long duration, int userTZ, CultureInfo culture, string returnURL,int checkEvery, string target)
         {
             DateTime startUTC = DateUtil.ParseUtc(utcStr);
             DateTime end = startUTC.AddSeconds(duration);
@@ -49,7 +54,16 @@ namespace iLabs.LabServer.Interactive
             buf.Append("		s=\"0\"+s\n");
   
             buf.Append("	window.setTimeout(\"checktime()\"," + checkEvery + ");\n");
-            buf.Append("	window.status=\"Time Remaining :  \"+m+\":\"+s\n");
+            if (target == null || target.Length == 0)
+            {
+                buf.Append("	window.status=\"Time Remaining :  \"+m+\":\"+s\n");
+            }
+            else
+            {
+                buf.Append("	document.");
+                buf.Append(target + ".innerText=");
+                buf.Append("\"+m+\":\"+s\n");
+            }
             buf.Append("    return true\n");
             buf.Append("}\n");
             buf.Append("function redirectSB(){\n");

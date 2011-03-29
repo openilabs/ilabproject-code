@@ -156,6 +156,13 @@ namespace iLabs.ServiceBroker.iLabSB
             bool error = false;
             lblResponse.Text = "";
             lblResponse.Visible = false;
+            if (!recaptcha.IsValid)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage("You must enter the security code!");
+                lblResponse.Visible = true;
+                return;
+            }
+
             StringBuilder msg = new StringBuilder();
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
             string userName = null;

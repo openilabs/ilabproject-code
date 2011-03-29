@@ -818,69 +818,76 @@ namespace iLabs.ServiceBroker.admin
 
                         try
                         {
-                            if (wrapper.AddMemberToGroupWrapper(agentID, destinationID))
+                            if (AdministrativeAPI.IsAgentMember(agentID, destinationID))
                             {
-                                count++;
-                                if (!expandIDs.Contains(destinationID))
-                                    expandIDs.Add(destinationID);
-                                msg.Append("'" + agentName + "' was successfully added to '" + destinationName + "'<br />");
-
-                                //send email message to moved user/group if given access from a request group
-                                if ((parentGroup.groupType.Equals(GroupType.REQUEST)) && (wrapper.GetAssociatedGroupIDWrapper(parentGroup.GroupID) == destinationID))
-                                {
-                                    MailMessage mail = new MailMessage();
-
-                                    string email = "";
-                                    if (InternalAuthorizationDB.IsAgentUser(agentID))
-                                    {
-                                        email = wrapper.GetUsersWrapper(new int[] { agentID })[0].email;
-                                    }
-                                    else
-                                    {
-                                        email = wrapper.GetGroupsWrapper(new int[] { agentID })[0].email;
-                                    }
-                                    mail.To = email;
-                                    mail.From = registrationMailAddress;
-
-                                    mail.Subject = "[iLabs] Request to join '" + destinationName + "' approved";
-                                    mail.Body = "You have been given permission to access the '" + destinationName + "' group.";
-                                    mail.Body += "\n\r\n\r";
-                                    mail.Body += "Login with the username and password that you registered with to use the lab.";
-                                    mail.Body += "\n\r\n\r";
-                                    mail.Body += "-------------------------------------------------\n\r";
-                                    mail.Body += "This is an automatically generated message. ";
-                                    mail.Body += "DO NOT reply to the sender. \n\n";
-                                    //mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
-                                    SmtpMail.SmtpServer = "127.0.0.1";
-                                    try
-                                    {
-                                        SmtpMail.Send(mail);
-                                        msg.Append(" An email has been sent confirming the move.<br />");
-
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        // Report detailed SMTP Errors
-                                        StringBuilder smtpErrorMsg = new StringBuilder();
-                                        smtpErrorMsg.Append("Exception: " + ex.Message);
-                                        //check the InnerException
-                                        if (ex.InnerException != null)
-                                            smtpErrorMsg.Append("<br>Inner Exceptions:");
-                                        while (ex.InnerException != null)
-                                        {
-                                            smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
-                                            ex = ex.InnerException;
-                                        }
-                                        msg.Append(" However an error occurred while sending email to the member." + ". Exception: " + smtpErrorMsg.ToString() + "<br />");
-
-                                    }
-                                } //End Send Mail
+                                msg.Append("Warning: '" + agentName + "' is already a member of '" + destinationName + "'<br />");
                             }
                             else
                             {
-                                msg.Append("'ERROR: adding " + agentName + "' to '" + destinationName + "'<br />");
+                                if (wrapper.AddMemberToGroupWrapper(agentID, destinationID))
+                                {
+                                    count++;
+                                    if (!expandIDs.Contains(destinationID))
+                                        expandIDs.Add(destinationID);
+                                    msg.Append("'" + agentName + "' was successfully added to '" + destinationName + "'<br />");
+
+                                    //send email message to moved user/group if given access from a request group
+                                    if ((parentGroup.groupType.Equals(GroupType.REQUEST)) && (wrapper.GetAssociatedGroupIDWrapper(parentGroup.GroupID) == destinationID))
+                                    {
+                                        MailMessage mail = new MailMessage();
+
+                                        string email = "";
+                                        if (InternalAuthorizationDB.IsAgentUser(agentID))
+                                        {
+                                            email = wrapper.GetUsersWrapper(new int[] { agentID })[0].email;
+                                        }
+                                        else
+                                        {
+                                            email = wrapper.GetGroupsWrapper(new int[] { agentID })[0].email;
+                                        }
+                                        mail.To = email;
+                                        mail.From = registrationMailAddress;
+
+                                        mail.Subject = "[iLabs] Request to join '" + destinationName + "' approved";
+                                        mail.Body = "You have been given permission to access the '" + destinationName + "' group.";
+                                        mail.Body += "\n\r\n\r";
+                                        mail.Body += "Login with the username and password that you registered with to use the lab.";
+                                        mail.Body += "\n\r\n\r";
+                                        mail.Body += "-------------------------------------------------\n\r";
+                                        mail.Body += "This is an automatically generated message. ";
+                                        mail.Body += "DO NOT reply to the sender. \n\n";
+                                        //mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
+                                        SmtpMail.SmtpServer = "127.0.0.1";
+                                        try
+                                        {
+                                            SmtpMail.Send(mail);
+                                            msg.Append(" An email has been sent confirming the move.<br />");
+
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // Report detailed SMTP Errors
+                                            StringBuilder smtpErrorMsg = new StringBuilder();
+                                            smtpErrorMsg.Append("Exception: " + ex.Message);
+                                            //check the InnerException
+                                            if (ex.InnerException != null)
+                                                smtpErrorMsg.Append("<br>Inner Exceptions:");
+                                            while (ex.InnerException != null)
+                                            {
+                                                smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                                                ex = ex.InnerException;
+                                            }
+                                            msg.Append(" However an error occurred while sending email to the member." + ". Exception: " + smtpErrorMsg.ToString() + "<br />");
+
+                                        }
+                                    } //End Send Mail
+                                }
+                                else
+                                {
+                                    msg.Append("'ERROR: adding " + agentName + "' to '" + destinationName + "'<br />");
+                                }
                             }
-                        } // END try Add member
+                        }// END try Add member
                         catch (Exception addEx)
                         {
                             msg.Append("Error: Adding " + agentName + "' to '" + destinationName + "' Exception: " + addEx.Message + "<br />");

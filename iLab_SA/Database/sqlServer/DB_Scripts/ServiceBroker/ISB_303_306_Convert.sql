@@ -1,5 +1,7 @@
 /* Convert isb db VERSION 3.0.4 TO 3.0.6 */
-/* $Id$ */
+
+-- Copyright (c) 2011 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
 
 /*** TicketIssuer Changes ***/
 

@@ -1981,7 +1981,6 @@ namespace iLabs.Core
 			try
 			{
 				// create sql command
-				// command executes the "RetrieveTickets" stored procedure
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText =  "GetProcessAgentTagsByTypeID";
 				cmd.CommandType = CommandType.StoredProcedure;
@@ -2002,6 +2001,7 @@ namespace iLabs.Core
 						tag.tag = dataReader.GetString(1);
 						list.Add(tag);
 					}
+                    dataReader.Close();
 				}
 			}
 			catch( DbException)

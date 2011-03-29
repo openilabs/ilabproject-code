@@ -17,6 +17,18 @@ Please see license.txt in top level directory for full license.
 		<link href="../css/popup.css" type="text/css" rel="stylesheet"/>
 		<style type="text/css">@import url( ../css/popup.css );
 		</style>
+			<script type="text/javascript">
+		<!--
+		function ReloadParent() 
+        {          
+            if (window.opener){            
+                window.opener.location.href = 'manageLabClients.aspx?refresh=t';
+                window.opener.focus();
+            } 
+            window.close();  
+        }
+        -->
+        </script>
 	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
@@ -83,6 +95,7 @@ Please see license.txt in top level directory for full license.
 						</div>
 						<br clear="all" />
 						<div class="simpleform">
+						<asp:Button ID="btnClose" runat="server" Text="Close" CssClass="button"  OnClick="btnClose_Click"></asp:Button>  
 						</div>
 						<div class="simpleform">
 							<table cellspacing="0" cellpadding="0" border="0">

@@ -1,3 +1,6 @@
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_ExperimentRecord_Experiment]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[ExperimentRecord] DROP CONSTRAINT FK_ExperimentRecord_Experiment
 GO

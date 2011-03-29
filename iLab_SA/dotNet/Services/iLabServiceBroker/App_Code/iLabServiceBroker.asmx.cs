@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: MergedSB.asmx.cs,v 1.1 2008/03/14 21:08:57 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;
@@ -271,7 +271,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="labServerID">A string GUID that uniquely identifies the Lab Server.</param>
         /// <param name="experimentSpecification">An opaque, domain-dependent experiment specification.</param>
         /// <param name="priorityHint">Indicates a requested priority for this experiment.  Possible values range from 20 (highest priority) to -20 (lowest priority); 0 is normal.  Priority hints may or may not be considered by the lab server.</param>
-        /// <param name="emailNotification">If true, the service broker will make one attempt to notify the user (by email to the address with which the user’s account on the service broker is registered) when this experiment terminates.</param>
+        /// <param name="emailNotification">If true, the service broker will make one attempt to notify the user (by email to the address with which the userâ€™s account on the service broker is registered) when this experiment terminates.</param>
         /// <returns>A ClientSubmissionReport object containing a ValidationReport object, the experimentID, time to live information, and a WaitEstimate object.</returns>
         /// <seealso cref="ClientSubmissionReport">ClientSubmissionReport Class</seealso>
         /// <seealso cref="ValidationReport">ValidationReport Class</seealso>

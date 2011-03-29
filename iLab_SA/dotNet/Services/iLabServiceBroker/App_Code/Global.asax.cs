@@ -66,14 +66,7 @@ namespace iLabs.ServiceBroker.iLabSB
                Logger.WriteLine(iLabGlobal.Release);
                Logger.WriteLine("ISB Application_Start: starting");
             }
-            ProcessAgentDB.RefreshServiceAgent();
-			// The AuthCache class is defined in the Authorization
-			AuthCache.GrantSet = InternalAuthorizationDB.RetrieveGrants();
-			AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
-			AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
-			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
-			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
-            ResourceMapManager.Refresh();
+            RefreshApplicationCaches();
             ticketRemover = new SBTicketRemover(60000);
             ticketRemover.ProcessIssuedTickets();
 		}
@@ -240,7 +233,14 @@ namespace iLabs.ServiceBroker.iLabSB
 			return formattedURL;
 		}
 
-
+        public static void RefreshApplicationCaches()
+        {
+            Logger.WriteLine("Refreshing Application Caches");
+            ProcessAgentDB.RefreshServiceAgent();
+            // The AuthCache class is defined in the Authorization
+            AuthCache.Refresh();
+            ResourceMapManager.Refresh();
+        }
 			
 		#region Web Form Designer generated code
 		/// <summary>

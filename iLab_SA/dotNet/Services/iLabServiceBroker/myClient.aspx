@@ -28,11 +28,9 @@ Please see license.txt in top level directory for full license.
 				<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
-						<h1>My Labs
-						</h1>
-						<h2>Group:
-							<asp:label id="lblGroupNameTitle" Runat="server"></asp:label></h2>
-							<asp:Label ID="lblResponse" runat="server" Visible="False"></asp:Label>
+						<h1>My Client</h1>
+						<h2>Group: <asp:label id="lblGroupNameTitle" Runat="server"></asp:label></h2>
+						<asp:Label ID="lblResponse" runat="server" Visible="False"></asp:Label>
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
@@ -59,33 +57,24 @@ Please see license.txt in top level directory for full license.
 							<h3>Lab Client:
 								<asp:label id="lblClientName" Runat="server"></asp:label>
 							</h3>
-							<p><strong>Version:</strong>
-								<asp:label id="lblVersion" Runat="server"></asp:label></p>
-							<p><strong>Description: </strong>
-								<asp:label id="lblLongDescription" Runat="server"></asp:label></p>
-							<p>
-								<asp:label id="lblNotes" Runat="server"></asp:label></p>
-							<p><asp:Label ID="lblDocURL" Runat="server"></asp:Label>
-                            </p>
-							<p><strong>Contact Email:</strong>
-								<asp:label id="lblEmail" Runat="server"></asp:label>
-							</p>
-							<p>
-							    <asp:button id="btnLaunchLab" Runat="server" CssClass="button" Text="Launch Lab" onClick="btnLaunchLab_Click" Visible="false" Width="171px" ></asp:button>
-							</p>
-							<p id="pReenter" runat="server">
-							    <asp:button id="btnReenter" Runat="server" CssClass="button" Text="Re-enter Experiment" onClick="btnReenter_Click" Visible="false" Width="171px" ></asp:button>
-							</p>
-                            <p id="pSchedule" runat="server">
-							    <asp:button id="btnSchedule" Runat="server" CssClass="button" Text="Schedule/Redeem Session" onclick="btnSchedule_Click" Visible="false" Width="170px"></asp:button>&nbsp;
-                            </p>
-							<asp:repeater id="repClientInfos" runat="server"></asp:repeater></div>
-						
+							<p><strong>Version: </strong><asp:label id="lblVersion" Runat="server"></asp:label></p>
+							<p><strong>Description: </strong><asp:label id="lblLongDescription" Runat="server"></asp:label></p>
+							<p id="pNotes" runat="server"><strong>Notes: </strong><asp:label id="lblNotes" Runat="server"></asp:label></p>
+							<p id="pDocURL" runat="server"><strong>Documentation: </strong><asp:Label ID="lblDocURL" Runat="server"></asp:Label></p>
+							<p id="pEmail" runat="server"><strong>Contact Email: </strong><asp:label id="lblEmail" Runat="server"></asp:label></p>
+							<p id="pLaunch" runat="server"><asp:button id="btnLaunchLab" Runat="server" CssClass="button"
+							 Text="Launch Lab" onClick="btnLaunchLab_Click" Visible="false" Width="171px" ></asp:button></p>
+							<p id="pReenter" runat="server"><asp:button id="btnReenter" Runat="server" CssClass="button" 
+							Text="Re-enter Experiment" onClick="btnReenter_Click" Visible="false" Width="171px" ></asp:button></p>
+                            <p id="pSchedule" runat="server"><asp:button id="btnSchedule" Runat="server" CssClass="button" 
+                            Text="Schedule/Redeem Session" onclick="btnSchedule_Click" Visible="false" Width="170px"></asp:button>&nbsp;</p>
+                            <p/>
+							<asp:repeater id="repClientInfos" Runat="server" ></asp:repeater>
+						</div>
 					</div>
 					<br clear="all" />
 					<!-- end pagecontent div --></div>
 				<!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
-			
 		</form>
 	</body>
 </html>

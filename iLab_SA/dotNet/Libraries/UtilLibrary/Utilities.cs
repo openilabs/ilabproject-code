@@ -121,11 +121,10 @@ namespace iLabs.UtilLib
         /// <returns>Error message text surrounded by appropriate div and paragraph tags.</returns>
         public static string FormatErrorMessage(string msgText)
         {
-            string errorMessage;
-            errorMessage = "<div class=errormessage><p>";
-            errorMessage += msgText;
-            errorMessage += "</p></div>";
-            return errorMessage;
+            StringBuilder message = new StringBuilder("<div class=\"errormessage\"><p>"); ;
+            message.Append(msgText);
+            message.AppendLine("</p></div>");
+            return message.ToString();
         }
         /// <summary>
         /// Standard formatting for warning messages.
@@ -134,11 +133,10 @@ namespace iLabs.UtilLib
         /// <returns>Error message text surrounded by appropriate div and paragraph tags.</returns>
         public static string FormatWarningMessage(string msgText)
         {
-            string errorMessage;
-            errorMessage = "<div class=warningmessage><p>";
-            errorMessage += msgText;
-            errorMessage += "</p></div>";
-            return errorMessage;
+            StringBuilder message = new StringBuilder("<div class=\"warningmessage\"><p>"); ;
+            message.Append(msgText);
+            message.AppendLine("</p></div>");
+            return message.ToString();
         }
         /// <summary>
         /// Standard formatting for general confirmation messages.
@@ -147,12 +145,10 @@ namespace iLabs.UtilLib
         /// <returns>Message text surrounded by appropriate div and paragraph tags.</returns>
         public static string FormatConfirmationMessage(string msgText)
         {
-            string confirmMessage;
-            // change the class of this when created
-            confirmMessage = "<div class=infomessage><p>";
-            confirmMessage += msgText;
-            confirmMessage += "</p></div>";
-            return confirmMessage;
+            StringBuilder message = new StringBuilder("<div class=\"infomessage\"><p>"); ;
+            message.Append(msgText);
+            message.AppendLine("</p></div>");
+            return message.ToString();
         }
 
 

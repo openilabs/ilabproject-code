@@ -1,3 +1,6 @@
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 /* created by Charu. Last Modified 12/16/2004 */
 
 /* ENTERING DEFAULT VALUES IN TABLES */

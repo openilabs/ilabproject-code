@@ -77,10 +77,10 @@ namespace iLabs.ServiceBroker.admin
                     // Check that the client is not a 6.1 Batch client and that it is from this domain
                     if ((lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0) && (lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0))
                     {
-                        if ((lc.labServerIDs.Length > 0) && (lc.labServerIDs[0] > 0))
+                        ProcessAgentInfo[] labServers = AdministrativeAPI.GetLabServersForClient(lc.clientID);
+                        if (labServers != null && (labServers.Length > 0) && (labServers[0].agentId > 0))
                         {
-                            ProcessAgent ls = brokerDb.GetProcessAgent(lc.labServerIDs[0]);
-                            if (ls != null && ls.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                            if (labServers[0].domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                             {
                                 ddlClient.Items.Add(new ListItem(lc.clientName, lc.clientID.ToString()));
                             }
@@ -102,8 +102,7 @@ namespace iLabs.ServiceBroker.admin
             if (Int32.Parse(ddlClient.SelectedValue) > 0)
             {
                 int selectedLabClientID = Int32.Parse(ddlClient.SelectedValue);
-                int[] labServerIDs = wrapper.GetLabClientsWrapper(new int[] { selectedLabClientID })[0].labServerIDs;
-                ProcessAgentInfo[] pais = wrapper.GetProcessAgentInfosWrapper(labServerIDs);
+                ProcessAgentInfo[] pais = AdministrativeAPI.GetLabServersForClient(selectedLabClientID);
                 foreach (ProcessAgentInfo pai in pais)
                 {
                     if (!pai.retired && pai.domainGuid.Equals(ProcessAgentDB.ServiceGuid))

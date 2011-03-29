@@ -9,10 +9,12 @@ namespace iLabs.UtilLib
     /// </summary>
     public class iLabGlobal
     {
+        static private string headUrl = "$HeadURL$";
+        static private string info = "$Id$";
         static private string date = "$Date$";
         static private string revision = "$Revision$";
-        //static private string release = "$ilab:Release$";
-	static private string release = "Release 3.0.6b";
+        static private string iLabRelease = "$ilab:Release$";
+	    static private string release = "Release 3.1.0 Devl";
         static private string buildDate = "$ilab:BuildDate$";
         /// <summary>
         /// Returns the date and svn revision last set, still not auto setting..

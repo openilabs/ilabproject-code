@@ -93,7 +93,9 @@ using iLabs.DataTypes.SoapHeaderTypes;
         public abstract bool RequestTicketCancellation(Coupon coupon,
                 string type, string redeemerGuid);
 
-      
+
+
+
 
 
 	}

@@ -229,6 +229,41 @@ namespace iLabs.ServiceBroker.Mapping
             return returnList;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rmt">ResourceMappingType</param>
+        /// <param name="sourceID">the id of the source object</param>
+        /// <param name="pat">The ProcessAgentType of the associated object</param>
+        /// <returns></returns>
+        public static int FindMapID(string rmt, int sourceID, string pat)
+        {
+            int targetId = 0;
+            ResourceMappingValue[] values = new ResourceMappingValue[1];
+
+            values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, pat);
+            //values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
+            //       TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION));
+            List<ResourceMapping> mapList = ResourceMapManager.Find(
+                new ResourceMappingKey(rmt, sourceID), values);
+            if (mapList != null && mapList.Count > 0)
+            {
+                foreach (ResourceMapping rm in mapList)
+                {
+                    for (int i = 0; i < rm.values.Length; i++)
+                    {
+                        if (rm.values[i].Type == ResourceMappingTypes.PROCESS_AGENT)
+                        {
+                            targetId = (int)rm.MappingID;
+                            break;
+                        }
+                    }
+                }
+            }
+            return targetId;
+        }
+
+
         public static List<int> FindMapIds(ResourceMappingEntry key, ResourceMappingValue[] values)
         {
             List<int> returnList = null;
@@ -245,6 +280,40 @@ namespace iLabs.ServiceBroker.Mapping
                 }
             }
             return returnList;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rmt">ResourceMappingType</param>
+        /// <param name="sourceID">the id of the source object</param>
+        /// <param name="pat">The ProcessAgentType of the associated object</param>
+        /// <returns>AZero if not found</returns>
+        public static int FindResourceProcessAgentID(string rmt, int sourceID, string pat)
+        {
+            int targetId = 0;
+            ResourceMappingValue[] values = new ResourceMappingValue[1];
+
+            values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, pat);
+            //values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
+            //       TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION));
+            List<ResourceMapping> mapList = ResourceMapManager.Find(
+                new ResourceMappingKey(rmt, sourceID), values);
+            if (mapList != null && mapList.Count > 0)
+            {
+                foreach (ResourceMapping rm in mapList)
+                {
+                    for (int i = 0; i < rm.values.Length; i++)
+                    {
+                        if (rm.values[i].Type == ResourceMappingTypes.PROCESS_AGENT)
+                        {
+                            targetId = (int)rm.values[i].Entry;
+                            if (targetId > 0)
+                                break;
+                        }
+                    }
+                }
+            }
+            return targetId;
         }
 
         public static bool Update(ResourceMapping rm){

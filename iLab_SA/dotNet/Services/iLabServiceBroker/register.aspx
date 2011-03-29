@@ -1,6 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
+<%@ Register TagPrefix="recaptcha" Namespace="Recaptcha" Assembly="Recaptcha" %>
 <%@ Page language="c#" CodeFile="register.aspx.cs" Inherits="iLabs.ServiceBroker.iLabSB.register" EnableEventValidation="false" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html>
@@ -107,34 +108,35 @@ Please see license.txt in top level directory for full license.
 										</td>
 									</tr>
 									<tr>
-										<th>
-											<label for="password">Password</label></th>
-										<td><asp:textbox id="txtPassword" Runat="server" TextMode="Password"></asp:textbox>
-											<!--input type="password" name="password" id="password"--></td>
+										<th><label for="password">Password</label></th>
+										<td><asp:textbox id="txtPassword" Runat="server" TextMode="Password"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="passwordconfirm">Confirm Password </label>
-										</th>
-										<td><asp:textbox id="txtConfirmPassword" Runat="server" TextMode="Password"></asp:textbox>
-											<!--input type="password" name="passwordconfirm" id="passwordconfirm"--></td>
+										<th><label for="passwordconfirm">Confirm Password </label></th>
+										<td><asp:textbox id="txtConfirmPassword" Runat="server" TextMode="Password"></asp:textbox></td>
 									</tr>
 									<tr>
 										<th>
 											<label for="purpose">Purpose for requesting account </label>
 										</th>
-										<td><asp:textbox id="txtReason" Runat="server" TextMode="MultiLine" Columns="30" Rows="6"></asp:textbox>
-											<!--textarea name="purpose" cols="30" rows="6" id="purpose"></textarea--></td>
+										<td><asp:textbox id="txtReason" Runat="server" TextMode="MultiLine" Columns="30" Rows="6"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th colSpan="2">
+									    <td colspan="2">
+										<recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/>
+										</td>
+									</tr>
+									<tr>
+										<th colspan="2">
 											<asp:button id="btnSubmit" Runat="server" CssClass="buttonright" Text="Submit"></asp:button>
-											<!--input type="submit" name="Submit" value="Submit" class="buttonright"--></th></tr>
+									    </th>
+								    </tr>
 								</table>
 							</form>
 						</div>
 					</div>
-					<br clear="all"/> <!-- end pagecontent div --></div> <!-- end innerwrapper div -->
+					<br clear="all"/> <!-- end pagecontent div -->
+				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>
 			</div>
 		</form>

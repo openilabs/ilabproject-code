@@ -16,6 +16,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
 
 using iLabs.Proxies.ISB;
+using iLabs.Proxies.LSS;
 using iLabs.Web;
 
 namespace iLabs.Scheduling.UserSide
@@ -118,6 +119,45 @@ namespace iLabs.Scheduling.UserSide
             return status;
         }
 
+
+        /// <summary>
+        /// Retrieve available time periods(local time of LSS) This is a pas-through method that gets the information from the LSS.
+        /// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="groupName"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="startTime"></param>the local time of LSS
+        /// <param name="endTime"></param>the local time of LSS
+        /// <returns></returns>return an array of time periods (local time), each of the time periods is longer than the experiment's minimum time 
+        [WebMethod]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+        public TimePeriod[] RetrieveAvailableTimePeriods(string serviceBrokerGuid, string groupName,
+            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
+        {
+            Coupon opCoupon = new Coupon();
+            opCoupon.couponId = opHeader.coupon.couponId;
+            opCoupon.passkey = opHeader.coupon.passkey;
+            opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
+            try
+            {
+                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
+                string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
+                ProcessAgentInfo lssInfo = dbTicketing.GetProcessAgentInfo(lssGuid);
+                LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                lssProxy.Url = lssInfo.ServiceUrl;
+                TimePeriod[] array = lssProxy.RetrieveAvailableTimePeriods( serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
+                    labServerGuid, clientGuid, startTime, endTime);
+                return array;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
         /// <summary>
         /// List all the reservations for the user for the specified time, any intersection.
         /// </summary>
@@ -153,7 +193,56 @@ namespace iLabs.Scheduling.UserSide
                 return null;
 
         }
-        
+
+        /// <summary>
+        /// Add a reservation for a lab server for thew specified user, client and time. 
+        /// If the reservation is confirmed by the LSS, the reservation will be added to the USS.
+        /// </summary>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="userName"></param>
+        /// <param name="groupName"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <param name="labClientGuid"></param>
+        /// <param name="startTime">UTC</param>
+        /// <param name="endTime">UTC</param>
+        /// <returns>Returns a message of succes or a simple description of the reason for failure.</returns>
+        [WebMethod(Description = "Add a reservation for a lab server for the specified user, client and time. "
+        + "If the reservation is confirmed by the LSS, the reservation will be added to the USS.")]
+        [SoapDocumentMethod(Binding = "IUSS"),
+        SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+        public string AddReservation(string serviceBrokerGuid, string userName, string groupName,
+            string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime)
+        {
+            string message = null;
+             Coupon opCoupon = new Coupon();
+            opCoupon.couponId = opHeader.coupon.couponId;
+            opCoupon.passkey = opHeader.coupon.passkey;
+            opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
+            string type = TicketTypes.SCHEDULE_SESSION;
+            try
+            {
+                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
+                string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(labClientGuid, labServerGuid);
+                ProcessAgentInfo lssInfo = dbTicketing.GetProcessAgentInfo(lssGuid);
+                LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                lssProxy.Url = lssInfo.ServiceUrl;
+                message = lssProxy.ConfirmReservation( serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
+                    labServerGuid, labClientGuid, startTime, endTime);
+                if(message.Contains("Success")){
+                    int infoID = USSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, labClientGuid);
+                    USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid,groupName,infoID,startTime,endTime);
+                }
+                return message;
+            }
+           
+            catch (Exception e)
+            {
+                throw new Exception("USS: AddReservation -> ", e);
+            }
+            return message;
+        }
 
 		/// <summary>
 		/// remove all the reservation for certain lab server being covered by the revocation time 

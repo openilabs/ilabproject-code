@@ -308,8 +308,8 @@ namespace iLabs.ServiceBroker.admin
         {
             if ((e.Item.ItemType == ListItemType.Item) || (e.Item.ItemType == ListItemType.AlternatingItem))
             {
-                Button curBtn = (Button)e.Item.FindControl("btnRemove");
-                //curBtn.Attributes.Add("onClick", "return confirmDelete();");
+                //Button curBtn = (Button)e.Item.FindControl("btnRemove");
+                //curBtn.Attributes.Add("onClick", btnRemove_Click);
             }
         }
 
@@ -320,7 +320,9 @@ namespace iLabs.ServiceBroker.admin
                 // get the current mapping 
                 Object o = e.Item.DataItem;
                 curMapping = (ResourceMapping)o;
-
+                Button curBtn = (Button)e.Item.FindControl("btnRemove");
+                //curBtn.Attributes.Add("onClick", btnRemove_Click);
+                curBtn.CommandArgument = curMapping.MappingID.ToString();
                 // set key label
                 Label lbl = (Label)e.Item.FindControl("keyLabel");
                 lbl.Text = brokerDB.GetMappingEntryString(curMapping.Key,false);
@@ -749,6 +751,17 @@ namespace iLabs.ServiceBroker.admin
             value_TicketTypeDropdown.Visible = false;
             value_GroupDropdown.Visible = false;
             value_ResourceTypeText.Visible = false;
+        }
+
+        protected void btnRemove_Click(object sender, EventArgs e)
+        {
+            Button curBtn = (Button)sender;
+            int i = Convert.ToInt32(curBtn.CommandArgument);
+            if (i > 0)
+            {
+                brokerDB.DeleteResourceMapping(i);
+                refreshMappingsRepeater();
+            }
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
+<%@ Register TagPrefix="recaptcha" Namespace="Recaptcha" Assembly="Recaptcha" %>
 <%@ Page language="c#" CodeFile="help.aspx.cs" AutoEventWireup="false" Inherits="iLabs.ServiceBroker.iLabSB.help" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <HTML>
@@ -10,7 +11,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id$ -->
+		<!-- $Id: help.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
 		<meta content="C#" name="CODE_LANGUAGE">
 		<meta content="JavaScript" name="vs_defaultClientScript">
@@ -21,18 +22,17 @@ Please see license.txt in top level directory for full license.
 	</HEAD>
 	<body>
 		<form id="helpForm" method="post" runat="server">
-			<a name="top"></a>
 			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all">
+				<a name="top"></a>
 				<div id="innerwrapper">
-				<asp:Label ID="lblRevision" runat="server" />
 					<div id="pageintro">
 						<h1>Help</h1>
 						<p>On this page you can read the <A href="#faqs">FAQ's</A>, <A href="#help">Request 
 								Help</A> for a specific problem or lab, or <A href="reportBug.aspx">Report a 
 								Bug</A> with the system.</p>
 						<!-- Errormessage should appear here:-->
-						<!--div class="errormessage"--><asp:label id="lblResponse" Visible="False" Runat="server"></asp:label>
-						<!--/div--> <!--End error message -->
+						<asp:label id="lblResponse" Visible="False" Runat="server"></asp:label>
+						<!--End error message -->
 					</div> <!-- end pageintro div -->
 					<div id="pagecontent">
 						<p><B>IMPORTANT:</B> To be able to run the Service Broker you must have Pop-Ups 
@@ -40,18 +40,13 @@ Please see license.txt in top level directory for full license.
 						<p>To run the Microelectronics Weblab you must have pop-ups enabled and a Java 
 							1.4.2 plugin installed. To download the Java plugin please go to the <a href="http://java.sun.com/j2se/1.4.2/download.html">
 								Sun Java download site</a>. Download and install the J2SE v 1.4.2 JRE.</p>
-						<p></p>
 						<div id="faq">
 							<h2><a id="faqs" name="faqs"></a>FAQ's</h2>
 							<ul>
-								<li>
-									<A href="#q1">Create a Service Broker Account</A>
-								<li>
-									<A href="#q2">Lost Password</A>
-								<li>
-									<A href="#q3">Report a Bug</A>
-								<li>
-									<A href="#q4">Microelectronics Weblab 6.0</A></li>
+								<li><A href="#q1">Create a Service Broker Account</A></li>
+								<li><A href="#q2">Lost Password</A></li>
+								<li><A href="#q3">Report a Bug</A></li>
+								<li><A href="#q4">Microelectronics Weblab 6.0</A></li>
 							</ul>
 							<div class="qa"><a id="q1" name="q1"></a>
 								<p class="question">Create a Service Broker Account</p>
@@ -86,7 +81,8 @@ Please see license.txt in top level directory for full license.
 									Microelectrionics Weblab please see the <a href="http://weblab2.mit.edu/docs/weblab/v6.1/manual/">
 										Lab specific help</a></p>
 							</div>
-							<div id="requesthelp">
+						</div> <!-- end div faq --><br clear="all">
+						<div id="requesthelp">
 								<h2><a id="help" name="help"></a>Request Help with a Lab</h2>
 								<p>Fill out the form below to request help with the iLab system or a particular 
 									lab. Someone will respond to you shortly.</p>
@@ -97,28 +93,31 @@ Please see license.txt in top level directory for full license.
 								<div class="simpleform">
 									<table>
 										<TR>
-											<TD>
+											<TD style="width: 192px">
 												<asp:Label id="lblUserName" runat="server" Font-Size="Small">User Name</asp:Label></TD>
-											<TD>
+											<TD style="width: 439px">
 												<asp:TextBox id="txtUserName" runat="server"></asp:TextBox></TD>
 										</TR>
 										<TR>
-											<TD>
+											<TD style="width: 192px">
 												<asp:Label id="lblEmail" runat="server" Font-Size="Small">Email</asp:Label></TD>
-											<TD>
+											<TD style="width: 439px">
 												<asp:TextBox id="txtEmail" runat="server"></asp:TextBox></TD>
 										</TR>
 										<tr>
-											<th>
+											<th style="width: 192px">
 												<label for="lab">Select the type of help you need.</label></th>
-											<td><asp:dropdownlist CssClass="i18n" id="ddlHelpType" Runat="server"></asp:dropdownlist></td>
+											<td style="width: 439px"><asp:dropdownlist CssClass="i18n" id="ddlHelpType" Runat="server"></asp:dropdownlist></td>
 										</tr>
 										<tr>
-											<th>
+											<th style="width: 192px">
 												<label for="problem">Describe your problem</label></th>
-											<td><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine"></asp:textbox>
+											<td style="width: 439px"><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine" Width="421px"></asp:textbox>
 												<!--textarea name="problem" cols="50" rows="6" id="problem"></textarea--></td>
 										</tr>
+										<tr><td style="width: 192px">
+										<recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/>
+										</td></tr>
 										<tr>
 											<th colSpan="2">
 												<asp:button id="btnRequestHelp" Runat="server" CssClass="buttonright" Text="Request Help"></asp:button>
@@ -134,15 +133,16 @@ Please see license.txt in top level directory for full license.
 												Submit a Bug Report:</th>
 										</tr>
 										<tr>
-											<th>
+											<th style="width: 192px">
 												&nbsp;</th>
-											<td><asp:button id="btnReportBug" Runat="server" CssClass="buttonright" Text="Report Bug"></asp:button></td>
+											<td style="width: 439px"><asp:button id="btnReportBug" Runat="server" CssClass="buttonright" Text="Report Bug"></asp:button></td>
 										</tr>
 									</table>
 								</div> <!-- end div class simpleform -->
-								<p><A href="#top">Top of Page</A></p>
-							</div> <!-- end div request help -->
-						</div> <!-- end div faq --><br clear="all">
+						</div> <!-- end div request help -->
+						<p><A href="#top">Top of Page</A></p>
+							
+						
 					</div> <!-- end pagecontent div -->
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>

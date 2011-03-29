@@ -2,6 +2,9 @@ using System;
 using System.Data;
 using System.Data.Common;
 
+using iLabs.ServiceBroker.Internal;
+using iLabs.UtilLib;
+
 namespace iLabs.ServiceBroker.Authorization
 {
 	public sealed class AuthCache
@@ -15,6 +18,16 @@ namespace iLabs.ServiceBroker.Authorization
 		private AuthCache()
 		{
 		}
+
+        public static void Refresh()
+        {
+            Logger.WriteLine("Refreshing AuthCache");
+            AuthCache.GrantSet = InternalAuthorizationDB.RetrieveGrants();
+            AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
+            AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
+            AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+            AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
+        }
 
 		public static DataSet GrantSet
 		{

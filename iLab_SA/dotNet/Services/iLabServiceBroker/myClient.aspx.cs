@@ -50,6 +50,8 @@ namespace iLabs.ServiceBroker.iLabSB
         protected System.Web.UI.HtmlControls.HtmlAnchor urlDocumentation;
 
         protected LabClient lc;
+        protected ProcessAgentInfo labServer;
+        protected ClientInfo[] clientInfos;
 
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
@@ -82,6 +84,8 @@ namespace iLabs.ServiceBroker.iLabSB
             if (Session["ClientID"] != null && Session["ClientID"].ToString().Length > 0)
             {
                 lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
+
+
             }
             if (Session["GroupID"] != null && Session["GroupID"].ToString().Length > 0)
             {
@@ -90,6 +94,7 @@ namespace iLabs.ServiceBroker.iLabSB
             if (groupID > 0 && lc != null)
             {
                 setEffectiveGroup(groupID, lc.clientID);
+
             }
             if (Session["GroupName"] != null && Session["GroupName"].ToString().Length > 0)
             {
@@ -98,7 +103,6 @@ namespace iLabs.ServiceBroker.iLabSB
                 lblGroupNameTitle.Text = groupName;
                 //lblBackToLabs.Text = groupName;
             }
-
             if (!IsPostBack)
             {
                 // retrieve parameters from URL
@@ -109,6 +113,8 @@ namespace iLabs.ServiceBroker.iLabSB
                 {
                     opCoupon = new Coupon(issuerGuid, Int64.Parse(couponId), passkey);
                 }
+                pReenter.Visible = false;
+                btnReenter.Visible = false;
                 auto = Request.QueryString["auto"];
                 if (auto != null && auto.Length > 0)
                 {
@@ -117,14 +123,15 @@ namespace iLabs.ServiceBroker.iLabSB
                         autoLaunch = true;
                     }
                 }
+
                 // System_Messages block
 
                 SystemMessage[] groupMessages = null;
                 SystemMessage[] serverMessages = null;
                 groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
-                if (lc != null && lc.labServerIDs[0] > 0)
+                if (lc != null && labServer != null && labServer.agentId > 0)
                 {
-                    serverMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, lc.labServerIDs[0]);
+                    serverMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServer.agentId);
                 }
                 if ((groupMessages == null || groupMessages.Length == 0) && (serverMessages == null || serverMessages.Length == 0))
                 {
@@ -164,6 +171,8 @@ namespace iLabs.ServiceBroker.iLabSB
             }
             if (lc != null)
             {
+                labServer = getLabServer(lc.clientID, effectiveGroupID);
+                clientInfos = AdministrativeAPI.ListClientInfos(lc.clientID);
                 if (lc.clientType == LabClient.INTERACTIVE_APPLET || lc.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                 {
                     if (lc.needsScheduling)
@@ -183,7 +192,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             if (ussId > 0)
                             {
                                 ProcessAgent uss = issuer.GetProcessAgent(ussId);
-                                ProcessAgent ls = issuer.GetProcessAgent(lc.labServerIDs[0]);
+
 
                                 // check for current reservation
 
@@ -199,7 +208,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 op.coupon = opCoupon;
                                 ussProxy.Url = uss.webServiceUrl;
                                 ussProxy.OperationAuthHeaderValue = op;
-                                Reservation reservation = ussProxy.RedeemReservation(ProcessAgentDB.ServiceGuid, Session["UserName"].ToString(), ls.agentGuid, lc.clientGuid);
+                                Reservation reservation = ussProxy.RedeemReservation(ProcessAgentDB.ServiceGuid, Session["UserName"].ToString(), labServer.agentGuid, lc.clientGuid);
 
                                 if (reservation != null)
                                 {
@@ -218,6 +227,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                             ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, ticketDuration, payload);
                                 }
                             }
+
                         }
                         if (allowExperimentExecutionTicket != null)
                         {
@@ -237,11 +247,12 @@ namespace iLabs.ServiceBroker.iLabSB
                             {
 
                                 long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
-                                    effectiveGroupID, lc.labServerIDs[0], lc.clientID);
+                                    effectiveGroupID, labServer.agentId, lc.clientID);
                                 if (ids.Length > 0)
                                 {
                                     btnLaunchLab.Text = "Launch New Experiment";
                                     btnLaunchLab.Visible = true;
+                                    pLaunch.Visible = true;
                                     pReenter.Visible = true;
                                     btnReenter.Visible = true;
                                     btnReenter.CommandArgument = ids[0].ToString();
@@ -249,8 +260,8 @@ namespace iLabs.ServiceBroker.iLabSB
                                 else
                                 {
 
-                                    pReenter.Visible = false;
-                                    btnReenter.Visible = false;
+                                    //pReenter.Visible = false;
+                                    //btnReenter.Visible = false;
                                     btnLaunchLab.Text = "Launch Lab";
                                     if (autoLaunch)
                                     {
@@ -258,52 +269,47 @@ namespace iLabs.ServiceBroker.iLabSB
                                     }
                                     else
                                     {
+                                        pLaunch.Visible = true;
                                         btnLaunchLab.Visible = true;
                                     }
                                 }
                             }
                             else
                             {
+                                pLaunch.Visible = true;
+                                btnLaunchLab.Visible = true;
                                 if (autoLaunch)
                                 {
                                     launchLabClient(lc.clientID);
-                                }
-                                else
-                                {
-                                    btnLaunchLab.Visible = true;
                                 }
                             }
                         }
                         else
                         {
+                            pLaunch.Visible = false;
                             btnLaunchLab.Visible = false;
                         }
                     }
 
                     else
                     {
+                        pLaunch.Visible = true;
+                        btnLaunchLab.Visible = true;
                         if (autoLaunch)
                         {
                             launchLabClient(lc.clientID);
-                            btnLaunchLab.Visible = true;
-                        }
-                        else
-                        {
-                            btnLaunchLab.Visible = true;
                         }
                     }
                 }
                 else if (lc.clientType == LabClient.BATCH_APPLET || lc.clientType == LabClient.BATCH_HTML_REDIRECT)
                 {
+                    pLaunch.Visible = true;
+                    btnLaunchLab.Visible = true;
                     if (autoLaunch)
                     {
                         launchLabClient(lc.clientID);
-                        btnLaunchLab.Visible = true;
                     }
-                    else
-                    {
-                        btnLaunchLab.Visible = true;
-                    }
+
                 }
 
 
@@ -311,21 +317,49 @@ namespace iLabs.ServiceBroker.iLabSB
                 lblClientName.Text = lc.clientName;
                 lblVersion.Text = lc.version;
                 lblLongDescription.Text = lc.clientLongDescription;
-                lblNotes.Text = lc.notes;
-                string emailCmd = "mailto:" + lc.contactEmail;
-                lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
+                if (lc.notes != null && lc.notes.Length > 0)
+                {
+                    pNotes.Visible = true;
+                    lblNotes.Text = lc.notes;
+                }
+                else
+                {
+                    pNotes.Visible = false;
+                    lblNotes.Text = null;
+                }
+                if (lc.contactEmail != null && lc.contactEmail.Length > 0)
+                {
+                    pEmail.Visible = true;
+                    string emailCmd = "mailto:" + lc.contactEmail;
+                    lblEmail.Text = "<a href=" + emailCmd + ">" + lc.contactEmail + "</a>";
+                }
+                else
+                {
+                    pEmail.Visible = false;
+                    lblEmail.Text = null;
+                }
+                if (lc.documentationURL != null && lc.documentationURL.Length > 0)
+                {
+                    pDocURL.Visible = true;
+                    lblDocURL.Text = "<a href=" + lc.documentationURL + ">" + lc.documentationURL + "</a>";
+                }
+                else
+                {
+                    pDocURL.Visible = false;
+                    lblDocURL.Text = null;
+                }
 
                 btnLaunchLab.Command += new CommandEventHandler(this.btnLaunchLab_Click);
                 btnLaunchLab.CommandArgument = lc.clientID.ToString();
 
                 int count = 0;
 
-                if (lc.clientInfos != null && lc.clientInfos.Length > 0)
+                if (clientInfos != null && clientInfos.Length > 0)
                 {
-                    foreach (ClientInfo ci in lc.clientInfos)
+                    //repClientInfos.DataSource = clientInfos;
+                    //repClientInfos.DataBind();
+                    foreach (ClientInfo ci in clientInfos)
                     {
-                        //if (ci.infoURLName.CompareTo("Documentation") != 0)
-                        //{
                         System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
                         b.Visible = true;
                         b.CssClass = "button";
@@ -334,10 +368,8 @@ namespace iLabs.ServiceBroker.iLabSB
                         b.CommandName = ci.infoURLName;
                         b.ToolTip = ci.description;
                         b.Command += new CommandEventHandler(this.HelpButton_Click);
-                        repClientInfos.Controls.AddAt(count, b);
-                        repClientInfos.Controls.AddAt(count + 1, new LiteralControl("&nbsp;&nbsp;"));
-                        count += 2;
-                        // }
+                        repClientInfos.Controls.Add(b);
+                        repClientInfos.Controls.Add(new LiteralControl("&nbsp;&nbsp;"));
                     }
                 }
             }
@@ -345,17 +377,46 @@ namespace iLabs.ServiceBroker.iLabSB
             {
                 // No LabClient
                 btnSchedule.Visible = false;
+                pLaunch.Visible = false;
                 btnLaunchLab.Visible = false;
                 string msg = "There are no labs assigned to group: " + Session["GroupName"].ToString() + "!";
                 lblResponse.Text = Utilities.FormatErrorMessage(msg);
                 lblResponse.Visible = true;
             }
-
-
-
-           
         }
+
         
+
+        //protected void ClientInfos_Bind(EventArgs args)
+        //{
+        //    if (repClientInfos.DataSource == null) { }
+        //    else
+        //    {
+        //        repClientInfos.ClearChildViewState();
+        //        repClientInfos.Controls.Clear();
+        //        ClientInfo[] infos = (ClientInfo[]) repClientInfos.DataSource;
+        //        int count = 0;
+        //        foreach (ClientInfo ci in infos)
+        //        {
+        //            System.Web.UI.WebControls.Button b = new System.Web.UI.WebControls.Button();
+        //            b.Visible = true;
+        //            b.CssClass = "button";
+        //            b.Text = ci.infoURLName;
+        //            b.CommandArgument = ci.infoURL;
+        //            b.CommandName = ci.infoURLName;
+        //            b.ToolTip = ci.description;
+        //            b.Command += new CommandEventHandler(this.HelpButton_Click);
+        //            repClientInfos.Controls.Add(b);
+        //            count++;
+        //            repClientInfos.Controls.Add(new LiteralControl("&nbsp;&nbsp;"));
+        //            count++;
+        //        }
+        //        repClientInfos.ViewState["count"] = count;
+        //        repClientInfos.ChildControlsCreated = true;
+        //        repClientInfos.TrackViewState();
+
+        //    }
+        //}
 
         #region Web Form Designer generated code
         override protected void OnInit(EventArgs e)
@@ -395,12 +456,12 @@ namespace iLabs.ServiceBroker.iLabSB
 
         protected void urlDocumentation_Click(object sender, System.EventArgs e)
         {
-
             LabClient lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
+            clientInfos = AdministrativeAPI.ListClientInfos(lc.clientID);
             string docURL = null;
-            if (lc.clientInfos != null)
+            if (clientInfos != null)
             {
-                foreach (ClientInfo ci in lc.clientInfos)
+                foreach (ClientInfo ci in clientInfos)
                 {
                     if (ci.infoURLName.CompareTo("Documentation") == 0)
                     {
@@ -431,6 +492,23 @@ namespace iLabs.ServiceBroker.iLabSB
             {
                 effectiveGroupName = AdministrativeAPI.GetGroupName(effectiveGroupID);
             }
+        }
+
+        /// <summary>
+        /// This returns the LabbServer for the client. In future may use effectiveGroupID to select if there are multiple lab servers.
+        /// </summary>
+        /// <returns>primary labServer for group or null</returns>
+        ProcessAgentInfo getLabServer(int clientID, int effectiveGrpID)
+        {
+            ProcessAgentInfo pai = null;
+            if(lc != null){
+                ProcessAgentInfo[] paInfos = AdministrativeAPI.GetLabServersForClient(clientID);
+                if (paInfos != null && paInfos.Length > 0)
+                {
+                    pai = paInfos[0];
+                }
+            }
+            return pai;
         }
         /// <summary>
         /// Check that the default operation coupon parameters are part of the loader script
@@ -476,30 +554,24 @@ namespace iLabs.ServiceBroker.iLabSB
             }
 
             StringBuilder message = new StringBuilder("Message: clientID = ");
-            int[] labIds = new int[1];
             message.Append(btnLaunchLab.CommandArgument + " ");
-            labIds[0] = c_id;
-            LabClient[] clients = AdministrativeAPI.GetLabClients(labIds);
-            if (clients.Length > 0)
+            LabClient client = AdministrativeAPI.GetLabClient(c_id);
+            if (client!= null)
             {
-
                 // [GeneralTicketing] get lab servers metadata from lab server ids
-                ProcessAgentInfo[] labServers = issuer.GetProcessAgentInfos(clients[0].labServerIDs);
-                if (labServers != null)
+                ProcessAgentInfo labServer = getLabServer(client.clientID,effectiveGroupID);
+                if (labServer != null)
                 {
-                    message.Append(" LabServer count: " + labServers.Length);
-                    if (labServers.Length > 0)
-                    {
                         TicketLoadFactory factory = TicketLoadFactory.Instance();
                         // 1. Create Coupon for ExperimentCollection
                         Coupon coupon = issuer.CreateCoupon();
 
                         iLabProperties properties = new iLabProperties();
                         properties.Add("sb", ProcessAgentDB.ServiceAgent);
-                        properties.Add("ls", labServers[0]);
+                        properties.Add("ls", labServer);
                         properties.Add("op", coupon);
 
-                        Session["ClientID"] = clients[0].clientID;
+                        Session["ClientID"] = client.clientID;
 
                         DateTime start = DateTime.UtcNow;
                         long duration = -1L; // default is never timeout
@@ -520,16 +592,16 @@ namespace iLabs.ServiceBroker.iLabSB
                         issuer.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
                                      ProcessAgentDB.ServiceGuid, duration, sessionPayload);
 
-                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["GroupID"]), clients[0].clientID, Session.SessionID);
+                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["GroupID"]), client.clientID, Session.SessionID);
 
-                        if (clients[0].clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
+                        if (client.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
                         {
                             // execute the "experiment execution recipe
                             RecipeExecutor executor = RecipeExecutor.Instance();
                             string redirectURL = null;
 
                             // loaderScript not parsed in Recipe
-                           redirectURL = executor.ExecuteExperimentExecutionRecipe(coupon, labServers[0], clients[0],
+                           redirectURL = executor.ExecuteExperimentExecutionRecipe(coupon, labServer, client,
                             start, duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]),
                             effectiveGroupID, effectiveGroupName);
 
@@ -549,13 +621,13 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
 
 
-                        else if (clients[0].clientType == LabClient.INTERACTIVE_APPLET)
+                        else if (client.clientType == LabClient.INTERACTIVE_APPLET)
                         {
 
                             // Note: Currently Interactive applets
                             // use the Loader script for Batch experiments
 
-                            Session["LoaderScript"] = iLabParser.Parse(clients[0].loaderScript, properties);
+                            Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
                             Session.Remove("RedirectURL");
 
                             string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
@@ -564,7 +636,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
 
                         // Support for Batch 6.1 Lab Clients
-                        else if (clients[0].clientType == LabClient.BATCH_HTML_REDIRECT)
+                        else if (client.clientType == LabClient.BATCH_HTML_REDIRECT)
                         {
                             // use the Loader script for Batch experiments
 
@@ -582,7 +654,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                                 /* This is the original batch-redirect using a pop-up */
                                 // check that the default auth tokens are added
-                                string loader = addDefaultParameters(clients[0].loaderScript);
+                                string loader = addDefaultParameters(client.loaderScript);
                                 string jScript = @"<script language='javascript'> window.open ('" + iLabParser.Parse(loader, properties) + "')</script>";
                                 Page.RegisterStartupScript("HTML Client", jScript);
 
@@ -592,18 +664,17 @@ namespace iLabs.ServiceBroker.iLabSB
                             }
                         }
                         // use the Loader script for Batch experiments
-                        else if (clients[0].clientType == LabClient.BATCH_APPLET)
+                        else if (client.clientType == LabClient.BATCH_APPLET)
                         {
 
-                            Session["LoaderScript"] = iLabParser.Parse(clients[0].loaderScript, properties);
+                            Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
                             Session.Remove("RedirectURL");
 
                             string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
                                 + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/applet.aspx" + @"'</script>";
                             ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
                         }
-                    } // LabServer count > 0
-                } // labservers != null
+                } // labserver != null
             }
             else
             {
@@ -641,13 +712,10 @@ namespace iLabs.ServiceBroker.iLabSB
                     if(coupon != null)
                         properties.Add("op", coupon);
                     // construct the redirect query
-                    ProcessAgentInfo lsInfo = null;
-                    if ((client.labServerIDs != null) && (client.labServerIDs.Length) > 0 && (client.labServerIDs[0] > 0))
-                    {
-                        lsInfo = brokerDB.GetProcessAgentInfo(client.labServerIDs[0]);
-                        if(lsInfo != null)
-                            properties.Add("ls",lsInfo);
-                    }
+                    ProcessAgentInfo lsInfo = getLabServer(client.clientID,effectiveGroupID);
+                    if(lsInfo != null)
+                        properties.Add("ls",lsInfo);
+                    
                     StringBuilder url = new StringBuilder(client.loaderScript.Trim());
                     // Add the return url to the redirect
                     if (url.ToString().IndexOf("?") == -1)
@@ -674,19 +742,16 @@ namespace iLabs.ServiceBroker.iLabSB
             string groupName = Session["GroupName"].ToString();
             string labClientName = lc.clientName;
             string labClientVersion = lc.version;
-
-            ProcessAgent labServer = issuer.GetProcessAgent(lc.labServerIDs[0]);
+            
+            ProcessAgentInfo labServer = getLabServer(lc.clientID,effectiveGroupID);
             int ussId = issuer.FindProcessAgentIdForClient(lc.clientID, ProcessAgentType.SCHEDULING_SERVER);
 
             if (ussId > 0)
             {
 
                 string ussGuid = issuer.GetProcessAgent(ussId).agentGuid;
-                int lssId = issuer.FindProcessAgentIdForAgent(lc.labServerIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
-
+                int lssId = issuer.FindProcessAgentIdForAgent(labServer.agentId, ProcessAgentType.LAB_SCHEDULING_SERVER);
                 string lssGuid = issuer.GetProcessAgent(lssId).agentGuid;
-
-               
 
                 //Default duration ????
                 long duration = 36000;

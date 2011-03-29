@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: assoclabserverspopup.aspx,v 1.1.1.1 2006/02/07 22:10:58 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
 		<meta content="C#" name="CODE_LANGUAGE">
 		<meta content="JavaScript" name="vs_defaultClientScript">
@@ -25,15 +25,15 @@ Please see license.txt in top level directory for full license.
 						<br>
 						<asp:Label ID="lblLabClient" Runat="server"></asp:Label>
 					</h1>
-					<p>Add, remove, or reorder associated lab servers below.
-					</p>
+					<p><b>This page is currently not being used as a client may only be associated with one LabServer in the current iLab Achitecture.</b></p>
+					<p>Add, remove, or reorder associated lab servers below.</p>
 					<div id="divErrorMessage" runat="server" class="errormessage"><p><asp:label id="lblResponse" Runat="server"></asp:label></p>
 					</div>
 				</div>
 				<div id="pagecontent">
 					<div class="simpleform">
-						<p>Note: Lab servers associated on this page will be automatically given "uselabserver" grants for any agent that has a "uselabclient" grant for this lab client.</p>
-						<table cellSpacing="0" cellPadding="0" border="0">
+						<p>Note: Lab servers associated on this page will automatically give "useLabServer" grants for any user or group that has a "useLabClient" grant for this lab client.</p>
+						<table cellspacing="0" cellpadding="0" border="0">
 							<tr>
 								<th class="top" style="WIDTH: 98px">
 									<label for="available">Available Lab Servers</label></th>
@@ -44,12 +44,12 @@ Please see license.txt in top level directory for full license.
 								<th class="top" style="WIDTH: 71px">
 									Reorder</th></tr>
 							<tr>
-								<td><asp:listbox cssClass="i18n" id="lbxAvailable" Height="90px" Width="200px" Runat="server"></asp:listbox></td>
+								<td><asp:listbox cssClass="i18n" id="lbxAvailable" Height="90px" Width="300px" Runat="server"></asp:listbox></td>
 								<td class="buttonstyle" style="WIDTH: 91px"><asp:imagebutton id="ibtnAdd" Height="22" Width="50" Runat="server" ImageUrl="../img/add-btn.gif"
 										CssClass="buttonstyle" AlternateText="Add"></asp:imagebutton><br>
 									<asp:imagebutton id="ibtnRemove" Height="22" Width="74" Runat="server" ImageUrl="../img/remove-btn.gif"
 										CssClass="buttonstyle" AlternateText="Remove"></asp:imagebutton></td>
-								<td><asp:listbox cssClass="i18n" id="lbxAssociated" Height="90px" Width="200px" Runat="server"></asp:listbox></td>
+								<td><asp:listbox cssClass="i18n" id="lbxAssociated" Height="90px" Width="300px" Runat="server"></asp:listbox></td>
 								<td class="buttonstyle" style="WIDTH: 71px"><asp:imagebutton id="ibtnMoveUp" Height="22" Width="43" Runat="server" ImageUrl="../img/up-btn.gif"
 										CssClass="buttonstyle" AlternateText="Move Up"></asp:imagebutton><br>
 									<asp:imagebutton id="ibtnMoveDown" Height="22" Width="57" Runat="server" ImageUrl="../img/down-btn.gif"
@@ -57,13 +57,13 @@ Please see license.txt in top level directory for full license.
 							</tr>
 							<tr>
 								<th style="WIDTH: 539px" colSpan="4">
-									<asp:button id="btnSaveChanges" Runat="server" CssClass="buttonright" Text="Save Changes" onclick="btnSaveChanges_Click"></asp:button>
+									<asp:button id="btnSaveChanges" Runat="server" CssClass="buttonright" Text="Save Order Changes" onclick="btnSaveChanges_Click"></asp:button>
 								</th>
 							</tr>
 						</table>
 					</div>
 				</div>
-				<!-- End pagecontent div --><br clear="all">
+				<!-- End pagecontent div --><br clear="all"/>
 			</div>
 		</form>
 	</body>

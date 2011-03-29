@@ -49,20 +49,21 @@ namespace iLabs.ServiceBroker.admin
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         BrokerDB issuer = new BrokerDB();
 
-        LabClient[] labClients;
+        //LabClient[] labClients;
         LabClient theClient;
+        ProcessAgentInfo[] labServers;
         int labClientID;
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			if (Session["UserID"]==null)
-				Response.Redirect("../login.aspx");
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
+            if (Session["UserID"] == null)
+                Response.Redirect("../login.aspx");
 
-			//only superusers can view this page
-			if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
-				Response.Redirect("../home.aspx");
+            //only superusers can view this page
+            if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
+                Response.Redirect("../home.aspx");
 
-			
+
             //RefreshAdminUserGroupsRepeater();
 
 
@@ -74,13 +75,7 @@ namespace iLabs.ServiceBroker.admin
                 if (Request.Params["lc"] != null && Request.Params["lc"].Length > 0)
                 {
                     labClientID = int.Parse(Request.Params["lc"]);
-                    if (labClientID > 0)
-                    {
-                        LabClient[] clients = wrapper.GetLabClientsWrapper(new int[] { labClientID });
-                        if (clients.Length > 0)
-                        {
-                            theClient = clients[0];
-                        }
+                    loadClient(labClientID);
 
                         ddlLabClient.SelectedValue = labClientID.ToString();
                         ddlLabClient.Enabled = false;
@@ -92,30 +87,32 @@ namespace iLabs.ServiceBroker.admin
                         RefreshAdminUserGroupsRepeater();
 
                         //btnSaveChanges.Enabled = true;
-                    }
                 }
 
                 // Save Button
                 //btnSaveChanges.Enabled = false;
-
                 //RefreshAdminUserGroupsRepeater();
-
-
             }
             else
             {
                 int id = int.Parse(ddlLabClient.SelectedValue);
-                if (id > 0)
+               loadClient(id);
+            }
+        }
+
+        private void loadClient(int clientID)
+        {
+            theClient = null;
+            labServers = null;
+            if(clientID > 0)
+            {
+                theClient = AdministrativeAPI.GetLabClient(clientID);
+                if (theClient != null && theClient.clientID > 0)
                 {
-                    LabClient[] clients = wrapper.GetLabClientsWrapper(new int[] { id });
-                    if (clients.Length > 0 && clients[0].clientID > 0)
-                    {
-                        theClient = clients[0];
-                    }
+                   labServers = AdministrativeAPI.GetLabServersForClient(theClient.clientID);
                 }
             }
-
-		}
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
@@ -217,7 +214,7 @@ namespace iLabs.ServiceBroker.admin
 		{
 
 			int[] labClientIDs = wrapper.ListLabClientIDsWrapper();
-			labClients = wrapper.GetLabClientsWrapper(labClientIDs);
+			LabClient[] labClients = wrapper.GetLabClientsWrapper(labClientIDs);
 			
 			ddlLabClient.Items.Clear();
 
@@ -236,38 +233,27 @@ namespace iLabs.ServiceBroker.admin
 		/// Creates an ArrayList of LabServer objects.
 		/// Binds the LabServer Repeater to this ArrayList.
 		/// </summary>
-		private void RefreshLabServerRepeater()
-		{
-            //LabClient lc = new LabClient();
-            //lc = wrapper.GetLabClientsWrapper(new int[] {Convert.ToInt32(ddlLabClient.SelectedValue)})[0];
-            ////lc = labClients[ddlLabClient.SelectedIndex - 1];
-
-			ArrayList labServersList = new ArrayList();
+        private void RefreshLabServerRepeater()
+        {
+            ArrayList labServersList = new ArrayList();
             //ddlLabServer.Items.Clear();
             repLabServers.DataSource = null;
             repLabServers.DataBind();
-            if (theClient.clientID >0)
+            if (theClient != null && theClient.clientID > 0)
             {
-                if (theClient.labServerIDs != null && theClient.labServerIDs.Length > 0)
+                labServers = AdministrativeAPI.GetLabServersForClient(theClient.clientID);
+                if (labServers != null && labServers.Length > 0)
                 {
-                    ProcessAgentInfo[] labServers = wrapper.GetProcessAgentInfosWrapper(theClient.labServerIDs);
-                    if (labServers.Length > 0)
+                    foreach (ProcessAgentInfo ls in labServers)
                     {
-                        //if (labServers.Length > 1)
-                        //{
-                        //    ddlLabServer.Items.Add(new ListItem("-- Select Lab Server --", "0"));
-                        //}
-                        foreach (ProcessAgentInfo ls in labServers)
-                        {
-                            if(!ls.retired)
-                                labServersList.Add(ls);
-                        }
-                        repLabServers.DataSource = labServersList;
-                        repLabServers.DataBind();
+                        if (!ls.retired)
+                            labServersList.Add(ls);
                     }
+                    repLabServers.DataSource = labServersList;
+                    repLabServers.DataBind();
                 }
-            }		
-		}
+            }
+        }
 
         private void RefreshUssAndEssRepeaters()
         {
@@ -397,23 +383,7 @@ namespace iLabs.ServiceBroker.admin
             int id = int.Parse(ddlLabClient.SelectedValue);
             if (id > 0)
             {
-                LabClient[] clients = wrapper.GetLabClientsWrapper(new int[] { id });
-                if (clients.Length > 0 && clients[0].clientID > 0)
-                {
-                    theClient = clients[0];
-                }
-                else
-                {
-                    theClient = new LabClient();
-                    repLabServers.DataSource = "";
-                    repLabServers.DataBind();
-
-                    repESS.DataSource = "";
-                    repESS.DataBind();
-
-                    repUSS.DataSource = "";
-                    repUSS.DataBind();
-                }
+                loadClient(id);
 
                 // Now that the Lab Client is known the associated/available Group
                 // ListBoxes can be loaded, along with the Lab Server Repeater
@@ -426,6 +396,8 @@ namespace iLabs.ServiceBroker.admin
             }
             else
             {
+                theClient = null;
+                labServers = null;
                 //lbxAssociated.Items.Clear();
                 //lbxAvailable.Items.Clear();
                 repLabServers.DataSource = "";
@@ -597,11 +569,11 @@ namespace iLabs.ServiceBroker.admin
                             int [] clientGrants = wrapper.FindGrantsWrapper(userGroupID, clientFunction, clientQualifierID);
                             if((clientGrants != null) && (clientGrants.Length >0) && (clientGrants[0] > 0))
                                 wrapper.RemoveGrantsWrapper(new int[] { clientGrants[0] });
-
-                            if ((theClient.labServerIDs != null) && (theClient.labServerIDs.Length > 0)
-                                && (theClient.labServerIDs[0] > 0))
+                            int[] labServerIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
+                            if ((labServerIDs != null) && (labServerIDs.Length > 0)
+                                && (labServerIDs[0] > 0))
                             {
-                                labServerID = theClient.labServerIDs[0];
+                                labServerID = labServerIDs[0];
                                 int remainingClients = AdministrativeAPI.CountServerClients(userGroupID, labServerID);
                                 if (remainingClients == 0)
                                 {
@@ -635,7 +607,7 @@ namespace iLabs.ServiceBroker.admin
         {
             //RefreshAdminUserGroupsRepeater();
             adminGroupUserList = GetGroupManagerUserMaps();
-            int labServerID = 0;
+            //int labServerID = 0;
             try
             {
                 if (e.CommandName.Equals("Remove"))
@@ -686,21 +658,26 @@ namespace iLabs.ServiceBroker.admin
                             if ((clientGrants != null) && (clientGrants.Length > 0) && (clientGrants[0] > 0))
                                 wrapper.RemoveGrantsWrapper(new int[] { clientGrants[0] });
 
-                            if ((theClient.labServerIDs != null) && (theClient.labServerIDs.Length > 0)
-                                && (theClient.labServerIDs[0] > 0))
+                            int[] labServerIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
+                            if ((labServerIDs != null) && (labServerIDs.Length > 0))
                             {
-                                labServerID = theClient.labServerIDs[0];
-                                int remainingClients = AdministrativeAPI.CountServerClients(userGroupID, labServerID);
-                                if (remainingClients == 0)
+                                foreach (int labServerID in labServerIDs)
                                 {
-                                    //delete the Grant [User Group] -> USE LAB SERVER -> lab Server
-                                    int labQualifierID = AuthorizationAPI.GetQualifierID(labServerID, Qualifier.labServerQualifierTypeID);
-                                    if (labQualifierID > 0)
+                                    if (labServerID > 0)
                                     {
-                                        int[] labGrants = (wrapper.FindGrantsWrapper(userGroupID, labFunction, labQualifierID));
-                                        if ((labGrants != null) && (labGrants.Length > 0) && (labGrants[0] > 0))
+                                        int remainingClients = AdministrativeAPI.CountServerClients(userGroupID, labServerID);
+                                        if (remainingClients == 0)
+                                        {
+                                            //delete the Grant [User Group] -> USE LAB SERVER -> lab Server
+                                            int labQualifierID = AuthorizationAPI.GetQualifierID(labServerID, Qualifier.labServerQualifierTypeID);
+                                            if (labQualifierID > 0)
+                                            {
+                                                int[] labGrants = (wrapper.FindGrantsWrapper(userGroupID, labFunction, labQualifierID));
+                                                if ((labGrants != null) && (labGrants.Length > 0) && (labGrants[0] > 0))
 
-                                            wrapper.RemoveGrantsWrapper(new int[] { labGrants[0] });
+                                                    wrapper.RemoveGrantsWrapper(new int[] { labGrants[0] });
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -715,6 +692,11 @@ namespace iLabs.ServiceBroker.admin
             {
                Logger.WriteLine(exc.Message);
             }
+        }
+        protected void btnClose_Click(Object Src, EventArgs E)
+        {
+            // This routine will create a javascript block to refresh the client & close the page.
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "Success", "ReloadParent();", true);
         }
 
         // Error recovery must be added to this method
@@ -756,10 +738,10 @@ namespace iLabs.ServiceBroker.admin
                 //Get the user Group Name to be displayed in the repeater
                 Group[] userGroup = wrapper.GetGroupsWrapper(new int[] { groupID });
                 string userGroupName = userGroup[0].GroupName;
-
-                if (theClient.labServerIDs != null && theClient.labServerIDs.Length > 0)
+                int[] labServerIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
+                if (labServerIDs != null && labServerIDs.Length > 0)
                 {
-                    labServer = issuer.GetProcessAgentInfo(theClient.labServerIDs[0]);
+                    labServer = issuer.GetProcessAgentInfo(labServerIDs[0]);
                 }
                 if (labServer == null)
                 {
@@ -792,7 +774,7 @@ namespace iLabs.ServiceBroker.admin
                         lblResponse.Text = Utilities.FormatWarningMessage("Lab Client should first be associated with a USS");
                         return;
                     }
-                    int lssId = issuer.FindProcessAgentIdForAgent(theClient.labServerIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
+                    int lssId = issuer.FindProcessAgentIdForAgent(labServerIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
                     if (lssId <= 0)
                     {
                         lblResponse.Visible = true;
@@ -946,7 +928,7 @@ namespace iLabs.ServiceBroker.admin
                 /*Update Lab Servers grant*/
 
                 //Update grants for each of the associated lab servers
-                foreach (int lsID in theClient.labServerIDs)
+                foreach (int lsID in labServerIDs)
                 {
                     //Get qualifier for labserver
                     int lsQualifierID = AuthorizationAPI.GetQualifierID(lsID, Qualifier.labServerQualifierTypeID);

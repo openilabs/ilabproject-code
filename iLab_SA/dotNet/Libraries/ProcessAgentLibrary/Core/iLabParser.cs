@@ -83,18 +83,19 @@ public class ParserException: System.ApplicationException
         public iLabProperties()
         {
         }
-        public iLabProperties(ProcessAgentInfo info)
+       
+        public override void Add(object key, object value)
         {
-            Add(info);
+            Add(key.ToString(), value.ToString());
         }
-        public void Add(ProcessAgentInfo info)
+        public void Add(string key, object  value)
         {
-            Add("agentGuid",info.agentGuid);
-            Add("agentName", info.agentName);
-            Add("codebase", info.codeBaseUrl);
-            Add("serviceUrl", info.webServiceUrl);
+            base.Add(key, value.ToString());
         }
-
+        public void Add(string key, string value)
+        {
+            base.Add(key, value);
+        }
         public void Add(string key, ProcessAgent info)
         {
             Add(key + ":agentGuid", info.agentGuid);

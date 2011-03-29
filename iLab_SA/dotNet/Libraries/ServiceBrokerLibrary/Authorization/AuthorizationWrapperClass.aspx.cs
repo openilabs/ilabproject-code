@@ -428,18 +428,18 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="contactLastName"></param>
 		/// <param name="clientInfos"></param>
 		/// <returns></returns>
-        public int AddLabClientWrapper(string clientGuid, string clientName, string version, string clientShortDescription, 
-            string clientLongDescription, string notes, string loaderScript, string clientType, int[] labServerIDs, 
-            string contactEmail, string contactFirstName, string contactLastName, 
-            bool needsScheduling,bool needsESS,bool isReentrant, ClientInfo[] clientInfos)
+        public int AddLabClientWrapper(string clientGuid, string clientName, string version, string clientShortDescription,
+            string clientLongDescription, string clientType, string loaderScript, string documentationURL,
+            string contactEmail, string contactFirstName, string contactLastName, string notes,
+            bool needsESS, bool needsScheduling, bool isReentrant)
 		{
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 			string sessionGroupName = Session["GroupName"].ToString();
 			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
 			{
-				return Administration.AdministrativeAPI .AddLabClient (clientGuid, clientName,  version, clientShortDescription, 
-                    clientLongDescription,  notes,  loaderScript,  clientType, labServerIDs, contactEmail, contactFirstName,  
-                    contactLastName,needsScheduling, needsESS, isReentrant, clientInfos);
+				return Administration.AdministrativeAPI .AddLabClient (clientGuid, clientName,  version, clientShortDescription,
+                    clientLongDescription, clientType, loaderScript, documentationURL, contactEmail, contactFirstName,
+                    contactLastName, notes, needsESS, needsScheduling, isReentrant);
 			}
 			else
 			{
@@ -481,16 +481,17 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="contactFirstName"></param>
 		/// <param name="contactLastName"></param>
 		/// <param name="clientInfos"></param>
-		public void ModifyLabClientWrapper (int clientID, string clientName, string version, string clientShortDescription,
-            string clientLongDescription, string notes,string loaderScript, string clientType, int[] labServerIDs, 
-            string contactEmail, string contactFirstName, string contactLastName,bool needsScheduling,
-            bool needsESS, bool isReentrant, ClientInfo[] clientInfos)
+		public void ModifyLabClientWrapper (int clientID, string clientGuid, string clientName, string version, string clientShortDescription,
+            string clientLongDescription, string clientType, string loaderScript, string documentationURL,
+            string contactEmail, string contactFirstName, string contactLastName, string notes,
+            bool needsESS, bool needsScheduling, bool isReentrant)
 		{
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 			string sessionGroupName = Session["GroupName"].ToString();
 			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
 			{
-				Administration.AdministrativeAPI .ModifyLabClient ( clientID,  clientName, version, clientShortDescription, clientLongDescription,  notes, loaderScript, clientType, labServerIDs, contactEmail, contactFirstName,  contactLastName,needsScheduling,needsESS,isReentrant,  clientInfos);
+                Administration.AdministrativeAPI.ModifyLabClient(clientID, clientGuid, clientName, version, clientShortDescription, clientLongDescription,
+                    clientType, loaderScript, documentationURL, contactEmail, contactFirstName, contactLastName, notes, needsESS, needsScheduling, isReentrant);
 			}
 			else
 			{

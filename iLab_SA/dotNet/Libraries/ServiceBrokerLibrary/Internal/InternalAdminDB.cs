@@ -114,257 +114,7 @@ namespace iLabs.ServiceBroker.Internal
 		 *							CALLS FOR LAB SERVERS
 		 * !------------------------------------------------------------------------------!
 		 */
-        /*
-		/// <summary>
-		/// to add a new lab server
-		/// </summary>
-		public static int InsertLabServer(LabServer ls)
-		{
-			int labServerID = -1;
-
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddLabServer", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerName", ls.labServerName ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerGUID", ls.labServerGUID));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@webServiceURL", ls.webServiceURL));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerDescription", ls.labServerDescription));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labInfoURL", ls.labInfoURL));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@contactFirstName", ls.contactFirstName ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@contactLastName", ls.contactLastName ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@contactEmail",ls.contactEmail ));
-			
-			try
-			{
-				myConnection.Open();
-				labServerID = Int32.Parse ( myCommand.ExecuteScalar().ToString ());
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in inserting lab server",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-
-			return labServerID;
-		}
-
-		/// <summary>
-		/// to modify an existing lab server's information
-		/// </summary>
-		public static void UpdateLabServer(LabServer ls)
-		{
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifyLabServer", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerID", ls.labServerID ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerName", ls.labServerName ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerGUID", ls.labServerGUID));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@webServiceURL", ls.webServiceURL));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerDescription", ls.labServerDescription));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labInfoURL", ls.labInfoURL));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@contactFirstName", ls.contactFirstName ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@contactLastName", ls.contactLastName ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@contactEmail",ls.contactEmail ));
-
-			try
-			{
-				myConnection.Open();
-				int i = myCommand.ExecuteNonQuery();
-				if(i == 0)
-					throw new Exception ("UpdateLabServer: No record modified exception");
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in modifying lab server",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-		}
-
-		/// <summary>
-		/// to delete all lab servers records specified by the array of lab server IDs
-		/// </summary>
-		public static int[] DeleteLabServers ( int[] labServerIDs )
-		{
-			
-			DbConnection myConnection = FactoryDB.CreateCommand()
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteLabServer", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure ;
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerID",null));
-
-			
-			 // Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
-			 // extremely inefficient and hence this method was chosen
-			 
-			 
-			ArrayList arrayList = new ArrayList ();
-
-			try 
-			{
-				myConnection.Open ();
-											
-				foreach (int labServerID in labServerIDs) 
-				{
-					
-					// Deleting from table LabServers
-                    //	IMPORTANT ! - The database if currently set to Cascade delete, where deleting an experiment will automatically
-                    //  delete the relevant Lab_Server_to_Client_Map records. If Cascade Delete is not to be used, then the code to delete the extra records
-                    //  in the map table when a lab server is deleted should be added in the stored procedure
-                    //  
-                    //  Also, the qualifiers pertaining to the lab server are automatically
-                    //  deleted in the 'DeleteLabServer' stored procedure. This preserves consistency
-                    //  and gets rid of unnecessary rollback mechanisms that would otherwise have 
-                    //  to be implemented. - CV, 4/29/05
-                    // 
-
-					myCommand.Parameters["@labServerID"].Value = labServerID;
-					if(myCommand.ExecuteNonQuery () == 0)
-					{
-						arrayList.Add(labServerID);
-					}
-				}
-
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in DeleteLabServers",ex);
-			}
-			finally 
-			{
-				myConnection.Close ();
-			}
-
-			// refresh in memory Q & Q-H cache - since the lab server qualifiers are automatically deleted
-			AuthCache.QualifierSet  = InternalAuthorizationDB.RetrieveQualifiers ();
-			AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy ();
-
-			int[] lsIDs = Utilities.ArrayListToIntArray(arrayList);
-			return lsIDs;
-		}
-        */
-
-		/// <summary>
-		/// to retrieve a list of all the lab servers in the database
-		/// </summary>
-
-        //public static int[] SelectLabServerIDs ()
-        //{
-        //    ProcessAgentDB ticketing = new ProcessAgentDB();
-        //    return ticketing.GetProcessAgentIDsByType((int) ProcessAgentType.AgentType.LAB_SERVER);
-        //}
-
-        ///// <summary>
-        ///// to retrieve lab server metadata for lab servers specified by array of lab server IDs 
-        ///// </summary>
-        //public static LabServer[] SelectLabServers ( int[] labServerIDs )
-        //{
-        //    LabServer[] ls = new LabServer[labServerIDs.Length ];
-        //    for (int i=0; i<labServerIDs.Length ; i++)
-        //    {
-        //        ls[i] = new LabServer();
-        //    }
-
-        //    DbConnection myConnection = FactoryDB.GetConnection();
-        //    DbCommand myCommand = FactoryDB.CreateComand("RetrieveLabServer", myConnection);
-        //    myCommand.CommandType = CommandType.StoredProcedure;
-        //    myCommand.Parameters .Add(new DbParameter ("@labServerID",DbType.Int));
-
-        //    try 
-        //    {
-        //        myConnection.Open ();
-				
-        //        for (int i =0; i < labServerIDs.Length ; i++) 
-        //        {
-        //            myCommand.Parameters["@labServerID"].Value = labServerIDs[i];
-
-        //            // get labserver info from table lab_servers
-        //            DbDataReader myReader = myCommand.ExecuteReader ();
-        //            while(myReader.Read ())
-        //            {	
-        //                ls[i].labServerID = labServerIDs[i];
-
-        //                if(myReader["lab_server_name"] != System.DBNull.Value )
-        //                    ls[i].labServerName = (string) myReader["lab_server_name"];
-        //                if(myReader["GUID"] != System.DBNull.Value )
-        //                    ls[i].labServerGUID = (string) myReader["GUID"];
-        //                if(myReader["web_service_URL"] != System.DBNull.Value )
-        //                    ls[i].webServiceURL= (string) myReader["web_service_URL"];
-        //                if(myReader["description"] != System.DBNull.Value )
-        //                    ls[i].labServerDescription= (string) myReader["description"];
-        //                if(myReader["info_URL"] != System.DBNull.Value )
-        //                    ls[i].labInfoURL= (string) myReader["info_URL"];
-        //                if(myReader["contact_first_name"] != System.DBNull.Value )
-        //                    ls[i].contactFirstName = (string) myReader["contact_first_name"];
-        //                if(myReader["contact_last_name"] != System.DBNull .Value )
-        //                    ls[i].contactLastName = (string) myReader["contact_last_name"];
-        //                if(myReader["contact_email"] != System.DBNull .Value )
-        //                    ls[i].contactEmail = (string) myReader["contact_email"];
-        //                //if(myReader["date_created"] != System.DBNull .Value )
-        //                //	ls[i].dateCreated = (DateTime) myReader["date_created"];
-        //            }
-        //            myReader.Close ();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Exception thrown SelectLabServers",ex);
-        //    }
-        //    finally 
-        //    {
-        //        myConnection.Close ();
-        //    }
-			
-        //    return ls;
-        //}
-
-        ///// <summary>
-        ///// to retrieve lab server metadata for lab servers specified by array of lab server IDs 
-        ///// </summary>
-        //public static ProcessAgent[] SelectLabServers ()
-        //{
-        //    ProcessAgentDB ticketing = new ProcessAgentDB();
-        //    return ticketing.GetProcessAgentsByType(ProcessAgentType.LAB_SERVER);
-        //}
-
-        ///// <summary>
-        ///// Gets the integer LabServerID given labServerGUID
-        ///// </summary>
-        //public static int SelectLabServerID(string labServerGUID)
-        //{
-			
-        //    DbConnection myConnection = FactoryDB.GetConnection();
-        //    DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabServerID", myConnection);
-        //    myCommand.CommandType = CommandType.StoredProcedure;
-
-        //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@GUID", labServerGUID));
-			
-        //    try
-        //    {
-        //        myConnection.Open();
-        //        int labServerID = Convert.ToInt32(myCommand.ExecuteScalar());
-
-        //        //If labServer record doesn't exist return -1
-        //        if (labServerID == 0)
-        //            labServerID=-1;
-				
-        //        return labServerID;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Exception thrown in retrieving labServerID",ex);
-        //    }
-        //    finally
-        //    {
-        //        myConnection.Close();
-        //    }
-        //}
+     
 
 		/// <summary>
 		/// Gets the integer LabServerID given the experimentID
@@ -375,7 +125,7 @@ namespace iLabs.ServiceBroker.Internal
 			int intLabServerID;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveExperimentRawData", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Experiment_RetrieveRawData", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", experimentID,DbType.Int64));
@@ -404,236 +154,73 @@ namespace iLabs.ServiceBroker.Internal
 			}
 			return intLabServerID;
 		}
-/*
-		/// <summary>
-		/// to modify the outgoing passkey 
-		/// Method name changed from UpdateSBOutgoingPasskey
-		/// </summary>
-		public static void UpdateLSOutgoingPasskey(int labServerID,string passKey)
-		{
-			
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifyOutPasskey", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
 
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@lsID", labServerID));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@passKey", passKey));
-			
-			try
-			{
-				myConnection.Open();
-				int i = myCommand.ExecuteNonQuery();
-				if(i == 0)
-					throw new Exception ("No record modified exception");
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in updating outgoing passkey",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-		}
-
-		/// <summary>
-		/// to modify the incoming passkey
-		/// Method name changed from UpdateSBIncomingPasskey
-		/// </summary>
-		public static void UpdateLSIncomingPasskey(int labServerID,string passKey)
-		{
-			
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifyInPasskey", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@lsID", labServerID));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@passKey", passKey));
-			
-			try
-			{
-				myConnection.Open();
-				int i = myCommand.ExecuteNonQuery();
-				if(i == 0)
-					throw new Exception ("No record modified exception");
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in updating incoming passkey",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-		}
-
-
-		/// <summary>
-		/// to select the passkey
-		/// </summary>
-		public static string selectSBOutgoingPasskey(int labServerID)
-		{
-			string passKey = null;
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("SelectOutPasskey", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@lsID", labServerID));
-			
-			
-			try
-			{
-				myConnection.Open();
-				passKey = myCommand.ExecuteScalar().ToString ();
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in selecting passkey",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-			return passKey;
-		}
-
-		/// <summary>
-		/// to select the passkey
-		/// </summary>
-		public static string selectSBIncomingPasskey(int labServerID)
-		{
-			string passKey = null;
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("SelectInPasskey", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@lsID", labServerID));
-			
-			try
-			{
-				myConnection.Open();
-				passKey = myCommand.ExecuteScalar().ToString ();
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in selecting passkey",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-			return passKey;
-		}
-		*/
 		/* !------------------------------------------------------------------------------!
 		 *							CALLS FOR LAB CLIENTS
 		 * !------------------------------------------------------------------------------!
 		 */
-		/// <summary>
-		/// to add a lab client
-		/// The order in which lab servers are associated with this client is the array order
-		/// </summary>
 		
-		public static int InsertLabClient(LabClient lc)
+		/// <summary>
+		/// Inserts a LabClient into the database, this does not reate any ClientInfo items or asociate a LabServer.
+		/// </summary>
+		/// <param name="guid"></param>
+		/// <param name="name"></param>
+		/// <param name="shortDescription"></param>
+		/// <param name="longDescription"></param>
+		/// <param name="version"></param>
+		/// <param name="loaderScript"></param>
+		/// <param name="clientType"></param>
+		/// <param name="email"></param>
+		/// <param name="firstName"></param>
+		/// <param name="lastName"></param>
+		/// <param name="notes"></param>
+		/// <param name="needsScheduling"></param>
+		/// <param name="needsESS"></param>
+		/// <param name="isReentrant"></param>
+		/// <returns>the client ID</returns>
+        public static int InsertLabClient(string guid, string name, string version, string shortDescription, string longDescription,
+             string clientType, string loaderScript, string documentationURL, string email, string firstName, string lastName, string notes,
+             bool needsESS, bool needsScheduling, bool isReentrant)
 		{
 			int clientID = -1;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddLabClient", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Client_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@guid", lc.clientGuid, DbType.AnsiString,50));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientName", lc.clientName, DbType.String,256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@shortDescription", lc.clientShortDescription, DbType.String,256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@longDescription", lc.clientLongDescription, DbType.String));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@version", lc.version,DbType.String,50));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@loaderScript", lc.loaderScript, DbType.String,2000));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientType", lc.clientType, DbType.AnsiString,100));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@email",lc.contactEmail, DbType.String,256 ));	
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@firstName",lc.contactFirstName, DbType.String,128 ));	
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@lastName",lc.contactLastName, DbType.String,128 ));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@notes", lc.notes, DbType.String));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsScheduling", lc.needsScheduling, DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsESS", lc.needsESS, DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@isReentrant", lc.IsReentrant, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@guid", guid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientName", name, DbType.String,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@shortDescription", shortDescription, DbType.String,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@longDescription", longDescription, DbType.String));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@version", version,DbType.String,50));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@loaderScript", loaderScript, DbType.String,2000));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@docURL", documentationURL, DbType.String, 512));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientType", clientType, DbType.AnsiString,100));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@email",email, DbType.String,256 ));	
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@firstName",firstName, DbType.String,128 ));	
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@lastName",lastName, DbType.String,128 ));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@notes", notes, DbType.String));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsScheduling", needsScheduling, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsESS", needsESS, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@isReentrant", isReentrant, DbType.Boolean));
 	
 			//Encoding transaction here
 			//Alternatively a dataset can be used, but it's not preferred bcos it's inefficient?
-			DbTransaction transaction;
-		
+			
+            //DbTransaction transaction;	
 			myConnection.Open();
-			transaction = myConnection.BeginTransaction();
-			myCommand.Transaction = transaction;
+			//transaction = myConnection.BeginTransaction();
+			//myCommand.Transaction = transaction;
 
 			try
 			{
 
-				clientID = Int32.Parse ( myCommand.ExecuteScalar().ToString ());
-				lc.clientID = clientID;
-
-				/*-- ASSOCIATED LAB SERVERS --*/
-				if(lc.labServerIDs != null)
-				{
-					myCommand.Parameters.Clear();
-					myCommand.CommandText = "AddLabServerClient";
-					myCommand.CommandType = CommandType.StoredProcedure ;
-
-                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
-					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerID", null, DbType.Int32));
-					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@displayOrder", null, DbType.Int32));
-				
-					int count=1;
-					foreach (int id in lc.labServerIDs ) 
-					{
-						myCommand.Parameters["@labServerID"].Value = id;
-						myCommand.Parameters["@displayOrder"].Value = count;
-
-						int i = myCommand.ExecuteNonQuery();
-						
-						if (i!=0)
-							count+=1;
-					}
-				}
-
-				/*-- ASSOCIATED INFO URLS --*/
-				if(lc.clientInfos != null)
-				{
-                    myCommand.Parameters.Clear();
-                    myCommand.CommandText = "AddClientInfo" ;
-					myCommand.CommandType = CommandType.StoredProcedure ;
-            
-                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", lc.clientID, DbType.Int32));
-					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@infoURL", null, DbType.String,512));
-					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@infoName", null, DbType.String,256));
-					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@description", null, DbType.String));
-					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@displayOrder", null, DbType.Int32));
-				
-					int count=1;
-					foreach (ClientInfo c in lc.clientInfos ) 
-					{
-                        if (c != null)
-                        {
-                            if ((c.infoURL != null) && (c.infoURL.CompareTo("") != 0))
-                            {
-                                myCommand.Parameters["@infoURL"].Value = c.infoURL;
-                                myCommand.Parameters["@infoName"].Value = c.infoURLName;
-                                myCommand.Parameters["@description"].Value = c.description;
-                                myCommand.Parameters["@displayOrder"].Value = count;
-                                //myCommand.Parameters["@displayOrder"].Value = c.displayOrder;
-
-                                int i = myCommand.ExecuteNonQuery();
-
-                                if (i != 0)
-                                    count += 1;
-                            }
-                        }
-					}
-				}
-
-				transaction.Commit();
+				clientID = Convert.ToInt32(myCommand.ExecuteScalar());
+				//transaction.Commit();
 			}
 			catch (Exception ex)
 			{
-				transaction.Rollback();	
+				//transaction.Rollback();	
 				throw new Exception("Exception thrown in inserting lab server to client",ex);
 			}
 			finally
@@ -643,134 +230,371 @@ namespace iLabs.ServiceBroker.Internal
 			return clientID;
 		}
 
-		/// <summary>
-		/// to modify a lab client
-		/// </summary>
-		
-		public static void UpdateLabClient(LabClient lc)
-		{
+        /// <summary>
+        /// Inserts an association between the LabClient and the labServer, sorting order may be specified.
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="serverID"></param>
+        /// <param name="displayOrder"></param>
+        /// <returns>count of affected rows</returns>
+        public static int LabServerClientInsert(int serverID, int clientID, int displayOrder)
+        {
+            /*-- ASSOCIATED LAB SERVERS --*/
+            int i = 0;
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifyLabClient", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_Insert",myConnection);
+			
+					myCommand.CommandType = CommandType.StoredProcedure ;
+
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerID", serverID, DbType.Int32));
+					myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@displayOrder", displayOrder, DbType.Int32));
+				try{
+                    myConnection.Open();
+				     i = myCommand.ExecuteNonQuery();
+                }
+				 catch(Exception e){
+                     throw new Exception("Exception thrown in inserting lab server to client",e);
+                }
+				finally
+			{
+				myConnection.Close();
+			}
+			return i;
+        }
+        /// <summary>
+        /// Inserts a LabCIlentInfo
+        /// </summary>
+        /// <param name="clientID"></param>
+        /// <param name="url"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="displayOrder"></param>
+        /// <returns>the ID of the LabClientInfo</returns>
+       public static int InsertLabClientInfo(int clientID, string url, string name, string description, int displayOrder)
+        {
+                DbConnection myConnection = FactoryDB.GetConnection();
+                DbCommand myCommand = FactoryDB.CreateCommand("ClientInfo_Insert", myConnection);
+                myCommand.CommandType = CommandType.StoredProcedure;
+
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@infoURL", url, DbType.String, 512));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@infoName", name, DbType.String, 256));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@description", description, DbType.String));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@displayOrder", displayOrder, DbType.Int32));
+                int id = 0;
+            try{
+                myConnection.Open();
+                id = Convert.ToInt32(myCommand.ExecuteScalar());
+            }
+            catch(Exception e){
+                     throw new Exception("Exception thrown inserting clientInfo",e);
+            }
+			finally
+			{
+				myConnection.Close();
+			}
+             return id;
+        }
+
+		/// <summary>
+		/// Updates the lab client core fields. This does not change LabServerClient map or ClientItems
+		/// </summary>
+		/// <param name="clientID"></param>
+		/// <param name="guid"></param>
+		/// <param name="name"></param>
+		/// <param name="version"></param>
+		/// <param name="shortDescription"></param>
+		/// <param name="longDescription"></param>
+		/// <param name="clientType"></param>
+		/// <param name="loaderScript"></param>
+		/// <param name="email"></param>
+		/// <param name="firstName"></param>
+		/// <param name="lastName"></param>
+		/// <param name="notes"></param>
+		/// <param name="needsESS"></param>
+		/// <param name="needsScheduling"></param>
+		/// <param name="isReentrant"></param>
+		/// <returns></returns>
+        public static int UpdateLabClient(int clientID, string guid, string name, string version, string shortDescription, string longDescription,
+            string clientType, string loaderScript, string documentationURL,string email, string firstName, string lastName, string notes,
+             bool needsESS, bool needsScheduling, bool isReentrant)
+		{
+            int status = -1;
+			DbConnection myConnection = FactoryDB.GetConnection();
+			DbCommand myCommand = FactoryDB.CreateCommand("Client_Update", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", lc.clientID, DbType.Int32 ));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientName", lc.clientName, DbType.String,256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@shortDescription", lc.clientShortDescription, DbType.String,256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@longDescription", lc.clientLongDescription, DbType.String));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@version", lc.version, DbType.String,50));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@loaderScript", lc.loaderScript, DbType.String,2000));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientType", lc.clientType, DbType.AnsiString,100));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@email",lc.contactEmail, DbType.String,256 ));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@firstName", lc.contactFirstName, DbType.String,128));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@lastName", lc.contactLastName, DbType.String, 128));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@notes", lc.notes, DbType.String));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsScheduling", lc.needsScheduling, DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsESS", lc.needsESS, DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@isReentrant", lc.IsReentrant, DbType.Boolean));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", clientID, DbType.Int32 ));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientGUID", guid, DbType.String,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientName", name, DbType.String,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@shortDescription", shortDescription, DbType.String,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@longDescription", longDescription, DbType.String));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@version", version, DbType.String,50));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@loaderScript", loaderScript, DbType.String,2000));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientType", clientType, DbType.AnsiString,100));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@docURL", documentationURL, DbType.String, 512));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@email",email, DbType.String,256 ));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@firstName", firstName, DbType.String,128));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@lastName", lastName, DbType.String, 128));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@notes", notes, DbType.String));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsScheduling", needsScheduling, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@needsESS", needsESS, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@isReentrant", isReentrant, DbType.Boolean));
 
 			//Encoding transaction here
 			//Alternatively a dataset can be used, but it's not preferred bcos it's inefficient?
-			DbTransaction transaction;
+			//DbTransaction transaction;
 		
 			myConnection.Open();
-			transaction = myConnection.BeginTransaction();
-            myCommand.Transaction = transaction;
+			//transaction = myConnection.BeginTransaction();
+            //myCommand.Transaction = transaction;
 
 			try
 			{
-				int i = myCommand.ExecuteNonQuery();
-				if(i == 0)
+				status = myCommand.ExecuteNonQuery();
+				if(status == 0)
 					throw new Exception ("No record modified exception");
-				//bool inserted = Boolean.Parse ( myCommand.ExecuteScalar().ToString ());
-
-				/*-- ASSOCIATED LAB SERVERS --*/
-				// update table Lab_Server_To_Client_Map
 				
-				/* First delete all the lab_server_ids that exist for a particular client */
-                myCommand.Parameters.Clear();
-				myCommand.CommandText = "DeleteLabServerClient";
-				myCommand.CommandType = CommandType.StoredProcedure ;
 
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", lc.clientID, DbType.Int32));  
-				myCommand.ExecuteNonQuery();
-
-                myCommand.Parameters.Clear();
-				myCommand.CommandText= "AddLabServerClient";
-				myCommand.CommandType = CommandType.StoredProcedure;
-
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", lc.clientID, DbType.Int32));
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labServerID", null, DbType.Int32));
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@displayOrder", null, DbType.Int32));
-
-				if(lc.labServerIDs != null)
-				{
-					int count=1;
-					foreach (int id in lc.labServerIDs ) 
-					{
-						myCommand.Parameters["@labServerID"].Value = id;
-						myCommand.Parameters["@displayOrder"].Value = count;
-
-						int x = myCommand.ExecuteNonQuery();
-						
-						if (x!=0)
-							count+=1;
-					}
-				}
-
-				/*-- ASSOCIATED INFO URLS --*/
-				/* First delete all the lab_server_ids that exist for a particular client */
-				myCommand.Parameters.Clear();
-				myCommand.CommandText = "DeleteClientInfo";
-				myCommand.CommandType = CommandType.StoredProcedure ;
-
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", lc.clientID,DbType.Int32));
-				myCommand.ExecuteNonQuery();
-
-				myCommand.Parameters.Clear();
-				myCommand.CommandText = "AddClientInfo";
-				myCommand.CommandType = CommandType.StoredProcedure ;
-
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", lc.clientID,DbType.Int32));
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@infoURL", null, DbType.String,512));
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@infoName", null, DbType.String,256));
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@description", null,DbType.String,2048));
-				myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@displayOrder", null, DbType.Int32));
-				
-				if(lc.clientInfos != null)
-				{
-					int count=1;
-					foreach (ClientInfo c in lc.clientInfos ) 
-					{
-                        if (c != null)
-                        {
-                            if ((c.infoURL != null) && (c.infoURL.CompareTo("") != 0))
-                            {
-                                myCommand.Parameters["@infoURL"].Value = c.infoURL;
-                                myCommand.Parameters["@infoName"].Value = c.infoURLName;
-                                myCommand.Parameters["@description"].Value = c.description;
-                                myCommand.Parameters["@displayOrder"].Value = count;
-                                //myCommand.Parameters["@displayOrder"].Value = c.displayOrder;
-
-                                int x = myCommand.ExecuteNonQuery();
-
-                                if (x != 0)
-                                    count++;
-                            }
-                        }
-					}
-				}
-
-				transaction.Commit();
+				//transaction.Commit();
 			}
 			catch (Exception ex)
 			{
-				transaction.Rollback();	
-				throw new Exception("Exception thrown in inserting lab server to client: " + ex.Message, ex);
+				//transaction.Rollback();	
+				throw new Exception("Exception thrown in updating lab client: " + ex.Message, ex);
 			}
 			finally
 			{
 				myConnection.Close();
 			}
+            return status;
 		}
+
+        public static int LabServerClientUpdate(int serverID, int clientID, int displayOrder)
+        {
+            /*-- ASSOCIATED LAB SERVERS --*/
+            // update table Lab_Server_To_Client_Map
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_Update", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labServerID", serverID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@displayOrder", displayOrder, DbType.Int32));
+            int x = 0;
+            try
+            {
+                myConnection.Open();
+                x = myCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                //transaction.Rollback();	
+                throw new Exception("Exception thrown in inserting lab server to client: " + ex.Message, ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return x;
+        }
+
+        public static ProcessAgentInfo[] GetLabServersForClient(int clientID)
+        {
+            List<ProcessAgentInfo> servers = null;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_RetrieveServerIDs", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+            DbDataReader reader = null;
+            try
+            {
+                myConnection.Open();
+                reader = myCommand.ExecuteReader();
+                if (reader != null && reader.HasRows)
+                {
+                    servers = new List<ProcessAgentInfo>();
+                    ProcessAgentDB paDB = new ProcessAgentDB();
+                    while (reader.Read())
+                    {
+
+                        int serverID = reader.GetInt32(0);
+                        ProcessAgentInfo pai = paDB.GetProcessAgentInfo(serverID);
+                        if (pai != null && !pai.retired)
+                        {
+                            servers.Add(pai);
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Exception thrown in getLabServersForClient: " + ex.Message, ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+
+            if (servers != null)
+                return servers.ToArray();
+            else
+                return null;
+        }
+
+        public static int[] GetLabServerIDsForClient(int clientID)
+        {
+            List<int> servers = new List<int>();
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_RetrieveServerIDs", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+            DbDataReader reader = null;
+            try
+            {
+                myConnection.Open();
+                reader = myCommand.ExecuteReader();
+                if (reader != null && reader.HasRows)
+                {
+                   
+                    ProcessAgentDB paDB = new ProcessAgentDB();
+                    while (reader.Read())
+                    {
+                        int serverID = reader.GetInt32(0);
+                        servers.Add(serverID);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in getLabServersForClient: " + ex.Message, ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return servers.ToArray();
+           
+        }
+
+        public static int UpdateLabClientInfoOrder(int[] clientInfoIDs)
+        {
+            int count = 0;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientInfo_UpdateOrder",myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            DbParameter infoID = FactoryDB.CreateParameter(myCommand, "@clientInfoID", DbType.Int32);
+            DbParameter order = FactoryDB.CreateParameter(myCommand, "@displayOrder", DbType.Int32);
+            myCommand.Parameters.Add(infoID);
+            myCommand.Parameters.Add(order);
+            try
+            {
+                myConnection.Open();
+                for (int i = 0; i < clientInfoIDs.Length; i++)
+                {
+                    infoID.Value = clientInfoIDs[i];
+                    order.Value = i;
+                    int status = myCommand.ExecuteNonQuery();
+                    if (status > 0)
+                    {
+                        count += status;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("error: " + e.Message);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Updates a ClientInfo that has the same ClientInfoID and clientID.
+        /// </summary>
+        /// <param name="clientInfoID"></param>
+        /// <param name="clientID"></param>
+        /// <param name="url"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="displayOrder"></param>
+        /// <returns></returns>
+        public static int UpdateLabClientInfo(int clientInfoID, int clientID, string url, string name, string description, int displayOrder)
+        {
+            int count = 0;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientInfo_Update", myConnection);
+			myCommand.CommandType = CommandType.StoredProcedure ;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientInfoID", clientInfoID, DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientID", clientID,DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@infoURL", url, DbType.String,512));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@infoName", name, DbType.String,256));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@description", description,DbType.String,2048));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@displayOrder", displayOrder, DbType.Int32));
+			try{
+                myConnection.Open();
+                int x = myCommand.ExecuteNonQuery();
+                if (x != 0)
+                    count += x;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("error: " + e.Message);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return count;
+        }
+
+        public static ClientInfo[] ListClientInfos(int clientID){
+            List<ClientInfo> infos = new List<ClientInfo>();
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientInfo_Retrieve", myConnection);
+			myCommand.CommandType = CommandType.StoredProcedure ;
+
+			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", clientID,DbType.Int32));
+
+            DbDataReader reader = null;
+
+            try
+            {
+                myConnection.Open();
+                reader = myCommand.ExecuteReader();
+                // select client_info_id, info_URL, info_name, display_order, description
+                if (reader != null)
+                {
+                    while (reader.Read())
+                    {
+                        ClientInfo info = new ClientInfo();
+                        info.clientID = clientID;
+                        info.clientInfoID = reader.GetInt32(0);
+                        info.infoURL = reader.GetString(1);
+                        info.infoURLName = reader.GetString(2);
+                        info.displayOrder = reader.GetInt32(3);
+                        info.description = reader.GetString(4);
+                        infos.Add(info);
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("error: " + e.Message);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return infos.ToArray();
+        }
 
 		/// <summary>
 		/// to delete all lab clients records specified by the array of lab client IDs
@@ -779,7 +603,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteLabClient", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Client_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID",null,DbType.Int32));
 
@@ -835,7 +659,7 @@ namespace iLabs.ServiceBroker.Internal
         {
             int count = -1;
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("DeleteLabClient", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Client_Delete", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@labClientID", clientID,DbType.Int32));
 
@@ -878,11 +702,84 @@ namespace iLabs.ServiceBroker.Internal
             return count;
         }
 
+        public static int LabServerClientDelete(int serverID, int clientID)
+        {
+            int count = 0;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_Delete", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labServerID", serverID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                count = Convert.ToInt32(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in LabServerClientDelete", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return count;
+        }
+        public static int DeleteLabClientInfo(int clientID)
+        {
+            int count = -1;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientInfo_DeleteByClient", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                count = myCommand.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in DeleteLabClients", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return count;
+        }
+        public static int DeleteLabClientInfo(int clientID, int infoID)
+        {
+            int count = -1;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientInfo_Delete", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@infoID", infoID, DbType.Int32));
+
+            try
+            {
+                 myConnection.Open();
+                count = Convert.ToInt32(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in DeleteLabClients", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return count;
+        }
+
+
         public static int SelectLabClientId(string guid)
         {
             int id = -1;
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabClientID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Client_RetrieveID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@guid", guid, DbType.AnsiString, 50));
 		    
@@ -895,7 +792,7 @@ namespace iLabs.ServiceBroker.Internal
 
                 while (myReader.Read())
                 {
-                    if (myReader["client_ID"] != System.DBNull.Value)
+                    if (!myReader.IsDBNull(0))
                         id = myReader.GetInt32(0);
 
                 }
@@ -918,10 +815,9 @@ namespace iLabs.ServiceBroker.Internal
 
 		public static int[] SelectLabClientIDs ()
 		{
-			int[] clientIDs;
-
+            List<int> clientIDs = new List<int>();
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabClientIDs", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("ClientIDs_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -931,18 +827,14 @@ namespace iLabs.ServiceBroker.Internal
 
 				// get labclient ids from table lab_clients
 				DbDataReader myReader = myCommand.ExecuteReader ();
-				ArrayList lcIDs = new ArrayList();
+				
 
 				while(myReader.Read ())
 				{	
 					if(myReader["client_ID"] != System.DBNull.Value )
-						lcIDs.Add(Convert.ToInt32(myReader["client_ID"]));
-					//	clientIDs [i] = (string) myReader["client_id"];
+                        clientIDs.Add(Convert.ToInt32(myReader["client_ID"]));
 				}
 				myReader.Close ();
-
-				// Converting to an int array
-				clientIDs = Utilities.ArrayListToIntArray(lcIDs);
 
 			}
 			catch (Exception ex)
@@ -953,9 +845,48 @@ namespace iLabs.ServiceBroker.Internal
 			{
 				myConnection.Close ();
 			}
-			
-			return clientIDs;
+
+            return clientIDs.ToArray();
 		}
+
+        public static IntTag[] SelectLabClientTags()
+        {
+            List<IntTag> clients = new List<IntTag>();
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Client_RetrieveTags", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            try
+            {
+                myConnection.Open();
+
+
+                // get labclient ids from table lab_clients
+                DbDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    IntTag tag = new IntTag();
+                    tag.id = myReader.GetInt32(0);
+                    if (!myReader.IsDBNull(1))
+                    {
+                        tag.tag = myReader.GetString(1);
+                    }
+                    clients.Add(tag);
+                }
+                myReader.Close();
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown SelectLabClientTagss", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return clients.ToArray();
+        }
 
         	/// <summary>
 		/// to retrieve lab client metadata for lab clients specified by array of lab client IDs 
@@ -963,7 +894,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static LabClient SelectLabClient( int clientID )
 		{
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabClient", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Client_Retrieve", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@labClientID", clientID, DbType.Int32));
             LabClient lc = new LabClient();
@@ -1003,73 +934,68 @@ namespace iLabs.ServiceBroker.Internal
                         lc.IsReentrant = Convert.ToBoolean(myReader["isReentrant"]);
                         if (myReader["Client_Guid"] != System.DBNull.Value)
                             lc.clientGuid = (string)myReader["Client_Guid"];
-                        /*if(myReader["date_created"] != System.DBNull .Value )
-                            lc.= (string) myReader["date_created"];*/
-
-                        //added by Karim
-                        //if(myReader["info_URL"] != System.DBNull .Value )
-                        //	lc.infoURL= (string) myReader["info_URL"];
-
+                        if (myReader["Documentation_URL"] != System.DBNull.Value)
+                            lc.documentationURL = (string)myReader["Documentation_URL"];
+                        
                     }
                     myReader.Close();
                 
-                //Retrieve  lab servers for a client
+                ////Retrieve  lab servers for a client
 
-                ArrayList lsIDs = new ArrayList();
+                //ArrayList lsIDs = new ArrayList();
 
-                DbCommand myCommand2 = FactoryDB.CreateCommand("RetrieveClientServerIDs", myConnection);
-                myCommand2.CommandType = CommandType.StoredProcedure;
-                myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", clientID, DbType.Int32));
+                //DbCommand myCommand2 = FactoryDB.CreateCommand("LabServerClient_RetrieveServerIDs", myConnection);
+                //myCommand2.CommandType = CommandType.StoredProcedure;
+                //myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", clientID, DbType.Int32));
 
-                    DbDataReader myReader2 = myCommand2.ExecuteReader();
+                //    DbDataReader myReader2 = myCommand2.ExecuteReader();
 
-                    while (myReader2.Read())
-                    {
-                        if (myReader2["agent_id"] != System.DBNull.Value)
-                            lsIDs.Add(Convert.ToInt32(myReader2["agent_id"]));
-                    }
+                //    while (myReader2.Read())
+                //    {
+                //        if (myReader2["agent_id"] != System.DBNull.Value)
+                //            lsIDs.Add(Convert.ToInt32(myReader2["agent_id"]));
+                //    }
 
-                    myReader2.Close();
+                //    myReader2.Close();
 
-                    // Convert to an int array and add to the current LabClient object
-                    lc.labServerIDs = Utilities.ArrayListToIntArray(lsIDs);
+                //    // Convert to an int array and add to the current LabClient object
+                //    lc.labServerIDs = Utilities.ArrayListToIntArray(lsIDs);
                 
 
-                //Retrieve info urls for a client
+                ////Retrieve info urls for a client
+                //ArrayList infoURLs = new ArrayList();
 
-                ArrayList infoURLs = new ArrayList();
+                //myCommand2 = FactoryDB.CreateCommand("ClientInfo_Retrieve", myConnection);
+                //myCommand2.CommandType = CommandType.StoredProcedure;
+                //myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", clientID, DbType.Int32));
 
-                myCommand2 = FactoryDB.CreateCommand("RetrieveClientInfo", myConnection);
-                myCommand2.CommandType = CommandType.StoredProcedure;
-                myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", clientID, DbType.Int32));
+                //    DbDataReader myReader3 = myCommand2.ExecuteReader();
 
-                    DbDataReader myReader3 = myCommand2.ExecuteReader();
+                //    while (myReader3.Read())
+                //    {
+                //        ClientInfo c = new ClientInfo();
+                //        if (myReader3["info_url"] != System.DBNull.Value)
+                //            c.infoURL = (string)myReader3["info_url"];
+                //        if (myReader3["info_name"] != System.DBNull.Value)
+                //            c.infoURLName = (string)myReader3["info_name"];
+                //        if (myReader3["client_info_id"] != System.DBNull.Value)
+                //            c.clientInfoID = Convert.ToInt32(myReader3["client_info_id"]);
+                //        if (myReader3["description"] != System.DBNull.Value)
+                //            c.description = ((string)myReader3["description"]);
+                //        if (myReader3["display_order"] != System.DBNull.Value)
+                //            c.displayOrder = (int)myReader3["display_order"];
 
-                    while (myReader3.Read())
-                    {
-                        ClientInfo c = new ClientInfo();
-                        if (myReader3["info_url"] != System.DBNull.Value)
-                            c.infoURL = (string)myReader3["info_url"];
-                        if (myReader3["info_name"] != System.DBNull.Value)
-                            c.infoURLName = (string)myReader3["info_name"];
-                        if (myReader3["client_info_id"] != System.DBNull.Value)
-                            c.clientInfoID = Convert.ToInt32(myReader3["client_info_id"]);
-                        if (myReader3["description"] != System.DBNull.Value)
-                            c.description = ((string)myReader3["description"]);
-                        if (myReader3["display_order"] != System.DBNull.Value)
-                            c.displayOrder = (int)myReader3["display_order"];
+                //        infoURLs.Add(c);
+                //    }
 
-                        infoURLs.Add(c);
-                    }
+                //    myReader2.Close();
 
-                    myReader2.Close();
-
-                    // Converting to a clientInfo array
-                    lc.clientInfos = new ClientInfo[infoURLs.Count];
-                    for (int j = 0; j < infoURLs.Count; j++)
-                    {
-                        lc.clientInfos[j] = (ClientInfo)(infoURLs[j]);
-                    }
+                //    // Converting to a clientInfo array
+                //    lc.clientInfos = new ClientInfo[infoURLs.Count];
+                //    for (int j = 0; j < infoURLs.Count; j++)
+                //    {
+                //        lc.clientInfos[j] = (ClientInfo)(infoURLs[j]);
+                //    }
                 }
             
             catch (Exception ex)
@@ -1090,7 +1016,7 @@ namespace iLabs.ServiceBroker.Internal
         public static LabClient SelectLabClient(string clientGuid)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabClientByGuid", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Client_RetrieveByGuid", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientGuid",clientGuid, DbType.String,50));
             LabClient lc = new LabClient();
@@ -1130,73 +1056,69 @@ namespace iLabs.ServiceBroker.Internal
                     lc.IsReentrant = Convert.ToBoolean(myReader["isReentrant"]);
                     if (myReader["Client_Guid"] != System.DBNull.Value)
                         lc.clientGuid = (string)myReader["Client_Guid"];
-                    /*if(myReader["date_created"] != System.DBNull .Value )
-                        lc.= (string) myReader["date_created"];*/
-
-                    //added by Karim
-                    //if(myReader["info_URL"] != System.DBNull .Value )
-                    //	lc.infoURL= (string) myReader["info_URL"];
-
+                    if (myReader["Documentation_URL"] != System.DBNull.Value)
+                        lc.documentationURL = (string)myReader["Documentation_URL"];
+                   
                 }
                 myReader.Close();
 
-                //Retrieve  lab servers for a client
+                ////Retrieve  lab servers for a client
 
-                ArrayList lsIDs = new ArrayList();
+                //ArrayList lsIDs = new ArrayList();
 
-                DbCommand myCommand2 = FactoryDB.CreateCommand("RetrieveClientServerIDs", myConnection);
-                myCommand2.CommandType = CommandType.StoredProcedure;
-                myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", lc.clientID, DbType.Int32));
+                //DbCommand myCommand2 = FactoryDB.CreateCommand("LabServerClient_RetrieveServerIDs", myConnection);
+                //myCommand2.CommandType = CommandType.StoredProcedure;
+                //myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", lc.clientID, DbType.Int32));
 
-                DbDataReader myReader2 = myCommand2.ExecuteReader();
+                //DbDataReader myReader2 = myCommand2.ExecuteReader();
 
-                while (myReader2.Read())
-                {
-                    if (myReader2["agent_id"] != System.DBNull.Value)
-                        lsIDs.Add(Convert.ToInt32(myReader2["agent_id"]));
-                }
+                //while (myReader2.Read())
+                //{
+                //    if (myReader2["agent_id"] != System.DBNull.Value)
+                //        lsIDs.Add(Convert.ToInt32(myReader2["agent_id"]));
+                //}
 
-                myReader2.Close();
+                //myReader2.Close();
 
-                // Convert to an int array and add to the current LabClient object
-                lc.labServerIDs = Utilities.ArrayListToIntArray(lsIDs);
+                //// Convert to an int array and add to the current LabClient object
+                //lc.labServerIDs = Utilities.ArrayListToIntArray(lsIDs);
 
 
-                //Retrieve info urls for a client
+                ////Retrieve info urls for a client
 
-                ArrayList infoURLs = new ArrayList();
+                //ArrayList infoURLs = new ArrayList();
 
-                myCommand2 = FactoryDB.CreateCommand("RetrieveClientInfo", myConnection);
-                myCommand2.CommandType = CommandType.StoredProcedure;
-                myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", lc.clientID, DbType.Int32));
+                //myCommand2 = FactoryDB.CreateCommand("ClientInfo_Retrieve", myConnection);
+                //myCommand2.CommandType = CommandType.StoredProcedure;
+                //myCommand2.Parameters.Add(FactoryDB.CreateParameter(myCommand2, "@labClientID", lc.clientID, DbType.Int32));
 
-                DbDataReader myReader3 = myCommand2.ExecuteReader();
+                //DbDataReader myReader3 = myCommand2.ExecuteReader();
 
-                while (myReader3.Read())
-                {
-                    ClientInfo c = new ClientInfo();
-                    if (myReader3["info_url"] != System.DBNull.Value)
-                        c.infoURL = (string)myReader3["info_url"];
-                    if (myReader3["info_name"] != System.DBNull.Value)
-                        c.infoURLName = (string)myReader3["info_name"];
-                    if (myReader3["client_info_id"] != System.DBNull.Value)
-                        c.clientInfoID = Convert.ToInt32(myReader3["client_info_id"]);
-                    if (myReader3["description"] != System.DBNull.Value)
-                        c.description = ((string)myReader3["description"]);
-                    if (myReader3["display_order"] != System.DBNull.Value)
-                        c.displayOrder = (int)myReader3["display_order"];
+                //while (myReader3.Read())
+                //{
+                //    ClientInfo c = new ClientInfo();
+                //    if (myReader3["info_url"] != System.DBNull.Value)
+                //        c.infoURL = (string)myReader3["info_url"];
+                //    if (myReader3["info_name"] != System.DBNull.Value)
+                //        c.infoURLName = (string)myReader3["info_name"];
+                //    if (myReader3["client_info_id"] != System.DBNull.Value)
+                //        c.clientInfoID = Convert.ToInt32(myReader3["client_info_id"]);
+                //    if (myReader3["description"] != System.DBNull.Value)
+                //        c.description = ((string)myReader3["description"]);
+                //    if (myReader3["display_order"] != System.DBNull.Value)
+                //        c.displayOrder = (int)myReader3["display_order"];
 
-                    infoURLs.Add(c);
-                }
+                //    infoURLs.Add(c);
+                //}
 
-                myReader2.Close();
+                //myReader2.Close();
 
-                // Converting to a clientInfo array
-                lc.clientInfos = new ClientInfo[infoURLs.Count];
-                for (int j = 0; j < infoURLs.Count; j++)
-                {
-                    lc.clientInfos[j] = (ClientInfo)(infoURLs[j]);
-                }
+                //// Converting to a clientInfo array
+                //lc.clientInfos = new ClientInfo[infoURLs.Count];
+                //for (int j = 0; j < infoURLs.Count; j++)
+                //{
+                //    lc.clientInfos[j] = (ClientInfo)(infoURLs[j]);
+                //}
             }
 
             catch (Exception ex)
@@ -1216,14 +1138,10 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static LabClient[] SelectLabClients ( int[] clientIDs )
 		{
-			LabClient[] lc = new LabClient[clientIDs.Length];
-			for (int i=0; i<clientIDs.Length ; i++)
-			{
-				lc[i] = new LabClient();
-			}
+            List<LabClient> clients = new List<LabClient>();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabClient", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Client_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand, "@labClientID",null, DbType.Int32));
 
@@ -1238,111 +1156,43 @@ namespace iLabs.ServiceBroker.Internal
 					// get labclient info from table lab_clients
 					DbDataReader myReader = myCommand.ExecuteReader ();
 					while(myReader.Read ())
-					{	
-						lc[i].clientID = clientIDs[i];
+                    {
+                        LabClient lc = new LabClient();
+						lc.clientID = clientIDs[i];
 
 						if(myReader["lab_client_name"] != System.DBNull.Value )
-							lc[i].clientName = (string) myReader["lab_client_name"];
+							lc.clientName = (string) myReader["lab_client_name"];
 						if(myReader["short_description"] != System.DBNull.Value )
-							lc[i].clientShortDescription = (string) myReader["short_description"];
+							lc.clientShortDescription = (string) myReader["short_description"];
 						if(myReader["long_description"] != System.DBNull.Value )
-							lc[i].clientLongDescription = (string) myReader["long_description"];
+							lc.clientLongDescription = (string) myReader["long_description"];
 						if(myReader["version"] != System.DBNull.Value )
-							lc[i].version = (string) myReader["version"];
+							lc.version = (string) myReader["version"];
 						if(myReader["loader_script"] != System.DBNull.Value )
-							lc[i].loaderScript= (string) myReader["loader_script"];
+							lc.loaderScript= (string) myReader["loader_script"];
 						if(myReader["description"] != System.DBNull.Value )
-							lc[i].clientType= (string) myReader["description"];
+							lc.clientType= (string) myReader["description"];
 						if(myReader["contact_email"] != System.DBNull .Value )
-							lc[i].contactEmail= (string) myReader["contact_email"];
+							lc.contactEmail= (string) myReader["contact_email"];
 						if(myReader["contact_first_name"]!= System.DBNull.Value)
-							lc[i].contactFirstName = (string) myReader["contact_first_name"];
+							lc.contactFirstName = (string) myReader["contact_first_name"];
 						if(myReader["contact_last_name"]!= System.DBNull.Value)
-							lc[i].contactLastName = (string) myReader["contact_last_name"];
+							lc.contactLastName = (string) myReader["contact_last_name"];
 						if(myReader["notes"]!= System.DBNull.Value)
-							lc[i].notes = (string) myReader["notes"];
-                        lc[i].needsScheduling = Convert.ToBoolean(myReader["needsScheduling"]);
-                        lc[i].needsESS = Convert.ToBoolean(myReader["needsESS"]);
-                        lc[i].IsReentrant = Convert.ToBoolean(myReader["isReentrant"]);
+							lc.notes = (string) myReader["notes"];
+                        lc.needsScheduling = Convert.ToBoolean(myReader["needsScheduling"]);
+                        lc.needsESS = Convert.ToBoolean(myReader["needsESS"]);
+                        lc.IsReentrant = Convert.ToBoolean(myReader["isReentrant"]);
                         if (myReader["Client_Guid"] != System.DBNull.Value)
-                            lc[i].clientGuid = (string)myReader["Client_Guid"];
-						/*if(myReader["date_created"] != System.DBNull .Value )
-							lc[i].= (string) myReader["date_created"];*/
-
-						//added by Karim
-						//if(myReader["info_URL"] != System.DBNull .Value )
-						//	lc[i].infoURL= (string) myReader["info_URL"];
-
+                            lc.clientGuid = (string)myReader["Client_Guid"];
+                        if (myReader["Documentation_URL"] != System.DBNull.Value)
+                            lc.documentationURL = (string)myReader["Documentation_URL"];
+                        clients.Add(lc);
+						
 					}
 					myReader.Close ();
 				}
-				//Retrieve  lab servers for a client
-						
-				ArrayList lsIDs = new ArrayList();
-
-				DbCommand myCommand2 = FactoryDB.CreateCommand("RetrieveClientServerIDs", myConnection);
-				myCommand2.CommandType = CommandType.StoredProcedure;
-				myCommand2.Parameters .Add(FactoryDB.CreateParameter(myCommand2,"@labClientID",null,DbType.Int32));
-				
-				for (int i =0; i < clientIDs.Length ; i++) 
-				{
-					myCommand2.Parameters["@labClientID"].Value = clientIDs[i];
-					DbDataReader myReader2 = myCommand2.ExecuteReader ();
-					
-					while(myReader2.Read ())
-					{	
-						if(myReader2["agent_id"] != System.DBNull.Value )
-							lsIDs.Add(Convert.ToInt32(myReader2["agent_id"]));
-					}
-				
-					myReader2.Close();
-
-					// Convert to an int array and add to the current LabClient object
-					lc[i].labServerIDs = Utilities.ArrayListToIntArray(lsIDs);
-					lsIDs.Clear();
-				}
-
-				//Retrieve info urls for a client
-						
-				ArrayList infoURLs = new ArrayList();
-
-				myCommand2 = FactoryDB.CreateCommand("RetrieveClientInfo", myConnection);
-				myCommand2.CommandType = CommandType.StoredProcedure;
-				myCommand2.Parameters .Add(FactoryDB.CreateParameter(myCommand2,"@labClientID",null, DbType.Int32));
-				
-				for (int i =0; i < clientIDs.Length ; i++) 
-				{
-					myCommand2.Parameters["@labClientID"].Value = clientIDs[i];
-		
-					DbDataReader myReader2 = myCommand2.ExecuteReader ();
-					
-					while(myReader2.Read ())
-					{	
-						ClientInfo c = new ClientInfo();
-						if(myReader2["info_url"] != System.DBNull.Value )
-							c.infoURL = (string) myReader2["info_url"];
-						if(myReader2["info_name"] != System.DBNull.Value )
-							c.infoURLName  = (string) myReader2["info_name"];
-						if(myReader2["client_info_id"] != System.DBNull.Value )
-							c.clientInfoID = Convert.ToInt32( myReader2["client_info_id"]);
-						if(myReader2["description"] != System.DBNull.Value )
-							c.description = ((string) myReader2["description"]);
-						if(myReader2["display_order"] != System.DBNull.Value )
-							c.displayOrder = (int) myReader2["display_order"];
-						
-						infoURLs.Add(c);
-					}
-				
-					myReader2.Close();
-
-					// Converting to a clientInfo array
-					lc[i].clientInfos = new ClientInfo [infoURLs.Count];
-					for (int j=0;j <infoURLs.Count ; j++) 
-					{
-						lc[i].clientInfos[j] = (ClientInfo) (infoURLs[j]);
-					}
-					infoURLs.Clear();
-				}
+ 
 			}
 			catch (Exception ex)
 			{
@@ -1353,12 +1203,18 @@ namespace iLabs.ServiceBroker.Internal
 				myConnection.Close ();
 			}
 			
-			return lc;
+			return clients.ToArray();;
 		}
-
+       
+        /// <summary>
+        /// Returns the number of clients for a LabServer, If the group is greater than zero only the grups clients will be counted
+        /// </summary>
+        /// <param name="groupID">Greater than zero, or not used</param>
+        /// <param name="labServerID">LabServer id</param>
+        /// <returns></returns>
         public static int CountServerClients(int groupID, int labServerID){
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("CountServerClients", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_Count", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@groupID", groupID, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@serverID", labServerID, DbType.Int32));
@@ -1378,9 +1234,28 @@ namespace iLabs.ServiceBroker.Internal
             }
         }
 
+public static int CountScheduledClients(int labServerID){
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_CountScheduledClients", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@serverID", labServerID, DbType.Int32));
+            
+            try
+            {
+                myConnection.Open();
+                return Convert.ToInt32(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+        }
         /// <summary>
-        /// Get the local labClientID from it's name. Note this does not use a stored procedure
-        /// as it was added as part of the service patch and did not want to require a database update.
+        /// Get the local labClientID from it's name. 
         /// </summary>
         /// <param name="name"></param>
         /// <returns>ClientID</returns>
@@ -1388,8 +1263,9 @@ namespace iLabs.ServiceBroker.Internal
         {
             int id = -1;
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SELECT Client_ID from Lab_Clients where Lab_Client_Name ='" + name + "';", myConnection);
-
+            DbCommand myCommand = FactoryDB.CreateCommand("LabClient_SelectByName", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@name",name, DbType.Single,256));
             myConnection.Open();
             try
             {
@@ -1475,7 +1351,7 @@ namespace iLabs.ServiceBroker.Internal
 			string[] clientTypes;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveLabClientTypes", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("ClientTypes_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -1521,7 +1397,7 @@ namespace iLabs.ServiceBroker.Internal
         public static void SaveClientItem(int clientID, int userID, string itemName, string itemValue)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SaveClientItem", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientItem_Save", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@clientID", clientID, DbType.Int32));
@@ -1551,7 +1427,7 @@ namespace iLabs.ServiceBroker.Internal
         {
             //string previousItem =  SelectClientItemValue(clientID,userID,itemName);
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("DeleteClientItem", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientItem_Delete", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
@@ -1584,7 +1460,7 @@ namespace iLabs.ServiceBroker.Internal
             string[] clientItemIDs;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveClientItemNames", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientItem_RetrieveNames", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
@@ -1631,7 +1507,9 @@ namespace iLabs.ServiceBroker.Internal
             ArrayList clientItems = new ArrayList();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveClientItem", myConnection);
+
+            // ClientItem_Retrieve currently only returns the value
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientItem_RetrieveValue", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@userID", userID, DbType.Int32));
@@ -1679,7 +1557,7 @@ namespace iLabs.ServiceBroker.Internal
 			int userID = -1;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddUser", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("User_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@userName", user.userName, DbType.String,256));
@@ -1728,7 +1606,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static void UpdateUser(User user, string principalString, string authenticationType)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifyUser", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("User_Update", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID", user.userID, DbType.Int32));
@@ -1767,7 +1645,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteUser", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("User_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",null,DbType.Int32));
 
@@ -1829,7 +1707,7 @@ namespace iLabs.ServiceBroker.Internal
 			int[] userIDs;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUserIDs", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveIDs", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -1870,7 +1748,7 @@ namespace iLabs.ServiceBroker.Internal
 			int[] userIDs;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveOrphanedUserIDs", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveOrphanedIDs", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -1914,7 +1792,7 @@ namespace iLabs.ServiceBroker.Internal
 			
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUser", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("User_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand, "@userID",null, DbType.Int32));
 
@@ -1976,7 +1854,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUserEmail", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveEmail", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userName", userName,DbType.String,256));
@@ -2003,7 +1881,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUserID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userName", userName,DbType.String,256));
@@ -2036,7 +1914,7 @@ namespace iLabs.ServiceBroker.Internal
         {
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveUserName", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveName", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@userID", userID, DbType.Int32));
@@ -2074,7 +1952,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 			
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddUserSession", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("UserSession_insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID", us.userID,DbType.Int32));
             DbParameter paramGroup = FactoryDB.CreateParameter(myCommand,"@groupID",DbType.Int32);
@@ -2114,7 +1992,7 @@ namespace iLabs.ServiceBroker.Internal
         {
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("ModifyUserSession", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("UserSession_Update", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sessionID", sessionID,DbType.Int64));
             DbParameter paramGroup = FactoryDB.CreateParameter(myCommand, "@groupID", DbType.Int32);
@@ -2153,7 +2031,7 @@ namespace iLabs.ServiceBroker.Internal
         {
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SetSessionGroup", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("UserSession_UpdateGroup", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sessionID", sessionID, DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -2177,7 +2055,7 @@ namespace iLabs.ServiceBroker.Internal
         public static bool SetSessionClient(long sessionID, int clientID)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SetSessionClient", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("UserSession_UpdateClient", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sessionID", sessionID, DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
@@ -2203,7 +2081,7 @@ namespace iLabs.ServiceBroker.Internal
         {
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SetSessionKey", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("UserSession_UpdateKey", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sessionID", sessionID,DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sessionKey", key,DbType.AnsiString,512));
@@ -2228,7 +2106,7 @@ namespace iLabs.ServiceBroker.Internal
         public static bool SetSessionTimeZone(long sessionID, int tzOffset)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SetSessionTzOffset", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("UserSession_UpdateTzOffset", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sessionID", sessionID, DbType.Int64));
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@tzOffset", tzOffset, DbType.Int32));
@@ -2250,11 +2128,11 @@ namespace iLabs.ServiceBroker.Internal
 		/// <summary>
 		/// to update the session end time in the user's session record -returns the user's session end time.
 		/// </summary>
-		public static DateTime SaveUserSessionEndTime(long sessionID)
+		public static bool SaveUserSessionEndTime(long sessionID)
 		{
 			
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("SaveUserSessionEndTime", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("UserSession_UpdateEndTime", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@sessionID", sessionID, DbType.Int64));
@@ -2262,7 +2140,7 @@ namespace iLabs.ServiceBroker.Internal
 			try
 			{
 				myConnection.Open();
-				return Convert.ToDateTime( myCommand.ExecuteScalar());
+				return Convert.ToBoolean( myCommand.ExecuteScalar());
 			}
 			catch (Exception ex)
 			{
@@ -2282,7 +2160,7 @@ namespace iLabs.ServiceBroker.Internal
             SessionInfo sessionInfo = null;
            
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("SelectSessionInfo", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SessionInfo_Retrieve", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sessionID",sessionID,  DbType.Int64));
            
@@ -2331,7 +2209,7 @@ namespace iLabs.ServiceBroker.Internal
 			}
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("SelectUserSession", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("UserSession_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@sessionID",null,DbType.Int64));
 
@@ -2440,7 +2318,7 @@ namespace iLabs.ServiceBroker.Internal
 			
 
 //			DbConnection myConnection = FactoryDB.GetConnection();
-//			DbCommand myCommand = FactoryDB.CreateCommand("SelectAllUserSessions", myConnection);
+//			DbCommand myCommand = FactoryDB.CreateCommand("UserSessions_RetrieveAll", myConnection);
 //			myCommand.CommandType = CommandType.StoredProcedure;
 //			myCommand.Parameters .Add(new DbParameter ("@userID",userID));
 //			myCommand.Parameters .Add(new DbParameter ("@groupID",groupID));
@@ -2561,7 +2439,7 @@ namespace iLabs.ServiceBroker.Internal
 
 
             //			DbConnection myConnection = FactoryDB.GetConnection();
-            //			DbCommand myCommand = FactoryDB.CreateCommand("SelectAllUserSessions", myConnection);
+            //			DbCommand myCommand = FactoryDB.CreateCommand("UserSessions_RetrieveAll", myConnection);
             //			myCommand.CommandType = CommandType.StoredProcedure;
             //			myCommand.Parameters .Add(new DbParameter ("@userID",userID));
             //			myCommand.Parameters .Add(new DbParameter ("@groupID",groupID));
@@ -2634,7 +2512,7 @@ namespace iLabs.ServiceBroker.Internal
 			int groupID = -1;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddGroup", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Group_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@groupName", grp.groupName,DbType.String,256));
@@ -2671,7 +2549,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static void UpdateGroup(Group grp)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifyGroup", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Group_Update", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", grp.groupID, DbType.Int32));
@@ -2706,7 +2584,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int[] DeleteGroups ( int[] groupIDs )
 		{
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteGroup", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", null, DbType.Int32));
 
@@ -2776,7 +2654,7 @@ namespace iLabs.ServiceBroker.Internal
 			int[] groupIDs;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroupIDs", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveIDs", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			try 
@@ -2818,7 +2696,7 @@ namespace iLabs.ServiceBroker.Internal
             int[] groupIDs;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAdminGroupIDs", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAdminGroupIDs", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             try
@@ -2864,7 +2742,7 @@ namespace iLabs.ServiceBroker.Internal
 			}
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroup", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@groupID",null,DbType.Int32));
 
@@ -2914,7 +2792,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int SelectGroupID(string groupName)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroupID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@groupName", groupName,DbType.String,256));
@@ -2947,7 +2825,7 @@ namespace iLabs.ServiceBroker.Internal
         public static string SelectGroupName(int groupID)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroupName", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveName", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -2983,7 +2861,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int SelectAssociatedGroupID(int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveAssociatedGroupID", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAssociatedGroupID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@groupID", groupID,DbType.Int32));
@@ -3016,7 +2894,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int SelectGroupRequestGroup(int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroupRequestGroupID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveRequestGroupID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -3049,7 +2927,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static int SelectGroupAdminGroup(int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroupAdminGroupID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAdminGroupID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -3087,7 +2965,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static bool InsertMemberInGroup(int memberID, int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddMemberToGroup", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_AddMember", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -3144,7 +3022,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static bool DeleteMemberFromGroup(int memberID, int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteMemberFromGroup", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_DeleteMember", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -3218,7 +3096,7 @@ namespace iLabs.ServiceBroker.Internal
                     DbConnection myConnection = FactoryDB.GetConnection();
                     try
                     {
-                        DbCommand isOrphanCommand = FactoryDB.CreateCommand("RetrieveGroupID", myConnection);
+                        DbCommand isOrphanCommand = FactoryDB.CreateCommand("Group_RetrieveID", myConnection);
                         isOrphanCommand.CommandType = CommandType.StoredProcedure;
                         isOrphanCommand.Parameters.Add(FactoryDB.CreateParameter(isOrphanCommand,"@groupName", Group.ORPHANEDGROUP,DbType.AnsiString,100));
                         myConnection.Open();
@@ -3267,7 +3145,7 @@ namespace iLabs.ServiceBroker.Internal
 			Agent[] members;
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveGroupMembers", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveMembers", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
@@ -3357,7 +3235,7 @@ namespace iLabs.ServiceBroker.Internal
 			int messageID =0;
 
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("AddSystemMessage", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("SystemMessage_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@messageType", sm.messageType, DbType.AnsiString,100 ));
@@ -3404,7 +3282,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static void UpdateSystemMessage(SystemMessage sm)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("ModifySystemMessage", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("SystemMessage_Update", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageID", sm.messageID, DbType.Int32));
@@ -3450,7 +3328,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteSystemMessageByID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SystemMessage_DeleteByID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageID", null, DbType.Int32));
 
@@ -3499,7 +3377,7 @@ namespace iLabs.ServiceBroker.Internal
 		{
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("DeleteSystemMessages", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SystemMessages_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@messageType",messageType, DbType.AnsiString,100));
             if (groupID == 0)
@@ -3542,7 +3420,7 @@ namespace iLabs.ServiceBroker.Internal
 			}
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessageByID", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SystemMessage_RetrieveByID", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@messageID",null,DbType.Int32));
 
@@ -3610,7 +3488,7 @@ namespace iLabs.ServiceBroker.Internal
             if (groups != null && groups.Count > 0)
             {
                 DbConnection myConnection = FactoryDB.GetConnection();
-                DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessagesForGroup", myConnection);
+                DbCommand myCommand = FactoryDB.CreateCommand("SystemMessages_RetrieveByGroup", myConnection);
                 myCommand.CommandType = CommandType.StoredProcedure;
                 myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupIds", Utilities.ToCSV(Utilities.ArrayListToIntArray(groups)), DbType.AnsiString, 4000));
                 try
@@ -3668,7 +3546,7 @@ namespace iLabs.ServiceBroker.Internal
             List<SystemMessage> systemMessages = new List<SystemMessage>();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessages", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SystemMessages_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageType", messageType, DbType.AnsiString,100));
             DbParameter client = FactoryDB.CreateParameter(myCommand, "@clientID", DbType.Int32);
@@ -3748,7 +3626,7 @@ namespace iLabs.ServiceBroker.Internal
 			List<SystemMessage> messages = new List<SystemMessage>();
 			
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessageByIDForAdmin", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SystemMessage_RetrieveByIDForAdmin", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@messageID",null, DbType.Int32));
 
@@ -3815,7 +3693,7 @@ namespace iLabs.ServiceBroker.Internal
 			ArrayList arrayList = new ArrayList();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("RetrieveSystemMessagesForAdmin", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("SystemMessages_RetrieveForAdmin", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageType", messageType, DbType.AnsiString,100));
