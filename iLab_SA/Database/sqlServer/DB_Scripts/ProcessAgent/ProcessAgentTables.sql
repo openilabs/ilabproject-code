@@ -1,12 +1,10 @@
--- $Id: ProcessAgentTables.sql,v 1.16 2007/06/25 14:11:41 pbailey Exp $
+
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
 
 --
 -- Tables common to all ticketing services.
 --
-
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_IssuedTicket_Ticket_Type]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[IssuedTicket] DROP CONSTRAINT FK_IssuedTicket_Ticket_Type
-GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Ticket_Ticket_Type]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Ticket] DROP CONSTRAINT FK_Ticket_Ticket_Type

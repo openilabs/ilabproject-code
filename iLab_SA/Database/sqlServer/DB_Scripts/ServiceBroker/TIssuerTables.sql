@@ -1,4 +1,6 @@
--- $Id: TIssuerTables.sql,v 1.6 2007/04/02 12:09:36 pbailey Exp $
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 
 --
 -- TicketIssuer additional tables. These tables should be added to the ProcessAgentTables for a ServiceBroker's Database.

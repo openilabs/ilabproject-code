@@ -1,4 +1,5 @@
-/* $Id: SetDefaultsTicketing.sql,v 1.17 2007/03/09 00:19:45 pbailey Exp $ */
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
 
 /* created by Tingting. */
 
@@ -16,6 +17,7 @@ INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VAL
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (16,' ESS', 'EXPERIMENT STORAGE SERVER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (32,' USS', 'SCHEDULING SERVER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (64,' LSS', 'LAB SCHEDULING SERVER');
+INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (128,'NOTA', 'NONE OF THE ABOVE');
 
 SET IDENTITY_INSERT ProcessAgent_Type OFF
 

@@ -1,4 +1,7 @@
--- $Id: TIssuerProcedures.sql,v 1.22 2007/06/02 09:51:30 pbailey Exp $
+
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 
 --
 -- Stored Procedures specfic to a TicketIssuer Service ( Service Broker ).

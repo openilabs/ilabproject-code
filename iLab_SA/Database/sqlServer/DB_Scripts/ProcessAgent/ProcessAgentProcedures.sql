@@ -1,4 +1,6 @@
--- $Id: ProcessAgentProcedures.sql,v 1.20 2008/03/11 19:10:40 pbailey Exp $
+-- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+-- $Id$
+
 --
 --
 -- These procedures implement the common ProcessAgent database methods.
