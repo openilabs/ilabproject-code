@@ -1,0 +1,9 @@
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\bin\Debug\UserSchedulingProxy.dll
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\bin\Debug\UserSchedulingProxy.pdb
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\bin\Debug\ilabdatatypes.dll
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\bin\Debug\ilabdatatypes.pdb
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\bin\Debug\ilabdatatypes.xml
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\obj\Debug\UserSchedulingProxy.dll
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\obj\Debug\UserSchedulingProxy.pdb
+D:\Project\code\dotNet\Proxies\UserSchedulingProxy\bin\Debug\UserSchedulingProxy.XML

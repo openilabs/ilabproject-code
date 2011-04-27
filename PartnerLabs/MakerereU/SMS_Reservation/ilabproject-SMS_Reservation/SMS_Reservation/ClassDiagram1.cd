@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="iLabs.Scheduling.UserSide.DBManager" Collapsed="true">
+    <Position X="1.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEgEAgCAECBBBghAAAAAjhQBIAgAAEAhSQCgowQSCAA=</HashCode>
+      <FileName>DBManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="iLabs.Scheduling.UserSide.ReservationInfo" Collapsed="true">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAEAAACRAAAAAAAgACAAAAAAAAAEAQAABAEACAA=</HashCode>
+      <FileName>USSSchedulingAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="iLabs.Scheduling.UserSide.USSSchedulingAPI" Collapsed="true">
+    <Position X="3.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgEAgCAEABBBgAAAAAAjhQBIAgAAEAgSQC4ogACCAA=</HashCode>
+      <FileName>USSSchedulingAPI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="userGroup" Collapsed="true">
+    <Position X="1.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAACAAAACAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Getting_userGroups.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="myDoSchedule" Collapsed="true">
+    <Position X="3.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BABAAgAAAQIQARAAQAAAAAEAAAIEIEAAIAAQAAABABA=</HashCode>
+      <FileName>MyDoScheduleCodeFile.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MyMakeReservationClass" Collapsed="true">
+    <Position X="5.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QABFAQCAIoIRAAAAAAAhACEAAA4EQIAAAAQQQAAAAQQ=</HashCode>
+      <FileName>MyMakeRerservation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="userDictionary" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAhEAAAAAQAAAAAAAAAAAAAAAKAAAAAAAAAABAAA=</HashCode>
+      <FileName>userDictionary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TextReservation.Service1" Collapsed="true">
+    <Position X="3.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service1.asmx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="iLabs.Scheduling.UserSide.LSSInfo" Collapsed="true">
+    <Position X="1.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAQAAAAAAAAAAIAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>USSSchedulingAPI.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="iLabs.Scheduling.UserSide.UssCredentialSet" Collapsed="true">
+    <Position X="3.5" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAAEAAAAAABAAAAAAAAAACAA=</HashCode>
+      <FileName>USSSchedulingAPI.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="iLabs.Scheduling.UserSide.USSPolicy" Collapsed="true">
+    <Position X="1.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAABABAAACAA=</HashCode>
+      <FileName>USSSchedulingAPI.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="iLabs.Scheduling.UserSide.UssExperimentInfo" Collapsed="true">
+    <Position X="5.25" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBAAAAAAAIQAAAAAQAAAAAAAAIACAAAAAAABAAAAAA=</HashCode>
+      <FileName>USSSchedulingAPI.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,6 @@
+D:\Project\code\dotNet\Libraries\DataTypes\bin\Debug\ilabdatatypes.dll
+D:\Project\code\dotNet\Libraries\DataTypes\bin\Debug\ilabdatatypes.pdb
+D:\Project\code\dotNet\Libraries\DataTypes\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\code\dotNet\Libraries\DataTypes\obj\Debug\ilabdatatypes.dll
+D:\Project\code\dotNet\Libraries\DataTypes\obj\Debug\ilabdatatypes.pdb
+D:\Project\code\dotNet\Libraries\DataTypes\bin\Debug\ilabdatatypes.XML

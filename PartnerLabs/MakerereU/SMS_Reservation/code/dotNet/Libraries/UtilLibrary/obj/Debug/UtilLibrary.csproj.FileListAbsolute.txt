@@ -1,0 +1,5 @@
+D:\Project\code\dotNet\Libraries\UtilLibrary\bin\Debug\UtilLibrary.dll
+D:\Project\code\dotNet\Libraries\UtilLibrary\bin\Debug\UtilLibrary.pdb
+D:\Project\code\dotNet\Libraries\UtilLibrary\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\code\dotNet\Libraries\UtilLibrary\obj\Debug\UtilLibrary.dll
+D:\Project\code\dotNet\Libraries\UtilLibrary\obj\Debug\UtilLibrary.pdb

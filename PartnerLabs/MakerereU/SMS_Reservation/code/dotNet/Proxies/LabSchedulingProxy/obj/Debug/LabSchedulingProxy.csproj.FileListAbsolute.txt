@@ -1,0 +1,9 @@
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\bin\Debug\LabSchedulingProxy.dll
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\bin\Debug\LabSchedulingProxy.pdb
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\bin\Debug\ilabdatatypes.dll
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\bin\Debug\ilabdatatypes.pdb
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\bin\Debug\ilabdatatypes.xml
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\obj\Debug\ResolveAssemblyReference.cache
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\obj\Debug\LabSchedulingProxy.dll
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\obj\Debug\LabSchedulingProxy.pdb
+D:\Project\code\dotNet\Proxies\LabSchedulingProxy\bin\Debug\LabSchedulingProxy.XML
