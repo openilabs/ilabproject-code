@@ -82,7 +82,12 @@ namespace iLabs.ServiceBroker.admin
             btnRefresh.CausesValidation = false;
 
             // "Are you sure" javascript for Remove button
-            btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this Lab Client?')== false) return false;");
+            StringBuilder jScript = new StringBuilder();
+            jScript.Append( "javascript:if(confirm('Are you sure you want to remove this Lab Client? ");
+            jScript.Append(" Removing the client will also delete all past experiments  and clientItems!");
+            jScript.Append(" Deleting a ClientID should only be done prior to any user experiments being run.");
+            jScript.Append( "')== false) return false;");
+            btnRemove.Attributes.Add("onclick",jScript.ToString());
 
             // This is a hidden input tag. The associatedLabServers popup changes its value using a window.opener call in javascript,
             // then the GetPostBackEventReference fires the event associated with the btnRefresh button.
@@ -93,8 +98,10 @@ namespace iLabs.ServiceBroker.admin
             if (!Page.IsPostBack)
             {
                 hdnEssID.Value = zero;
+                hdnNeedsEss.Value = zero;
                 hdnLabServerID.Value = zero;
                 hdnUssID.Value = zero;
+                hdnNeedsUss.Value = zero;
 
                 // Load Lab Client dropdown
                 InitializeClientDropDown();
@@ -151,6 +158,17 @@ namespace iLabs.ServiceBroker.admin
                 lblResponse.Visible = false;
 
             }
+            else if (Request.Params["refresh"] != null)
+            {
+                string tst = Request.Params["refresh"];
+                int cid = Int32.Parse(Request.Params["refresh"]);
+                ListItem theItem = ddlLabClient.Items.FindByValue(cid.ToString());
+                if (theItem != null)
+                {
+                    theItem.Selected = true;
+                    LoadFormFields();
+                }
+            }
         }
 
         #region Web Form Designer generated code
@@ -200,8 +218,10 @@ namespace iLabs.ServiceBroker.admin
         private void ClearFormFields()
         {
             hdnEssID.Value = zero;
+            hdnNeedsEss.Value = zero;
             hdnLabServerID.Value = zero;
             hdnUssID.Value = zero;
+            hdnNeedsUss.Value = zero;
             assocGroupIDs = null;
             txtLabClientName.Text = "";
             txtVersion.Text = "";
@@ -244,6 +264,8 @@ namespace iLabs.ServiceBroker.admin
             btnRegisterUSS.Visible = false;
 
             trOptions.Visible = false;
+            Session.Remove("ESSmapID");
+            Session.Remove("USSmapID");
         }
 
         /// <summary>
@@ -264,7 +286,8 @@ namespace iLabs.ServiceBroker.admin
                     assocGroupIDs = AdministrativeUtilities.GetLabClientGroups(labClient.clientID, false);
                     txtClientGuid.Text = labClient.clientGuid;
 
-                    txtLabClientName.Text = labClient.clientName;
+                    if(labClient.clientName != null)
+                        txtLabClientName.Text = labClient.clientName;
                     txtVersion.Text = labClient.version;
                     txtShortDesc.Text = labClient.clientShortDescription;
                     txtLongDesc.Text = labClient.clientLongDescription;
@@ -278,7 +301,10 @@ namespace iLabs.ServiceBroker.admin
                         ddlClientTypes.SelectedValue = labClient.clientType;
                     txtNotes.Text = labClient.notes;
                     txtLoaderScript.Text = labClient.loaderScript;
-
+                    cbxESS.Checked = labClient.needsESS;
+                    hdnNeedsEss.Value = labClient.needsESS ? "1" : zero;
+                    cbxScheduling.Checked = labClient.needsScheduling;
+                    hdnNeedsUss.Value = labClient.needsScheduling ? "1" : zero;
                     //Check if there is an associated USS and/or ESS => lab experiment needs scheduling and/or storage
                     CheckAssociatedResources(labClient);
 
@@ -304,7 +330,7 @@ namespace iLabs.ServiceBroker.admin
                     // javascript onclick routine with the correct Lab Client ID in the querystring
                     StringBuilder infoPopupScript = new StringBuilder("javascript:window.open('addInfoURLPopup.aspx?lc=");
                     infoPopupScript.Append(labClient.clientID);
-                    infoPopupScript.Append("','manageclientinfo','scrollbars=yes,resizable=yes,width=1000,height=600').focus()");
+                    infoPopupScript.Append("','manageclientinfo','scrollbars=yes,resizable=yes,width=800').focus()");
                     btnAddEditResources.Attributes.Remove("onClick");
                     btnAddEditResources.Attributes.Add("onClick", infoPopupScript.ToString());
 
@@ -312,7 +338,7 @@ namespace iLabs.ServiceBroker.admin
                     // javascript onclick routine with the correct Lab Client ID in the querystring
                     StringBuilder groupsPopupScript = new StringBuilder("javascript:window.open('manageLabGroups.aspx?lc=");
                     groupsPopupScript.Append(labClient.clientID);
-                    groupsPopupScript.Append("','manageLabGroups','scrollbars=yes,resizable=yes,width=800,height=600').focus()");
+                    groupsPopupScript.Append("','manageLabGroups','scrollbars=yes,resizable=yes,width=800').focus()");
                     btnAssociateGroups.Attributes.Remove("onClick");
                     btnAssociateGroups.Attributes.Add("onClick", groupsPopupScript.ToString());
 
@@ -321,7 +347,7 @@ namespace iLabs.ServiceBroker.admin
                     //// javascript onclick routine with the correct Lab Client ID in the querystring
                     //StringBuilder metadataPopupScript = new StringBuilder("javascript:window.open('editMetadataPopup.aspx?lc=");
                     //metadataPopupScript.Append(labClient.clientID);
-                    //metadataPopupScript.Append("','editMetadataPopup','scrollbars=yes,resizable=yes,width=800,height=600').focus()");
+                    //metadataPopupScript.Append("','editMetadataPopup','scrollbars=yes,resizable=yes,width=800').focus()");
                     //btnMetadata.Attributes.Remove("onClick");
                     //btnMetadata.Attributes.Add("onClick", metadataPopupScript.ToString());
 
@@ -341,8 +367,8 @@ namespace iLabs.ServiceBroker.admin
             int essId = 0;
            
 
-            cbxScheduling.Checked = client.needsScheduling;
-            cbxESS.Checked = client.needsESS;
+            //cbxScheduling.Checked = client.needsScheduling;
+            //cbxESS.Checked = client.needsESS;
 
             ProcessAgentInfo[] labServers = AdministrativeAPI.GetLabServersForClient(client.clientID);
             if (labServers != null && labServers.Length > 0 && labServers[0].agentId > 0)
@@ -466,10 +492,10 @@ namespace iLabs.ServiceBroker.admin
                 txtClientGuid.BackColor = disabled;
                 btnGuid.Visible = false;
             }
-            // Check if we can assign groups
+            // Check if we can assign groups, or if groups are assigned display button
             if (labServerID > 0)
             {
-                if (client.needsScheduling)
+                if (!hasGroups() && client.needsScheduling)
                 {
                     btnAssociateGroups.Visible = (lssId > 0 && ussId > 0) ? true : false;
                 }
@@ -480,8 +506,8 @@ namespace iLabs.ServiceBroker.admin
                 }
             }
             // for testing
-            btnAssociateGroups.Visible = true;
-            btnAssociateGroups.Enabled = true;
+            //btnAssociateGroups.Visible = true;
+            //btnAssociateGroups.Enabled = true;
         }
 
         protected void ddlLabClient_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -519,9 +545,9 @@ namespace iLabs.ServiceBroker.admin
             labClientID = 0;
             labClient = null;
             ddlLabClient.SelectedIndex = 0;
-            hdnEssID.Value = zero;
-            hdnLabServerID.Value = zero;
-            hdnUssID.Value = zero;
+            //hdnEssID.Value = zero;
+            //hdnLabServerID.Value = zero;
+            //hdnUssID.Value = zero;
             ClearFormFields();
         }
 
@@ -539,15 +565,22 @@ namespace iLabs.ServiceBroker.admin
             StringBuilder message = new StringBuilder();
             int status = 1;
             int result = 1;
+            int labServerID = 0;
+            int lssID = 0;
             if (txtVersion.Text == null || txtVersion.Text.Equals(""))
             {
                 status = Math.Min(status, 0);
                 message.AppendLine("You must specify a version for the client!<br/>");
             }
-            if (txtClientGuid.Text == null || txtClientGuid.Text.Equals("") || txtClientGuid.Text.Length > 50)
+            if (txtClientGuid.Text == null || txtClientGuid.Text.Equals(""))
             {
                 status = Math.Min(status, 0);
-                message.AppendLine("You must specify a GUID for the client, the maximun number of characters is 50!<br/>");
+                message.AppendLine("You must specify a GUID for the client!<br/>");
+            }
+            if (txtClientGuid.Text.Length > 50)
+            {
+                status = Math.Min(status, 0);
+                message.AppendLine("The GUID is too long, the maximun number of characters is 50!<br/>");
             }
             if (txtLoaderScript.Text == null || txtLoaderScript.Text.Equals(""))
             {
@@ -585,7 +618,7 @@ namespace iLabs.ServiceBroker.admin
                         InitializeClientDropDown();
                         ddlLabClient.SelectedValue = labClientID.ToString();
                     }
-                    int labServerID = Convert.ToInt32(ddlLabServer.SelectedValue);
+                    labServerID = Convert.ToInt32(ddlLabServer.SelectedValue);
                     if (labServerID > 0)
                     {
                         result = registerLS(labServerID, ref message);
@@ -613,20 +646,30 @@ namespace iLabs.ServiceBroker.admin
                     }
                     if (cbxScheduling.Checked)
                     {
-                        if (Convert.ToInt32(ddlLabServer.SelectedValue) > 0)
+                        int ussId = Convert.ToInt32(ddlAssociatedUSS.SelectedValue);
+                        if (ussId > 0)
                         {
-                            int ussId = Convert.ToInt32(ddlAssociatedUSS.SelectedValue);
-                            if (ussId > 0)
+                            if (labServerID > 0)
                             {
-                                result = registerUSS(ussId, ref message);
-                                status = Math.Min(status, result);
-                                message.AppendLine("Associating USS: " + ddlAssociatedUSS.SelectedItem.Text + ".<br/>");
+                                lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT,
+                                labServerID, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                                if (lssID > 0)
+                                {
+                                    result = registerUSS(ussId, ref message);
+                                    status = Math.Min(status, result);
+                                    message.AppendLine("Associating USS: " + ddlAssociatedUSS.SelectedItem.Text + ".<br/>");
+                                }
+                                else
+                                {
+                                    message.AppendLine("You must assign a lab scheduling server before you may register a Scheduling Server!<br/>");
+                                    status = Math.Min(status, 0);
+                                }
                             }
-                        }
-                        else
-                        {
-                            message.AppendLine("You must assign a lab server before you may register a Scheduling Server!<br/>");
-                            status = Math.Min(status, 0);
+                            else
+                            {
+                                message.AppendLine("You must assign a Lab Server and Lab Scheduling Server before you may register a User Scheduling Server!<br/>");
+                                status = Math.Min(status, 0);
+                            }
                         }
                     }
                 }
@@ -665,6 +708,8 @@ namespace iLabs.ServiceBroker.admin
             else
             ///////////////////////////////////////////////////////////////
             /// MODIFY an existing Lab Client                            //
+            /// Note: Modify only changes the primary attributes of      //
+            /// the client, resourceMapped values use the butttons.      // 
             ///////////////////////////////////////////////////////////////
             {
                 // Save the index
@@ -684,7 +729,7 @@ namespace iLabs.ServiceBroker.admin
                         txtContactEmail.Text, txtContactFirstName.Text, txtContactLastName.Text, txtNotes.Text,
                         cbxESS.Checked, cbxScheduling.Checked, cbxIsReentrant.Checked);
                     labClient = AdministrativeAPI.GetLabClient(labClientID);
-
+/***********
                     // Add support for Modified LabServer, Ess & Uss
                     int currentLS = Convert.ToInt32(hdnLabServerID.Value);
                     int lsId = Convert.ToInt32(ddlLabServer.SelectedValue);
@@ -737,6 +782,8 @@ namespace iLabs.ServiceBroker.admin
                             status = Math.Min(status, result);
                         }
                     }
+ * ****************/
+
                     // Reload the Lab Client dropdown
                     InitializeClientDropDown();
                     ddlLabClient.SelectedValue = savedSelectedValue;
@@ -821,7 +868,12 @@ namespace iLabs.ServiceBroker.admin
         //}
 
  
-
+        /// <summary>
+        /// This will remove the client from the database and any ResourceMapping. 
+        /// Because of cascading deletes all clientInfos, User's past experiments, and the user's clientItems will also be deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void btnRemove_Click(object sender, System.EventArgs e)
         {
             lblResponse.Visible = false;
@@ -830,18 +882,46 @@ namespace iLabs.ServiceBroker.admin
             if (ddlLabClient.SelectedIndex == 0)
             {
                 lblResponse.Visible = true;
-                lblResponse.Text = Utilities.FormatErrorMessage("Please select a lab client from dropdown list to delete");
+                lblResponse.Text = Utilities.FormatWarningMessage("Please select a lab client from dropdown list to delete!");
                 return;
             }
             else
             {
                 labClientID = Convert.ToInt32(ddlLabClient.SelectedValue);
                 labClient = AdministrativeAPI.GetLabClient(labClientID);
+                if (hasGroups() && labClient.needsScheduling)
+                {
+                    lblResponse.Visible = true;
+                    lblResponse.Text = Utilities.FormatWarningMessage("You may not delete a client that has groups assigned to it and needs scheduling! Please remove the grpoup(s) first.");
+                    return;
+                }
+                StringBuilder message = new StringBuilder();
+                int status = 1; 
                 try
                 {
+                    int oldEssId = int.Parse(hdnEssID.Value);
+                    if (oldEssId > 0)
+                    {
+                        status = Math.Min(status,dissociateESS(oldEssId, ref message));
+                    }
+                    int oldUssId = int.Parse(hdnUssID.Value);
+                    if (oldUssId > 0)
+                    {
+                        status = Math.Min(status,dissociateUSS(oldUssId, ref message));
+                    }
+                    int oldLabServerId = int.Parse(hdnLabServerID.Value);
+                    if (oldLabServerId > 0)
+                    {
+                        status = Math.Min(status,dissociateLS(oldLabServerId, ref message));
+                    }
                     wrapper.RemoveLabClientsWrapper(new int[] { labClientID });
+                    status = Math.Min(status, 1);
+                    message.Append("Lab Client '" + txtLabClientName.Text + "' has been deleted");
                     lblResponse.Visible = true;
-                    lblResponse.Text = Utilities.FormatConfirmationMessage("Lab Client '" + txtLabClientName.Text + "' has been deleted");
+                    if(status < 1)
+                        lblResponse.Text = Utilities.FormatWarningMessage(message.ToString());
+                    else
+                        lblResponse.Text = Utilities.FormatConfirmationMessage(message.ToString());
                     InitializeClientDropDown();
                     ClearFormFields();
                 }
@@ -973,6 +1053,8 @@ namespace iLabs.ServiceBroker.admin
                 {
                     message.AppendLine("Association between labServer & Client was not found.<br/>");
                     status = 0;
+                }
+                else{
                     int ussId = Convert.ToInt32(hdnUssID);
                     if (ussId > 0)
                     {
@@ -1019,7 +1101,7 @@ namespace iLabs.ServiceBroker.admin
                 return status;
             }
             TicketLoadFactory tlf = TicketLoadFactory.Instance();
-            string payload = tlf.createRevokeReservationPayload();
+            string payload = tlf.createRevokeReservationPayload("ISB");
             Coupon coupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, lss.agentGuid, ProcessAgentDB.ServiceGuid, 300L, payload);
             ticketing.AddTicket(coupon, TicketTypes.REVOKE_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 300L, payload);
 
@@ -1277,25 +1359,14 @@ namespace iLabs.ServiceBroker.admin
                     return status;
                 }
 
-                Object keyObj = labClientID;
-                string keyType = ResourceMappingTypes.CLIENT;
+                List<ResourceMappingValue> valuesList = new List<ResourceMappingValue>();
+              
+                ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.CLIENT, labClientID);
+                valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.EXPERIMENT_STORAGE_SERVER));
+                valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, essID));
+                valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,TicketTypes.GetTicketType(TicketTypes.ADMINISTER_EXPERIMENT)));
 
-                ArrayList valuesList = new ArrayList();
-                Object valueObj = null;
-
-                ResourceMappingValue value = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
-                valuesList.Add(value);
-
-                value = new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, essID);
-                valuesList.Add(value);
-
-                value = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-                    TicketTypes.GetTicketType(TicketTypes.ADMINISTER_EXPERIMENT));
-                valuesList.Add(value);
-
-                ResourceMappingKey key = new ResourceMappingKey(keyType, keyObj);
-                ResourceMappingValue[] values = (ResourceMappingValue[])valuesList.ToArray((new ResourceMappingValue()).GetType());
-                ResourceMapping newMapping = ticketing.AddResourceMapping(key, values);
+                ResourceMapping newMapping = ticketing.AddResourceMapping(key, valuesList.ToArray());
 
                 // add mapping to qualifier list
                 int qualifierType = Qualifier.resourceMappingQualifierTypeID;
@@ -1306,7 +1377,6 @@ namespace iLabs.ServiceBroker.admin
                 hdnEssID.Value = essID.ToString();
                 btnRegisterESS.Text = "Dissociate";
                 //ddlAssociatedESS.Enabled = false;
-
 
                 message.AppendLine("Experiment Storage Server \"" + ddlAssociatedESS.SelectedItem.Text + "\" succesfully "
                     + "associated with client \"" + ddlLabClient.SelectedItem.Text + "\".");
@@ -1342,13 +1412,14 @@ namespace iLabs.ServiceBroker.admin
                 if (status < 1)
                     return status;
 
-                int mapId = ResourceMapManager.FindMapID(ResourceMappingTypes.CLIENT, labClientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
-                int qualID = AuthorizationAPI.GetQualifierID(mapId, Qualifier.resourceMappingQualifierTypeID);
-                AuthorizationAPI.RemoveQualifiers(new int[] { qualID });
+                int mapId = ResourceMapManager.FindMapID(ResourceMappingTypes.CLIENT, labClientID, 
+                    ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
+                //int qualID = AuthorizationAPI.GetQualifierID(mapId, Qualifier.resourceMappingQualifierTypeID);
+                //AuthorizationAPI.RemoveQualifiers(new int[] { qualID });
                 ticketing.DeleteResourceMapping(mapId);
                 btnRegisterESS.Visible = true;
                 btnRegisterESS.Text = "Register";
-                message.AppendLine("Experiment Storage Server \"" + ddlAssociatedESS.SelectedItem.Text + "\" succesfully "
+                message.AppendLine("Experiment Storage Server \"" + ddlAssociatedESS.SelectedItem.Text + "\" successfully "
                     + "dissociated from client \"" + ddlLabClient.SelectedItem.Text + "\".");
 
                 ddlAssociatedESS.Enabled = true;
@@ -1382,14 +1453,7 @@ namespace iLabs.ServiceBroker.admin
                 if (status < 1)
                     return status;
 
-                Object keyObj = labClientID;
-                string keyType = ResourceMappingTypes.CLIENT;
-
-                ArrayList valuesList = new ArrayList();
-                Object valueObj = null;
-
-                ResourceMappingValue value = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER);
-                valuesList.Add(value);
+              
 
                 if (ussID > 0)
                 {
@@ -1430,7 +1494,7 @@ namespace iLabs.ServiceBroker.admin
                                             return 0;
                                         }
                                         // The REVOKE_RESERVATION ticket
-                                        string revokePayload = factory.createRevokeReservationPayload();
+                                        string revokePayload = factory.createRevokeReservationPayload("LSS");
                                         Coupon ussCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, uss.agentGuid,
                                             lss.agentGuid, -1L, revokePayload);
 
@@ -1472,18 +1536,14 @@ namespace iLabs.ServiceBroker.admin
                                             labClient.clientGuid, labClient.clientName, labClient.version, labClient.contactEmail, lss.agentGuid);
 
                                         //Ceate resource Map
-                                        value = new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussID);
-                                        valuesList.Add(value);
-
-                                        value = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-                                            TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION));
-                                        valuesList.Add(value);
-
-                                        ResourceMappingKey key = new ResourceMappingKey(keyType, keyObj);
-                                        ResourceMappingValue[] values = (ResourceMappingValue[])valuesList.ToArray((new ResourceMappingValue()).GetType());
-
+                                        ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.CLIENT, labClientID);
+                                        List<ResourceMappingValue> valuesList = new List<ResourceMappingValue>();
+                                        valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER));
+                                        valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussID));
+                                        valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
+                                            TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION)));
                                         // Add the mapping to the database & cache
-                                        ResourceMapping newMapping = ticketing.AddResourceMapping(key, values);
+                                        ResourceMapping newMapping = ticketing.AddResourceMapping(key, valuesList.ToArray());
 
                                         // add mapping to qualifier list
                                         int qualifierType = Qualifier.resourceMappingQualifierTypeID;
@@ -1569,7 +1629,8 @@ namespace iLabs.ServiceBroker.admin
                     message.AppendLine("The uss_Id and currently assigned resource do not match!<br/>");
                     return -1;
                 }
-                int ussMapId = ResourceMapManager.FindMapID(ResourceMappingTypes.CLIENT, labClientID, ProcessAgentType.SCHEDULING_SERVER);
+                int ussMapId = ResourceMapManager.FindMapID(ResourceMappingTypes.CLIENT, labClientID, 
+                    ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER);
                 int lssId = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, Convert.ToInt32(hdnLabServerID.Value), ProcessAgentType.LAB_SCHEDULING_SERVER);
                 if (ussID > 0 || lssId > 0)
                 {
@@ -1614,7 +1675,7 @@ namespace iLabs.ServiceBroker.admin
         {
             Guid guid = System.Guid.NewGuid();
             txtClientGuid.Text = Utilities.MakeGuid();
-            valGuid.Validate();
+            //valGuid.Validate();
         }
 
         protected void checkGuid(object sender, ServerValidateEventArgs args)

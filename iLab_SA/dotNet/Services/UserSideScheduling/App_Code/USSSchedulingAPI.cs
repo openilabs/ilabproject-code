@@ -1,4 +1,6 @@
 using System;
+using System.Data;
+
 using iLabs.DataTypes.SchedulingTypes;
 
 namespace iLabs.Scheduling.UserSide
@@ -95,6 +97,59 @@ namespace iLabs.Scheduling.UserSide
             set
             {
                 this.experimentInfoIdField = value;
+            }
+        }
+    }
+
+    public class ReservationData : ReservationInfo
+    {
+        private string sbGuidField;
+        private string groupNameField;
+        private string lsGuidField;
+        private string clientGuidField;
+
+        public string sbGuid
+        {
+            get
+            {
+                return sbGuidField;
+            }
+            set
+            {
+                sbGuidField = value;
+            }
+        }
+        public string groupName
+        {
+            get
+            {
+                return groupNameField;
+            }
+            set
+            {
+                groupNameField = value;
+            }
+        }
+        public string lsGuid
+        {
+            get
+            {
+                return lsGuidField;
+            }
+            set
+            {
+                lsGuidField = value;
+            }
+        }
+        public string clientGuid
+        {
+            get
+            {
+                return clientGuidField;
+            }
+            set
+            {
+                clientGuidField = value;
             }
         }
     }
@@ -406,7 +461,7 @@ namespace iLabs.Scheduling.UserSide
         /// <returns></returns>
         public static ReservationInfo[] GetReservations(int[] reservationIDs)
         {
-            return DBManager.GetReservations(reservationIDs);
+            return DBManager.GetReservationInfos(reservationIDs);
         }
 
         /// <summary>
@@ -420,18 +475,24 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static ReservationInfo[] GetReservations(string sbGuid, string userName, string groupName,
+        public static ReservationInfo[] GetReservationInfos(string sbGuid, string userName, string groupName,
             string lsGuid, string clientGuid, DateTime start, DateTime end)
         {
-            return DBManager.GetReservations(sbGuid, userName, groupName,lsGuid, clientGuid, start, end);
+            return DBManager.GetReservationInfos(sbGuid, userName, groupName,lsGuid, clientGuid, start, end);
         }
-        /// <summary>
-        /// to select reservation accorrding to given criterion
-        /// </summary>
-        public static ReservationInfo[] GetReservations(string userName, int experimentInfoId, int credentialSetId, DateTime timeAfter, DateTime timeBefore)
+
+        public static ReservationInfo[] GetReservationInfos(string userName, int experimentInfoID,
+           int credentialSetID, DateTime start, DateTime end)
         {
-            return DBManager.GetReservations(userName, experimentInfoId, credentialSetId, timeAfter, timeBefore);
+            return DBManager.GetReservationInfos(userName, experimentInfoID, credentialSetID, start, end);
         }
+
+        public static ReservationData[] GetReservations(string sbGuid, string userName, string groupName,
+            string lsGuid, string clientGuid, DateTime start, DateTime end)
+        {
+            return DBManager.GetReservations(sbGuid, userName, groupName, lsGuid, clientGuid, start, end);
+        }
+      
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information
 			 * !------------------------------------------------------------------------------!
@@ -767,7 +828,7 @@ namespace iLabs.Scheduling.UserSide
                 int i = DBManager.ListReservationIDByUser(userName, serviceBrokerGuid, clientGuid, labServerGuid, targetTime);
 				if (i >0)
 				{
-                    redeemedRes = DBManager.GetReservations(new int[] { i })[0];
+                    redeemedRes = DBManager.GetReservationInfos(new int[] { i })[0];
 				}
 			}
 			catch(Exception ex)
@@ -789,7 +850,7 @@ namespace iLabs.Scheduling.UserSide
             TimeSpan ts = new TimeSpan();
             try
             {
-             redeemedRes = DBManager.GetReservations(new int[] { reservationID })[0];
+             redeemedRes = DBManager.GetReservationInfos(new int[] { reservationID })[0];
              DateTime startTime = redeemedRes.startTime.ToLocalTime();
              ts = startTime.Subtract(DateTime.Now);
              }

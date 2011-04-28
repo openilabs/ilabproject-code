@@ -26,9 +26,6 @@ namespace iLabs.Scheduling.LabSide
 		 int credentialSetID;
 		 int[] credentialSetIDs;
 	     LssCredentialSet[] credentialSets;
-		 int[] ussInfoIDs;
-		 USSInfo[] ussInfos;
-
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
 
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -36,9 +33,7 @@ namespace iLabs.Scheduling.LabSide
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this experiment Information?')== false) return false;");
 			credentialSetIDs=LSSSchedulingAPI.ListCredentialSetIDs();
 			credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
-			ussInfoIDs=LSSSchedulingAPI.ListUSSInfoIDs();
-			ussInfos=LSSSchedulingAPI.GetUSSInfos(ussInfoIDs);
-
+			
 			if(!IsPostBack)
 			{
 
@@ -105,15 +100,8 @@ namespace iLabs.Scheduling.LabSide
                     ddlGroup.Items.Add(new ListItem(" ---------- select Group ---------- "));
                     for (int i = 0; i < credentialSets.Length; i++)
                     {
-                        USSInfo[] uIn = LSSSchedulingAPI.GetUSSInfos(new int[] { LSSSchedulingAPI.ListUSSInfoID(credentialSets[i].ussGuid) });
-                        string cred = credentialSets[i].groupName + " " + credentialSets[i].serviceBrokerName + " " + uIn[0].ussName;
+                        string cred = credentialSets[i].groupName + " " + credentialSets[i].serviceBrokerName;
                         ddlGroup.Items.Add(new ListItem(cred, credentialSets[i].credentialSetId.ToString()));
-                    }
-                    // Load the USS list box
-                    ddlUSS.Items.Add(new ListItem(" ---------- select User side scheduling server ---------- "));
-                    for (int i = 0; i < ussInfos.Length; i++)
-                    {
-                        ddlUSS.Items.Add(new ListItem(ussInfos[i].ussName, ussInfos[i].ussGuid.ToString()));
                     }
 
                     // Set the GUID field to not ReadOnly
@@ -155,8 +143,7 @@ namespace iLabs.Scheduling.LabSide
 			ddlGroup.Items.Add(new ListItem(" ---------- select Group ---------- "));
 			for(int i=0; i< credentialSets.Length; i++)
 			{
-				USSInfo[] uIn=LSSSchedulingAPI.GetUSSInfos(new int[]{LSSSchedulingAPI.ListUSSInfoID(credentialSets[i].ussGuid)});
-				string cred=credentialSets[i].groupName+" "+credentialSets[i].serviceBrokerName + " " + uIn[0].ussName;
+				string cred=credentialSets[i].groupName+" "+credentialSets[i].serviceBrokerName;
 				ddlGroup.Items.Add(new ListItem(cred, credentialSets[i].credentialSetId.ToString()));
 			}
 		}
@@ -191,9 +178,6 @@ namespace iLabs.Scheduling.LabSide
 			txtServiceBrokerID.Text = "";
 			SetReadOnly(false);
 			txtServiceBrokerName.Text = "";
-			ddlUSS.ClearSelection();
-			ddlUSS.Items[0].Selected=true;
-		  
 		}
 		/// <summary>
 		/// This method fires when the GROUP dropdown changes.
@@ -219,8 +203,7 @@ namespace iLabs.Scheduling.LabSide
 				txtGroupName.Text = cr.groupName;
 				txtServiceBrokerID.Text = cr.serviceBrokerGuid;
 				txtServiceBrokerName.Text = cr.serviceBrokerName;
-				ddlUSS.ClearSelection();
-				ddlUSS.Items.FindByValue(cr.ussGuid).Selected=true;
+				
 				// Make the serverice broker id field ReadOnly
 				SetReadOnly(true);
 			
@@ -264,12 +247,6 @@ namespace iLabs.Scheduling.LabSide
 				return;
 			}
 
-			if(ddlUSS.SelectedIndex==0 )
-			{
-				lblErrorMessage.Text = Utilities.FormatWarningMessage("You must select a user side scheduling server.");
-				lblErrorMessage.Visible=true;
-				return;
-			}
 			
 			///////////////////////////////////////////////////////////////
 			/// ADD a new Credential Set                                            //
@@ -280,20 +257,19 @@ namespace iLabs.Scheduling.LabSide
 				// see if this Credential Set already exists
 				foreach (LssCredentialSet cr in credentialSets)
 				{
-					if((txtGroupName.Text == cr.groupName )&& (txtServiceBrokerID.Text == cr.serviceBrokerGuid) && (ddlUSS.SelectedItem.Value == cr.ussGuid))
+					if((txtGroupName.Text == cr.groupName )&& (txtServiceBrokerID.Text == cr.serviceBrokerGuid) )
 					{
 						lblErrorMessage.Visible = true;
-						lblErrorMessage.Text = Utilities.FormatWarningMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedItem.Value+ " exists, choose another one");
+						lblErrorMessage.Text = Utilities.FormatWarningMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " exists, choose another one");
 						
 						return;
 					}
 				}
 
 				// Add the Credential Set
-				int savedIndexforUSS=ddlUSS.SelectedIndex;
 				try
 				{
-					credentialSetID = LSSSchedulingAPI.AddCredentialSet(txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text,ddlUSS.SelectedValue);
+					credentialSetID = LSSSchedulingAPI.AddCredentialSet(txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text);
 				}
 				catch (Exception ex)
 				{
@@ -306,19 +282,16 @@ namespace iLabs.Scheduling.LabSide
 				if (credentialSetID != -1)
 				{
 					lblErrorMessage.Visible = true;
-					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedItem.Value+ " " + " has been added.");
+					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " has been added.");
 					// set dropdown to newly created credential set.
 					InitializeGroupDropDown();
 					ddlGroup.Items.FindByValue(credentialSetID.ToString()).Selected = true;
-					ddlUSS.ClearSelection();
-					ddlUSS.Items[savedIndexforUSS].Selected=true;
-		  
 					SetReadOnly(true);	
 				}
 				else // cannot create Credential Set
 				{
 					lblErrorMessage.Visible = true;
-					lblErrorMessage.Text = Utilities.FormatErrorMessage("Cannot create Group" +txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedValue +".");
+					lblErrorMessage.Text = Utilities.FormatErrorMessage("Cannot create Group" +txtGroupName.Text + " " + txtServiceBrokerName.Text + ".");
 				    return;
 				}
 			}
@@ -330,27 +303,24 @@ namespace iLabs.Scheduling.LabSide
 				
 				// Save the index
 				int savedSelectedIndex = ddlGroup.SelectedIndex;
-                int savedIndexForUSS=ddlUSS.SelectedIndex;
 				credentialSetID = credentialSets[ddlGroup.SelectedIndex-1].credentialSetId;
 				try
 				{
 					// Modify the Credential
-					LSSSchedulingAPI.ModifyCredentialSet(credentialSetID, txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text, ddlUSS.SelectedValue);
+					LSSSchedulingAPI.ModifyCredentialSet(credentialSetID, txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text);
 					
 					lblErrorMessage.Visible = true;
-					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedItem.Value+ " has been modified.");
+					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " has been modified.");
 					
 					// Reload the Group dropdown
 					InitializeGroupDropDown();
 					ddlGroup.SelectedIndex = savedSelectedIndex;
-					ddlUSS.ClearSelection();
-					ddlUSS.SelectedIndex=savedIndexForUSS;
                  
 				}
 				catch(Exception ex)
 				{
 					lblErrorMessage.Visible = true;
-					lblErrorMessage.Text = Utilities.FormatErrorMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedItem.Value+ " cannot be modified."+ex.Message);
+					lblErrorMessage.Text = Utilities.FormatErrorMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " cannot be modified."+ex.Message);
 					return;
 				}
 			}
@@ -371,14 +341,14 @@ namespace iLabs.Scheduling.LabSide
 				{
 					LSSSchedulingAPI.RemoveCredentialSets(new int[]{credentialSetID});
 					lblErrorMessage.Visible = true;
-					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Group '" +txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedItem.Value + "' has been deleted");
+					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Group '" +txtGroupName.Text + " " + txtServiceBrokerName.Text + "' has been deleted");
 					InitializeGroupDropDown();
 					ClearFormFields();
 				}
 				catch
 				{
 					lblErrorMessage.Visible = true;
-					lblErrorMessage.Text = Utilities.FormatErrorMessage("Group '" +txtGroupName.Text + " " + txtServiceBrokerName.Text + " " + ddlUSS.SelectedItem.Value + "' cannot be deleted");
+					lblErrorMessage.Text = Utilities.FormatErrorMessage("Group '" +txtGroupName.Text + " " + txtServiceBrokerName.Text + "' cannot be deleted");
 				}
 
 			}

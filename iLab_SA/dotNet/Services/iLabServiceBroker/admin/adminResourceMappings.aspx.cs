@@ -186,6 +186,7 @@ namespace iLabs.ServiceBroker.admin
             // mappings dropdown
             value_MappingDropdown.Items.Clear();
             value_MappingDropdown.Items.Add(new ListItem(" ------------- select Resource Mapping ------------ ", "0"));
+            ResourceMapManager.Refresh();
             List<ResourceMapping> mappings = ResourceMapManager.Get();
             foreach (ResourceMapping rm in mappings)
             {

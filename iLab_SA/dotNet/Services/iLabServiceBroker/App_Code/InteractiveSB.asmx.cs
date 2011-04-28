@@ -882,24 +882,42 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public Coupon RequestAuthorization(string[] types, long duration, string group, string user, string serviceGuid, string clientGuid)
         {
-            
-            Coupon coupon = null;
+            bool ok = false;
             BrokerDB brokerDB = new BrokerDB();
+            Coupon coupon = brokerDB.CreateCoupon();
             //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             //{
-                if (ProcessAgentDB.ServiceGuid.CompareTo(agentAuthHeader.coupon.issuerGuid) == 0)
+            if (ProcessAgentDB.ServiceGuid.CompareTo(agentAuthHeader.coupon.issuerGuid) == 0)
+            {
+                if (types != null && types.Length > 0)
                 {
-                    if (types != null && types.Length > 0)
+                    int userID = -1;
+                    int groupID = -1;
+                    int lcID = -1;
+                    int lsID = -1;
+                    int lssID = -1;
+                    int ussID = -1;
+                    int essID = -1;
+                    ProcessAgent lss = null;
+                    ProcessAgent uss = null;
+                    ProcessAgent ess = null;
+                    if (clientGuid != null && clientGuid.Length > 0)
+                        lcID = AdministrativeAPI.GetLabClientID(clientGuid);
+                    if (serviceGuid != null && serviceGuid.Length > 0)
+                        lsID = brokerDB.GetProcessAgentID(serviceGuid);
+                    if (lsID > 0)
+                        lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                    if (lcID > 0)
                     {
-                        int userID = -1;
-                        int groupID = -1;
-                        int lcID = AdministrativeAPI.GetLabClientID(clientGuid);
-                        int lsID = brokerDB.GetProcessAgentID(serviceGuid);
-                        int lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
-                        int ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, lcID, ProcessAgentType.SCHEDULING_SERVER);
-                        ProcessAgent lss = brokerDB.GetProcessAgent(lssID);
-                        ProcessAgent uss = brokerDB.GetProcessAgent(ussID);
-                        ProcessAgent ess = null;
+                        ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, lcID, ProcessAgentType.SCHEDULING_SERVER);
+                        essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, lcID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
+                        if (lssID > 0)
+                            lss = brokerDB.GetProcessAgent(lssID);
+                        if (ussID > 0)
+                            uss = brokerDB.GetProcessAgent(ussID);
+                        if (essID > 0)
+                            ess = brokerDB.GetProcessAgent(essID);
+
                         TicketLoadFactory factory = TicketLoadFactory.Instance();
 
                         foreach (string str in types)
@@ -919,11 +937,12 @@ namespace iLabs.ServiceBroker.iLabSB
                                 case TicketTypes.SCHEDULE_SESSION:
                                     // Create the Authority's SCHEDULE_SESSION ticket
                                     string payloadUss = factory.makeReservationPayload(ProcessAgentDB.ServiceGuid, user, group, serviceGuid, clientGuid, uss.webServiceUrl);
-                                    coupon = brokerDB.CreateTicket(TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, duration, payloadUss);
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, duration, payloadUss);
                                     // Create the USS to LSS REQUEST_RESERVATION Ticket
                                     brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, duration, null);
                                     // Create the USS to LSS
                                     brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, duration, null);
+                                    ok = true;
                                     break;
                                 case TicketTypes.REDEEM_RESERVATION:
                                     break;
@@ -932,12 +951,14 @@ namespace iLabs.ServiceBroker.iLabSB
                                 default:
                                     break;
                             }
-                         
                         }
                     }
                 }
-            //}
-            return coupon;
+            }
+            if (ok)
+                return coupon;
+            else
+                return null;
         }
 
         

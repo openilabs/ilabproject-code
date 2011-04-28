@@ -22,7 +22,10 @@ Please see license.txt in top level directory for full license.
 	</HEAD>
 	<body>
 		<form id="helpForm" method="post" runat="server">
-			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all">
+			<div id="outerwrapper">
+			    <uc1:banner id="Banner1" runat="server"></uc1:banner>
+			    <uc1:usernav id="UserNav1" runat="server"></uc1:usernav>
+			    <br clear="all">
 				<a name="top"></a>
 				<div id="innerwrapper">
 					<div id="pageintro">
@@ -85,64 +88,48 @@ Please see license.txt in top level directory for full license.
 						<div id="requesthelp">
 								<h2><a id="help" name="help"></a>Request Help with a Lab</h2>
 								<p>Fill out the form below to request help with the iLab system or a particular 
-									lab. Someone will respond to you shortly.</p>
+									lab. Someone will respond to you shortly. You will have to enter the the security code before you can send the request.</p>
 								<% if (Session["UserID"] == null) { %>
 								<p>You are not currently logged in. Please include your name and email address, so 
 									that we can respond to you.</p>
 								<% } %>
 								<div class="simpleform">
 									<table>
-										<TR>
-											<TD style="width: 192px">
-												<asp:Label id="lblUserName" runat="server" Font-Size="Small">User Name</asp:Label></TD>
-											<TD style="width: 439px">
-												<asp:TextBox id="txtUserName" runat="server"></asp:TextBox></TD>
-										</TR>
-										<TR>
-											<TD style="width: 192px">
-												<asp:Label id="lblEmail" runat="server" Font-Size="Small">Email</asp:Label></TD>
-											<TD style="width: 439px">
-												<asp:TextBox id="txtEmail" runat="server"></asp:TextBox></TD>
-										</TR>
 										<tr>
-											<th style="width: 192px">
-												<label for="lab">Select the type of help you need.</label></th>
-											<td style="width: 439px"><asp:dropdownlist CssClass="i18n" id="ddlHelpType" Runat="server"></asp:dropdownlist></td>
+											<th style="width: 192px"><asp:Label id="lblUserName" runat="server">User Name</asp:Label></th>
+											<td style="width: 608px"><asp:TextBox id="txtUserName" runat="server" Width="600px"></asp:TextBox></td>
 										</tr>
 										<tr>
-											<th style="width: 192px">
-												<label for="problem">Describe your problem</label></th>
-											<td style="width: 439px"><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine" Width="421px"></asp:textbox>
-												<!--textarea name="problem" cols="50" rows="6" id="problem"></textarea--></td>
-										</tr>
-										<tr><td style="width: 192px">
-										<recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/>
-										</td></tr>
-										<tr>
-											<th colSpan="2">
-												<asp:button id="btnRequestHelp" Runat="server" CssClass="buttonright" Text="Request Help"></asp:button>
-											</th>
-										</tr>
-										<TR>
-											<TD colSpan="2">
-												<P>&nbsp;</P>
-											</TD>
-										</TR>
-										<tr>
-											<th colspan="2">
-												Submit a Bug Report:</th>
+											<th style="width: 192px"><asp:Label id="lblEmail" runat="server">Email</asp:Label></th>
+											<td style="width: 608px"><asp:TextBox id="txtEmail" runat="server" Width="600px"></asp:TextBox></td>
 										</tr>
 										<tr>
-											<th style="width: 192px">
-												&nbsp;</th>
-											<td style="width: 439px"><asp:button id="btnReportBug" Runat="server" CssClass="buttonright" Text="Report Bug"></asp:button></td>
+											<th style="width: 192px"><label for="lab">Select the type<br/>of help you need.</label></th>
+											<td style="width: 608px"><asp:dropdownlist CssClass="i18n" id="ddlHelpType" Runat="server" Width="603px"></asp:dropdownlist></td>
+										</tr>
+										<tr>
+											<th style="width: 192px"><label for="problem">Describe your problem</label></th>
+											<td style="width: 608px"><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine" Width="600px"></asp:textbox>
+										</tr>
+										<tr>
+										    <th style="width: 192px"><label for="enterSecurityCode">Please enter security code</label></th>
+										    <td style="width: 608px"><recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/></td>
+										</tr>
+										<tr>
+										    <th><label for="sendHelp">Send Help Request</label></th>
+										    <th style="width: 608px"><asp:button id="btnRequestHelp" Runat="server" CssClass="buttonright" Text="Send Request"></asp:button></th>
+										</tr>
+										<tr>
+											<td colspan="2"><p>&nbsp;</p></td>
+										</tr>
+										<tr>
+											<th>Submit a Bug Report:</th>
+											<td style="width: 608px"><asp:button id="btnReportBug" Runat="server" CssClass="buttonright" Text="Report Bug"></asp:button></td>
 										</tr>
 									</table>
 								</div> <!-- end div class simpleform -->
 						</div> <!-- end div request help -->
 						<p><A href="#top">Top of Page</A></p>
-							
-						
 					</div> <!-- end pagecontent div -->
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>

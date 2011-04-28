@@ -17,8 +17,10 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
+using iLabs.UtilLib;
 
 
 namespace iLabs.ServiceBroker.admin
@@ -48,28 +50,33 @@ namespace iLabs.ServiceBroker.admin
             if (clientInfos != null && clientInfos.Length > 0)
                 clientInfoList.AddRange(clientInfos);
             //clientName = AdministrativeAPI.GetLabClientName(labClientID);
-          
-            //// Add the JavaScript code to the page.
-            //if (!ClientScript.IsClientScriptBlockRegistered("ValueChanged"))
-            //{
-            //    StringBuilder jsBuf = new StringBuilder();
-            //    jsBuf.AppendLine("<script language='javascript'> function ValueChanged() {");
-            //    jsBuf.AppendLine("document.getElementById('btnSaveInfoChanges').disabled = false; }</script>");
-            //    ClientScript.RegisterClientScriptBlock(this.GetType(), "ValueChanged", jsBuf.ToString());
-            //}
+
+            // Add the JavaScript code to the page.
+            if (!ClientScript.IsClientScriptBlockRegistered("ValueChanged"))
+            {
+                StringBuilder jsBuf = new StringBuilder();
+                jsBuf.AppendLine("<script> function ValueChanged() {");
+                //jsBuf.AppendLine("debugger");
+                jsBuf.AppendLine("document.getElementById('btnSaveInfoChanges').disabled = false; ");
+                //jsBuf.AppendLine("return false;");
+                jsBuf.AppendLine("}</script>");
+                ClientScript.RegisterClientScriptBlock(this.GetType(), "ValueChanged", jsBuf.ToString());
+            }
 			if(!IsPostBack)
 			{
+                clearMessage();
+                hdnClientInfoID.Value = "0";
                 lblLabClient.Text = AdministrativeAPI.GetLabClientName(labClientID);
                 RefreshClientInfoRepeater();
 				ClearFormFields();
 				LoadListBox();
+                
                
 			}
-            //txtInfoname.Attributes.Add("onchange", "ValueChanged");
-            //txtUrl.Attributes.Add("onchange", "ValueChanged");
-            //txtDesc.Attributes.Add("onchange", "ValueChanged");
-			// Error Message
-			divErrorMessage.Visible = false;
+            txtInfoname.Attributes.Add("onkeypress", "ValueChanged();");
+            txtUrl.Attributes.Add("onkeypress", "ValueChanged();");
+            txtDesc.Attributes.Add("onkeypress", "ValueChanged();");
+			
 
 		}
 
@@ -127,25 +134,39 @@ namespace iLabs.ServiceBroker.admin
 		/// <param name="e"></param>
 		private void repClientInfo_ItemCommand(object source, System.Web.UI.WebControls.RepeaterCommandEventArgs e)
 		{
-          
+            clearMessage();
 			int clientInfoID = Convert.ToInt32(e.CommandArgument);
-			int index=0;
-            for (index = 0; index < clientInfoList.Count; index++)
-            {
-				if ((clientInfoList[index].clientInfoID==clientInfoID))
-					break;
-            }
-			if(e.CommandName == "Edit"){
 			
-				LoadFormFields(clientInfoList[index]);
+			if(e.CommandName == "Edit"){
+
+                LoadFormFields(clientInfoID);
 			}
 			else if(e.CommandName == "Remove")
 			{
 				RemoveClientInfo(clientInfoID);
                 RefreshClientInfoRepeater();
+                ClearFormFields();
 			}
-            
 		}
+
+        private void LoadFormFields(int infoID)
+        {
+            int index = 0;
+            bool found = false;
+            for (index = 0; index < clientInfoList.Count; index++)
+            {
+                if ((clientInfoList[index].clientInfoID == infoID))
+                {
+                    LoadFormFields(clientInfoList[index]);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                ClearFormFields();
+            }
+        }
 
 		/// <summary>
 		/// Loads the fields in the Info Edit Box with information
@@ -158,7 +179,7 @@ namespace iLabs.ServiceBroker.admin
 			txtInfoname.Text = clientInfo.infoURLName;
 			hdnClientInfoID.Value = clientInfo.ClientInfoID.ToString();
             hdnDisplayOrder.Value = clientInfo.displayOrder.ToString();
-            btnSaveInfoChanges.Enabled = true;
+            btnSaveInfoChanges.Enabled = false;
 		}
 
 		/// <summary>
@@ -175,22 +196,39 @@ namespace iLabs.ServiceBroker.admin
 			// Array Length property is not zero-based, hence equality here.
 			hdnClientInfoID.Value = "0";
             btnSaveInfoChanges.Enabled = false;
+            
 		}
+        protected void clearMessage()
+        {
+            lblResponse.Visible = false;
+            lblResponse.Text = "";
+        }
 
 		protected void btnNew_Click(object sender, System.EventArgs e)
 		{
+            clearMessage();
 			ClearFormFields();
             btnSaveInfoChanges.Enabled = true;
 		}
 
 		protected void btnSaveInfoChanges_Click(object sender, System.EventArgs e)
 		{
+            clearMessage();
+            if (txtUrl.Text == null || txtUrl.Text == String.Empty || txtInfoname.Text == null || txtInfoname.Text == String.Empty)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage("You must supply both a name and URL for the info item!");
+                lblResponse.Visible = true;
+                return;
+            }
 			int id = int.Parse(hdnClientInfoID.Value);
 			
 		// Set the correct element of the clientInfos array to the values from the text boxes
             if (id == 0)
 			{
-                int newID = AdministrativeAPI.InsertLabClientInfo(labClientID, txtUrl.Text, txtInfoname.Text, txtDesc.Text, clientInfoList.Count);
+
+                hdnDisplayOrder.Value = clientInfoList.Count.ToString();
+                id = AdministrativeAPI.InsertLabClientInfo(labClientID, txtUrl.Text, txtInfoname.Text, txtDesc.Text, clientInfoList.Count);
+                hdnClientInfoID.Value = id.ToString();
                 RefreshClientInfoRepeater();
                 LoadListBox();
                 btnSaveInfoChanges.Enabled = false;
@@ -347,7 +385,6 @@ namespace iLabs.ServiceBroker.admin
 			}
 			catch (Exception ex)
 			{
-				divErrorMessage.Visible = true;
 				lblResponse.Visible = true;
 				lblResponse.Text = "Cannot update Lab Client. " + ex.Message;
 			}

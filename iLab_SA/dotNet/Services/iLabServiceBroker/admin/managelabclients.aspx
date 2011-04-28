@@ -29,19 +29,18 @@ Please see license.txt in top level directory for full license.
 	<body>
 		<form id="Form1" method="post" runat="server">
 		<asp:HiddenField id="hdnLabServerID" runat="server" /><asp:HiddenField id="hdnEssID" runat="server" /><asp:HiddenField id="hdnUssID" runat="server" />
+		<asp:HiddenField id="hdnNeedsEss" runat="server" /><asp:HiddenField id="hdnNeedsUss" runat="server" />
 			<a name="top"></a><input id="hiddenPopupOnSave" type="hidden" name="hiddenPopupOnSave" runat="server" />
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
 				<uc1:adminNav id="AdminNav1" runat="server"></uc1:adminNav>
-				<br clear="all">
+				<br clear="all" />
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Manage Lab Clients</h1>
 						<p>Add, remove or modify a lab client below.</p>
 						<p id="pResponse" runat="server"><asp:label id="lblResponse" Runat="server" Visible="False"></asp:label></p>
 						<div id="Div1"  runat="server">
-					<!--    <asp:CustomValidator ID="valGuid" ControlToValidate="txtClientGuid" OnServerValidate="checkGuid" Text="A Guid must be unique and no longer than 50 characters" runat="server"/>
-                        <asp:requiredfieldvalidator id="rfvLabClientName" ControlToValidate="txtLabClientName" Runat="server" ErrorMessage="You must enter the Lab Client Name"></asp:requiredfieldvalidator> -->
 					</div>
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
@@ -106,6 +105,10 @@ Please see license.txt in top level directory for full license.
 									<th><label for="loaderscript">Loader Script</label></th>
 									<td colspan="3"><asp:textbox id="txtLoaderScript" Runat="server" Width="615px" TextMode="MultiLine" Rows="5"></asp:textbox></td>
 								</tr>
+								<tr>
+								    <th>&nbsp;</th>
+								    <th align="left"> Associated Services</th>
+								</tr>
 								<tr id="trLabServer">
 									<th><label for="labServer">Lab&nbsp;Server</label></th>
 									<td colspan="3" style="height: 26px;"><asp:DropDownList CssClass="i18n" id="ddlLabServer" Runat="server" Width="516px"></asp:DropDownList>
@@ -140,7 +143,7 @@ Please see license.txt in top level directory for full license.
 										<asp:button id="btnAddEditResources" Runat="server" Text="Add/Edit Resources" CssClass="button"
 											Width="173px" onclick="btnAddEditResources_Click"/>
 										<asp:button id="btnMetadata" Runat="server" Text="Edit Metadata" CssClass="button"
-											Width="173px" onclick="btnMetadata_Click"/>
+											Width="173px" visible="false" onclick="btnMetadata_Click"/>
 									</th>
 								</tr>
 							</table>

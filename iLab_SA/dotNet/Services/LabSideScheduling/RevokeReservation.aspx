@@ -23,8 +23,7 @@
 		<div id="pageintro">
 						<h1>Revoke Reservation
 						</h1>
-						<p><asp:label id="lblDescription" runat="server"></asp:label>
-						</p>
+						<p><asp:label id="lblDescription" runat="server"></asp:label></p>
 						<!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
 						<p><asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label></p>
 					</div>
@@ -34,52 +33,54 @@
 		<div class="simpleform"><form id="Form1" method="post" runat="server">
 		<table>
 		<tr>
-		<th>
-		<label for="startTime">Start Time</label>
-		</th>
-		<td>
-		<a href="javascript:;" onclick="window.open('datePickerPopup.aspx?date=start','cal','width=250,height=225,left=270,top=180')">
-	    <img src="calendar.gif" border="0" class="normal" /></a><asp:TextBox ID="txtStartDate" runat="server" Width="74px"></asp:TextBox>
-           
-		</td>
-		<td style="width: 41px">
-		<asp:DropDownList cssClass="i18n" ID="ddlStartHour" runat="server">
-            <asp:ListItem>12</asp:ListItem>
-            <asp:ListItem>1</asp:ListItem>
-            <asp:ListItem>2</asp:ListItem>
-            <asp:ListItem>3</asp:ListItem>
-            <asp:ListItem>4</asp:ListItem>
-            <asp:ListItem>5</asp:ListItem>
-            <asp:ListItem>6</asp:ListItem>
-            <asp:ListItem>7</asp:ListItem>
-            <asp:ListItem>8</asp:ListItem>
-            <asp:ListItem>9</asp:ListItem>
-            <asp:ListItem>10</asp:ListItem>
-            <asp:ListItem>11</asp:ListItem>
-        </asp:DropDownList>
-		</td>
-		<td  style="width:25px">
-		 <asp:TextBox ID="txtStartMin" runat="server" Width="24px" >00</asp:TextBox>
-		</td>
-		<td>
-		<asp:DropDownList cssClass="i18n" ID="ddlStartAM" runat="server"  >
-            <asp:ListItem>AM</asp:ListItem>
-            <asp:ListItem>PM</asp:ListItem>
-        </asp:DropDownList>
-		</td>
+		<th><label for="userMessage">Message to Users</label></th>
+		<td colspan="5"><asp:TextBox ID="txtMessage" runat="server"  Columns="20" Rows="5" TextMode="MultiLine" Width="560px"></asp:TextBox></td>
 		</tr>
 		
-		
+		<tr>
+		    <th>
+		        <label for="startTime">Start Time</label>
+		    </th>
+		    <td>
+		        <a href="javascript:;" onclick="window.open('datePickerPopup.aspx?date=start','cal','width=250,height=225,left=270,top=180')">
+	            <img src="calendar.gif" border="0" class="normal" /></a><asp:TextBox ID="txtStartDate" runat="server" Width="124px"></asp:TextBox>
+		    </td>
+		    <td>
+		        <asp:DropDownList cssClass="i18n" ID="ddlStartHour" runat="server">
+                <asp:ListItem>12</asp:ListItem>
+                <asp:ListItem>1</asp:ListItem>
+                <asp:ListItem>2</asp:ListItem>
+                <asp:ListItem>3</asp:ListItem>
+                <asp:ListItem>4</asp:ListItem>
+                <asp:ListItem>5</asp:ListItem>
+                <asp:ListItem>6</asp:ListItem>
+                <asp:ListItem>7</asp:ListItem>
+                <asp:ListItem>8</asp:ListItem>
+                <asp:ListItem>9</asp:ListItem>
+                <asp:ListItem>10</asp:ListItem>
+                <asp:ListItem>11</asp:ListItem>
+                </asp:DropDownList>
+		    </td>
+		    <td >
+		        <asp:TextBox ID="txtStartMin" runat="server" Width="24px" >00</asp:TextBox>
+		    </td>
+		    <td style="width: 46px">
+		        <asp:DropDownList cssClass="i18n" ID="ddlStartAM" runat="server"  >
+                <asp:ListItem>AM</asp:ListItem>
+                <asp:ListItem>PM</asp:ListItem>
+                </asp:DropDownList>
+		    </td>
+		    <td style="width:268px"> </td>
+		</tr>
 		<tr>
 		<th>
 		<label for="endTime">End Time</label>
 		</th>
 		<td>
 		<a href="javascript:;" onclick="window.open('datePickerPopup.aspx?date=end','cal','width=250,height=225,left=270,top=180')">
-											<img src="calendar.gif" border="0" class="normal" /></a><asp:TextBox ID="txtEndDate" runat="server" Width="74px"></asp:TextBox>
-           
+		<img src="calendar.gif" border="0" class="normal" /></a><asp:TextBox ID="txtEndDate" runat="server" Width="124px"></asp:TextBox>
 		</td>
-		<td style="width: 41px">
+		<td>
 		<asp:DropDownList cssClass="i18n" ID="ddlEndHour" runat="server">
             <asp:ListItem>12</asp:ListItem>
             <asp:ListItem>1</asp:ListItem>
@@ -95,24 +96,25 @@
             <asp:ListItem>11</asp:ListItem>
         </asp:DropDownList>
 		</td>
-		<td  style="width:25px">
+		<td>
 		 <asp:TextBox ID="txtEndMin" runat="server" Width="25px" >00</asp:TextBox>
 		</td>
-		<td>
+		<td style="width: 46px">
 		<asp:DropDownList cssClass="i18n" ID="ddlEndAM" runat="server"  >
             <asp:ListItem>AM</asp:ListItem>
             <asp:ListItem>PM</asp:ListItem>
         </asp:DropDownList>
 		</td>
+		<td style="width: 268px"> </td>
 		</tr>
 		<tr>
 	     <th> </th>
-	     <td colspan="4">
+	     <td colspan="5">
 	     <asp:button id="btnRevoke" runat="server" Text="Revoke Reservation" CssClass="button" onclick="btnRevoke_Click" ></asp:button>
-	    	</td>
+	     </td>
 		</tr>
 		</table>
-			</form>
+		</form>
 		</div>
 		</div>
 		</div>

@@ -31,6 +31,7 @@ namespace iLabs.LabServer.LabView
 	/// </summary>
 	public partial class RunExperiment : System.Web.UI.Page
 	{
+        protected bool showTime;
 		protected System.Web.UI.WebControls.Label lblCoupon;
 		protected System.Web.UI.WebControls.Label lblTicket;
 		protected System.Web.UI.WebControls.Label lblGroupNameTitle;
@@ -83,9 +84,18 @@ namespace iLabs.LabServer.LabView
             thePanel.version = revision;
 			thePanel.width = width;
 			thePanel.height= height;
-            if(duration > 0){
-                RegisterStartupScript("timer", LabUtils.TimerScript(startStr, duration, tz,
-                    DateUtil.ParseCulture(Request.Headers["Accept-Language"]),returnURL,1000,"txtTimeRemaining"));
+            if (divTimeRemaining.Visible)
+            {
+                if (duration > 0)
+                {
+                    RegisterStartupScript("timer", LabUtils.TimerScript(startStr, duration, tz,
+                        DateUtil.ParseCulture(Request.Headers["Accept-Language"]), returnURL, 1000, "txtTimeRemaining"));
+                }
+                else
+                {
+                    divTimeRemaining.Visible = false;
+                }
+
             }
 						
             /* Use Session payload vs. URL params to validate

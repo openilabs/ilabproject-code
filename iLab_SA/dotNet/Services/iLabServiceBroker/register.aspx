@@ -59,52 +59,37 @@ Please see license.txt in top level directory for full license.
 						<div class="simpleform"><form id="register" name="register" method="post" action="">
 								<table>
 									<tr>
-										<th>
-											<label for="username">Username</label></th>
-										<td><asp:textbox id="txtUsername" Runat="server"></asp:textbox>
-											<!--input type="text" name="username" id="username"--></td>
+										<th><label for="username">Username</label></th>
+										<td><asp:textbox id="txtUsername" Runat="server" Width="260px"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="firstname">First Name </label>
-										</th>
-										<td><asp:textbox id="txtFirstName" Runat="server"></asp:textbox>
-											<!--input type="text" name="firstname" id="firstname"--></td>
-									</tr>
+										<th><label for="firstname">First Name </label></th>
+										<td><asp:textbox id="txtFirstName" Runat="server" Width="260px"></asp:textbox></tr>
 									<tr>
-										<th>
-											<label for="lastname">Last Name </label>
-										</th>
-										<td><asp:textbox id="txtLastName" Runat="server"></asp:textbox>
-											<!--input type="text" name="lastname" id="lastname"--></td>
-									</tr>
+										<th><label for="lastname">Last Name </label></th>
+										<td><asp:textbox id="txtLastName" Runat="server" Width="260px"></asp:textbox></tr>
 									<tr>
 										<th>
 											<label for="email">Email</label></th>
-										<td><asp:textbox id="txtEmail" Runat="server"></asp:textbox>
+										<td><asp:textbox id="txtEmail" Runat="server" Width="260px"></asp:textbox>
 										<asp:RegularExpressionValidator ID = valEmail runat="server"
 										ControlToValidate="txtEmail" ValidationExpression=".*@.*\..*"
 										ErrorMessage="* The email address is not in the correct format!"
-										Display="dynamic">*</asp:RegularExpressionValidator>
-											<!--input type="text" name="email" id="email"-->
-										</td>
+										Display="dynamic">*</asp:RegularExpressionValidator></td>
 									</tr>
 									<tr>
 										<th style="HEIGHT: 7px">
 											<label for="affiliation">Affiliation</label></th>
 										<td style="HEIGHT: 7px">
 											<% if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true")){ %>
-											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server"></asp:dropdownlist>
-											<% }else{ %>
-											<asp:TextBox id="txtAffiliation" Runat="server"></asp:TextBox>
-											<% } %>
-										</td>
+											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server"></asp:dropdownlist>&nbsp;<% }else{ %>
+											<asp:TextBox id="txtAffiliation" Runat="server" Width="179px"></asp:TextBox><% } %></td>
 									</tr>
 									<tr id="trowRequestGroup" runat="server">
 										<th>
 											<label for="group">Requested Group </label>
 										</th>
-										<td><asp:dropdownlist CssClass="i18n" id="ddlGroup" Runat="server"></asp:dropdownlist>
+										<td><asp:dropdownlist CssClass="i18n" id="ddlGroup" Runat="server" Width="266px"></asp:dropdownlist>
 										</td>
 									</tr>
 									<tr>
@@ -122,7 +107,9 @@ Please see license.txt in top level directory for full license.
 										<td><asp:textbox id="txtReason" Runat="server" TextMode="MultiLine" Columns="30" Rows="6"></asp:textbox></td>
 									</tr>
 									<tr>
-									    <td colspan="2">
+									<th><label for="captcha">Please enter the security code </label>
+										</th>
+									    <td>
 										<recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/>
 										</td>
 									</tr>
@@ -134,11 +121,11 @@ Please see license.txt in top level directory for full license.
 								</table>
 							</form>
 						</div>
-					</div>
-					<br clear="all"/> <!-- end pagecontent div -->
+					</div><!-- end pagecontent div -->
+					<br clear="all"/> 
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>
 			</div>
-		</form>
+	    </form>
 	</body>
 </html>

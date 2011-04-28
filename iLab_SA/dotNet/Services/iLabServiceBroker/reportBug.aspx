@@ -1,6 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
+<%@ Register TagPrefix="recaptcha" Namespace="Recaptcha" Assembly="Recaptcha" %>
 <%@ Page language="c#" CodeFile="reportBug.aspx.cs" AutoEventWireup="false" Inherits="iLabs.ServiceBroker.iLabSB.reportBug" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <HTML>
@@ -49,7 +50,7 @@ Please see license.txt in top level directory for full license.
 											<asp:Label ID="lblUserName" Visible="false" Runat="server">User Name</asp:Label>
 										</th>
 										<td>
-											<asp:TextBox id="txtUserName" Visible="False" Runat="server"></asp:TextBox>
+											<asp:TextBox id="txtUserName" Visible="False" Runat="server" Width="415px"></asp:TextBox>
 										</td>
 									</tr>
 									<tr>
@@ -57,14 +58,14 @@ Please see license.txt in top level directory for full license.
 											<asp:Label ID="lblEmail" Visible="false" Runat="server">Email</asp:Label>
 										</th>
 										<td>
-											<asp:TextBox id="txtEmail" Visible="False" Runat="server"></asp:TextBox>
+											<asp:TextBox id="txtEmail" Visible="False" Runat="server" Width="415px"></asp:TextBox>
 										</td>
 									</tr>
 									<tr>
 										<th>
-											<label for="whichlab">Select the type of problem or lab server</label></th>
+											<label for="whichlab">Select the type of<br/>problem or lab server</label></th>
 										<td>
-											<asp:DropDownList CssClass="i18n" ID="ddlArea" Runat="server"></asp:DropDownList>
+											<asp:DropDownList CssClass="i18n" ID="ddlArea" Runat="server" Width="415px"></asp:DropDownList>
 										</td>
 									</tr>
 									<tr>
@@ -72,6 +73,12 @@ Please see license.txt in top level directory for full license.
 											<label for="problemtext">Describe your problem</label></th>
 										<td>
 											<asp:TextBox ID="txtBugReport" Runat="server" TextMode="MultiLine" Columns="50" Rows="6"></asp:TextBox>
+										</td>
+									</tr>
+									<tr>
+									    <th><label for="captcha">Please enter the<br/>security code</label></th>
+									    <td>
+										    <recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/>
 										</td>
 									</tr>
 									<tr>

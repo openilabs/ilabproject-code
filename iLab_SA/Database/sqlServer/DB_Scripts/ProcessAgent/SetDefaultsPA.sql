@@ -9,6 +9,7 @@
 
 SET IDENTITY_INSERT ProcessAgent_Type ON
 
+INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (1,'NOTA', 'NOT A PA');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (4,' ISB', 'SERVICE BROKER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (5,' BSB', 'BATCH SERVICE BROKER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (6,' RSB', 'REMOTE SERVICE BROKER');
@@ -17,7 +18,9 @@ INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VAL
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (16,' ESS', 'EXPERIMENT STORAGE SERVER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (32,' USS', 'SCHEDULING SERVER');
 INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (64,' LSS', 'LAB SCHEDULING SERVER');
-INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (128,'NOTA', 'NONE OF THE ABOVE');
+INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (128,'AUTH', 'AUTHORIZATION SERVICE');
+INSERT INTO ProcessAgent_Type(ProcessAgent_Type_ID, Short_Name, Description) VALUES (256,' GPA', 'GENERIC PA');
+
 
 SET IDENTITY_INSERT ProcessAgent_Type OFF
 
@@ -62,5 +65,7 @@ INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUE
 INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (25,'EXECUTE EXPERIMENT','Execute Experiment', 0);
 INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (26,'CREATE EXPERIMENT','Create Experiment', 0);
 INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (27,'REDEEM RESERVATION','Redeem Reservation', 0);
+INSERT INTO Ticket_Type(Ticket_Type_ID, Name, Short_Description, Abstract) VALUES (28,'AUTHORIZE_ACCESS','Authorize Access', 0);
+
 
 SET IDENTITY_INSERT Ticket_Type OFF

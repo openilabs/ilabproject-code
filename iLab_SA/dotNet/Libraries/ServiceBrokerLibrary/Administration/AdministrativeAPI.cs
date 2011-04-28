@@ -900,6 +900,7 @@ namespace iLabs.ServiceBroker.Administration
         /// and gets rid of unnecessary rollback mechanisms that would otherwise have
         /// to be implemented. - CV, 4/29/05
         ///  ClientItems and LabServerClients are also deleted (PHB 11/12/2010)
+        /// ResourceMaps to USS ESS and labServer are also removed (PHB 04/01/2011)
 		/// </summary>
 		/// <param name="labClientIDs">The IDs identifying the lab clients to be unregistered.</param>
 		/// <returns>An array of LabClientIDs for the lab clients that were not successfully removed, i.e. those for which the operation failed.</returns>
@@ -967,6 +968,16 @@ namespace iLabs.ServiceBroker.Administration
 		{
 			return InternalAdminDB.SelectLabClientIDs ();
 		}
+
+
+        /// <summary>
+        /// Lists the IDs of all lab clients registered with the service broker.
+        /// </summary>
+        /// <returns>An array of LabClientIDs for all registered lab clients.</returns>
+        public static int[] ListLabClientIDsForServer(int labServerID)
+        {
+            return InternalAdminDB.SelectLabClientIDsForServer(labServerID);
+        }
 
         /// <summary>
         /// Get tags for all labClients.

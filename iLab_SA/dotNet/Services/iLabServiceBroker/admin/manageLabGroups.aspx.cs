@@ -54,6 +54,9 @@ namespace iLabs.ServiceBroker.admin
         ProcessAgentInfo[] labServers;
         int labClientID;
 
+         // "Are you sure" javascript for Remove button
+            StringBuilder jScriptRemove = null;
+
         protected void Page_Load(object sender, System.EventArgs e)
         {
             if (Session["UserID"] == null)
@@ -63,6 +66,11 @@ namespace iLabs.ServiceBroker.admin
             if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
                 Response.Redirect("../home.aspx");
 
+            // "Are you sure" javascript for Remove button
+            jScriptRemove = new StringBuilder();
+            jScriptRemove.Append( "javascript:if(confirm('Are you sure you want to remove the group from this Lab Client? ");
+            jScriptRemove.Append(" Removing the group will revoke all the groups remaining reservations  for the client!");
+            jScriptRemove.Append( "')== false) return false;");
 
             //RefreshAdminUserGroupsRepeater();
 
@@ -319,8 +327,8 @@ namespace iLabs.ServiceBroker.admin
                 int[] assocGroupIDs = AdministrativeUtilities.GetLabClientGroups(theClient.clientID,false);
                 Group[] assocGroups = wrapper.GetGroupsWrapper(assocGroupIDs);
 
-               // if (theClient.needsScheduling)
-               // {
+                if (theClient.needsScheduling)
+                {
                     int ussId = issuer.FindProcessAgentIdForClient(theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
 
                     if (ussId > 0) // HasScheduling 
@@ -330,34 +338,35 @@ namespace iLabs.ServiceBroker.admin
 
                         repUSS.DataSource = ussList;
                         repUSS.DataBind();
-                    
 
 
-                    ResourceMappingValue[] values = new ResourceMappingValue[2];
-                    values[0] = new ResourceMappingValue(ResourceMappingTypes.CLIENT, theClient.clientID);
-                    values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE, TicketTypes.GetTicketType(TicketTypes.MANAGE_USS_GROUP));
-                    //values[1] = new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussId);
-                    
-                    
-                    foreach (Group g in assocGroups)
-                    {
-                        ResourceMappingKey rmKey = new ResourceMappingKey(ResourceMappingTypes.GROUP, g.groupID);
-                        List<int> rmIds = ResourceMapManager.FindMapIds(rmKey, values);
-                        if (rmIds != null)
+
+                        ResourceMappingValue[] values = new ResourceMappingValue[2];
+                        values[0] = new ResourceMappingValue(ResourceMappingTypes.CLIENT, theClient.clientID);
+                        values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE, TicketTypes.GetTicketType(TicketTypes.MANAGE_USS_GROUP));
+                        //values[1] = new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussId);
+
+
+                        foreach (Group g in assocGroups)
                         {
-                            foreach (int rm in rmIds)
+                            ResourceMappingKey rmKey = new ResourceMappingKey(ResourceMappingTypes.GROUP, g.groupID);
+                            List<int> rmIds = ResourceMapManager.FindMapIds(rmKey, values);
+                            if (rmIds != null)
                             {
-                                int qualId = AuthorizationAPI.GetQualifierID(rm, Qualifier.resourceMappingQualifierTypeID);
-                                int[] grantIDs = AuthorizationAPI.FindGrants(-1, Function.manageUSSGroup, qualId);
-                                if (grantIDs.Length > 0)
+                                foreach (int rm in rmIds)
                                 {
-                                    Grant[] grants = AuthorizationAPI.GetGrants(grantIDs);
-                                    foreach (Grant grant in grants)
+                                    int qualId = AuthorizationAPI.GetQualifierID(rm, Qualifier.resourceMappingQualifierTypeID);
+                                    int[] grantIDs = AuthorizationAPI.FindGrants(-1, Function.manageUSSGroup, qualId);
+                                    if (grantIDs.Length > 0)
                                     {
-                                        Group[] managerGroups = AdministrativeAPI.GetGroups(new int[] { grant.agentID });
-                                        foreach (Group mg in managerGroups)
+                                        Grant[] grants = AuthorizationAPI.GetGrants(grantIDs);
+                                        foreach (Grant grant in grants)
                                         {
-                                            mapList.Add(new GroupManagerUserMap(mg.groupName, g.groupName, grant.grantID, rm));
+                                            Group[] managerGroups = AdministrativeAPI.GetGroups(new int[] { grant.agentID });
+                                            foreach (Group mg in managerGroups)
+                                            {
+                                                mapList.Add(new GroupManagerUserMap(mg.groupName, g.groupName, grant.grantID, rm));
+                                            }
                                         }
                                     }
                                 }
@@ -371,7 +380,7 @@ namespace iLabs.ServiceBroker.admin
                     {
                         mapList.Add(new GroupManagerUserMap("", g.groupName, 0, 0));
                     }
-               }
+                }
             }
             //return the array list of "ManagerGroup" -> "UserGroup"
             return mapList;
@@ -439,6 +448,11 @@ namespace iLabs.ServiceBroker.admin
                 Button curBtn = (Button)e.Item.FindControl("btnRemove");
                 
                 curBtn.CommandArgument = gm.ToCSV(); 
+                if(theClient.needsScheduling){
+                    curBtn.Attributes.Add("onclick", jScriptRemove.ToString());
+                    //curBtn.OnClientClick = "javascript:ConfirmRemove();";
+                    //curBtn.OnClientClick = "javascript:confirm(\"Test2 Are you sure you want to remove the group? Doing so will revoke all remaining reservations for the client made by the group!\");";
+                }
             }
 
         }
@@ -555,6 +569,30 @@ namespace iLabs.ServiceBroker.admin
 
                     if (theClient.clientID > 0)
                     {
+                        if (theClient.needsScheduling)
+                        {
+                            ProcessAgentInfo[] labServers = AdministrativeAPI.GetLabServersForClient(theClient.clientID);
+                            if (labServers != null && labServers.Length > 0 && labServers[0].agentId > 0)
+                            {
+                                int lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, labServers[0].agentId, ProcessAgentType.LAB_SCHEDULING_SERVER);
+                                ProcessAgentInfo lss = issuer.GetProcessAgentInfo(lssID);
+                                int ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
+                                if (ussID > 0)
+                                {
+                                    ProcessAgentInfo uss = issuer.GetProcessAgentInfo(ussID);
+
+                                    string payload = TicketLoadFactory.Instance().createRevokeReservationPayload("ISB");
+                                    Coupon revokeCoupon = issuer.CreateTicket(TicketTypes.REVOKE_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 600, payload);
+                                    issuer.AddTicket(revokeCoupon, TicketTypes.REVOKE_RESERVATION, lss.AgentGuid, uss.agentGuid, 600, payload);
+                                    UserSchedulingProxy ussProxy = new UserSchedulingProxy();
+                                    ussProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                                    ussProxy.OperationAuthHeaderValue.coupon = revokeCoupon;
+                                    ussProxy.Url = uss.webServiceUrl;
+                                    int status = ussProxy.RevokeReservation(ProcessAgentDB.ServiceGuid, gm.UserGroupName, labServers[0].AgentGuid,
+                                        theClient.clientGuid, DateTime.UtcNow, DateTime.MaxValue,"Your group no longer has permission to use the experiment!");
+                                }
+                            }
+                        }
                         //If there is a USS Manager Group
                         if(gm.GrantID > 0 && gm.ResourceMappingID >0){
                             wrapper.RemoveGrantsWrapper(new int[] { gm.GrantID });
@@ -567,8 +605,9 @@ namespace iLabs.ServiceBroker.admin
                         if (clientQualifierID > 0)
                         {
                             int [] clientGrants = wrapper.FindGrantsWrapper(userGroupID, clientFunction, clientQualifierID);
-                            if((clientGrants != null) && (clientGrants.Length >0) && (clientGrants[0] > 0))
+                            if((clientGrants != null) && (clientGrants.Length >0) && (clientGrants[0] > 0)){
                                 wrapper.RemoveGrantsWrapper(new int[] { clientGrants[0] });
+                            }
                             int[] labServerIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
                             if ((labServerIDs != null) && (labServerIDs.Length > 0)
                                 && (labServerIDs[0] > 0))
@@ -693,10 +732,21 @@ namespace iLabs.ServiceBroker.admin
                Logger.WriteLine(exc.Message);
             }
         }
+
         protected void btnClose_Click(Object Src, EventArgs E)
         {
-            // This routine will create a javascript block to refresh the client & close the page.
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "Success", "ReloadParent();", true);
+            int id = int.Parse(ddlLabClient.SelectedValue);
+            if (id > 0)
+            {
+                // This routine will create a javascript block to refresh the client & close the page.
+                StringBuilder jScript = new StringBuilder();
+                jScript.AppendLine(@"<script language='javascript'> <!--");
+                jScript.Append(@"if (window.opener){ window.opener.location.href = 'manageLabClients.aspx?refresh=");
+                jScript.Append(id);
+                jScript.AppendLine(@"';  window.opener.focus(); }  window.close(); ");
+                 jScript.AppendLine(" --> </script>");
+                Page.RegisterStartupScript("Success", jScript.ToString());
+            }
         }
 
         // Error recovery must be added to this method
@@ -862,7 +912,7 @@ namespace iLabs.ServiceBroker.admin
                         {
                             // Create RevokeReservation ticket
                             revokeCoupon = issuer.CreateTicket(TicketTypes.REVOKE_RESERVATION,
-                                 uss.agentGuid, lss.agentGuid, -1L, factory.createRevokeReservationPayload());
+                                 uss.agentGuid, lss.agentGuid, -1L, factory.createRevokeReservationPayload("USS"));
                         }
 
                         //Add Credential set on the LSS

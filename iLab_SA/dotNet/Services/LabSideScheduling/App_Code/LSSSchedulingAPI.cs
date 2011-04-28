@@ -211,10 +211,7 @@ namespace iLabs.Scheduling.LabSide
         /// the Name of the goup with this credential set
         /// </summary>
         public string groupName;
-        /// <summary>
-        /// the GUID of the user side scheduling server one which the group registered   
-        /// </summary>
-        public string ussGuid;
+       
     }
     /// <summary>
     /// a structure which holds reservation information
@@ -236,6 +233,7 @@ namespace iLabs.Scheduling.LabSide
         /// the ID of the credentialSet. the user from the group with this credential set made the reservation
         /// </summary>
         public int credentialSetId;
+        public int ussId;
         /// <summary>
         /// the start time of the reservation
         /// </summary>
@@ -614,7 +612,7 @@ namespace iLabs.Scheduling.LabSide
 		/// <param name="groupName"></param>
 		/// <param name="ussID"></param>
 		/// <returns></returns>the unique ID which identifies the credential set added.>0 was successfully added,-1 otherwise
-		public static int AddCredentialSet(string serviceBrokerGuid,string serviceBrokerName, string groupName, string ussGuid)
+		public static int AddCredentialSet(string serviceBrokerGuid,string serviceBrokerName, string groupName)
 		{
             int[] credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
             LssCredentialSet[] credentialSets = LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
@@ -622,14 +620,14 @@ namespace iLabs.Scheduling.LabSide
             foreach (LssCredentialSet set in credentialSets)
             {
                 if (set.serviceBrokerGuid.Equals(serviceBrokerGuid) && set.serviceBrokerName.Equals(serviceBrokerName) &&
-                    set.groupName.Equals(groupName) && set.ussGuid.Equals(ussGuid))
+                    set.groupName.Equals(groupName))
                 {
                     return -1;
                 }
                     
             }
 
-			int cID=DBManager.AddCredentialSet(serviceBrokerGuid,serviceBrokerName, groupName, ussGuid);	
+			int cID=DBManager.AddCredentialSet(serviceBrokerGuid,serviceBrokerName, groupName);	
 			return cID;
 		}
 		/// <summary>
@@ -641,9 +639,9 @@ namespace iLabs.Scheduling.LabSide
 		/// <param name="groupName"></param>
 		/// <param name="ussGuid"></param>
 		/// <returns></returns>if modified successfully, false otherwise
-		public static int ModifyCredentialSet(int credentialSetID, string serviceBrokerGuid, string serviceBrokerName, string groupName, string ussGuid)
+		public static int ModifyCredentialSet(int credentialSetID, string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
-			int i=DBManager.ModifyCredentialSet(credentialSetID, serviceBrokerGuid,serviceBrokerName, groupName,  ussGuid);
+			int i=DBManager.ModifyCredentialSet(credentialSetID, serviceBrokerGuid,serviceBrokerName, groupName);
 			return i;
 			   
 		}
@@ -674,9 +672,9 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns></returns>true, the credentialset is removed successfully, false otherwise
-        public static int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName, string ussGuid)
+        public static int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
         {
-            return DBManager.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
+            return DBManager.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
         }
 		/// <summary>
 		/// Returns an array of the immutable Credential objects that correspond to the supplied credentialSet IDs. 
@@ -695,9 +693,9 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="groupName"></param>
         /// <param name="ussID"></param>
         /// <returns></returns>the unique ID which identifies the credential set added.>0 was successfully added,-1 otherwise
-        public static int GetCredentialSetID(string serviceBrokerGuid, string groupName, string ussGuid)
+        public static int GetCredentialSetID(string serviceBrokerGuid, string groupName)
         {
-            int credentialSetID = DBManager.GetCredentialSetID(serviceBrokerGuid, groupName, ussGuid);
+            int credentialSetID = DBManager.GetCredentialSetID(serviceBrokerGuid, groupName);
            
             return credentialSetID;
         }
@@ -1161,9 +1159,10 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="credentialSetID"></param>
         /// <param name="experimentInfoID"></param>
         /// <returns></returns>the unique ID identifying the reservation information added, >0 successfully added, -1 otherwise
-        public static int AddReservationInfo(DateTime startTime, DateTime endTime, int credentialSetID, int experimentInfoId, int resourceID, int status)
+        public static int AddReservationInfo(DateTime startTime, DateTime endTime, int credentialSetID, int experimentInfoId, 
+            int resourceID, int ussID, int status)
         {
-            return DBManager.AddReservationInfo(startTime, endTime, credentialSetID, experimentInfoId, resourceID, status);
+            return DBManager.AddReservationInfo(startTime, endTime, credentialSetID, experimentInfoId, resourceID, ussID, status);
         }
 
 
@@ -1178,7 +1177,7 @@ namespace iLabs.Scheduling.LabSide
             return rIDs;
         }
 
-        public static int RevokeReservations(int[] ids)
+        public static int RevokeReservations(int[] ids, string message)
         {
             int count = 0;
             ReservationInfo[] info = DBManager.GetReservationInfos(ids);
@@ -1186,12 +1185,13 @@ namespace iLabs.Scheduling.LabSide
             {
                 foreach (ReservationInfo ri in info)
                 {
-                    count += RevokeReservation(ri);
+                    count += RevokeReservation(ri,message);
                 }
             }
             return count;
         }
-        public static int RevokeReservation(ReservationInfo ri)
+        /* TO DO */
+        public static int RevokeReservation(ReservationInfo ri, string message)
         {
             int count = 0;
             LssCredentialSet[] sets = DBManager.GetCredentialSets(new int[] { ri.credentialSetId });
@@ -1199,7 +1199,7 @@ namespace iLabs.Scheduling.LabSide
             if (sets != null && sets.Length > 0 && exps != null && exps.Length > 0)
             {
 
-                USSInfo uss = DBManager.GetUSSInfo(sets[0].ussGuid);
+                USSInfo uss = DBManager.GetUSSInfo(ri.ussId);
                 if (uss != null)
                 {
                     ProcessAgentDB paDB = new ProcessAgentDB();
@@ -1210,7 +1210,7 @@ namespace iLabs.Scheduling.LabSide
                     ussProxy.Url = uss.ussUrl;
 
                     int num = ussProxy.RevokeReservation(sets[0].serviceBrokerGuid, sets[0].groupName,
-                        exps[0].labServerGuid, exps[0].labClientGuid, ri.Start, ri.End, "The reservation time assigned to this reservation is being removed");
+                        exps[0].labServerGuid, exps[0].labClientGuid, ri.Start, ri.End, message);
                     if (num > 0)
                     {
                         LSSSchedulingAPI.RemoveReservationInfoByIDs(new int[] { ri.reservationInfoId });
@@ -1224,7 +1224,7 @@ namespace iLabs.Scheduling.LabSide
 
 
         /// <summary>
-        /// remove the reservation information
+        /// Remove the reservation information. If a contact email is specifie for the experimentInfo an email will be sent to the contact.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
@@ -1233,13 +1233,13 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="labClientVersion"></param>
         /// <param name="startTime"></param>
         /// <param name="endTime"></param>
-        /// <returns></returns>true remove successfully, false otherwise
-        public static bool RemoveReservationInfo(string serviceBrokerGuid, string groupName, string ussGuid,
+        /// <returns>the number of reservationInfos deleted, -1 otherwise</returns>
+        public static int RemoveReservationInfo(string serviceBrokerGuid, string groupName, string ussGuid,
             string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
         {
-            bool removed = DBManager.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
+            int rcount = DBManager.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
                 labServerGuid, clientGuid, startTime, endTime);
-            if (removed)
+            if (rcount > 0)
             {
                 int eID = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
                 LssExperimentInfo exInfo = GetExperimentInfos(new int[] { eID })[0];
@@ -1253,7 +1253,10 @@ namespace iLabs.Scheduling.LabSide
                     mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
                     mail.Subject = "Removed Reservation: " + exInfo.labClientName;
 
-                    message.Append("A reservation for " + exInfo.labClientName + " version: " + exInfo.labClientVersion);
+                    message.Append("Removed " + rcount + " reservation");
+                    if(rcount > 1)
+                        message.Append("s");
+                    message.Append(" for " + exInfo.labClientName + " version: " + exInfo.labClientVersion);
                     message.AppendLine(" on " + exInfo.labServerName + " has been made.");
                     message.AppendLine("\tGroup: " + groupName + " ServiceBroker: " + serviceBrokerGuid);
                     message.Append("\tFrom: " + DateUtil.ToUserTime(startTime, CultureInfo.CurrentCulture, DateUtil.LocalTzOffset));
@@ -1287,7 +1290,7 @@ namespace iLabs.Scheduling.LabSide
                 }
             }
             
-            return removed;
+            return rcount;
         }
 
         /// <summary>
@@ -1557,7 +1560,7 @@ namespace iLabs.Scheduling.LabSide
                             {
                                 if (tb.Intersects(ri))
                                 {
-                                    count += LSSSchedulingAPI.RevokeReservation(ri);
+                                    count += LSSSchedulingAPI.RevokeReservation(ri, "The permission for you to execute this reservation has been revoked!");
                                 }
                             }
                         }

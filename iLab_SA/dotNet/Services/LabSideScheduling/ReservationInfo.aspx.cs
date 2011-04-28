@@ -316,8 +316,7 @@ namespace iLabs.Scheduling.LabSide
 				LssCredentialSet[] credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
 				for(int i=0; i< credentialSets.Length; i++)
 				{
-					USSInfo[] uIn=LSSSchedulingAPI.GetUSSInfos(new int[]{LSSSchedulingAPI.ListUSSInfoID(credentialSets[i].ussGuid)});
-					string cred=credentialSets[i].groupName+" "+credentialSets[i].serviceBrokerName + " " + uIn[0].ussName;
+					string cred=credentialSets[i].groupName+" "+credentialSets[i].serviceBrokerName;
 					ddlGroup.Items.Add(new ListItem(cred, credentialSets[i].credentialSetId.ToString()));
 				}
 			}

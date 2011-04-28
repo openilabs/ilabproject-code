@@ -293,19 +293,31 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+
+-- DROP FUNCTIONS
+
+/****** Object:  User Defined Function dbo.GetReservationIDs    Script Date: 4/25/2011 1:41:06 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetReservationIDs]') and xtype in (N'FN', N'IF', N'TF'))
+drop function [dbo].[GetReservationIDs]
+GO
+
+
+
+
+-- CREATE PROCEDURES
+
 /*** Start of Procedures ***/
 
 CREATE PROCEDURE CredentialSet_Add
 
 @serviceBrokerGUID varchar(50),
 @serviceBrokerName nvarchar(256),
-@groupName nvarchar(256),
-@ussGUID varchar(50)
+@groupName nvarchar(256)
 
 AS
 
-insert into Credential_Sets(Service_Broker_GUID,Service_Broker_Name, Group_Name, USS_GUID) 
-values (@serviceBrokerGUID,@serviceBrokerName,@groupName,@ussGUID)
+insert into Credential_Sets(Service_Broker_GUID,Service_Broker_Name, Group_Name) 
+values (@serviceBrokerGUID,@serviceBrokerName,@groupName)
 select ident_current('Credential_Sets')
 
 
@@ -344,13 +356,11 @@ GO
 CREATE PROCEDURE CredentialSet_GetID
 
 @serviceBrokerGUID varchar(50),
-@groupName nvarchar(256),
-@ussGUID varchar(50)
+@groupName nvarchar(256)
 
 AS
 select Credential_Set_ID from Credential_Sets
 where Service_Broker_GUID = @serviceBrokerGuid AND Group_Name = @groupName
-AND USS_GUID = @ussGUID
 GO
 
 SET QUOTED_IDENTIFIER OFF 
@@ -368,13 +378,12 @@ CREATE PROCEDURE CredentialSet_Modify
 @credentialSetID int,
 @serviceBrokerGUID varchar(50),
 @serviceBrokerName nvarchar(256),
-@groupName nvarchar(256),
-@ussGUID varchar(50)
+@groupName nvarchar(256)
 
  AS
 
 update Credential_Sets set Service_Broker_GUID=@serviceBrokerGUID, Service_Broker_Name=@serviceBrokerName, 
-Group_Name=@groupName, USS_GUID=@ussGUID 
+Group_Name=@groupName
 where Credential_Set_ID=@credentialSetID
 select @@rowcount
 
@@ -419,14 +428,13 @@ CREATE PROCEDURE CredentialSet_Remove
 
 @serviceBrokerGUID varchar(50),
 @serviceBrokerName nvarchar(256),
-@groupName nvarchar(256),
-@ussGUID varchar(50)
+@groupName nvarchar(256)
 
 AS
 
 delete  from Credential_Sets 
 where Service_Broker_GUID=@serviceBrokerGUID and Service_Broker_Name=@serviceBrokerName 
-and Group_Name=@groupName and USS_GUID=@ussGUID
+and Group_Name=@groupName
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -445,7 +453,7 @@ CREATE PROCEDURE CredentialSet_RetrieveByID
 
 AS
 
-select Service_Broker_GUID, Service_Broker_Name, Group_Name, USS_GUID from Credential_Sets 
+select Service_Broker_GUID, Service_Broker_Name, Group_Name from Credential_Sets 
 where Credential_Set_ID=@credentialSetID
 
 return
@@ -1376,14 +1384,15 @@ CREATE PROCEDURE Reservation_Add
 @endTime datetime,
 @experimentInfoID int,
 @credentialSetID int,
+@ussID int,
 @status int
 
 
 AS
 
 
-insert into Reservation_Info( resource_id, Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID, status) 
-values ( @resourceID, @startTime, @endTime, @experimentInfoID, @credentialSetID, @status)
+insert into Reservation_Info( resource_id, Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID, USS_Info_ID, status) 
+values ( @resourceID, @startTime, @endTime, @experimentInfoID, @credentialSetID, @ussID, @status)
 select ident_current('Reservation_Info')
 
 
@@ -1439,12 +1448,13 @@ AS
 declare 
 @resourceID int,
 @credentialSetID int,
-@experimentInfoID int
+@experimentInfoID int,
+@ussId int
 select @resourceID=(select resource_id from LS_Resources where Lab_Server_Guid = @labServerGuid)
-select @credentialSetID=(select Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName and USS_GUID=@ussGUID)
+select @credentialSetID=(select Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName)
 select @experimentInfoID = (select Experiment_Info_ID from Experiment_Info where Lab_Client_Guid = @clientGuid and Lab_Server_Guid = @labServerGuid)
-EXEC Reservation_Add @resourceID,@startTime,@endTime,@experimentInfoID,@credentialSetId,@status
-
+select @ussId = (select USS_Info_ID from USS_Info where USS_GUID = @ussGUID)
+EXEC Reservation_Add @resourceID,@startTime,@endTime,@experimentInfoID,@credentialSetId, @ussId, @status
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -1474,17 +1484,19 @@ CREATE PROCEDURE ReservationInfo_Delete
  AS
 declare
 @experimentInfoID int,
-@credentialSetID int
+@credentialSetID int,
+@ussID int
 
 select @experimentInfoID=(select Experiment_Info_ID from Experiment_Info 
 where Lab_Client_Guid=@clientGuid and Lab_Server_GUID=@labServerGuid)
 
 select @credentialSetID=(select Credential_Set_ID from Credential_Sets 
-where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName and USS_GUID=@ussGUID)
+where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName)
+select @ussID = (select USS_Info_ID from US_Info where USS_GUID = @ussGUID)
 
 delete from Reservation_Info 
 where Start_Time=@startTime and End_Time=@endTime and Experiment_Info_ID=@experimentInfoID 
-and Credential_Set_ID=@credentialSetID
+and Credential_Set_ID=@credentialSetID and USS_Info_ID = @ussID
 select @@rowcount
 
 
@@ -1531,7 +1543,7 @@ GO
 CREATE PROCEDURE ReservationInfo_RetrieveByID
 @reservationInfoID int
  AS
-select resource_ID,Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID,status from Reservation_Info where Reservation_Info_ID=@reservationInfoID
+select resource_ID,Start_Time, End_Time, Experiment_Info_ID, Credential_Set_ID, USS_Info_ID, status from Reservation_Info where Reservation_Info_ID=@reservationInfoID
 
 
 GO
@@ -1614,11 +1626,14 @@ CREATE PROCEDURE ReservationInfo_RetrieveIDs
  AS
 declare
 @credentialSetID int,
-@experimentInfoID int
+@experimentInfoID int,
+@ussID int
 
-select @credentialSetID=Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName and USS_GUID=@ussGUID
+select @credentialSetID=Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName
 select @experimentInfoID=Experiment_Info_ID from Experiment_Info where Lab_Client_Guid=@clientGuid and Lab_Server_Guid=@labServerGuid
-select Reservation_Info_ID from Reservation_Info where Credential_Set_ID=@credentialSetID and Experiment_Info_ID=@experimentInfoID and End_Time>@startTime and Start_Time<@endTime ORDER BY Start_Time asc
+select @ussId = (select USS_Info_ID from US_Info where USS_GUID = @ussGUID)
+select Reservation_Info_ID from Reservation_Info where Credential_Set_ID=@credentialSetID and Experiment_Info_ID=@experimentInfoID 
+and USS_Info_ID = @ussID and End_Time>@startTime and Start_Time<@endTime ORDER BY Start_Time asc
 
 
 GO

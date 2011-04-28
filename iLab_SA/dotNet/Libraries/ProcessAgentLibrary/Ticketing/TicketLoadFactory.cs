@@ -176,10 +176,11 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.REDEEM_RESERVATION, keyValueDictionary);
         }
 
-        public string createRevokeReservationPayload()
+        public string createRevokeReservationPayload(string source)
         {
             string rootElemt = "RevokeReservationPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            keyValueDictionary.Add("source", source);
             return writeTicketLoad(rootElemt, TicketTypes.REVOKE_RESERVATION, keyValueDictionary);
         }
 

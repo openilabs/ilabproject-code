@@ -605,8 +605,29 @@ namespace iLabs.Scheduling.UserSide
 			return i;
              
 		}
+
+
+        /// <summary>
+        /// Lists all IDs of the reservations made that match the Criteria, null or empty strings are wild cards.
+        /// </summary>
+        /// <param name="sbGuid"></param>
+        /// <param name="userName"></param>
+        /// <param name="groupName"></param>
+        /// <param name="lsGuid"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
+        public static int[] GetReservationInfoIds(string sbGuid, string userName, string groupName,
+           string lsGuid, string clientGuid, DateTime start, DateTime end)
+        {
+            List<int> resIDs = new List<int>();
+
+            return resIDs.ToArray();
+        }
+
 		/// <summary>
-		/// enumerates all IDs of the reservations made on a particular experiment by a particular user identified by the combination of userName and serviceBrokerID
+		/// enumerates all IDs of the reservations made that match the Criteria, null or empty strings are wild cards.
 		/// </summary>
 		/// <param name="userName"></param>
         /// <param name="serviceBrokerGuid"></param>
@@ -810,12 +831,15 @@ namespace iLabs.Scheduling.UserSide
 		}
 
 
+
+       
+
 		/// <summary>
 		/// returns an array of the immutable reservation objects that correspond to the supplied reservation IDs
 		/// </summary>
 		/// <param name="reservationIDs"></param>
 		/// <returns></returns>
-		public static ReservationInfo[] GetReservations(int[] reservationIDs)
+		public static ReservationInfo[] GetReservationInfos(int[] reservationIDs)
 		{
 			ReservationInfo[] reservations=new ReservationInfo[reservationIDs.Length];
 			for(int i=0; i<reservationIDs.Length;i++)
@@ -827,7 +851,7 @@ namespace iLabs.Scheduling.UserSide
 
 			// create sql command
 			// command executes the "RetrieveReservationByID" stored procedure
-			DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationByID", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", null, DbType.Int32));
 			//execute the command
@@ -869,20 +893,130 @@ namespace iLabs.Scheduling.UserSide
 			return reservations;
 		}
 
-        public static ReservationInfo[] GetReservations(string sbGuid, string userName, string groupName,
+        public static ReservationData[] GetReservations(string sbGuid, string userName, string groupName,
+     string lsGuid, string clientGuid, DateTime start, DateTime end)
+        {
+            List<ReservationData> reservations = new List<ReservationData>();
+            // create sql connection
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = null;
+            cmd = FactoryDB.CreateCommand("RetrieveReservations", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (sbGuid != null && sbGuid.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@sbGuid", sbGuid, DbType.String, 50));
+            if (userName != null && userName.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
+            if (groupName != null && groupName.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupName", groupName, DbType.String, 256));
+            if (lsGuid != null && lsGuid.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGuid", lsGuid, DbType.String, 50));
+            if (clientGuid != null && clientGuid.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@clientGuid", clientGuid, DbType.String, 50));
+            if (start != null)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", start, DbType.DateTime));
+            if (end != null)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+
+            DbDataReader dataReader = null;
+            try
+            {
+              
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    ReservationData reservation = new ReservationData();
+                    reservation.reservationId = dataReader.GetInt32(0); ;
+                    if (dataReader[1] != System.DBNull.Value)
+                        reservation.startTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(1));
+                    if (dataReader[2] != System.DBNull.Value)
+                        reservation.endTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
+                    if (dataReader[3] != System.DBNull.Value)
+                        reservation.credentialSetId = (int)dataReader.GetInt32(3);
+                    if (dataReader[4] != System.DBNull.Value)
+                        reservation.experimentInfoId = (int)dataReader.GetInt32(4);
+                    if (dataReader[5] != System.DBNull.Value)
+                        reservation.userName = dataReader.GetString(5);
+                    reservations.Add(reservation);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return reservations.ToArray();
+        }
+
+
+        /// <summary>
+        /// to select reservation according to given criterion
+        /// </summary>
+        public static ReservationInfo[] GetReservationInfos(string sbGuid, string userName, string groupName,
             string lsGuid, string clientGuid, DateTime start, DateTime end)
         {
-            int experimentId = DBManager.ListExperimentInfoIDByExperiment(lsGuid, clientGuid);
-            int credId = -1;
-            if(groupName != null && groupName.Length >0)
-                credId = DBManager.GetCredentialSetID(sbGuid, groupName);
-            return DBManager.GetReservations(userName, experimentId, credId, start, end);
+            List<ReservationInfo> reservations = new List<ReservationInfo>();
+            // create sql connection
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = null;
+            cmd = FactoryDB.CreateCommand("RetrieveReservationInfos", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if(sbGuid != null && sbGuid .Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@sbGuid", sbGuid, DbType.String, 50));
+            if (userName != null && userName.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
+            if (groupName != null && groupName.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupName", groupName, DbType.String, 256));
+            if (lsGuid != null && lsGuid.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGuid", lsGuid, DbType.String, 50));
+            if (clientGuid != null && clientGuid.Length > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@clientGuid", clientGuid, DbType.String, 50));
+            if(start != null)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", start, DbType.DateTime));
+            if(end != null)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+            
+            DbDataReader dataReader = null;
+            try
+            {
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    ReservationInfo reservation = new ReservationInfo();
+                    reservation.reservationId = dataReader.GetInt32(0); ;
+                    if (dataReader[1] != System.DBNull.Value)
+                        reservation.startTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(1));
+                    if (dataReader[2] != System.DBNull.Value)
+                        reservation.endTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
+                    if (dataReader[3] != System.DBNull.Value)
+                        reservation.credentialSetId = (int)dataReader.GetInt32(3);
+                    if (dataReader[4] != System.DBNull.Value)
+                        reservation.experimentInfoId = (int)dataReader.GetInt32(4);
+                    if (dataReader[5] != System.DBNull.Value)
+                        reservation.userName = dataReader.GetString(5);
+                    reservations.Add(reservation);
+                }
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return reservations.ToArray();
         }
 
 		/// <summary>
 		/// to select reservation accorrding to given criterion
 		/// </summary>
-        public static ReservationInfo[] GetReservations(string userName, int experimentInfoId, int credentialSetId, DateTime start, DateTime end)
+        public static ReservationInfo[] GetReservationInfos(string userName, int experimentInfoId, int credentialSetId, DateTime start, DateTime end)
         {
             List<ReservationInfo> reservations = new List<ReservationInfo>();
             int action = 0;
@@ -997,6 +1131,7 @@ namespace iLabs.Scheduling.UserSide
             }
             return reservations.ToArray();
         }
+
 
 		    /* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information
@@ -1113,9 +1248,10 @@ namespace iLabs.Scheduling.UserSide
 			try 
 			{
 				connection.Open();
+               
 				dataReader = cmd.ExecuteReader ();
 				//store the experimentInfoIds retrieved in arraylist
-				
+               
 				while(dataReader.Read ())
 				{	
 					if(dataReader["Experiment_Info_ID"] != System.DBNull.Value )

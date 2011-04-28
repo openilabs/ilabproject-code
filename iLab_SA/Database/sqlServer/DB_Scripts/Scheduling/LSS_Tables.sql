@@ -1,3 +1,4 @@
+
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 -- $Id$
 
@@ -24,6 +25,9 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Reservation_Info_Experiment_Info]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Reservation_Info] DROP CONSTRAINT FK_Reservation_Info_Experiment_Info
 GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Reservation_Info_USS_Info]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Reservation_Info] DROP CONSTRAINT FK_Reservation_Info_USS_Info
+GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Permitted_Experiments_Recurrence]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Permitted_Experiments] DROP CONSTRAINT FK_Permitted_Experiments_Recurrence
@@ -33,9 +37,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Permitt
 ALTER TABLE [dbo].[Permitted_Groups] DROP CONSTRAINT FK_Permitted_Groups_Recurrence
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Credential_Sets_USS_Info]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Credential_Sets] DROP CONSTRAINT FK_Credential_Sets_USS_Info
-GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Credential_Sets]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Credential_Sets]
@@ -77,8 +78,7 @@ CREATE TABLE [dbo].[Credential_Sets] (
 	[Credential_Set_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Service_Broker_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Service_Broker_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[USS_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
 ) ON [PRIMARY]
 GO
 
@@ -149,6 +149,7 @@ CREATE TABLE [dbo].[Reservation_Info] (
 	[End_Time] [datetime] NOT NULL ,
 	[Experiment_Info_ID] [int] NOT NULL ,
 	[Credential_Set_ID] [int] NOT NULL,
+	{USS_Info_ID] [int] NOT NULL,
 	[Status] [int] NOT NULL 
 ) ON [PRIMARY]
 GO
@@ -237,14 +238,6 @@ ALTER TABLE [dbo].[USS_Info] ADD
 	)  ON [PRIMARY] 
 GO
 
-ALTER TABLE [dbo].[Credential_Sets] ADD 
-	CONSTRAINT [FK_Credential_Sets_USS_Info] FOREIGN KEY 
-	(
-		[USS_GUID]
-	) REFERENCES [dbo].[USS_Info] (
-		[USS_GUID]
-	) ON DELETE CASCADE  ON UPDATE CASCADE 
-GO
 
 ALTER TABLE [dbo].[LSS_Policy] ADD 
 	CONSTRAINT [FK_LSS_Policy_Credential_Sets] FOREIGN KEY 
@@ -304,4 +297,12 @@ ALTER TABLE [dbo].[Reservation_Info] ADD
 	) REFERENCES [dbo].[Experiment_Info] (
 		[Experiment_Info_ID]
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
+
+	CONSTRAINT [FK_Reservation_Info_USS_Info] FOREIGN KEY 
+	(
+		[USS_Info_ID]
+	) REFERENCES [dbo].[USS_Info] (
+		[USS_Info_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE 
+GO
 GO

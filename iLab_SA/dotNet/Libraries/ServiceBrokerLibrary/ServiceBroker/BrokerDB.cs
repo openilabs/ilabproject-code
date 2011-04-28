@@ -790,7 +790,7 @@ namespace iLabs.ServiceBroker
            ResourceMapping mapping = null;
            try
            {
-               connection.Open();
+               
                mapping = InsertResourceMapping(connection, keyType, key, valueTypes, values);
                if (mapping != null)
                {
@@ -814,6 +814,8 @@ namespace iLabs.ServiceBroker
            return mapping;
 
        }
+     
+
 
         protected ResourceMapping InsertResourceMapping(DbConnection connection, string keyType, object key, string[] valueTypes, object[] values)
         {
@@ -821,13 +823,14 @@ namespace iLabs.ServiceBroker
                 throw new ArgumentException("Arguments cannot be null", "valueTypes and values");
 
             if (valueTypes.Length != values.Length)
-                throw new ArgumentException ("Parameter Arrays \"valueTypes\" and \"values\" should be of the same length");
+                throw new ArgumentException("Parameter Arrays \"valueTypes\" and \"values\" should be of the same length");
 
             ResourceMappingKey mappingKey = new ResourceMappingKey(keyType, key);
             // insert key into database
-         
+
             try
             {
+                connection.Open();
                 DbCommand cmd = FactoryDB.CreateCommand("ResourceMapKey_Insert", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -845,7 +848,7 @@ namespace iLabs.ServiceBroker
                     cmd2.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@string_Value", key, DbType.String,2048));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@string_Value", key, DbType.String, 2048));
 
                     keyID = Convert.ToInt32(cmd2.ExecuteScalar());
                 }
@@ -856,7 +859,7 @@ namespace iLabs.ServiceBroker
                     DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
 
-                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@resourceType_Value", key, DbType.String,256));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@resourceType_Value", key, DbType.String, 256));
 
                     keyID = Convert.ToInt32(cmd2.ExecuteScalar());
                 }
@@ -868,9 +871,9 @@ namespace iLabs.ServiceBroker
                     throw new ArgumentException("Value for key is invalid");
 
                 // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingKey_Type",keyTypeID, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingKey", keyID,DbType.Int32));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingKey_Type", keyTypeID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingKey", keyID, DbType.Int32));
+
                 // execute the command
                 int mappingID = Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -896,8 +899,8 @@ namespace iLabs.ServiceBroker
                         cmd2.CommandType = CommandType.StoredProcedure;
 
                         // populate parameters
-                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@string_Value", (string)values[i],DbType.String,2048));
-                    
+                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@string_Value", (string)values[i], DbType.String, 2048));
+
                         valueID = Convert.ToInt32(cmd2.ExecuteScalar());
                     }
 
@@ -907,7 +910,7 @@ namespace iLabs.ServiceBroker
                         DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                         cmd2.CommandType = CommandType.StoredProcedure;
 
-                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@resourceType_Value",(string)values[i],DbType.String,256));
+                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@resourceType_Value", (string)values[i], DbType.String, 256));
                         valueID = Convert.ToInt32(cmd2.ExecuteScalar());
                     }
 
@@ -922,19 +925,19 @@ namespace iLabs.ServiceBroker
                     //cmd.Parameters.Clear();
 
                     // populate stored procedure parameters
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@Mapping_ID", mappingID,DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingValue_Type", valueTypeID,DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@MappingValue", valueID, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@Mapping_ID", mappingID, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingValue_Type", valueTypeID, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingValue", valueID, DbType.Int32));
 
                     // execute the command
-                    mappingID = Convert.ToInt32(cmd.ExecuteScalar());
+                    int mapValueID = Convert.ToInt32(cmd.ExecuteScalar());
                 }
 
                 // create new mapping object
                 ResourceMapping mapping = new ResourceMapping(mappingID, mappingKey, mappingValues);
 
 
-         
+
                 return mapping;
             }
 
@@ -949,7 +952,7 @@ namespace iLabs.ServiceBroker
                 connection.Close();
             }
         }
-
+        
         public ResourceMapping AddResourceMapping(ResourceMappingKey key, ResourceMappingValue[] values)
         {
             string[] valueTypes = new string[values.Length];
@@ -966,7 +969,7 @@ namespace iLabs.ServiceBroker
 
 
          /// <summary>
-        /// 
+        /// Deletes the resourceMapping and any qualifiers and grants related to the mapping
         /// </summary>
         /// <param name="mapping">Resource Mapping to be deleted</param>
         /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
@@ -976,7 +979,7 @@ namespace iLabs.ServiceBroker
         }
 
         /// <summary>
-        /// 
+        /// Deletes the resourceMapping and any qualifiers and grants related to the mapping 
         /// </summary>
         /// <param name="mapping">Resource Mapping to be deleted</param>
         /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
@@ -1039,6 +1042,11 @@ namespace iLabs.ServiceBroker
             return status;
         }
 
+        /// <summary>
+        /// Deletes the resourceMapping and any qualifiers and grants related to the mapping 
+        /// </summary>
+        /// <param name="mapping">Resource Mapping to be deleted</param>
+        /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
         public bool DeleteResourceMapping(string keyType, int keyId, string valueType, int valueId)
         {
             return DeleteResourceMapping(ResourceMappingTypes.GetResourceMappingTypeID(keyType), keyId, 
@@ -1046,11 +1054,11 @@ namespace iLabs.ServiceBroker
     }
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="mapping">Resource Mapping to be deleted</param>
-        /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
+    /// <summary>
+    /// Deletes the resourceMapping and any qualifiers and grants related to the mapping 
+    /// </summary>
+    /// <param name="mapping">Resource Mapping to be deleted</param>
+    /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
         public bool DeleteResourceMapping(int keyTypeId, int keyId, int valueTypeId, int valueId)
         {
             bool status = false;
@@ -1202,17 +1210,17 @@ namespace iLabs.ServiceBroker
                     value = (ResourceMappingValue)CompleteResourceMappingKeyRead(connection, valueTypeID, valueID, false);
                     valuesList.Add(value);
                 }
-                //if (valuesList.Count > 0)
-                //{
+                if (valuesList.Count > 0)
+                {
                     ResourceMappingValue[] values = (ResourceMappingValue[])valuesList.ToArray(value.GetType());
 
                     // construct resource mapping
                     return new ResourceMapping(mappingID, key, values);
-                //}
-                //else
-                //{
-                //    return null;
-                //}
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (DbException e)
             {
@@ -1644,7 +1652,12 @@ namespace iLabs.ServiceBroker
             }
             return target;
         }
-
+        /// <summary>
+        /// Creates the resourceMapping for this relationship and adds a qualifier.
+        /// </summary>
+        /// <param name="lsId"></param>
+        /// <param name="lssId"></param>
+        /// <returns>the qualifierID</returns>
         public int AssociateLSS(int lsId, int lssId)
         {
             Object keyObj = lsId;

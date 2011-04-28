@@ -118,6 +118,9 @@ INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (8,'User Sche
 INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (9,'Service Broker');
 INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (10,'Storage Server');
 INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (11,'Resource Mapping');
+INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (12,'Authentication Service');
+INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (13,'Generic ProcessAgent');
+INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (13,'Not ProcessAgent');
 
 
 /* QUALIFIERS & QUALIFIER HIERARCHY */
@@ -175,6 +178,7 @@ INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (4,'STR
 INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (5,'TICKET_TYPE','Ticket Type');
 INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (6,'GROUP','Group');
 INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (7,'RESOURCE_TYPE', 'Resource Type');
+INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (8,'AUTHORIZATION_SERVICE', 'Authorization Service');
 
 SET IDENTITY_INSERT ResourceMappingTypes OFF
 DBCC CHECKIDENT (ResourceMappingTypes, RESEED);

@@ -20,10 +20,8 @@ Please see license.txt in top level directory for full license.
 			<div id="wrapper">
 				<div id="pageintro">
 					<h1>Lab Client Resources for <asp:Label ID="lblLabClient" Runat="server"></asp:Label></h1>
-					<p>Add, edit, reorder, and remove lab client resource URLs.</p>
-					<div class="errormessage" id="divErrorMessage" runat="server">
-						<p><asp:label id="lblResponse" Runat="server"></asp:label></p>
-					</div>
+					<p>Add, edit, reorder, and remove lab client resource URLs. The save buttons will be enabled once you modify information.</p>
+					<p><asp:label id="lblResponse" Runat="server"></asp:label></p>
 				</div>
 				<div id="pagecontent">
 					<div id="sidedisplay">
@@ -36,7 +34,7 @@ Please see license.txt in top level directory for full license.
 								</tr>
 								<tr>
 									<th><label for="url">Link URL</label></th>
-									<td><asp:textbox id="txtUrl" Runat="server" Width="280px"></asp:textbox></td>
+									<td><asp:textbox id="txtUrl" Runat="server" Width="280px" ></asp:textbox></td>
 								</tr>
 								<tr>
 									<th><label for="desc">Link<br/>Description</label></th>

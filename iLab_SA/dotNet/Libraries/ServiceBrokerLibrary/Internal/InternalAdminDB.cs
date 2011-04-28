@@ -598,6 +598,7 @@ namespace iLabs.ServiceBroker.Internal
 
 		/// <summary>
 		/// to delete all lab clients records specified by the array of lab client IDs
+        /// ResourceMapping (ESS,USS & LabServer) are removeded as will as ClientInfo Items
 		/// </summary>
 		public static int[] DeleteLabClients ( int[] clientIDs )
 		{
@@ -621,7 +622,7 @@ namespace iLabs.ServiceBroker.Internal
 				foreach (int clientID in clientIDs) 
 				{
 					// Deleting from table LabClients
-					/*	IMPORTANT ! - The database if currently set to Cascade delete, where deleting an experiment will automatically
+					/*	IMPORTANT ! - The database is currently set to Cascade delete, where deleting an experiment will automatically
 					 *  delete the relevant Lab_Server_to_Client_Map records. If Cascade Delete is not to be used, then the code to delete the extra records
 					 *  in the map table when a lab client is deleted should be added in the stored procedure
 					 *  
@@ -848,6 +849,49 @@ namespace iLabs.ServiceBroker.Internal
 
             return clientIDs.ToArray();
 		}
+
+        /// <summary>
+        /// to retrieve a list of all the lab clients in the database
+        /// </summary>
+
+        public static int[] SelectLabClientIDsForServer(int serverID)
+        {
+            List<int> clientIDs = new List<int>();
+            if (serverID > 0)
+            {
+                DbConnection myConnection = FactoryDB.GetConnection();
+                DbCommand myCommand = FactoryDB.CreateCommand("LabServerClient_ClientIDs", myConnection);
+                myCommand.CommandType = CommandType.StoredProcedure;
+                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@serverID", serverID, DbType.Int32));
+                try
+                {
+                    myConnection.Open();
+
+
+                    // get labclient ids from table lab_clients
+                    DbDataReader myReader = myCommand.ExecuteReader();
+
+
+                    while (myReader.Read())
+                    {
+                        if (myReader["client_ID"] != System.DBNull.Value)
+                            clientIDs.Add(Convert.ToInt32(myReader["client_ID"]));
+                    }
+                    myReader.Close();
+
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Exception thrown SelectLabClientIDs", ex);
+                }
+                finally
+                {
+                    myConnection.Close();
+                }
+            }
+            return clientIDs.ToArray();
+        }
+
 
         public static IntTag[] SelectLabClientTags()
         {

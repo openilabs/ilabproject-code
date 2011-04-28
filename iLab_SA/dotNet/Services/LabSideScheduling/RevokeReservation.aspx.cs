@@ -252,7 +252,7 @@ namespace iLabs.Scheduling.LabSide
                 int[] resIDs = DBManager.ListReservationInfoIDsByLabServer(Session["lsGuid"].ToString(), startTime, endTime);
                 if (resIDs != null && resIDs.Length > 0)
                 {
-                    count = LSSSchedulingAPI.RevokeReservations(resIDs);
+                    count = LSSSchedulingAPI.RevokeReservations(resIDs,txtMessage.Text);
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("For the time period " 
                         + DateUtil.ToUserTime(startTime,culture,userTZ) + " to "
                     + DateUtil.ToUserTime(endTime,culture,userTZ) + ", " + count + " out of " + resIDs.Length + " reservations have been revoked successfully.");
@@ -268,7 +268,7 @@ namespace iLabs.Scheduling.LabSide
 				foreach (ReservationInfo resInfo in removedRes)
 				{
 					LSSSchedulingAPI.AddReservationInfo(resInfo.startTime, resInfo.endTime, 
-                        resInfo.credentialSetId, resInfo.experimentInfoId, resInfo.resourceId,resInfo.statusCode);
+                        resInfo.credentialSetId, resInfo.experimentInfoId, resInfo.resourceId,resInfo.ussId, resInfo.statusCode);
 
 				}
                 return;
@@ -308,7 +308,7 @@ namespace iLabs.Scheduling.LabSide
 				// rollback
 				foreach (ReservationInfo resInfo in removedRes)
 				{
-					LSSSchedulingAPI.AddReservationInfo(resInfo.startTime, resInfo.endTime, resInfo.credentialSetId, resInfo.experimentInfoId, resInfo.resourceId, resInfo.statusCode);
+					LSSSchedulingAPI.AddReservationInfo(resInfo.startTime, resInfo.endTime, resInfo.credentialSetId, resInfo.experimentInfoId, resInfo.resourceId, resInfo.ussId, resInfo.statusCode);
 
 				}
 			}

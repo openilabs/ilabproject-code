@@ -158,33 +158,35 @@ namespace iLabs.ServiceBroker.admin
                         {
                             //int resourceMappingID = ;
                             ResourceMapping mapping = ticketIssuer.GetResourceMapping(qualifier.qualifierReferenceID);
-
-                            ResourceMappingKey mappingKey = mapping.Key;
-                            if (mapping.Key.Type.Equals(ResourceMappingTypes.GROUP))
+                            if (mapping != null)
                             {
-                                if (mapping.values[0].Type == ResourceMappingTypes.CLIENT)
-                                    paID = ticketIssuer.FindProcessAgentIdForClient((int)mapping.values[0].Entry, ProcessAgentType.SCHEDULING_SERVER);
-                            }
-                            else if (mapping.Key.Type.Equals(ResourceMappingTypes.PROCESS_AGENT))
-                            {
-                                if (mapping.values[2].Type.Equals(ResourceMappingTypes.TICKET_TYPE))// && mapping.values[2].Entry.Equals(TicketTypes.GetTicketType(TicketTypes.MANAGE_USS_GROUP)))
+                                ResourceMappingKey mappingKey = mapping.Key;
+                                if (mapping.Key.Type.Equals(ResourceMappingTypes.GROUP))
                                 {
-                                    paID = (int)mapping.values[1].Entry;
-                                    ResourceMappingValue[] mappingValues = mapping.values;
-
-                                    //TO BE FIXED: I am assuming that the Mapping has 3 values, the 3rd one being the Ticket Type,
-                                    //the 2nd one being the Process Agent, and the 1st one the Resource Type.
-
-                                    //if (mappingValues[2].Type.Equals(ResourceMappingTypes.TICKET_TYPE))
-                                    //{
-                                    //    if (TicketTypes.IsManagePAType((string)mappingValues[2].Entry))
-                                    //        isManage = true;
-                                    //}
-
-                                    if (mappingValues[1].Type.Equals(ResourceMappingTypes.PROCESS_AGENT))
+                                    if (mapping.values[0].Type == ResourceMappingTypes.CLIENT)
+                                        paID = ticketIssuer.FindProcessAgentIdForClient((int)mapping.values[0].Entry, ProcessAgentType.SCHEDULING_SERVER);
+                                }
+                                else if (mapping.Key.Type.Equals(ResourceMappingTypes.PROCESS_AGENT))
+                                {
+                                    if (mapping.values[2].Type.Equals(ResourceMappingTypes.TICKET_TYPE))// && mapping.values[2].Entry.Equals(TicketTypes.GetTicketType(TicketTypes.MANAGE_USS_GROUP)))
                                     {
-                                        isProcessAgent = true;
-                                        targetId = (int)mappingValues[1].Entry;
+                                        paID = (int)mapping.values[1].Entry;
+                                        ResourceMappingValue[] mappingValues = mapping.values;
+
+                                        //TO BE FIXED: I am assuming that the Mapping has 3 values, the 3rd one being the Ticket Type,
+                                        //the 2nd one being the Process Agent, and the 1st one the Resource Type.
+
+                                        //if (mappingValues[2].Type.Equals(ResourceMappingTypes.TICKET_TYPE))
+                                        //{
+                                        //    if (TicketTypes.IsManagePAType((string)mappingValues[2].Entry))
+                                        //        isManage = true;
+                                        //}
+
+                                        if (mappingValues[1].Type.Equals(ResourceMappingTypes.PROCESS_AGENT))
+                                        {
+                                            isProcessAgent = true;
+                                            targetId = (int)mappingValues[1].Entry;
+                                        }
                                     }
                                 }
                             }

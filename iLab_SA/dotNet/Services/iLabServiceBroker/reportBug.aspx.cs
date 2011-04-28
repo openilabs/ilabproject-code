@@ -132,6 +132,12 @@ namespace iLabs.ServiceBroker.iLabSB
 				lblResponse.Text = "<div class=errormessage><p>Please enter a description of the problem!</p></div>";
 				lblResponse.Visible = true;
 			}
+            else if (!recaptcha.IsValid)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage("You must enter the security code!");
+                lblResponse.Visible = true;
+            }
+
 			else
 			{
 				string userEmail = null;

@@ -391,8 +391,10 @@ GO
 /****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Agents] (
 	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
-	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Is_Group] [bit] NOT NULL 
+	[Is_Group] [bit] NOT NULL,
+	Create_Time] [datetime] NOT NULL DEFAULT GETUTCDATE(),
+	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+	
 ) ON [PRIMARY]
 GO
 
@@ -495,7 +497,6 @@ CREATE TABLE [dbo].[Groups] (
 	[Group_Type_ID] [int] NOT NULL ,
 	[Associated_Group_ID] [int] NULL ,
 	[AccessCode] [int] NOT NULL DEFAULT 0,
-	[Date_Created] [datetime] NOT NULL ,
 	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
@@ -631,8 +632,9 @@ GO
 CREATE TABLE [dbo].[ResourceMappingValues] (
 	[MappingValue_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Mapping_ID] [int] NOT NULL ,
-	[MappingValue] [int] NOT NULL ,
-	[MappingValue_Type] [int] NOT NULL 
+	[MappingValue_Type] [int] NOT NULL, 
+	[MappingValue] [int] NOT NULL
+	
 ) ON [PRIMARY]
 GO
 
@@ -687,8 +689,8 @@ GO
 /****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:08:00 PM ******/
 CREATE TABLE [dbo].[Users] (
 	[User_ID] [int] NOT NULL ,
-	[Date_Created] [datetime] NOT NULL ,
 	[Lock_User] [bit] NOT NULL ,
+	[Auth_Provider [int] NOT NULL Default =0,
 	[Xml_Extension] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[User_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,

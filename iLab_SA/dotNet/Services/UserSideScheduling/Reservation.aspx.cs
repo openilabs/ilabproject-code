@@ -220,7 +220,7 @@ namespace iLabs.Scheduling.UserSide
             lbxReservation.Items.Clear();
             try
             {
-                ReservationInfo[] res = DBManager.GetReservations(serviceBrokerGuid, userName, groupName,
+                ReservationInfo[] res = DBManager.GetReservationInfos(serviceBrokerGuid, userName, groupName,
                     labServerGuid, clientGuid, DateTime.UtcNow,DateTime.MaxValue);
                 if (res != null)
                 {

@@ -101,7 +101,9 @@ using iLabs.DataTypes.SchedulingTypes;
             DateTime startTime, DateTime endTime);
         
 		/// <summary>
-		/// Removes all reservations which intersect the parameters, called from the USS does not require the LSS to notify the USS.
+        /// remove the ReservationInfos that intersect the specification, 
+        /// wraps the API method which sends a single email to the experiment contact email address.
+        /// Note: should only be called from the USS, this does not forward the RemoveReservation method call to the USS or ServiceBroker.
 		/// </summary>
         /// <param name="serviceBrokerGuid">Must be specified if groupName specified</param>
 		/// <param name="groupName"></param>
@@ -110,8 +112,8 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="labServerGuid">Must be specified</param>
         /// <param name="startTime">UTC start time, trucated within the method to UTCnow</param>
         /// <param name="endTime">UTC end time</param>
-        /// <returns>true remove successfully, false otherwise</returns>
-        [WebMethod(Description="Removes all reservations which intersect the parameters, called from the USS does not require the LSS to notify the USS.")]
+        /// <returns>The number of reservationInfos deleted, or -1 on error</returns>
+        [WebMethod(Description="Removes all reservations which intersect the parameters, should only be called from the USS, the LSS does not notify the USS.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RemoveReservation(string serviceBrokerGuid, string groupName,

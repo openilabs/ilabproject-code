@@ -63,7 +63,7 @@ using iLabs.DataTypes.SchedulingTypes;
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime);
        
         /// <summary>
-        /// Add a reservation for a lab server for thew specified user, client and time. 
+        /// Add a reservation for a lab server for the specified user, group, client and time. 
         /// If the reservation is confirmed by the LSS, the reservation will be added to the USS.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
@@ -75,7 +75,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="startTime">UTC</param>
         /// <param name="endTime">UTC</param>
         /// <returns>Returns a message of succes or a simple description of the reason for failure.</returns>
-        [WebMethod(Description = "Add a reservation for a lab server for the specified user, client and time. "
+        [WebMethod(Description = "Add a reservation for a lab server for the specified user, group, client and time. "
         + "If the reservation is confirmed by the LSS, the reservation will be added to the USS.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
@@ -83,8 +83,9 @@ using iLabs.DataTypes.SchedulingTypes;
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime);
 		
 		/// <summary>
-		/// Remove all the reservations for a lab server covered by the revocation time. 
-        /// Mail is sent to each of the owners of the removed reservations, via a request to the ServiceBroker.
+		/// Remove all the reservations for a lab server  that match the specification.. 
+        /// The serviceBroker is notified of each reservation so that an email is sent to each of the owners of the removed reservations.
+        /// If the method is not called by an LSS the LSS is forwarded a RemoveReservation request."
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
@@ -94,10 +95,10 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// <param name="startTime">UTC</param>
 		/// <param name="endTime">UTC</param>
         /// <param name="message"></param>
-        /// <returns>true if all the reservations have been 
-        /// removed successfully</returns>
-        [WebMethod(Description = "Remove all the reservation for a lab server covered by the revocation time."
-            + " Mail is sent to each of the owners of the removed reservations.")]
+        /// <returns>The number of reservations removed or -1 in an error</returns>
+        [WebMethod(Description = "Remove all the reservations for a lab server that match the specification."
+            + " The serviceBroker is notified of each reservation so that an email is sent to each of the owners of the removed reservations."
+            + " If the method is not called by an LSS the LSS is forwarded a RemoveReservation request.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public abstract int RevokeReservation(string serviceBrokerGuid, string groupName,

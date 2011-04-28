@@ -224,7 +224,9 @@ namespace iLabs.Scheduling.LabSide
         }
 
 		/// <summary>
-		/// remove the reservation information
+		/// Remove the ReservationInfos that intersect the specification, 
+        /// wraps the API method which sends a single email to the experiment contact email address.
+        /// Note this does not forward the RemoveReservation to the USS or ServiceBroker.
 		/// </summary>
 		/// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
@@ -233,15 +235,15 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="labServerGuid"></param>
         /// <param name="startTime"></param>
 		/// <param name="endTime"></param>
-		/// <returns></returns>true remove successfully, false otherwise
-        [WebMethod]
+		/// <returns>The number of ReservationInfos deleted , or -1 on error</returns>
+        [WebMethod(Description = "Removes all reservations which intersect the parameters, should only be called from the USS, the LSS does not notify the USS or ServiceBroker.")]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public int RemoveReservation(string serviceBrokerGuid, string groupName,
             string ussGuid, string labServerGuid, string clientGuid, 
             DateTime startTime, DateTime endTime)
 		{
-            bool removed = false;
+            int count = -1;
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -255,7 +257,7 @@ namespace iLabs.Scheduling.LabSide
 
                 DateTime startTimeUTC = startTime.ToUniversalTime();
                 DateTime endTimeUTC = endTime.ToUniversalTime();
-                 removed = LSSSchedulingAPI.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
+                count = LSSSchedulingAPI.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
                     labServerGuid, clientGuid, startTimeUTC, endTimeUTC);
                 
             }
@@ -263,7 +265,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 throw;
             }
-            return removed ? 1 : 0;
+            return count;
 		}
 
 		/// <summary>
@@ -370,14 +372,14 @@ namespace iLabs.Scheduling.LabSide
             int status = 0;
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
-                int test = LSSSchedulingAPI.GetCredentialSetID(serviceBrokerGuid, groupName, ussGuid);
+                int test = LSSSchedulingAPI.GetCredentialSetID(serviceBrokerGuid, groupName);
                 if (test > 0)
                 {
                     status = 1;
                 }
                 else
                 {
-                    int cID = LSSSchedulingAPI.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
+                    int cID = LSSSchedulingAPI.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
                     if (cID != -1)
                         status = 1;
                 }
@@ -393,8 +395,8 @@ namespace iLabs.Scheduling.LabSide
         {
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
-                int id = DBManager.GetCredentialSetID(serviceBrokerGuid, groupName, ussGuid);
-                return LSSSchedulingAPI.ModifyCredentialSet(id, serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
+                int id = DBManager.GetCredentialSetID(serviceBrokerGuid, groupName);
+                return LSSSchedulingAPI.ModifyCredentialSet(id, serviceBrokerGuid, serviceBrokerName, groupName);
             }
             else
                 return 0;
@@ -415,7 +417,7 @@ namespace iLabs.Scheduling.LabSide
         {
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
-                return LSSSchedulingAPI.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName, ussGuid);
+                return LSSSchedulingAPI.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
             }
             else 
                 return 0;

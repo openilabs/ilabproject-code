@@ -17,15 +17,20 @@ Please see license.txt in top level directory for full license.
 		<link href="../css/popup.css" type="text/css" rel="stylesheet"/>
 		<style type="text/css">@import url( ../css/popup.css );
 		</style>
-			<script type="text/javascript">
+		<script type="text/javascript">
 		<!--
 		function ReloadParent() 
-        {          
+        {      str = "manageLabClients.aspx?refresh="  + id;
             if (window.opener){            
-                window.opener.location.href = 'manageLabClients.aspx?refresh=t';
+                window.opener.location.href = str;
                 window.opener.focus();
             } 
             window.close();  
+        }
+        
+        function ConfirmRemove()
+        {
+            return confirm("Are you sure you want to remove the group?\nDoing so will revoke all remaining reservations for the client made by the group!");
         }
         -->
         </script>
@@ -39,9 +44,7 @@ Please see license.txt in top level directory for full license.
 						</h1>
 						<p>Select a Lab Client and then give permissions to groups below.
 						</p>
-						<div  runat="server">
-							<p><asp:label id="lblResponse" Runat="server"></asp:label></p>
-						</div>
+						<div runat="server"><p><asp:label id="lblResponse" Runat="server"></asp:label></p></div>
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
@@ -50,53 +53,23 @@ Please see license.txt in top level directory for full license.
 							<asp:dropdownlist CssClass="i18n" id="ddlLabClient" Runat="server" AutoPostBack="True" Width="260px" onselectedindexchanged="ddlLabClient_SelectedIndexChanged"></asp:dropdownlist></div>
 						<DIV class="simpleform">&nbsp;</DIV>
 						<div id="messagebox">
-							<h3>Associated Lab Servers
-							</h3>
-							<ul>
-								<asp:repeater id="repLabServers" Runat="server">
-									<ItemTemplate>
-										<li>
-											<strong>Name:</strong>
-											<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "AgentName"))%>
-											<br />
-											<strong>Web Service URL:</strong>
-											<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "ServiceURL"))%>
-											</li>
-									</ItemTemplate>
-								</asp:repeater></ul>
-								<h3>Associated USS
-							</h3>
-							<ul>
-								<asp:repeater id="repUSS" Runat="server">
-									<ItemTemplate>
-										<li>
-											<strong>USS Name:</strong>
-											<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "AgentName"))%>
-											<br>
-											<strong>Web Service URL:</strong>
-											<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "ServiceURL"))%>
-										</li>
-									</ItemTemplate>
-								</asp:repeater></ul>
-								<h3>Associated ESS
-							</h3>
-							<ul>
-								<asp:repeater id="repESS" Runat="server">
-									<ItemTemplate>
-										<li>
-											<strong>ESS Name:</strong>
-											<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "AgentName"))%>
-											<br />
-											<strong>Web Service URL:</strong>
-											<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "ServiceURL"))%>
-										</li>
-									</ItemTemplate>
-								</asp:repeater></ul>
+							<h3>Associated Lab Servers</h3>
+							<ul><asp:repeater id="repLabServers" Runat="server"><ItemTemplate><li><strong>Name:</strong><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "AgentName"))%><br />
+								<strong>URL:</strong><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "ServiceURL"))%>
+							    </li>
+							</ItemTemplate></asp:repeater></ul>
+							<h3>Associated USS</h3>
+							<ul><asp:repeater id="repUSS" Runat="server"><ItemTemplate><li><strong>USS Name:</strong><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "AgentName"))%><br />
+								<strong>URL:</strong><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "ServiceURL"))%>
+								</li>
+							</ItemTemplate></asp:repeater></ul>
+							<h3>Associated ESS</h3>
+							<ul><asp:repeater id="repESS" Runat="server"><ItemTemplate><li><strong>ESS Name:</strong><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "AgentName"))%><br />
+								<strong>URL:</strong><%# Convert.ToString(DataBinder.Eval(Container.DataItem, "ServiceURL"))%>
+								</li>
+							</ItemTemplate></asp:repeater></ul>
 						</div>
 						<br clear="all" />
-						<div class="simpleform">
-						<asp:Button ID="btnClose" runat="server" Text="Close" CssClass="button"  OnClick="btnClose_Click"></asp:Button>  
-						</div>
 						<div class="simpleform">
 							<table cellspacing="0" cellpadding="0" border="0">
 							<tr>
@@ -110,9 +83,8 @@ Please see license.txt in top level directory for full license.
                                 </th>         
 							</tr>
 							<tr>
-								<th colspan="2">
-									<asp:button id="btnSaveChange" Runat="server" CssClass="buttonright" Text="Save Changes" onclick="btnSaveChange_Click"></asp:button>
-								</th>
+							    <th><asp:Button ID="btnClose" runat="server" Text="Close" CssClass="button"  OnClick="btnClose_Click"></asp:Button></th>
+								<th><asp:button id="btnSaveChange" Runat="server" CssClass="buttonright" Text="Save Changes" onclick="btnSaveChange_Click"></asp:button></th>
 							</tr>
 							</table>
 							</div>

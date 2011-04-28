@@ -222,7 +222,7 @@ namespace iLabs.ServiceBroker.iLabSB
 						uMail.Body += txtProblem.Text;
 						SmtpMail.Send(uMail);
 					}
-					lblResponse.Text = "<div class=errormessage><p>Thank-you! Your help request has been submitted. An administrator will contact you within 24-48 hours.</p></div>";
+					lblResponse.Text = Utilities.FormatConfirmationMessage("Thank-you! Your help request has been submitted. An administrator will contact you within 24-48 hours.");
 					lblResponse.Visible = true;
 
 				}

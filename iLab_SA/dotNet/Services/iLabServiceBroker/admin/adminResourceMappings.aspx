@@ -79,8 +79,7 @@ Please see license.txt in top level directory for full license.
 						                            <asp:dropdownlist CssClass="i18n" id="key_ProcessAgentDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_ProcessAgent_SelectedIndexChanged"></asp:dropdownlist>
 						                            <asp:dropdownlist CssClass="i18n" id="key_ClientDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_Client_SelectedIndexChanged"></asp:dropdownlist>						                        
 						                            <asp:dropdownlist CssClass="i18n" id="key_TicketTypeDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged"></asp:dropdownlist>
-                                                    <asp:dropdownlist CssClass="i18n" id="key_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged">
-                                                    </asp:DropDownList>
+                                                    <asp:dropdownlist CssClass="i18n" id="key_GroupDropdown" Runat="server" AutoPostBack="True" Width="300px" onselectedindexchanged="key_TicketType_SelectedIndexChanged"></asp:dropdownlist>
 						                        </td>
 						                    </tr>
 						                    <tr></tr>

@@ -176,7 +176,7 @@ namespace iLabs.Scheduling.UserSide
             
             Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
 
-            ReservationInfo[] resInfos = USSSchedulingAPI.GetReservations(serviceBrokerGuid, userName, null,
+            ReservationInfo[] resInfos = USSSchedulingAPI.GetReservationInfos(serviceBrokerGuid, userName, null,
                 labServerGuid, labClientGuid, startTime, endTime);
             if (resInfos != null && resInfos.Length > 0)
             {
@@ -245,13 +245,17 @@ namespace iLabs.Scheduling.UserSide
         }
 
 		/// <summary>
-		/// remove all the reservation for certain lab server being covered by the revocation time 
+		/// Remove all the reservations for certain lab server being covered by the revocation time. 
+        /// Unless the request is from a LSS the LSS will be forwarded A RemoveReservation request.
+        /// For each reservation the service broker is notified, so that an email may be sent to the user.
 		/// </summary>
         /// <param name="labServerGuid"></param>
 		/// <param name="startTime"></param>local time of USS
 		/// <param name="endTime"></param>local time of USS
 		/// true if all the reservations have been removed successfully
-		[WebMethod]
+		[WebMethod(Description = "Remove all the reservations for a lab server that match the specification."
+            + " The serviceBroker is notified of each reservation so that an email is sent to each of the owners of the removed reservations."
+            + " If the method is not called by an LSS the LSS is forwarded a RemoveReservation request.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public int RevokeReservation(string serviceBrokerGuid, string groupName,
@@ -267,9 +271,10 @@ namespace iLabs.Scheduling.UserSide
             try
             {
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
-                ReservationInfo[]ri = USSSchedulingAPI.GetReservations(serviceBrokerGuid, null, groupName,
+                ReservationData[] ris = USSSchedulingAPI.GetReservations(serviceBrokerGuid, null, groupName,
                     labServerGuid, labClientGuid, startTime, endTime);
-                if (ri != null && ri.Length > 0)
+           
+                if (ris != null && ris.Length > 0)
                 {
 
                     InteractiveSBProxy sbProxy = new InteractiveSBProxy();
@@ -279,14 +284,18 @@ namespace iLabs.Scheduling.UserSide
                     header.agentGuid = ProcessAgentDB.ServiceGuid;
                     sbProxy.AgentAuthHeaderValue = header;
                     sbProxy.Url = sbInfo.webServiceUrl;
-                    status = sbProxy.RevokeReservation(serviceBrokerGuid, ri[0].userName, groupName, labServerGuid,
-                        labClientGuid, startTime, endTime, message);
-                    if (status)
+                    foreach (ReservationData rd in ris)
                     {
-                        count++;
-                        USSSchedulingAPI.RevokeReservation(serviceBrokerGuid, groupName, labServerGuid, labClientGuid,
-                              startTime, endTime, message);
+                        status = USSSchedulingAPI.RevokeReservation(rd.sbGuid, rd.groupName, rd.lsGuid, rd.clientGuid,
+                              rd.startTime, rd.endTime, message);
+                        if (status)
+                        {
+                            count++;
+                            status = sbProxy.RevokeReservation(rd.sbGuid, rd.userName, rd.groupName, rd.lsGuid, rd.clientGuid,
+                              rd.startTime, rd.endTime, message);
+                        }
                     }
+                    
                 }
             }
             catch (Exception e)

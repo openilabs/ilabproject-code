@@ -123,7 +123,9 @@
     <Compile Include="Internal\InternalAuthorizationDB.cs" />
     <Compile Include="Internal\InternalDataDB.cs" />
     <Compile Include="Mapping\GroupManagerUserMap.cs" />
-    <Compile Include="Mapping\ResourceMap.cs" />
+    <Compile Include="Mapping\ResourceMap.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Mapping\ResourceMapManager.cs" />
     <Compile Include="Mapping\ResourceMapping.cs" />
     <Compile Include="ServiceBroker\AdminUrl.cs" />

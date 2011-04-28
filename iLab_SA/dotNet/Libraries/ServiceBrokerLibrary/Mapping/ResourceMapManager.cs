@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using iLabs.UtilLib;
+
 namespace iLabs.ServiceBroker.Mapping
 {
     /// <summary>
-    /// In memory cache of all ResourceMapping objects, this does not perform database calls
+    /// In memory cache of all ResourceMapping objects, this does not perform database calls, except on static constructor and Refresh().
     /// </summary>
     public static class ResourceMapManager
     {
@@ -19,14 +21,8 @@ namespace iLabs.ServiceBroker.Mapping
             entryComparer = new ResourceEntryComparer();
             mappingCache = new Dictionary<int, ResourceMapping>();
             mapKeyCache = new Dictionary<ResourceMappingEntry, List<int>>();
-            BrokerDB db = new BrokerDB();
-            List<ResourceMapping> list = db.RetrieveResourceMapping();
-            if (list != null && list.Count > 0)
-            {
-                Add(list);
-            }
-            needsRefresh = false;
             
+            Refresh();
         }
 
         static public bool NeedsRefresh
@@ -50,6 +46,7 @@ namespace iLabs.ServiceBroker.Mapping
                 count = list.Count;
             }
             needsRefresh = false;
+            Logger.WriteLine("Refreshed ResourceMapManager: count= " + count);
             return count;
         }
 
@@ -67,6 +64,9 @@ namespace iLabs.ServiceBroker.Mapping
 
         public static void Add(ResourceMapping map)
         {
+            if (map == null)
+                return;
+
             if (mappingCache.ContainsKey(map.MappingID))
             {
                 return;
@@ -212,8 +212,8 @@ namespace iLabs.ServiceBroker.Mapping
         public static List<ResourceMapping> Find(ResourceMappingEntry key, ResourceMappingValue[] values)
         {
             List<ResourceMapping> returnList = null;
-            //if (needsRefresh)
-            //    Refresh();
+            if (needsRefresh)
+                Refresh();
             List<ResourceMapping> list = Get(key);
             if (list != null && list.Count > 0)
             {
@@ -236,16 +236,26 @@ namespace iLabs.ServiceBroker.Mapping
         /// <param name="sourceID">the id of the source object</param>
         /// <param name="pat">The ProcessAgentType of the associated object</param>
         /// <returns></returns>
-        public static int FindMapID(string rmt, int sourceID, string pat)
+        //public static int FindMapID(string rmt, int sourceID, string pat)
+        //{
+        //    return FindMapID(rmt, sourceID, ResourceMappingTypes.RESOURCE_TYPE, pat);
+        //}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rmt">ResourceMappingType</param>
+        /// <param name="sourceID">the id of the source object</param>
+        /// <param name="pat">The ProcessAgentType of the associated object</param>
+        /// <returns></returns>
+        public static int FindMapID(string rmt, int sourceID, string targetType, string target)
         {
             int targetId = 0;
             ResourceMappingValue[] values = new ResourceMappingValue[1];
 
-            values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, pat);
-            //values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-            //       TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION));
-            List<ResourceMapping> mapList = ResourceMapManager.Find(
-                new ResourceMappingKey(rmt, sourceID), values);
+            values[0] = new ResourceMappingValue(targetType, target);
+           
+            List<ResourceMapping> mapList = ResourceMapManager.Find(new ResourceMappingKey(rmt, sourceID), values);
             if (mapList != null && mapList.Count > 0)
             {
                 foreach (ResourceMapping rm in mapList)
@@ -262,8 +272,7 @@ namespace iLabs.ServiceBroker.Mapping
             }
             return targetId;
         }
-
-
+        
         public static List<int> FindMapIds(ResourceMappingEntry key, ResourceMappingValue[] values)
         {
             List<int> returnList = null;
@@ -296,8 +305,7 @@ namespace iLabs.ServiceBroker.Mapping
             values[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, pat);
             //values[1] = new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
             //       TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION));
-            List<ResourceMapping> mapList = ResourceMapManager.Find(
-                new ResourceMappingKey(rmt, sourceID), values);
+            List<ResourceMapping> mapList = ResourceMapManager.Find(new ResourceMappingKey(rmt, sourceID), values);
             if (mapList != null && mapList.Count > 0)
             {
                 foreach (ResourceMapping rm in mapList)

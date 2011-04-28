@@ -159,7 +159,7 @@ namespace iLabs.Scheduling.UserSide
 			try
 			{
 				txtDisplay.Text=null;
-				ReservationInfo[] reservations = USSSchedulingAPI.GetReservations(userName, ExperimentInfoID, credentialSetId,  time1,  time2);						
+				ReservationInfo[] reservations = USSSchedulingAPI.GetReservationInfos(userName, ExperimentInfoID, credentialSetId,  time1,  time2);						
 				if (reservations.Length==0)
 				{
 					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been made.");
