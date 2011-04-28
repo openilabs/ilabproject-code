@@ -392,7 +392,7 @@ GO
 CREATE TABLE [dbo].[Agents] (
 	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
 	[Is_Group] [bit] NOT NULL,
-	[Create_Time] [datetime] NOT NULL DEFAULT GETUTCDATE(),
+	[Date_Created] [datetime] NOT NULL DEFAULT GETUTCDATE(),
 	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
 	
 ) ON [PRIMARY]
