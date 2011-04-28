@@ -392,7 +392,7 @@ GO
 CREATE TABLE [dbo].[Agents] (
 	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
 	[Is_Group] [bit] NOT NULL,
-	Create_Time] [datetime] NOT NULL DEFAULT GETUTCDATE(),
+	[Create_Time] [datetime] NOT NULL DEFAULT GETUTCDATE(),
 	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
 	
 ) ON [PRIMARY]
@@ -690,7 +690,7 @@ GO
 CREATE TABLE [dbo].[Users] (
 	[User_ID] [int] NOT NULL ,
 	[Lock_User] [bit] NOT NULL ,
-	[Auth_Provider [int] NOT NULL Default =0,
+	[Auth_Provider] [int] NOT NULL Default 0,
 	[Xml_Extension] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[User_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
@@ -894,9 +894,6 @@ ALTER TABLE [dbo].[Grants] ADD
 	)  ON [PRIMARY] 
 GO
 
-ALTER TABLE [dbo].[Groups] ADD 
-	CONSTRAINT [DF_Groups_Date_Created] DEFAULT (getUtcdate()) FOR [Date_Created]
-GO
 
 ALTER TABLE [dbo].[Lab_Clients] ADD
 	CONSTRAINT [DF_NeedsScheduling] DEFAULT (0) FOR [NeedsScheduling],
@@ -945,7 +942,6 @@ GO
 
 
 ALTER TABLE [dbo].[Users] ADD 
-	CONSTRAINT [DF_Users_Date_Created] DEFAULT (getUtcdate()) FOR [Date_Created],
 	CONSTRAINT [DF_Users_Lock_User] DEFAULT (0) FOR [Lock_User]
 GO
 
