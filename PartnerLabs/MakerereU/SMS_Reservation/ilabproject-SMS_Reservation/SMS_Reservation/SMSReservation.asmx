@@ -1,0 +1,1 @@
+﻿<%@ WebService Language="C#" CodeBehind="SMSReservation.asmx.cs" Class="iLabs.Generic.TextReservation.SMSReservation" %>
