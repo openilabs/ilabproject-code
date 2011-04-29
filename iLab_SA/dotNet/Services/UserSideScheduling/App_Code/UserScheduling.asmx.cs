@@ -142,13 +142,15 @@ namespace iLabs.Scheduling.UserSide
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             try
             {
+                DBManager dbManager = new DBManager();
                 Ticket ssTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.SCHEDULE_SESSION);
                 
                 string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
-                ProcessAgentInfo lssInfo = dbTicketing.GetProcessAgentInfo(lssGuid);
+                LSSInfo  lssInfo = DBManager.GetLSSInfo(lssGuid);
                 LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                lssProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                 lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
-                lssProxy.Url = lssInfo.ServiceUrl;
+                lssProxy.Url = lssInfo.lssUrl; 
                 TimePeriod[] array = lssProxy.RetrieveAvailableTimePeriods( serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
                     labServerGuid, clientGuid, startTime, endTime);
                 return array;
@@ -196,7 +198,7 @@ namespace iLabs.Scheduling.UserSide
         }
 
         /// <summary>
-        /// Add a reservation for a lab server for thew specified user, client and time. 
+        /// Add a reservation for a lab server for the specified user, client and time. 
         /// If the reservation is confirmed by the LSS, the reservation will be added to the USS.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
@@ -225,13 +227,14 @@ namespace iLabs.Scheduling.UserSide
             {
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
                 string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(labClientGuid, labServerGuid);
-                ProcessAgentInfo lssInfo = dbTicketing.GetProcessAgentInfo(lssGuid);
+                LSSInfo lssInfo = DBManager.GetLSSInfo(lssGuid);
                 LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                lssProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                 lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
-                lssProxy.Url = lssInfo.ServiceUrl;
+                lssProxy.Url = lssInfo.lssUrl;
                 message = lssProxy.ConfirmReservation( serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
                     labServerGuid, labClientGuid, startTime, endTime);
-                if(message.Contains("Success")){
+                if(message.ToLower().Contains("success")){
                     int infoID = USSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, labClientGuid);
                     USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid,groupName,infoID,startTime,endTime);
                 }
