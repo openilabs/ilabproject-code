@@ -901,16 +901,17 @@ namespace iLabs.ServiceBroker.iLabSB
                     ProcessAgent lss = null;
                     ProcessAgent uss = null;
                     ProcessAgent ess = null;
+                    LabClient theClient = null;
                     if (clientGuid != null && clientGuid.Length > 0)
-                        lcID = AdministrativeAPI.GetLabClientID(clientGuid);
+                        theClient = AdministrativeAPI.GetLabClient(clientGuid);
                     if (serviceGuid != null && serviceGuid.Length > 0)
                         lsID = brokerDB.GetProcessAgentID(serviceGuid);
                     if (lsID > 0)
                         lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
-                    if (lcID > 0)
+                    if (theClient != null)
                     {
-                        ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, lcID, ProcessAgentType.SCHEDULING_SERVER);
-                        essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, lcID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
+                        ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
+                        essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
                         if (lssID > 0)
                             lss = brokerDB.GetProcessAgent(lssID);
                         if (ussID > 0)
@@ -935,13 +936,29 @@ namespace iLabs.ServiceBroker.iLabSB
                                 case TicketTypes.STORE_RECORDS:
                                     break;
                                 case TicketTypes.SCHEDULE_SESSION:
+                                    /**
+                                      string payload1 = factory.createScheduleSessionPayload(user, group, issuer.GetIssuerGuid(),
+                    serviceGuid, clientGuid, labClientName, labClientVersion, userTZ);
+                string payload2 = factory.createRequestReservationPayload();
+
+                Coupon schedulingCoupon = issuer.CreateTicket(TicketTypes.SCHEDULE_SESSION, ussGuid, 
+                    issuer.GetIssuerGuid(), duration, payload1);
+                issuer.AddTicket(schedulingCoupon, TicketTypes.REQUEST_RESERVATION, lssGuid, ussGuid, 
+                    duration, payload2);
+***/
                                     // Create the Authority's SCHEDULE_SESSION ticket
-                                    string payloadUss = factory.makeReservationPayload(ProcessAgentDB.ServiceGuid, user, group, serviceGuid, clientGuid, uss.webServiceUrl);
-                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, duration, payloadUss);
+                                    string payload1 = factory.createScheduleSessionPayload(user, group, ProcessAgentDB.ServiceGuid,
+                                        serviceGuid, clientGuid, theClient.ClientName, theClient.version, 0);
+                                    string payloadMakeRes = factory.makeReservationPayload(ProcessAgentDB.ServiceGuid, user, group, serviceGuid, clientGuid, uss.webServiceUrl);
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, ProcessAgentDB.ServiceGuid, duration, payloadMakeRes);
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, duration, payload1);
+                                    //brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, duration, payload1);
+                                    
                                     // Create the USS to LSS REQUEST_RESERVATION Ticket
-                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, duration, null);
+                                    string payload2 = factory.createRequestReservationPayload();
+                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, duration, payload2);
                                     // Create the USS to LSS
-                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, duration, null);
+                                    
                                     ok = true;
                                     break;
                                 case TicketTypes.REDEEM_RESERVATION:

@@ -28,7 +28,6 @@ namespace iLabs.Core
         public const string LAB_SCHEDULING_SERVER = "LAB SCHEDULING SERVER";
         public const string AUTHORIZATION_SERVICE = "AUTHORIZATION SERVICE";
         public const string GENERIC_PA = "GENERIC PA";
-        public const string NOT_A_PA = "NOT A PA";
 
         public static string ToTypeName(AgentType type)
         {

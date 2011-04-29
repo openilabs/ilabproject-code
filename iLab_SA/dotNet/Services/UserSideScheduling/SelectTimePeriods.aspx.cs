@@ -193,7 +193,7 @@ namespace iLabs.Scheduling.UserSide
             lssProxy.OperationAuthHeaderValue = opHeader;
 
             TimePeriod[] availablePeriods = lssProxy.RetrieveAvailableTimePeriods(serviceBrokerGuid, groupName,
-                "", labServerGuid, clientGuid, startTime, endTime);
+                ProcessAgentDB.ServiceGuid, labServerGuid, clientGuid, startTime, endTime);
             if (availablePeriods == null)
             {
                 string msg = "There are no available time slots for this experiment.";

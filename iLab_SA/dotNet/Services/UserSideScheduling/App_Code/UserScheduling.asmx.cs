@@ -142,7 +142,8 @@ namespace iLabs.Scheduling.UserSide
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
+                Ticket ssTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.SCHEDULE_SESSION);
+                
                 string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
                 ProcessAgentInfo lssInfo = dbTicketing.GetProcessAgentInfo(lssGuid);
                 LabSchedulingProxy lssProxy = new LabSchedulingProxy();

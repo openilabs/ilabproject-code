@@ -182,26 +182,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabViewInterface2009", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabViewInterface2010", "..\..\LabView\LabViewInterface\LabViewInterface2010.csproj", "{BC9ACFA3-99D1-4C07-91F9-84ED50887853}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/TextReservation/", "http://localhost/TextReservation", "{B67F853E-9752-4627-A707-C31AC7D91C0C}"
-	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{BF60ADC0-5696-45D3-8B3E-986E88C565F0}|LabSchedulingProxy.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{06EF99E2-DB59-4139-AF0C-EC9B339DD460}|UserSchedulingProxy.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{8C295C05-959B-483C-9F31-62E45FE46543}|iLabsArchitecture.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;"
-		Debug.AspNetCompiler.VirtualPath = "/TextReservation"
-		Debug.AspNetCompiler.PhysicalPath = "..\..\..\..\MAK\SMS_Reservation\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\TextReservation\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/TextReservation"
-		Release.AspNetCompiler.PhysicalPath = "..\..\..\..\MAK\SMS_Reservation\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\TextReservation\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "..\..\..\..\MAK\SMS_Reservation\"
-	EndProjectSection
-EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLabGeneric/", "http://localhost/iLabGeneric", "{B73D2A93-DEFD-425B-AF36-F5C232A43C70}"
 	ProjectSection(WebsiteProperties) = preProject
 		ProjectReferences = "{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;"
@@ -220,6 +200,25 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLabGeneri
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		SlnRelativePath = "..\..\Services\iLabGeneric\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/TextReservation/", "http://localhost/TextReservation", "{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.VirtualPath = "/TextReservation"
+		Debug.AspNetCompiler.PhysicalPath = "..\..\..\..\MAK\SMS_Reservation\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\TextReservation\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/TextReservation"
+		Release.AspNetCompiler.PhysicalPath = "..\..\..\..\MAK\SMS_Reservation\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\TextReservation\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "..\..\..\..\MAK\SMS_Reservation\"
 	EndProjectSection
 EndProject
 Global
@@ -492,16 +491,6 @@ Global
 		{BC9ACFA3-99D1-4C07-91F9-84ED50887853}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC9ACFA3-99D1-4C07-91F9-84ED50887853}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{BC9ACFA3-99D1-4C07-91F9-84ED50887853}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Debug|.NET.ActiveCfg = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Debug|.NET.Build.0 = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Debug|Any CPU.ActiveCfg = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Debug|Mixed Platforms.Build.0 = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Release|.NET.ActiveCfg = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Release|.NET.Build.0 = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Release|Any CPU.ActiveCfg = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
-		{B67F853E-9752-4627-A707-C31AC7D91C0C}.Release|Mixed Platforms.Build.0 = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Debug|.NET.ActiveCfg = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Debug|.NET.Build.0 = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Debug|Any CPU.ActiveCfg = Debug|.NET
@@ -512,6 +501,16 @@ Global
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Release|Any CPU.ActiveCfg = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Release|Mixed Platforms.Build.0 = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|.NET.ActiveCfg = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|.NET.Build.0 = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|Any CPU.ActiveCfg = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|Mixed Platforms.Build.0 = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|.NET.ActiveCfg = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|.NET.Build.0 = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|Any CPU.ActiveCfg = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
+		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|Mixed Platforms.Build.0 = Debug|.NET
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

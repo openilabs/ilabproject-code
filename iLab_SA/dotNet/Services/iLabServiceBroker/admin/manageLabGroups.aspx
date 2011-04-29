@@ -83,7 +83,7 @@ Please see license.txt in top level directory for full license.
                                 </th>         
 							</tr>
 							<tr>
-							    <th><asp:Button ID="btnClose" runat="server" Text="Close" CssClass="button"  OnClick="btnClose_Click"></asp:Button></th>
+							    <th><asp:Button ID="btnClose" runat="server" Text="Close" CssClass="button"  OnClick="btnClose_Click" Visible="false"></asp:Button></th>
 								<th><asp:button id="btnSaveChange" Runat="server" CssClass="buttonright" Text="Save Changes" onclick="btnSaveChange_Click"></asp:button></th>
 							</tr>
 							</table>
