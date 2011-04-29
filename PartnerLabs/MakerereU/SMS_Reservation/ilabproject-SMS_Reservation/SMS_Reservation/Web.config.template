@@ -19,7 +19,7 @@
     
     <!-- the database connection information 
     NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
-    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_TOD;Integrated Security=SSPI"/>
+    <add key="sqlConnection" value="data source=(local);initial catalog=ILAB_SMS;Integrated Security=SSPI"/>
     <add key="DatabaseProvider" value="System.Data.SqlClient" />
 
      <!-- The following optional keys are used by the SelfRegistration page to populate the selfRegistration page
@@ -28,8 +28,8 @@
     <!-- The name of the Service displayed for the user, please change -->
     <add key="serviceName" value="iLab Generic"/>
     
-    <add key="codebaseURL" value="http://localhost/iLabGeneric"/>
-    <add key="serviceURL" value="http://localhost/iLabGeneric/iLabGeneric.asmx"/>
+    <add key="codebaseURL" value="http://localhost/TextReservation"/>
+    <add key="serviceURL" value="http://localhost/TextReservation/SMSReservation.asmx"/>
     <add key="defaultPasskey" value="GPA"/>
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
     <add key="supportMailAddress" value="ilab-bug@mit.edu"/>

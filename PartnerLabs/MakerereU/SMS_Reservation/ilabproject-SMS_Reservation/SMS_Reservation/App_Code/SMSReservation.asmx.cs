@@ -44,29 +44,16 @@ namespace iLabs.Generic.TextReservation
     {
           public OperationAuthHeader opHeader = new OperationAuthHeader();
 
-       /** DEXTER.MIT.EDU INFO ***/
-         // The inSBcoupon and outSBcoupon id  were obtained from the
-         //service broker database, particulary from the issued_coupon table
 
-        long inID = 169L;
-        long outID = 170L;
-        string sbURL = "http://dexter.mit.edu/iLabServiceBroker/iLabServiceBroker.asmx"; //mine
-        string sbGuid = "AISB-179CD2BE-41-99CF-EAABB1D90A82";
-        //this is the default timeOfDay Server
-        string lsGuid = "ATOD-E8190629-5986-4695-8FED-C5E72B354AD8";
+        //this is the timeOfDay Server
+        string lsGuid = "TOD-BC2D1D79-7229-4F42-ABF7-E200B05E3730";
          //clientGuid is the interactive Time of Day Client Guid
         string clientGuid = "TOD-12345";
         //the group for the time of day experiment
-        string testGroup = "Experiment_Group";
+        string testGroup = "Test_Group";
         //a typical user that was created for testing purposes
         string testUser = "test"; 
 
-      
-
-        //The dummy "lab server" termed as TextReservation which will spoof being a Batch LabServer
-        string smsGuid = "0E9FD54639F7452690808B03BB9FC315"; 
-       
-        
          /*** END OF DEXTER Values **/    
         
              
@@ -99,12 +86,19 @@ namespace iLabs.Generic.TextReservation
         [WebMethod]
         public string incomingMessage(string newMessage)
         {
+            DateTime targetTime;
             /* The rest of these values were not altered at all
              */
-            DateTime start = DateTime.UtcNow.AddDays(1);
-            DateTime end = start.AddMinutes(15);
+            DateTime start = DateTime.UtcNow.AddDays(1.3);
+            DateTime end;
             string message = null;
-
+            try
+            {
+                targetTime = DateTime.Parse(newMessage);
+                start = targetTime;
+            }
+            catch( Exception E){ }
+            end = start.AddMinutes(15);
             message = MakeReservation(testUser, testGroup, lsGuid, clientGuid, start, end);
             return message;
         }
@@ -118,13 +112,11 @@ namespace iLabs.Generic.TextReservation
             {
                 ProcessAgentDB paDb = new ProcessAgentDB();
                 ProcessAgentInfo domainServer = paDb.GetProcessAgentInfo(ProcessAgentDB.ServiceAgent.domainGuid);
-                Coupon inSBcoupon = new Coupon(sbGuid, inID, "SendMe");
-                Coupon outSBcoupon = new Coupon(sbGuid, outID, "GOT_ME");
 
                 InteractiveSBProxy isbProxy = new InteractiveSBProxy();
                 isbProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                 isbProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                isbProxy.AgentAuthHeaderValue.coupon = domainServer.identIn;
+                isbProxy.AgentAuthHeaderValue.coupon = domainServer.identOut;
                 isbProxy.Url = domainServer.ServiceUrl;
 
                 string[] types = new string[] { TicketTypes.SCHEDULE_SESSION };
@@ -135,7 +127,7 @@ namespace iLabs.Generic.TextReservation
                     TicketIssuerProxy ticketProxy = new TicketIssuerProxy();
                     ticketProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                     ticketProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                    ticketProxy.AgentAuthHeaderValue.coupon = domainServer.identIn;
+                    ticketProxy.AgentAuthHeaderValue.coupon = domainServer.identOut;
                     ticketProxy.Url = domainServer.ServiceUrl;
                     //the method call below is one which does not returns a null value
                     //in otherwards the ticket value is not created.
@@ -147,16 +139,17 @@ namespace iLabs.Generic.TextReservation
                             XmlQueryDoc xdoc = new XmlQueryDoc(ticketSMS.payload);
                             string ussURL = xdoc.Query("MakeReservationPayload/ussURL");
                             UserSchedulingProxy ussProxy = new UserSchedulingProxy();
+                            ussProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                             ussProxy.OperationAuthHeaderValue.coupon = opCoupon;
                             ussProxy.Url = ussURL;
 
-                            TimePeriod[] times = ussProxy.RetrieveAvailableTimePeriods(sbGuid, groupName, lsGuid,
+                            TimePeriod[] times = ussProxy.RetrieveAvailableTimePeriods(ProcessAgentDB.ServiceAgent.domainGuid, groupName, lsGuid,
                                 clientGuid, start, end);
                             // Logic to check for final time
                             DateTime resStart = start;
                             DateTime resEnd = end;
 
-                            message = ussProxy.AddReservation(sbGuid, userName, groupName, lsGuid, clientGuid, resStart, resEnd);
+                            message = ussProxy.AddReservation(ProcessAgentDB.ServiceAgent.domainGuid, userName, groupName, lsGuid, clientGuid, resStart, resEnd);
                         }
                     }
                 }
