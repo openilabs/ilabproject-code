@@ -1,9 +1,0 @@
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\bin\Debug\TicketIssuerProxy.dll
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\bin\Debug\TicketIssuerProxy.pdb
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\bin\Debug\ilabdatatypes.dll
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\bin\Debug\ilabdatatypes.pdb
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\bin\Debug\ilabdatatypes.xml
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\obj\Debug\ResolveAssemblyReference.cache
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\obj\Debug\TicketIssuerProxy.dll
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\obj\Debug\TicketIssuerProxy.pdb
-D:\Project\code\dotNet\Proxies\TicketIssuerProxy\bin\Debug\TicketIssuerProxy.XML
