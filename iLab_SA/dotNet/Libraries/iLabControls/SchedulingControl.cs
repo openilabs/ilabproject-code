@@ -504,7 +504,7 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("text-align", "right");
 #endif
             output.RenderBeginTag("table");
-            output.Write("<tr>");
+            output.RenderBeginTag("tr");
             output.AddStyleAttribute("height", HeaderHeight * 2 + "px");
             output.AddStyleAttribute("width", hourWidth + "px");
             if (browserMode > 0)
@@ -517,8 +517,8 @@ namespace iLabs.Controls.Scheduling
 #endif
             output.RenderBeginTag("th");
             output.Write("&nbsp;");
-            output.RenderEndTag();
-            output.WriteLine("</tr>");
+            output.RenderEndTag(); // end hd
+            output.RenderEndTag(); // end tr
           
             
             for (int i = MinHour; i < MaxHour; i++)
@@ -689,7 +689,7 @@ namespace iLabs.Controls.Scheduling
 
                             while (cur < end)
                             {
-                                cellDur = defaultCellDuration -(cur.TimeOfDay.Minutes % defaultCellDuration);
+                                cellDur = defaultCellDuration -( cur.TimeOfDay.Minutes % defaultCellDuration);
                                 if(cellDur < defaultCellDuration) 
                                     cellDur += defaultCellDuration;
                                 if ((end - cur.AddMinutes(cellDur)).TotalMinutes < (defaultCellDuration/2))
@@ -801,6 +801,7 @@ namespace iLabs.Controls.Scheduling
                 output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
 #endif
             output.RenderBeginTag("td");
+            output.Write("&nbsp;");
             //DateTime end = startTime.AddSeconds(duration);
             //output.Write(startTime.AddMinutes(userTZ).TimeOfDay + " - " + end.AddMinutes(userTZ).TimeOfDay);
            
@@ -810,7 +811,9 @@ namespace iLabs.Controls.Scheduling
         }
 
         private void renderReservations(HtmlTextWriter output, DateTime day, IEnumerable reservations)
-        { }
+        { 
+            int a = 0;
+        }
  
         #endregion
 

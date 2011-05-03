@@ -427,7 +427,8 @@ namespace iLabs.ServiceBroker.admin
                     //TO BE FIXED: this is a special case. I am assuming that a mapping of key type "PROCESS_AGENT" only
                     //corresponds to an LSS
                    if (labServer != null)
-                       payload = factory.createManageLabPayload(labServer.agentGuid, labServer.agentName, Convert.ToInt32(Session["UserTZ"]));
+                       payload = factory.createManageLabPayload(labServer.agentGuid, labServer.agentName,
+                           ProcessAgentDB.ServiceGuid, Session["GroupName"].ToString(), Convert.ToInt32(Session["UserTZ"]));
                     
                 }
                 processAgent = ticketIssuer.GetProcessAgent(processAgentID);

@@ -89,6 +89,8 @@ namespace iLabs.Scheduling.LabSide
                         Session["labServerGuid"] = labServerGuid;
                         labServerName = payload.GetElementsByTagName("labServerName")[0].InnerText;
                         Session["labServerName"] = labServerName;
+                        string adminGroup = payload.GetElementsByTagName("adminGroup")[0].InnerText;
+                        Session["adminGroup"] = adminGroup;
                         userTZ = Convert.ToInt32(payload.GetElementsByTagName("userTZ")[0].InnerText);
                         Session["userTZ"] = userTZ;
                     }

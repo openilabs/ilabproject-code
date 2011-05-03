@@ -938,6 +938,16 @@ namespace iLabs.Scheduling.UserSide
                         reservation.experimentInfoId = (int)dataReader.GetInt32(4);
                     if (dataReader[5] != System.DBNull.Value)
                         reservation.userName = dataReader.GetString(5);
+                    if (dataReader[6] != System.DBNull.Value)
+                        reservation.groupName = dataReader.GetString(6);
+                    if (dataReader[7] != System.DBNull.Value)
+                        reservation.sbGuid = dataReader.GetString(7);    
+                    if (dataReader[8] != System.DBNull.Value)
+                        reservation.lsGuid = dataReader.GetString(8);
+                    if (dataReader[9] != System.DBNull.Value)
+                        reservation.clientGuid = dataReader.GetString(9);
+                    if (dataReader[10] != System.DBNull.Value)
+                        reservation.lssGuid = dataReader.GetString(10);
                     reservations.Add(reservation);
                 }
             }

@@ -17,6 +17,7 @@ using iLabs.DataTypes.SchedulingTypes;
 
 using iLabs.Proxies.ISB;
 using iLabs.Proxies.LSS;
+using iLabs.UtilLib;
 using iLabs.Web;
 
 namespace iLabs.Scheduling.UserSide
@@ -178,9 +179,16 @@ namespace iLabs.Scheduling.UserSide
         {
             
             Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
-
+            DateTime targetStart = new DateTime(startTime.Year, startTime.Month, startTime.Day,
+                startTime.Hour, startTime.Minute, 0, startTime.Kind);
+            if (targetStart.Kind != DateTimeKind.Utc)
+                targetStart = targetStart.ToUniversalTime();
+            DateTime targetEnd = new DateTime(endTime.Year, endTime.Month, endTime.Day,
+                endTime.Hour, endTime.Minute, 0, endTime.Kind);
+            if (targetEnd.Kind != DateTimeKind.Utc)
+                targetEnd = targetEnd.ToUniversalTime();
             ReservationInfo[] resInfos = USSSchedulingAPI.GetReservationInfos(serviceBrokerGuid, userName, null,
-                labServerGuid, labClientGuid, startTime, endTime);
+                labServerGuid, labClientGuid, targetStart, targetEnd);
             if (resInfos != null && resInfos.Length > 0)
             {
                 Reservation[] reservations = new Reservation[resInfos.Length];
@@ -228,15 +236,24 @@ namespace iLabs.Scheduling.UserSide
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
                 string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(labClientGuid, labServerGuid);
                 LSSInfo lssInfo = DBManager.GetLSSInfo(lssGuid);
+                DateTime targetStart = new DateTime(startTime.Year, startTime.Month, startTime.Day,
+               startTime.Hour, startTime.Minute, 0, startTime.Kind);
+                if (targetStart.Kind != DateTimeKind.Utc)
+                    targetStart = targetStart.ToUniversalTime();
+                DateTime targetEnd = new DateTime(endTime.Year, endTime.Month, endTime.Day,
+                    endTime.Hour, endTime.Minute, 0, endTime.Kind);
+                if (targetEnd.Kind != DateTimeKind.Utc)
+                    targetEnd = targetEnd.ToUniversalTime();
+
                 LabSchedulingProxy lssProxy = new LabSchedulingProxy();
                 lssProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                 lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
                 lssProxy.Url = lssInfo.lssUrl;
                 message = lssProxy.ConfirmReservation( serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
-                    labServerGuid, labClientGuid, startTime, endTime);
+                    labServerGuid, labClientGuid, targetStart, targetEnd);
                 if(message.ToLower().Contains("success")){
                     int infoID = USSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, labClientGuid);
-                    USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid,groupName,infoID,startTime,endTime);
+                    USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid,groupName,infoID,targetStart,targetEnd);
                 }
                 return message;
             }
@@ -266,17 +283,48 @@ namespace iLabs.Scheduling.UserSide
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime, string message)
 		{
             bool status = false;
+            bool fromISB = false;
             int count = 0;
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
-            string type = TicketTypes.REVOKE_RESERVATION;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
+                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
+                if (retrievedTicket.payload != null && retrievedTicket.payload.Length > 0)
+                {
+                    XmlQueryDoc revokeDoc = new XmlQueryDoc(retrievedTicket.payload);
+                    string sourceStr = revokeDoc.Query("RevokeReservationPayload/source");
+                    if (sourceStr != null && sourceStr.CompareTo("ISB") == 0)
+                    {
+                        fromISB = true;
+                    }
+                }
+                DateTime targetStart = new DateTime(startTime.Year, startTime.Month, startTime.Day,
+                    startTime.Hour, startTime.Minute, 0, startTime.Kind);
+                if (targetStart.Kind != DateTimeKind.Utc)
+                    targetStart = targetStart.ToUniversalTime();
+                DateTime targetEnd = new DateTime(endTime.Year, endTime.Month, endTime.Day,
+                    endTime.Hour, endTime.Minute, 0, endTime.Kind);
+                if (targetEnd.Kind != DateTimeKind.Utc)
+                    targetEnd = targetEnd.ToUniversalTime();
+                if (fromISB)
+                { // Need to forward to LSS
+                    string lssUrl = USSSchedulingAPI.ListLSSURLbyExperiment(labClientGuid, labServerGuid);
+                    if (lssUrl != null && lssUrl.Length > 0)
+                    {
+                        LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                        lssProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                        lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                        lssProxy.Url = lssUrl;
+                        int rCount = lssProxy.RemoveReservation(serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
+                            labServerGuid, labClientGuid, targetStart, targetEnd);
+                    }
+                }
+                
                 ReservationData[] ris = USSSchedulingAPI.GetReservations(serviceBrokerGuid, null, groupName,
-                    labServerGuid, labClientGuid, startTime, endTime);
+                    labServerGuid, labClientGuid, targetStart, targetEnd);
            
                 if (ris != null && ris.Length > 0)
                 {
@@ -290,6 +338,7 @@ namespace iLabs.Scheduling.UserSide
                     sbProxy.Url = sbInfo.webServiceUrl;
                     foreach (ReservationData rd in ris)
                     {
+                        
                         status = USSSchedulingAPI.RevokeReservation(rd.sbGuid, rd.groupName, rd.lsGuid, rd.clientGuid,
                               rd.startTime, rd.endTime, message);
                         if (status)
@@ -299,7 +348,6 @@ namespace iLabs.Scheduling.UserSide
                               rd.startTime, rd.endTime, message);
                         }
                     }
-                    
                 }
             }
             catch (Exception e)
@@ -307,8 +355,9 @@ namespace iLabs.Scheduling.UserSide
                 throw new Exception("USS: RevokeReservation -> ",e);
             }
             return count;
-			
 		}
+
+
 		/// <summary>
         /// Returns an existing reservation for the current time for 
         /// a particular user to execute a particular experiment. 
@@ -350,8 +399,6 @@ namespace iLabs.Scheduling.UserSide
             {
                 throw;
             }
-			
-
 		}
 		
 		/// <summary>

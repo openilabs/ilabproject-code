@@ -25,6 +25,7 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.Proxies.PAgent;
+using iLabs.Proxies.LSS;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
@@ -1202,6 +1203,14 @@ namespace iLabs.ServiceBroker.admin
                     {
                        int qualifierID = brokerDB.AssociateLSS(lsID, lssID);
                        int labGrantID = wrapper.AddGrantWrapper(manageGroupID, Function.manageLAB, qualifierID);
+                       string manageGroup = AdministrativeAPI.GetGroupName(manageGroupID);
+                       ProcessAgentInfo lss = brokerDB.GetProcessAgentInfo(lssID);
+                       LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                       lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                       lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                       lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
+                       lssProxy.Url = lss.webServiceUrl;
+                       lssProxy.AddCredentialSet(ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceAgent.agentName, manageGroup, null);
                         
 
                     }

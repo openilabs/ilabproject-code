@@ -209,12 +209,14 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.ADMINISTER_LSS, keyValueDictionary);
         }
 
-        public string createManageLabPayload(string labServerGuid, string labServerName, int userTZ)
+        public string createManageLabPayload(string labServerGuid, string labServerName, string sbGuid, string adminGroupName,int userTZ)
         {
             string rootElemt = "ManageLabPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
             keyValueDictionary.Add("labServerGuid", labServerGuid);
             keyValueDictionary.Add("labServerName", labServerName);
+            keyValueDictionary.Add("sbGuid", sbGuid);
+            keyValueDictionary.Add("adminGroup", adminGroupName);
             keyValueDictionary.Add("userTZ", userTZ);
             return writeTicketLoad(rootElemt, TicketTypes.MANAGE_LAB, keyValueDictionary);
         }

@@ -9,6 +9,7 @@
 				<div class="info">
 		<ul>
 			<li><asp:label id="lblUserNameBanner" Visible="False" Runat="server"></asp:label></li>
+			<li><asp:label id="lblGroup" Visible="False" Runat="server"></asp:label></li>
 			
 		</ul>
 	</div>

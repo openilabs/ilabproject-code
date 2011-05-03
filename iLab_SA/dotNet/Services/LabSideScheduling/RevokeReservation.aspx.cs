@@ -98,6 +98,7 @@ namespace iLabs.Scheduling.LabSide
 
                         Session["lsGuid"] = payload.GetElementsByTagName("labServerGuid")[0].InnerText;
                         Session["lsName"] = payload.GetElementsByTagName("labServerName")[0].InnerText;
+                        Session["adminGroup"] = payload.GetElementsByTagName("adminGroup")[0].InnerText;
                         userTZ = Convert.ToInt32(payload.GetElementsByTagName("userTZ")[0].InnerText);
                         Session["userTZ"] = userTZ;
                         txtStartDate.Text = culture.DateTimeFormat.ShortDatePattern;
@@ -154,6 +155,15 @@ namespace iLabs.Scheduling.LabSide
 		}
 		#endregion
 
+        protected void btnSearch_Click(object sender, System.EventArgs e)
+        {
+
+        }
+
+        protected void btnReserve_Click(object sender, System.EventArgs e)
+        {
+
+        }
 		protected void btnRevoke_Click(object sender, System.EventArgs e)
    		{
             int count = 0;

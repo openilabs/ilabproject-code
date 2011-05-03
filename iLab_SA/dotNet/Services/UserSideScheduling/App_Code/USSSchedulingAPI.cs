@@ -105,8 +105,10 @@ namespace iLabs.Scheduling.UserSide
     {
         private string sbGuidField;
         private string groupNameField;
-        private string lsGuidField;
         private string clientGuidField;
+        private string lsGuidField;
+        private string lssGuidField;
+        
 
         public string sbGuid
         {
@@ -130,6 +132,18 @@ namespace iLabs.Scheduling.UserSide
                 groupNameField = value;
             }
         }
+        
+        public string clientGuid
+        {
+            get
+            {
+                return clientGuidField;
+            }
+            set
+            {
+                clientGuidField = value;
+            }
+        }
         public string lsGuid
         {
             get
@@ -141,15 +155,15 @@ namespace iLabs.Scheduling.UserSide
                 lsGuidField = value;
             }
         }
-        public string clientGuid
+        public string lssGuid
         {
             get
             {
-                return clientGuidField;
+                return lssGuidField;
             }
             set
             {
-                clientGuidField = value;
+                lssGuidField = value;
             }
         }
     }

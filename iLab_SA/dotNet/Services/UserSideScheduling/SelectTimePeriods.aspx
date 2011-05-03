@@ -4,7 +4,6 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%  
     Response.Write(cntrScheduling.getDocType());
-    
 %>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -43,7 +42,6 @@
 		<form id="Form1" method="post" runat="server">
 	<div id="outerwrapper">
 	<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
-
 	<br />
 	<div id="innerwrapper">
 			<div id="pageintro">

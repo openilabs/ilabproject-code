@@ -583,7 +583,8 @@ namespace iLabs.ServiceBroker.admin
 
                                     string payload = TicketLoadFactory.Instance().createRevokeReservationPayload("ISB");
                                     Coupon revokeCoupon = issuer.CreateTicket(TicketTypes.REVOKE_RESERVATION, uss.agentGuid, ProcessAgentDB.ServiceGuid, 600, payload);
-                                    issuer.AddTicket(revokeCoupon, TicketTypes.REVOKE_RESERVATION, lss.AgentGuid, uss.agentGuid, 600, payload);
+                                    string payload2 = TicketLoadFactory.Instance().createRevokeReservationPayload("ISB");
+                                    issuer.AddTicket(revokeCoupon, TicketTypes.REVOKE_RESERVATION, lss.AgentGuid, uss.agentGuid, 600, payload2);
                                     UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                                     ussProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                                     ussProxy.OperationAuthHeaderValue.coupon = revokeCoupon;
@@ -929,6 +930,9 @@ namespace iLabs.ServiceBroker.admin
                             lssProxy.AddUSSInfo(uss.AgentGuid, uss.agentName, uss.webServiceUrl, revokeCoupon);
                             int credentialSetAdded = lssProxy.AddCredentialSet(domainGuid,
                                 sbName, userGroupName, uss.agentGuid);
+                            // not sure this is the correct way to handle reserving a block for Lab Maintainance
+                            int credSetAdded = lssProxy.AddCredentialSet(domainGuid,
+                                sbName, adminGroupName, uss.agentGuid);
                         }
                         else
                         { // Cross-Domain Registration needed

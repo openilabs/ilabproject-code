@@ -24,6 +24,15 @@ public partial class Banner : System.Web.UI.UserControl
         {
             lblUserNameBanner.Visible = false;
         }
+        if (Session["adminGroup"] != null)
+        {
+            lblGroup.Visible = true;
+            lblGroup.Text = "Group: " + Session["adminGroup"].ToString();
+        }
+        else
+        {
+            lblGroup.Visible = false;
+        }
 
       
     }
