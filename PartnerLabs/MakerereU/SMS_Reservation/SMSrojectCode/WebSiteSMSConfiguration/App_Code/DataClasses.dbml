@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database Name="InstantMessageDB" Class="DataClassesDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=.\SQLEXPRESS;AttachDbFilename=D:\project\Application_project\InstantScheduling\InstantScheduling\App_Data\InstantMessageDB.mdf;Integrated Security=True;User Instance=True" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="InstantMessageDBConnectionString1" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.ErrorDescriptions" Member="ErrorDescriptions">
+    <Type Name="ErrorDescription">
+      <Column Name="ErrorID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="nameError" Type="System.String" DbType="NChar(20)" CanBeNull="true" />
+      <Column Name="codeError" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="ShortDescription" Type="System.String" DbType="NChar(60)" CanBeNull="true" />
+      <Column Name="LongDescription" Type="System.String" DbType="NChar(500)" CanBeNull="true" />
+      <Column Name="PossibleSoln" Type="System.String" DbType="NChar(80)" CanBeNull="true" />
+      <Association Name="ErrorDescription_OutGoingMessage" Member="OutGoingMessages" OtherKey="ErrorID" Type="OutGoingMessage" />
+    </Type>
+  </Table>
+  <Table Name="dbo.OutGoingMessages" Member="OutGoingMessages">
+    <Type Name="OutGoingMessage">
+      <Column Name="OutGoingMessageID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LabConfigurationID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="IsScheduled" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="GivenStartTime" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="GivenEndTime" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="RwSentMsg" Type="System.String" DbType="NChar(160)" CanBeNull="true" />
+      <Column Name="MessageKey" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="TimeAndDateSent" Type="System.String" DbType="NChar(20)" CanBeNull="true" />
+      <Column Name="ErrorID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="OutGoingMessage_OutGoingMessage" Member="OutGoingMessage2" OtherKey="OutGoingMessageID" Type="OutGoingMessage" Cardinality="One" />
+      <Association Name="ErrorDescription_OutGoingMessage" Member="ErrorDescription" ThisKey="ErrorID" Type="ErrorDescription" IsForeignKey="true" />
+      <Association Name="OutGoingMessage_OutGoingMessage" Member="OutGoingMessage1" ThisKey="OutGoingMessageID" Type="OutGoingMessage" IsForeignKey="true" />
+      <Association Name="LabConfiguration_OutGoingMessage" Member="LabConfiguration" ThisKey="LabConfigurationID" Type="LabConfiguration" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.InComingMessages" Member="InComingMessages">
+    <Type Name="InComingMessage">
+      <Column Name="IncomingMessageID" Type="System.String" DbType="NChar(10) NOT NULL" IsPrimaryKey="true" CanBeNull="false" />
+      <Column Name="Telephone" Type="System.String" DbType="NChar(50)" CanBeNull="true" />
+      <Column Name="username" Type="System.String" DbType="NChar(50)" CanBeNull="true" />
+      <Column Name="LabConfigurationID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="StartTimeRange" Type="System.String" DbType="NChar(50)" CanBeNull="true" />
+      <Column Name="EndTimeRange" Type="System.String" DbType="NChar(50)" CanBeNull="true" />
+      <Column Name="TimeReceived" Type="System.String" DbType="NChar(50)" CanBeNull="true" />
+      <Column Name="MessageKey" Type="System.String" DbType="NChar(10)" CanBeNull="true" />
+      <Column Name="RwRecievedMsg" Type="System.String" DbType="NChar(160)" CanBeNull="true" />
+      <Association Name="LabConfiguration_InComingMessage" Member="LabConfiguration" ThisKey="LabConfigurationID" Type="LabConfiguration" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.LabConfiguration" Member="LabConfigurations">
+    <Type Name="LabConfiguration">
+      <Column Name="LabConfigurationID" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="LabName" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="LabDescription" Type="System.String" DbType="NChar(500)" CanBeNull="true" />
+      <Column Name="ExperimentGroupName" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="ServiceBrokerGUID" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="InstantMessageInPasskey" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="InstantMessageInID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="InstantMessageOutID" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="InstantMessageOutPassKey" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="ServiceBrokerURL" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="ClientName" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="ClientGuid" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="LabServerName" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="LabServerGuid" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="InstantMessageGUID" Type="System.String" DbType="NChar(70)" CanBeNull="true" />
+      <Column Name="MinimumLabDuration" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="MaximumLabDuration" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="LabConfiguration_OutGoingMessage" Member="OutGoingMessages" OtherKey="LabConfigurationID" Type="OutGoingMessage" />
+      <Association Name="LabConfiguration_InComingMessage" Member="InComingMessages" OtherKey="LabConfigurationID" Type="InComingMessage" />
+    </Type>
+  </Table>
+</Database>
