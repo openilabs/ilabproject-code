@@ -36,7 +36,35 @@
 		<th><label for="userMessage">Message to Users</label></th>
 		<td colspan="5"><asp:TextBox ID="txtMessage" runat="server"  Columns="20" Rows="5" TextMode="MultiLine" Width="560px"></asp:TextBox></td>
 		</tr>
-		
+		  <tr>
+                                <th>
+                                    <label for="Lab Resource">
+                                        Lab Resource</label></th>
+                                <td colspan="3" style="width: 454px">
+                                    <asp:DropDownList CssClass="i18n" ID="ddlLabResource" runat="server" AutoPostBack="True"
+                                        Width="100%">
+                                    </asp:DropDownList>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="Experiment">
+                                        Experiment</label></th>
+                                <td colspan="3" style="width: 454px">
+                                    <asp:DropDownList CssClass="i18n" ID="ddlExperiment" runat="server" AutoPostBack="True"
+                                        Width="100%">
+                                    </asp:DropDownList>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <label for="Group">
+                                        Group</label></th>
+                                <td colspan="3" style="width: 454px">
+                                    <asp:DropDownList CssClass="i18n" ID="ddlGroup" runat="server" Width="100%">
+                                    </asp:DropDownList>
+                                </td>
+                            </tr>
 		<tr>
 		    <th>
 		        <label for="startTime">Start Time</label>
@@ -70,7 +98,7 @@
                 <asp:ListItem>PM</asp:ListItem>
                 </asp:DropDownList>
 		    </td>
-		    <td style="width:268px"> </td>
+		    <td style="width:259px"> </td>
 		</tr>
 		<tr>
 		<th>
@@ -105,12 +133,16 @@
             <asp:ListItem>PM</asp:ListItem>
         </asp:DropDownList>
 		</td>
-		<td style="width: 268px"> </td>
+		<td style="width: 259px"> </td>
+		</tr>
+		<tr>
+		 <td colspan="5"><asp:TextBox ID="txtDisplay" runat="server" Width="860px" Height="288px" TextMode="MultiLine"></asp:TextBox></td>
 		</tr>
 		<tr>
 	     <th> </th>
-	     <td colspan="5">
+	     <td colspan="5" id="tdRevoke" runat="server">
 	     <asp:button id="btnRevoke" runat="server" Text="Revoke Reservation" CssClass="button" onclick="btnRevoke_Click" ></asp:button>
+	     <asp:button id="btnReserve" runat="server" Text="Revoke & Reserve" CssClass="button" onclick="btnReserve_Click" ></asp:button>
 	     </td>
 		</tr>
 		</table>
