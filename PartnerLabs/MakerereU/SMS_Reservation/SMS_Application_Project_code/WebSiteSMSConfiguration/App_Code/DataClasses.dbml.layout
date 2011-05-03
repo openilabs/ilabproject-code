@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 10.5" name="DataClasses">
+  <DataContextMoniker Name="/DataClassesDataContext" />
+  <nestedChildShapes>
+    <classShape Id="519763d0-932f-4ef3-8b21-f4b8f7da9d92" absoluteBounds="0.75, 0.75, 2, 1.9631982421875">
+      <DataClassMoniker Name="/DataClassesDataContext/ErrorDescription" />
+      <nestedChildShapes>
+        <elementListCompartment Id="cc42c117-242c-4294-8f66-9804a9f235d4" absoluteBounds="0.765, 1.21, 1.9700000000000002, 1.4031982421875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="e4d49da0-5ae5-41c0-9c86-cf40f7a4b706" absoluteBounds="3.5, 4.5, 2, 2.5401025390625005">
+      <DataClassMoniker Name="/DataClassesDataContext/OutGoingMessage" />
+      <nestedChildShapes>
+        <elementListCompartment Id="66979ef2-03c5-464a-9317-ecb73a1da04b" absoluteBounds="3.515, 4.96, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="f1732395-e411-4bf6-b08d-03e3255d2fe8" absoluteBounds="3.5, 7.75, 2, 2.5401025390625005">
+      <DataClassMoniker Name="/DataClassesDataContext/InComingMessage" />
+      <nestedChildShapes>
+        <elementListCompartment Id="28aad0d2-105e-4cbb-9cc1-558521239992" absoluteBounds="3.515, 8.21, 1.9700000000000002, 1.9801025390625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <classShape Id="8a412abb-09a0-4a91-b005-3880663d95a3" absoluteBounds="0.75, 3.75, 2, 4.0785139973958326">
+      <DataClassMoniker Name="/DataClassesDataContext/LabConfiguration" />
+      <nestedChildShapes>
+        <elementListCompartment Id="f4f4d9ad-4b1c-4619-8579-5e54c7681b20" absoluteBounds="0.765, 4.21, 1.9700000000000002, 3.518513997395833" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+    <associationConnector edgePoints="[(2.75 : 1.73159912109375); (4.5 : 1.73159912109375); (4.5 : 4.5)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/DataClassesDataContext/ErrorDescription/ErrorDescription_OutGoingMessage" />
+      <nodes>
+        <classShapeMoniker Id="519763d0-932f-4ef3-8b21-f4b8f7da9d92" />
+        <classShapeMoniker Id="e4d49da0-5ae5-41c0-9c86-cf40f7a4b706" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(4.20923076923077 : 7.0401025390625); (4.20923076923077 : 7.2901025390625); (4.80461538461539 : 7.2901025390625); (4.80461538461539 : 7.0401025390625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
+      <AssociationMoniker Name="/DataClassesDataContext/OutGoingMessage/OutGoingMessage_OutGoingMessage" />
+      <nodes>
+        <classShapeMoniker Id="e4d49da0-5ae5-41c0-9c86-cf40f7a4b706" />
+        <classShapeMoniker Id="e4d49da0-5ae5-41c0-9c86-cf40f7a4b706" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(2.75 : 5.77005126953125); (3.5 : 5.77005126953125)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/DataClassesDataContext/LabConfiguration/LabConfiguration_OutGoingMessage" />
+      <nodes>
+        <classShapeMoniker Id="8a412abb-09a0-4a91-b005-3880663d95a3" />
+        <classShapeMoniker Id="e4d49da0-5ae5-41c0-9c86-cf40f7a4b706" />
+      </nodes>
+    </associationConnector>
+    <associationConnector edgePoints="[(1.75 : 7.82851399739583); (1.75 : 9.05930876822917); (3.5 : 9.05930876822917)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+      <AssociationMoniker Name="/DataClassesDataContext/LabConfiguration/LabConfiguration_InComingMessage" />
+      <nodes>
+        <classShapeMoniker Id="8a412abb-09a0-4a91-b005-3880663d95a3" />
+        <classShapeMoniker Id="f1732395-e411-4bf6-b08d-03e3255d2fe8" />
+      </nodes>
+    </associationConnector>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>

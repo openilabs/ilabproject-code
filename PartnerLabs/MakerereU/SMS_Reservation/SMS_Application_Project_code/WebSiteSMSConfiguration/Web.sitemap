@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+    <siteMapNode url="" title=""  description="">
+        <siteMapNode url="~/Default.aspx" title="Application Configuration"  description="Where to configure the Instant Schedule Application" />
+        <siteMapNode url="~/StatisticalReview.aspx" title="Statistical Review"  description="Review of Application Performance" />
+    </siteMapNode>
+</siteMap>
