@@ -1,0 +1,175 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPagePopupWindow.master.cs" Inherits="MasterPagePopupWindow" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>Instant Schedule Application</title>
+    <asp:ContentPlaceHolder id="head" runat="server">
+    </asp:ContentPlaceHolder>
+    <style type="text/css">
+        .style1
+        {
+            width: 100%;
+            height: 535px;
+            background: #F4FFFF;
+            margin-left: 0px;
+        }
+        .style4
+        {
+            height: 112px;
+        }
+        .style6
+        {
+            height: 431px;
+            }
+        .style10
+        {
+            height: 28px;
+            background: F4FFFF;
+        }
+        #form1
+        {
+            height: 684px;
+            width: 944px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 70px;
+            margin-bottom:auto;
+            background: #FFFFFF;
+        }
+        .style11
+        {
+            height: 21px;
+            background-color: #FFFFFF;
+        }
+        .style12
+        {
+            font-size: small;
+        }
+        .style13
+        {
+            width: 100%;
+            height: 424px;
+        }
+        .style14
+        {
+            height: 370px;
+            width: 100px;
+        }
+        .style15
+        {
+            width: 22px;
+        }
+        .style16
+        {
+            height: 370px;
+            width: 22px;
+        }
+        .style17
+        {
+            width: 869px;
+        }
+        .style19
+        {
+            width: 22px;
+            height: 90px;
+        }
+        .style20
+        {
+            width: 469px;
+            height: 90px;
+        }
+        .style21
+        {
+            height: 90px;
+        }
+        .style22
+        {
+            height: 370px;
+            width: 269px;
+        }
+        .style25
+        {
+            height: 370px;
+        }
+    </style>
+</head>
+<body background="#FFFFFF" 
+    style="text-align: center; margin:0 auto; width:944px;   background-color: #FFFFFF";>
+    <form id="form1"  runat="server">
+    <div style="text-align: center; text-align:center; width:944px; " >
+        <table align="center" class="style1" width="944px">
+            <tr>
+                <td class="style4">
+                    <asp:Image ID="Image1" runat="server" Height="119px" ImageUrl="~/admin/images/heading.jpg" 
+                        style="background: FFFFFF; text-align: center" Width="944px" />
+                </td>
+            </tr>
+            <tr>
+                <td class="style11">
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="style6" style="text-align: left; vertical-align: top">
+                    <table class="style13">
+                        <tr>
+                            <td class="style19">
+                            </td>
+                            <td class="style20" colspan="2" 
+                                style="background: #F0EFFF; vertical-align: top; text-align: left">
+                                <asp:ContentPlaceHolder ID="ContentPlaceHolder3" runat="server">
+                                </asp:ContentPlaceHolder>
+                            </td>
+                            <td class="style21">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style16">
+                            </td>
+                            <td class="style22" 
+                                style="vertical-align: middle; background-color: #F0EFFF; text-align: right;">
+                                <asp:ContentPlaceHolder ID="PopupWindowLabels" runat="server">
+                                </asp:ContentPlaceHolder>
+                                <br />
+                                <br />
+                            </td>
+                            <td class="style25" style="vertical-align: top; background-color: #F0EFFF;">
+                                <asp:ContentPlaceHolder ID="PopUpWindowTextBoxes" runat="server">
+                                    <p>
+                                        
+                                    </asp:ContentPlaceHolder>
+                            </td>
+                            <td class="style14">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style15">
+                                &nbsp;</td>
+                            <td class="style17" colspan="2">
+                                &nbsp;</td>
+                            <td>
+                                &nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td class="style10">
+                          
+                    <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server">
+                        <p>
+                            <span class="style12">(c) 2011 </span><a href="mailto:iLabs@MAK">
+                            <span class="style12">
+                            <asp:HyperLink ID="iLabsMakWebsite" runat="server"><a href="http://tech.mak.ac.ug/ilabs"><span 
+                                class="style12">iLabs@MAK</span></a></asp:HyperLink>
+                            </span></a><span class="style12">&nbsp;SMS Scheduling Project</span></p>
+                    </asp:ContentPlaceHolder>
+                          
+                </td>
+            </tr>
+        </table>
+    </div>
+    </form>
+</body>
+</html>
