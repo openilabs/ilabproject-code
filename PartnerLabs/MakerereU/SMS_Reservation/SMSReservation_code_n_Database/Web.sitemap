@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+    <siteMapNode url="" title=""  description="">
+        <siteMapNode url="~/admin/StatisticalReview.aspx" title="Statistical Review"  description="Performance Review of the SMS application" />
+        <siteMapNode url="~/admin/PopupLabSetup.aspx" title="Schedule Setup"  description="Setting up a new schedule system for a given lab" />
+    </siteMapNode>
+</siteMap>
