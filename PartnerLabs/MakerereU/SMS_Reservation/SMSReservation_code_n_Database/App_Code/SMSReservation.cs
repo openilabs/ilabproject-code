@@ -53,7 +53,7 @@ public class SMSReservation : iLabs.Web.WS_ILabCore
 
 }
 
-public class FormatMessage
+public class FormatMessage : System.Web.Services.WebService
 {
     //These are the parameters actually sent by the user during scheduling
     private string telephone = null;    // the telephone contact used by the user while scheduling
@@ -179,124 +179,137 @@ public class FormatMessage
 
     private string switchUserOptns()
     {
-        //deal with the start time first
-        string res = resources.dateChecker(SplitMessage[2], SplitMessage[3]);
-
-        if (res.Equals("failedTotally"))
+        try
         {
-            //the date was not successfully formatted
-            //provide the date format section and remind him that it should be uptodate
+            //deal with the start time first
+            string res = resources.dateChecker(SplitMessage[2], SplitMessage[3]);
 
-            //update the database
-            //storing incoming message
-            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                username, labAcronym, startTimeRange, endTimeRange);
-
-            userReply = DBconnect.errorMessage("SDT01");
-
-            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
-                StartTimeGiven, EndTimeGiven, "SDT01");
-
-            return userReply;
-        }
-        else if (res.Equals("formatOny"))
-        {
-            //the date and start time was not uptodate
-            //update DB
-            //storing the incoming message
-            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                username, labAcronym, startTimeRange, endTimeRange);
-
-            userReply = DBconnect.errorMessage("SDT02");
-
-            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
-                StartTimeGiven, EndTimeGiven, "SDT02");
-
-            return userReply;
-        }
-
-        else
-        {
-            //update the startTimeRange
-            startTimeRange = Convert.ToDateTime(resources.dateChecker(SplitMessage[2], SplitMessage[3]));
-
-            if (SplitMessage.Length == 4)
+            if (res.Equals("failedTotally"))
             {
-                //add like 4 hours to create the end time
-                //then call on the method which gives the specific time to use for scheduling
-                //which calls on the scheduling method
-                startTimeRange = Convert.ToDateTime(SplitMessage[2] + " " + SplitMessage[3]);
-                endTimeRange = startTimeRange.AddHours(4.0);
-                return specificTime(startTimeRange, endTimeRange);
+                //the date was not successfully formatted
+                //provide the date format section and remind him that it should be uptodate
+
+                //update the database
+                //storing incoming message
+                DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                    username, labAcronym, startTimeRange, endTimeRange);
+
+                userReply = DBconnect.errorMessage("SDT01");
+
+                DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                    StartTimeGiven, EndTimeGiven, "SDT01");
+
+                return userReply;
+            }
+            else if (res.Equals("formatOny"))
+            {
+                //the date and start time was not uptodate
+                //update DB
+                //storing the incoming message
+                DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                    username, labAcronym, startTimeRange, endTimeRange);
+
+                userReply = DBconnect.errorMessage("SDT02");
+
+                DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                    StartTimeGiven, EndTimeGiven, "SDT02");
+
+                return userReply;
             }
 
-            else if (SplitMessage.Length == 5)
+            else
             {
-                //check if the endtime is fine and move on to ensure it aint before the finish time
-                string resE = resources.dateChecker(SplitMessage[2], SplitMessage[4]);
-                if (resE.Equals("failedTotally"))
+                //update the startTimeRange
+                startTimeRange = Convert.ToDateTime(resources.dateChecker(SplitMessage[2], SplitMessage[3]));
+
+                if (SplitMessage.Length == 4)
                 {
-                    //the date was not successfully formatted
-                    //provide the date format section and remind him that it should be uptodate
-
-                    //update the database
-                    //update incoming message table
-                    DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                username, labAcronym, startTimeRange, endTimeRange);
-
-                    userReply = DBconnect.errorMessage("EDT01");
-
-                    DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
-                        StartTimeGiven, EndTimeGiven, "EDT01");
-
-                    return userReply;
-                }
-                else if (resE.Equals("formatOny"))
-                {
-                    //the date and start time was not uptodate
-                    //update DB
-                    //updating incoming message
-                    DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                username, labAcronym, startTimeRange, endTimeRange);
-
-                    userReply = DBconnect.errorMessage("EDT02");
-
-                    DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
-                        StartTimeGiven, EndTimeGiven, "EDT02");
-
-                    return userReply;
+                    //add like 4 hours to create the end time
+                    //then call on the method which gives the specific time to use for scheduling
+                    //which calls on the scheduling method
+                    startTimeRange = Convert.ToDateTime(SplitMessage[2] + " " + SplitMessage[3]);
+                    endTimeRange = startTimeRange.AddHours(4.0);
+                    return specificTime(startTimeRange, endTimeRange);
                 }
 
-                else
+                else if (SplitMessage.Length == 5)
                 {
-                    endTimeRange = Convert.ToDateTime(resources.dateChecker(SplitMessage[2], SplitMessage[4]));
-                    if (endTimeRange <= startTimeRange)
+                    //check if the endtime is fine and move on to ensure it aint before the finish time
+                    string resE = resources.dateChecker(SplitMessage[2], SplitMessage[4]);
+                    if (resE.Equals("failedTotally"))
                     {
-                        //update the database with the possible errors that will arise in the system
-                        //we could go on and do the scheduling and point it out to the user after
-                        //updating the incoming message
+                        //the date was not successfully formatted
+                        //provide the date format section and remind him that it should be uptodate
+
+                        //update the database
+                        //update incoming message table
                         DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                username, labAcronym, startTimeRange, endTimeRange);
+                    username, labAcronym, startTimeRange, endTimeRange);
 
-                        userReply = DBconnect.errorMessage("SDT00");
-
+                        userReply = DBconnect.errorMessage("EDT01");
 
                         DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
-                            StartTimeGiven, EndTimeGiven, "SDT00");
+                            StartTimeGiven, EndTimeGiven, "EDT01");
 
                         return userReply;
                     }
+                    else if (resE.Equals("formatOny"))
+                    {
+                        //the date and start time was not uptodate
+                        //update DB
+                        //updating incoming message
+                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                    username, labAcronym, startTimeRange, endTimeRange);
+
+                        userReply = DBconnect.errorMessage("EDT02");
+
+                        DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                            StartTimeGiven, EndTimeGiven, "EDT02");
+
+                        return userReply;
+                    }
+
                     else
                     {
-                        //call on the method which gives the specific time and range
-                        return specificTime(startTimeRange, endTimeRange);
+                        endTimeRange = Convert.ToDateTime(resources.dateChecker(SplitMessage[2], SplitMessage[4]));
+                        if (endTimeRange <= startTimeRange)
+                        {
+                            //update the database with the possible errors that will arise in the system
+                            //we could go on and do the scheduling and point it out to the user after
+                            //updating the incoming message
+                            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                    username, labAcronym, startTimeRange, endTimeRange);
+
+                            userReply = DBconnect.errorMessage("SDT00");
+
+
+                            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                                StartTimeGiven, EndTimeGiven, "SDT00");
+
+                            return userReply;
+                        }
+                        else
+                        {
+                            //call on the method which gives the specific time and range
+                            return specificTime(startTimeRange, endTimeRange);
+                        }
                     }
                 }
             }
         }
+        catch
+        {
 
-        return "Unknown Error has occured";
+            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+        username, labname, startTimeRange, endTimeRange);
 
+            userReply = DBconnect.errorMessage("DEF00") + "@ switch method";
+
+            DBconnect.storeOutgoing(userReply , messageKey, false, labname,
+                StartTimeGiven, EndTimeGiven, "DEF00");
+
+            return userReply;
+        }
     }
 
     private bool LabConfigurationVariables(string sLs)
@@ -377,9 +390,9 @@ public class FormatMessage
                    //to get the minutes to be added, split the message first
                     //then from the array, we pick the value and convert it to double
                     string[] ISAmessageSplit = message.Split(' ');
-                    double nxtAvail = Convert.ToDouble(ISAmessageSplit[25]);
+                    double nxtAvail = Convert.ToDouble(ISAmessageSplit[26]); //can also be [17]
 
-                    StartTimeGiven = StartTimeGiven.AddMinutes(nxtAvail + 1);
+                    StartTimeGiven = StartTimeGiven.AddMinutes(nxtAvail);
                     EndTimeGiven = StartTimeGiven.AddMinutes(Dur);
 
                     //after adjusting, check if the new times given are within the user time range
@@ -387,16 +400,27 @@ public class FormatMessage
                     //   Inform the user that he cannot be scheduled and should try another time range
                     if(StartTimeGiven >= endTimeRange)
                     {
-                        //started error format has not been created for this issue as yet.
-                        userReply = "Unfortunately the lab durations are full in this time Range. Please choose another time range";
+                        try
+                        {
+                            //started error format has not been created for this issue as yet.
+                            userReply = "Unfortunately the lab durations are full in this time Range. Please choose another time range";
 
-                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                    username, labname, startTimeRange, endTimeRange);
+                            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                        username, labname, startTimeRange, endTimeRange);
 
-                        DBconnect.storeOutgoing(userReply, messageKey, true, labname,
-                    StartTimeGiven, EndTimeGiven, userReply);
+                            DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                        StartTimeGiven, EndTimeGiven, userReply);
 
-                        return userReply;
+                            return userReply + " while connecting to the ISA";
+                        }
+                        catch
+                        {
+
+                            DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                                StartTimeGiven, EndTimeGiven, "DEF00");
+
+                            return userReply;
+                        }
                     }
 
                     //2.when the startTimeRange is within the EndtimeGiven but the endTimeGiven is outside.
@@ -411,6 +435,7 @@ public class FormatMessage
                     //when we cant figure out what happened!!
                     else 
                     {
+                        goto Loop;
                         DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labname, startTimeRange, endTimeRange);
 
@@ -431,7 +456,7 @@ public class FormatMessage
 
                     userReply = message + "Contact Administrator for more details";
 
-                    DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                    DBconnect.storeOutgoing(userReply, messageKey, false, labname,
                         StartTimeGiven, EndTimeGiven, userReply);
 
                     return userReply;
@@ -440,13 +465,26 @@ public class FormatMessage
                 //when the user has actually been scheduled
                 else if (message.Contains("confirmed successfully"))
                 {
-                    DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
-                    username, labname, startTimeRange, endTimeRange);
+                    try
+                    {
+                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                        username, labname, startTimeRange, endTimeRange);
 
-                    userReply = message + " and will be between " + StartTimeGiven.ToString() + " to " + EndTimeGiven.ToString();
+                        userReply = message + " for " + username + " and will be between " + StartTimeGiven.ToString() + " to " + EndTimeGiven.ToString();
 
-                    DBconnect.storeOutgoing(userReply, messageKey, true, labname,
-                        StartTimeGiven, EndTimeGiven, userReply);
+                        DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                            StartTimeGiven, EndTimeGiven, userReply);
+                    }
+                        //when for some reason we cannot store into the databases but the schedule has been done
+
+                    catch
+                    {
+
+                        DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                            StartTimeGiven, EndTimeGiven, "DEF00");
+
+                        return userReply;
+                    }
 
                     return userReply;
                 }
@@ -478,11 +516,22 @@ public class FormatMessage
     }
 
 
-
+}
+    /// <summary>
+    /// Class that is used by the application to connect the database iLab_SMS
+    /// Databases connections used in this case are based on Linq to SQL
+    /// </summary>
     public static class DBconnect
     {
-        //this class connects to the database whenever a user wants somethign out of it
-
+       
+        /// <summary>
+        /// Checks if the message key assigned to an incoming message is valied
+        /// valied message keys are the ones which are unique
+        /// if a message key is present, the application returns a true
+        /// else its a false
+        /// </summary>
+        /// <param name="messageKey">message key being tasted or checked if available</param>
+        /// <returns></returns>
         public static bool KeyChecker(string messageKey)
         {
             DataClassesDataContext db = new DataClassesDataContext();
@@ -493,7 +542,13 @@ public class FormatMessage
                 return false;
         }
 
-
+        /// <summary>
+        /// checking if the labname acronym given by the user was the one actually used by the application
+        /// requires connection to the database
+        /// Note: ID no. 1 is the default value returned when no lab is present
+        /// </summary>
+        /// <param name="labnameReq">acronynm of the lab to be scheduled for</param>
+        /// <returns>returns a value greater than 1 if present and a 1 if not present</returns>
         public static int isLabnamePresent(string labnameReq)
         {
             try
@@ -502,7 +557,7 @@ public class FormatMessage
                 //string labInDB = null;
                 //checks if the labname requested by the user is present in the system
                 LabConfiguration lb = db.LabConfigurations.Where(s => s.applicationCallName == labnameReq).First();
-                if (lb.LabConfigurationID > 0)
+                if (lb.LabConfigurationID > 1)
                 {
 
                     return lb.LabConfigurationID;
@@ -518,6 +573,18 @@ public class FormatMessage
             }
         }
 
+        /// <summary>
+        /// Stores every incoming message that reaches the application
+        /// Values can be null depending on the level of how the message was decoded
+        /// </summary>
+        /// <param name="contact"> The contact of the user</param>
+        /// <param name="RwRecievedMsg">The actual message recieved by the user</param>
+        /// <param name="MessageKey">The key assigned to the incoming message</param>
+        /// <param name="TimeRecieved">The time when the message has been recieved</param>
+        /// <param name="username">The username of the user(is nullable)</param>
+        /// <param name="labAcronym">LabAcronym given to the user to schedule for a given lab</param>
+        /// <param name="startTimeRange">The star time range within the user would want to do the lab</param>
+        /// <param name="EndTimeRange">The End time range within which the lab should be scheduled</param>
         public static void storeIncoming(string contact, string RwRecievedMsg,
             string MessageKey, DateTime TimeRecieved, string username, string labAcronym,
             DateTime startTimeRange, DateTime EndTimeRange)
@@ -539,6 +606,16 @@ public class FormatMessage
 
         }
 
+        /// <summary>
+        /// Storing the message replied to the user
+        /// </summary>
+        /// <param name="RwSentMsg">The Raw message sent to user</param>
+        /// <param name="MessageKey"> The key of the message; similar to the incoming message key</param>
+        /// <param name="IsScheduled">boolen comfirming if the message has been scheduled or not</param>
+        /// <param name="labAcronym">The lab being scheduled for</param>
+        /// <param name="GivenStartTimeDB">The given startTime if lab was scheduled</param>
+        /// <param name="GivenEndTimeDB">The given Endtime of the given lab</param>
+        /// <param name="codeERR">The error incase of not succesfully sent</param>
         public static void storeOutgoing(string RwSentMsg, string MessageKey,
              bool IsScheduled, string labAcronym,
             DateTime GivenStartTimeDB, DateTime GivenEndTimeDB, string codeERR)
@@ -561,7 +638,11 @@ public class FormatMessage
             db.SubmitChanges();
 
         }
-
+        /// <summary>
+        /// Retrieves an error message for the corresponding code of the error..
+        /// </summary>
+        /// <param name="errorCode">The errorCode for a particular error in the message</param>
+        /// <returns>Resturns a short description of what has happened and a possible solution</returns>
         public static string errorMessage(string errorCode)
         {
             try
@@ -579,12 +660,24 @@ public class FormatMessage
         }
     }
 
-}
 
+    /// <summary>
+    /// Class that helps us to connect to the sms application to the ISA
+    /// </summary>
     public class ISAConnect 
     {
 
-
+        /// <summary>
+        /// Method that does the actual make reservation for the user. 
+        /// makes the basis of the parameters from the message and the application database
+        /// </summary>
+        /// <param name="userName"> the user who is scheduling for the lab; must be registered with the service broker</param>
+        /// <param name="groupName">the group name authorized to do a lab</param>
+        /// <param name="labServerGuid">lab server which holds the lab that does the actual scheduling</param>
+        /// <param name="clientGuid">Guid of the lab being registered for</param>
+        /// <param name="start">Start time of a particular period scheduled for</param>
+        /// <param name="end">End time of a particular period being scheduled for</param>
+        /// <returns>returns a message string that the application bases on for to give the feedback to the user</returns>
         public static string MakeReservation(string userName, string groupName, string labServerGuid,
                     string clientGuid, DateTime start, DateTime end)
         {
@@ -651,13 +744,28 @@ public class FormatMessage
 
     }
 
+    /// <summary>
+    /// class that gives some utility methods for the application to operate
+    /// 
+    /// </summary>
     public static class resources
     {
+        /// <summary>
+        /// The default date and time
+        /// This acts like a null value to a string
+        /// </summary>
+        /// <returns>Date and time considered 'null' as per the system</returns>
         public static DateTime defaultTime()
         {
             return Convert.ToDateTime("01/01/1753 12:00AM").ToUniversalTime();
         }
 
+        /// <summary>
+        /// takes in date and time as two seperate strings
+        /// it then comforms that these two parameters make a standard dateTime
+        /// and comforms that these dates given are up to date
+        /// </summary>
+        /// <returns>a string that contains the given date and time</returns>
         public static string dateChecker(string date, string time)
         {
             try
@@ -666,16 +774,24 @@ public class FormatMessage
                 string[] messageElementsDate = date.Split('/', '.', '-');
                 string DateInWords = messageElementsDate[0] + "/" + messageElementsDate[1] + "/" + messageElementsDate[2];
                 //DateTime day = Convert.ToDateTime(messageElementsDate[0]).Day;
+                //assingning each element a location
+                string day = messageElementsDate[0];
+                string month = messageElementsDate[1];
+                string year = messageElementsDate[2];
+                string UtcDateInWords = month + "/" + day + "/" + year;
+
+
                 string[] messageElementsTime = time.Split(':', ';');
                 string TimeInWords = messageElementsTime[0] + ":" + messageElementsTime[1];
 
-                string format = "dd/mm/yyyy hh:mm";
-                string ThisDateDayWord = DateInWords + " " + TimeInWords;
+                //string format = "dd/mm/yyyy hh:mm";
+                string ThisDateDayWord = UtcDateInWords + " " + TimeInWords;
                 DateTime ThisDate = Convert.ToDateTime(ThisDateDayWord);
-                
+
                 if (ThisDate >= DateTime.Now)
                 {
-                   return ThisDate.ToString();
+                    return ThisDate.ToString();
+
                 }
                 else
                 {
