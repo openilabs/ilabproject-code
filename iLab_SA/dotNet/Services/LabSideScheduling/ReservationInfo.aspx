@@ -34,6 +34,16 @@
                 <div id="pagecontent">
                     <div class="simpleform">
                         <table>
+                        <tr>
+                                <th>
+                                    <label for="Resource">
+                                        Resource</label></th>
+                                <td colspan="3" style="width: 454px">
+                                    <asp:DropDownList CssClass="i18n" ID="ddlResource" runat="server" AutoPostBack="True"
+                                        Width="100%">
+                                    </asp:DropDownList>
+                                </td>
+                            </tr>
                             <tr>
                                 <th>
                                     <label for="Experiment">

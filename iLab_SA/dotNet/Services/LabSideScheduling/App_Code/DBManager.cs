@@ -2343,7 +2343,8 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="resourceID"></param>
         /// <param name="status"></param>
         /// <returns></returns>the unique ID identifying the reservation information added, >0 successfully added, -1 otherwise
-        public static int AddReservationInfo(DateTime startTime, DateTime endTime, int credentialSetID, int experimentInfoID, int resourceID, int ussID, int status)
+        public static int AddReservationInfo(DateTime startTime, DateTime endTime, int credentialSetID, int experimentInfoID, int resourceID,
+            int ussID, int status)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -2356,7 +2357,13 @@ namespace iLabs.Scheduling.LabSide
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetID", credentialSetID, DbType.Int32));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoID", experimentInfoID, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ussID", ussID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceID", resourceID, DbType.Int32));
+            DbParameter ussParam = FactoryDB.CreateParameter(cmd, "@ussID", DbType.Int32);
+            if (ussID < 1)
+                ussParam.Value = ussID;
+            else
+                ussParam.Value = DBNull.Value;
+            cmd.Parameters.Add(ussParam);
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", status, DbType.Int32));
             
 			int i=-1;
@@ -2477,6 +2484,70 @@ namespace iLabs.Scheduling.LabSide
 			
 			return status;			
 		}
+
+
+        public static ReservationData[] RetrieveReservationData(int resourceId, int expId, int credId, DateTime start, DateTime end)
+        {
+
+            List<ReservationData> data = new List<ReservationData>();
+            DbConnection connection = FactoryDB.GetConnection();
+
+            // create sql command
+            // command executes the "Reserva" stored procedure
+            DbCommand cmd = FactoryDB.CreateCommand("ReservationData_Retrieve", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            if (expId < 1)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", null, DbType.Int32));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", resourceId, DbType.Int32));
+            if (expId < 1)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@expid", null, DbType.Int32));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@expid", expId, DbType.Int32));
+            if (credId < 1)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@credid", null, DbType.Int32));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@credid", credId, DbType.Int32));
+            if (start == DateTime.MinValue)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", null, DbType.DateTime));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", start, DbType.DateTime));
+            if (end == DateTime.MinValue)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", null, DbType.DateTime));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+            DbDataReader dataReader = null;
+            try
+            {
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+                while (dataReader.NextResult())
+                {
+                    ReservationData rd = new ReservationData();
+                    rd.reservationID = dataReader.GetInt32(0);
+                    rd.start = DateUtil.SpecifyUTC(dataReader.GetDateTime(1));
+                    rd.end = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
+                    rd.clientGuid = dataReader.GetString(3);
+                    rd.labServerGuid = dataReader.GetString(4);
+                    rd.groupName = dataReader.GetString(5);
+                    rd.sbGuid = dataReader.GetString(6);
+                    rd.ussId = dataReader.GetInt32(7);
+                    rd.status = dataReader.GetInt32(8);
+                    data.Add(rd);
+                }
+
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return data.ToArray();
+        }
 		
 		/// <summary>
 		/// enumerates all IDs of the reservations made to a particular experiment identified by the experimentInfoID
@@ -2943,7 +3014,9 @@ namespace iLabs.Scheduling.LabSide
 			return reservationInfos.ToArray();
 		}
 
-        public static IntTag[] ListReservations(string labServerGuid, DateTime start, DateTime end, CultureInfo culture, int userTZ)
+
+
+        public static IntTag[] ListReservationTags(string labServerGuid, DateTime start, DateTime end, CultureInfo culture, int userTZ)
         {
             string temp = culture.DateTimeFormat.ShortDatePattern;
              if (temp.Contains("MM"))
@@ -2977,21 +3050,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
-                {
-                    //t R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name
-                    IntTag t = new IntTag();
-                    StringBuilder buf = new StringBuilder();
-                    t.id = dataReader.GetInt32(0);
-                    buf.Append(DateUtil.ToUserTime( DateUtil.SpecifyUTC(dataReader.GetDateTime(1)),culture,userTZ,dateF) + " - ");
-                    buf.Append(DateUtil.ToUserTime(DateUtil.SpecifyUTC(dataReader.GetDateTime(2)), culture, userTZ,dateF) + " ");
-                    buf.Append(dataReader.GetString(3) + " ");
-                    buf.Append(dataReader.GetString(4) + ":");
-                    buf.Append(dataReader.GetString(5));
-                    //buf.Append(" " + dataReader.GetInt32(6));
-                    t.tag = buf.ToString();
-                    tags.Add(t);
-                }
+                tags = ParseReservationTags(dataReader, culture, userTZ);
             }
             catch {
                 throw;
@@ -3003,26 +3062,22 @@ namespace iLabs.Scheduling.LabSide
             return tags.ToArray();
         }
 
-         public static IntTag[] ListReservations(int expId, int credId, DateTime start, DateTime end, CultureInfo culture, int userTZ)
+       
+         public static IntTag[] ListReservationTags(int resourceId, int expId, int credId, DateTime start, DateTime end, CultureInfo culture, int userTZ)
          {
-             string temp = culture.DateTimeFormat.ShortDatePattern;
-             if (temp.Contains("MM"))
-                 ;
-             else
-                 temp = temp.Replace("M", "MM");
-             if (temp.Contains("dd"))
-                 ;
-             else
-                 temp = temp.Replace("d", "dd");
-            string dateF = temp + " HH" + culture.DateTimeFormat.TimeSeparator + "mm";
-            List<IntTag> tags = new List<IntTag>();
+            
+            List<IntTag> tags = null;
             DbConnection connection = FactoryDB.GetConnection();
 
             // create sql command
             // command executes the "Reserva" stored procedure
             DbCommand cmd = FactoryDB.CreateCommand("ReservationTags_Retrieve", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            
+
+            if (expId < 1)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", null, DbType.Int32));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", resourceId, DbType.Int32));
              if(expId <1)
                  cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@expid", null, DbType.Int32));
              else
@@ -3044,21 +3099,8 @@ namespace iLabs.Scheduling.LabSide
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
-                {
-                    //t R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name
-                    IntTag t = new IntTag();
-                    StringBuilder buf = new StringBuilder();
-                    t.id = dataReader.GetInt32(0);
-                    buf.Append(DateUtil.ToUserTime( DateUtil.SpecifyUTC(dataReader.GetDateTime(1)),culture,userTZ,dateF) + " - ");
-                    buf.Append(DateUtil.ToUserTime(DateUtil.SpecifyUTC(dataReader.GetDateTime(2)), culture, userTZ,dateF) + " ");
-                    buf.Append(dataReader.GetString(3) + " ");
-                    buf.Append(dataReader.GetString(4) + ":");
-                    buf.Append(dataReader.GetString(5));
-                    //buf.Append(" " +dataReader.GetInt32(6));
-                    t.tag = buf.ToString();
-                    tags.Add(t);
-                }
+                tags = ParseReservationTags(dataReader, culture, userTZ);
+               
             }
             catch {
                 throw;
@@ -3068,6 +3110,36 @@ namespace iLabs.Scheduling.LabSide
                 connection.Close();
             }
             return tags.ToArray();
+        }
+        private static List<IntTag> ParseReservationTags(DbDataReader dataReader, CultureInfo culture, int userTZ)
+        {
+            string temp = culture.DateTimeFormat.ShortDatePattern;
+            if (temp.Contains("MM"))
+                ;
+            else
+                temp = temp.Replace("M", "MM");
+            if (temp.Contains("dd"))
+                ;
+            else
+                temp = temp.Replace("d", "dd");
+            string dateF = temp + " HH" + culture.DateTimeFormat.TimeSeparator + "mm";
+            List<IntTag> tags = new List<IntTag>();
+            while (dataReader.Read())
+            {
+                //t R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name
+                IntTag t = new IntTag();
+                StringBuilder buf = new StringBuilder();
+                t.id = dataReader.GetInt32(0);
+                buf.Append(DateUtil.ToUserTime(DateUtil.SpecifyUTC(dataReader.GetDateTime(1)), culture, userTZ, dateF) + " - ");
+                buf.Append(DateUtil.ToUserTime(DateUtil.SpecifyUTC(dataReader.GetDateTime(2)), culture, userTZ, dateF) + " ");
+                buf.Append(dataReader.GetString(3) + " ");
+                buf.Append(dataReader.GetString(4) + ":");
+                buf.Append(dataReader.GetString(5));
+                //buf.Append(" " +dataReader.GetInt32(6));
+                t.tag = buf.ToString();
+                tags.Add(t);
+            }
+            return tags;
         }
 
 		/* !------------------------------------------------------------------------------!
@@ -3325,6 +3397,7 @@ namespace iLabs.Scheduling.LabSide
 			credentialSetIDs=Utilities.ArrayListToIntArray(arrayList);
 			return credentialSetIDs;
 		}
+
 /// <summary>
 /// Returns an array of the immutable Credential objects that correspond to the supplied credentialSet IDs. 
 /// </summary>
@@ -3380,6 +3453,61 @@ namespace iLabs.Scheduling.LabSide
 			}	
 			return credentialSets.ToArray();
 		}
+
+        		
+/// <summary>
+/// Returns an array of the immutable Credential objects that correspond to the supplied credentialSet IDs. 
+/// </summary>
+/// <param name="credentialSetIDs"></param>
+/// <returns></returns>An array of immutable objects describing the specified Credential Set information; if the nth credentialSetID does not correspond to a valid experiment scheduling property, the nth entry in the return array will be null.
+		public static LssCredentialSet[] GetCredentialSetsByLS(string lsGuid)
+		{
+            List<LssCredentialSet> credentialSets = new List<LssCredentialSet>();
+			
+			// create sql connection
+			DbConnection connection = FactoryDB.GetConnection();
+
+			// create sql command
+			// command executes the "RetrieveCredentialSetByLS" stored procedure
+            DbCommand cmd = FactoryDB.CreateCommand("CredentialSets_RetrieveByLS", connection);
+			cmd.CommandType = CommandType.StoredProcedure;
+			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lsGuid", lsGuid, DbType.String,50));
+			//execute the command
+			try 
+			{
+				connection.Open();
+			
+					// populate the parameters
+					DbDataReader dataReader = null;
+					dataReader=cmd.ExecuteReader();
+					while(dataReader.Read())
+					{
+                        LssCredentialSet credentialSet = new LssCredentialSet();
+                        credentialSet.credentialSetId = dataReader.GetInt32(0);
+						if(dataReader[1] != System.DBNull.Value )
+							credentialSet.serviceBrokerGuid=dataReader.GetString(1);
+						if(dataReader[2] != System.DBNull.Value )
+							credentialSet.serviceBrokerName=dataReader.GetString(2);
+						if(dataReader[3] != System.DBNull.Value )
+							credentialSet.groupName=dataReader.GetString(3);
+						
+                        credentialSets.Add(credentialSet);
+					}
+					dataReader.Close();
+					
+			} 
+
+			catch (Exception ex)
+			{
+				throw new Exception("Exception thrown in get credentialSets",ex);
+			}
+			finally
+			{
+				connection.Close();
+			}	
+			return credentialSets.ToArray();
+		}
+
         /// <summary>
         /// Get a credential set ID of a particular group
         /// </summary>

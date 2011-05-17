@@ -151,9 +151,9 @@ namespace iLabs.ServiceBroker.admin
 		/// <summary>
 		/// Write Available and Associated Group List Boxes
 		/// </summary>
-		private void LoadListBoxes()
-		{
-			// Clear listboxes
+        private void LoadListBoxes()
+        {
+            // Clear listboxes
 
             ddlAdminGroup.Items.Clear();
             //ddlLabServer.Items.Clear();
@@ -179,41 +179,24 @@ namespace iLabs.ServiceBroker.admin
             ListItem liHeaderUserGroup = new ListItem("---Select User Group---", "-1");
             ddlUserGroup.Items.Add(liHeaderUserGroup);
 
-			// Get All Groups
-			int[] groupIDs = wrapper.ListGroupIDsWrapper();
-			Group[] availGroups = wrapper.GetGroupsWrapper(groupIDs);
-			
-			// Get Associated Groups (i.e. associated to a specified Lab Client)
-			int[] assocGroupIDs = AdministrativeUtilities.GetLabClientGroups(Convert.ToInt32(ddlLabClient.SelectedValue));
-			ArrayList assocGroupList = new ArrayList(assocGroupIDs);
+            // Get All User Groups
+            int[] groupIDs = wrapper.ListGroupIDsByType(GroupType.REGULAR);
+            Group[] availGroups = wrapper.GetGroupsWrapper(groupIDs);
 
-
-			foreach(Group availGroup in availGroups)
-			{
-				string gName = availGroup.groupName;
-				//Dont populate Root, SuperUser, NewUser and OrphanedUser groups
-				if ((availGroup.groupID>0)&&(!gName.Equals(Group.ROOT))
-					&&(!gName.Equals(Group.SUPERUSER))&&(!gName.Equals(Group.NEWUSERGROUP))
-					&&(!gName.Equals(Group.ORPHANEDGROUP)))
-				{
-					// Don't write Groups that are already associated with the client
-					// to the Available List box
-					if(assocGroupList.Contains(availGroup.groupID))
-					{
-						//Write to Associated Listbox if already associated.
-						//lbxAssociated.Items.Add(new ListItem(availGroup.groupName,availGroup.groupID.ToString()));
-                        
-					}
-					else
-					{
-						//Write to available Listbox
-						//lbxAvailable.Items.Add(new ListItem(availGroup.groupName, availGroup.groupID.ToString()));
-                        ddlUserGroup.Items.Add(new ListItem(availGroup.groupName, availGroup.groupID.ToString()));
-					}
-				}
-			}
-
-		} // END private void LoadListBoxes()
+            // Get Associated Groups (i.e. associated to a specified Lab Client)
+            int[] assocGroupIDs = AdministrativeUtilities.GetLabClientGroups(Convert.ToInt32(ddlLabClient.SelectedValue));
+            List<int> assocGroupList = new List<int>(assocGroupIDs);
+            foreach (Group availGroup in availGroups)
+            {
+                // Don't write Groups that are already associated with the client
+                // to the Available List box
+                if (!assocGroupList.Contains(availGroup.groupID))
+                {
+                    //Write to available Listbox
+                    ddlUserGroup.Items.Add(new ListItem(availGroup.groupName, availGroup.groupID.ToString()));
+                }
+            }
+        } // END private void LoadListBoxes()
 
 		/// <summary>
 		/// Clears the Lab Client dropdown and reloads it from the array of LabClient objects

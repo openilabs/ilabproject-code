@@ -311,6 +311,23 @@ namespace iLabs.Scheduling.LabSide
         }
        
     }
+    /// <summary>
+    /// Defines a view of a reservation for efficient revoking of reservations.
+    /// </summary>
+    public class ReservationData
+    {
+        //R.Reservation_Info_ID,R.Start_Time, R.End_Time,
+        //E.Lab_Client_GUID,E.Lab_Server_GUID, C.Group_Name,C.Service_Broker_Guid,R.USS_Info_ID,R.status
+        public int reservationID;
+        public int ussId;
+        public int status;
+        public DateTime start;
+        public DateTime end;
+        public string clientGuid;
+        public string labServerGuid;
+        public string groupName;
+        public string sbGuid;
+    }
 
 #endregion
 
@@ -686,6 +703,16 @@ namespace iLabs.Scheduling.LabSide
 			LssCredentialSet[] credentialSets=DBManager.GetCredentialSets(credentialSetIDs);
 			return credentialSets;
 		}
+        /// <summary>
+        /// Returns an array of the immutable Credential objects that correspond to the supplied labServer guid. 
+        /// </summary>
+        /// <param name="credentialSetIDs"></param>
+        /// <returns></returns>An array of immutable objects describing the specified Credential Set information; if the nth credentialSetID does not correspond to a valid experiment scheduling property, the nth entry in the return array will be null.
+        public static LssCredentialSet[] GetCredentialSetsByLS(string lsGuid)
+        {
+            LssCredentialSet[] credentialSets = DBManager.GetCredentialSetsByLS(lsGuid);
+            return credentialSets;
+        }
         /// <summary>
         /// Get the credential set ID of a particular group
         /// </summary>
@@ -1359,11 +1386,11 @@ namespace iLabs.Scheduling.LabSide
         }
         public static IntTag[] ListReservations(string labServerGuid, DateTime start, DateTime end, CultureInfo culture, int userTZ)
         {
-            return DBManager.ListReservations(labServerGuid, start, end, culture, userTZ);
+            return DBManager.ListReservationTags(labServerGuid, start, end, culture, userTZ);
         }
-        public static IntTag[] ListReservations(int expId, int credId, DateTime start, DateTime end, CultureInfo culture, int userTZ)
+        public static IntTag[] ListReservations(int resourceID, int expId, int credId, DateTime start, DateTime end, CultureInfo culture, int userTZ)
         {
-            return DBManager.ListReservations(expId, credId, start, end, culture, userTZ);
+            return DBManager.ListReservationTags(resourceID, expId, credId, start, end, culture, userTZ);
         }
         /// <summary>
         /// Returns an Boolean indicating whether a particular reservation from a USS is confirmed and added to the database in LSS successfully. If it fails, exception will be throw out indicating
@@ -1380,7 +1407,7 @@ namespace iLabs.Scheduling.LabSide
         public static string ConfirmReservation(string serviceBrokerGuid, string groupName, string ussGuid,
              string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
         {
-            string notification = null;
+            StringBuilder notification = new StringBuilder();
             try
             {
 
@@ -1394,59 +1421,19 @@ namespace iLabs.Scheduling.LabSide
                 //check whether the reservation is executable
                 if (((TimeSpan)endTime.Subtract(startTime)).TotalMinutes < minTime)
                 {
-                    notification = "The reservation time is less than the minimum time the experiment required";
-                    return notification;
+                    notification.Append("The reservation time is less than the minimum time the experiment required");
+                    return notification.ToString();
                 }
                 //the start time for the experiment equipment
                 DateTime expStartTime = startTime.AddMinutes(-preTime);
                 //the end time for the experiment equipment
                 DateTime expEndTime = endTime.AddMinutes(recTime);
-                Recurrence[] recurrences = DBManager.GetRecurrences(serviceBrokerGuid, groupName,
-                    labServerGuid, clientGuid, startTime, endTime);
-                if ((recurrences == null) || (recurrences.Length == 0))
-                {
-                    notification = "This experiment is not available to your group during this time.";
-                    return notification;
-                }
-                else if (recurrences.Length > 1)
-                {
-                    notification = "More than one recurrence was found for this request. Please choose another time.";
-                    return notification;
-                }
-
-                else
-                {
-                    TimeBlock[] reserved = DBManager.ListReservationTimeBlocks(recurrences[0].resourceId, expStartTime, expEndTime);
-                    bool ok = true;
-                    if ((reserved != null) && (reserved.Length > 0))
-                    {
-
-                        // Need to process the reservations to make suggestions
-                        notification = "This reservation time is not available now, please adjust your reservation time.";
-                        TimeBlock check = new TimeBlock(expStartTime, expEndTime);
-                        foreach (TimeBlock tb in reserved)
-                        {
-                            TimeBlock intersection = check.Intersection(tb);
-                            if (intersection != null)
-                            {
-                                TimeSpan span = TimeSpan.FromSeconds(intersection.Duration);
-                                if(intersection.Start < expEndTime)
-                                    notification += @"<br />Adjust the time by starting " + span.TotalMinutes +
-                                        " minutes earlier, or make the duration shorter by " + span.TotalMinutes + " minutes.";
-                                if (intersection.End > expStartTime)
-                                    notification += @"<br />Adjust the time by starting " + span.TotalMinutes +
-                                        " minutes later.";
-
-                            }
-                           
-                        }
-                        return notification;
-                    }
-                    //add the reservation to to reservationInfo table
-                    int status = AddReservationInfo(serviceBrokerGuid, groupName, ussGuid, labServerGuid, clientGuid, startTime.ToUniversalTime(), endTime.ToUniversalTime(), 0);
+                int status = MakeReservation(serviceBrokerGuid, groupName,  ussGuid, labServerGuid, clientGuid,
+                    startTime, endTime, ref notification);
+   
                     if (status > 0)
                     {
-                        notification = "The reservation is confirmed successfully";
+                        notification.AppendLine("The reservation is confirmed successfully");
                         if (exInfo.contactEmail != null && exInfo.contactEmail.Length > 0)
                         {
                             // Send a mail Message
@@ -1490,16 +1477,64 @@ namespace iLabs.Scheduling.LabSide
                             }
                         }
                     }
-                    else
-                        notification = "Error: AddReservation status = " + status;
-                    return notification;
-                }
+                   
             }
             catch (Exception ex)
             {
                 return ex.Message;
             }
-            return notification;
+            return notification.ToString();
+        }
+
+        public static int MakeReservation(string serviceBrokerGuid, string groupName, string ussGuid,
+            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime, ref StringBuilder notification)
+        {
+            int status = -1;
+            Recurrence[] recurrences = DBManager.GetRecurrences(serviceBrokerGuid, groupName,
+                labServerGuid, clientGuid, startTime, endTime);
+            if ((recurrences == null) || (recurrences.Length == 0))
+            {
+                notification.AppendLine("This experiment is not available to your group during this time.");
+                return status;
+            }
+            else if (recurrences.Length > 1)
+            {
+                notification.Append("More than one recurrence was found for this request. Please choose another time.");
+                return status;
+            }
+
+            else
+            {
+                TimeBlock[] reserved = DBManager.ListReservationTimeBlocks(recurrences[0].resourceId, startTime, endTime);
+                bool ok = true;
+                if ((reserved != null) && (reserved.Length > 0))
+                {
+
+                    // Need to process the reservations to make suggestions
+                    notification.AppendLine("This reservation time is not available now, please adjust your reservation time.");
+                    TimeBlock check = new TimeBlock(startTime, endTime);
+                    foreach (TimeBlock tb in reserved)
+                    {
+                        TimeBlock intersection = check.Intersection(tb);
+                        if (intersection != null)
+                        {
+                            TimeSpan span = TimeSpan.FromSeconds(intersection.Duration);
+                            if (intersection.Start < endTime)
+                                notification.AppendLine(@"<br />Adjust the time by starting " + span.TotalMinutes +
+                                    " minutes earlier, or make the duration shorter by " + span.TotalMinutes + " minutes.");
+                            if (intersection.End > startTime)
+                                notification.AppendLine(@"<br />Adjust the time by starting " + span.TotalMinutes +
+                                    " minutes later.");
+
+                        }
+
+                    }
+                    return 0;
+                }
+                //add the reservation to to reservationInfo table
+                status = AddReservationInfo(serviceBrokerGuid, groupName, ussGuid, labServerGuid, clientGuid, startTime.ToUniversalTime(), endTime.ToUniversalTime(), 0);
+            }
+            return status;
         }
 
         #endregion

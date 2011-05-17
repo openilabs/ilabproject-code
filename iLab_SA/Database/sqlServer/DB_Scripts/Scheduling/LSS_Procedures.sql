@@ -33,6 +33,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Credential
 drop procedure [dbo].[CredentialSet_RetrieveIDs]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[CredentialSets_RetrieveByLS]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[CredentialSets_RetrieveByLS]
+GO
+
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ExperimentInfo_Add]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[ExperimentInfo_Add]
 GO
@@ -189,6 +194,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Reservatio
 drop procedure [dbo].[Reservation_GetTimes]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ReservationData_Retrieve]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[ReservationData_Retrieve]
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[ReservationInfo_Add]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[ReservationInfo_Add]
 GO
@@ -301,7 +310,190 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetReserva
 drop function [dbo].[GetReservationIDs]
 GO
 
+/****** Object:  User Defined Function dbo.GetReservationIDs    Script Date: 4/25/2011 1:41:06 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetReservationIDs_ByIDs]') and xtype in (N'FN', N'IF', N'TF'))
+drop function [dbo].[GetReservationIDs_ByIDs]
+GO
 
+
+-- CREATE FUNCTIONS
+
+CREATE Function [dbo].[GetReservationIDs]
+(
+@sbGuid varchar (50) = null,
+@groupName nvarchar(256) = null,
+@labServerGuid varchar(50) = null,
+@clientGuid varchar(50) = null,
+@resourceID int = null,
+@start datetime = '1753-01-01 00:00:00',
+@end datetime = '9999-12-31 00:00:00'
+)
+RETURNS @resIds TABLE(id int)
+AS
+BEGIN
+
+declare @target int
+
+DECLARE @credIds TABLE ( cID int )
+DECLARE @expIds TABLE ( eID int )
+--DECLARE @resIds TABLE {id int)
+set @target = 0
+
+if (@sbGuid is not null) and ( LEN(@sbGuid) > 0)
+set @target = 1
+if (@groupName is not null ) and (LEN(@groupName) > 0)
+set @target = @target | 2
+if (@resourceID is not null ) AND (@ResourceID > 0)
+set @target = @target | 4
+if (@labServerGuid is not null)  AND (LEN(@labServerGuid) > 0)
+set @target = @target | 8
+if (@clientGuid is not null)  AND (LEN(@clientGuid) > 0)
+set @target = @target | 16
+
+if(@target & 3 = 3)
+BEGIN
+INSERT INTO  @credIds select credential_Set_id from Credential_Sets where Group_Name = @groupName and Service_Broker_Guid = @sbGuid
+END
+else if @target & 3 = 1
+BEGIN
+INSERT INTO  @credIds select credential_Set_id from Credential_Sets where Service_Broker_Guid = @sbGuid
+END
+else if @target & 3 = 2
+BEGIN
+INSERT INTO  @credIds select Credential_Sets.Credential_Set_ID from Credential_Sets where Group_Name = @groupName
+END
+
+if @target & 24 = 24
+BEGIN
+insert into @expIds select Experiment_Info_ID from Experiment_Info where Lab_Server_GUID = @labServerGuid and Lab_Client_GUID = @clientGuid
+END
+else if @target & 24 = 8
+BEGIN
+insert into @expIds select Experiment_Info.Experiment_Info_ID from Experiment_Info where Lab_Server_GUID = @labServerGuid
+END
+else if @target & 24 = 16
+BEGIN
+insert into @expIds select Experiment_Info_ID from Experiment_Info where Lab_Client_GUID = @clientGuid
+END
+
+if(@target = 0) -- no Filelds
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end
+else if( @target = 4 ) -- ResourceID only
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID
+else if( @target = 31) -- All Fields
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID and r.Credential_Set_ID in (select * from @credIds) and r.Experiment_Info_ID in (select * from @expIds)
+else if (@target & 3 > 0) AND (@target & 24 >0) AND (@target & 4 = 4)
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end
+	and r.Resource_ID = @resourceID and r.Credential_Set_ID in (select * from @credIds) and r.Experiment_Info_ID in (select * from @expIds)
+else if (@target & 3 > 0) AND (@target & 24 >0) AND (@target & 4 = 0)
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Credential_Set_ID in (select * from @credIds) and r.Experiment_Info_ID in (select * from @expIds)
+else if (@target & 3 > 0) AND (@target & 24 = 0) AND (@target & 4 = 4)
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID and r.Credential_Set_ID in (select * from @credIds)
+else if (@target & 3 > 0) AND (@target & 24 = 0) AND (@target & 4 = 0)
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Credential_Set_ID in (select * from @credIds)
+else if (@target & 3 = 0) AND (@target & 24 >0) AND (@target & 4 = 4)
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID and r.Experiment_Info_ID in (select * from @expIds)
+else if (@target & 3 = 0) AND (@target & 24 >0) AND (@target & 4 = 0)
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Experiment_Info_ID in (select * from @expIds)
+
+--DROP TABLE #credIds
+--DROP TABLE #expIds
+RETURN
+END
+GO
+
+CREATE Function [dbo].[GetReservationIDs_ByIDs]
+(
+@resourceID int = 0,
+@expID int = 0,
+@credID int = 0,
+@start datetime = '1753-01-01 00:00:00',
+@end datetime = '9999-12-31 00:00:00'
+)
+RETURNS @resIds TABLE(id int)
+AS
+BEGIN
+
+declare @target int
+
+set @target = 0
+
+if (@resourceID is not null) and ( @resourceID > 0)
+set @target = 1
+if (@expID is not null ) and (@expID > 0)
+set @target = @target | 2
+if (@credID is not null ) AND (@credID > 0)
+set @target = @target | 4
+
+if(@target = 0) -- no Filelds
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end
+else if( @target = 1 ) -- ResourceID only
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID
+else if( @target = 2 ) 
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Experiment_Info_ID = @expID
+else if( @target = 3 ) 
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID and r.Experiment_Info_ID = @expID
+else if( @target = 4) -- All Fields
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Credential_Set_ID = @credId
+else if( @target = 5) -- All Fields
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID and r.Credential_Set_ID = @credId
+	
+else if( @target = 6) -- All Fields
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Credential_Set_ID = @credId and r.Experiment_Info_ID = @expId
+else if( @target = 7) -- All Fields
+	insert into @resIds select  r.Reservation_Info_ID
+	from Reservation_Info r
+	where  r.End_Time>@start and r.Start_Time<@end 
+	and r.Resource_ID = @resourceID and r.Credential_Set_ID = @credId and r.Experiment_Info_ID = @expId
+
+RETURN
+END
+GO
 
 
 -- CREATE PROCEDURES
@@ -476,9 +668,34 @@ CREATE PROCEDURE CredentialSet_RetrieveIDs
  AS
 
 select Credential_Set_ID from Credential_Sets
-
-
 GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE CredentialSets_RetrieveByLS
+@lsGuid varchar (50)
+
+AS
+
+select Credential_Set_ID, Service_Broker_GUID, Service_Broker_Name, Group_Name from Credential_Sets 
+where Credential_Set_ID in 
+(select distinct Credential_set_id from Permitted_Groups where Recurrence_ID in
+	(select Recurrence_ID from Recurrence where resource_ID in 
+		(Select resource_ID from LS_Resources where Lab_server_Guid = @lsGuid)
+	)
+)
+order by Group_Name
+return
+GO
+
 SET QUOTED_IDENTIFIER OFF 
 GO
 SET ANSI_NULLS ON 
@@ -1378,6 +1595,7 @@ GO
 SET ANSI_NULLS OFF 
 GO
 
+
 CREATE PROCEDURE Reservation_Add
 @resourceID int,
 @startTime datetime,
@@ -1537,6 +1755,26 @@ SET ANSI_NULLS OFF
 GO
 
 
+
+CREATE PROCEDURE ReservationData_Retrieve
+@resourceID int = 0,
+@expID int = 0,
+@credID int = 0,
+@start Datetime ,
+@end Datetime
+ AS
+BEGIN
+
+select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_GUID,E.Lab_Server_GUID, C.Group_Name,C.Service_Broker_Guid,R.USS_Info_ID,R.status
+from Reservation_Info R, Experiment_info E, Credential_Sets C
+where R.Reservation_Info_ID IN (Select * from GetReservationIDs_ByIDs( @resourceID, @expID,@credID, @start,@end))
+and R.Experiment_Info_ID = E.Experiment_Info_ID and R.Credential_Set_ID = C.Credential_Set_ID
+ORDER BY R.USS_Info_ID asc, R.Start_Time desc
+
+END
+
+GO
+
 /****** Object:  Stored Procedure dbo.RetrieveReservationInfoByID    Script Date: 5/2/2006 5:51:11 PM ******/
 
 /****** Object:  Stored Procedure dbo.RetrieveReservationInfoByID    Script Date: 4/11/2006 6:19:42 PM ******/
@@ -1672,43 +1910,19 @@ GO
 
 /****** Object:  Stored Procedure dbo.ReservationTags_Retrieve    Script Date: 5/20/2010 6:39:48 PM ******/
 
-CREATE  PROCEDURE ReservationTags_Retrieve
-@expID int,
-@credID int,
-@start Datetime,
+CREATE PROCEDURE ReservationTags_Retrieve
+@resourceID int = 0,
+@expID int = 0,
+@credID int = 0,
+@start Datetime ,
 @end Datetime
  AS
 BEGIN
-Create Table #resids  ( ids int )
 
-if @expID != null AND @credID != null AND @start != Null and @end != null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where Experiment_Info_ID = @expID and Credential_Set_ID = @credID and End_Time >= @start AND start_time <= @end
-else if @expID = null AND @credID != null AND @start != Null and @end != null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where Credential_Set_ID = @credID and End_Time >= @start AND start_time <= @end
-else if @expID != null AND @credID = null AND @start != Null and @end != null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where Experiment_Info_ID = @expID and End_Time >= @start AND start_time <= @end
-else if @expID = null AND @credID = null AND @start != Null and @end != null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where End_Time >= @start AND start_time <= @end
-
-else if @expID != null AND @credID != null AND @start = Null and @end = null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where Experiment_Info_ID = @expID and Credential_Set_ID = @credID 
-else if @expID = null AND @credID != null AND @start = Null and @end = null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where Credential_Set_ID = @credID 
-else if @expID != null AND @credID = null AND @start = Null and @end = null 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
-	where Experiment_Info_ID = @expID 
-else 
-	INSERT INTO #resids SELECT Reservation_Info_ID from Reservation_Info
 
 select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_Name, C.Group_Name,C.Service_Broker_Name,R.status
 from Reservation_Info R, Experiment_info E, Credential_Sets C
-where R.Reservation_Info_ID IN (Select ids from #resids)
+where R.Reservation_Info_ID IN (Select * from GetReservationIDs_ByIDs( @resourceID, @expID,@credID, @start,@end))
 and R.Experiment_Info_ID = E.Experiment_Info_ID and R.Credential_Set_ID = C.Credential_Set_ID
 ORDER BY R.Start_Time desc
 

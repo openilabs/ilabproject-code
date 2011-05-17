@@ -2731,6 +2731,39 @@ public static int CountScheduledClients(int labServerID){
 			
 			return groupIDs;
 		}
+
+        public static int[] SelectGroupIDsByType(string typeName)
+        {
+            List<int> groupIDs = new List<int>();
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveGroupIDsByType", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@typeName", typeName, DbType.String, 50));
+
+            try
+            {
+                myConnection.Open();
+                // get group ids from table groups
+                DbDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    if (myReader["group_id"] != System.DBNull.Value)
+                        groupIDs.Add(Convert.ToInt32(myReader["group_id"]));
+                }
+                myReader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown SelectGroupIDs", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return groupIDs.ToArray();
+        }
         /// <summary>
         /// to retrieve a list of all the admin group IDs in the database
         /// </summary>

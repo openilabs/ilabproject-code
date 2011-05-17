@@ -26,7 +26,7 @@ using iLabs.UtilLib;
 namespace iLabs.Scheduling.LabSide
 {
 	/// <summary>
-	/// Summary description for RervationManagement.
+	/// Summary description for ReservationManagement.
 	/// </summary>
 	public partial class ReservationManagement : System.Web.UI.Page
 	{
@@ -142,8 +142,9 @@ namespace iLabs.Scheduling.LabSide
 
                 if (!unauthorized)
                 {
+                    LoadResourceListBox(Session["labServerGuid"].ToString());
                     // Load the Group list box
-                    LoadGroupListBox();
+                    LoadGroupListBox(Session["labServerGuid"].ToString());
                     // Load the Experiment list box
                     LoadExperimentListBox(Session["labServerGuid"].ToString());
                     // load the reservation List box.
@@ -201,13 +202,13 @@ namespace iLabs.Scheduling.LabSide
 			}
 		}
 		//list the reservation information according to the selected criterion
-		private void BuildReservatoinListBox(int ExperimentInfoID, int CredentialSetID, DateTime time1, DateTime time2)
+		private void BuildReservationListBox(int resourceID, int ExperimentInfoID, int CredentialSetID, DateTime time1, DateTime time2)
 		{
 			
 			try
 			{
 				txtDisplay.Text=null;
-                IntTag[] reservations = LSSSchedulingAPI.ListReservations(ExperimentInfoID, CredentialSetID, time1, time2, culture, localTzOffset);
+                IntTag[] reservations = LSSSchedulingAPI.ListReservations(resourceID, ExperimentInfoID, CredentialSetID, time1, time2, culture, localTzOffset);
                 if (reservations == null || reservations.Length == 0)
                 {
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("no reservations have been found.");
@@ -233,91 +234,102 @@ namespace iLabs.Scheduling.LabSide
 		{
 			lblErrorMessage.Text ="";
 			lblErrorMessage.Visible=false;
-			
-			if(ddlGroup.SelectedIndex <= 0 && ddlExperiment.SelectedIndex <=0 && txtTime1.Text==null && txtTime2.Text==null)
-			{
-                BuildReservationListBox(Session["labServerGuid"].ToString());		
-			}
-			else
-			{
-				int experimentInfoID = -1;
-				int credentialSetID = -1;
-                DateTime start = DateTime.MinValue;
-                DateTime end = DateTime.MinValue;
+            int resourceID = 0;
+            int expID = 0;
+            int credID = 0;
+            DateTime start = FactoryDB.MinDbDate;
+            DateTime end = FactoryDB.MaxDbDate;
 
-                if (ddlGroup.SelectedIndex >= 1)
+            if (ddlResource.SelectedIndex > 0)
+            {
+                resourceID = Convert.ToInt32(ddlResource.SelectedValue);
+            }
+            if (ddlGroup.SelectedIndex > 0)
+            {
+                credID = Convert.ToInt32(ddlGroup.SelectedValue);
+            }
+            if (ddlExperiment.SelectedIndex > 0)
+            {
+                expID = Convert.ToInt32(ddlExperiment.SelectedValue);
+            }
+
+           
+                if (ddlTimeIs.SelectedIndex > 0)
                 {
-                    credentialSetID = Int32.Parse(ddlGroup.SelectedValue);
-                }
-				if (ddlExperiment.SelectedIndex >= 1)
-				{
-                      experimentInfoID = Int32.Parse(ddlExperiment.SelectedValue);
-				}
-				if (ddlTimeIs.SelectedIndex >0)
-				{
-					DateTime time1;
-					try
-					{
-						time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,localTzOffset);
-					}
-					catch
-					{	
-						lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter a valid time");
-						lblErrorMessage.Visible=true;
-						return;
-					}
-					if(ddlTimeIs.SelectedIndex==1) //Equal To
-					{
+                    DateTime time1;
+                    try
+                    {
+                        time1 = DateUtil.ParseUserToUtc(txtTime1.Text, culture, localTzOffset);
+                    }
+                    catch
+                    {
+                        lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter a valid time");
+                        lblErrorMessage.Visible = true;
+                        return;
+                    }
+                    if (ddlTimeIs.SelectedIndex == 1) //Equal To
+                    {
                         start = time1;
                         end = time1.AddDays(1);
-                      
 
-					}
-					else if(ddlTimeIs.SelectedIndex==2) // Before
-					{
-                        start = FactoryDB.MinDbDate;
+
+                    }
+                    else if (ddlTimeIs.SelectedIndex == 2) // Before
+                    {
+                        //start = FactoryDB.MinDbDate;
                         end = time1;
-                       
-					}				
-					else if(ddlTimeIs.SelectedIndex==3) // After
-					{
+
+                    }
+                    else if (ddlTimeIs.SelectedIndex == 3) // After
+                    {
                         start = time1;
-                        end = FactoryDB.MaxDbDate;
-                       
-					}
-					else if(ddlTimeIs.SelectedIndex==4) //Between
-					{
-						DateTime time2;
-						try
-						{
+                        //end = FactoryDB.MaxDbDate;
+
+                    }
+                    else if (ddlTimeIs.SelectedIndex == 4) //Between
+                    {
+                        DateTime time2;
+                        try
+                        {
                             time2 = DateUtil.ParseUserToUtc(txtTime2.Text, culture, localTzOffset);
                             start = time1;
                             end = time2;
-						}
-						catch
-						{	
-							lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter a valid time");
-							lblErrorMessage.Visible=true;
-							return;
-						}
-					}
-				}
-                BuildReservatoinListBox(experimentInfoID, credentialSetID, start, end);
-			}		
+                        }
+                        catch
+                        {
+                            lblErrorMessage.Text = Utilities.FormatWarningMessage("Please enter a valid time");
+                            lblErrorMessage.Visible = true;
+                            return;
+                        }
+                    }
+                }
+                BuildReservationListBox(resourceID,expID, credID, start, end);
+            		
 		}
 
-		private void LoadGroupListBox()
+        private void LoadResourceListBox(string lsGuid)
+        {
+            ddlResource.Items.Clear();
+            ddlResource.Items.Add(new ListItem(" ---------- All Resources ---------- "));
+            IntTag[] resources = DBManager.GetLSResourceTags(lsGuid);
+            foreach (IntTag it in resources)
+            {
+                ddlResource.Items.Add(new ListItem(it.tag, it.id.ToString()));
+            }
+
+        }
+
+		private void LoadGroupListBox(string lsGuid)
 		{
 			ddlGroup.Items.Clear();
 			try
 			{
-				ddlGroup.Items.Add(new ListItem(" ---------- select Group ---------- "));
-				int[] credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
-				LssCredentialSet[] credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
+				ddlGroup.Items.Add(new ListItem(" ---------- All Groups ---------- "));
+				LssCredentialSet[] credentialSets=LSSSchedulingAPI.GetCredentialSetsByLS(lsGuid);
 				for(int i=0; i< credentialSets.Length; i++)
 				{
-					string cred=credentialSets[i].groupName+" "+credentialSets[i].serviceBrokerName;
-					ddlGroup.Items.Add(new ListItem(cred, credentialSets[i].credentialSetId.ToString()));
+                    string cred = credentialSets[i].groupName + " : " + credentialSets[i].serviceBrokerName;
+                    ddlGroup.Items.Add(new ListItem(cred, credentialSets[i].credentialSetId.ToString()));
 				}
 			}
 			catch(Exception ex)
@@ -332,7 +344,7 @@ namespace iLabs.Scheduling.LabSide
 			ddlExperiment.Items.Clear();
 			try
 			{
-				ddlExperiment.Items.Add(new ListItem(" ---------- select Experiment ---------- "));
+				ddlExperiment.Items.Add(new ListItem(" ---------- Any Experiment ---------- "));
 				int[] experimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(labServerID);
 				LssExperimentInfo[] experimentInfos = LSSSchedulingAPI.GetExperimentInfos(experimentInfoIDs);
 				for(int i=0; i< experimentInfoIDs.Length; i++)

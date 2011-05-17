@@ -849,6 +849,15 @@ namespace iLabs.ServiceBroker.Authorization
 			return Administration.AdministrativeAPI .ListGroupIDs ();
 		}
 
+        /// <summary>
+        /// anyone access
+        /// </summary>
+        /// <returns></returns>
+        public int[] ListGroupIDsByType(string typeName)
+        {
+            return Administration.AdministrativeAPI.ListGroupIDsByType(typeName);
+        }
+
 		/// <summary>
 		/// administerGroup, superUser privilege
 		/// </summary>

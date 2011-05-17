@@ -149,7 +149,7 @@ CREATE TABLE [dbo].[Reservation_Info] (
 	[End_Time] [datetime] NOT NULL ,
 	[Experiment_Info_ID] [int] NOT NULL ,
 	[Credential_Set_ID] [int] NOT NULL,
-	[USS_Info_ID] [int] NOT NULL,
+	[USS_Info_ID] [int] NULL,
 	[Status] [int] NOT NULL 
 ) ON [PRIMARY]
 GO
@@ -305,4 +305,5 @@ ALTER TABLE [dbo].[Reservation_Info] ADD
 		[USS_Info_ID]
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
 GO
+
 GO

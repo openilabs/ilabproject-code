@@ -1522,6 +1522,15 @@ namespace iLabs.ServiceBroker.Administration
 		{
 			return InternalAdminDB.SelectGroupIDs();
 		}
+
+        /// <summary>
+        /// Lists the IDs of all groups registered with the Service Broker.
+        /// </summary>
+        /// <returns>An array of all registered group IDs.</returns>
+        public static int[] ListGroupIDsByType(string typeName)
+        {
+            return InternalAdminDB.SelectGroupIDsByType(typeName);
+        }
         /// <summary>
         /// Lists the IDs of all admin groups registered with the Service Broker.
         /// </summary>
