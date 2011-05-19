@@ -883,8 +883,13 @@ namespace iLabs.ServiceBroker.iLabSB
         public Coupon RequestAuthorization(string[] types, long duration, string group, string user, string serviceGuid, string clientGuid)
         {
             bool ok = false;
+            long minDuration = 120L; // force all requests to have at minimum a relativly short duration, longer requests are supported.
+            long ticketDuration = Math.Max(minDuration, duration);
             BrokerDB brokerDB = new BrokerDB();
             Coupon coupon = brokerDB.CreateCoupon();
+           
+            // There should be an authentication scheme as part of this method, either by adding another argument or using some other plan.
+            
             //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             //{
             if (ProcessAgentDB.ServiceGuid.CompareTo(agentAuthHeader.coupon.issuerGuid) == 0)
@@ -921,6 +926,8 @@ namespace iLabs.ServiceBroker.iLabSB
 
                         TicketLoadFactory factory = TicketLoadFactory.Instance();
 
+                        //Should create a REDEEM_SESSION ticket based on authenticated input and user_session record.
+
                         foreach (string str in types)
                         {
                             switch (str)
@@ -941,7 +948,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     serviceGuid, clientGuid, labClientName, labClientVersion, userTZ);
                 string payload2 = factory.createRequestReservationPayload();
 
-                Coupon schedulingCoupon = issuer.CreateTicket(TicketTypes.SCHEDULE_SESSION, ussGuid, 
+                Coupon schedulingCoupon = issuer.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, ussGuid, 
                     issuer.GetIssuerGuid(), duration, payload1);
                 issuer.AddTicket(schedulingCoupon, TicketTypes.REQUEST_RESERVATION, lssGuid, ussGuid, 
                     duration, payload2);
@@ -950,13 +957,13 @@ namespace iLabs.ServiceBroker.iLabSB
                                     string payload1 = factory.createScheduleSessionPayload(user, group, ProcessAgentDB.ServiceGuid,
                                         serviceGuid, clientGuid, theClient.ClientName, theClient.version, 0);
                                     string payloadMakeRes = factory.makeReservationPayload(ProcessAgentDB.ServiceGuid, user, group, serviceGuid, clientGuid, uss.webServiceUrl);
-                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, ProcessAgentDB.ServiceGuid, duration, payloadMakeRes);
-                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, duration, payload1);
-                                    //brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, duration, payload1);
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, ProcessAgentDB.ServiceGuid, ticketDuration, payloadMakeRes);
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, ticketDuration, payload1);
+                                    //brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, ticketDuration, payload1);
                                     
                                     // Create the USS to LSS REQUEST_RESERVATION Ticket
                                     string payload2 = factory.createRequestReservationPayload();
-                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, duration, payload2);
+                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, ticketDuration, payload2);
                                     // Create the USS to LSS
                                     
                                     ok = true;

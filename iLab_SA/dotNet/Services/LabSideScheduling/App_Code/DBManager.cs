@@ -1395,9 +1395,9 @@ namespace iLabs.Scheduling.LabSide
             return resource;
         }
 
-        public static LSResource GetLSResource(string guid)
+        public static LSResource[] GetLSResources(string guid)
         {
-            LSResource resource = null;
+            List<LSResource> resources = new List<LSResource>();
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
             //create a command
@@ -1415,12 +1415,13 @@ namespace iLabs.Scheduling.LabSide
                 {
                     while (dataReader.Read())
                     {
-                        resource = new LSResource();
+                        LSResource resource = new LSResource();
                         resource.resourceID = dataReader.GetInt32(0);
                         resource.labServerGuid = dataReader.GetString(1);
                         resource.labServerName = dataReader.GetString(2);
                         if (!dataReader.IsDBNull(3))
                             resource.description = dataReader.GetString(3);
+                        resources.Add(resource);
                     }
                 }
                
@@ -1433,7 +1434,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 connection.Close();
             }
-            return resource;
+            return resources.ToArray();
         }
 
         public static IntTag[] GetLSResourceTags()
@@ -2305,7 +2306,12 @@ namespace iLabs.Scheduling.LabSide
 			//populate the parameters
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid,DbType.AnsiString,50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussGUID", ussGuid, DbType.AnsiString,50));
+            DbParameter ussParam = FactoryDB.CreateParameter(cmd,"@ussGUID", DbType.AnsiString,50);
+            if (ussGuid == null || ussGuid.Length == 0)
+                ussParam.Value = DBNull.Value;
+            else
+                ussParam.Value = ussGuid;
+			cmd.Parameters.Add(ussParam);
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid,DbType.AnsiString,50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
@@ -2359,10 +2365,10 @@ namespace iLabs.Scheduling.LabSide
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoID", experimentInfoID, DbType.Int32));
             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceID", resourceID, DbType.Int32));
             DbParameter ussParam = FactoryDB.CreateParameter(cmd, "@ussID", DbType.Int32);
-            if (ussID < 1)
+            if (ussID > 1)
                 ussParam.Value = ussID;
             else
-                ussParam.Value = DBNull.Value;
+                ussParam.Value = 0;
             cmd.Parameters.Add(ussParam);
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", status, DbType.Int32));
             
@@ -2497,17 +2503,32 @@ namespace iLabs.Scheduling.LabSide
             DbCommand cmd = FactoryDB.CreateCommand("ReservationData_Retrieve", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
-            if (expId < 1)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", null, DbType.Int32));
-            else
+            //if (resourceId < 1)
+            //    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", null, DbType.Int32));
+            //else
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", resourceId, DbType.Int32));
-            if (expId < 1)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@expid", null, DbType.Int32));
-            else
+            //if (expId < 1)
+            //    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@expid", null, DbType.Int32));
+            //else
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@expid", expId, DbType.Int32));
-            if (credId < 1)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@credid", null, DbType.Int32));
-            else
+            //if (credId < 1)
+            //    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@credid", null, DbType.Int32));
+            //else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@credid", credId, DbType.Int32));
+            //if (start == DateTime.MinValue)
+            //    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", null, DbType.DateTime));
+            //else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", start, DbType.DateTime));
+            //if (end == DateTime.MinValue)
+            //    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", null, DbType.DateTime));
+            //else
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+ /*
+            //if (resourceId > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceid", resourceId, DbType.Int32));
+            //if (expId >0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@expid", expId, DbType.Int32));
+            //if (credId > 0)
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@credid", credId, DbType.Int32));
             if (start == DateTime.MinValue)
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", null, DbType.DateTime));
@@ -2517,22 +2538,27 @@ namespace iLabs.Scheduling.LabSide
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", null, DbType.DateTime));
             else
                 cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+  * ***/
             DbDataReader dataReader = null;
             try
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
-                while (dataReader.NextResult())
+                while (dataReader.Read())
                 {
-                    ReservationData rd = new ReservationData();
+                    ReservationData rd = new ReservationData(DateUtil.SpecifyUTC(dataReader.GetDateTime(1)),
+                        DateUtil.SpecifyUTC(dataReader.GetDateTime(2)));
                     rd.reservationID = dataReader.GetInt32(0);
-                    rd.start = DateUtil.SpecifyUTC(dataReader.GetDateTime(1));
-                    rd.end = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
+                    //rd.start = DateUtil.SpecifyUTC(dataReader.GetDateTime(1));
+                    //rd.end = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
                     rd.clientGuid = dataReader.GetString(3);
                     rd.labServerGuid = dataReader.GetString(4);
                     rd.groupName = dataReader.GetString(5);
                     rd.sbGuid = dataReader.GetString(6);
-                    rd.ussId = dataReader.GetInt32(7);
+                    if (dataReader.IsDBNull(7))
+                        rd.ussId = 0;
+                    else
+                        rd.ussId = dataReader.GetInt32(7);
                     rd.status = dataReader.GetInt32(8);
                     data.Add(rd);
                 }
@@ -2622,7 +2648,12 @@ namespace iLabs.Scheduling.LabSide
 			// populate the parameters
             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussGUID", ussGuid,DbType.AnsiString,50));
+            DbParameter ussParameter = FactoryDB.CreateParameter(cmd, "@ussGUID", ussGuid, DbType.AnsiString, 50);
+            if (ussGuid != null && ussGuid.Length > 0)
+                ussParameter.Value = ussGuid;
+            else
+                ussParameter.Value = DBNull.Value;
+            cmd.Parameters.Add(ussParameter);
             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
@@ -2872,7 +2903,7 @@ namespace iLabs.Scheduling.LabSide
             List<ReservationInfo> reInfos = new List<ReservationInfo>();
 
             StringBuilder sqlQuery = new StringBuilder();
-            sqlQuery.Append("select Reservation_Info_ID, resource_ID,Start_Time, End_Time, R.Experiment_Info_ID, Credential_Set_ID, Status from Reservation_Info AS R Join Experiment_Info AS E on (R.Experiment_Info_ID = E.Experiment_Info_ID) where E.Lab_server_GUID = " + "'" + labServerGuid + "'");
+            sqlQuery.Append("select Reservation_Info_ID, resource_ID,Start_Time, End_Time, R.Experiment_Info_ID, Credential_Set_ID, Status, uss_Info_ID from Reservation_Info AS R Join Experiment_Info AS E on (R.Experiment_Info_ID = E.Experiment_Info_ID) where E.Lab_server_GUID = " + "'" + labServerGuid + "'");
 			if (experimentInfoID!=-1)
 			{
 				sqlQuery.Append(" and R.Experiment_Info_ID = " + experimentInfoID);
@@ -2923,7 +2954,10 @@ namespace iLabs.Scheduling.LabSide
 						ri.credentialSetId = Convert.ToInt32(myReader["Credential_Set_ID"]);
                     if (myReader["Status"] != System.DBNull.Value)
                         ri.statusCode= Convert.ToInt32(myReader["Status"]);
-							
+                    if (myReader["uss_Info_ID"] != System.DBNull.Value)
+                        ri.ussId = Convert.ToInt32(myReader["uss_Info_ID"]);
+                    else
+                        ri.ussId = 0;	
 					reInfos.Add(ri);
 
 				}
@@ -2993,7 +3027,9 @@ namespace iLabs.Scheduling.LabSide
                             if (dataReader[5] != System.DBNull.Value)
                                 reservationInfo.ussId = (int)dataReader.GetInt32(5);
                             if (dataReader[6] != System.DBNull.Value)
-                                reservationInfo.statusCode = (int)dataReader.GetInt32(6);
+                                reservationInfo.ussId = (int)dataReader.GetInt32(6);
+                            if (dataReader[7] != System.DBNull.Value)
+                                reservationInfo.statusCode = (int)dataReader.GetInt32(7);
                             reservationInfos.Add(reservationInfo);
                             
 
@@ -3787,7 +3823,7 @@ namespace iLabs.Scheduling.LabSide
 
             // create sql command
             // command executes the "RetrieveUSSInfoByID" stored procedure
-            DbCommand cmd = FactoryDB.CreateCommand("USSInfo_RetrieveByGUID", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("USSInfo_RetrieveByID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussInfoId", id, DbType.Int32));
             

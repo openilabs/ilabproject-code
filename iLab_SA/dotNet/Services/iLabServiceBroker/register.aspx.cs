@@ -166,13 +166,13 @@ namespace iLabs.ServiceBroker.iLabSB
             StringBuilder msg = new StringBuilder();
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
             string userName = null;
-			if(txtUsername.Text == "" || txtFirstName.Text == "" || txtLastName.Text == "" || txtEmail.Text == "" || txtPassword.Text == "" || txtConfirmPassword.Text == "")
+            if (txtUsername.Text.Trim() == "" || txtFirstName.Text.Trim() == "" || txtLastName.Text.Trim() == "" || txtEmail.Text.Trim() == "" || txtPassword.Text.Trim() == "" || txtConfirmPassword.Text.Trim() == "")
 			{
                 msg.Append("You must enter a Username, first name, last name, email and password.<br/>");
                 error = true;
 				
 			}
-			if(txtPassword.Text != txtConfirmPassword.Text )
+            if (txtPassword.Text.Trim() != txtConfirmPassword.Text.Trim())
 			{
 				msg.Append("Password fields don't match, please reenter.<br/>");
                 error = true;
@@ -198,7 +198,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 			else
 			{
-				if (txtAffiliation.Text == "")
+				if (txtAffiliation.Text.Trim() == "")
 				{
 					msg.Append("Please enter an affiliation.<br/>");
 					error = true;
@@ -263,13 +263,13 @@ namespace iLabs.ServiceBroker.iLabSB
                     {
                         initialGroup = AdministrativeUtilities.GetGroupRequestGroup(initialGroup);
                         userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
-                            affiliation, reason, "",initialGroup, false);
+                            affiliation.Trim(), reason, "",initialGroup, false);
                         msg.Append("Added user: " + userName + " into request group ");
                     }
                     else
                     {
                         userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
-                            affiliation, reason, "", initialGroup, false);
+                            affiliation.Trim(), reason, "", initialGroup, false);
                         msg.Append("Added user: " + userName + " ");
                     }
                 }
@@ -286,7 +286,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				{
 					Session["UserID"] = userID;
 					Session["UserName"] = userName;
-					AuthenticationAPI.SetNativePassword (userID, txtPassword.Text );
+					AuthenticationAPI.SetNativePassword (userID, txtPassword.Text.Trim() );
 					// setnativepasswordwrapper doesn't work here since there the user isn't logged in yet.
 					// user the admin API call directly instead
 					//wrapper.SetNativePasswordWrapper (userID, txtPassword.Text );

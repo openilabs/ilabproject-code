@@ -1047,7 +1047,7 @@ namespace iLabs.Scheduling.UserSide
             switch (action)
             {
                 case 0:
-                    cmd = FactoryDB.CreateCommand("RetrieveReservations", connection);
+                    cmd = FactoryDB.CreateCommand("RetrieveReservationInfos", connection);
                     break;
                 case 1:
                     cmd = FactoryDB.CreateCommand("RetrieveReservationsByExperiment", connection);

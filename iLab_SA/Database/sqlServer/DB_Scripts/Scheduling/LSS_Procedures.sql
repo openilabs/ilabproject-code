@@ -1668,9 +1668,13 @@ declare
 @credentialSetID int,
 @experimentInfoID int,
 @ussId int
+
 select @resourceID=(select resource_id from LS_Resources where Lab_Server_Guid = @labServerGuid)
 select @credentialSetID=(select Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName)
 select @experimentInfoID = (select Experiment_Info_ID from Experiment_Info where Lab_Client_Guid = @clientGuid and Lab_Server_Guid = @labServerGuid)
+if @ussGuid Is Null
+SET @ussId = 0
+else
 select @ussId = (select USS_Info_ID from USS_Info where USS_GUID = @ussGUID)
 EXEC Reservation_Add @resourceID,@startTime,@endTime,@experimentInfoID,@credentialSetId, @ussId, @status
 
@@ -1704,13 +1708,17 @@ declare
 @experimentInfoID int,
 @credentialSetID int,
 @ussID int
+if @ussGUID IS NULL
+	set @ussID = NULL
+else 
+	select @ussID = (select USS_Info_ID from USS_Info where USS_GUID = @ussGUID)
 
 select @experimentInfoID=(select Experiment_Info_ID from Experiment_Info 
 where Lab_Client_Guid=@clientGuid and Lab_Server_GUID=@labServerGuid)
 
 select @credentialSetID=(select Credential_Set_ID from Credential_Sets 
 where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName)
-select @ussID = (select USS_Info_ID from US_Info where USS_GUID = @ussGUID)
+select @ussID = (select USS_Info_ID from USS_Info where USS_GUID = @ussGUID)
 
 delete from Reservation_Info 
 where Start_Time=@startTime and End_Time=@endTime and Experiment_Info_ID=@experimentInfoID 
@@ -1769,7 +1777,7 @@ select R.Reservation_Info_ID,R.Start_Time, R.End_Time, E.Lab_Client_GUID,E.Lab_S
 from Reservation_Info R, Experiment_info E, Credential_Sets C
 where R.Reservation_Info_ID IN (Select * from GetReservationIDs_ByIDs( @resourceID, @expID,@credID, @start,@end))
 and R.Experiment_Info_ID = E.Experiment_Info_ID and R.Credential_Set_ID = C.Credential_Set_ID
-ORDER BY R.USS_Info_ID asc, R.Start_Time desc
+ORDER BY R.Start_Time desc
 
 END
 
@@ -1867,9 +1875,14 @@ declare
 @experimentInfoID int,
 @ussID int
 
+if @ussGUID = NULL
+SET @ussID = null
+else
+select @ussId = (select USS_Info_ID from USS_Info where USS_GUID = @ussGUID)
+
 select @credentialSetID=Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName
 select @experimentInfoID=Experiment_Info_ID from Experiment_Info where Lab_Client_Guid=@clientGuid and Lab_Server_Guid=@labServerGuid
-select @ussId = (select USS_Info_ID from US_Info where USS_GUID = @ussGUID)
+select @ussId = (select USS_Info_ID from USS_Info where USS_GUID = @ussGUID)
 select Reservation_Info_ID from Reservation_Info where Credential_Set_ID=@credentialSetID and Experiment_Info_ID=@experimentInfoID 
 and USS_Info_ID = @ussID and End_Time>@startTime and Start_Time<@endTime ORDER BY Start_Time asc
 

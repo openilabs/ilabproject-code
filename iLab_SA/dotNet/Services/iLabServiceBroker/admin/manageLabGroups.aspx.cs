@@ -625,7 +625,7 @@ namespace iLabs.ServiceBroker.admin
             }
         }
 
-
+/************
         protected void repAdminUserGroups_ItemCommand_ORIG(object source, RepeaterCommandEventArgs e)
         {
             //RefreshAdminUserGroupsRepeater();
@@ -644,8 +644,10 @@ namespace iLabs.ServiceBroker.admin
 
                     if (theClient.clientID > 0)
                     {
-                        //if (theClient.needsScheduling)
-                        //{
+                        if (theClient.needsScheduling)
+                        {
+                            
+
                         string managerGroupName = null;
                         int mapGrantID = 0, mapResourceMappingID = 0;
                         GroupManagerUserMap groupMap = new GroupManagerUserMap();
@@ -671,7 +673,9 @@ namespace iLabs.ServiceBroker.admin
                         //delete Resource Mapping [User Group] <-> [USS]
                         if (mapResourceMappingID > 0)
                             issuer.DeleteResourceMapping(issuer.GetResourceMapping(mapResourceMappingID));
-                        //} End needs scheduling
+                        
+                        
+                        } //End needs scheduling
 
                         //delete the Grant [User Group] -> USE LAB CLIENT -> lab client
                         int clientQualifierID = AuthorizationAPI.GetQualifierID(theClient.clientID, Qualifier.labClientQualifierTypeID);
@@ -716,7 +720,7 @@ namespace iLabs.ServiceBroker.admin
                Logger.WriteLine(exc.Message);
             }
         }
-
+        ***/
         protected void btnClose_Click(Object Src, EventArgs E)
         {
             int id = int.Parse(ddlLabClient.SelectedValue);

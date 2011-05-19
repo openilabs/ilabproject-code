@@ -256,7 +256,7 @@ namespace iLabs.ServiceBroker.admin
             txtAssociatedESS.Text = "";
             btnRegisterESS.Visible = false;
 
-            cbxScheduling.Checked = false;
+            cbxScheduling.Checked = true;
             ddlAssociatedUSS.SelectedIndex = 0;
             ddlAssociatedUSS.Visible = true;
             txtAssociatedUSS.Visible = false;

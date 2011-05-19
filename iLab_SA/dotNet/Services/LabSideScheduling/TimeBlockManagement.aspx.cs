@@ -171,8 +171,8 @@ namespace iLabs.Scheduling.LabSide
             lbxSelectTimeBlock.Items.Clear();
             lbxPermittedExperiments.Items.Clear();
             lbxSelectExperiment.Items.Clear();
-            LSResource resource = LSSSchedulingAPI.GetLSResource(Session["labServerGuid"].ToString());
-            int[] recurrenceIDs = LSSSchedulingAPI.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resource.resourceID);
+            LSResource[] resources = LSSSchedulingAPI.GetLSResources(Session["labServerGuid"].ToString());
+            int[] recurrenceIDs = LSSSchedulingAPI.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resources[0].resourceID);
             Recurrence[] recurs = LSSSchedulingAPI.GetRecurrence(recurrenceIDs);
 			//if related recurrence have been found
 			if (recurs.Length > 0)

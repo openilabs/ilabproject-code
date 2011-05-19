@@ -149,7 +149,7 @@ CREATE TABLE [dbo].[Reservation_Info] (
 	[End_Time] [datetime] NOT NULL ,
 	[Experiment_Info_ID] [int] NOT NULL ,
 	[Credential_Set_ID] [int] NOT NULL,
-	[USS_Info_ID] [int] NULL,
+	[USS_Info_ID] [int] NOT NULL,
 	[Status] [int] NOT NULL 
 ) ON [PRIMARY]
 GO
@@ -306,4 +306,9 @@ ALTER TABLE [dbo].[Reservation_Info] ADD
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
 GO
 
+-- set a default USS for management groups that do not have an USS
+SET IDENTITY_INSERT USS_Info ON
+INSERT INTO USS_Info(USS_Info_ID,coupon_ID,USS_GUID,USS_Name,USS_URL,domain_GUID)
+	Values(0,0,'0','No USS Assigned','0','0');
+SET IDENTITY_INSERT USS_Info OFF
 GO

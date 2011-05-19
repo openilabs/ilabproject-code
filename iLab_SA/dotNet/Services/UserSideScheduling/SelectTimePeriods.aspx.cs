@@ -323,7 +323,7 @@ namespace iLabs.Scheduling.UserSide
                 lssProxy.OperationAuthHeaderValue = opHeader;
                 notification = lssProxy.ConfirmReservation(serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid, labServerGuid, clientGuid,
                     startReserveTime, endReserveTime);
-                if (notification != "The reservation is confirmed successfully")
+                if (!notification.Contains("success"))
                 {
                     lblErrorMessage.Text = Utilities.FormatErrorMessage(notification);
                 }

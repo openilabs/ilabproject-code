@@ -42,40 +42,18 @@ namespace iLabs.Scheduling.LabSide
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         CultureInfo culture;
         int userTZ = 0;
+        int localTzOffset = 0;
 
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            localTzOffset = DateUtil.LocalTzOffset;
 			// Put user code to initialize the page here
             txtStartDate.Attributes.Add("OnKeyPress", "return false;");
             txtEndDate.Attributes.Add("OnKeyPress", "return false;");
 
-            // Add the JavaScript code to the page.
-            if (!ClientScript.IsClientScriptBlockRegistered("DisableRevoke"))
-            {
-                StringBuilder jsBuf = new StringBuilder();
-                jsBuf.AppendLine("<script> function DisableRevoke() {");
-                //jsBuf.AppendLine("debugger");
-                jsBuf.AppendLine("document.getElementById('btnRevoke').disabled = true; ");
-                jsBuf.AppendLine("document.getElementById('btnReserve').disabled = true; ");
-                //jsBuf.AppendLine("return false;");
-                jsBuf.AppendLine("}</script>");
-                ClientScript.RegisterClientScriptBlock(this.GetType(), "DisableRevoke", jsBuf.ToString());
-            }
-            //string disableFunction = "javascript:disableRevoke();";
-            string disableFunction = "DisableRevoke();";
-            ddlResource.Attributes.Add("onchange", disableFunction);
-            ddlExperiment.Attributes.Add("onchange", disableFunction);
-            ddlGroup.Attributes.Add("onchange", disableFunction);
-            txtStartDate.Attributes.Add("onchange", disableFunction);
-            ddlStartHour.Attributes.Add("onchange", disableFunction);
-            txtStartMin.Attributes.Add("onchange", disableFunction);
-            ddlStartAM.Attributes.Add("onchange", disableFunction);
-            txtEndDate.Attributes.Add("onchange", disableFunction);
-            ddlEndHour.Attributes.Add("onchange", disableFunction);
-            txtEndMin.Attributes.Add("onchange", disableFunction);
-            ddlEndAM.Attributes.Add("onchange", disableFunction);
+            
 
             if (!IsPostBack)
             {
@@ -131,37 +109,44 @@ namespace iLabs.Scheduling.LabSide
                         userTZ = Convert.ToInt32(payload.GetElementsByTagName("userTZ")[0].InnerText);
                         Session["userTZ"] = userTZ;
 
+                       
+                       
                         LoadResourceListBox(Session["labServerGuid"].ToString());
                         // Load the Group list box
                         LoadGroupListBox(Session["labServerGuid"].ToString());
                         // Load the Experiment list box
                         LoadExperimentListBox(Session["labServerGuid"].ToString());
-                        LoadStartLists();
+                        LoadTimeLists();
                         // load the reservation List box.
                         //BuildReservationListBox(Session["labServerGuid"].ToString());
 
                         DateTime curTime = DateTime.UtcNow;
-                        txtStartDate.Text = DateUtil.ToUserDate(curTime, culture, userTZ);
-                        curTime = curTime.AddMinutes(userTZ);
+                        txtStartDate.Text = DateUtil.ToUserDate(curTime, culture, localTzOffset);
+                        curTime = curTime.AddMinutes(localTzOffset);
+
                         int hour = curTime.Hour;
-                        if (hour > 12)
-                        {
-                            ddlStartHour.SelectedValue = (hour - 12).ToString();
-                            ddlStartAM.SelectedValue = "PM";
-                        }
-                        else
-                        {
-                            ddlStartHour.SelectedValue = hour.ToString();
-                            ddlStartAM.SelectedValue = "AM";
-                        }
+                        ddlStartHour.SelectedValue = hour.ToString();
+                     
                         int minute = curTime.Minute;
                         txtStartMin.Text = minute.ToString();
 
                         //txtEndDate.Text = culture.DateTimeFormat.ShortDatePattern;
-
-                        lblDescription.Text = "All reservations for LabServer: " + Session["labServerName"].ToString()
-                            + "<br/>for the time span you select will be revoked."
-                            + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ/60.0;
+                        StringBuilder buf = new StringBuilder("Select criteria for the reservations displayed.<br/><br/>Times shown are LSS local time GMT:&nbsp;&nbsp;&nbsp;");
+                        if (localTzOffset > 0)
+                            buf.Append("+");
+                        buf.Append(localTzOffset / 60.0);
+                        buf.Append(".");
+                        if (userTZ != localTzOffset)
+                        {
+                            buf.AppendLine("<br/><b>Warning:</b> Your local timezone is GMT: ");
+                            if (userTZ > 0)
+                                buf.Append("+");
+                            buf.Append(userTZ / 60.0);
+                            buf.Append(".");
+                        }
+                        buf.AppendLine("<br/>You must perform a search before any reservations may be revoked, change the selected criteria to reduce the number of selected reservations. ");
+                        buf.AppendLine("Only reservations found matching the search criteria will be revoked.");
+                        lblDescription.Text = buf.ToString();
                     }
 
                     catch (Exception ex)
@@ -186,6 +171,19 @@ namespace iLabs.Scheduling.LabSide
             labServerName = (string) Session["labServerName"];
             if(Session["userTZ"] != null)
                 userTZ  = (int) Session["userTZ"];
+            if (!ClientScript.IsClientScriptBlockRegistered("DisableRevoke"))
+            {
+                StringBuilder jsBuf = new StringBuilder();
+                jsBuf.AppendLine("<script> function DisableRevoke() {");
+                //jsBuf.AppendLine("debugger");
+                jsBuf.AppendLine("if( document.getElementById('btnRevoke') != null )");
+                jsBuf.AppendLine("document.getElementById('btnRevoke').disabled = true; ");
+                jsBuf.AppendLine("if( document.getElementById('btnReserve') != null )");
+                jsBuf.AppendLine("document.getElementById('btnReserve').disabled = true; ");
+                //jsBuf.AppendLine("return false;");
+                jsBuf.AppendLine("}</script>");
+                ClientScript.RegisterClientScriptBlock(this.GetType(), "DisableRevoke", jsBuf.ToString());
+            }
 		}
 
 		#region Web Form Designer generated code
@@ -262,25 +260,21 @@ namespace iLabs.Scheduling.LabSide
             }
 
         }
-        private void LoadStartLists()
+        private void LoadTimeLists()
         {
             ddlStartHour.Items.Clear();
-            ddlStartHour.Items.Add(new ListItem("12","0"));
-             ddlStartHour.Items.Add(new ListItem("1","1"));
-             ddlStartHour.Items.Add(new ListItem("2","2"));
-             ddlStartHour.Items.Add(new ListItem("3","3"));
-             ddlStartHour.Items.Add(new ListItem("4","4"));
-             ddlStartHour.Items.Add(new ListItem("5","5"));
-            ddlStartHour.Items.Add(new ListItem("6","6"));
-            ddlStartHour.Items.Add(new ListItem("7","7"));
-            ddlStartHour.Items.Add(new ListItem("8","8"));
-            ddlStartHour.Items.Add(new ListItem("9","9"));
-            ddlStartHour.Items.Add(new ListItem("10", "10"));
-            ddlStartHour.Items.Add(new ListItem("11","11"));
+            //ddlStartHour.Items.Add(new ListItem("12","0"));
+            for (int k = 0; k < 24; k++)
+            {
+                ddlStartHour.Items.Add(new ListItem(k.ToString("00")));
+            }
 
-            ddlStartAM.Items.Clear();
-            ddlStartAM.Items.Add(new ListItem("AM", "AM"));
-            ddlStartAM.Items.Add(new ListItem("PM", "PM"));
+            ddlEndHour.Items.Clear();
+            //ddlEndHour.Items.Add(new ListItem("12", "0"));
+            for (int k = 0; k < 24; k++)
+            {
+                ddlEndHour.Items.Add(new ListItem(k.ToString("00")));
+            }
         }
 
         //list the reservation information according to the selected criterion
@@ -290,7 +284,7 @@ namespace iLabs.Scheduling.LabSide
             try
             {
                 txtDisplay.Text = null;
-                IntTag[] reservations = LSSSchedulingAPI.ListReservations(resourceID, ExperimentInfoID, CredentialSetID, time1, time2, culture, userTZ);
+                IntTag[] reservations = LSSSchedulingAPI.ListReservations(resourceID, ExperimentInfoID, CredentialSetID, time1, time2, culture, localTzOffset);
                 if (reservations == null || reservations.Length == 0)
                 {
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("no reservations have been found.");
@@ -346,7 +340,19 @@ namespace iLabs.Scheduling.LabSide
             //btnRevoke.Attributes.Add("onclick", "btnRevoke_Click");
             btnReserve.Enabled = true;
             //btnReserve.Attributes.Add("onclick", "btnReserve_Click");
-
+            // Add the JavaScript code to the page.
+           
+            //string disableFunction = "javascript:disableRevoke();";
+            string disableFunction = "DisableRevoke();";
+            ddlResource.Attributes.Add("onchange", disableFunction);
+            ddlExperiment.Attributes.Add("onchange", disableFunction);
+            ddlGroup.Attributes.Add("onchange", disableFunction);
+            txtStartDate.Attributes.Add("onchange", disableFunction);
+            ddlStartHour.Attributes.Add("onchange", disableFunction);
+            txtStartMin.Attributes.Add("onchange", disableFunction);
+            txtEndDate.Attributes.Add("onchange", disableFunction);
+            ddlEndHour.Attributes.Add("onchange", disableFunction);
+            txtEndMin.Attributes.Add("onchange", disableFunction);
             
         }
 
@@ -356,13 +362,8 @@ namespace iLabs.Scheduling.LabSide
             if (txtStartDate.Text != null && txtStartDate.Text.Length > 0)
             {
                 tmp = DateUtil.ParseUserToUtc(txtStartDate.Text, culture, 0);
-
                 tmp = tmp.AddHours(Convert.ToDouble(ddlStartHour.SelectedValue));
-                if (ddlStartAM.SelectedValue.Contains("PM"))
-                {
-                    tmp = tmp.AddHours(12);
-                }
-                tmp = tmp.AddMinutes(Convert.ToDouble(txtStartMin.Text) + userTZ);
+                tmp = tmp.AddMinutes(Convert.ToDouble(txtStartMin.Text) - localTzOffset);
             }
             return tmp;
         }
@@ -374,11 +375,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 tmpE = DateUtil.ParseUserToUtc(txtEndDate.Text, culture, 0);
                 tmpE = tmpE.AddHours(Convert.ToDouble(ddlEndHour.SelectedValue));
-                if (ddlEndAM.SelectedValue.Contains("PM"))
-                {
-                    tmpE = tmpE.AddHours(12);
-                }
-                tmpE = tmpE.AddMinutes(Convert.ToDouble(txtStartMin.Text) + userTZ);
+                tmpE = tmpE.AddMinutes(Convert.ToDouble(txtEndMin.Text) - localTzOffset);
             }
             return tmpE;
         }
@@ -392,6 +389,7 @@ namespace iLabs.Scheduling.LabSide
             int credId = 0;
             DateTime start = FactoryDB.MinDbDate;
             DateTime end = FactoryDB.MaxDbDate;
+            StringBuilder buf = new StringBuilder();
             lblErrorMessage.Visible = false;
             if (hdnResource.Value.CompareTo("0") != 0) { resourceId = Convert.ToInt32(hdnResource.Value); }
             if (hdnExpID.Value.CompareTo("0") != 0) { expId = Convert.ToInt32(hdnExpID.Value); }
@@ -408,14 +406,21 @@ namespace iLabs.Scheduling.LabSide
                 lblErrorMessage.Visible = true;
                 return;
             }
-            status = revokeReservations(resourceId, expId,credId,start, end);
-            int adminCredId = LSSSchedulingAPI.GetCredentialSetID(Session["adminSbGuid"].ToString(),Session["adminGroup"].ToString());
-            status = LSSSchedulingAPI.AddReservationInfo(start, end, adminCredId, expId, resourceId, 0, 0);
+            status = revokeReservations(resourceId, expId,credId,start, end, ref buf);
+            if (status >= 0)
+            {
+
+                buf.Append("The existing reservations have been revoked.");
+            }
+            status = makeAdminReservation(resourceId, expId, credId, start, end, ref buf);
+            
             if (status > 0)
             {
-                lblErrorMessage.Text = "The existing reservations have been revoked, and the time reserved for " + Session["adminGroup"].ToString();
-                lblErrorMessage.Visible = true;
+                buf.AppendLine(" The time has been reserved for " + Session["adminGroup"].ToString());
+                
             }
+                lblErrorMessage.Text = Utilities.FormatConfirmationMessage(buf.ToString());
+                lblErrorMessage.Visible = true;
         }
 
 
@@ -427,6 +432,7 @@ namespace iLabs.Scheduling.LabSide
             int credId = 0;
             DateTime start = FactoryDB.MinDbDate;
             DateTime end = FactoryDB.MaxDbDate;
+             StringBuilder buf = new StringBuilder();
             lblErrorMessage.Visible = false;
             if (hdnResource.Value.CompareTo("0") != 0) { resourceId = Convert.ToInt32(hdnResource.Value); }
             if (hdnExpID.Value.CompareTo("0") != 0) { expId = Convert.ToInt32(hdnExpID.Value); }
@@ -443,7 +449,7 @@ namespace iLabs.Scheduling.LabSide
                 lblErrorMessage.Visible = true;
                 return;
             }
-            status = revokeReservations(resourceId, expId, credId,start, end);
+            status = revokeReservations(resourceId, expId, credId,start, end, ref buf);
             if (status >= 0)
             {
                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage(status.ToString() + " reservations have been revoked.");
@@ -455,10 +461,82 @@ namespace iLabs.Scheduling.LabSide
             lblErrorMessage.Visible = true;
 		}
 
-        protected int revokeReservations(int resourceId, int expId, int credId, DateTime start, DateTime end) 
+        protected int makeAdminReservation(int resourceId, int expId, int credId, DateTime start, DateTime end, ref StringBuilder message)
         {
+            int status = -1;
+            int experimentID = expId;
+            string lsGuid = null;
+            string clientGuid = null;
+            string groupName = Session["adminGroup"].ToString();
+            string sbGuid = Session["adminSbGuid"].ToString();
+
+            //int adminCredId = LSSSchedulingAPI.GetCredentialSetID(Session["adminSbGuid"].ToString(), Session["adminGroup"].ToString());
+
+            if (experimentID <= 0)
+            {
+                int[] expIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
+                if (expIDs != null && expIDs.Length > 0)
+                {
+                    experimentID = expIDs[0];
+                }
+            }
+            //if (resourceId <= 0 && expId <= 0)
+            //{
+            //    message.AppendLine("You must specify a Lab server resource or experiment before you may make an administrative reservation!");
+            //    return status;
+            //}
+
+            if (experimentID > 0)
+            {
+                LssExperimentInfo[] expInfos = LSSSchedulingAPI.GetExperimentInfos(new int[] { experimentID });
+                if (expInfos != null && expInfos.Length > 0)
+                {
+                    lsGuid = expInfos[0].labServerGuid;
+                    clientGuid = expInfos[0].labClientGuid;
+                }
+                //if (resourceId <= 0)
+                //{
+                //    LSResource[] resources = DBManager.GetLSResources(Session["labServerGuid"].ToString());
+                //    if (resources != null && resources.Length > 0)
+                //        resourceId = resources[0].resourceID;
+                //}
+                //else
+                //{
+                //    int[] expIds = DBManager.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
+                //    if (expIds != null && expIds.Length > 0)
+                //        expId = expIds[0];
+                //}
+
+
+                TimePeriod[] availTime = LSSSchedulingAPI.RetrieveAvailableTimePeriods(sbGuid, groupName, null, lsGuid, clientGuid, start, end);
+                if (availTime != null && availTime.Length > 0)
+                {
+                    status = 0;
+                    //TimeBlock target = new TimeBlock(start, end);
+                    //TimeBlock results = new TimeBlock();
+
+                    //foreach(TimeBlock tb in availableTime){
+                    //}
+                    string msg = LSSSchedulingAPI.ConfirmReservation(sbGuid, groupName, null, lsGuid, clientGuid, start, end);
+                    message.AppendLine(msg);
+                    if (msg.Contains("success"))
+                    {
+                        status = 1;
+                    }
+                }
+                else{
+                    message.AppendLine(" Unable to reserve time no available time blocks.");
+                }
+            }
+            return status;
+        }
+
+        protected int revokeReservations(int resourceId, int expId, int credId, DateTime start, DateTime end, ref StringBuilder message)
+        {
+            int status = 0;
             int count = 0;
-            Dictionary<int,List<ReservationData>> reservations = new Dictionary<int,List<ReservationData>>();
+            Dictionary<int, List<ReservationData>> reservations = new Dictionary<int, List<ReservationData>>();
+            try{
             ReservationData[] data = DBManager.RetrieveReservationData(resourceId, expId, credId, start, end);
             if (data != null && data.Length > 0)
             {
@@ -475,37 +553,49 @@ namespace iLabs.Scheduling.LabSide
                 }
                 foreach (int uid in reservations.Keys)
                 {
-
-
-                    USSInfo uss = DBManager.GetUSSInfo(uid);
-                    if (uss != null)
+                    if (uid > 0)
                     {
-                        ProcessAgentDB paDB = new ProcessAgentDB();
-                        UserSchedulingProxy ussProxy = new UserSchedulingProxy();
-                        OperationAuthHeader header = new OperationAuthHeader();
-                        header.coupon = paDB.GetCoupon(uss.couponId, uss.domainGuid);
-                        ussProxy.OperationAuthHeaderValue = header;
-                        ussProxy.Url = uss.ussUrl;
-                        foreach (ReservationData res in reservations[uid])
+                        USSInfo uss = DBManager.GetUSSInfo(uid);
+                        if (uss != null)
                         {
-
-                            int num = ussProxy.RevokeReservation(res.sbGuid, res.groupName,
-                                res.labServerGuid, res.clientGuid, res.start, res.end, txtMessage.Text);
-                            if (num > 0)
+                            ProcessAgentDB paDB = new ProcessAgentDB();
+                            UserSchedulingProxy ussProxy = new UserSchedulingProxy();
+                            OperationAuthHeader header = new OperationAuthHeader();
+                            header.coupon = paDB.GetCoupon(uss.couponId, uss.domainGuid);
+                            ussProxy.OperationAuthHeaderValue = header;
+                            ussProxy.Url = uss.ussUrl;
+                            foreach (ReservationData res in reservations[uid])
                             {
-                                LSSSchedulingAPI.RemoveReservationInfoByIDs(new int[] { res.reservationID });
-                                count += num;
+
+                                int num = ussProxy.RevokeReservation(res.sbGuid, res.groupName,
+                                    res.labServerGuid, res.clientGuid, res.Start, res.End, txtMessage.Text);
+                                //if (num > 0)
+                                //{
+                                    LSSSchedulingAPI.RemoveReservationInfoByIDs(new int[] { res.reservationID });
+                                    count += 1;
+                                //}
+                                status = 1;
                             }
                         }
                     }
+                    else
+                    {
+                        foreach (ReservationData res in reservations[uid])
+                        {
+                            LSSSchedulingAPI.RemoveReservationInfoByIDs(new int[] { res.reservationID });
+                            status = 1;
+                            count += 1;
+                        }
+                    }
                 }
+                message.AppendLine( count.ToString() + " reservations were revoked!");
             }
-
-            return count;
-        }
-
-        protected void makeReservation(int resourceID, int expId, string groupName, string sbGuid, DateTime start, DateTime end)
-        {
+            }
+            catch(Exception e){
+                status = -1;
+                message.AppendLine(e.Message);
+            }
+            return status;
         }
 
         void JunkCode()
@@ -570,16 +660,9 @@ namespace iLabs.Scheduling.LabSide
             }
 
             startHours = int.Parse(ddlStartHour.SelectedItem.Text);
-            if (ddlStartAM.Text.CompareTo("PM") == 0)
-            {
-                startHours += 12;
-            }
-
+            
             endHours = int.Parse(ddlEndHour.SelectedItem.Text);
-            if (ddlEndAM.Text.CompareTo("PM") == 0)
-            {
-                endHours += 12;
-            }
+           
 
             DateTime startTime = new DateTime(startDate.Year, startDate.Month, startDate.Day,
                 startHours, startMinutes, 0, DateTimeKind.Utc);

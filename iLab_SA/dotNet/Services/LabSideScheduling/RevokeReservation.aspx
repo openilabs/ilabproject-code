@@ -88,9 +88,7 @@
                                 <td>
                                     <asp:TextBox ID="txtStartMin" runat="server" Width="24px">00</asp:TextBox>
                                 </td>
-                                <td>
-                                    <asp:DropDownList CssClass="i18n" ID="ddlStartAM" runat="server" Width="48px" />
-                                </td>
+                                <td></td>
                                 <td></td>
                             </tr>
                             <tr>
@@ -104,36 +102,18 @@
                                             runat="server" Width="100px"></asp:TextBox>
                                 </td>
                                 <td>
-                                    <asp:DropDownList CssClass="i18n" ID="ddlEndHour" runat="server" Width="48px" >
-                                        <asp:ListItem>12</asp:ListItem>
-                                        <asp:ListItem>1</asp:ListItem>
-                                        <asp:ListItem>2</asp:ListItem>
-                                        <asp:ListItem>3</asp:ListItem>
-                                        <asp:ListItem>4</asp:ListItem>
-                                        <asp:ListItem>5</asp:ListItem>
-                                        <asp:ListItem>6</asp:ListItem>
-                                        <asp:ListItem>7</asp:ListItem>
-                                        <asp:ListItem>8</asp:ListItem>
-                                        <asp:ListItem>9</asp:ListItem>
-                                        <asp:ListItem>10</asp:ListItem>
-                                        <asp:ListItem>11</asp:ListItem>
-                                    </asp:DropDownList>
+                                    <asp:DropDownList CssClass="i18n" ID="ddlEndHour" runat="server" Width="48px" />
                                 </td>
                                 <td>
                                     <asp:TextBox ID="txtEndMin" runat="server" Width="24px">00</asp:TextBox>
                                 </td>
-                                <td>
-                                    <asp:DropDownList CssClass="i18n" ID="ddlEndAM" runat="server" Width="48px">
-                                        <asp:ListItem>AM</asp:ListItem>
-                                        <asp:ListItem>PM</asp:ListItem>
-                                    </asp:DropDownList>
-                                </td>
+                                <td></td>
                                 <td align="center"><asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="button" OnClick="btnSearch_Click">
                                     </asp:Button></td>
                             </tr>
                             <tr>
                                 <td colspan="6">
-                                    <asp:TextBox ID="txtDisplay" runat="server" Width="640px" Height="288px" TextMode="MultiLine"></asp:TextBox></td>
+                                    <asp:TextBox ID="txtDisplay" runat="server" Width="800px" Height="288px" TextMode="MultiLine"></asp:TextBox></td>
                             </tr>
                              <tr>
                                 <th>

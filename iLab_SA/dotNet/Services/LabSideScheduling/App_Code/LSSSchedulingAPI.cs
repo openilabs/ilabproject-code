@@ -314,19 +314,23 @@ namespace iLabs.Scheduling.LabSide
     /// <summary>
     /// Defines a view of a reservation for efficient revoking of reservations.
     /// </summary>
-    public class ReservationData
+    public class ReservationData : TimeBlock
     {
         //R.Reservation_Info_ID,R.Start_Time, R.End_Time,
         //E.Lab_Client_GUID,E.Lab_Server_GUID, C.Group_Name,C.Service_Broker_Guid,R.USS_Info_ID,R.status
         public int reservationID;
         public int ussId;
         public int status;
-        public DateTime start;
-        public DateTime end;
+        //public DateTime start;
+        //public DateTime end;
         public string clientGuid;
         public string labServerGuid;
         public string groupName;
         public string sbGuid;
+
+        public ReservationData(DateTime start, DateTime end)
+            : base(start, end)
+        { }
     }
 
 #endregion
@@ -493,9 +497,9 @@ namespace iLabs.Scheduling.LabSide
             return DBManager.GetLSResource(id);
         }
 
-        public static LSResource GetLSResource(string guid)
+        public static LSResource[] GetLSResources(string guid)
         {
-            return DBManager.GetLSResource(guid);
+            return DBManager.GetLSResources(guid);
         }
 
         public static IntTag[] GetLSResourceTags()
@@ -947,7 +951,8 @@ namespace iLabs.Scheduling.LabSide
         }
 
         /// <summary>
-/// retrieve available time periods(local time of LSS) overlaps with a time chrunk for a particular group and particular experiment, so that we get the a serials available time periods
+/// retrieve available time periods(local time of LSS) overlaps with a time chrunk for a particular group 
+/// and particular experiment, so that we get the a serials available time periods
 /// which is the minumum available time periods set covering the time chunk
 /// </summary>
 /// <param name="serviceBrokeGUID"></param>
