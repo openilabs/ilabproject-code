@@ -869,9 +869,10 @@ namespace iLabs.ServiceBroker.iLabSB
         
         /// <summary>
         /// Request authorization for the specified types of access, for the specified group and optional user. At this time remote SB's are not supported.
+        /// This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header, at least one must be used.
         /// </summary>
         /// <param name="types">An array of requested ticket types</param>
-        /// <param name="duration">minimum duration of the created tickets</param>
+        /// <param name="duration">minimum duration of the created tickets in seconds, durations less than 2 minutes will be converted to two minutes.</param>
         /// <param name="groupName">group name on the ticketIssuer service, may in the future support validation from the service making the request</param>
         /// <param name="userName">User name on the ticketIssuer service, may in the future support validation from the service making the request, may be null</param>
         /// <param name="serviceGuid">May be null</param>
@@ -880,6 +881,7 @@ namespace iLabs.ServiceBroker.iLabSB
         [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, server and  client.")]
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
         public Coupon RequestAuthorization(string[] types, long duration, string group, string user, string serviceGuid, string clientGuid)
         {
             bool ok = false;
@@ -888,12 +890,22 @@ namespace iLabs.ServiceBroker.iLabSB
             BrokerDB brokerDB = new BrokerDB();
             Coupon coupon = brokerDB.CreateCoupon();
            
-            // There should be an authentication scheme as part of this method, either by adding another argument or using some other plan.
-            
+            // There should be an authentication scheme as part of this method, currently checking for an agentAuthHeader or OperationHeader.
+            /*****
             //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             //{
-            if (ProcessAgentDB.ServiceGuid.CompareTo(agentAuthHeader.coupon.issuerGuid) == 0)
-            {
+            if(agentAuthHeader != null)
+            { // Request is from a ProcessAgent 
+                //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader)){}
+  
+                if (ProcessAgentDB.ServiceGuid.CompareTo(agentAuthHeader.coupon.issuerGuid) == 0)
+                {  // The requesting service is a member of the domain
+                }
+            }
+            if(opHeader != null)
+            { // From a client or existing ticket collection
+            }
+             * ****/
                 if (types != null && types.Length > 0)
                 {
                     int userID = -1;
@@ -978,7 +990,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
                     }
                 }
-            }
+            
             if (ok)
                 return coupon;
             else

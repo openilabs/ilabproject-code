@@ -202,11 +202,14 @@ EnableSession = true)]
 
 
     /// <summary>
-    /// Request authorization for the specified types of access, for the specified group and optional user
+    /// Request authorization for the specified types of access, for the specified group and optional user.
+    /// While several fields may be null, enough imformation must be supplied by a combination of the headers 
+    /// and the fields to authenticate & authorize the requested actions.
+    /// This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header, at least one must be used.
     /// </summary>
     /// <param name="types">an array of the ticket types requested</param>
-    /// <param name="duration">minimum duration of the created tickets</param>
-    /// <param name="group">group name on the ticketIssuer service, may in the future support validation from the service making the request</param>
+    /// <param name="duration">minimum duration of the created tickets in seconds, durations less than 2 minutes will be converted to two minutes.</param>
+    /// <param name="group">group name on the ticketIssuer service, may be null.  May in the future support validation from the service making the request</param>
     /// <param name="user">User name on the ticketIssuer service, may in the future support validation from the service making the request, may be null</param>
     /// <param name="serviceGuid">May be null</param>
     /// <param name="clientGuid">May be null</param>
@@ -214,6 +217,7 @@ EnableSession = true)]
     [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, server and  client.")]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+    [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
     public abstract Coupon RequestAuthorization(string[] types, long duration, string group, string user, string serviceGuid, string clientGuid);
     }
 

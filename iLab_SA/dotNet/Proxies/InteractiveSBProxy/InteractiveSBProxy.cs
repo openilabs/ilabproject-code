@@ -864,8 +864,6 @@ namespace iLabs.Proxies.ISB {
         }
     }
     
-   
-    
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("wsdl", "2.0.50727.42")]
     public delegate void SaveClientDataCompletedEventHandler(object sender, System.ComponentModel.AsyncCompletedEventArgs e);
