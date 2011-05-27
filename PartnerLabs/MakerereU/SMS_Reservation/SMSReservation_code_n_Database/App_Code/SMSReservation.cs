@@ -22,6 +22,10 @@ using iLabs.Proxies.ISB;
 using iLabs.Proxies.USS;
 using System.Xml.Serialization;
 
+using iLabs.ServiceBroker.Authentication;
+using iLabs.ServiceBroker.Authorization;
+using iLabs.ServiceBroker.Administration;
+
 
 /// <summary>
 /// Summary description for SMSReservation
@@ -47,7 +51,11 @@ public class SMSReservation : iLabs.Web.WS_ILabCore
     {
         FormatMessage SMS = new FormatMessage();
 
-        return SMS.SplittingMessage(message, contact);
+        string response =  SMS.SplittingMessage(message, contact);
+
+        Context.Response.Output.Write(response);
+        Context.Response.End();
+        return string.Empty;
 
     }
 
@@ -83,51 +91,67 @@ public class FormatMessage : System.Web.Services.WebService
     private DateTime StartTimeGiven = DateTime.MinValue.AddYears(1753);
     private DateTime EndTimeGiven = DateTime.MinValue.AddYears(1753);
 
+    /// <summary>
+    /// constructor
+    /// </summary>
     public FormatMessage()
     {
 
 
     }
 
+    /// <summary>
+    /// Splits the message and asigns more like a session key
+    /// </summary>
+    /// <param name="recievedMessage">The message Sent by the user</param>
+    /// <param name="contact">The user contact number</param>
+    /// <returns>returns result from userAuthorize() unless otherwise</returns>
     public string SplittingMessage(string recievedMessage, string contact)
     {
         //storing the recieved elements 
         telephone = contact;
-        recievedRawMsg = recievedMessage;
+        recievedRawMsg = recievedMessage.TrimEnd();
 
 
         //give the message a key by use of random numbers
+        //need to check if the given key is already available
+        key:
         Random r = new Random();
         messageKey = r.Next(10000001, 99999999).ToString();
-        //while (DBconnect.KeyChecker(messageKey) == true)
+        //if (LinqConnections.KeyChecker(messageKey) == true)
         //{
-        //    messageKey = r.Next(10000001, 99999999).ToString();
+        //    goto key;
         //}
-        //split the message into an array
-        SplitMessage = recievedMessage.Split(' ');
 
-        //check if message has the minimum requirements
-        //for now these are username, labname, date and start Time
-        //if this is not the case then return an error message
+        //split the message into an array basing on the spaces
+        SplitMessage = recievedRawMsg.Split(' ');
+
+        
+        /*The message needs to be either 4 or 5 words/elements between the spaces
+         * If not this if statement is fulfilled and user recieves an approriate error message
+         */
         if (SplitMessage.Length < 4 || SplitMessage.Length > 5)
         {
-            //storing incoming message to database
-            // DBconnect.storeIncoming(contact, recievedRawMsg, messageKey, NowTime(), "null",
-            //     "null", "null", "null");
-            DBconnect.storeIncoming(contact, recievedRawMsg, messageKey, DateTime.UtcNow,
+            LinqConnections.storeIncoming(contact, recievedRawMsg, messageKey, DateTime.UtcNow,
                 username, labAcronym, startTimeRange, endTimeRange);
 
 
             //generating error message for the out going message
-            userReply = DBconnect.errorMessage("MFE01");
+            userReply = LinqConnections.errorMessage("MFE01");
 
             //storing the out going message to the user
-            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+            LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                StartTimeGiven, EndTimeGiven, "MFE01");
 
             return userReply;
         }
 
+
+        /* The message is 4 or 5 characters long
+         * Username, and labAcronym are picked up from here
+         * These are the 1st and 2nd elements in the message respectively
+         * Calls on the userAuthorize()
+         */
         else
         {
             //store the user elements
@@ -146,14 +170,28 @@ public class FormatMessage : System.Web.Services.WebService
         //if true, call on the LabNamePresent()
         //else  - update databases and return  reply:"username not present. the username used is not being recoganized by the system"
 
+        //if (ISAConnect.checkUser(username) == true)
+        //{
+        //    return LabNamePresent(labAcronym);
+        //}
 
+        //else
+        //{
+        //    return null;
+        //}
         return LabNamePresent(labAcronym);
     }
 
+    /// <summary>
+    /// Checks if the labAcronym given by the user is actually present
+    /// Requires connection to the database
+    /// </summary>
+    /// <param name="labAcronym">second element as input by the user</param>
+    /// <returns>calls the switchUserOptns if true and error otherwise</returns>
     private string LabNamePresent(string labAcronym)
     {
         //check in LabConfig if the labname of the configuration is present
-        int value = DBconnect.isLabnamePresent(labAcronym);
+        int value = LinqConnections.isLabnamePresent(labAcronym);
         if (value != 1)
         {
             //allow the user to proceed with the experiment
@@ -162,12 +200,12 @@ public class FormatMessage : System.Web.Services.WebService
         else
         {
             //storing the incoming message
-            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+            LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                    username, labAcronym, startTimeRange, endTimeRange);
 
-            userReply = DBconnect.errorMessage("LRU01");
+            userReply = LinqConnections.errorMessage("LRU01");
 
-            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+            LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                    StartTimeGiven, EndTimeGiven, "LRU01");
 
 
@@ -191,12 +229,12 @@ public class FormatMessage : System.Web.Services.WebService
 
                 //update the database
                 //storing incoming message
-                DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labAcronym, startTimeRange, endTimeRange);
 
-                userReply = DBconnect.errorMessage("SDT01");
+                userReply = LinqConnections.errorMessage("SDT01");
 
-                DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                     StartTimeGiven, EndTimeGiven, "SDT01");
 
                 return userReply;
@@ -206,12 +244,12 @@ public class FormatMessage : System.Web.Services.WebService
                 //the date and start time was not uptodate
                 //update DB
                 //storing the incoming message
-                DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labAcronym, startTimeRange, endTimeRange);
 
-                userReply = DBconnect.errorMessage("SDT02");
+                userReply = LinqConnections.errorMessage("SDT02");
 
-                DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                     StartTimeGiven, EndTimeGiven, "SDT02");
 
                 return userReply;
@@ -243,12 +281,12 @@ public class FormatMessage : System.Web.Services.WebService
 
                         //update the database
                         //update incoming message table
-                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                        LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labAcronym, startTimeRange, endTimeRange);
 
-                        userReply = DBconnect.errorMessage("EDT01");
+                        userReply = LinqConnections.errorMessage("EDT01");
 
-                        DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                        LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                             StartTimeGiven, EndTimeGiven, "EDT01");
 
                         return userReply;
@@ -258,12 +296,12 @@ public class FormatMessage : System.Web.Services.WebService
                         //the date and start time was not uptodate
                         //update DB
                         //updating incoming message
-                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                        LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labAcronym, startTimeRange, endTimeRange);
 
-                        userReply = DBconnect.errorMessage("EDT02");
+                        userReply = LinqConnections.errorMessage("EDT02");
 
-                        DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                        LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                             StartTimeGiven, EndTimeGiven, "EDT02");
 
                         return userReply;
@@ -277,13 +315,13 @@ public class FormatMessage : System.Web.Services.WebService
                             //update the database with the possible errors that will arise in the system
                             //we could go on and do the scheduling and point it out to the user after
                             //updating the incoming message
-                            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                            LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labAcronym, startTimeRange, endTimeRange);
 
-                            userReply = DBconnect.errorMessage("SDT00");
+                            userReply = LinqConnections.errorMessage("SDT00");
 
 
-                            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+                            LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                                 StartTimeGiven, EndTimeGiven, "SDT00");
 
                             return userReply;
@@ -296,17 +334,19 @@ public class FormatMessage : System.Web.Services.WebService
                     }
                 }
             }
+
+            return null;
         }
         catch
         {
 
-            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+            LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
         username, labname, startTimeRange, endTimeRange);
 
-            userReply = DBconnect.errorMessage("DEF00") + "@ switch method";
+            userReply = LinqConnections.errorMessage("EDT02");
 
-            DBconnect.storeOutgoing(userReply , messageKey, false, labname,
-                StartTimeGiven, EndTimeGiven, "DEF00");
+            LinqConnections.storeOutgoing(userReply , messageKey, false, labname,
+                StartTimeGiven, EndTimeGiven, "EDT02");
 
             return userReply;
         }
@@ -356,12 +396,12 @@ public class FormatMessage : System.Web.Services.WebService
         if (LabConfigurationVariables(labAcronym) == false)
         {
             //update the database and inform the user what happened of the error
-            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+            LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                 username, labAcronym, startTimeRange, endTimeRange);
 
-            userReply = DBconnect.errorMessage("DBF01");
+            userReply = LinqConnections.errorMessage("DBF01");
 
-            DBconnect.storeOutgoing(userReply, messageKey, false, labAcronym,
+            LinqConnections.storeOutgoing(userReply, messageKey, false, labAcronym,
                 StartTimeGiven, EndTimeGiven, "DBF01");
 
             return userReply;
@@ -405,10 +445,10 @@ public class FormatMessage : System.Web.Services.WebService
                             //started error format has not been created for this issue as yet.
                             userReply = "Unfortunately the lab durations are full in this time Range. Please choose another time range";
 
-                            DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                            LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                         username, labname, startTimeRange, endTimeRange);
 
-                            DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                            LinqConnections.storeOutgoing(userReply, messageKey, true, labname,
                         StartTimeGiven, EndTimeGiven, userReply);
 
                             return userReply + " while connecting to the ISA";
@@ -416,7 +456,7 @@ public class FormatMessage : System.Web.Services.WebService
                         catch
                         {
 
-                            DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                            LinqConnections.storeOutgoing(userReply, messageKey, true, labname,
                                 StartTimeGiven, EndTimeGiven, "DEF00");
 
                             return userReply;
@@ -436,12 +476,12 @@ public class FormatMessage : System.Web.Services.WebService
                     else 
                     {
                         goto Loop;
-                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                        LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labname, startTimeRange, endTimeRange);
 
-                        userReply = DBconnect.errorMessage("DEF00");
+                        userReply = LinqConnections.errorMessage("DEF00");
 
-                        DBconnect.storeOutgoing(userReply, messageKey, false, labname,
+                        LinqConnections.storeOutgoing(userReply, messageKey, false, labname,
                             StartTimeGiven, EndTimeGiven, "DEF00");
 
                         return userReply;
@@ -451,12 +491,12 @@ public class FormatMessage : System.Web.Services.WebService
                 //when the experiment is not availabe to the user at that time...
                 else if (message.Contains("your group during this time"))
                 {
-                    DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                    LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                     username, labname, startTimeRange, endTimeRange);
 
                     userReply = message + "Contact Administrator for more details";
 
-                    DBconnect.storeOutgoing(userReply, messageKey, false, labname,
+                    LinqConnections.storeOutgoing(userReply, messageKey, false, labname,
                         StartTimeGiven, EndTimeGiven, userReply);
 
                     return userReply;
@@ -467,12 +507,14 @@ public class FormatMessage : System.Web.Services.WebService
                 {
                     try
                     {
-                        DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                        LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
                         username, labname, startTimeRange, endTimeRange);
+                        string format = "f";
+                        //userReply = "sucess "+StartTimeGiven.ToString();
+                        userReply = "Reservation confirmed successfully for: " + 
+                            username  + " for the Period: " + StartTimeGiven.ToString(format) + " to " + EndTimeGiven.ToString(format) + ". Thank you. iLabs@MAK";
 
-                        userReply = message + " for " + username + " and will be between " + StartTimeGiven.ToString() + " to " + EndTimeGiven.ToString();
-
-                        DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                        LinqConnections.storeOutgoing(userReply, messageKey, true, labname,
                             StartTimeGiven, EndTimeGiven, userReply);
                     }
                         //when for some reason we cannot store into the databases but the schedule has been done
@@ -480,7 +522,7 @@ public class FormatMessage : System.Web.Services.WebService
                     catch
                     {
 
-                        DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                        LinqConnections.storeOutgoing(userReply, messageKey, true, labname,
                             StartTimeGiven, EndTimeGiven, "DEF00");
 
                         return userReply;
@@ -491,12 +533,12 @@ public class FormatMessage : System.Web.Services.WebService
 
                 //when we cant figure out what might have happened!!
 
-                DBconnect.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
+                LinqConnections.storeIncoming(telephone, recievedRawMsg, messageKey, DateTime.UtcNow,
             username, labname, startTimeRange, endTimeRange);
 
-                userReply = DBconnect.errorMessage("DEF00");
+                userReply = LinqConnections.errorMessage("DEF00");
 
-                DBconnect.storeOutgoing(userReply, messageKey, false, labname,
+                LinqConnections.storeOutgoing(userReply, messageKey, false, labname,
                     StartTimeGiven, EndTimeGiven, "DEF00");
 
                 return userReply;
@@ -504,9 +546,9 @@ public class FormatMessage : System.Web.Services.WebService
 
             catch
             {
-                userReply = DBconnect.errorMessage("DEF00");
+                userReply = LinqConnections.errorMessage("DEF00");
 
-                DBconnect.storeOutgoing(userReply, messageKey, true, labname,
+                LinqConnections.storeOutgoing(userReply, messageKey, true, labname,
                     StartTimeGiven, EndTimeGiven, "DEF00");
 
                 return userReply;
@@ -521,7 +563,7 @@ public class FormatMessage : System.Web.Services.WebService
     /// Class that is used by the application to connect the database iLab_SMS
     /// Databases connections used in this case are based on Linq to SQL
     /// </summary>
-    public static class DBconnect
+    public static class LinqConnections
     {
        
         /// <summary>
@@ -534,12 +576,19 @@ public class FormatMessage : System.Web.Services.WebService
         /// <returns></returns>
         public static bool KeyChecker(string messageKey)
         {
-            DataClassesDataContext db = new DataClassesDataContext();
-            InComingMessage InCom = db.InComingMessages.Where(s => s.MessageKey == messageKey).First();
-            if (InCom.LabConfigurationID > 0)
+            try
+            {
+                DataClassesDataContext db = new DataClassesDataContext();
+                InComingMessage InCom = db.InComingMessages.Where(s => s.MessageKey == messageKey).First();
+                if (InCom.LabConfigurationID > 0)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
                 return true;
-            else
-                return false;
+            }
         }
 
         /// <summary>
@@ -649,7 +698,7 @@ public class FormatMessage : System.Web.Services.WebService
             {
                 DataClassesDataContext db = new DataClassesDataContext();
                 ErrorDescription err = db.ErrorDescriptions.Where(s => s.codeError == errorCode).First();
-                return err.ShortDescription + " " + err.PossibleSoln;
+                return err.ShortDescription.TrimEnd() + " " + err.PossibleSoln;
             }
             catch
             {
@@ -742,6 +791,24 @@ public class FormatMessage : System.Web.Services.WebService
             return message;
         }
 
+        public static bool checkUser(string username)
+        {
+            AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+            int userID = -1;
+            try
+            {
+                userID = wrapper.GetUserIDWrapper(username);
+                if (userID > 0)
+                    return true;
+                else
+                    return false;
+
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 
     /// <summary>
