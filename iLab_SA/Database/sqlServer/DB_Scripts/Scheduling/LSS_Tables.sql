@@ -296,7 +296,7 @@ ALTER TABLE [dbo].[Reservation_Info] ADD
 		[Experiment_Info_ID]
 	) REFERENCES [dbo].[Experiment_Info] (
 		[Experiment_Info_ID]
-	) ON DELETE CASCADE  ON UPDATE CASCADE 
+	) ON DELETE CASCADE  ON UPDATE CASCADE , 
 
 	CONSTRAINT [FK_Reservation_Info_USS_Info] FOREIGN KEY 
 	(
