@@ -107,7 +107,11 @@
                                 <td>
                                     <asp:TextBox ID="txtEndMin" runat="server" Width="24px">00</asp:TextBox>
                                 </td>
-                                <td></td>
+                                <td colspan="2"></td>
+                                </tr>
+                                <tr>
+                                <th colspan="2">Reservations to be revoked</th>
+                                <td colspan="3"></td>
                                 <td align="center"><asp:Button ID="btnSearch" runat="server" Text="Search" CssClass="button" OnClick="btnSearch_Click">
                                     </asp:Button></td>
                             </tr>
@@ -124,7 +128,7 @@
                                         Width="540px"></asp:TextBox>
                                 </td>
                             </tr>
-                            <tr id="trRevoke"  runat="server" visible="false">
+                            <tr id="trRevoke"  runat="server" visible="true">
                                 <th>
                                 </th>
                                 <td colspan="4" id="tdRevoke" runat="server">

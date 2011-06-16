@@ -140,7 +140,25 @@ textarea.noneditable
 {
 	border-right: 1px solid #0a6f7d; /* see header background */
 }
-
+/*****mainnav********/
+#mainnav TABLE {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 0px; BORDER-TOP: 0px; PADDING-LEFT: 0px; FLOAT: left; PADDING-BOTTOM: 0px; MARGIN: 0px; BORDER-LEFT: 0px; WIDTH: 100%; PADDING-TOP: 0px; BORDER-BOTTOM: 0px; TEXT-ALIGN: center
+}
+#mainnav TABLE TR {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 0px; BORDER-TOP: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; BORDER-LEFT: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: 0px
+}
+#mainnav TABLE TD {
+	BORDER-RIGHT: 0px; PADDING-RIGHT: 0px; BORDER-TOP: 0px; PADDING-LEFT: 0px; BACKGROUND: #660000; PADDING-BOTTOM: 0px; MARGIN: 0px; BORDER-LEFT: 0px; PADDING-TOP: 0px; BORDER-BOTTOM: 0px; TEXT-ALIGN: center
+}
+#mainnav TABLE TD A {
+	BORDER-RIGHT: medium none; PADDING-RIGHT: 32px; DISPLAY: block; PADDING-LEFT: 32px; PADDING-BOTTOM: 5px; MARGIN: 0px; FONT: bold 15px Arial, verdana, sans-serif; COLOR: #cc9933; PADDING-TOP: 5px; TEXT-DECORATION: none
+}
+#mainnav TABLE TD A:hover {
+	COLOR: #fff
+}
+#mainnav TABLE TD#active A {
+	BACKGROUND: white; COLOR: #000
+}
 /******* banner **************/
 
 #topbanner .banner,
@@ -597,22 +615,45 @@ DIV.errormessage p
 /* Info Message Styles */	
 DIV.infomessage {
 	background: #6FC url(../img/tick-icon-sm.gif) no-repeat;
+	min-height: 40px;
 	}
 	
 
 /* End Info Message Styles */
 /* Warning Message Styles */	
 DIV.warningmessage {
-	background: #CF6 url(../img/alert-icon-sm.gif) no-repeat;
+	background: #FE6 url(../img/alert-icon-sm.gif) no-repeat;
+	min-height: 40px;
 	}
 
 /* End warning Message Styles */	
 /* Error Message Styles */	
 DIV.errormessage {
-	background: #CF6 url(../img/alert-icon-sm.gif) no-repeat;
+	background: #F86 url(../img/error-icon-sm.gif) no-repeat;
+	min-height: 50px;
+	}
+
+/* Info Message Styles */	
+#pageintro .infomessage, #pagecontent .infomessage {
+	background: #6FC url(../img/tick-icon-sm.gif) no-repeat;
+	min-height: 40px;
+	}
+	
+/* End Info Message Styles */
+/* Warning Message Styles */	
+#pageintro .warningmessage, #pagecontent .warningmessage {
+	background: #FF6 url(../img/alert-icon-sm.gif) no-repeat;
+	min-height: 40px;
+	}
+
+/* End warning Message Styles */	
+/* Error Message Styles */	
+#pageintro .errormessage, #pagecontent .errormessage {
+	background: #FF9191 url(../img/error-icon.gif) no-repeat;
+	min-height: 50px;
 }
 
-
+/* End Error Message Styles */
 /* End Error Message Styles */
 /* End Message Styles */	
 /* End Page Intro Styles ////////////////////////////////////////////////////////*/

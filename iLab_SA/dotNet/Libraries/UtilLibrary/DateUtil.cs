@@ -92,7 +92,7 @@ namespace iLabs.UtilLib
         /// <returns></returns>
         public static DateTime ParseUserToUtc(string dateStr, CultureInfo culture, int tz)
         {
-            DateTime value = DateTime.Parse(dateStr, culture);
+            DateTime value = DateTime.Parse(dateStr, culture, DateTimeStyles.AllowTrailingWhite);
             value = SpecifyUTC(value);
             value = value.AddMinutes(-tz);
             return value;

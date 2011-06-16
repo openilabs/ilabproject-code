@@ -19,11 +19,23 @@ namespace iLabs.Core
 
         public static string Parse(StringBuilder input, Hashtable properties)
         {
-            return Parse(input.ToString(), properties);
+            return Parse(input.ToString(), properties, false);
         }
-
+        public static string Parse(StringBuilder input, Hashtable properties, bool appendDefaults)
+        {
+            return Parse(input.ToString(), properties, appendDefaults);
+        }
         public static string Parse(string input, Hashtable properties)
         {
+            return Parse(input, properties, false);
+        }
+        public static string Parse(string inputStr, Hashtable properties, bool appendDefaults)
+        {
+            string input = null;
+            if (appendDefaults)
+                input = addDefaultParameters(inputStr);
+            else
+                input = inputStr;
             int offset = 0;
             int pos = 0;
             int idx = -2;
@@ -69,6 +81,42 @@ namespace iLabs.Core
                 }
             }
             return output.ToString();
+        }
+
+        /// <summary>
+        /// Check that the default operation coupon parameters are part of the loader script
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private static string addDefaultParameters(string str)
+        {
+            // check that the default auth tokens are added
+            string loader = str;
+            if (loader.IndexOf("coupon_id=") == -1)
+            {
+                if (loader.IndexOf("?") == -1)
+                    loader += "?";
+                else
+                    loader += "&";
+                loader += "coupon_id=${op:couponId}";
+            }
+            if (loader.IndexOf("passkey=") == -1)
+            {
+                if (loader.IndexOf("?") == -1)
+                    loader += "?";
+                else
+                    loader += "&";
+                loader += "passkey=${op:passkey}";
+            }
+            if (loader.IndexOf("issuer_guid=") == -1)
+            {
+                if (loader.IndexOf("?") == -1)
+                    loader += "?";
+                else
+                    loader += "&";
+                loader += "issuer_guid=${op:issuer}";
+            }
+            return loader;
         }
     }
 

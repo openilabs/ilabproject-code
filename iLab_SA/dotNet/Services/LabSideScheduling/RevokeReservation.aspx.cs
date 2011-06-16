@@ -131,7 +131,11 @@ namespace iLabs.Scheduling.LabSide
                         txtStartMin.Text = minute.ToString();
 
                         //txtEndDate.Text = culture.DateTimeFormat.ShortDatePattern;
-                        StringBuilder buf = new StringBuilder("Select criteria for the reservations displayed.<br/><br/>Times shown are LSS local time GMT:&nbsp;&nbsp;&nbsp;");
+                        StringBuilder buf = new StringBuilder();
+                        buf.Append("Select criteria for the reservations to be revoked. ");
+                        buf.Append("You must perform a search before any reservations may be revoked, change the selected criteria to reduce the number of selected reservations. ");
+                        buf.AppendLine("Only reservations found matching the search criteria will be revoked.</p>");
+                        buf.Append("<p>Reservation times are shown as LSS local time GMT:&nbsp;&nbsp;&nbsp;");
                         if (localTzOffset > 0)
                             buf.Append("+");
                         buf.Append(localTzOffset / 60.0);
@@ -144,9 +148,10 @@ namespace iLabs.Scheduling.LabSide
                             buf.Append(userTZ / 60.0);
                             buf.Append(".");
                         }
-                        buf.AppendLine("<br/>You must perform a search before any reservations may be revoked, change the selected criteria to reduce the number of selected reservations. ");
-                        buf.AppendLine("Only reservations found matching the search criteria will be revoked.");
+                        buf.AppendLine("<br/>");
                         lblDescription.Text = buf.ToString();
+                        btnReserve.Enabled = false;
+                        btnRevoke.Enabled = false;
                     }
 
                     catch (Exception ex)
@@ -278,9 +283,9 @@ namespace iLabs.Scheduling.LabSide
         }
 
         //list the reservation information according to the selected criterion
-        private void BuildReservationListBox(int resourceID, int ExperimentInfoID, int CredentialSetID, DateTime time1, DateTime time2)
+        private int BuildReservationListBox(int resourceID, int ExperimentInfoID, int CredentialSetID, DateTime time1, DateTime time2)
         {
-
+            int count = 0;
             try
             {
                 txtDisplay.Text = null;
@@ -296,6 +301,7 @@ namespace iLabs.Scheduling.LabSide
                     foreach (IntTag t in reservations)
                     {
                         buf.AppendLine(t.tag);
+                        count++;
                     }
                     txtDisplay.Text = buf.ToString();
                 }
@@ -305,6 +311,7 @@ namespace iLabs.Scheduling.LabSide
                 lblErrorMessage.Text = Utilities.FormatErrorMessage("can not retrieve reservationInfos  " + ex.Message);
                 lblErrorMessage.Visible = true;
             }
+            return count;
         }
 
         protected void btnSearch_Click(object sender, System.EventArgs e)
@@ -334,25 +341,28 @@ namespace iLabs.Scheduling.LabSide
             hdnCredID.Value = credID.ToString();
             hdnStart.Value = DateUtil.ToUtcString(start);
             hdnEnd.Value = DateUtil.ToUtcString(end);
-            BuildReservationListBox(resourceID, expID, credID, start, end);
-            trRevoke.Visible = true;
-            btnRevoke.Enabled = true;
-            //btnRevoke.Attributes.Add("onclick", "btnRevoke_Click");
-            btnReserve.Enabled = true;
-            //btnReserve.Attributes.Add("onclick", "btnReserve_Click");
-            // Add the JavaScript code to the page.
-           
-            //string disableFunction = "javascript:disableRevoke();";
-            string disableFunction = "DisableRevoke();";
-            ddlResource.Attributes.Add("onchange", disableFunction);
-            ddlExperiment.Attributes.Add("onchange", disableFunction);
-            ddlGroup.Attributes.Add("onchange", disableFunction);
-            txtStartDate.Attributes.Add("onchange", disableFunction);
-            ddlStartHour.Attributes.Add("onchange", disableFunction);
-            txtStartMin.Attributes.Add("onchange", disableFunction);
-            txtEndDate.Attributes.Add("onchange", disableFunction);
-            ddlEndHour.Attributes.Add("onchange", disableFunction);
-            txtEndMin.Attributes.Add("onchange", disableFunction);
+            int count = BuildReservationListBox(resourceID, expID, credID, start, end);
+            if (count > 0)
+            {
+                //trRevoke.Visible = true;
+                btnRevoke.Enabled = true;
+                //btnRevoke.Attributes.Add("onclick", "btnRevoke_Click");
+                btnReserve.Enabled = true;
+                //btnReserve.Attributes.Add("onclick", "btnReserve_Click");
+                // Add the JavaScript code to the page.
+
+                //string disableFunction = "javascript:disableRevoke();";
+                string disableFunction = "DisableRevoke();";
+                ddlResource.Attributes.Add("onchange", disableFunction);
+                ddlExperiment.Attributes.Add("onchange", disableFunction);
+                ddlGroup.Attributes.Add("onchange", disableFunction);
+                txtStartDate.Attributes.Add("onchange", disableFunction);
+                ddlStartHour.Attributes.Add("onchange", disableFunction);
+                txtStartMin.Attributes.Add("onchange", disableFunction);
+                txtEndDate.Attributes.Add("onchange", disableFunction);
+                ddlEndHour.Attributes.Add("onchange", disableFunction);
+                txtEndMin.Attributes.Add("onchange", disableFunction);
+            }
             
         }
 
@@ -411,6 +421,8 @@ namespace iLabs.Scheduling.LabSide
             {
 
                 buf.Append("The existing reservations have been revoked.");
+                btnRevoke.Enabled = false;
+                btnReserve.Enabled = false;
             }
             status = makeAdminReservation(resourceId, expId, credId, start, end, ref buf);
             
@@ -421,6 +433,7 @@ namespace iLabs.Scheduling.LabSide
             }
                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage(buf.ToString());
                 lblErrorMessage.Visible = true;
+               
         }
 
 
@@ -453,6 +466,8 @@ namespace iLabs.Scheduling.LabSide
             if (status >= 0)
             {
                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage(status.ToString() + " reservations have been revoked.");
+                btnRevoke.Enabled = false;
+                btnReserve.Enabled = false;
             }
             else
             {
@@ -594,8 +609,9 @@ namespace iLabs.Scheduling.LabSide
             catch(Exception e){
                 status = -1;
                 message.AppendLine(e.Message);
+                return status;
             }
-            return status;
+            return count;
         }
 
         void JunkCode()

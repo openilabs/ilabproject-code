@@ -29,9 +29,9 @@ Please see license.txt in top level directory for full license.
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Experiments</h1>
-						<p>View experiments below.</p>
-						<!-- Error message here --><asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label></div>
-					<!-- end pageintro div -->
+						<asp:label ID="lblDescription" runat="server"></asp:label>
+						<asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label>
+					</div><!-- end pageintro div -->
 					<div id="pagecontent">
 					<table style="width: 960px" >
                             <tr>
@@ -58,22 +58,26 @@ Please see license.txt in top level directory for full license.
 								<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
 								<tr>
 									<th>
-										<label for="timeis">Time </label>
+										<label for="timerange">Time Range</label>
 									</th>
 									<td colspan="2"><asp:dropdownlist CssClass="i18n" id="ddlTimeAttribute" Runat="server" Width="200px" AutoPostBack="True" onselectedindexchanged="ddlTimeAttribute_SelectedIndexChanged">
-											<asp:ListItem Value="-- Select one --">-- Select one --</asp:ListItem>
-											<asp:ListItem Value="equal to">equal to</asp:ListItem>
-											<asp:ListItem Value="before">before</asp:ListItem>
-											<asp:ListItem Value="after">after</asp:ListItem>
-											<asp:ListItem Value="between">between</asp:ListItem>
-											<asp:ListItem Value="on date">on date</asp:ListItem>
+											<asp:ListItem Value="Any Time">Any Time</asp:ListItem>
+											<asp:ListItem Value="Date">Date</asp:ListItem>
+											<asp:ListItem Value="Before">Before</asp:ListItem>
+											<asp:ListItem Value="After">After</asp:ListItem>
+											<asp:ListItem Value="Between">Between</asp:ListItem>
 										</asp:dropdownlist></td>
 								</tr>
 								<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
 								<tr>
-									<th>&nbsp;</th>
-									<td style="width: 165px"><asp:textbox id="txtTime1" Runat="server" Width="153px"></asp:textbox></td>					
+									<th><label for="timeone">Time One</label></th>
+									<td style="width: 165px"><asp:textbox id="txtTime1" Runat="server" Width="153px"></asp:textbox></td>
+									<td>&nbsp;</td>
+									</tr>
+									<tr>
+									<th><label for="timetwo">Time Two</label></th>					
 									<td style="width: 165px"><asp:textbox id="txtTime2" Runat="server" ReadOnly="true" Width="149px" BackColor="Lavender"></asp:textbox></td>
+									<td>&nbsp;</td>
 								</tr>
 								<tr>
 								    <th>&nbsp;</th>

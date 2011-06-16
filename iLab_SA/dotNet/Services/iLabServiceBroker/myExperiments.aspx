@@ -54,32 +54,35 @@ Please see license.txt in top level directory for full license.
                                                             <tr>
                                                                 <th>
                                                                     <label for="timeis">
-                                                                        Time
-                                                                    </label>
+                                                                        Time Range </label>
                                                                 </th>
                                                                 <td colspan="3">
                                                                     <asp:DropDownList CssClass="i18n" ID="ddlTimeAttribute" runat="server" Width="128px" AutoPostBack="True"
                                                                         OnSelectedIndexChanged="ddlTimeAttribute_SelectedIndexChanged">
-                                                                        <asp:ListItem Value="Select before">-- Select One --</asp:ListItem>
-                                                                        <asp:ListItem Value="before">before</asp:ListItem>
-                                                                        <asp:ListItem Value="after">after</asp:ListItem>
-                                                                        <asp:ListItem Value="between">between</asp:ListItem>
-                                                                        <asp:ListItem Value="on date">on date</asp:ListItem>
+                                                                        <asp:ListItem Value="Any Time">Any Time</asp:ListItem>
+                                                                        <asp:ListItem Value="Date">Date</asp:ListItem>
+                                                                        <asp:ListItem Value="Before">Before</asp:ListItem>
+                                                                        <asp:ListItem Value="After">After</asp:ListItem>
+                                                                        <asp:ListItem Value="Between">Between</asp:ListItem>
                                                                     </asp:DropDownList>
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <th>
-                                                                    &nbsp;</th>
-                                                                <td style="width: 310px">
+                                                                <th><label for="timeone">
+                                                                Time One </label></th>
+                                                                <td colspan="3" style="width: 310px">
                                                                     <asp:TextBox ID="txtTime1" runat="server" Width="160px"></asp:TextBox>
                                                                 </td>
+                                                                
+                                                             </tr>
+                                                             <tr>
+                                                                 <th><label for="timetwo">
+                                                                 Time Two </label></th>
                                                                 <!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
-                                                                <td style="width: 225px">
-                                                                    <asp:TextBox ID="txtTime2" runat="server" Width="160px" Enabled="False"></asp:TextBox>
+                                                                <td colspan="3" style="width: 225px">
+                                                                    <asp:TextBox ID="txtTime2" runat="server" Width="160px"></asp:TextBox>
                                                                 </td>
-                                                                <td>
-                                                                    &nbsp;</td>
+                                                               
                                                             </tr>
                                                             <tr>
                                                                 <th>

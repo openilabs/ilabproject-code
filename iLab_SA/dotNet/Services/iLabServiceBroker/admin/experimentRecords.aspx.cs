@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -47,6 +48,7 @@ namespace iLabs.ServiceBroker.admin
 		protected System.Web.UI.WebControls.DropDownList ddlTimeis;
         int userTZ;
         CultureInfo culture = null;
+        string dateF = null;
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         int userId;
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -63,11 +65,20 @@ namespace iLabs.ServiceBroker.admin
 				txtTime2.BackColor=Color.Lavender;
 			}
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            dateF = DateUtil.DateTime24(culture);
+
             if(Session["UserTZ"] != null)
                 userTZ = Convert.ToInt32(Session["UserTZ"]);
             // "Are you sure" javascript for DeleteExperiment button
             btnDeleteExperiment.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to delete this experiment?')== false) return false;");
-           
+            
+
+            StringBuilder buf = new StringBuilder();
+            buf.Append("Select criteria for the experiments to be displayed.  Enter date values using this format: '");
+            buf.Append(dateF + " [PM]");
+            buf.Append("' time may be entered as 24 or 12 hour format.");
+            buf.Append("<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0 + "&nbsp;&nbsp; and use a 24 hour clock.");
+            lblDescription.Text = buf.ToString();
 		}
 
 		#region Web Form Designer generated code
@@ -117,7 +128,8 @@ namespace iLabs.ServiceBroker.admin
             clearExperimentDisplay();
 
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-
+            DateTime time1 = FactoryDB.MinDbDate;
+            
 			
 				List<Criterion> cList = new List<Criterion>();
 				if(txtGroupname.Text != "")
@@ -131,56 +143,46 @@ namespace iLabs.ServiceBroker.admin
 					int uID = wrapper.GetUserIDWrapper(txtUsername.Text);
 					cList.Add(new Criterion ("User_ID", "=", uID.ToString() ));
 				}
-			if((ddlTimeAttribute.SelectedValue.ToString() != "") && ((txtTime1.Text != null) && (txtTime1.Text != "")))
+			if((ddlTimeAttribute.SelectedIndex > 0))
 			{
-				DateTime time1 = new DateTime();
-				DateTime time2 = new DateTime();
-
-				try
-				{
-                    time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,Convert.ToInt32(Session["UserTZ"]));
+                try
+                {
+                    time1 = DateUtil.ParseUserToUtc(txtTime1.Text, culture, Convert.ToInt32(Session["UserTZ"]));
                 }
                 catch
-				{	
-					lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid time.");
-					lblResponse.Visible = true;
-					return;
+                {
+                    lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid date & time in the first time field.");
+                    lblResponse.Visible = true;
+                    return;
                 }
-				if( (ddlTimeAttribute.SelectedValue.ToString().CompareTo("between") ==0)
-                    ||(ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") ==0))
-				{	
-                        try{
+            }
+            if (ddlTimeAttribute.SelectedIndex ==1){ //Date
+               
+                cList.Add(new Criterion ("CreationTime", ">=",time1.Date.ToString()));
+					cList.Add(new Criterion ("CreationTime", "<", time1.Date.AddDays(1).ToString()));
+
+            }
+            else if(ddlTimeAttribute.SelectedIndex ==2){ // Before
+                 cList.Add(new Criterion ("CreationTime", "<", time1.ToString()));
+            }
+            else if(ddlTimeAttribute.SelectedIndex ==3){ // After
+                 cList.Add(new Criterion ("CreationTime", ">=", time1.ToString()));
+            }
+            else if(ddlTimeAttribute.SelectedIndex ==2){ // Between
+                DateTime time2 = FactoryDB.MaxDbDate;
+                try{
 						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["UserTZ"]));
 					    }
                         catch{	
-					        lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid time in the second time field.");
+					        lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid date & time in the second time field.");
 					        lblResponse.Visible = true;
 					        return;
                         }
-                }
-				if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("before")== 0)
-				{
-					cList.Add(new Criterion ("CreationTime", "<", time1.ToString()));
-				}
-				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("after") == 0)
-				{
-					cList.Add(new Criterion ("CreationTime", ">=", time1.ToString()));
-				}
-				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("between") == 0)
-				{
 					cList.Add(new Criterion ("CreationTime", ">=",time1.ToString()));
 					cList.Add(new Criterion ("CreationTime", "<", time2.ToString()));
-				}
-                else if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") == 0)
-                {
-                    cList.Add(new Criterion("CreationTime", ">=",  time1.ToString()));
-                    cList.Add(new Criterion("CreationTime", "<", time1.AddDays(1).ToString()));
-                }              
-             }
-        
-			
+            }
 		 long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userId,sessionGroupID, cList.ToArray());
-            LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture,true,true,true,false,false,false,true,false);
+            LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture,true,true,true,false,true,false,true,false);
 
             for (int i = 0; i < expTags.Length; i++)
             {

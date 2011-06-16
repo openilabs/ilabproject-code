@@ -27,8 +27,13 @@ This page should not be used as part of a public site, but is supplied as exampl
 users, groups and clients on your test machine. or you will have to replace the user names, passwords, 
 client guids and group names in this file to reflect your machine's population.</p>
 <UL>
-  <LI>Users<ul><LI>test pw: tstpw<LI>test2 pw: tst2pw<LI> test3 pw: tst3pw<LI>web pw: webpw</ul>
-  <LI>Groups:<ul> <LI>Experiment_Group<LI>Test_Group<LI>weblab_group<LI>html_group</ul>
+  <LI>Users<ul><LI>test pw: tstpw<LI>test2 pw: tst2pw<LI>test3 pw: tst3pw<LI>web pw: webpw</ul>
+  <LI>Groups:<ul>
+  <LI>Experiment_Group - Request & Admin
+  <LI>Test_Group - Admin
+  <LI>weblab_group - Group only
+  <LI>html_group - Request
+  </ul>
   <LI>clients:<ul>
   <LI>TimeOfDay guid: TOD-12345 
   <LI>TOD2 guid: TOD2-67890 
@@ -40,7 +45,7 @@ client guids and group names in this file to reflect your machine's population.<
   <LI>Test is in Experiment_Group 
   <LI>web is in weblab_group 
   <LI>Test2 is in Experiment_Group, Test_Group 
-  <LI>Test3 is in Experiment_Group, Test_Group-admin 
+  <LI>Test3 is in Test_Group, Experiment_Group-admin 
 </ul>
 <ul><b>Group Clients</b>
   <LI>Test_Group may run TOD only

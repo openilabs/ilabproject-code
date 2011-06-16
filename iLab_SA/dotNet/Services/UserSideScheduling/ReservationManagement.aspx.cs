@@ -119,8 +119,12 @@ namespace iLabs.Scheduling.UserSide
 
                  if (!unauthorized)
                  {
-                     lblDescription.Text = "Select criteria for the reservations to be displayed."
-                            + "<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0  + "&nbsp;&nbsp; and use a 24 hour clock.";
+                     StringBuilder buf = new StringBuilder();
+                     buf.Append("Select criteria for the reservations to be displayed.  Enter date values using this format: '");
+                     buf.Append(dateF + " [PM]");
+                     buf.Append ("' time may be entered as 24 or 12 hour format.");
+                     buf.Append("<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0 + "&nbsp;&nbsp; and use a 24 hour clock.");
+                     lblDescription.Text = buf.ToString();
                      lblFormat.Text = dateF;
                      LoadGroupListBox();
                      LoadExperimentListBox();
@@ -224,9 +228,9 @@ namespace iLabs.Scheduling.UserSide
 						lblErrorMessage.Visible=true;
 						return;
 					}
-					if(ddlTimeIs.SelectedIndex==1) // Equal
+					if(ddlTimeIs.SelectedIndex==1) // Date
 					{
-						BuildReservationListBox(userName, experimentInfoId,credentialSetId, time1,time1);
+						BuildReservationListBox(userName, experimentInfoId,credentialSetId, time1.Date,time1.Date.AddDays(1));
 
 					}
 					else if(ddlTimeIs.SelectedIndex==2) // before

@@ -58,10 +58,15 @@ namespace iLabs.ServiceBroker.iLabSB
            if (Session["UserID"]==null)
 		        Response.Redirect("../login.aspx");
 
-            if(ddlTimeAttribute.SelectedValue != "between")
+            if (ddlTimeAttribute.SelectedIndex != 4)
             {
                 txtTime2.ReadOnly = true;
                 txtTime2.BackColor = Color.Lavender;
+            }
+            else
+            {
+                txtTime2.ReadOnly = false;
+                txtTime2.BackColor = Color.White;
             }
  			userTZ = Convert.ToInt32(Session["UserTZ"]);
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
@@ -78,6 +83,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			if(! IsPostBack )
 			{
                 culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+                //txtTime2.Enabled = false;
 				List<Criterion> cList = new List<Criterion> ();
                 if (Session["UserID"] != null)
                 {
@@ -131,10 +137,14 @@ namespace iLabs.ServiceBroker.iLabSB
 		
 		protected void ddlTimeAttribute_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
-			if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("between")==0)
-			{
-				txtTime2.Enabled=true;
-			}
+            //if (ddlTimeAttribute.SelectedIndex == 4)
+            //{
+            //    txtTime2.Enabled = true;
+            //}
+            //else
+            //{
+            //    txtTime2.Enabled = false;
+            //}
 		}
 
         protected void clearExperimentDisplay(){
@@ -173,52 +183,48 @@ namespace iLabs.ServiceBroker.iLabSB
                 cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
             }
 			
-			if((ddlTimeAttribute.SelectedValue.ToString() != "") && ((txtTime1.Text != null) && (txtTime1.Text != "")))
+			if((ddlTimeAttribute.SelectedIndex >0))
 			{
-				DateTime time1 = new DateTime();
-				DateTime time2 = new DateTime();
-
+				DateTime time1 = FactoryDB.MinDbDate;
 				try
 				{
                     time1 = DateUtil.ParseUserToUtc(txtTime1.Text,culture,Convert.ToInt32(Session["UserTZ"]));
                 }
                 catch
 				{	
-					lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid time.");
+					lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid date & time in the first time field .");
 					lblResponse.Visible = true;
 					return;
                 }
-				if( (ddlTimeAttribute.SelectedValue.ToString().CompareTo("between") ==0)
-                    ||(ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") ==0))
-					{	
-                        try{
-						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["UserTZ"]));
-					    }
-                        catch{	
-					        lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid time in the second time field.");
-					        lblResponse.Visible = true;
-					        return;
-                        }
-                }
-				if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("before")== 0)
-				{
-					cList.Add(new Criterion ("CreationTime", "<", time1.ToString()));
-				}
-				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("after") == 0)
-				{
-					cList.Add(new Criterion ("CreationTime", ">=", time1.ToString()));
-				}
-				else if(ddlTimeAttribute.SelectedValue.ToString().CompareTo("between") == 0)
-				{
-					cList.Add(new Criterion ("CreationTime", ">=",time1.ToString()));
-					cList.Add(new Criterion ("CreationTime", "<", time2.ToString()));
-				}
-                else if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("on date") == 0)
+                if (ddlTimeAttribute.SelectedIndex == 1)
                 {
-                    cList.Add(new Criterion("CreationTime", ">=",  time1.ToString()));
+                    cList.Add(new Criterion("CreationTime", ">=", time1.ToString()));
                     cList.Add(new Criterion("CreationTime", "<", time1.AddDays(1).ToString()));
-                }              
-			}
+                }
+                else if (ddlTimeAttribute.SelectedIndex == 2)
+                {
+                    cList.Add(new Criterion("CreationTime", "<", time1.ToString()));
+                }
+                else if (ddlTimeAttribute.SelectedIndex == 3)
+                {
+                    cList.Add(new Criterion("CreationTime", ">=", time1.ToString()));
+                }
+                if (ddlTimeAttribute.SelectedIndex == 4)
+                {
+                    DateTime time2 = FactoryDB.MaxDbDate;
+                    try
+                    {
+                        time2 = DateUtil.ParseUserToUtc(txtTime2.Text, culture, Convert.ToInt32(Session["UserTZ"]));
+                    }
+                    catch
+                    {
+                        lblResponse.Text = Utilities.FormatErrorMessage("Please enter a valid date & time in the second time field.");
+                        lblResponse.Visible = true;
+                        return;
+                    }
+                }
+            }
+			
            // cList.Add(new Criterion("Record_Count", ">", "0"));
 
             long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userID,groupID, cList.ToArray());

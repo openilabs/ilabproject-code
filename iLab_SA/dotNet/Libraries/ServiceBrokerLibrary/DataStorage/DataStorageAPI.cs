@@ -234,7 +234,7 @@ namespace iLabs.ServiceBroker.DataStorage
             bool showUser, bool showGroup, bool showClient, bool showStatus,
             bool showStart, bool showClose, bool showAnnotation, bool showID)
         {
-
+            
             ExperimentSummary [] exp = RetrieveExperimentSummaries(experimentIDs);
             LongTag [] tags = new LongTag[exp.Length];
            
@@ -248,6 +248,23 @@ namespace iLabs.ServiceBroker.DataStorage
                 if (showID)
                         {
                             buf.Append(exp[i].experimentId.ToString("0000") + " ");
+                        }
+                        //Create
+                        if (showStart)
+                        {
+                            buf.Append(DateUtil.ToUserTime(exp[i].creationTime, culture, userTZ) + " ");
+                        }
+                        //Close
+                        if (showClose)
+                        {
+                            if (exp[i].closeTime != null)
+                            {
+                                buf.Append(DateUtil.ToUserTime(exp[i].closeTime, culture, userTZ) + " ");
+                            }
+                            else
+                            {
+                                buf.Append("Experiment Not Closed ");
+                            }
                         }
                         
                         // User
@@ -279,23 +296,7 @@ namespace iLabs.ServiceBroker.DataStorage
                         {
                                 buf.Append(exp[i].status.ToString("000") + " ");
                         }
-                        //Create
-                        if (showStart)
-                        {
-                           buf.Append(DateUtil.ToUserTime(exp[i].creationTime, culture, userTZ) + " ");
-                        }
-                        //Close
-                        if (showClose)
-                        {
-                            if (exp[i].closeTime != null)
-                            {
-                                buf.Append(DateUtil.ToUserTime(exp[i].closeTime, culture, userTZ) + " ");
-                            }
-                            else
-                            {
-                                buf.Append("Experiment Not Closed ");
-                            }
-                        }
+                       
                         //Annotation
                         if (showAnnotation)
                         {

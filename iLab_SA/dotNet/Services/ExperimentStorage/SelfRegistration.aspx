@@ -21,9 +21,11 @@ Please see license.txt in top level directory for full license.
 	<body>
 	    <form id="Form1" method="post" runat="server">
 			<a name="top"></a>
+			<div id="outerwrapper">
 			<div id="innerwrapper">
 				<iLab:RegisterSelf id="selfReg"  runat="server" AgentType="EXPERIMENT STORAGE SERVER" ></iLab:RegisterSelf>
 			</div><!-- end innerwrapper div -->
+			</div>
 			<br clear="all"/>
 		</form>				
 	</body>

@@ -510,41 +510,7 @@ namespace iLabs.ServiceBroker.iLabSB
             }
             return pai;
         }
-        /// <summary>
-        /// Check that the default operation coupon parameters are part of the loader script
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        private string addDefaultParameters(string str)
-        {
-            // check that the default auth tokens are added
-            string loader = str;
-            if (loader.IndexOf("coupon_id=") == -1)
-            {
-                if (loader.IndexOf("?") == -1)
-                    loader += "?";
-                else
-                    loader += "&";
-                loader += "coupon_id=${op:couponId}";
-            }
-            if (loader.IndexOf("passkey=") == -1)
-            {
-                if (loader.IndexOf("?") == -1)
-                    loader += "?";
-                else
-                    loader += "&";
-                loader += "passkey=${op:passkey}";
-            }
-            if (loader.IndexOf("issuer_guid=") == -1)
-            {
-                if (loader.IndexOf("?") == -1)
-                    loader += "?";
-                else
-                    loader += "&";
-                loader += "issuer_guid=${op:issuer}";
-            }
-            return loader;
-        }
+      
 
         private void launchLabClient(int c_id)
         {
@@ -585,7 +551,6 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
 
                         //payload includes username and current group name & client id.
-                        //ideally this should be encoded in xml  - CV, 7/27/2005
                         string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]), Convert.ToInt32(Session["GroupID"]),
                                    Convert.ToInt32(Session["ClientID"]), (string)Session["UserName"], (string)Session["GroupName"]);
                         // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
@@ -604,9 +569,6 @@ namespace iLabs.ServiceBroker.iLabSB
                            redirectURL = executor.ExecuteExperimentExecutionRecipe(coupon, labServer, client,
                             start, duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]),
                             effectiveGroupID, effectiveGroupName);
-
-                            // check that the default auth tokens are added
-                            redirectURL = addDefaultParameters(redirectURL);
                            
                             // Add the return url to the redirect
                             if (redirectURL.IndexOf("?") == -1)
@@ -614,7 +576,8 @@ namespace iLabs.ServiceBroker.iLabSB
                             else
                                 redirectURL += "&";
                             redirectURL += "sb_url=" + Utilities.ExportUrlPath(Request.Url);
-                            string tmpUrl = iLabParser.Parse(redirectURL, properties);
+                            // Parse & check that the default auth tokens are added
+                            string tmpUrl = iLabParser.Parse(redirectURL, properties, true);
 
                             // Now open the lab within the current Window/frame
                             Response.Redirect(tmpUrl, true);
@@ -626,7 +589,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                             // Note: Currently Interactive applets
                             // use the Loader script for Batch experiments
-
+                            // Applets do not use default query string parameters, parametes must be in the loader script
                             Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
                             Session.Remove("RedirectURL");
 
@@ -654,8 +617,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                                 /* This is the original batch-redirect using a pop-up */
                                 // check that the default auth tokens are added
-                                string loader = addDefaultParameters(client.loaderScript);
-                                string jScript = @"<script language='javascript'> window.open ('" + iLabParser.Parse(loader, properties) + "')</script>";
+                                string jScript = @"<script language='javascript'> window.open ('" + iLabParser.Parse(client.loaderScript, properties, true) + "')</script>";
                                 Page.RegisterStartupScript("HTML Client", jScript);
 
                                 /* This is the batch-redirect with a simple redirect, this may not work as we need to preserve session-state */
@@ -666,7 +628,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         // use the Loader script for Batch experiments
                         else if (client.clientType == LabClient.BATCH_APPLET)
                         {
-
+                            // Do not append defaults
                             Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
                             Session.Remove("RedirectURL");
 
@@ -724,7 +686,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         url.Append('&');
                     url.Append("&sb_url=");
                     url.Append(Utilities.ExportUrlPath(Request.Url));
-                    string targetURL = iLabParser.Parse(url,properties);
+                    string targetURL = iLabParser.Parse(url,properties,true);
                     // Now open the lab within the current Window/frame
                     Response.Redirect(targetURL, true);
                 }

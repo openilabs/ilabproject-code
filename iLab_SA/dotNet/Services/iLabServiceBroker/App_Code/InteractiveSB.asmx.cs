@@ -891,7 +891,7 @@ namespace iLabs.ServiceBroker.iLabSB
             Coupon coupon = brokerDB.CreateCoupon();
            
             // There should be an authentication scheme as part of this method, currently checking for an agentAuthHeader or OperationHeader.
-            /*****
+            /****
             //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             //{
             if(agentAuthHeader != null)
@@ -902,6 +902,15 @@ namespace iLabs.ServiceBroker.iLabSB
                 {  // The requesting service is a member of the domain
                 }
             }
+            
+             //payload includes username and current group name & client id.
+                        string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]), Convert.ToInt32(Session["GroupID"]),
+                                   Convert.ToInt32(Session["ClientID"]), (string)Session["UserName"], (string)Session["GroupName"]);
+                        // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
+                        issuer.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
+                                     ProcessAgentDB.ServiceGuid, duration, sessionPayload);
+
+                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["GroupID"]), client.clientID, Session.SessionID);
             if(opHeader != null)
             { // From a client or existing ticket collection
             }
