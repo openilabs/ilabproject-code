@@ -222,6 +222,8 @@ namespace iLabs.ServiceBroker.iLabSB
                         lblResponse.Visible = true;
                         return;
                     }
+                    cList.Add(new Criterion("CreationTime", ">=", time1.ToString()));
+                    cList.Add(new Criterion("CreationTime", "<=", time2.ToString()));
                 }
             }
 			

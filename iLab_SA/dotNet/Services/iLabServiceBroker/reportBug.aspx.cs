@@ -119,17 +119,17 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			if((userID == -1) && (txtEmail.Text.Length == 0))
 			{
-                lblResponse.Text = "<div class=errormessage><p>Please enter an emailaddress, so we can respond to your report.</p></div>";
+                lblResponse.Text = Utilities.FormatErrorMessage("Please enter an emailaddress, so we can respond to your report.");
 				lblResponse.Visible = true;
 			}
 			else if(ddlArea.SelectedItem.Text.CompareTo("") == 0)
 			{
-				lblResponse.Text = "<div class=errormessage><p>Please select a general problem catagory.</p></div>";
+				lblResponse.Text = Utilities.FormatErrorMessage("Please select a general problem catagory.");
 				lblResponse.Visible = true;
 			}
 			else if (txtBugReport.Text == "")
 			{
-				lblResponse.Text = "<div class=errormessage><p>Please enter a description of the problem!</p></div>";
+				lblResponse.Text = Utilities.FormatErrorMessage("Please enter a description of the problem!");
 				lblResponse.Visible = true;
 			}
             else if (!recaptcha.IsValid)
@@ -222,14 +222,14 @@ namespace iLabs.ServiceBroker.iLabSB
 						uMail.Body += txtBugReport.Text;
 						SmtpMail.Send(uMail);
 					}
-					lblResponse.Text = "<div class=errormessage><p>Thank-you! Your bug report has been submitted. An administrator will contact you within 24-48 hours.</p></div>";
+					lblResponse.Text = Utilities.FormatConfirmationMessage("Thank-you! Your bug report has been submitted. An administrator will contact you within 24-48 hours.");
 					lblResponse.Visible = true;
 
 				}
 				catch (Exception ex)
 				{
-					lblResponse.Text = "<div class=errormessage><p>Error sending your bug report, please email "
-						+ ConfigurationSettings.AppSettings["bugReportMailAddress"] + ". "+ex.Message+"</p></div>";
+					lblResponse.Text = Utilities.FormatErrorMessage("Error sending your bug report, please email "
+						+ ConfigurationSettings.AppSettings["bugReportMailAddress"] + ". "+ex.Message);
 					lblResponse.Visible = true;
 				}
 			}

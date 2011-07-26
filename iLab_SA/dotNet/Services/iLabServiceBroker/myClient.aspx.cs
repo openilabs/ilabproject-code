@@ -124,50 +124,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
                 }
 
-                // System_Messages block
-
-                SystemMessage[] groupMessages = null;
-                SystemMessage[] serverMessages = null;
-                groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
-                if (lc != null && labServer != null && labServer.agentId > 0)
-                {
-                    serverMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServer.agentId);
-                }
-                if ((groupMessages == null || groupMessages.Length == 0) && (serverMessages == null || serverMessages.Length == 0))
-                {
-
-                    lblGroupNameSystemMessage.Text += "No Messages at this time!";
-                    lblGroupNameSystemMessage.Visible = true;
-                    lblServerSystemMessage.Visible = false;
-                }
-                else
-                {
-                    if (groupMessages != null && groupMessages.Length > 0)
-                    {
-                        //lblGroupNameSystemMessage.Text = "Messages for " + groupName;
-                        lblGroupNameSystemMessage.Text = "Group Messages:";
-                        lblGroupNameSystemMessage.Visible = true;
-                        repGroupMessage.DataSource = groupMessages;
-                        repGroupMessage.DataBind();
-                    }
-                    else
-                    {
-                        lblGroupNameSystemMessage.Visible = false;
-                    }
-
-                    if (serverMessages != null && serverMessages.Length > 0)
-                    {
-                        //lblGroupNameSystemMessage.Text = "Messages for " + groupName;
-                        lblServerSystemMessage.Text = "Client/Server Messages:";
-                        lblServerSystemMessage.Visible = true;
-                        repServerMessage.DataSource = serverMessages;
-                        repServerMessage.DataBind();
-                    }
-                    else
-                    {
-                        lblServerSystemMessage.Visible = false;
-                    }
-                }
+               
             }
             if (lc != null)
             {
@@ -197,7 +154,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 // check for current reservation
 
                                 //create a collection & redeemTicket
-                                string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow);
+                                string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow, Session["UserName"].ToString(), groupName, lc.clientGuid);
                                 if (opCoupon == null)
                                     opCoupon = issuer.CreateCoupon();
 
@@ -219,7 +176,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                     DateTime start = reservation.Start;
                                     long duration = reservation.Duration;
                                     string payload = TicketLoadFactory.Instance().createAllowExperimentExecutionPayload(
-                                        start, duration, effectiveGroupName);
+                                        start, duration, effectiveGroupName,lc.clientGuid);
                                     DateTime tmpTime = start.AddTicks(duration * TimeSpan.TicksPerSecond);
                                     DateTime utcNow = DateTime.UtcNow;
                                     long ticketDuration = (tmpTime.Ticks - utcNow.Ticks) / TimeSpan.TicksPerSecond;
@@ -382,6 +339,50 @@ namespace iLabs.ServiceBroker.iLabSB
                 string msg = "There are no labs assigned to group: " + Session["GroupName"].ToString() + "!";
                 lblResponse.Text = Utilities.FormatErrorMessage(msg);
                 lblResponse.Visible = true;
+            }
+            // System_Messages block
+
+            SystemMessage[] groupMessages = null;
+            SystemMessage[] serverMessages = null;
+            groupMessages = AdministrativeAPI.SelectSystemMessagesForGroup(Convert.ToInt32(Session["GroupID"]));
+            if (lc != null && labServer != null && labServer.agentId > 0)
+            {
+                serverMessages = wrapper.GetSystemMessagesWrapper(SystemMessage.LAB, 0, 0, labServer.agentId);
+            }
+            if ((groupMessages == null || groupMessages.Length == 0) && (serverMessages == null || serverMessages.Length == 0))
+            {
+
+                lblGroupNameSystemMessage.Text += "No Messages at this time!";
+                lblGroupNameSystemMessage.Visible = true;
+                lblServerSystemMessage.Visible = false;
+            }
+            else
+            {
+                if (groupMessages != null && groupMessages.Length > 0)
+                {
+                    //lblGroupNameSystemMessage.Text = "Messages for " + groupName;
+                    lblGroupNameSystemMessage.Text = "Group Messages:";
+                    lblGroupNameSystemMessage.Visible = true;
+                    repGroupMessage.DataSource = groupMessages;
+                    repGroupMessage.DataBind();
+                }
+                else
+                {
+                    lblGroupNameSystemMessage.Visible = false;
+                }
+
+                if (serverMessages != null && serverMessages.Length > 0)
+                {
+                    //lblGroupNameSystemMessage.Text = "Messages for " + groupName;
+                    lblServerSystemMessage.Text = "Client/Server Messages:";
+                    lblServerSystemMessage.Visible = true;
+                    repServerMessage.DataSource = serverMessages;
+                    repServerMessage.DataBind();
+                }
+                else
+                {
+                    lblServerSystemMessage.Visible = false;
+                }
             }
         }
 
@@ -711,16 +712,16 @@ namespace iLabs.ServiceBroker.iLabSB
             if (ussId > 0)
             {
 
-                string ussGuid = issuer.GetProcessAgent(ussId).agentGuid;
+                ProcessAgent uss = issuer.GetProcessAgent(ussId);
                 int lssId = issuer.FindProcessAgentIdForAgent(labServer.agentId, ProcessAgentType.LAB_SCHEDULING_SERVER);
-                string lssGuid = issuer.GetProcessAgent(lssId).agentGuid;
+                ProcessAgent lss = issuer.GetProcessAgent(lssId);
 
                 //Default duration ????
                 long duration = 36000;
 
                 RecipeExecutor recipeExec = RecipeExecutor.Instance();
-                string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(ussGuid, lssGuid, username, effectiveGroupName,
-                    labServer.agentGuid, lc.clientGuid, labClientName, labClientVersion,
+                string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss, lss, username, effectiveGroupName,
+                    labServer.agentGuid, lc,
                     Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
 
                 schedulingUrl += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);

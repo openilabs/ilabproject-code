@@ -624,7 +624,7 @@ namespace iLabs.Scheduling.UserSide
             
 
             string payload = factory.createAllowExperimentExecutionPayload(
-                res.startTime, duration, Session["groupName"].ToString());
+                res.startTime, duration, Session["groupName"].ToString(),clientGuid);
             DateTime tmpTime = res.startTime.AddTicks(duration * TimeSpan.TicksPerSecond);
             DateTime utcNow = DateTime.UtcNow;
             long ticketDuration = (tmpTime.Ticks - utcNow.Ticks) / TimeSpan.TicksPerSecond;

@@ -3626,19 +3626,23 @@ public static int CountScheduledClients(int labServerID){
             DbCommand myCommand = FactoryDB.CreateCommand("SystemMessages_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
             myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@messageType", messageType, DbType.AnsiString,100));
-            DbParameter client = FactoryDB.CreateParameter(myCommand, "@clientID", DbType.Int32);
-            if (clientID > 0)
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
-            else
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", null, DbType.Int32));
-            if (agentID > 0)
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
-            else
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", null, DbType.Int32));
-            if (groupID > 0)
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
-            else
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", null, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
+             
+            //DbParameter client = FactoryDB.CreateParameter(myCommand, "@clientID", DbType.Int32);
+            //if (clientID > 0)
+            //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", clientID, DbType.Int32));
+            //else
+            //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@clientID", null, DbType.Int32));
+            //if (agentID > 0)
+            //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
+            //else
+            //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", null, DbType.Int32));
+            //if (groupID > 0)
+            //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
+            //else
+            //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", null, DbType.Int32));
             
 			try 
 			{

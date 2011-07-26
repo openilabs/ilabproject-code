@@ -31,7 +31,7 @@ namespace iLabs.ServiceBroker
     /// </summary>
     public class BrokerDB : TicketIssuerDB
     {
-        
+
 
         //protected static ResourceMapping[] resourceMappings;
 
@@ -44,7 +44,7 @@ namespace iLabs.ServiceBroker
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("Experiment_Retrieve EssInfo", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentID", experimentID, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentID", experimentID, DbType.Int64));
             ProcessAgentInfo ess = null;
             try
             {
@@ -78,7 +78,7 @@ namespace iLabs.ServiceBroker
                 {
                     Coupon tmpCoupon = GetIssuedCoupon(couponIDs[i]);
                     Ticket ticket = RetrieveTicket(tmpCoupon, ticketType);
-                    if (ticket != null && !ticket.IsExpired()&& (ticket.SecondsToExpire() > duration))
+                    if (ticket != null && !ticket.IsExpired() && (ticket.SecondsToExpire() > duration))
                     {
                         if (ticket.redeemerGuid.CompareTo(essGuid) == 0)
                         {
@@ -174,7 +174,7 @@ namespace iLabs.ServiceBroker
 
         //public Coupon CreateExperimentTicketCollection(ProcessAgentInfo ess, int userId, int groupId, int roles, long duration){
         //    Coupon coupon = CreateCoupon();
-           
+
         //        TicketLoadFactory factory = TicketLoadFactory.Instance();
         //        string payload = null;
         //        if (ticketType.CompareTo(TicketTypes.ADMINISTER_EXPERIMENT) == 0)
@@ -192,7 +192,7 @@ namespace iLabs.ServiceBroker
         //        // Create a ticket to read records
         //        opCoupon = CreateTicket(ticketType, agentGuid, ProcessAgentDB.ServiceGuid, duration, payload);
         //        DataStorage.InsertExperimentCoupon(experimentId, opCoupon.couponId);
-            
+
         //    return opCoupon;
         //}
 
@@ -211,10 +211,10 @@ namespace iLabs.ServiceBroker
 
                 // populate parameter
                 // 1. type
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentID", id, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@adminURL", url,DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType, DbType.AnsiString, 100));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@adminURL", url, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ticketType", ticketType, DbType.AnsiString, 100));
+
 
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
@@ -273,8 +273,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@adminURLID",Id, DbType.Int32));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@adminURLID", Id, DbType.Int32));
+
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
             }
@@ -299,10 +299,10 @@ namespace iLabs.ServiceBroker
 
                 // populate parameter
                 // 1. type
-               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentID",processAgentId,DbType.Int32));
-               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@adminURL", url, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType, DbType.AnsiString, 100));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", processAgentId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@adminURL", url, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ticketType", ticketType, DbType.AnsiString, 100));
+
 
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
@@ -376,69 +376,70 @@ namespace iLabs.ServiceBroker
 
             // populate parameter
             // 1. type
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", agentID, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@old", oldCodebase,DbType.String, 512));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@new",newCodebase,DbType.String, 512));
-            
-            try{
-             // execute the command
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", agentID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@old", oldCodebase, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@new", newCodebase, DbType.String, 512));
+
+            try
+            {
+                // execute the command
                 connection.Open();
                 object obj = cmd.ExecuteScalar();
-                if(obj != null)
+                if (obj != null)
                     status = Convert.ToInt32(obj);
             }
-             catch (Exception ex)
-             {
-                 throw;
-             }
-             finally
-             {
-                 connection.Close();
-             }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
             return status;
         }
 
         public int ModifyClientScripts(int clientID, string oldCodebase, string newCodebase)
         {
-             int status = 0;
-             // create sql connection
-             DbConnection connection = FactoryDB.GetConnection();
-            
-             DbCommand cmd = FactoryDB.CreateCommand("Client_RetrieveLoaderScript", connection);
-             cmd.CommandType = CommandType.StoredProcedure;
+            int status = 0;
+            // create sql connection
+            DbConnection connection = FactoryDB.GetConnection();
 
-             // populate parameter
-             // 1. type
-             cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", clientID,DbType.Int32));
-            
-             int count = -1;
-             try
-             {
-                 // execute the command
-                 connection.Open();
-                 string loaderScript = Convert.ToString(cmd.ExecuteScalar());
-                 if (loaderScript.Contains(oldCodebase))
-                 {
-                     loaderScript = loaderScript.Replace(oldCodebase, newCodebase);
+            DbCommand cmd = FactoryDB.CreateCommand("Client_RetrieveLoaderScript", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
 
-                     DbCommand cmd2 = FactoryDB.CreateCommand("Client_UpdateLoaderScript", connection);
-                     cmd2.CommandType = CommandType.StoredProcedure;
-                     cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2,"@id", clientID, DbType.Int32));
-                     cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@script", loaderScript, DbType.String,2000));
-                     
-                     count = cmd2.ExecuteNonQuery();
-                 }
-             }
-             catch (Exception ex)
-             {
-                 throw;
-             }
-             finally
-             {
-                 connection.Close();
-             }
-             return status;
-         }
+            // populate parameter
+            // 1. type
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", clientID, DbType.Int32));
+
+            int count = -1;
+            try
+            {
+                // execute the command
+                connection.Open();
+                string loaderScript = Convert.ToString(cmd.ExecuteScalar());
+                if (loaderScript.Contains(oldCodebase))
+                {
+                    loaderScript = loaderScript.Replace(oldCodebase, newCodebase);
+
+                    DbCommand cmd2 = FactoryDB.CreateCommand("Client_UpdateLoaderScript", connection);
+                    cmd2.CommandType = CommandType.StoredProcedure;
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@id", clientID, DbType.Int32));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@script", loaderScript, DbType.String, 2000));
+
+                    count = cmd2.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return status;
+        }
 
         public int ModifyResourceInfoURL(int agentID, string oldCodebase, string newCodebase)
         {
@@ -447,13 +448,13 @@ namespace iLabs.ServiceBroker
             if (resources != null) // Check the current resources
             {
                 IntTag resourceTag = null;
-               
+
                 if (resources.ContainsKey("Info URL"))
                 {
                     resourceTag = (IntTag)resources["Info URL"];
-                    string value = resourceTag.tag.Replace(oldCodebase, newCodebase); 
+                    string value = resourceTag.tag.Replace(oldCodebase, newCodebase);
                     status = UpdateResourceMappingString(resourceTag.id, value);
-                }  
+                }
             }
             return status;
         }
@@ -499,9 +500,9 @@ namespace iLabs.ServiceBroker
         public AdminUrl RetrieveAdminURL(string processAgentGuid, string function)
         {
             int id = GetProcessAgentID(processAgentGuid);
-            if( id > 0)
+            if (id > 0)
                 return RetrieveAdminURL(id, function);
-            else 
+            else
                 return null;
         }
 
@@ -513,8 +514,8 @@ namespace iLabs.ServiceBroker
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-           cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", processAgentID, DbType.Int32));
-           
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", processAgentID, DbType.Int32));
+
 
             // read the result
             ArrayList list = new ArrayList();
@@ -549,13 +550,13 @@ namespace iLabs.ServiceBroker
             return urls;
         }
 
-        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent,Coupon inCoupon, Coupon outCoupon, string extra)
+        public override int ModifyDomainCredentials(string originalGuid, ProcessAgent agent, Coupon inCoupon, Coupon outCoupon, string extra)
         {
             int status = 0;
             ProcessAgentInfo paiOld = GetProcessAgentInfo(agent.agentGuid);
             try
             {
-                status = base.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon,extra);
+                status = base.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
             }
             catch (Exception ex)
             {
@@ -579,7 +580,7 @@ namespace iLabs.ServiceBroker
             foreach (ProcessAgentInfo pi in domainServices)
             {
                 // Do not send if retired this service or the service being modified since this is
-                if (!pi.retired && (pi.agentGuid.CompareTo(ProcessAgentDB.ServiceGuid) != 0) 
+                if (!pi.retired && (pi.agentGuid.CompareTo(ProcessAgentDB.ServiceGuid) != 0)
                     && (pi.agentGuid.CompareTo(agent.agentGuid) != 0))
                 {
                     proxy = new ProcessAgentProxy();
@@ -620,13 +621,15 @@ namespace iLabs.ServiceBroker
                         status += ModifyClientScripts(paiOld.agentId, paiOld.codeBaseUrl, agent.codeBaseUrl);
                     }
                 }
-                if(agent.agentName.CompareTo(paiOld.agentName) !=0){
+                if (agent.agentName.CompareTo(paiOld.agentName) != 0)
+                {
                     // need to update Qualifier Names
-                    AuthorizationAPI.ModifyQualifierName(Qualifier.ToTypeID(agent.type),paiOld.agentId,agent.agentName);
-                    int[] resourceMapIds = GetResourceMappingIdsByValue(ResourceMappingTypes.PROCESS_AGENT,paiOld.agentId);
-                    foreach(int id in resourceMapIds){
-                        ResourceMapping map =ResourceMapManager.GetMap(id);
-                        AuthorizationAPI.ModifyQualifierName(Qualifier.resourceMappingQualifierTypeID,id,ResourceMappingToString(map));
+                    AuthorizationAPI.ModifyQualifierName(Qualifier.ToTypeID(agent.type), paiOld.agentId, agent.agentName);
+                    int[] resourceMapIds = GetResourceMappingIdsByValue(ResourceMappingTypes.PROCESS_AGENT, paiOld.agentId);
+                    foreach (int id in resourceMapIds)
+                    {
+                        ResourceMapping map = ResourceMapManager.GetMap(id);
+                        AuthorizationAPI.ModifyQualifierName(Qualifier.resourceMappingQualifierTypeID, id, ResourceMappingToString(map));
                     }
                 }
                 //Notify all ProcessAgents about the change
@@ -662,7 +665,7 @@ namespace iLabs.ServiceBroker
 
 
         /* START OF RESOURCE MAPPING */
-     
+
         public IntTag[] GetAdminServiceTags(int groupID)
         {
             ArrayList list = new ArrayList();
@@ -671,19 +674,19 @@ namespace iLabs.ServiceBroker
             {
                 DbCommand cmd = FactoryDB.CreateCommand("ProcesAgent_RetrieveAdminServiceTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                   // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupId", groupID,DbType.Int32));
-                
+                // populate stored procedure parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupId", groupID, DbType.Int32));
+
 
                 // read the result
                 connection.Open();
                 DbDataReader dataReader = cmd.ExecuteReader();
-           
+
                 while (dataReader.Read())
                 {
                     int id = dataReader.GetInt32(0);
                     string name = dataReader.GetString(1);
-                    list.Add(new IntTag(id,name));
+                    list.Add(new IntTag(id, name));
                 }
                 dataReader.Close();
             }
@@ -713,18 +716,18 @@ namespace iLabs.ServiceBroker
             {
                 DbCommand cmd = FactoryDB.CreateCommand("ProcessAgent_RetrieveAdminTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                   // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupID", groupID, DbType.Int32));
+                // populate stored procedure parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupID", groupID, DbType.Int32));
 
                 // read the result
                 connection.Open();
                 DbDataReader dataReader = cmd.ExecuteReader();
-           
+
                 while (dataReader.Read())
                 {
                     int id = dataReader.GetInt32(0);
                     string name = dataReader.GetString(1);
-                    list.Add(new IntTag(id,name));
+                    list.Add(new IntTag(id, name));
                 }
                 dataReader.Close();
             }
@@ -783,38 +786,39 @@ namespace iLabs.ServiceBroker
 
         }
 
-     
-	
-       public ResourceMapping AddResourceMapping(string keyType, object key, string[] valueTypes, object[] values){
-           DbConnection connection = FactoryDB.GetConnection();
-           ResourceMapping mapping = null;
-           try
-           {
-               
-               mapping = InsertResourceMapping(connection, keyType, key, valueTypes, values);
-               if (mapping != null)
-               {
-                  
-                   // add the new resource mapping to the static resource mappings array
-                   ResourceMapManager.Add(mapping);
-                   
-
-               }
 
 
-           }
-           catch (DbException sqlEx)
-           {
-           }
-           finally
-           {
-               connection.Close();
-           }
+        public ResourceMapping AddResourceMapping(string keyType, object key, string[] valueTypes, object[] values)
+        {
+            DbConnection connection = FactoryDB.GetConnection();
+            ResourceMapping mapping = null;
+            try
+            {
 
-           return mapping;
+                mapping = InsertResourceMapping(connection, keyType, key, valueTypes, values);
+                if (mapping != null)
+                {
 
-       }
-     
+                    // add the new resource mapping to the static resource mappings array
+                    ResourceMapManager.Add(mapping);
+
+
+                }
+
+
+            }
+            catch (DbException sqlEx)
+            {
+            }
+            finally
+            {
+                connection.Close();
+            }
+
+            return mapping;
+
+        }
+
 
 
         protected ResourceMapping InsertResourceMapping(DbConnection connection, string keyType, object key, string[] valueTypes, object[] values)
@@ -952,7 +956,7 @@ namespace iLabs.ServiceBroker
                 connection.Close();
             }
         }
-        
+
         public ResourceMapping AddResourceMapping(ResourceMappingKey key, ResourceMappingValue[] values)
         {
             string[] valueTypes = new string[values.Length];
@@ -968,7 +972,7 @@ namespace iLabs.ServiceBroker
         }
 
 
-         /// <summary>
+        /// <summary>
         /// Deletes the resourceMapping and any qualifiers and grants related to the mapping
         /// </summary>
         /// <param name="mapping">Resource Mapping to be deleted</param>
@@ -1003,8 +1007,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@mapping_ID", mappingId,DbType.Int32));
-               
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@mapping_ID", mappingId, DbType.Int32));
+
                 connection.Open();
                 cmd.ExecuteNonQuery();
 
@@ -1049,16 +1053,16 @@ namespace iLabs.ServiceBroker
         /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
         public bool DeleteResourceMapping(string keyType, int keyId, string valueType, int valueId)
         {
-            return DeleteResourceMapping(ResourceMappingTypes.GetResourceMappingTypeID(keyType), keyId, 
-                ResourceMappingTypes.GetResourceMappingTypeID( valueType), valueId);
-    }
+            return DeleteResourceMapping(ResourceMappingTypes.GetResourceMappingTypeID(keyType), keyId,
+                ResourceMappingTypes.GetResourceMappingTypeID(valueType), valueId);
+        }
 
 
-    /// <summary>
-    /// Deletes the resourceMapping and any qualifiers and grants related to the mapping 
-    /// </summary>
-    /// <param name="mapping">Resource Mapping to be deleted</param>
-    /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
+        /// <summary>
+        /// Deletes the resourceMapping and any qualifiers and grants related to the mapping 
+        /// </summary>
+        /// <param name="mapping">Resource Mapping to be deleted</param>
+        /// <returns><code>true</code> if the mapping has been deleted successfully</returns>
         public bool DeleteResourceMapping(int keyTypeId, int keyId, int valueTypeId, int valueId)
         {
             bool status = false;
@@ -1071,13 +1075,13 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyID", keyId,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyType", keyTypeId, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@valueID", valueId,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@valueType", valueTypeId,DbType.Int32));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@keyID", keyId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@keyType", keyTypeId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@valueID", valueId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@valueType", valueTypeId, DbType.Int32));
+
                 connection.Open();
-                mapId  = (int)cmd.ExecuteScalar();
+                mapId = (int)cmd.ExecuteScalar();
                 if (mapId > 0)
                 {
                     status = DeleteResourceMapping(mapId);
@@ -1099,11 +1103,11 @@ namespace iLabs.ServiceBroker
         public ResourceMappingKey GetResourceMappingKey(int mappingID)
         {
             ResourceMapping mapping = ResourceMapManager.GetMap(mappingID);
-            if(mapping != null)
+            if (mapping != null)
                 return mapping.key;
-            else 
+            else
                 return null;
-            
+
         }
 
         public ResourceMapping GetResourceMapping(int mappingID)
@@ -1119,9 +1123,9 @@ namespace iLabs.ServiceBroker
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type,DbType.AnsiString, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", value, DbType.Int32));
-           
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", type, DbType.AnsiString, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", value, DbType.Int32));
+
             // execute the command
             try
             {
@@ -1173,7 +1177,7 @@ namespace iLabs.ServiceBroker
                 connection.Close();
             }
         }
-      
+
         public ResourceMapping ReadResourceMapping(int mappingID, DbConnection connection)
         {
             DbDataReader dataReader = null;
@@ -1183,8 +1187,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@mappingID", mappingID, DbType.Int32));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@mappingID", mappingID, DbType.Int32));
+
                 // execute the command
                 dataReader = cmd.ExecuteReader();
 
@@ -1227,7 +1231,8 @@ namespace iLabs.ServiceBroker
                 writeEx(e);
                 throw;
             }
-            finally{
+            finally
+            {
                 dataReader.Close();
             }
         }
@@ -1247,7 +1252,7 @@ namespace iLabs.ServiceBroker
         //    // otherwise, read mappings from the database    
         //    List<ResourceMapping> mappingList = null;
         //    mappingList = RetrieveResourceMapping();
-           
+
         //    if (mappingList != null)
         //        resourceMappings = mappingList.ToArray();
 
@@ -1301,7 +1306,7 @@ namespace iLabs.ServiceBroker
             else
                 return null;
         }
- 
+
 
         /// <summary>
         /// Complete reading a resource mapping given the mapping id as well an entry id. The entry is could be a key or a value.
@@ -1313,7 +1318,7 @@ namespace iLabs.ServiceBroker
         private ResourceMappingEntry CompleteResourceMappingKeyRead(DbConnection connection, int typeID, int entryID, bool isKey)
         {
             // get the entry type
-            string type = ResourceMappingTypes.GetResourceMappingType(typeID);            
+            string type = ResourceMappingTypes.GetResourceMappingType(typeID);
 
             // construct the entry object based on the entry type
             object entry = null;
@@ -1362,7 +1367,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", strID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ID", strID, DbType.Int32));
 
                 connection.Open();
                 return Convert.ToString(cmd.ExecuteScalar());
@@ -1389,8 +1394,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@string_Value", s, DbType.String,2048));
-                
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@string_Value", s, DbType.String, 2048));
+
                 connection.Open();
                 return Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -1413,9 +1418,9 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", id,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@string", s, DbType.String,2048));
-               
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@string", s, DbType.String, 2048));
+
                 connection.Open();
                 mappingID = Convert.ToInt32(cmd.ExecuteScalar());
                 if (mappingID > 0)
@@ -1443,8 +1448,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@resourceType_Value", s,DbType.String,256));
-            
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceType_Value", s, DbType.String, 256));
+
                 connection.Open();
                 return Convert.ToInt32(cmd.ExecuteScalar());
 
@@ -1467,8 +1472,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", resourceTypeID, DbType.Int32));
-               
+                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ID", resourceTypeID, DbType.Int32));
+
                 connection.Open();
                 return Convert.ToString(cmd.ExecuteScalar());
             }
@@ -1505,7 +1510,7 @@ namespace iLabs.ServiceBroker
         //        key = new ResourceMappingKey(type, (int)searchKey);
         //    }
 
-           
+
         //    List<ResourceMapping> list = ResourceMapManager.Get(key);
         //    if (list != null && list.Count > 0)
         //    {
@@ -1530,48 +1535,51 @@ namespace iLabs.ServiceBroker
 
             ResourceMappingValue[][] values = new ResourceMappingValue[mappingsTable.Count][];
             int i = 0;
-            foreach(DictionaryEntry entry in mappingsTable)
+            foreach (DictionaryEntry entry in mappingsTable)
             {
                 values[i++] = ((ResourceMapping)entry.Value).values;
-               
+
             }
-            return values;  
+            return values;
         }
 
         public Hashtable GetResourceStringTags(ResourceMappingKey key)
         {
-            return GetResourceStringTags((int) key.Entry, key.Type);
+            return GetResourceStringTags((int)key.Entry, key.Type);
         }
 
         public Hashtable GetResourceStringTags(int target, string rmType)
         {
-            
+
             return GetResourceStringTags(target, ResourceMappingTypes.GetResourceMappingTypeID(rmType));
         }
 
-        public Hashtable GetResourceStringTags(int target,int type){
+        public Hashtable GetResourceStringTags(int target, int type)
+        {
             Hashtable resources = null;
             Hashtable results = null;
 
             DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("ResourceMapTypeStrings_Retrieve", connection);   
+            DbCommand cmd = FactoryDB.CreateCommand("ResourceMapTypeStrings_Retrieve", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-          
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@target", target,DbType.Int32));
-            
+
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", type, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@target", target, DbType.Int32));
+
             try
             {
                 connection.Open();
                 DbDataReader reader = cmd.ExecuteReader();
-                if(reader.HasRows){
+                if (reader.HasRows)
+                {
                     resources = new Hashtable();
-                    int mid = 0;                    
-                    while(reader.Read()){
+                    int mid = 0;
+                    while (reader.Read())
+                    {
                         mid = reader.GetInt32(0);
-                        resources.Add(mid,reader.GetString(1));
+                        resources.Add(mid, reader.GetString(1));
                     }
                     if (reader.NextResult())
                     {
@@ -1587,21 +1595,22 @@ namespace iLabs.ServiceBroker
                                 results.Add(resources[id], tag);
                             }
                         }
-                    }          
+                    }
                 }
                 reader.Close();
             }
-                 
+
             catch (Exception ex)
             {
-               Logger.WriteLine(ex.Message);
+                Logger.WriteLine(ex.Message);
                 throw;
             }
-            finally{
+            finally
+            {
                 connection.Close();
-                
+
             }
-            if(results != null && results.Count > 0)
+            if (results != null && results.Count > 0)
                 return results;
             else
                 return null;
@@ -1689,14 +1698,14 @@ namespace iLabs.ServiceBroker
 
             // Should a grant be created here
 
-            return qualifierID;   
+            return qualifierID;
         }
 
         public int FindProcessAgentIdForAgent(int keyId, string type)
         {
             int result = -1;
             ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.PROCESS_AGENT, keyId);
-            ResourceMappingValue [] search = new ResourceMappingValue[1];
+            ResourceMappingValue[] search = new ResourceMappingValue[1];
             search[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, type);
             List<ResourceMapping> found = ResourceMapManager.Find(key, search);
             if (found != null && found.Count > 0)
@@ -1714,7 +1723,7 @@ namespace iLabs.ServiceBroker
                 }
 
             }
-            
+
             //Hashtable mappingsTable = GetResourceMappingsForKey(keyId, ResourceMappingTypes.PROCESS_AGENT);
             //if (mappingsTable != null)
             //{
@@ -1724,7 +1733,7 @@ namespace iLabs.ServiceBroker
             //}
             return result;
         }
-          
+
         /// <summary>
         /// Find a Process Agent (an LSS) associated with a particular LS, given a matrix of values
         /// </summary>
@@ -1740,7 +1749,7 @@ namespace iLabs.ServiceBroker
         //        return paId;
 
         //    ResourceMappingValue searchValue = null;
-            
+
 
         //    if (processAgentType.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
         //        searchValue = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.LAB_SCHEDULING_SERVER);
@@ -1795,7 +1804,7 @@ namespace iLabs.ServiceBroker
 
             ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.CLIENT, clientID);
             ResourceMappingValue[] searchValue = new ResourceMappingValue[1];
-           
+
 
             if (processAgentType.Equals(ProcessAgentType.SCHEDULING_SERVER))
                 searchValue[0] = new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER);
@@ -1842,7 +1851,7 @@ namespace iLabs.ServiceBroker
 
             //if (foundProcessAgent)
             //{
-                
+
             //    ResourceMappingValue[] associatedPA = values[row - 1];
             //    for (int i = 0; i < associatedPA.Length; i++)
             //    {
@@ -1853,12 +1862,12 @@ namespace iLabs.ServiceBroker
             //        }
             //    }
             //}
-            
+
             return paId;
 
-                
+
         }
-        
+
         /// <summary>
         /// Checks if an array of Resource Mapping values is Equal to another one
         /// </summary>
@@ -1929,7 +1938,7 @@ namespace iLabs.ServiceBroker
         //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value0", DbType.Int);
         //        paramType.Value = type0;
         //        paramValue.Value = value0;
-            
+
         //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type1", DbType.Int);
         //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value1", DbType.Int);
         //    if(ResourceMap.IsResourceMapType(type1)){
@@ -1967,23 +1976,23 @@ namespace iLabs.ServiceBroker
         //    return id;
         //}
 
-           public string ResourceMappingToString(ResourceMapping mapping)
+        public string ResourceMappingToString(ResourceMapping mapping)
         {
             StringBuilder s = new StringBuilder();
             //s.Append(mapping.MappingID + " ");
-             s.Append(GetMappingEntryString(mapping.key,true) + "-> ");
+            s.Append(GetMappingEntryString(mapping.key, true) + "-> ");
 
             //if (mapping.values.Length > 1)
             //    s.Append("(");
 
             // print all values except last
-             for (int i = 0; i < mapping.values.Length; i++)
-             {
-                 if (i > 0 && i < mapping.values.Length)
-                     s.Append(", ");
-                 s.Append(GetMappingEntryString(mapping.values[i],true));
+            for (int i = 0; i < mapping.values.Length; i++)
+            {
+                if (i > 0 && i < mapping.values.Length)
+                    s.Append(", ");
+                s.Append(GetMappingEntryString(mapping.values[i], true));
 
-             }
+            }
 
             //// print last value
             //if (mapping.values[mapping.values.Length - 1].Type.Equals(ResourceMappingTypes.RESOURCE_MAPPING))
@@ -2013,7 +2022,7 @@ namespace iLabs.ServiceBroker
                 //if (showType)
                 //    name = GetProcessAgentNameWithType((int)o);
                 //else
-                    name = GetProcessAgentName((int)o);
+                name = GetProcessAgentName((int)o);
                 if (name != null)
                     buf.Append(name);
                 else
@@ -2052,15 +2061,16 @@ namespace iLabs.ServiceBroker
                 if (showType)
                     buf.Append("RT: ");
                 string type = (string)o;
-                if(type.Equals(ProcessAgentType.EXPERIMENT_STORAGE_SERVER))
+                if (type.Equals(ProcessAgentType.EXPERIMENT_STORAGE_SERVER))
                     buf.Append("ESS");
-                else if(type.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
-                     buf.Append("LSS");
-                 else if(type.Equals(ProcessAgentType.SCHEDULING_SERVER))
-                     buf.Append("USS");
-                else if(type.Equals(ProcessAgentType.LAB_SERVER))
-                     buf.Append("LS");
-                else{
+                else if (type.Equals(ProcessAgentType.LAB_SCHEDULING_SERVER))
+                    buf.Append("LSS");
+                else if (type.Equals(ProcessAgentType.SCHEDULING_SERVER))
+                    buf.Append("USS");
+                else if (type.Equals(ProcessAgentType.LAB_SERVER))
+                    buf.Append("LS");
+                else
+                {
                     buf.Append(type);
                 }
             }
@@ -2123,354 +2133,687 @@ namespace iLabs.ServiceBroker
         //        s += ")";
         //    return s;
         //}
-/*
-        public int InsertRegisterRecord(int couponId, string couponGuid, string registerGuid,
-            string sourceGuid, int status, string email, string descriptor)
-        {
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponId", DbType.Int );
-            idParam.Value = couponId;
-            DbParameter couponGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponGuid", DbType.AnsiString,50 );
-            couponGuidParam.Value = couponGuid;
-            DbParameter registerGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@registerGuid", DbType.Varchar,50);
-            registerGuidParam.Value = registerGuid;
-            DbParameter sourceParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sourceGuid", DbType.Varchar,50);
-            sourceParam.Value = sourceGuid;
-            DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int );
-            statusParam.Value = status;
-            DbParameter emailParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@email", DbType.AnsiString,256 );
-            emailParam.Value = email;
-            DbParameter descriptorParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@descriptor", DbType.Text );
-            descriptorParam.Value = descriptor;
-            try
-            {
-            
-                return Convert.ToInt32(cmd.ExecuteScalar());
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-        }
-
-        public string[] SelectRegisterGuids()
-        {
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
-            Param.Value = (string)s;
-            try
-            {
-
-                DbDataReader dataReader = null;
-                dataReader = cmd.ExecuteReader();
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
-        }
-
-        protected RegisterRecord readRegisterRecord(DbDataReader reader){
-            RegisterRecord record = new RegisterRecord();
-            
-            record.recordId = reader.GetInt32(0);
-            if(!reader.IsDBNull(1))
-                record.couponId = reader.GetInt32(1);
-            if(!reader.IsDBNull(2))
-                record.couponGuid = reader.GetString(2);
-            if(!reader.IsDBNull(3))
-                record.registerGuid = reader.GetString(3);
-            if(!reader.IsDBNull(4))
-                record.sourceGuid = reader.GetString(4);
-            if(!reader.IsDBNull(5))
-                record.status = reader.GetInt32(5);
-           record.create =  DateUtil.SpecifyUTC(reader.GetDateTime(6));
-             record.lastModified = DateUtil.SpecifyUTC(reader.GetDateTime(7));
-             if(!reader.IsDBNull(8))
-                record.descriptor = reader.GetString(8);
-             if(!reader.IsDBNull(9))
-                record.email = reader.GetString(9);
-            return record;
-        }
-
-        public RegisterRecord SelectRegisterRecord(int id)
-        {
-            RegisterRecord record = null;
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("SelectRegistrationRecord", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
-            Param.Value = id;
-            try
-            {
-                DbDataReader dataReader = null;
-                dataReader = cmd.ExecuteReader();
-                while(dataReader.Read()){
-                    record = readRegisterRecord(dataReader);
-
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
-        }
-
-        public RegisterRecord[] SelectRegister(string registerGuid)
-        {
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
-            Param.Value = (string)s;
-            try
-            {
-
-                return Convert.ToInt32(cmd.ExecuteScalar());
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-        }
-
-        public RegisterRecord[] SelectRegisterByStatus(int status)
-        {
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
-            Param.Value = (string)s;
-            try
-            {
-
-                return Convert.ToInt32(cmd.ExecuteScalar());
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-        }
-        public RegisterRecord[] SelectRegisterByStatus(int low, int high)
-        {
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
-            Param.Value = (string)s;
-            try
-            {
-
-                return Convert.ToInt32(cmd.ExecuteScalar());
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-            finally
-            {
-                connection.Close();
-            }
-
-
-        }
-
-        public int SetRegisterStatus(int id, int status)
-        {
-            DbConnection connection = CreateConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("UpdateRegistrationStatus", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
-            idParam.Value = id;
-            DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int);
-            statusParam.Value = status;
-            try
-            {
-
-                return cmd.ExecuteNonQuery();
-
-            }
-            catch (Exception e)
-            {
-               Logger.WriteLine(e.Message);
-            }
-
-            finally
-            {
-                connection.Close();
-            }
-
-
-        }
-*/
         /*
+                public int InsertRegisterRecord(int couponId, string couponGuid, string registerGuid,
+                    string sourceGuid, int status, string email, string descriptor)
+                {
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponId", DbType.Int );
+                    idParam.Value = couponId;
+                    DbParameter couponGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponGuid", DbType.AnsiString,50 );
+                    couponGuidParam.Value = couponGuid;
+                    DbParameter registerGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@registerGuid", DbType.Varchar,50);
+                    registerGuidParam.Value = registerGuid;
+                    DbParameter sourceParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sourceGuid", DbType.Varchar,50);
+                    sourceParam.Value = sourceGuid;
+                    DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int );
+                    statusParam.Value = status;
+                    DbParameter emailParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@email", DbType.AnsiString,256 );
+                    emailParam.Value = email;
+                    DbParameter descriptorParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@descriptor", DbType.Text );
+                    descriptorParam.Value = descriptor;
+                    try
+                    {
+            
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+                }
+
+                public string[] SelectRegisterGuids()
+                {
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    Param.Value = (string)s;
+                    try
+                    {
+
+                        DbDataReader dataReader = null;
+                        dataReader = cmd.ExecuteReader();
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+
+                }
+
+                protected RegisterRecord readRegisterRecord(DbDataReader reader){
+                    RegisterRecord record = new RegisterRecord();
+            
+                    record.recordId = reader.GetInt32(0);
+                    if(!reader.IsDBNull(1))
+                        record.couponId = reader.GetInt32(1);
+                    if(!reader.IsDBNull(2))
+                        record.couponGuid = reader.GetString(2);
+                    if(!reader.IsDBNull(3))
+                        record.registerGuid = reader.GetString(3);
+                    if(!reader.IsDBNull(4))
+                        record.sourceGuid = reader.GetString(4);
+                    if(!reader.IsDBNull(5))
+                        record.status = reader.GetInt32(5);
+                   record.create =  DateUtil.SpecifyUTC(reader.GetDateTime(6));
+                     record.lastModified = DateUtil.SpecifyUTC(reader.GetDateTime(7));
+                     if(!reader.IsDBNull(8))
+                        record.descriptor = reader.GetString(8);
+                     if(!reader.IsDBNull(9))
+                        record.email = reader.GetString(9);
+                    return record;
+                }
+
+                public RegisterRecord SelectRegisterRecord(int id)
+                {
+                    RegisterRecord record = null;
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("SelectRegistrationRecord", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
+                    Param.Value = id;
+                    try
+                    {
+                        DbDataReader dataReader = null;
+                        dataReader = cmd.ExecuteReader();
+                        while(dataReader.Read()){
+                            record = readRegisterRecord(dataReader);
+
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+
+                }
+
+                public RegisterRecord[] SelectRegister(string registerGuid)
+                {
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    Param.Value = (string)s;
+                    try
+                    {
+
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+                }
+
+                public RegisterRecord[] SelectRegisterByStatus(int status)
+                {
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    Param.Value = (string)s;
+                    try
+                    {
+
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+                }
+                public RegisterRecord[] SelectRegisterByStatus(int low, int high)
+                {
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("InsertRegistration", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    Param.Value = (string)s;
+                    try
+                    {
+
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+
+                }
+
+                public int SetRegisterStatus(int id, int status)
+                {
+                    DbConnection connection = CreateConnection();
+                    DbCommand cmd = FactoryDB.CreateCommand("UpdateRegistrationStatus", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // populate parameters
+                    DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
+                    idParam.Value = id;
+                    DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int);
+                    statusParam.Value = status;
+                    try
+                    {
+
+                        return cmd.ExecuteNonQuery();
+
+                    }
+                    catch (Exception e)
+                    {
+                       Logger.WriteLine(e.Message);
+                    }
+
+                    finally
+                    {
+                        connection.Close();
+                    }
+
+
+                }
+        */
+
         /// <summary>
-        /// This examines the specified parameters and current session state to resove the next action.
+        /// This examines the specified parameters to resolve the available resources for the user
         /// This may only be called after a user is Authenticated.
         /// </summary>
-        private int ResolveAction(string group_Name, string user_Name, string serviceGuid, string client_Guid,
-            out string message, out User user, out Group group, out ProcessAgentInfo service, out Client client)
+        public int ResolveResources(string authorityGuid, string userName, string groupName, string serviceGuid, string clientGuid,
+            ref StringBuilder message, out int userID, out Dictionary<int, int[]> groupClientsMap)
         {
-            int status = -1;    
-            int user_ID = 0;
-            int client_ID = 0;
-            int group_ID = 0;
-           
-            StringBuilder buf = new StringBuilder();
-
-            if (hdnUser.Value != null && hdnUser.Value.Length > 0)
+            int status = -1;
+            int groupID = 0;
+            int clientID = 0;
+            List<int> grpIds = new List<int>();
+            List<int> clientIds = new List<int>();
+            //StringBuilder buf = new StringBuilder();
+            groupClientsMap = new Dictionary<int, int[]>();
+            userID = 0;
+            if (userName != null && userName.Length > 0)
             {
-                // Check that the specified user & current user match
-                if (hdnUser.Value.ToLower().CompareTo(Session["UserName"].ToString().ToLower()) == 0)
+                if (serviceGuid == null || serviceGuid.Length == 0 || (serviceGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0))
                 {
-                    user_Name = hdnUser.Value;
-                    user_ID = AdministrativeAPI.GetUserID(user_Name);
-                }
-                else
-                {
-                    //logout();
-                    lblMessages.Visible = true;
-                    lblMessages.Text = "You are not the user that was specified!";
-                    return;
+                    // Local user
+                    userID = AdministrativeAPI.GetUserID(userName);
                 }
             }
-            else // User is current user
+            else
             {
-                user_Name = Session["UserName"].ToString();
-                user_ID = Convert.ToInt32(Session["UserID"]);
+                message.Append(" No user was specified!");
+                return status;
             }
-
-            //Get Client_ID
-            if (hdnClient.Value != null && hdnClient.Value.Length > 0)
+            if (userID > 0)
             {
-                client_ID = AdministrativeAPI.GetLabClientID(hdnClient.Value);
-                //Session["clientID"] = client_ID;
-            }
-
-            //{ // Note: The existing session client should not be concidered?
-
-            if (hdnGroup.Value != null && hdnGroup.Value.Length > 0)
-            {
-                group_Name = hdnGroup.Value;
-            }
-
-            // Check that the user & is a member of the group
-            if (group_Name != null)
-            {
-                int gid = AdministrativeAPI.GetGroupID(group_Name);
-                if (gid > 0)
+                if (groupName != null && groupName.Length > 0)
                 {
-                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    groupID = AdministrativeAPI.GetGroupID(groupName);
+                    if (groupID > 0)
                     {
-                        group_ID = gid;
-                        //Session["GroupID"] = group_ID;
-                        //Session["GroupName"] = group_Name;
-                    }
-                    else
-                    {
-                        // user is not a member of the group
-                        group_ID = -1;
-                        group_Name = null;
-
-                    }
-                }
-            }
-
-            // Session and parameters are parsed, do we have enough info to launch
-            int[] clientGroupIDs = null;
-            int[] userGroupIDs = null;
-
-            // Try and resolve any unspecified parameters
-            if (client_ID <= 0 && group_ID <= 0)
-            {
-                userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
-                Group[] groups = AdministrativeAPI.GetGroups(userGroupIDs);
-                Dictionary<int, int[]> clientMap = new Dictionary<int, int[]>();
-                foreach (Group g in groups)
-                {
-                    if ((g.groupType.CompareTo(GroupType.REGULAR) == 0) && (g.groupName.CompareTo("ROOT") != 0)
-                        && (g.groupName.CompareTo("NewUserGroup") != 0) && (g.groupName.CompareTo("OrphanedUserGroup") != 0)
-                         && (g.groupName.CompareTo("SuperUserGroup") != 0))
-                    {
-                        int[] clientIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
-                        if (clientIDs != null & clientIDs.Length > 0)
+                        if (AdministrativeAPI.IsAgentMember(userID, groupID))
                         {
-                            clientMap.Add(g.groupID, clientIDs);
+                            grpIds.Add(groupID);
+                        }
+                        else
+                        {
+                            message.AppendLine(" The specified user is not a member of the specified group!");
                         }
                     }
                 }
-                if (clientMap.Count > 1) //more than one group with clients
+                else
                 {
-                    modifyUserSession(group_ID, client_ID);
-                    Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+                    grpIds.AddRange(AdministrativeAPI.ListGroupsForAgentRecursively(userID));
                 }
-                if (clientMap.Count == 1) // get the group with clients
+                
+                if (clientGuid != null && clientGuid.Length > 0)
                 {
-                    Dictionary<int, int[]>.Enumerator en = clientMap.GetEnumerator();
-                    int gid = -1;
-                    int[] clients = null;
-                    while (en.MoveNext())
+                    clientID = AdministrativeAPI.GetLabClientID(clientGuid);
+                    // Check that the client may be run from an authorized group
+                    if (clientID > 0)
                     {
-                        gid = en.Current.Key;
-                        clients = en.Current.Value;
+                        int[] clientGroups = AdministrativeUtilities.GetLabClientGroups(clientID);
+                        if (clientGroups != null && clientGroups.Length > 0)
+                        {
+                            foreach (int id in clientGroups)
+                            {
+                                if (grpIds.Contains(id))
+                                {
+                                    groupClientsMap.Add(id, new int[] { clientID });
+                                }
+                            }
+                        }
+
                     }
-                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                }
+                else
+                {
+                    Group[] groups = AdministrativeAPI.GetGroups(grpIds.ToArray());
+                    foreach (Group g in groups)
                     {
-                        group_ID = gid;
-                        group_Name = AdministrativeAPI.GetGroupName(gid);
+                        if ((g.groupType.CompareTo(GroupType.REGULAR) == 0)
+                            || (g.groupType.CompareTo(GroupType.COURSE_STAFF) == 0)
+                            || (g.groupType.CompareTo(GroupType.SERVICE_ADMIN) == 0))
+                        {
+                            int[] cIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                            if (cIDs != null & cIDs.Length > 0)
+                            {
+                                groupClientsMap.Add(g.groupID, cIDs);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                message.Append("The specified user could not be authorized!");
+            }
+            return status;
+        }
+        
 
 
-                        if (clients == null || clients.Length > 1)
+        //if (clientMap.Count > 1) //more than one group with clients
+        //            {
+        //                modifyUserSession(group_ID, client_ID);
+        //                Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+        //            }
+        //            else if (clientMap.Count == 1) // get the group with clients
+        //    {
+        //        Dictionary<int, int[]>.Enumerator en = clientMap.GetEnumerator();
+        //        int gid = -1;
+        //        int[] clients = null;
+        //        while (en.MoveNext())
+        //        {
+        //            gid = en.Current.Key;
+        //            clients = en.Current.Value;
+        //        }
+        //        if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+        //        {
+        //            group_ID = gid;
+        //            group_Name = AdministrativeAPI.GetGroupName(gid);
+
+
+        //            if (clients == null || clients.Length > 1)
+        //            {
+        //                modifyUserSession(group_ID, client_ID);
+        //                Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
+        //            }
+        //            else
+        //            {
+        //                client_ID = clients[0];
+        //            }
+        //        }    
+        //}
+
+        //    //Get Client_ID
+        //    if (hdnClient.Value != null && hdnClient.Value.Length > 0)
+        //    {
+        //        client_ID = AdministrativeAPI.GetLabClientID(hdnClient.Value);
+        //        //Session["clientID"] = client_ID;
+        //    }
+
+        //    //{ // Note: The existing session client should not be concidered?
+
+        //    if (hdnGroup.Value != null && hdnGroup.Value.Length > 0)
+        //    {
+        //        group_Name = hdnGroup.Value;
+        //    }
+
+        //    // Check that the user & is a member of the group
+        //    if (group_Name != null)
+        //    {
+        //        int gid = AdministrativeAPI.GetGroupID(group_Name);
+        //        if (gid > 0)
+        //        {
+        //            if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+        //            {
+        //                group_ID = gid;
+        //                //Session["GroupID"] = group_ID;
+        //                //Session["GroupName"] = group_Name;
+        //            }
+        //            else
+        //            {
+        //                // user is not a member of the group
+        //                group_ID = -1;
+        //                group_Name = null;
+
+        //            }
+        //        }
+        //    }
+
+        //    // Session and parameters are parsed, do we have enough info to launch
+        //    int[] clientGroupIDs = null;
+        //    int[] userGroupIDs = null;
+
+        //    // Try and resolve any unspecified parameters
+        //    if (client_ID <= 0 && group_ID <= 0)
+        //    {
+        //        userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+
+
+        //    }
+
+        //    else if (client_ID > 0 && group_ID <= 0)
+        //    {
+        //        int gid = -1;
+        //        clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+        //        if (clientGroupIDs == null || clientGroupIDs.Length == 0)
+        //        {
+        //            modifyUserSession(group_ID, client_ID);
+        //            Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+        //        }
+        //        else if (clientGroupIDs.Length == 1)
+        //        {
+        //            gid = clientGroupIDs[0];
+        //        }
+        //        else
+        //        {
+        //            userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+        //            int count = 0;
+        //            foreach (int ci in clientGroupIDs)
+        //            {
+        //                foreach (int ui in userGroupIDs)
+        //                {
+        //                    if (ci == ui)
+        //                    {
+        //                        count++;
+        //                        gid = ui;
+        //                    }
+        //                }
+        //            }
+        //            if (count != 1)
+        //            {
+        //                gid = -1;
+        //            }
+        //        }
+        //        if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
+        //        {
+        //            group_ID = gid;
+
+        //        }
+        //        else
+        //        {
+        //            modifyUserSession(group_ID, client_ID);
+        //        }
+        //    }
+        //    else if (client_ID <= 0 && group_ID > 0)
+        //    {
+        //        int[] clients = AdministrativeUtilities.GetGroupLabClients(group_ID);
+        //        if (clients == null || clients.Length != 1)
+        //        {
+        //            modifyUserSession(group_ID, client_ID);
+        //            Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
+        //        }
+        //        else
+        //        {
+        //            client_ID = clients[0];
+        //        }
+        //    }
+        //    if (user_ID > 0 && group_ID > 0 && client_ID > 0)
+        //    {
+        //        int gid = -1;
+        //        clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+        //        foreach (int g_id in clientGroupIDs)
+        //        {
+        //            if (g_id == group_ID)
+        //            {
+        //                gid = g_id;
+        //                break;
+        //            }
+        //        }
+        //        if (gid == -1)
+        //        {
+        //            buf.Append("The specified group does not have permission to to run the specified client!");
+        //            lblMessages.Visible = true;
+        //            lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
+        //            return;
+        //        }
+        //        if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
+        //        {
+        //            buf.Append("You do not have permission to to run the specified client!");
+        //            lblMessages.Visible = true;
+        //            lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
+        //            return;
+        //        }
+
+        //        // is authorized ?
+
+        //        modifyUserSession(group_ID, client_ID);
+        //        launchLab(user_ID, group_ID, client_ID);
+
+        //    }
+        //    return status;
+        //}
+        /*
+                /// <summary>
+                /// This examines the specified parameters and current session state to resove the next action.
+                /// This may only be reached after a user is Authenticated.
+                /// </summary>
+                private void ResolveAction()
+                {
+                    int user_ID = 0;
+                    int client_ID = 0;
+                    int group_ID = 0;
+                    string client_Guid = null;
+                    string group_Name = null;
+                    string user_Name = null;
+                    StringBuilder buf = new StringBuilder();
+                    Session["IsAdmin"] = false;
+                    Session["IsServiceAdmin"] = false;
+                    lblMessages.Visible = false;
+                    lblMessages.Text = "";
+
+                    if (hdnUser.Value != null && hdnUser.Value.Length > 0)
+                    {
+                        // Check that the specified user & current user match
+                        if (hdnUser.Value.ToLower().CompareTo(Session["UserName"].ToString().ToLower()) == 0)
+                        {
+                            user_Name = hdnUser.Value;
+                            user_ID = AdministrativeAPI.GetUserID(user_Name);
+                        }
+                        else
+                        {
+                            //logout();
+                            lblMessages.Visible = true;
+                            lblMessages.Text = "You are not the user that was specified!";
+                            return;
+                        }
+                    }
+                    else // User is current user
+                    {
+                        user_Name = Session["UserName"].ToString();
+                        user_ID = Convert.ToInt32(Session["UserID"]);
+                    }
+
+                    //Get Client_ID
+                    if (hdnClient.Value != null && hdnClient.Value.Length > 0)
+                    {
+                        client_ID = AdministrativeAPI.GetLabClientID(hdnClient.Value);
+                        //Session["clientID"] = client_ID;
+                    }
+
+                    //{ // Note: The existing session client should not be concidered?
+
+                    if (hdnGroup.Value != null && hdnGroup.Value.Length > 0)
+                    {
+                        group_Name = hdnGroup.Value;
+                    }
+
+                    // Check that the user & is a member of the group
+                    if (group_Name != null)
+                    {
+                        int gid = AdministrativeAPI.GetGroupID(group_Name);
+                        if (gid > 0)
+                        {
+                            if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                            {
+                                group_ID = gid;
+                                //Session["GroupID"] = group_ID;
+                                //Session["GroupName"] = group_Name;
+                            }
+                            else
+                            {
+                                // user is not a member of the group
+                                group_ID = -1;
+                                group_Name = null;
+
+                            }
+                        }
+                    }
+
+                    // Session and parameters are parsed, do we have enough info to launch
+                    int[] clientGroupIDs = null;
+                    int[] userGroupIDs = null;
+
+                    // Try and resolve any unspecified parameters
+                    if (client_ID <= 0 && group_ID <= 0)
+                    {
+                        userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                        Group[] groups = AdministrativeAPI.GetGroups(userGroupIDs);
+                        Dictionary<int, int[]> clientMap = new Dictionary<int, int[]>();
+                        foreach (Group g in groups)
+                        {
+                            if ((g.groupType.CompareTo(GroupType.REGULAR) == 0) && (g.groupName.CompareTo("ROOT") != 0)
+                                && (g.groupName.CompareTo("NewUserGroup") != 0) && (g.groupName.CompareTo("OrphanedUserGroup") != 0)
+                                 && (g.groupName.CompareTo("SuperUserGroup") != 0))
+                            {
+                                int[] clientIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                                if (clientIDs != null & clientIDs.Length > 0)
+                                {
+                                    clientMap.Add(g.groupID, clientIDs);
+                                }
+                            }
+                        }
+                        if (clientMap.Count > 1) //more than one group with clients
+                        {
+                            modifyUserSession(group_ID, client_ID);
+                            Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+                        }
+                        if (clientMap.Count == 1) // get the group with clients
+                        {
+                            Dictionary<int, int[]>.Enumerator en = clientMap.GetEnumerator();
+                            int gid = -1;
+                            int[] clients = null;
+                            while (en.MoveNext())
+                            {
+                                gid = en.Current.Key;
+                                clients = en.Current.Value;
+                            }
+                            if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                            {
+                                group_ID = gid;
+                                group_Name = AdministrativeAPI.GetGroupName(gid);
+
+
+                                if (clients == null || clients.Length > 1)
+                                {
+                                    modifyUserSession(group_ID, client_ID);
+                                    Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
+                                }
+                                else
+                                {
+                                    client_ID = clients[0];
+                                }
+                            }
+                        }
+                    }
+
+                    else if (client_ID > 0 && group_ID <= 0)
+                    {
+                        int gid = -1;
+                        clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+                        if (clientGroupIDs == null || clientGroupIDs.Length == 0)
+                        {
+                            modifyUserSession(group_ID, client_ID);
+                            Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
+                        }
+                        else if (clientGroupIDs.Length == 1)
+                        {
+                            gid = clientGroupIDs[0];
+                        }
+                        else
+                        {
+                            userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                            int count = 0;
+                            foreach (int ci in clientGroupIDs)
+                            {
+                                foreach (int ui in userGroupIDs)
+                                {
+                                    if (ci == ui)
+                                    {
+                                        count++;
+                                        gid = ui;
+                                    }
+                                }
+                            }
+                            if (count != 1)
+                            {
+                                gid = -1;
+                            }
+                        }
+                        if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
+                        {
+                            group_ID = gid;
+
+                        }
+                        else
+                        {
+                            modifyUserSession(group_ID, client_ID);
+                        }
+                    }
+                    else if (client_ID <= 0 && group_ID > 0)
+                    {
+                        int[] clients = AdministrativeUtilities.GetGroupLabClients(group_ID);
+                        if (clients == null || clients.Length != 1)
                         {
                             modifyUserSession(group_ID, client_ID);
                             Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
@@ -2480,116 +2823,57 @@ namespace iLabs.ServiceBroker
                             client_ID = clients[0];
                         }
                     }
-                }
-            }
-
-            else if (client_ID > 0 && group_ID <= 0)
-            {
-                int gid = -1;
-                clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
-                if (clientGroupIDs == null || clientGroupIDs.Length == 0)
-                {
-                    modifyUserSession(group_ID, client_ID);
-                    Response.Redirect(Global.FormatRegularURL(Request, "myGroups.aspx"), true);
-                }
-                else if (clientGroupIDs.Length == 1)
-                {
-                    gid = clientGroupIDs[0];
-                }
-                else
-                {
-                    userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
-                    int count = 0;
-                    foreach (int ci in clientGroupIDs)
+                    if (user_ID > 0 && group_ID > 0 && client_ID > 0)
                     {
-                        foreach (int ui in userGroupIDs)
+                        int gid = -1;
+                        clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+                        foreach (int g_id in clientGroupIDs)
                         {
-                            if (ci == ui)
+                            if (g_id == group_ID)
                             {
-                                count++;
-                                gid = ui;
+                                gid = g_id;
+                                break;
                             }
                         }
-                    }
-                    if (count != 1)
-                    {
-                        gid = -1;
-                    }
-                }
-                if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
-                {
-                    group_ID = gid;
+                        if (gid == -1)
+                        {
+                            buf.Append("The specified group does not have permission to to run the specified client!");
+                            lblMessages.Visible = true;
+                            lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
+                            return;
+                        }
+                        if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
+                        {
+                            buf.Append("You do not have permission to to run the specified client!");
+                            lblMessages.Visible = true;
+                            lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
+                            return;
+                        }
 
-                }
-                else
-                {
-                    modifyUserSession(group_ID, client_ID);
-                }
-            }
-            else if (client_ID <= 0 && group_ID > 0)
-            {
-                int[] clients = AdministrativeUtilities.GetGroupLabClients(group_ID);
-                if (clients == null || clients.Length != 1)
-                {
-                    modifyUserSession(group_ID, client_ID);
-                    Response.Redirect(Global.FormatRegularURL(Request, "myLabs.aspx"), true);
-                }
-                else
-                {
-                    client_ID = clients[0];
-                }
-            }
-            if (user_ID > 0 && group_ID > 0 && client_ID > 0)
-            {
-                int gid = -1;
-                clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
-                foreach (int g_id in clientGroupIDs)
-                {
-                    if (g_id == group_ID)
-                    {
-                        gid = g_id;
-                        break;
+                        // is authorized ?
+
+                        modifyUserSession(group_ID, client_ID);
+                        launchLab(user_ID, group_ID, client_ID);
+
                     }
                 }
-                if (gid == -1)
-                {
-                    buf.Append("The specified group does not have permission to to run the specified client!");
-                    lblMessages.Visible = true;
-                    lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
-                    return;
-                }
-                if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
-                {
-                    buf.Append("You do not have permission to to run the specified client!");
-                    lblMessages.Visible = true;
-                    lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
-                    return;
-                }
-
-                // is authorized ?
-
-                modifyUserSession(group_ID, client_ID);
-                launchLab(user_ID, group_ID, client_ID);
-
-            }
-            return status;
-        }
-*/
-
         
+            }
+         * */
+
+        //public class RegisterRecord
+        //{
+        //    public int recordId;
+        //    public int status;
+        //    public int couponId;
+        //    public DateTime create;
+        //    public DateTime lastModified;
+        //    public string couponGuid;
+        //    public string registerGuid;
+        //    public string sourceGuid;
+        //    public string descriptor;
+        //    public string email;
+        //}
+
     }
-    //public class RegisterRecord
-    //{
-    //    public int recordId;
-    //    public int status;
-    //    public int couponId;
-    //    public DateTime create;
-    //    public DateTime lastModified;
-    //    public string couponGuid;
-    //    public string registerGuid;
-    //    public string sourceGuid;
-    //    public string descriptor;
-    //    public string email;
-    //}
-        
 }

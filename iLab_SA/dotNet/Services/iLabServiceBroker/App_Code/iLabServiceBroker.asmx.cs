@@ -69,6 +69,9 @@ namespace iLabs.ServiceBroker.iLabSB
    WebService(Name = "iLabServiceBroker", Namespace = "http://ilab.mit.edu/iLabs/Services")]
 	public class iLabServiceBroker : InteractiveSB
 	{
+        /// <summary>
+        /// Instantiated to send sbAuthHeader objects in SOAP requests
+        /// </summary>
         public sbAuthHeader sbHeader = new sbAuthHeader();
 		private BatchLSProxy batchLS_Proxy = new BatchLSProxy();
 

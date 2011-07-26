@@ -2183,8 +2183,17 @@ namespace iLabs.ServiceBroker.Administration
                 {
                     throw new AccessDeniedException("The ticket has expired.");
                 }
-                // Get Session info	
-                XmlQueryDoc expDoc = new XmlQueryDoc(sessionTicket.payload);
+
+                sessionInfo = ParseRedeemSessionPayload(sessionTicket.payload);
+            }
+            return sessionInfo;
+        }
+
+        public static SessionInfo ParseRedeemSessionPayload(string payload){
+            SessionInfo sessionInfo = null;
+            if(payload != null && payload.Length >0){
+            // Get Session info	
+                XmlQueryDoc expDoc = new XmlQueryDoc(payload);
                 sessionInfo = new SessionInfo();
                 string STR_RedeemSessionPayload = "RedeemSessionPayload/";
                 string userID = expDoc.Query(STR_RedeemSessionPayload + "userID");
@@ -2197,7 +2206,7 @@ namespace iLabs.ServiceBroker.Administration
                 sessionInfo.groupName = expDoc.Query(STR_RedeemSessionPayload + "groupName");
             }
             return sessionInfo;
-        }
+    }
 
 		/// <summary>
 		/// Obtain all sessions of a given User.

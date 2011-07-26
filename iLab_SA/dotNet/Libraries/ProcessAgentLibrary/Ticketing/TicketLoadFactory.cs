@@ -123,20 +123,20 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.ADMINISTER_USS, keyValueDictionary);
         }
 
-        public string createManageUSSGroupPayload(string groupName, string sbGuid, string clientGUID, int userTZ)
+        public string createManageUSSGroupPayload(string groupName, string sbGuid, string clientGuid, int userTZ)
         {
             string rootElemt = "ManageUSSGroupPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();        
             keyValueDictionary.Add("groupName", groupName);
             keyValueDictionary.Add("sbGuid", sbGuid);
-	    if(clientGUID != null)
-                keyValueDictionary.Add("clientGuid", clientGUID);
+	        if(clientGuid != null)
+                keyValueDictionary.Add("clientGuid", clientGuid);
             keyValueDictionary.Add("userTZ", userTZ);
             return writeTicketLoad(rootElemt, TicketTypes.MANAGE_USS_GROUP, keyValueDictionary);
         }
 
         public string createScheduleSessionPayload(string userName, string groupName, string sbGuid, 
-            string labServerGUID, string clientGuid, string labClientName, string labClientVersion, int userTZ)
+            string labServerGUID, string clientGuid, string labClientName, string labClientVersion, string ussURL,int userTZ)
         {
             string rootElemt = "ScheduleSessionPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
@@ -147,32 +147,24 @@ namespace iLabs.Ticketing
             keyValueDictionary.Add("clientGuid", clientGuid);
             keyValueDictionary.Add("labClientName", labClientName);
             keyValueDictionary.Add("labClientVersion", labClientVersion);
+            if(ussURL != null && ussURL.Length >0)
+                keyValueDictionary.Add("ussURL", ussURL);
             keyValueDictionary.Add("userTZ", userTZ);
             return writeTicketLoad(rootElemt, TicketTypes.SCHEDULE_SESSION, keyValueDictionary);
         }
 
-        public string makeReservationPayload(string authGuid, string userName, string groupName,
-           string labServerGUID, string clientGuid, string ussURL)
-        {
-            string rootElemt = "MakeReservationPayload";
-            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
-            keyValueDictionary.Add("authGuid", authGuid);
-            keyValueDictionary.Add("userName", userName);
-            keyValueDictionary.Add("groupName", groupName);
-            keyValueDictionary.Add("labServerGuid", labServerGUID);
-            keyValueDictionary.Add("clientGuid", clientGuid);
-            keyValueDictionary.Add("ussURL", ussURL);
-          
-            return writeTicketLoad(rootElemt, TicketTypes.SCHEDULE_SESSION, keyValueDictionary);
-        }
+       
 
 
-        public string createRedeemReservationPayload(DateTime startTime,DateTime endTime)
+        public string createRedeemReservationPayload(DateTime startTime,DateTime endTime, string userName, string groupName, string clientGuid)
         {
             string rootElemt = "RedeemReservationPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
             keyValueDictionary.Add("start", DateUtil.ToUtcString(startTime));
             keyValueDictionary.Add("end", DateUtil.ToUtcString(endTime));
+            keyValueDictionary.Add("userName", userName);
+            keyValueDictionary.Add("groupName", groupName);
+            keyValueDictionary.Add("clientGuid", clientGuid);
             return writeTicketLoad(rootElemt, TicketTypes.REDEEM_RESERVATION, keyValueDictionary);
         }
 
@@ -188,13 +180,15 @@ namespace iLabs.Ticketing
         //Do we need the ServiceBroker ID??
         //
         public string createAllowExperimentExecutionPayload(DateTime startExecution, long duration,
-            string groupName)//, string sbGuid)
+            string groupName, string clientGuid)//, string sbGuid)
         {
             string rootElemt = "AllowExperimentExecutionPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
             keyValueDictionary.Add("startExecution", DateUtil.ToUtcString(startExecution));
             keyValueDictionary.Add("duration", duration);
             keyValueDictionary.Add("groupName", groupName);
+            if(clientGuid != null && clientGuid.Length > 0)
+                keyValueDictionary.Add("clientGuid", clientGuid);
             return writeTicketLoad(rootElemt, TicketTypes.ALLOW_EXPERIMENT_EXECUTION, keyValueDictionary);
         }
 

@@ -177,8 +177,8 @@ namespace iLabs.ServiceBroker
         /// <param name="labClientName"></param>
         /// <param name="labClientVersion"></param>
         /// <returns>The redirect url where the user should be redirected, with the coupon appended to it</returns>
-        public string ExecuteExerimentSchedulingRecipe(string ussGuid, string lssGuid, string username, string groupName, 
-            string labServerGuid, string clientGuid, string labClientName, string labClientVersion, long duration, int userTZ)
+        public string ExecuteExerimentSchedulingRecipe(ProcessAgent uss, ProcessAgent lss, string username, string groupName, 
+            string labServerGuid, LabClient labClient, long duration, int userTZ)
         {
             try
             {
@@ -194,12 +194,12 @@ namespace iLabs.ServiceBroker
                 //string sponsorId = issuer.GetIssuerGuid();
 
                 string payload1 = factory.createScheduleSessionPayload(username, groupName, issuer.GetIssuerGuid(),
-                    labServerGuid, clientGuid, labClientName, labClientVersion, userTZ);
+                    labServerGuid, labClient.clientGuid, labClient.clientName, labClient.version, uss.webServiceUrl, userTZ);
                 string payload2 = factory.createRequestReservationPayload();
 
-                Coupon schedulingCoupon = issuer.CreateTicket(TicketTypes.SCHEDULE_SESSION, ussGuid, 
+                Coupon schedulingCoupon = issuer.CreateTicket(TicketTypes.SCHEDULE_SESSION, uss.agentGuid, 
                     issuer.GetIssuerGuid(), duration, payload1);
-                issuer.AddTicket(schedulingCoupon, TicketTypes.REQUEST_RESERVATION, lssGuid, ussGuid, 
+                issuer.AddTicket(schedulingCoupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, 
                     duration, payload2);
 
                 //
@@ -210,7 +210,7 @@ namespace iLabs.ServiceBroker
                 string couponId = schedulingCoupon.couponId.ToString();
 
                 // obtain the reservation URL from the admin URLs table
-                string schedulingUrl = issuer.RetrieveAdminURL(ussGuid, TicketTypes.SCHEDULE_SESSION).Url;                
+                string schedulingUrl = issuer.RetrieveAdminURL(uss.agentGuid, TicketTypes.SCHEDULE_SESSION).Url;                
                 schedulingUrl += "?coupon_id=" + couponId + "&issuer_guid=" + issuerGuid + "&passkey=" + passkey;
 
                 return schedulingUrl;
