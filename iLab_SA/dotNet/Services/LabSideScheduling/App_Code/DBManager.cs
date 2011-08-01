@@ -3055,13 +3055,9 @@ namespace iLabs.Scheduling.LabSide
         public static IntTag[] ListReservationTags(string labServerGuid, DateTime start, DateTime end, CultureInfo culture, int userTZ)
         {
             string temp = culture.DateTimeFormat.ShortDatePattern;
-             if (temp.Contains("MM"))
-                 ;
-             else
+             if (!temp.Contains("MM"))
                  temp = temp.Replace("M", "MM");
-             if (temp.Contains("dd"))
-                 ;
-             else
+             if (!temp.Contains("dd"))
                  temp = temp.Replace("d", "dd");
             string dateF = temp + " HH" + culture.DateTimeFormat.TimeSeparator + "mm";
             List<IntTag> tags = new List<IntTag>();
