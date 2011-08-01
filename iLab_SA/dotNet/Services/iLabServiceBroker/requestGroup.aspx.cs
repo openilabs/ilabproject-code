@@ -17,6 +17,8 @@ using System.Web.UI.HtmlControls;
 using System.Web.Security;
 using System.Web.Mail;
 using System.Configuration;
+
+using iLabs.Core;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
