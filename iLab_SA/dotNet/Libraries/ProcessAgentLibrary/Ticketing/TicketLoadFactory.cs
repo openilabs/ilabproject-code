@@ -135,19 +135,26 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.MANAGE_USS_GROUP, keyValueDictionary);
         }
 
-        public string createScheduleSessionPayload(string userName, string groupName, string sbGuid, 
-            string labServerGUID, string clientGuid, string labClientName, string labClientVersion, string ussURL,int userTZ)
+        public string createScheduleSessionPayload(string userName, string groupName, string sbGuid,
+            string labServerGUID, string clientGuid, string labClientName, string labClientVersion, string ussURL, int userTZ)
         {
             string rootElemt = "ScheduleSessionPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
-            keyValueDictionary.Add("userName", userName);
-            keyValueDictionary.Add("groupName", groupName);
-            keyValueDictionary.Add("sbGuid", sbGuid);
-            keyValueDictionary.Add("labServerGuid", labServerGUID);
-            keyValueDictionary.Add("clientGuid", clientGuid);
-            keyValueDictionary.Add("labClientName", labClientName);
-            keyValueDictionary.Add("labClientVersion", labClientVersion);
-            if(ussURL != null && ussURL.Length >0)
+            if (userName != null && userName.Length > 0)
+                keyValueDictionary.Add("userName", userName);
+            if (groupName != null && groupName.Length > 0)
+                keyValueDictionary.Add("groupName", groupName);
+            if (sbGuid != null && sbGuid.Length > 0)
+                keyValueDictionary.Add("sbGuid", sbGuid);
+            if (labServerGUID != null && labServerGUID.Length > 0)
+                keyValueDictionary.Add("labServerGuid", labServerGUID);
+            if (clientGuid != null && clientGuid.Length > 0)
+                keyValueDictionary.Add("clientGuid", clientGuid);
+            if (labClientName != null && labClientName.Length > 0)
+                keyValueDictionary.Add("labClientName", labClientName);
+            if (labClientVersion != null && labClientVersion.Length > 0)
+                keyValueDictionary.Add("labClientVersion", labClientVersion);
+            if (ussURL != null && ussURL.Length > 0)
                 keyValueDictionary.Add("ussURL", ussURL);
             keyValueDictionary.Add("userTZ", userTZ);
             return writeTicketLoad(rootElemt, TicketTypes.SCHEDULE_SESSION, keyValueDictionary);
@@ -167,12 +174,27 @@ namespace iLabs.Ticketing
             keyValueDictionary.Add("clientGuid", clientGuid);
             return writeTicketLoad(rootElemt, TicketTypes.REDEEM_RESERVATION, keyValueDictionary);
         }
-
         public string createRevokeReservationPayload(string source)
+        {
+             return createRevokeReservationPayload(source,null, null,null,null,null);
+        }
+
+        public string createRevokeReservationPayload(string source, string userName, string groupName, string authorityGuid, string clientGuid, string ussURL)
         {
             string rootElemt = "RevokeReservationPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
-            keyValueDictionary.Add("source", source);
+            if (source != null && source.Length > 0)
+                keyValueDictionary.Add("source", source);
+            if (userName != null && userName.Length > 0)
+                keyValueDictionary.Add("userName", userName);
+            if (groupName != null && groupName.Length > 0)
+                keyValueDictionary.Add("groupName", groupName);
+            if (authorityGuid != null && authorityGuid.Length > 0)
+                keyValueDictionary.Add("authorityGuid", authorityGuid);
+            if (clientGuid != null && clientGuid.Length > 0)
+                keyValueDictionary.Add("clientGuid", clientGuid);
+            if (ussURL != null && ussURL.Length > 0)
+                keyValueDictionary.Add("ussURL", ussURL);
             return writeTicketLoad(rootElemt, TicketTypes.REVOKE_RESERVATION, keyValueDictionary);
         }
 
