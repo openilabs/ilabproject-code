@@ -101,10 +101,5 @@ namespace iLabs.ServiceBroker.Authorization
 
 	}
 
-	public class AccessDeniedException: System.ApplicationException 
-	{
-		public AccessDeniedException(string message): base(message)
-		{
-		}
-	}
+	
 }
