@@ -22,6 +22,7 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.UtilLib;
 
+using iLabs.Core;
 using iLabs.Ticketing;
 using iLabs.TicketIssuer;
 using iLabs.ServiceBroker;
