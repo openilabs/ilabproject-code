@@ -207,18 +207,19 @@ EnableSession = true)]
     /// While several fields may be null, enough imformation must be supplied by a combination of the headers 
     /// and the fields to authenticate & authorize the requested actions.
     /// This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header, at least one must be used.
+    /// Currently support for Scheduling tickets only.
     /// </summary>
     /// <param name="types">an array of the ticket types requested</param>
     /// <param name="duration">minimum duration of the created tickets in seconds, durations less than 2 minutes will be converted to two minutes.</param>
     /// <param name="userName">User name on the ticketIssuer service, may in the future support validation from the service making the request, may be null</param>
     /// <param name="groupName">group name on the ticketIssuer service, may be null.  May in the future support validation from the service making the request</param>
-    /// <param name="authtority">The authority that validates the specified user. This assumes that the requesting authority has authenticated the user. May be null</param>
+    /// <param name="serviceGuid">TThe lab server or other service that authorization is being requested for. May be null</param>
     /// <param name="clientGuid">May be null</param>
     /// <returns>An operationCoupon or null</returns>
-    [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, authority and  client.")]
+    [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, service and  client. Currently support for Scheduling tickets only.")]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
-    public abstract Coupon RequestAuthorization(string[] types, long duration, string userName, string groupName, string authority, string clientGuid);
+    public abstract Coupon RequestAuthorization(string[] types, long duration, string userName, string groupName, string serviceGuid, string clientGuid);
     }
 
