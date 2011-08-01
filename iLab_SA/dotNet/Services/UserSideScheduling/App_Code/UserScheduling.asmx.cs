@@ -7,6 +7,9 @@ using System.Diagnostics;
 using System.Web;
 using System.Web.Services;
 using System.Web.Services.Protocols;
+using System.Xml;
+using System.Xml.Serialization;
+using System.Xml.XPath;
 
 using iLabs.Core;
 using iLabs.Ticketing;
@@ -14,7 +17,6 @@ using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SchedulingTypes;
-
 using iLabs.Proxies.ISB;
 using iLabs.Proxies.LSS;
 using iLabs.UtilLib;
@@ -177,18 +179,53 @@ namespace iLabs.Scheduling.UserSide
         public Reservation[] ListReservations(string serviceBrokerGuid, string userName, 
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime)
         {
+           
             
             Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
+            if (retrievedTicket.IsExpired())
+            {
+                throw new AccessDeniedException("The reservation ticket has expired, Please re-login.");
+            }
+            //used to check ticketPayload
+            string user = null;
+            string group = null;
+            string labGuid = null;
+            string clientGuid = null;
+            string sbGuid = null;
+
+            //Resolved target arguments
+            string userTarget = null;
+            string labGuidTarget = null;
+            string clientGuidTarget = null;
+            string lssUrl = null;
+            string lssGuid = null;
+            XmlDocument payload = new XmlDocument();
+            payload.LoadXml(retrievedTicket.payload);
+       
+            sbGuid = payload.GetElementsByTagName("sbGuid")[0].InnerText;
+            user = payload.GetElementsByTagName("userName")[0].InnerText;
+            group = payload.GetElementsByTagName("groupName")[0].InnerText;
+            clientGuid = payload.GetElementsByTagName("clientGuid")[0].InnerText;
+            labGuid = payload.GetElementsByTagName("labServerGuid")[0].InnerText;
+
+            lssUrl = USSSchedulingAPI.ListLSSURLbyExperiment(clientGuid, labServerGuid);
+            lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
+
+            userTarget = Utilities.ResolveArguments(userName, user, true);
+            clientGuidTarget = Utilities.ResolveArguments(labClientGuid, clientGuid, false);
+            labGuidTarget = Utilities.ResolveArguments(labServerGuid, labGuid, false);
+
+
             DateTime targetStart = new DateTime(startTime.Year, startTime.Month, startTime.Day,
-                startTime.Hour, startTime.Minute, 0, startTime.Kind);
+               startTime.Hour, startTime.Minute, 0, startTime.Kind);
             if (targetStart.Kind != DateTimeKind.Utc)
                 targetStart = targetStart.ToUniversalTime();
             DateTime targetEnd = new DateTime(endTime.Year, endTime.Month, endTime.Day,
-                endTime.Hour, endTime.Minute, 0, endTime.Kind);
+                    endTime.Hour, endTime.Minute, 0, endTime.Kind);
             if (targetEnd.Kind != DateTimeKind.Utc)
                 targetEnd = targetEnd.ToUniversalTime();
-            ReservationInfo[] resInfos = USSSchedulingAPI.GetReservationInfos(serviceBrokerGuid, userName, null,
-                labServerGuid, labClientGuid, targetStart, targetEnd);
+            ReservationInfo[] resInfos = USSSchedulingAPI.GetReservationInfos(serviceBrokerGuid, userTarget, group,
+                labGuidTarget, clientGuidTarget, targetStart, targetEnd);
             if (resInfos != null && resInfos.Length > 0)
             {
                 Reservation[] reservations = new Reservation[resInfos.Length];
@@ -234,6 +271,39 @@ namespace iLabs.Scheduling.UserSide
             try
             {
                 Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
+                if (retrievedTicket.IsExpired())
+                {
+                    throw new AccessDeniedException("The reservation ticket has expired, Please re-login.");
+                }
+                //used to check ticketPayload
+                string user = null;
+                string group = null;
+                string labGuid = null;
+                string clientGuid = null;
+                string sbGuid = null;
+
+                //Resolved target arguments
+                string userTarget = null;
+                string groupTarget = null;
+                string labGuidTarget = null;
+                string clientGuidTarget = null;
+               
+                XmlDocument payload = new XmlDocument();
+                payload.LoadXml(retrievedTicket.payload);
+
+                sbGuid = payload.GetElementsByTagName("sbGuid")[0].InnerText;
+                user = payload.GetElementsByTagName("userName")[0].InnerText;
+                group = payload.GetElementsByTagName("groupName")[0].InnerText;
+                clientGuid = payload.GetElementsByTagName("clientGuid")[0].InnerText;
+                labGuid = payload.GetElementsByTagName("labServerGuid")[0].InnerText;
+
+
+                userTarget = Utilities.ResolveArguments(userName, user, true);
+                groupTarget = Utilities.ResolveArguments(groupName, group, true);
+                clientGuidTarget = Utilities.ResolveArguments(labClientGuid, clientGuid, false);
+                labGuidTarget = Utilities.ResolveArguments(labServerGuid, labGuid, false);
+
+                
                 string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(labClientGuid, labServerGuid);
                 LSSInfo lssInfo = DBManager.GetLSSInfo(lssGuid);
                 DateTime targetStart = new DateTime(startTime.Year, startTime.Month, startTime.Day,
