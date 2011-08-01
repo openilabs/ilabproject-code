@@ -202,25 +202,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLabGeneri
 		SlnRelativePath = "..\..\Services\iLabGeneric\"
 	EndProjectSection
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/TextReservation/", "http://localhost/TextReservation", "{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.VirtualPath = "/TextReservation"
-		Debug.AspNetCompiler.PhysicalPath = "..\..\..\..\MAK\SMS_Reservation\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\TextReservation\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/TextReservation"
-		Release.AspNetCompiler.PhysicalPath = "..\..\..\..\MAK\SMS_Reservation\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\TextReservation\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "..\..\..\..\MAK\SMS_Reservation\"
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|.NET = Debug|.NET
@@ -501,16 +482,6 @@ Global
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Release|Any CPU.ActiveCfg = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70}.Release|Mixed Platforms.Build.0 = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|.NET.ActiveCfg = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|.NET.Build.0 = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|Any CPU.ActiveCfg = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Debug|Mixed Platforms.Build.0 = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|.NET.ActiveCfg = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|.NET.Build.0 = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|Any CPU.ActiveCfg = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
-		{E15F9CE1-A8F6-4BD1-80E1-F76CD3BBE7A8}.Release|Mixed Platforms.Build.0 = Debug|.NET
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
