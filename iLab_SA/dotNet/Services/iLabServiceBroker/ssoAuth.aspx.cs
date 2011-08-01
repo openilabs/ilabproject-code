@@ -436,7 +436,9 @@ namespace iLabs.ServiceBroker.iLabSB
         protected void launchLab(int userID, int groupID, int clientID)
         {
             // Currently there is not a good solution for checking for an AllowExperiment ticket, will check the USS for reservation
-            StringBuilder buf = new StringBuilder("~/myClient.aspx?auto=t");
+            StringBuilder buf = new StringBuilder();
+            buf.Append(Global.FormatRegularURL(Request, "myClient.aspx"));
+            buf.Append("?auto=t");
           
             string userName = null;
             Coupon opCoupon = null;
@@ -511,7 +513,7 @@ namespace iLabs.ServiceBroker.iLabSB
             bool status = false;
             if (userName == null || userName.Length == 0 || passwd == null || passwd.Length == 0)
             {
-                lblLoginErrorMessage.Text = "<div class=errormessage><p>Missing user ID and/or password field. </p></div>";
+                lblLoginErrorMessage.Text = Utilities.FormatErrorMessage("Missing user ID and/or password field.");
                 lblLoginErrorMessage.Visible = true;
                 return status;
             }
@@ -521,7 +523,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 if (hdnUser.Value.ToLower().CompareTo(userName.ToLower()) != 0)
                 {
                     lblMessages.Visible = true;
-                    lblMessages.Text = "You are currently trying to login  in as a different user than the specified user. Please login as " + hdnUser.Value;
+                    lblMessages.Text = Utilities.FormatWarningMessage("You are currently trying to login  in as a different user than the specified user. Please login as " + hdnUser.Value); ;
                     return status;
                 }
             }
@@ -536,7 +538,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 if (userID != -1 && user.lockAccount == true)
                 {
-                    lblLoginErrorMessage.Text = "<div class=errormessage><p>Account locked - Email " + supportMailAddress + ". </p></div>";
+                    lblLoginErrorMessage.Text = Utilities.FormatErrorMessage("Account locked - Email " + supportMailAddress + ".");
                     lblLoginErrorMessage.Visible = true;
                     return status;
                 }
@@ -563,14 +565,14 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
                 else
                 {
-                    lblLoginErrorMessage.Text = "<div class=errormessage><p>Invalid user ID and/or password. </p></div>";
+                    lblLoginErrorMessage.Text = Utilities.FormatErrorMessage("Invalid user ID and/or password.");
                     lblLoginErrorMessage.Visible = true;
                     return status;
                 }
             }
             else
             {
-                lblLoginErrorMessage.Text = "<div class=errormessage><p>Username does not exist. </p></div>";
+                lblLoginErrorMessage.Text = Utilities.FormatErrorMessage("Username does not exist.");
                 lblLoginErrorMessage.Visible = true;
             }
             return status;
