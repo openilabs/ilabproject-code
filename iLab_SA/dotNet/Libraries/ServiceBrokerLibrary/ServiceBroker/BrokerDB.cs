@@ -2368,7 +2368,7 @@ namespace iLabs.ServiceBroker
         /// This examines the specified parameters to resolve the available resources for the user
         /// This may only be called after a user is Authenticated.
         /// </summary>
-        public int ResolveResources(string authorityGuid, string userName, string groupName, string serviceGuid, string clientGuid,
+        public int ResolveResources(string authStr, string userName, string groupName, string serviceGuid, string clientGuid, bool allGroups,
             ref StringBuilder message, out int userID, out Dictionary<int, int[]> groupClientsMap)
         {
             int status = -1;
@@ -2381,11 +2381,14 @@ namespace iLabs.ServiceBroker
             userID = 0;
             if (userName != null && userName.Length > 0)
             {
-                if (serviceGuid == null || serviceGuid.Length == 0 || (serviceGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0))
-                {
+                status = 0;
+                // Note not using the authStr since all users are local at this time. Will need to create logic for checking authentication.
+                //if (authStr == null || authStr.Length == 0 || (authStr.CompareTo(ProcessAgentDB.ServiceGuid) == 0))
+                //{
                     // Local user
                     userID = AdministrativeAPI.GetUserID(userName);
-                }
+                    
+                //}
             }
             else
             {
@@ -2394,6 +2397,7 @@ namespace iLabs.ServiceBroker
             }
             if (userID > 0)
             {
+                status = 0;
                 if (groupName != null && groupName.Length > 0)
                 {
                     groupID = AdministrativeAPI.GetGroupID(groupName);
@@ -2402,6 +2406,7 @@ namespace iLabs.ServiceBroker
                         if (AdministrativeAPI.IsAgentMember(userID, groupID))
                         {
                             grpIds.Add(groupID);
+                            //status = 1;
                         }
                         else
                         {
@@ -2428,6 +2433,7 @@ namespace iLabs.ServiceBroker
                                 if (grpIds.Contains(id))
                                 {
                                     groupClientsMap.Add(id, new int[] { clientID });
+                                    status++;
                                 }
                             }
                         }
@@ -2439,14 +2445,19 @@ namespace iLabs.ServiceBroker
                     Group[] groups = AdministrativeAPI.GetGroups(grpIds.ToArray());
                     foreach (Group g in groups)
                     {
-                        if ((g.groupType.CompareTo(GroupType.REGULAR) == 0)
-                            || (g.groupType.CompareTo(GroupType.COURSE_STAFF) == 0)
-                            || (g.groupType.CompareTo(GroupType.SERVICE_ADMIN) == 0))
+                        if (    (g.groupType.CompareTo(GroupType.REGULAR) == 0)
+                            || (allGroups && ((g.groupType.CompareTo(GroupType.COURSE_STAFF) == 0)
+                                || (g.groupType.CompareTo(GroupType.SERVICE_ADMIN) == 0)) ||(g.groupName.CompareTo("SuperUserGroup") ==0) ))
                         {
                             int[] cIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
-                            if (cIDs != null & cIDs.Length > 0)
+                            if (cIDs != null && cIDs.Length > 0)
                             {
                                 groupClientsMap.Add(g.groupID, cIDs);
+                                status += cIDs.Length;
+                            }
+                            if (allGroups && (cIDs == null || cIDs.Length == 0))
+                            {
+                                groupClientsMap.Add(g.groupID, new int[] { });
                             }
                         }
                     }
