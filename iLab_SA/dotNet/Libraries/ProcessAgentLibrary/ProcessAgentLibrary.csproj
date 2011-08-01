@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\AccessDeniedException.cs" />
     <Compile Include="Core\FactoryDB.cs" />
     <Compile Include="Core\iLabParser.cs" />
     <Compile Include="Core\ProcessAgentDB.cs" />
