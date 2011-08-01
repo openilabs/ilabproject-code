@@ -151,6 +151,47 @@ namespace iLabs.UtilLib
             return message.ToString();
         }
 
+        /// <summary>
+        /// Take two strings and returns one of them. 
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns>If either is Empty the other is returned, if both match the string is returned, if they do not match an exception is thrown.</returns>
+        public static string ResolveArguments(string arg1, string arg2, bool ignoreCase)
+        {
+            string value = null;
+            
+            if ((arg1 == null || arg1.Length < 1) && (arg2 != null && arg2.Length > 0))
+            {
+                value = arg2;
+            }
+            else if ((arg1 != null && arg1.Length > 0) && (arg2 == null || arg2.Length < 1))
+            {
+                value = arg1;
+            }
+            else if ((arg1 != null && arg1.Length > 0) && (arg2 != null && arg2.Length > 0))
+            {
+                int status = -1;
+                if (ignoreCase)
+                {
+                    status = arg1.ToLower().CompareTo(arg2.ToLower());
+                }
+                else
+                {
+                    status = arg1.CompareTo(arg2);
+                }
+                if (status  == 0)
+                {
+                    value = arg1;
+                }
+                else
+                {
+                    throw new ApplicationException("Parameter mismatch in ResolveArguments.");
+                }
+            }
+            return value;
+        }
 
         public static string DumpException(Exception e)
         {
