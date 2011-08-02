@@ -315,7 +315,7 @@ namespace iLabs.LabView.LV82
                     string statusVI = taskDoc.Query("task/status");
                     string server = taskDoc.Query("task/server");
                     string portStr = taskDoc.Query("task/serverPort");
-                    if ((portStr != null) && (portStr.Length > 0))
+                    if ((portStr != null) && (portStr.Length > 0) && (portStr.CompareTo("0") != 0) )
                     {
                         lvi = new LabViewRemote(server, Convert.ToInt32(portStr));
                     }
@@ -341,6 +341,7 @@ namespace iLabs.LabView.LV82
                     VirtualInstrument vi = lvi.GetVI(viName);
                     // LV 8.2.1
                     //Server takes control of RemotePanel, connection not broken
+                    
                     lvi.SubmitAction("lockvi", lvi.qualifiedName(vi));
                     int stopStatus = lvi.StopVI(vi);
                     if (stopStatus != 0)
@@ -350,7 +351,9 @@ namespace iLabs.LabView.LV82
                     }
 
                     // Also required for LV 8.2.0 and 7.1, force disconnection of RemotePanel
-                    //lvi.SubmitAction("closevi", lvi.qualifiedName(vi));
+#if LabVIEW_82
+                    lvi.SubmitAction("closevi", lvi.qualifiedName(vi));
+#endif
 
                     vi = null;
 
