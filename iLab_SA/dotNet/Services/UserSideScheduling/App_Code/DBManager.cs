@@ -997,19 +997,19 @@ namespace iLabs.Scheduling.UserSide
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
-                    //select r.Reservation_ID, r.User_Name, r.Start_Time, r.End_Time,r.Credential_Set_ID, r.Experiment_Info_ID
+                    //select r.Reservation_ID, r.Start_Time, r.End_Time,r.Credential_Set_ID, r.Experiment_Info_ID, r.User_Name
                     ReservationInfo reservation = new ReservationInfo();
                     reservation.reservationId = dataReader.GetInt32(0);
                     if (dataReader[1] != System.DBNull.Value)
-                        reservation.userName = dataReader.GetString(1);
+                        reservation.startTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(1));
                     if (dataReader[2] != System.DBNull.Value)
-                        reservation.startTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
+                        reservation.endTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(2));
                     if (dataReader[3] != System.DBNull.Value)
-                        reservation.endTime = DateUtil.SpecifyUTC(dataReader.GetDateTime(3));
+                        reservation.credentialSetId = (int)dataReader.GetInt32(3);
                     if (dataReader[4] != System.DBNull.Value)
-                        reservation.credentialSetId = (int)dataReader.GetInt32(4);
+                        reservation.experimentInfoId = (int)dataReader.GetInt32(4);
                     if (dataReader[5] != System.DBNull.Value)
-                        reservation.experimentInfoId = (int)dataReader.GetInt32(5);
+                        reservation.userName = dataReader.GetString(5);
                     
                     reservations.Add(reservation);
                 }

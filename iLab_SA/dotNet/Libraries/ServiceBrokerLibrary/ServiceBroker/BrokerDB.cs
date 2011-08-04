@@ -2369,15 +2369,14 @@ namespace iLabs.ServiceBroker
         /// This may only be called after a user is Authenticated.
         /// </summary>
         public int ResolveResources(string authStr, string userName, string groupName, string serviceGuid, string clientGuid, bool allGroups,
-            ref StringBuilder message, out int userID, out Dictionary<int, int[]> groupClientsMap)
+            ref StringBuilder message, out int userID, out Dictionary<string, int[]> groupClientsMap)
         {
             int status = -1;
             int groupID = 0;
             int clientID = 0;
-            List<int> grpIds = new List<int>();
+            List<int> grpIDs = new List<int>();
             List<int> clientIds = new List<int>();
-            //StringBuilder buf = new StringBuilder();
-            groupClientsMap = new Dictionary<int, int[]>();
+            groupClientsMap = new Dictionary<string, int[]>();
             userID = 0;
             if (userName != null && userName.Length > 0)
             {
@@ -2405,7 +2404,7 @@ namespace iLabs.ServiceBroker
                     {
                         if (AdministrativeAPI.IsAgentMember(userID, groupID))
                         {
-                            grpIds.Add(groupID);
+                            grpIDs.Add(groupID);
                             //status = 1;
                         }
                         else
@@ -2416,7 +2415,7 @@ namespace iLabs.ServiceBroker
                 }
                 else
                 {
-                    grpIds.AddRange(AdministrativeAPI.ListGroupsForAgentRecursively(userID));
+                    grpIDs.AddRange(AdministrativeAPI.ListGroupsForAgentRecursively(userID));
                 }
                 
                 if (clientGuid != null && clientGuid.Length > 0)
@@ -2430,9 +2429,9 @@ namespace iLabs.ServiceBroker
                         {
                             foreach (int id in clientGroups)
                             {
-                                if (grpIds.Contains(id))
+                                if (grpIDs.Contains(id))
                                 {
-                                    groupClientsMap.Add(id, new int[] { clientID });
+                                    groupClientsMap.Add(AdministrativeAPI.GetGroupName(id), new int[] { clientID });
                                     status++;
                                 }
                             }
@@ -2442,7 +2441,7 @@ namespace iLabs.ServiceBroker
                 }
                 else
                 {
-                    Group[] groups = AdministrativeAPI.GetGroups(grpIds.ToArray());
+                    Group[] groups = AdministrativeAPI.GetGroups(grpIDs.ToArray());
                     foreach (Group g in groups)
                     {
                         if (    (g.groupType.CompareTo(GroupType.REGULAR) == 0)
@@ -2452,12 +2451,12 @@ namespace iLabs.ServiceBroker
                             int[] cIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
                             if (cIDs != null && cIDs.Length > 0)
                             {
-                                groupClientsMap.Add(g.groupID, cIDs);
+                                groupClientsMap.Add(g.groupName, cIDs);
                                 status += cIDs.Length;
                             }
                             if (allGroups && (cIDs == null || cIDs.Length == 0))
                             {
-                                groupClientsMap.Add(g.groupID, new int[] { });
+                                groupClientsMap.Add(g.groupName, new int[] { });
                             }
                         }
                     }

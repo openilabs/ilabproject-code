@@ -895,19 +895,19 @@ namespace iLabs.ServiceBroker.iLabSB
             long ticketDuration = Math.Max(minDuration, duration);
             BrokerDB brokerDB = new BrokerDB();
             Coupon coupon = null;
-            SessionInfo sessionInfo = null;
+
             int userID = 0;
             int groupID = 0;
+            int clientID = 0;
+            int[] clientIDs;
+
             string curGroup = null;
             string eGroupName = null;
-
-            int clientID = 0;
             LabClient theClient = null;
-
             string requestGuid = null;
             ProcessAgentInfo authPA = null;
             StringBuilder message = new StringBuilder();
-            Dictionary<int, int[]> groupClientsMap = null;
+            Dictionary<string, int[]> groupClientsMap = null;
 
             if (agentAuthHeader.coupon == null && opHeader.coupon == null)
             {
@@ -915,6 +915,7 @@ namespace iLabs.ServiceBroker.iLabSB
             }
             if (opHeader.coupon != null)
             {
+                //SessionInfo sessionInfo = null;
                 //Ticket sessionTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid);
                 //if (sessionTicket != null)
                 //{
@@ -958,6 +959,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     // check if the The requesting service is known to the domain
                     if (authPA != null)
                     {
+                        // What type of PA is it, any additional processing?
 
                         //Determine resources available based on supplied fields, note requestGuid is not used to authenticate users at this time
                         // Only return groups that match the inputs, have clients & are not administrative
@@ -967,24 +969,77 @@ namespace iLabs.ServiceBroker.iLabSB
                         {
                             return null;
                         }
-                        if (groupClientsMap.Count == 1)
+                        if (clientGuid != null && clientGuid.Length > 0)
                         {
-                            foreach (KeyValuePair<int, int[]> kv in groupClientsMap)
+                            clientID = AdministrativeAPI.GetLabClientID(clientGuid);
+                            if (clientID < 1)
                             {
-                                groupID = kv.Key;
-                                curGroup = AdministrativeAPI.GetGroupName(groupID);
-                                int[] c = kv.Value;
+                                throw new Exception("Specified client does not exist!");
+                            }
+                        }
+                        if (groupClientsMap.Count > 0)
+                        {
+                            if (groupName != null && groupName.Length > 0)
+                            {
+                                if (groupClientsMap.ContainsKey(groupName))
+                                {
+
+                                    groupClientsMap.TryGetValue(groupName, out clientIDs);
+                                    if (clientIDs != null && clientIDs.Length > 0)
+                                    {
+                                        if (clientID > 0)
+                                        {
+                                            foreach (int c in clientIDs)
+                                            {
+                                                if (clientID == c)
+                                                {
+                                                    curGroup = groupName;
+                                                    theClient = AdministrativeAPI.GetLabClient(c);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        else if (clientIDs.Length == 1)
+                                        {
+                                            curGroup = groupName;
+                                            clientID = clientIDs[0];
+                                            theClient = AdministrativeAPI.GetLabClient(clientID);
+
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (groupClientsMap.Count == 1)
+                                {
+                                    foreach (KeyValuePair<string, int[]> kval in groupClientsMap)
+                                    {
+                                        if (kval.Value.Length == 1)
+                                        {
+                                            if (clientID < 1 && kval.Value[0] > 1)
+                                            {
+                                                curGroup = kv.Key;
+                                                clientID = kval.Value[0];
+                                                theClient = AdministrativeAPI.GetLabClient(clientID);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (KeyValuePair<string, int[]> kv in groupClientsMap)
+                                    {
+                                        curGroup = kv.Key;
+                                        int[] c = kv.Value;
+                                        foreach (int i in c)
+                                        {
+                                            string cGuid = AdministrativeAPI.GetLabClientGUID(i);
+                                        }
+                                    }
+                                }
                             }
 
-                        }
-                        else if (groupClientsMap.Count > 1)
-                        {
-                            foreach (KeyValuePair<int, int[]> kv in groupClientsMap)
-                            {
-                                groupID = kv.Key;
-                                curGroup = AdministrativeAPI.GetGroupName(groupID);
-                                int[] c = kv.Value;
-                            }
                         }
                         //Resolve user/group/client/services
                         coupon = brokerDB.CreateCoupon();
@@ -1006,220 +1061,117 @@ namespace iLabs.ServiceBroker.iLabSB
                         ProcessAgent lss = null;
                         ProcessAgent uss = null;
                         ProcessAgent ess = null;
-                        if (clientGuid != null && clientGuid.Length > 0)
+
+                        if (theClient != null)
                         {
-                            theClient = AdministrativeAPI.GetLabClient(clientGuid);
-                            if (theClient != null)
+                            lsIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
+                            if (lsIDs != null && lsIDs.Length > 0)
                             {
-                                lsIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
+                                ls = brokerDB.GetProcessAgent(lsIDs[0]);
+                            }
+                            if (theClient.needsScheduling)
+                            {
                                 if (lsIDs != null && lsIDs.Length > 0)
                                 {
-                                    ls = brokerDB.GetProcessAgent(lsIDs[0]);
-                                }
-                                if (theClient.needsScheduling)
-                                {
-                                    if (lsIDs != null && lsIDs.Length > 0)
+                                    lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
+                                    if (lssID > 0)
                                     {
-                                        lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
-                                        if (lssID > 0)
-                                        {
-                                            lss = brokerDB.GetProcessAgent(lssID);
-                                        }
-                                    }
-                                    ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
-                                    if (ussID > 0)
-                                    {
-                                        uss = brokerDB.GetProcessAgent(ussID);
+                                        lss = brokerDB.GetProcessAgent(lssID);
                                     }
                                 }
-                                if (theClient.needsESS)
+                                ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
+                                if (ussID > 0)
                                 {
-                                    essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
-                                    if (essID > 0)
-                                        ess = brokerDB.GetProcessAgent(essID);
+                                    uss = brokerDB.GetProcessAgent(ussID);
                                 }
                             }
-                            TicketLoadFactory tlf = TicketLoadFactory.Instance();
-
-                            //Should create a REDEEM_SESSION ticket based on authenticated input and user_session record.
-
-                            foreach (string str in types)
+                            if (theClient.needsESS)
                             {
-                                DateTime start = DateTime.UtcNow;
-                                long expID = 1;
-                                string payload = null;
-                                switch (str)
-                                {
-                                    //case TicketTypes.ALLOW_EXPERIMENT_EXECUTION:
-                                    //    payload = tlf.createAllowExperimentExecutionPayload(start,duration,groupName,theClient.clientGuid);
-                                    //    break;
-                                    //case TicketTypes.CREATE_EXPERIMENT:
-                                    //    payload = tlf.createCreateExperimentPayload(start,duration,userName,groupName,ProcessAgentDB.ServiceGuid,theClient.clientGuid);
-                                    //    break;
-                                    //case TicketTypes.EXECUTE_EXPERIMENT:
-                                    //    payload = tlf.createExecuteExperimentPayload(ess.webServiceUrl,start,duration,0,groupName,ProcessAgentDB.ServiceGuid,expID);
-                                    //    break;
-
-                                    //case TicketTypes.RETRIEVE_RECORDS:
-                                    //    payload = tlf.RetrieveRecordsPayload(expID,ess.webServiceUrl);
-                                    //    break;
-                                    //case TicketTypes.STORE_RECORDS:
-                                    //    payload = tlf.StoreRecordsPayload(false,expID,ess.webServiceUrl);
-                                    //    break;
-                                    case TicketTypes.SCHEDULE_SESSION:
-
-                                        payload = tlf.createScheduleSessionPayload(userName, groupName, ProcessAgentDB.ServiceGuid,
-                                            ls.agentGuid, theClient.clientGuid, theClient.ClientName, theClient.version, uss.webServiceUrl, 0);
-                                        // Create USS ticket
-                                        brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid,
-                                            duration, payload);
-                                        // Create Requester ticket
-                                        brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, uss.agentGuid,
-                                             ticketDuration, payload);
-                                        // Create the USS to LSS REQUEST_RESERVATION Ticket
-                                        brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, ticketDuration,
-                                            tlf.createRequestReservationPayload());
-
-                                        ok = true;
-                                        break;
-                                    case TicketTypes.REDEEM_RESERVATION:
-                                        payload = tlf.createRedeemReservationPayload(start, start.AddMinutes(duration), userName, groupName, clientGuid);
-                                        brokerDB.AddTicket(coupon, TicketTypes.REDEEM_RESERVATION, agentAuthHeader.agentGuid, uss.agentGuid,
-                                            ticketDuration, payload);
-                                        break;
-                                    case TicketTypes.REVOKE_RESERVATION:
-                                        payload = tlf.createRevokeReservationPayload("", userName, groupName, ProcessAgentDB.ServiceGuid,
-                                            theClient.clientGuid, uss.webServiceUrl);
-                                        brokerDB.AddTicket(coupon, TicketTypes.REVOKE_RESERVATION, agentAuthHeader.agentGuid, uss.agentGuid,
-                                            ticketDuration, payload);
-                                        break;
-                                    default:
-                                        break;
-                                }
+                                essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
+                                if (essID > 0)
+                                    ess = brokerDB.GetProcessAgent(essID);
                             }
                         }
-                    }
-                }
-            }
-            if (ok)
-                return coupon;
-            else
-                return null;
-        }
-
-            // There should be an authentication scheme as part of this method, currently checking for an agentAuthHeader or OperationHeader.
-            /****
-            //if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
-            //{
-           
-            
-             //payload includes username and current group name & client id.
-                        string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]), Convert.ToInt32(Session["GroupID"]),
-                                   Convert.ToInt32(Session["ClientID"]), (string)Session["UserName"], (string)Session["GroupName"]);
-                        // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
-                        issuer.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
-                                     ProcessAgentDB.ServiceGuid, duration, sessionPayload);
-
-                        AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), Convert.ToInt32(Session["GroupID"]), client.clientID, Session.SessionID);
-            if(opHeader != null)
-            { // From a client or existing ticket collection
-            }
-             * ****/
-
-        /****
-                if (types != null && types.Length > 0)
-                {
-                    int userID = -1;
-                    int groupID = -1;
-                    int lcID = -1;
-                    int lsID = -1;
-                    int lssID = -1;
-                    int ussID = -1;
-                    int essID = -1;
-                    ProcessAgent lss = null;
-                    ProcessAgent uss = null;
-                    ProcessAgent ess = null;
-                    LabClient theClient = null;
-                    if (clientGuid != null && clientGuid.Length > 0)
-                        theClient = AdministrativeAPI.GetLabClient(clientGuid);
-                    if (serviceGuid != null && serviceGuid.Length > 0)
-                        lsID = brokerDB.GetProcessAgentID(serviceGuid);
-                    if (lsID > 0)
-                        lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsID, ProcessAgentType.LAB_SCHEDULING_SERVER);
-                    if (theClient != null)
-                    {
-                        ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
-                        essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
-                        if (lssID > 0)
-                            lss = brokerDB.GetProcessAgent(lssID);
-                        if (ussID > 0)
-                            uss = brokerDB.GetProcessAgent(ussID);
-                        if (essID > 0)
-                            ess = brokerDB.GetProcessAgent(essID);
-
-                        TicketLoadFactory factory = TicketLoadFactory.Instance();
+                        TicketLoadFactory tlf = TicketLoadFactory.Instance();
 
                         //Should create a REDEEM_SESSION ticket based on authenticated input and user_session record.
 
                         foreach (string str in types)
                         {
+                            DateTime start = DateTime.UtcNow;
+                            long expID = 1;
+                            string payload = null;
                             switch (str)
                             {
-                                case TicketTypes.CREATE_EXPERIMENT:
+                                case TicketTypes.REDEEM_SESSION:
+                                    payload = tlf.createRedeemSessionPayload(userID, AdministrativeAPI.GetGroupID(curGroup), clientID, userName, curGroup);
+                                    brokerDB.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid, agentAuthHeader.agentGuid, duration, payload);
                                     break;
-                                case TicketTypes.EXECUTE_EXPERIMENT:
-                                    break;
-                                case TicketTypes.ALLOW_EXPERIMENT_EXECUTION:
-                                    break;
-                                case TicketTypes.RETRIEVE_RECORDS:
-                                    break;
-                                case TicketTypes.STORE_RECORDS:
-                                    break;
-                                case TicketTypes.SCHEDULE_SESSION:
-                                    /**
-                                      string payload1 = factory.createScheduleSessionPayload(user, group, issuer.GetIssuerGuid(),
-                    serviceGuid, clientGuid, labClientName, labClientVersion, userTZ);
-                string payload2 = factory.createRequestReservationPayload();
+                                //case TicketTypes.ALLOW_EXPERIMENT_EXECUTION:
+                                //    payload = tlf.createAllowExperimentExecutionPayload(start,duration,groupName,theClient.clientGuid);
+                                //    break;
+                                //case TicketTypes.CREATE_EXPERIMENT:
+                                //    payload = tlf.createCreateExperimentPayload(start,duration,userName,groupName,ProcessAgentDB.ServiceGuid,theClient.clientGuid);
+                                //    break;
+                                //case TicketTypes.EXECUTE_EXPERIMENT:
+                                //    payload = tlf.createExecuteExperimentPayload(ess.webServiceUrl,start,duration,0,groupName,ProcessAgentDB.ServiceGuid,expID);
+                                //    break;
 
-                Coupon schedulingCoupon = issuer.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, ussGuid, 
-                    issuer.GetIssuerGuid(), duration, payload1);
-                issuer.AddTicket(schedulingCoupon, TicketTypes.REQUEST_RESERVATION, lssGuid, ussGuid, 
-                    duration, payload2);
-***/
-        /*
-                                    // Create the Authority's SCHEDULE_SESSION ticket
-                                    string payload1 = factory.createScheduleSessionPayload(user, group, ProcessAgentDB.ServiceGuid,
-                                        serviceGuid, clientGuid, theClient.ClientName, theClient.version, 0);
-                                    string payloadMakeRes = factory.makeReservationPayload(ProcessAgentDB.ServiceGuid, user, group, serviceGuid, clientGuid, uss.webServiceUrl);
-                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, ProcessAgentDB.ServiceGuid, ticketDuration, payloadMakeRes);
-                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid, ticketDuration, payload1);
-                                    //brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, lss.agentGuid, uss.agentGuid, ticketDuration, payload1);
-                                    
+                                //case TicketTypes.RETRIEVE_RECORDS:
+                                //    payload = tlf.RetrieveRecordsPayload(expID,ess.webServiceUrl);
+                                //    break;
+                                //case TicketTypes.STORE_RECORDS:
+                                //    payload = tlf.StoreRecordsPayload(false,expID,ess.webServiceUrl);
+                                //    break;
+                                case TicketTypes.SCHEDULE_SESSION:
+                                    if(theClient != null && ls != null && uss != null && lss != null){
+                                    payload = tlf.createScheduleSessionPayload(userName, curGroup, ProcessAgentDB.ServiceGuid,
+                                        ls.agentGuid, theClient.clientGuid, theClient.ClientName, theClient.version, uss.webServiceUrl, 0);
+                                    // Create USS ticket
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid,
+                                        duration, payload);
+                                    // Create Requester ticket
+                                    brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, uss.agentGuid,
+                                         ticketDuration, payload);
                                     // Create the USS to LSS REQUEST_RESERVATION Ticket
-                                    string payload2 = factory.createRequestReservationPayload();
-                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, ticketDuration, payload2);
-                                    // Create the USS to LSS
-                                    
+                                    brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, ticketDuration,
+                                        tlf.createRequestReservationPayload());
+
                                     ok = true;
+                                    }
                                     break;
                                 case TicketTypes.REDEEM_RESERVATION:
+                                    if (theClient != null && uss != null)
+                                    {
+                                        payload = tlf.createRedeemReservationPayload(start, start.AddMinutes(duration), userName, curGroup, theClient.clientGuid);
+                                        brokerDB.AddTicket(coupon, TicketTypes.REDEEM_RESERVATION, agentAuthHeader.agentGuid, uss.agentGuid,
+                                            ticketDuration, payload);
+                                        ok = true;
+                                    }
                                     break;
                                 case TicketTypes.REVOKE_RESERVATION:
+                                    if (theClient != null && uss != null)
+                                    {
+                                        payload = tlf.createRevokeReservationPayload("", userName, curGroup, ProcessAgentDB.ServiceGuid,
+                                            theClient.clientGuid, uss.webServiceUrl);
+                                        brokerDB.AddTicket(coupon, TicketTypes.REVOKE_RESERVATION, agentAuthHeader.agentGuid, uss.agentGuid,
+                                            ticketDuration, payload);
+                                        ok = true;
+                                    }
                                     break;
+
                                 default:
                                     break;
                             }
                         }
                     }
                 }
-            
+            }
             if (ok)
                 return coupon;
             else
                 return null;
         }
-        */
-        
 
         /////////////////////////////////////////////////////////////////////
         ////  ExperimentStorage Methods                            //////////
