@@ -746,7 +746,7 @@ public class FormatMessage : System.Web.Services.WebService
 
                 string[] types = new string[] { TicketTypes.SCHEDULE_SESSION };
 
-                Coupon opCoupon = isbProxy.RequestAuthorization(types, 600, groupName, userName, labServerGuid, clientGuid);
+                Coupon opCoupon = isbProxy.RequestAuthorization(types, 600, 			userName, groupName,  labServerGuid, clientGuid);
                 if (opCoupon != null)
                 {
                     TicketIssuerProxy ticketProxy = new TicketIssuerProxy();
@@ -762,7 +762,7 @@ public class FormatMessage : System.Web.Services.WebService
                         if (ticketSMS.payload != null || ticketSMS.payload.Length > 0)
                         {
                             XmlQueryDoc xdoc = new XmlQueryDoc(ticketSMS.payload);
-                            string ussURL = xdoc.Query("MakeReservationPayload/ussURL");
+                            string ussURL = xdoc.Query("ScheduleSessionPayload/ussURL");
                             UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                             ussProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                             ussProxy.OperationAuthHeaderValue.coupon = opCoupon;
