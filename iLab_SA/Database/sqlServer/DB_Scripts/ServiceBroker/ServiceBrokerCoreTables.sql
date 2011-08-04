@@ -3,6 +3,7 @@
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 -- $Id$
 
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_AdminURLs_ProcessAgent]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[AdminURLs] DROP CONSTRAINT FK_AdminURLs_ProcessAgent
 GO
@@ -487,7 +488,7 @@ GO
 /****** Object:  Table [dbo].[Group_Types]    Script Date: 8/30/2005 4:07:57 PM ******/
 CREATE TABLE [dbo].[Group_Types] (
 	[Group_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Description] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
