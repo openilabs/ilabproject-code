@@ -2737,9 +2737,9 @@ public static int CountScheduledClients(int labServerID){
             List<int> groupIDs = new List<int>();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveGroupIDsByType", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveIDsByType", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@typeName", typeName, DbType.String, 50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@typeName", typeName, DbType.String, 256));
 
             try
             {
