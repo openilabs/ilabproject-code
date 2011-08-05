@@ -1019,7 +1019,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                         {
                                             if (clientID < 1 && kval.Value[0] > 1)
                                             {
-                                                curGroup = kv.Key;
+                                                curGroup = kval.Key;
                                                 clientID = kval.Value[0];
                                                 theClient = AdministrativeAPI.GetLabClient(clientID);
                                             }
