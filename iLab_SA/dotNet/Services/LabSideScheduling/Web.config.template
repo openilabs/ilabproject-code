@@ -16,6 +16,13 @@
     NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
     <add key="sqlConnection" value="data source=(local);initial catalog=iLab_LSS;Integrated Security=SSPI"/>
     <add key="DatabaseProvider" value="System.Data.SqlClient" />
+
+    <!-- NOTE Default Recaptcha: Global keys assigned to ilab.mit.edu 
+	You should generate Keys for your Institution or site specific keys
+	see documentation at http://www.google.com/recaptcha
+    -->
+    <add key="RecaptchaPublicKey" value="6LcLF8ISAAAAAMhwOM1ipf9N1Kh_obO1VG0PwCQB"/>
+    <add key="RecaptchaPrivateKey" value="6LcLF8ISAAAAALHhc_wOQibhl3jIc5gf9MUKvOw_"/>
     
     <add key="serviceType" value="LAB SCHEDULING SERVER"/>
     <!-- The name of the Service displayed for the user, please change -->

@@ -22,7 +22,14 @@
     <add key="sqlConnection" value="data source=(local);initial catalog=iLab_TOD;Integrated Security=SSPI"/>
     <add key="DatabaseProvider" value="System.Data.SqlClient" />
 
-     <!-- The following optional keys are used by the SelfRegistration page to populate the selfRegistration page
+    <!-- NOTE Default Recaptcha: Global keys assigned to ilab.mit.edu 
+	You should generate Keys for your Institution or site specific keys
+	see documentation at http://www.google.com/recaptcha
+    -->
+    <add key="RecaptchaPublicKey" value="6LcLF8ISAAAAAMhwOM1ipf9N1Kh_obO1VG0PwCQB"/>
+    <add key="RecaptchaPrivateKey" value="6LcLF8ISAAAAALHhc_wOQibhl3jIc5gf9MUKvOw_"/>
+    
+    <!-- The following optional keys are used by the SelfRegistration page to populate the selfRegistration page
  	which is used to generate the ProcessAgent's Bootstrap ProcessAgent Record, 
 	which must be created before installing domain credientials -->
     <!-- The name of the Service displayed for the user, please change -->
