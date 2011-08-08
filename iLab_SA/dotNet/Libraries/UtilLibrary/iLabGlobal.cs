@@ -1,3 +1,6 @@
+/* Copyright (c) 2008 The Massachusetts Institute of Technology. All rights reserved. */
+/* $Id$ */
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +17,7 @@ namespace iLabs.UtilLib
         static private string date = "$Date$";
         static private string revision = "$Revision$";
         static private string iLabRelease = "$ilab:Release$";
-	    static private string release = "Release 3.5.0 Devl";
+	static private string release = "Release 3.5.0";
         static private string buildDate = "$ilab:BuildDate$";
         /// <summary>
         /// Returns the date and svn revision last set, still not auto setting.
