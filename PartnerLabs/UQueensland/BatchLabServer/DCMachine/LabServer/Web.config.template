@@ -41,6 +41,13 @@
     <!-- Number of measurements to take and then get the average -->
     <add key="MeasurementCount" value="3" />
 
+    <!-- Comma seperated list of email addresses for when the experiment completes success or is cancelled - if empty, no email is sent -->
+    <add key="EmailAddressesExperimentCompleted" value="" />
+    <!-- Comma seperated list of email addresses for when the experiment fails - if empty, no email is sent -->
+    <add key="EmailAddressesExperimentFailed" value="" />
+    <!-- Email address of sender -->
+    <add key="EmailAddressLabServer" value="" />
+
   </appSettings>
 
   <connectionStrings/>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Xml;
 using Library.Lab;
 using Library.LabServerEngine.Drivers.Equipment;
 
@@ -140,13 +141,83 @@ namespace Library.LabServerEngine.Drivers.Setup
             // Calculate actual execution time
             //
             TimeSpan timeSpan = DateTime.Now - startDateTime;
+            int executionTime = (int)timeSpan.TotalSeconds;
 
             string logMessage = STRLOG_StatusCode + experimentResultInfo.statusCode
-                + Logfile.STRLOG_Spacer + STRLOG_ExecutionTime + timeSpan.TotalSeconds.ToString();
+                + Logfile.STRLOG_Spacer + STRLOG_ExecutionTime + executionTime.ToString();
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 
             return experimentResultInfo;
         }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected XmlDocument CreateXmlRequestDocument(string command)
+        {
+            return CreateXmlRequestDocument(command, null);
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected XmlDocument CreateXmlRequestDocument(string command, string[,] args)
+        {
+            XmlDocument xmlDocument = null;
+
+            try
+            {
+                xmlDocument = new XmlDocument();
+                XmlElement xmlElement = xmlDocument.CreateElement(LabServerEngine.Consts.STRXML_Request);
+                xmlDocument.AppendChild(xmlElement);
+
+                //
+                // Add command
+                //
+                xmlElement = xmlDocument.CreateElement(LabServerEngine.Consts.STRXML_Command);
+                xmlElement.InnerText = command;
+                xmlDocument.DocumentElement.AppendChild(xmlElement);
+
+                //
+                // Add arguments which could be XML strings
+                //
+                if (args != null)
+                {
+                    for (int i = 0; i < args.GetLength(0); i++)
+                    {
+                        xmlElement = xmlDocument.CreateElement(args[i, 0]);
+                        xmlElement.InnerXml = args[i, 1];
+                        xmlDocument.DocumentElement.AppendChild(xmlElement);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+            }
+
+            return xmlDocument;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        protected XmlNode CreateXmlResponseNode(string xmlResponse)
+        {
+            XmlDocument xmlDocument = null;
+            XmlNode xmlResponseNode = null;
+
+            try
+            {
+                xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(xmlResponse);
+                xmlResponseNode = XmlUtilities.GetXmlRootNode(xmlDocument, LabServerEngine.Consts.STRXML_Response);
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+            }
+
+            return xmlResponseNode.Clone();
+        }
+
     }
 }

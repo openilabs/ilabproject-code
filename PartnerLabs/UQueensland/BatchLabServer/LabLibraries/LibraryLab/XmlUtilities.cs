@@ -623,5 +623,22 @@ namespace Library.Lab
             xmlNodeTemp.InnerXml = dataVector.ToString();
         }
 
+        //-------------------------------------------------------------------------------------------------//
+
+        public static string ToXmlString(XmlNode xmlNode)
+        {
+            string xmlString = string.Empty;
+
+            StringWriter sw = new StringWriter();
+            XmlTextWriter xtw = new XmlTextWriter(sw);
+            xtw.Formatting = Formatting.Indented;
+            xmlNode.WriteTo(xtw);
+            xtw.Flush();
+
+            xmlString = sw.ToString();
+
+            return xmlString;
+        }
+
     }
 }

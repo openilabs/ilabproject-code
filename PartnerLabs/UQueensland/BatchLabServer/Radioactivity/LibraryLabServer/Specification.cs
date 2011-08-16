@@ -16,7 +16,6 @@ namespace Library.LabServer
         //
         // Constants
         //
-        private const int TIMESECS_AdministrationExecution = 6;
  
         //
         // String constants for logfile messages
@@ -38,10 +37,19 @@ namespace Library.LabServer
 
         #region Properties
 
+        public struct Absorber
+        {
+            public string name;
+            public char location;
+            public Absorber(string name, char location)
+            {
+                this.name = name;
+                this.location = location;
+            }
+        }
         private string sourceName;
         private char sourceLocation;
-        private string absorberName;
-        private char absorberLocation;
+        private Absorber[] absorberList;
         private int[] distanceList;
         private int duration;
         private int repeat;
@@ -56,14 +64,9 @@ namespace Library.LabServer
             get { return this.sourceLocation; }
         }
 
-        public string AbsorberName
+        public Absorber[] AbsorberList
         {
-            get { return this.absorberName; }
-        }
-
-        public char AbsorberLocation
-        {
-            get { return this.absorberLocation; }
+            get { return this.absorberList; }
         }
 
         public int[] DistanceList
@@ -165,26 +168,32 @@ namespace Library.LabServer
                 //
                 // Get the source name and check that it is valid - search is case-sensitive
                 //
-                string sourceName = XmlUtilities.GetXmlValue(this.xmlNodeSpecification, Consts.STRXML_sourceName, false);
-                int index = Array.IndexOf(this.configuration.SourceNames, sourceName);
+                string strSourceName = XmlUtilities.GetXmlValue(this.xmlNodeSpecification, Consts.STRXML_sourceName, false);
+                int index = Array.IndexOf(this.configuration.SourceNames, strSourceName);
                 if (index < 0)
                 {
-                    throw new ArgumentException(STRERR_InvalidSource, sourceName);
+                    throw new ArgumentException(STRERR_InvalidSource, strSourceName);
                 }
                 this.sourceName = this.configuration.SourceNames[index];
                 this.sourceLocation = this.configuration.SourceLocations[index];
 
                 //
-                // Get the absorber name and check that it is valid - search is case-sensitive
+                // Get the absorber list and validate - search is case-sensitive
                 //
-                string absorberName = XmlUtilities.GetXmlValue(this.xmlNodeSpecification, Consts.STRXML_absorberName, false);
-                index = Array.IndexOf(this.configuration.AbsorberNames, absorberName);
-                if (index < 0)
+                string csvAbsorbers = XmlUtilities.GetXmlValue(this.xmlNodeSpecification, Consts.STRXML_absorberName, false);
+                string[] csvAbsorbersSplit = csvAbsorbers.Split(new char[] { Consts.CHR_CsvSplitter });
+                this.absorberList = new Absorber[csvAbsorbersSplit.Length];
+                for (int i = 0; i < csvAbsorbersSplit.Length; i++)
                 {
-                    throw new ArgumentException(STRERR_InvalidAbsorber, absorberName);
+                    index = Array.IndexOf(this.configuration.AbsorberNames, csvAbsorbersSplit[i]);
+                    if (index < 0)
+                    {
+                        throw new ArgumentException(STRERR_InvalidAbsorber, csvAbsorbersSplit[i]);
+                    }
+                    string name = this.configuration.AbsorberNames[index];
+                    char location = this.configuration.AbsorberLocations[index];
+                    this.absorberList[i] = new Absorber(name, location);
                 }
-                this.absorberName = this.configuration.AbsorberNames[index];
-                this.absorberLocation = this.configuration.AbsorberLocations[index];
 
                 //
                 // Get duration and validate
@@ -201,14 +210,14 @@ namespace Library.LabServer
                 //
                 // Get distance list and validate
                 //
-                string csvString = XmlUtilities.GetXmlValue(this.xmlNodeSpecification, Consts.STRXML_distance, false);
-                string[] csvStringSplit = csvString.Split(new char[] { Consts.CHR_CsvSplitter });
-                this.distanceList = new int[csvStringSplit.Length];
-                for (int i = 0; i < csvStringSplit.Length; i++)
+                string csvDistances = XmlUtilities.GetXmlValue(this.xmlNodeSpecification, Consts.STRXML_distance, false);
+                string[] csvDistancesSplit = csvDistances.Split(new char[] { Consts.CHR_CsvSplitter });
+                this.distanceList = new int[csvDistancesSplit.Length];
+                for (int i = 0; i < csvDistancesSplit.Length; i++)
                 {
                     try
                     {
-                        this.distanceList[i] = Int32.Parse(csvStringSplit[i]);
+                        this.distanceList[i] = Int32.Parse(csvDistancesSplit[i]);
                     }
                     catch (Exception ex)
                     {
@@ -237,7 +246,6 @@ namespace Library.LabServer
                         //
                         DriverRadioactivity driver = new DriverRadioactivity(this.equipmentServiceProxy, this.configuration);
                         executionTime = driver.GetExecutionTime(this);
-                        executionTime += TIMESECS_AdministrationExecution;
                     }
                     else
                     {
@@ -246,6 +254,21 @@ namespace Library.LabServer
                         //
                         DriverSimActivity driver = new DriverSimActivity(this.configuration);
                         executionTime = driver.GetExecutionTime(this);
+                    }
+                }
+                else if (this.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsAbsorber))
+                {
+                    if (this.equipmentServiceProxy != null)
+                    {
+                        //
+                        // Hardware is available to this unit, run it there
+                        //
+                        DriverAbsorbers driver = new DriverAbsorbers(this.equipmentServiceProxy, this.configuration);
+                        executionTime = driver.GetExecutionTime(this);
+                    }
+                    else
+                    {
+                        throw new ArgumentException(STRERR_EquipmentServiceNotAvailable, this.setupId);
                     }
                 }
                 else if (this.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTime) ||
@@ -259,6 +282,10 @@ namespace Library.LabServer
                 {
                     DriverSimActivity driver = new DriverSimActivity(this.configuration, false);
                     executionTime = driver.GetExecutionTime(this);
+                }
+                else
+                {
+                    throw new ArgumentException(STRERR_SetupIdInvalid, this.SetupId);
                 }
 
                 // Validate total execution time

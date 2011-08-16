@@ -39,6 +39,8 @@
   <ItemGroup>
     <Compile Include="AllowedCallers.cs" />
     <Compile Include="Consts.cs" />
+    <Compile Include="Drivers\DriverGeneric.cs" />
+    <Compile Include="ExperimentSpecification.cs" />
     <Compile Include="LabEquipmentEngine.cs" />
     <Compile Include="LabEquipmentManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

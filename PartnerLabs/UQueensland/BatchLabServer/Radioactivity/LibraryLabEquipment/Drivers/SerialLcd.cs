@@ -30,7 +30,19 @@ namespace Library.LabEquipment.Drivers
         //
         // String constants for error messages
         //
+        protected const string STRERR_FailedToInitialise = "Failed to initialise!";
+        private const string STRERR_NumberIsNegative = "Number cannot be negative!";
+        private const string STRERR_NumberIsInvalid = "Number is invalid!";
+        private const string STRERR_InitialiseDelayNotSpecified = "Initialise delay is not specified!";
         private const string STRERR_ReportHandlerThreadFailedToStart = "ReportHandler thread failed to start!";
+
+        //
+        // Local constants
+        //
+        private const int MAX_DATA_LENGTH = 16;
+        private const int MAX_PACKET_LENGTH = MAX_DATA_LENGTH + 4;
+        private const int LINE_LENGTH = 16;
+        private const int MAX_RESPONSE_TIME = 1000;
 
         //
         // Command and report packet types
@@ -40,17 +52,11 @@ namespace Library.LabEquipment.Drivers
         private const byte PKTRPT_TEMP_SENSOR = 0x82;
         private const byte PKTRPT_CAPTURE_DATA = 0x83;
 
-        private const int DELAY_INITIALISE = 2;
-
-        private const int MAX_DATA_LENGTH = 16;
-        private const int MAX_PACKET_LENGTH = MAX_DATA_LENGTH + 4;
-        private const int LINE_LENGTH = 16;
-        private const int MAX_RESPONSE_TIME = 1000;
-
         //
         // Local variables
         //
         protected Logfile.LoggingLevels logLevel;
+        protected double writeLineTime;
         protected bool initialised;
         private string lastError;
         private bool disposed;
@@ -170,7 +176,6 @@ namespace Library.LabEquipment.Drivers
             //
             // Initialise properties
             //
-            this.initialiseDelay = DELAY_INITIALISE;
             this.online = false;
             this.statusMessage = STRLOG_NotInitialised;
 
@@ -186,6 +191,46 @@ namespace Library.LabEquipment.Drivers
                 this.logLevel = Logfile.LoggingLevels.Minimum;
             }
             Logfile.Write(Logfile.STRLOG_LogLevel + this.logLevel.ToString());
+
+            //
+            // Get initialisation delay
+            //
+            XmlNode xmlNodeSerialLcd = XmlUtilities.GetXmlNode(xmlNodeEquipmentConfig, Consts.STRXML_serialLcd);
+            try
+            {
+                this.initialiseDelay = XmlUtilities.GetIntValue(xmlNodeSerialLcd, Consts.STRXML_initialiseDelay);
+                if (this.initialiseDelay < 0)
+                {
+                    throw new ArgumentException(STRERR_NumberIsNegative);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                throw new ArgumentException(STRERR_InitialiseDelayNotSpecified);
+            }
+            catch (FormatException)
+            {
+                // Value cannot be converted
+                throw new ArgumentException(STRERR_NumberIsInvalid, Consts.STRXML_initialiseDelay);
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+                throw new ArgumentException(ex.Message, Consts.STRXML_initialiseDelay);
+            }
+
+            //
+            // Get WriteLine() time
+            //
+            try
+            {
+                this.writeLineTime = XmlUtilities.GetRealValue(xmlNodeSerialLcd, Consts.STRXML_writeLineTime, 0.0);
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+                throw new ArgumentException(ex.Message, Consts.STRXML_writeLineTime);
+            }
 
             //
             // Create the receive and report objects
@@ -256,7 +301,7 @@ namespace Library.LabEquipment.Drivers
 
         //---------------------------------------------------------------------------------------//
 
-        public string GetHardwareFirmwareVersion()
+        public virtual string GetHardwareFirmwareVersion()
         {
             byte[] version = SendReturnData((byte)LCDPktType.GetVersion, null, 0);
 
@@ -270,7 +315,14 @@ namespace Library.LabEquipment.Drivers
 
         //---------------------------------------------------------------------------------------//
 
-        public bool WriteLine(int lineno, string message)
+        public double GetWriteLineTime()
+        {
+            return this.writeLineTime;
+        }
+
+        //---------------------------------------------------------------------------------------//
+
+        public virtual bool WriteLine(int lineno, string message)
         {
             //
             // Pad out the message the the line length and convert to a byte array
@@ -292,7 +344,7 @@ namespace Library.LabEquipment.Drivers
 
         //---------------------------------------------------------------------------------------//
 
-        public bool StartCapture(int seconds)
+        public virtual bool StartCapture(int seconds)
         {
             byte[] data = new byte[1] { (byte)seconds };
 
@@ -302,7 +354,7 @@ namespace Library.LabEquipment.Drivers
 
         //---------------------------------------------------------------------------------------//
 
-        public bool StopCapture()
+        public virtual bool StopCapture()
         {
             byte[] data = new byte[1] { 0 };
 

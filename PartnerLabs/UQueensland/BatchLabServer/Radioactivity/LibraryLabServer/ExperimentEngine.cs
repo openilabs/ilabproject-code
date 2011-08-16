@@ -79,6 +79,7 @@ namespace Library.LabServer
                 {
                     throw new ArgumentException(validationReport.errorMessage);
                 }
+                experimentInfo.setupId = specification.SetupId;
 
                 //
                 // Create an instance of the driver for the specified setup and then
@@ -104,6 +105,11 @@ namespace Library.LabServer
                         DriverSimActivity driver = new DriverSimActivity(this.configuration, this.labExperimentInfo.cancelExperiment);
                         resultInfo = (ResultInfo)driver.Execute(specification);
                     }
+                }
+                else if (specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsAbsorber))
+                {
+                    DriverAbsorbers driver = new DriverAbsorbers(this.equipmentServiceProxy, this.configuration, this.labExperimentInfo.cancelExperiment);
+                    resultInfo = (ResultInfo)driver.Execute(specification);
                 }
                 else if (specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTime) ||
                     specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsDistance))

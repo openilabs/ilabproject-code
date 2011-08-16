@@ -156,10 +156,7 @@ namespace Library.LabEquipment
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            //
-            // YOUR CODE HERE
-            LabStatus labStatus = new LabStatus(true, STR_LabEquipmentIsReady);
-            //
+            LabStatus labStatus = new LabStatus(true, StatusCodes.Ready.ToString());
 
             string logMessage = STRLOG_Online + labStatus.online.ToString() +
                 Logfile.STRLOG_Spacer + STRLOG_StatusMessage + Logfile.STRLOG_Quote + labStatus.labStatusMessage + Logfile.STRLOG_Quote;

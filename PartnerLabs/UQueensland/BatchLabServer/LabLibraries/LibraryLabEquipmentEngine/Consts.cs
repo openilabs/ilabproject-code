@@ -18,6 +18,13 @@ namespace Library.LabEquipment.Engine
         public const char CHR_CsvSplitterChar = ',';
 
         //
+        // XML elements in the experiment specification string
+        //
+        public const string STRXML_ExperimentSpecification = "experimentSpecification";
+        public const string STRXML_SetupId = "setupId";
+        public const string STRXML_SetupId_DriverGeneric = "DriverGeneric";
+
+        //
         // XML elements in the EquipmentConfig.xml file
         //
         public const string STRXML_equipmentConfig = "equipmentConfig";
@@ -25,7 +32,6 @@ namespace Library.LabEquipment.Engine
         public const string STRXMLPARAM_version = "@version";
         public const string STRXML_powerupDelay = "powerupDelay";
         public const string STRXML_powerdownTimeout = "powerdownTimeout";
-        public const string STRXML_initialiseDelay = "initialiseDelay";
 
         //
         // XML elements in the equipment request string

@@ -36,7 +36,7 @@ namespace Library.Lab
         private const string DEFAULT_EXT = ".log";
 
         private const string STRLOG_LogFilePath = " LogFilePath: ";
-        private const string STRLOG_TimestampFormat = "hh:mm:ss tt";
+        private const string STRLOG_TimestampFormat = "hh:mm:ss.ff tt";
         private const string STRLOG_TimestampSpacer = ":  ";
         private const string STRLOG_TimestampEmpty = "              ";
         private const string STRLOG_NewLine = "\r\n";

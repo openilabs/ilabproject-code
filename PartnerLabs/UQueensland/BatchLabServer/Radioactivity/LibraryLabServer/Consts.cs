@@ -14,6 +14,7 @@ namespace Library.LabServer
         //
         public const string STRXML_SetupId_RadioactivityVsTime = "RadioactivityVsTime";
         public const string STRXML_SetupId_RadioactivityVsDistance = "RadioactivityVsDistance";
+        public const string STRXML_SetupId_RadioactivityVsAbsorber = "RadioactivityVsAbsorber";
         public const string STRXML_SetupId_SimActivityVsTime = "SimActivityVsTime";
         public const string STRXML_SetupId_SimActivityVsDistance = "SimActivityVsDistance";
         public const string STRXML_SetupId_SimActivityVsTimeNoDelay = "SimActivityVsTimeNoDelay";
@@ -42,6 +43,7 @@ namespace Library.LabServer
         //
         // XML elements for the commands in the equipment request strings
         //
+        public const string STRXML_CmdGetLcdWriteLineTime = "GetLcdWriteLineTime";
         public const string STRXML_CmdGetTubeHomeDistance = "GetTubeHomeDistance";
         public const string STRXML_CmdGetTubeMoveTime = "GetTubeMoveTime";
         public const string STRXML_CmdGetSourceHomeLocation = "GetSourceHomeLocation";
@@ -73,6 +75,7 @@ namespace Library.LabServer
         //
         // XML elements in the equipment response strings
         //
+        public const string STRXML_RspLcdWriteLineTime = "LcdWriteLineTime";
         public const string STRXML_RspTubeHomeDistance = "TubeHomeDistance";
         public const string STRXML_RspTubeMoveTime = "TubeMoveTime";
         public const string STRXML_RspSourceHomeLocation = "SourceHomeLocation";

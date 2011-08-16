@@ -20,6 +20,7 @@ namespace LabClientHtml
         private const string STR_HasBeenSubmitted = " has been submitted.";
         private const string STR_ExperimentNos = "Experiments #";
         private const string STR_HaveBeenSubmitted = " have been submitted.";
+        private const string STRWTR_ExperimentNoIs = " Experiment # is {0}.";
         private const string STRWTR_ExecutionTimeWillBe = " Execution time will be ";
         private const string STRWTR_ExecutionTimeIs = " Execution time is ";
         private const string STRWTR_MinutesAnd = "{0} minute{1} and ";
@@ -422,6 +423,8 @@ namespace LabClientHtml
             try
             {
                 StringWriter sw = new StringWriter();
+
+                sw.Write(STRWTR_ExperimentNoIs, experimentID);
 
                 sw.Write(STRWTR_ExecutionTimeIs);
                 if (minutes > 0)

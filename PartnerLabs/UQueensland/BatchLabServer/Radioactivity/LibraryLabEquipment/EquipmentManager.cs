@@ -39,21 +39,6 @@ namespace Library.LabEquipment
 
         //-------------------------------------------------------------------------------------------------//
 
-        public override LabStatus GetLabEquipmentStatus()
-        {
-            const string STRLOG_MethodName = "GetLabEquipmentStatus";
-
-            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
-
-            LabStatus labStatus = this.labEquipmentEngine.GetLabEquipmentStatus();
-
-            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
-
-            return labStatus;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
         public override string ExecuteXmlRequest(string xmlRequest)
         {
             string strXmlResponse = string.Empty;
@@ -284,6 +269,20 @@ namespace Library.LabEquipment
                             //
                             xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspAbsorberReturnTime);
                             xmlElement.InnerText = absorberReturnTime.ToString();
+                            xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
+                            break;
+
+                        case NonExecuteCommands.GetLcdWriteLineTime:
+                            //
+                            // Get LCD writeline time
+                            //
+                            double lcdWriteLineTime = equipmentEngine.GetLcdWriteLineTime();
+
+                            //
+                            // Add capture data time to response
+                            //
+                            xmlElement = xmlResponseDocument.CreateElement(Consts.STRXML_RspLcdWriteLineTime);
+                            xmlElement.InnerText = lcdWriteLineTime.ToString();
                             xmlResponseDocument.DocumentElement.AppendChild(xmlElement);
                             break;
 

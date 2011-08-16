@@ -11,6 +11,11 @@ namespace Library.LabEquipment.Engine
         private const string STRLOG_ClassName = "LabEquipmentManager";
 
         //
+        // String constants
+        //
+        protected const string STR_NotInitialised = "Not Initialised!";
+
+        //
         // String constants for log messages
         //
         protected const string STRLOG_Command = " Command: ";
@@ -102,7 +107,7 @@ namespace Library.LabEquipment.Engine
 
         public int GetTimeUntilReady()
         {
-            int timeUntilReady = 0;
+            int timeUntilReady = -1;
 
             if (this.labEquipmentEngine != null)
             {
@@ -110,6 +115,27 @@ namespace Library.LabEquipment.Engine
             }
 
             return timeUntilReady;
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
+        public LabStatus GetLabEquipmentStatus()
+        {
+            LabStatus labStatus = null;
+
+            lock (this.managerLock)
+            {
+                if (this.labEquipmentEngine != null)
+                {
+                    labStatus = this.labEquipmentEngine.GetLabEquipmentStatus();
+                }
+                else
+                {
+                    labStatus = new LabStatus(false, STR_NotInitialised);
+                }
+            }
+
+            return labStatus;
         }
 
         //-------------------------------------------------------------------------------------------------//
@@ -154,27 +180,6 @@ namespace Library.LabEquipment.Engine
             {
                 this.labEquipmentEngine.Close();
             }
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
-        public virtual LabStatus GetLabEquipmentStatus()
-        {
-            LabStatus labStatus = null;
-
-            lock (this.managerLock)
-            {
-                if (this.labEquipmentEngine != null)
-                {
-                    labStatus = this.labEquipmentEngine.GetLabEquipmentStatus();
-                }
-                else
-                {
-                    labStatus = new LabStatus();
-                }
-            }
-
-            return labStatus;
         }
 
         //-------------------------------------------------------------------------------------------------//

@@ -65,12 +65,12 @@ namespace Library.LabEquipment
                 //
                 // Check the minimum initialise delay and update if necessary
                 //
-                int initialiseDelay = this.redLion.InitialiseDelay;
-                if (initialiseDelay > this.InitialiseDelay)
-                {
-                    this.InitialiseDelay = initialiseDelay;
-                    Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString() + STRLOG_Seconds);
-                }
+                //int initialiseDelay = this.redLion.InitialiseDelay;
+                //if (initialiseDelay > this.InitialiseDelay)
+                //{
+                //    this.InitialiseDelay = initialiseDelay;
+                //    Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString() + STRLOG_Seconds);
+                //}
 
                 //
                 // Get the delay in seconds to wait before taking a measurement

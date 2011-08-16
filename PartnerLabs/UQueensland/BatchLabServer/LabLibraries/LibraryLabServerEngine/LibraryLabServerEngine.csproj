@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -42,7 +43,6 @@
     <Compile Include="Drivers\Setup\DriverEquipmentGeneric.cs" />
     <Compile Include="Drivers\Setup\DriverModuleGeneric.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AllowedCallers.cs" />
     <Compile Include="CancelExperiment.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="ExperimentQueueDB.cs" />
@@ -56,11 +56,13 @@
     <Compile Include="LabExperimentResult.cs" />
     <Compile Include="LabServerToSbAPI.cs" />
     <Compile Include="ProxyServiceBroker.cs" />
-    <Compile Include="TypeAppData.cs" />
-    <Compile Include="TypeExperimentInfo.cs" />
-    <Compile Include="TypeExperimentResultInfo.cs" />
-    <Compile Include="TypeQueuedExperimentInfo.cs" />
-    <Compile Include="TypeResultsIdInfo.cs" />
+    <Compile Include="AllowedServiceBrokersDB.cs" />
+    <Compile Include="Types\AppData.cs" />
+    <Compile Include="Types\ExperimentInfo.cs" />
+    <Compile Include="Types\ExperimentResultInfo.cs" />
+    <Compile Include="Types\QueuedExperimentInfo.cs" />
+    <Compile Include="Types\ResultsIdInfo.cs" />
+    <Compile Include="Types\ServiceBrokerInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibraryLab\LibraryLab.csproj">

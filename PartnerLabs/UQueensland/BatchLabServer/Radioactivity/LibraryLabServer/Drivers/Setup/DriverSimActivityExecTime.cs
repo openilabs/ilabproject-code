@@ -35,7 +35,7 @@ namespace Library.LabServer.Drivers.Setup
             //
             // Get source and absorber select times
             //
-            executionTime += this.simActivity.GetAbsorberSelectTime(specification.AbsorberLocation);
+            executionTime += this.simActivity.GetAbsorberSelectTime(specification.AbsorberList[0].location);
             executionTime += this.simActivity.GetSourceSelectTime(specification.SourceLocation);
 
             //
@@ -79,7 +79,7 @@ namespace Library.LabServer.Drivers.Setup
             // Get source and absorber return times
             //
             executionTime += this.simActivity.GetSourceReturnTime(specification.SourceLocation);
-            executionTime += this.simActivity.GetAbsorberReturnTime(specification.AbsorberLocation);
+            executionTime += this.simActivity.GetAbsorberReturnTime(specification.AbsorberList[0].location);
 
             //
             // Get tube return to home time

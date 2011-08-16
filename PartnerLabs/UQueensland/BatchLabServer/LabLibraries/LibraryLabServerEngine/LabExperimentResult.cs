@@ -113,16 +113,7 @@ namespace Library.LabServerEngine
 
         public override string ToString()
         {
-            //
-            // Write the Xml specification to a string
-            //
-            StringWriter sw = new StringWriter();
-            XmlTextWriter xtw = new XmlTextWriter(sw);
-            xtw.Formatting = Formatting.Indented;
-            this.xmlNodeExperimentResult.WriteTo(xtw);
-            xtw.Flush();
-
-            return sw.ToString();
+            return XmlUtilities.ToXmlString(this.xmlNodeExperimentResult);
         }
 
     }

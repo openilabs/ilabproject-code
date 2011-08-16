@@ -79,6 +79,7 @@ namespace Library.LabServer
                 {
                     throw new ArgumentException(validationReport.errorMessage);
                 }
+                experimentInfo.setupId = specification.SetupId;
 
                 //
                 // Create an instance of the driver for the specified setup and then

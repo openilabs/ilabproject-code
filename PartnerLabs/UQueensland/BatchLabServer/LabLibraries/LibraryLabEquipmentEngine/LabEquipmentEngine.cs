@@ -23,7 +23,12 @@ namespace Library.LabEquipment.Engine
         //
         // String constants
         //
-        protected const string STR_LabEquipmentIsReady = "LabEquipment is ready.";
+        protected const string STR_NotInitialised = "Not Initialised!";
+        protected const string STR_PoweringUp = "Powering up ...";
+        protected const string STR_Initialising = "Initialising ...";
+        protected const string STR_PoweringDown = "Powering down ...";
+        protected const string STR_Ready = "Ready";
+        protected const string STR_PoweredDown = "Powered down";
 
         //
         // String constants for logfile messages
@@ -34,7 +39,6 @@ namespace Library.LabEquipment.Engine
         private const string STRLOG_Version = " Version: ";
 
         private const string STRLOG_PowerupDelayNotSpecified = "Powerup delay is not specified!";
-        private const string STRLOG_InitialiseDelayNotSpecified = "Initialise delay is not specified!";
         private const string STRLOG_PowerdownTimeoutNotSpecified = "Powerdown timeout is not specified!";
         private const string STRLOG_PowerdownDisabled = " Powerdown: Disabled";
         private const string STRLOG_LabEquipmentEngineThreadIsStarting = " LabEquipmentEngine thread is starting...";
@@ -43,9 +47,9 @@ namespace Library.LabEquipment.Engine
         protected const string STRLOG_disposing = " disposing: ";
         protected const string STRLOG_disposed = " disposed: ";
         protected const string STRLOG_PowerupDelay = " Powerup Delay: ";
-        protected const string STRLOG_InitialiseDelay = " Initialise Delay: ";
         protected const string STRLOG_PowerdownTimeout = " Powerdown Timeout: ";
         protected const string STRLOG_PoweroffDelay = " PowerOff Delay: ";
+        protected const string STRLOG_InitialiseDelay = " Initialise Delay: ";
         protected const string STRLOG_TimeUntilReady = " TimeUntilReady: ";
         protected const string STRLOG_Seconds = " seconds";
         protected const string STRLOG_Success = "Success: ";
@@ -65,8 +69,10 @@ namespace Library.LabEquipment.Engine
         private const string STRERR_threadLabEquipmentEngine = "threadLabEquipmentEngine";
         private const string STRERR_LabEquipmentEngineThreadFailedToStart = "Lab equipment engine thread failed to start!";
         private const string STRERR_LabEquipmentFailedToBecomeReady = "Lab equipment failed to become ready!";
-
+        private const string STRERR_InitiliaseFailedRetrying_arg2 = "Lab equipment failed to initialise! Retrying {0} of {1}...";
+        private const string STRERR_InitiliaseFailedAfterRetrying_arg = "Lab equipment failed to initialise after {0} attempts!";
         protected const string STRERR_UnknownCommand = " Unknown Command: ";
+        protected const string STRERR_UnknownSetupId = " Unknown SetupId: ";
 
         //
         // Local variables
@@ -86,7 +92,9 @@ namespace Library.LabEquipment.Engine
         //
         private int slPowerupTimeRemaining;
         private int slPowerdownTimeRemaining;
-        private DateTime slInitialiseStartTime;
+        private DateTime slPowerupInitialiseStartTime;
+        protected bool slOnline;
+        protected string slStatusMessage;
 
         //
         // Local variables accessible by a derived class
@@ -104,11 +112,6 @@ namespace Library.LabEquipment.Engine
         private const int DEFAULT_DelayPowerup = 5;
 
         /// <summary>
-        /// Time in seconds to wait for equipment initialisation.
-        /// </summary>
-        private const int DEFAULT_DelayInitialise = 7;
-
-        /// <summary>
         /// Time in seconds to wait for equipment finalisation.
         /// </summary>
         private const int DEFAULT_DelayFinalise = 3;
@@ -117,6 +120,8 @@ namespace Library.LabEquipment.Engine
         /// Minimum time in seconds to wait to powerup the equipment after it has been powered down.
         /// </summary>
         private const int MIN_DelayPoweroff = 10;
+
+        private const int RETRY_PowerOnInit = 2;
 
         #endregion
 
@@ -127,10 +132,11 @@ namespace Library.LabEquipment.Engine
         private string version;
         private bool powerdownEnabled;
         private int powerupDelay;
-        private int initialiseDelay;
-        private int finaliseDelay;
         private int powerdownTimeout;
         private int poweroffDelay;
+        protected int powerupInitialiseDelay;
+        private int finaliseDelay;
+        private bool debug_Retry;
 
         public string Filename
         {
@@ -170,8 +176,7 @@ namespace Library.LabEquipment.Engine
         /// </summary>
         public int InitialiseDelay
         {
-            get { return this.initialiseDelay; }
-            set { this.initialiseDelay = value; }
+            get { return this.powerupInitialiseDelay; }
         }
 
         /// <summary>
@@ -225,6 +230,12 @@ namespace Library.LabEquipment.Engine
                     return this.slPowerdownIsSuspended;
                 }
             }
+        }
+
+        public bool Debug_Retry
+        {
+            get { return this.debug_Retry; }
+            set { this.debug_Retry = value; }
         }
 
         #endregion
@@ -327,11 +338,15 @@ namespace Library.LabEquipment.Engine
             this.rootFilePath = rootFilePath;
 
             //
-            // Initialise private properties
+            // Initialise properties
             //
+            this.powerupInitialiseDelay = 0;
             this.slRunning = false;
             this.slIsReady = false;
             this.slPowerdownSuspended = false;
+            this.slOnline = false;
+            this.slStatusMessage = STR_NotInitialised;
+            this.debug_Retry = false;
 
             //
             // Determine the logging level for this class
@@ -439,36 +454,6 @@ namespace Library.LabEquipment.Engine
             this.slPowerupTimeRemaining = this.powerupDelay;
 
             //
-            // Get initialisation delay, may not be specified
-            //
-            try
-            {
-                this.initialiseDelay = XmlUtilities.GetIntValue(this.xmlNodeEquipmentConfig, Consts.STRXML_initialiseDelay);
-                if (this.initialiseDelay < 0)
-                {
-                    throw new ArgumentException(STRERR_NumberIsNegative);
-                }
-            }
-            catch (ArgumentNullException)
-            {
-                Logfile.Write(STRLOG_InitialiseDelayNotSpecified);
-
-                // Initialisation delay is not specified, set default initialisation delay
-                this.initialiseDelay = DEFAULT_DelayInitialise;
-            }
-            catch (FormatException)
-            {
-                // Value cannot be converted
-                throw new ArgumentException(STRERR_NumberIsInvalid, Consts.STRXML_initialiseDelay);
-            }
-            catch (Exception ex)
-            {
-                Logfile.WriteError(ex.Message);
-                throw new ArgumentException(ex.Message, Consts.STRXML_initialiseDelay);
-            }
-            this.slInitialiseStartTime = DateTime.Now;
-
-            //
             // Get powerdown timeout, may not be specified
             //
             try
@@ -511,8 +496,7 @@ namespace Library.LabEquipment.Engine
             //
             // Log details
             //
-            string logMessage = STRLOG_PowerupDelay + this.powerupDelay.ToString() + STRLOG_Seconds +
-                Logfile.STRLOG_Spacer + STRLOG_InitialiseDelay + this.initialiseDelay.ToString() + STRLOG_Seconds;
+            string logMessage = STRLOG_PowerupDelay + this.powerupDelay.ToString() + STRLOG_Seconds;
 
             if (this.powerdownEnabled == true)
             {
@@ -560,6 +544,8 @@ namespace Library.LabEquipment.Engine
                 // Don't start the thread yet, the method Start() must be called to start the thread
                 // after the derived class has completed its initialisation.
                 //
+                this.slOnline = true;
+                this.slPowerupInitialiseStartTime = DateTime.Now;
             }
             catch (Exception ex)
             {
@@ -761,20 +747,28 @@ namespace Library.LabEquipment.Engine
                 }
                 else if (this.slRunning == false)
                 {
-                    // Equipment is powered down
-                    timeUntilReady = this.powerupDelay + this.initialiseDelay;
-                    logMessage += "Not Running";
+                    if (this.slOnline == true)
+                    {
+                        // Equipment is powered down
+                        timeUntilReady = this.powerupDelay + this.powerupInitialiseDelay;
+                        logMessage += "Not Running";
+                    }
+                    else
+                    {
+                        // Equipment failed to powerup or initialise
+                        timeUntilReady = -1;
+                    }
                 }
                 else if (this.slPowerupTimeRemaining > this.powerupDelay)
                 {
                     // Equipment has powered off
-                    timeUntilReady = this.slPowerupTimeRemaining + this.initialiseDelay;
+                    timeUntilReady = this.slPowerupTimeRemaining + this.powerupInitialiseDelay;
                     logMessage += "Poweroff";
                 }
                 else if (this.slPowerupTimeRemaining > 0)
                 {
                     // Equipment is still powering up
-                    timeUntilReady = this.slPowerupTimeRemaining + this.initialiseDelay;
+                    timeUntilReady = this.slPowerupTimeRemaining + this.powerupInitialiseDelay;
                     logMessage += "Powerup";
                 }
                 else
@@ -782,8 +776,8 @@ namespace Library.LabEquipment.Engine
                     //
                     // Equipment has powered up and is initialising
                     //
-                    TimeSpan timeSpan = DateTime.Now - this.slInitialiseStartTime;
-                    timeUntilReady = this.initialiseDelay;
+                    TimeSpan timeSpan = DateTime.Now - this.slPowerupInitialiseStartTime;
+                    timeUntilReady = this.powerupInitialiseDelay;
                     try
                     {
                         // Get the time to complete initialisation
@@ -877,7 +871,12 @@ namespace Library.LabEquipment.Engine
 
             Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName);
 
-            LabStatus labStatus = new LabStatus(true, STR_LabEquipmentIsReady);
+            LabStatus labStatus = new LabStatus();
+            lock (this.statusLock)
+            {
+                labStatus.online = this.slOnline;
+                labStatus.labStatusMessage = this.slStatusMessage;
+            }
 
             string logMessage = STRLOG_Online + labStatus.online.ToString() +
                 Logfile.STRLOG_Spacer + STRLOG_StatusMessage + Logfile.STRLOG_Quote + labStatus.labStatusMessage + Logfile.STRLOG_Quote;
@@ -919,9 +918,9 @@ namespace Library.LabEquipment.Engine
             bool success = true;
 
             //
-            // Initialisation delay, this will be overridden
+            // Powerup initialisation delay, this will be overridden
             //
-            for (int i = 0; i < this.initialiseDelay; i++)
+            for (int i = 0; i < this.powerupInitialiseDelay; i++)
             {
                 Thread.Sleep(1000);
             }
@@ -1145,9 +1144,12 @@ namespace Library.LabEquipment.Engine
             //
             // Initialise state machine
             //
-            this.Running = true;
+            int retryPowerOnInit = RETRY_PowerOnInit;
+            bool retry = false;
             States state = States.sPowerInit;
             States lastState = States.sExitThread;
+            this.slOnline = true;
+            this.Running = true;
 
             try
             {
@@ -1174,6 +1176,8 @@ namespace Library.LabEquipment.Engine
 
                             lock (this.statusLock)
                             {
+                                this.slStatusMessage = STR_PoweringUp;
+
                                 // Initialise powerup delay
                                 this.slPowerupTimeRemaining = this.powerupDelay;
                             }
@@ -1181,6 +1185,8 @@ namespace Library.LabEquipment.Engine
                             // Powerup the equipment 
                             if (PowerupEquipment() == false)
                             {
+                                this.slOnline = false;
+                                this.slStatusMessage = STR_NotInitialised;
                                 state = States.sExitThread;
                                 break;
                             }
@@ -1210,22 +1216,56 @@ namespace Library.LabEquipment.Engine
 
                         case States.sPowerOnInit:
 
-                            // Set the intialisation start time
+                            // Set the power intialisation start time
                             lock (this.statusLock)
                             {
-                                this.slInitialiseStartTime = DateTime.Now;
+                                this.slStatusMessage = STR_Initialising;
+                                this.slPowerupInitialiseStartTime = DateTime.Now;
                             }
 
+                            //
                             // Initialise the equipment
-                            if (InitialiseEquipment() == false)
+                            //
+                            retry = false;
+                            if (InitialiseEquipment() == false || this.debug_Retry == true)
                             {
-                                state = States.sExitThread;
+                                if (--retryPowerOnInit >= 0)
+                                {
+                                    retry = true;
+
+                                    Logfile.WriteError(
+                                        String.Format(STRERR_InitiliaseFailedRetrying_arg2, RETRY_PowerOnInit - retryPowerOnInit, RETRY_PowerOnInit));
+
+                                    //
+                                    // Equipment failed to initialise, powerdown the equipment and try again
+                                    //
+                                    lock (this.statusLock)
+                                    {
+                                        this.slPowerupTimeRemaining = this.PoweroffDelay + this.PowerupDelay;
+                                    }
+                                    PowerdownEquipment();
+                                    state = States.sPowerOffDelay;
+                                }
+                                else
+                                {
+                                    Logfile.WriteError(
+                                        String.Format(STRERR_InitiliaseFailedAfterRetrying_arg, RETRY_PowerOnInit + 1));
+
+                                    //
+                                    // Could initialise the equipment after retrying, powerdown the equipment and exit
+                                    //
+                                    this.slOnline = false;
+                                    this.slStatusMessage = STR_NotInitialised;
+                                    PowerdownEquipment();
+                                    state = States.sExitThread;
+                                }
                                 break;
                             }
 
                             lock (this.statusLock)
                             {
                                 // Equipment is now ready to use
+                                this.slStatusMessage = STR_Ready;
                                 this.slIsReady = true;
 
                                 // Initialise powerdown timeout
@@ -1289,6 +1329,7 @@ namespace Library.LabEquipment.Engine
                                 //
                                 this.slPowerupTimeRemaining = this.PoweroffDelay + this.PowerupDelay;
                                 this.slIsReady = false;
+                                this.slStatusMessage = STR_PoweringDown;
                             }
 
                             // Powerdown the equipment
@@ -1378,7 +1419,19 @@ namespace Library.LabEquipment.Engine
                                     else
                                     {
                                         // Powerdown has completed
-                                        state = States.sExitThread;
+                                        this.slStatusMessage = STR_PoweredDown;
+
+                                        //
+                                        // Check if retrying
+                                        //
+                                        if (retry == true)
+                                        {
+                                            state = States.sPowerInit;
+                                        }
+                                        else
+                                        {
+                                            state = States.sExitThread;
+                                        }
                                     }
                                 }
                             }

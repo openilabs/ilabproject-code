@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
+using System.Web;
 using System.Web.Hosting;
 using Library.Lab;
 using Library.LabServer;
@@ -11,8 +13,8 @@ namespace LabServer
     {
         private const string STRLOG_ClassName = "Global";
 
-        public static AllowedCallers allowedCallers = null;
-        public static Configuration configuration = null;
+        public static AllowedServiceBrokersDB allowedServiceBrokers = null;
+        public static Library.LabServer.Configuration configuration = null;
         public static ExperimentManager experimentManager = null;
 
         //-------------------------------------------------------------------------------------------------//
@@ -25,7 +27,7 @@ namespace LabServer
             // Set the filepath for the log files 
             //
             string rootFilePath = HostingEnvironment.ApplicationPhysicalPath;
-            string logFilesPath = Utilities.GetAppSetting(Library.LabServerEngine.Consts.STRCFG_LogFilesPath);
+            string logFilesPath = Utilities.GetAppSetting(Consts.STRCFG_LogFilesPath);
             Logfile.SetFilePath(Path.Combine(rootFilePath, logFilesPath));
 
             Logfile.Write("");
@@ -34,9 +36,9 @@ namespace LabServer
             //
             // Create the experiment manager
             //
-            allowedCallers = new AllowedCallers();
-            configuration = new Configuration(rootFilePath);
-            experimentManager = new ExperimentManager(allowedCallers, configuration);
+            allowedServiceBrokers = new AllowedServiceBrokersDB();
+            configuration = new Library.LabServer.Configuration(rootFilePath);
+            experimentManager = new ExperimentManager(allowedServiceBrokers, configuration);
             experimentManager.Create();
 
             //
@@ -90,5 +92,42 @@ namespace LabServer
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName);
         }
+
+        //---------------------------------------------------------------------------------------//
+
+        public static string FormatRegularURL(HttpRequest httpRequest, string relativePath)
+        {
+            return FormatURL(httpRequest, relativePath, Consts.STR_RegularProtocol);
+        }
+
+        //---------------------------------------------------------------------------------------//
+
+        public static string FormatSecureURL(HttpRequest httpRequest, string relativePath)
+        {
+            return FormatURL(httpRequest, relativePath, Consts.STR_SecureProtocol);
+        }
+
+        //---------------------------------------------------------------------------------------//
+
+        private static string FormatURL(HttpRequest httpRequest, string relativePath, string protocol)
+        {
+            string serverName = HttpUtility.UrlEncode(httpRequest.ServerVariables["SERVER_NAME"]);
+            string serverPort = HttpUtility.UrlEncode(httpRequest.ServerVariables["SERVER_PORT"]);
+            string vdirName = httpRequest.ApplicationPath;
+            string formattedURL = protocol + "://" + serverName;
+            // handle non-conventional ports
+            if (serverPort != "80")
+            {
+                formattedURL += ":" + serverPort;
+            }
+            if (vdirName.EndsWith("/") == false)
+            {
+                vdirName += "/";
+            }
+            formattedURL += vdirName + relativePath;
+
+            return formattedURL;
+        }
+
     }
 }

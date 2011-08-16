@@ -37,7 +37,7 @@ namespace Library.LabServerEngine
         // String constants for exception messages
         //
         private const string STRERR_appData = "appData";
-        private const string STRERR_allowedCallers = "allowedCallers";
+        private const string STRERR_allowedServiceBrokers = "allowedServiceBrokers";
         private const string STRERR_experimentQueue = "experimentQueue";
         private const string STRERR_experimentResults = "experimentResults";
         private const string STRERR_experimentStatistics = "experimentStatistics";
@@ -178,14 +178,14 @@ namespace Library.LabServerEngine
 
         //-------------------------------------------------------------------------------------------------//
 
-        public LabExperimentManager(AllowedCallers allowedCallers, LabConfiguration labConfiguration)
-            : this(allowedCallers, labConfiguration, 0)
+        public LabExperimentManager(AllowedServiceBrokersDB allowedServiceBrokers, LabConfiguration labConfiguration)
+            : this(allowedServiceBrokers, labConfiguration, 0)
         {
         }
 
         //-------------------------------------------------------------------------------------------------//
 
-        public LabExperimentManager(AllowedCallers allowedCallers, LabConfiguration labConfiguration, int farmSize)
+        public LabExperimentManager(AllowedServiceBrokersDB allowedServiceBrokers, LabConfiguration labConfiguration, int farmSize)
         {
             const string STRLOG_MethodName = "LabExperimentManager";
 
@@ -205,11 +205,11 @@ namespace Library.LabServerEngine
                     throw new ArgumentNullException(STRERR_appData);
                 }
 
-                if (allowedCallers == null)
+                if (allowedServiceBrokers == null)
                 {
-                    throw new ArgumentNullException(STRERR_allowedCallers);
+                    throw new ArgumentNullException(STRERR_allowedServiceBrokers);
                 }
-                this.appData.allowedCallers = allowedCallers;
+                this.appData.allowedServiceBrokers = allowedServiceBrokers;
 
                 if (labConfiguration == null)
                 {
@@ -225,27 +225,27 @@ namespace Library.LabServerEngine
                     if (farmSize == 0)
                     {
                         // Get the farm size from the Application's configuration file
-                        appData.farmSize = Utilities.GetIntAppSetting(Consts.STRCFG_FarmSize);
+                        this.appData.farmSize = Utilities.GetIntAppSetting(Consts.STRCFG_FarmSize);
                     }
                     else
                     {
-                        appData.farmSize = farmSize;
+                        this.appData.farmSize = farmSize;
                     }
                 }
                 catch (ArgumentNullException)
                 {
                     // Farm size is not specified, default to 1
-                    appData.farmSize = 1;
+                    this.appData.farmSize = 1;
                 }
                 catch (Exception)
                 {
                     throw new ArgumentException(STRERR_FarmSizeInvalid);
                 }
-                if (appData.farmSize < 1)
+                if (this.appData.farmSize < 1)
                 {
                     throw new ArgumentException(STRERR_FarmSizeMinimum);
                 }
-                if (appData.farmSize > MAX_FARM_SIZE)
+                if (this.appData.farmSize > MAX_FARM_SIZE)
                 {
                     throw new ArgumentException(STRERR_FarmSizeMaximum + MAX_FARM_SIZE.ToString());
                 }
@@ -260,28 +260,44 @@ namespace Library.LabServerEngine
                 {
                     throw new ArgumentNullException(STRERR_experimentQueue);
                 }
-                appData.experimentQueue = this.experimentQueue;
+                this.appData.experimentQueue = this.experimentQueue;
 
                 this.experimentResults = new ExperimentResults();
                 if (this.experimentResults == null)
                 {
                     throw new ArgumentNullException(STRERR_experimentResults);
                 }
-                appData.experimentResults = this.experimentResults;
+                this.appData.experimentResults = this.experimentResults;
 
                 this.experimentStatistics = new ExperimentStatistics();
                 if (this.experimentStatistics == null)
                 {
                     throw new ArgumentNullException(STRERR_experimentStatistics);
                 }
-                appData.experimentStatistics = this.experimentStatistics;
+                this.appData.experimentStatistics = this.experimentStatistics;
 
                 this.signalCompleted = new Object();
                 if (this.signalCompleted == null)
                 {
                     throw new ArgumentNullException(STRERR_signalCompleted);
                 }
-                appData.signalCompleted = this.signalCompleted;
+                this.appData.signalCompleted = this.signalCompleted;
+
+                //
+                // Get email addresses for the LabServer, experiment completion/cancelled and failed
+                //
+                try
+                {
+                    this.appData.emailAddressLabServer = Utilities.GetAppSetting(Consts.STRCFG_EmailAddressLabServer);
+                    char[] splitterCharArray = new char[] { Consts.CHR_CsvSplitterChar };
+                    string csvEmail = Utilities.GetAppSetting(Consts.STRCFG_EmailAddressesExperimentCompleted);
+                    this.appData.emailAddressesExperimentCompleted = csvEmail.Split(splitterCharArray);
+                    csvEmail = Utilities.GetAppSetting(Consts.STRCFG_EmailAddressesExperimentFailed);
+                    this.appData.emailAddressesExperimentFailed = csvEmail.Split(splitterCharArray);
+                }
+                catch
+                {
+                }
 
                 //
                 // Initialise property variables
@@ -1012,7 +1028,7 @@ namespace Library.LabServerEngine
                             // Check if any experiments have not notified their ServiceBroker
                             //
                             this.submittedSinceLastNotifyCheck = true;
-                            state = States.sCheckNotified;
+                            state = States.sIdle;
                             break;
 
                         case States.sIdle:
@@ -1165,7 +1181,7 @@ namespace Library.LabServerEngine
                                     //
                                     // Attempt to notify the ServiceBroker for this experiment
                                     //
-                                    LabServerToSbAPI labServerToSbAPI = new LabServerToSbAPI(this.appData.allowedCallers);
+                                    LabServerToSbAPI labServerToSbAPI = new LabServerToSbAPI(this.appData.allowedServiceBrokers);
                                     if ((success = labServerToSbAPI.Notify(experimentId, sbName)) == true)
                                     {
                                         success = this.experimentResults.UpdateNotified(experimentId, sbName);

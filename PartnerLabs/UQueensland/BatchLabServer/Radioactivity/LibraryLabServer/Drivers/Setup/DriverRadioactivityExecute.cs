@@ -405,11 +405,11 @@ namespace Library.LabServer.Drivers.Setup
                     switch (entry.currentState)
                     {
                         case States_Execute.sSelectAbsorberMessageLine2:
-                            entry.commandArguments[1, 1] = HttpUtility.UrlEncode(specification.AbsorberName);
+                            entry.commandArguments[1, 1] = HttpUtility.UrlEncode(specification.AbsorberList[0].name);
                             break;
 
                         case States_Execute.sSelectAbsorber:
-                            entry.commandArguments[0, 1] = specification.AbsorberLocation.ToString();
+                            entry.commandArguments[0, 1] = specification.AbsorberList[0].location.ToString();
                             break;
 
                         case States_Execute.sSelectSourceMessageLine2:
@@ -537,12 +537,13 @@ namespace Library.LabServer.Drivers.Setup
             }
 
             //
-            // Calculate actual execution time
+            // Calculate actual execution time and round to the nearest integer
             //
             TimeSpan timeSpan = DateTime.Now - startDateTime;
+            int execTime = (int)(timeSpan.TotalSeconds + 0.5);
 
             logMessage = STRLOG_StatusCode + resultInfo.statusCode
-                + Logfile.STRLOG_Spacer + STRLOG_ExecutionTime + timeSpan.TotalSeconds.ToString();
+                + Logfile.STRLOG_Spacer + STRLOG_ExecutionTime + execTime.ToString();
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 

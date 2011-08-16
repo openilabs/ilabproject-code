@@ -33,11 +33,8 @@ namespace Library.LabEquipment.Drivers
         // Delays are in millisecs
         //
         private const int DELAY_DISPLAY_MS = 1000;
-        private const int DELAY_CAPTURE_DATA = DELAY_DISPLAY_MS / 1000;
-        private const int DELAY_ISCOUNTING_MS = 1000;
-
+        private const int DELAY_ISCOUNTING_MS = 500;
         private const int MAX_RESPONSE_TIME = 2000;
-
 
         //
         // Display selections
@@ -71,6 +68,10 @@ namespace Library.LabEquipment.Drivers
         //
         // String constants for error messages
         //
+        protected const string STRERR_FailedToInitialise = "Failed to initialise!";
+        private const string STRERR_NumberIsNegative = "Number cannot be negative!";
+        private const string STRERR_NumberIsInvalid = "Number is invalid!";
+        private const string STRERR_InitialiseDelayNotSpecified = "Initialise delay is not specified!";
         private const string STRERR_ReportHandlerThreadFailedToStart = "ReportHandler thread failed to start!";
         private const string STRERR_InvalidCommand = "Invalid command!";
         private const string STRERR_FailedToSetInterfaceMode = "Failed to set Interface Mode: ";
@@ -176,12 +177,11 @@ namespace Library.LabEquipment.Drivers
         // Minimum power-up and initialise delays in seconds
         //
         public const int DELAY_POWERUP = 5;
-        public const int DELAY_INITIALISE = DELAY_DISPLAY_MS * 2 / 1000 + 2;
 
         protected int initialiseDelay;
         protected bool online;
         protected string statusMessage;
-        private double adjustDuration;
+        private double[] timeAdjustmentCapture;
 
         /// <summary>
         /// Returns the time (in seconds) that it takes for the equipment to initialise.
@@ -202,12 +202,6 @@ namespace Library.LabEquipment.Drivers
         public string StatusMessage
         {
             get { return this.statusMessage; }
-        }
-
-        public double AdjustDuration
-        {
-            get { return this.adjustDuration; }
-            set { this.adjustDuration = value; }
         }
 
         #endregion
@@ -231,7 +225,6 @@ namespace Library.LabEquipment.Drivers
             //
             // Initialise properties
             //
-            this.initialiseDelay = DELAY_INITIALISE;
             this.online = false;
             this.statusMessage = STRLOG_NotInitialised;
 
@@ -249,9 +242,35 @@ namespace Library.LabEquipment.Drivers
             Logfile.Write(Logfile.STRLOG_LogLevel + this.logLevel.ToString());
 
             //
-            // Get Geiger tube voltage from application's configuration file
+            // Get initialisation delay
             //
             XmlNode xmlNodeST360Counter = XmlUtilities.GetXmlNode(xmlNodeEquipmentConfig, Consts.STRXML_st360Counter);
+            try
+            {
+                this.initialiseDelay = XmlUtilities.GetIntValue(xmlNodeST360Counter, Consts.STRXML_initialiseDelay);
+                if (this.initialiseDelay < 0)
+                {
+                    throw new ArgumentException(STRERR_NumberIsNegative);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                throw new ArgumentException(STRERR_InitialiseDelayNotSpecified);
+            }
+            catch (FormatException)
+            {
+                // Value cannot be converted
+                throw new ArgumentException(STRERR_NumberIsInvalid, Consts.STRXML_initialiseDelay);
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+                throw new ArgumentException(ex.Message, Consts.STRXML_initialiseDelay);
+            }
+
+            //
+            // Get Geiger tube voltage from application's configuration file
+            //
             this.geigerTubeVoltage = XmlUtilities.GetIntValue(xmlNodeST360Counter, Consts.STRXML_voltage, DEFAULT_HighVoltage);
 
             //
@@ -284,6 +303,18 @@ namespace Library.LabEquipment.Drivers
                 this.speakerVolume = MAX_SpeakerVolume;
             }
             Logfile.Write(STRLOG_SpeakerVolume + this.speakerVolume.ToString());
+
+            //
+            // Get capture time adjustment: y = Mx + C
+            //
+            XmlNode xmlNode = XmlUtilities.GetXmlNode(xmlNodeST360Counter, Consts.STRXML_timeAdjustment, false);
+            string capture = XmlUtilities.GetXmlValue(xmlNode, Consts.STRXML_capture, false);
+            string[] strSplit = capture.Split(new char[] { Engine.Consts.CHR_CsvSplitterChar });
+            this.timeAdjustmentCapture = new double[strSplit.Length];
+            for (int i = 0; i < strSplit.Length; i++)
+            {
+                this.timeAdjustmentCapture[i] = Double.Parse(strSplit[i]);
+            }
 
             //
             // Create the receive objects
@@ -366,6 +397,7 @@ namespace Library.LabEquipment.Drivers
                 }
 
                 this.configured = true;
+				success = true;
             }
             catch (Exception ex)
             {
@@ -383,9 +415,14 @@ namespace Library.LabEquipment.Drivers
 
         public double GetCaptureDataTime(int duration)
         {
-            double seconds = 0;
+            double seconds = duration;
 
-            seconds = duration + (double)(DELAY_DISPLAY_MS * 2) / 1000 + this.adjustDuration;
+            seconds += (double)(DELAY_DISPLAY_MS) / 1000.0;
+
+            //
+            // y = Mx + C
+            // 
+            seconds = seconds * this.timeAdjustmentCapture[0] + this.timeAdjustmentCapture[1];
 
             return seconds;
         }
@@ -474,7 +511,8 @@ namespace Library.LabEquipment.Drivers
                     //
                     // Set the display to time so that we can see the progress
                     //
-                    if (this.SetDisplay(ST360Counter.Display.Time) == false)
+                    //if (this.SetDisplay(ST360Counter.Display.Time) == false)
+                    if (this.SetDisplay(ST360Counter.Display.Counts) == false)
                     {
                         throw new Exception(this.GetLastError());
                     }
@@ -490,7 +528,7 @@ namespace Library.LabEquipment.Drivers
                     //
                     // Set a timeout so that we don't wait forever if something goes wrong
                     //
-                    int timeout = duration + 5;
+                    int timeout = (duration + 5) * 1000 / DELAY_ISCOUNTING_MS;
                     while (--timeout > 0)
                     {
                         //
@@ -527,17 +565,8 @@ namespace Library.LabEquipment.Drivers
                     }
 
                     //
-                    // Wait a moment before changing the display
+                    // Display the counts for a moment
                     //
-                    Thread.Sleep(DELAY_DISPLAY_MS);
-
-                    //
-                    // Set the display to counts so that we can see how many counts there were
-                    //
-                    if (this.SetDisplay(ST360Counter.Display.Counts) == false)
-                    {
-                        throw new Exception(this.GetLastError());
-                    }
                     Thread.Sleep(DELAY_DISPLAY_MS);
 
                     //
@@ -1065,7 +1094,7 @@ namespace Library.LabEquipment.Drivers
         /// </summary>
         ~ST360Counter()
         {
-            Trace.WriteLine("~ST360CounterSer():");
+            Trace.WriteLine("~ST360Counter():");
 
             //
             // Do not re-create Dispose clean-up code here. Calling Dispose(false) is optimal in terms of

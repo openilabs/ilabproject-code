@@ -16,15 +16,8 @@
     <!-- XML simulation configuration filename -->
     <add key="XmlSimulationConfigFilename" value="App_Data\SimulationConfig.xml" />
 
-    <!-- An allowed caller entry is a CSV string containing the following items:
-      ServiceBroker's Name - string
-      ServiceBroker's Guid - string, containing up to 32 hexadecimal characters which can be represented as a 128-bit number
-      ServiceBroker's OutgoingPassKey - string, is a guid
-      ServiceBroker's Webservice URL - string, can be entered directly into a web browser
-      LabServer's Notify Passkey - string, is a guid
-      Enable Caller Entry - boolean, set to 'true' to enabled Allowed Caller checking
-      -->
-    <add key="AllowedCaller" value=" , , , , , true"/>
+    <!-- Database connection string -->
+    <add key="SqlConnection" value="data source=.\SQLEXPRESS;initial catalog=Radioactivity_LabServer;Integrated Security=SSPI" />
 
     <!-- ServiceBroker checking flag - Set to false to disable ServiceBroker authentication -->
     <add key="AuthenticateCaller" value="true"/>
@@ -32,14 +25,18 @@
     <!-- Log ServiceBroker Id and Passkey - Set to false or remove to not log Id and Passkey -->
     <add key="LogCallerIdPasskey" value="false"/>
 
-    <!-- Database connection string -->
-    <add key="SqlConnection" value="data source=.\SQLEXPRESS;initial catalog=Radioactivity_LabServer;Integrated Security=SSPI" />
-
     <!-- Number of units in the farm -->
     <add key="FarmSize" value="1" />
 
     <!-- Equipment service comma-seperated-value list: Webservice URL and passkey -->
     <add key="EquipmentService" value="" />
+
+    <!-- Comma seperated list of email addresses for when the experiment completes success or is cancelled - if empty, no email is sent -->
+    <add key="EmailAddressesExperimentCompleted" value="" />
+    <!-- Comma seperated list of email addresses for when the experiment fails - if empty, no email is sent -->
+    <add key="EmailAddressesExperimentFailed" value="" />
+    <!-- Email address of sender -->
+    <add key="EmailAddressLabServer" value="" />
 
   </appSettings>
 

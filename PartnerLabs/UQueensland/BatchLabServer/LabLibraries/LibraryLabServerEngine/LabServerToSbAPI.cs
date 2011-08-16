@@ -15,7 +15,7 @@ namespace Library.LabServerEngine
         //
         private const string STRLOG_experimentId = " experimentId: ";
         private const string STRLOG_sbName = " sbName: ";
-        private const string STRLOG_sbNotifyUrl = " sbNotifyUrl: ";
+        private const string STRLOG_webServiceUrl = " webServiceUrl: ";
         private const string STRLOG_lsToSbPasskey = " lsToSbPasskey: ";
         private const string STRLOG_labServerId = " labServerId: ";
         private const string STRLOG_SbNotifyUrlNotSpecified = " sbNotifyUrl is not specified. ServiceBroker will not be notified.";
@@ -25,7 +25,7 @@ namespace Library.LabServerEngine
         //
         // Local variables
         //
-        private AllowedCallers allowedCallers;
+        private AllowedServiceBrokersDB allowedServiceBrokers;
 
         #endregion
 
@@ -34,13 +34,13 @@ namespace Library.LabServerEngine
         /// <summary>
         /// </summary>
         /// <param name="allowedCallers"></param>
-        public LabServerToSbAPI(AllowedCallers allowedCallers)
+        public LabServerToSbAPI(AllowedServiceBrokersDB allowedServiceBrokers)
         {
             const string STRLOG_MethodName = "LabServerToSbAPI";
 
             Logfile.WriteCalled(null, STRLOG_MethodName);
 
-            this.allowedCallers = allowedCallers;
+            this.allowedServiceBrokers = allowedServiceBrokers;
 
             Logfile.WriteCompleted(null, STRLOG_MethodName);
         }
@@ -65,22 +65,23 @@ namespace Library.LabServerEngine
             bool success = true;
 
             //
-            // Get the ServiceBroker's Url for notification
+            // Get the ServiceBroker's web service URL for notification
             //
-            string sbNotifyUrl = this.allowedCallers.GetSbNotifyUrl(sbName);
-            if (sbNotifyUrl != null && sbNotifyUrl.Length > 0)
+            ServiceBrokerInfo serviceBrokerInfo = this.allowedServiceBrokers.GetServiceBrokerInfo(sbName);
+            string webServiceUrl = serviceBrokerInfo.webServiceUrl;
+            if (webServiceUrl != null && webServiceUrl.Length > 0)
             {
                 //
                 // Notify Url is specified so notify ServiceBroker
                 //
                 try
                 {
-                    Logfile.Write(STRLOG_sbNotifyUrl + sbNotifyUrl);
+                    Logfile.Write(STRLOG_webServiceUrl + webServiceUrl);
 
                     //
                     // Get the passkey for notification
                     //
-                    string lsToSbPasskey = this.allowedCallers.GetLsToSbPasskey(sbName);
+                    string lsToSbPasskey = serviceBrokerInfo.incomingPasskey;
                     if (lsToSbPasskey == null)
                     {
                         throw new ArgumentNullException(STRLOG_lsToSbPasskey);
@@ -101,7 +102,7 @@ namespace Library.LabServerEngine
                     // Create ServiceBroker interface
                     //
                     ServiceBrokerService serviceBroker = new ServiceBrokerService();
-                    serviceBroker.Url = sbNotifyUrl;
+                    serviceBroker.Url = webServiceUrl;
 
                     //
                     // Create and fill in authorisation information

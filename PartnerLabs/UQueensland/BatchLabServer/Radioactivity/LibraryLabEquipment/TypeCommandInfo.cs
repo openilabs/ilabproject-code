@@ -21,7 +21,7 @@ namespace Library.LabEquipment
         GetTubeHomeDistance, GetTubeMoveTime,
         GetSourceHomeLocation, GetSourceSelectTime, GetSourceReturnTime,
         GetAbsorberHomeLocation, GetAbsorberSelectTime, GetAbsorberReturnTime,
-        GetCaptureDataTime,
+        GetLcdWriteLineTime, GetCaptureDataTime,
     }
 
     /// <summary>
@@ -31,8 +31,7 @@ namespace Library.LabEquipment
     public enum ExecuteCommands
     {
         SetTubeDistance, SetSourceLocation, SetAbsorberLocation,
-        GetCaptureData,
-        WriteLcdLine
+        WriteLcdLine, GetCaptureData,
     }
 
 }

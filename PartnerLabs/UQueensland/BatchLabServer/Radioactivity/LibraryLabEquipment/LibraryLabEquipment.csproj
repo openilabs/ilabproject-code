@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_NO_HARDWARE _NO_POWERDOWN</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_NO_POWERDOWN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -39,12 +39,16 @@
   <ItemGroup>
     <Compile Include="Consts.cs" />
     <Compile Include="Drivers\FlexMotion.cs" />
+    <Compile Include="Drivers\FlexMotionCntl.cs" />
+    <Compile Include="Drivers\FlexMotionNone.cs" />
     <Compile Include="Drivers\Nimc.cs" />
-    <Compile Include="Drivers\RadiationCounter.cs" />
+    <Compile Include="Drivers\PhysicsCounter.cs" />
     <Compile Include="Drivers\SerialLcd.cs" />
+    <Compile Include="Drivers\SerialLcdNone.cs" />
     <Compile Include="Drivers\SerialLcdSer.cs" />
     <Compile Include="Drivers\SerialLcdTcp.cs" />
     <Compile Include="Drivers\ST360Counter.cs" />
+    <Compile Include="Drivers\ST360CounterNone.cs" />
     <Compile Include="Drivers\ST360CounterSer.cs" />
     <Compile Include="Drivers\ST360CounterTcp.cs" />
     <Compile Include="EquipmentEngine.cs" />

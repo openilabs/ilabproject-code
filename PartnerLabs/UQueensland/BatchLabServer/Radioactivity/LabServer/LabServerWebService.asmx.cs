@@ -459,7 +459,7 @@ namespace LabServer
                 //
                 // Check if authenticating
                 //
-                if (Global.allowedCallers.IsAuthenticating == false)
+                if (Global.allowedServiceBrokers.IsAuthenticating == false)
                 {
                     // Set string to LocalHost
                     sbName = Consts.STR_SbNameLocalHost;
@@ -473,7 +473,7 @@ namespace LabServer
             else
             {
                 // Get the caller's name
-                sbName = Global.allowedCallers.Authentication(authHeader.identifier, authHeader.passKey);
+                sbName = Global.allowedServiceBrokers.Authentication(authHeader.identifier, authHeader.passKey);
 
                 //
                 // Check if caller is allowed access to this web service

@@ -33,7 +33,7 @@ namespace Library.LabEquipment
         private const string STRERR_RadiationCounterTypeNotSpecified = "Radiation counter type not specified!";
         private const string STRERR_FailedToInitialiseSerialLcd = "Failed to initialise Serial LCD!";
         private const string STRERR_FailedToInitialiseST360Counter = "Failed to initialise ST360 Counter!";
-        private const string STRERR_FailedToInitialiseRadiationCounter = "Failed to initialise Radiation Counter!";
+        private const string STRERR_FailedToInitialisePhysicsCounter = "Failed to initialise Physics Counter!";
         private const string STRERR_FailedToInitialiseFlexMotion = "Failed to initialise FlexMotion controller!";
 
         //
@@ -41,7 +41,7 @@ namespace Library.LabEquipment
         //
         private enum CommunicationTypes
         {
-            Network, Serial
+            Network, Serial, None
         }
 
         //
@@ -59,13 +59,15 @@ namespace Library.LabEquipment
         private CommunicationTypes serialLcdCommType;
         private SerialLcdSer serialLcdSer;
         private SerialLcdTcp serialLcdTcp;
+        private SerialLcdNone serialLcdNone;
         private SerialLcd serialLcd;
         private RadiationCounterTypes radiationCounterType;
         private CommunicationTypes st360CounterCommType;
         private ST360CounterSer st360CounterSer;
         private ST360CounterTcp st360CounterTcp;
+        private ST360CounterNone st360CounterNone;
         private ST360Counter st360Counter;
-        private RadiationCounter radiationCounter;
+        private PhysicsCounter physicsCounter;
 
         #endregion
 
@@ -78,9 +80,36 @@ namespace Library.LabEquipment
 
             Logfile.WriteCalled(null, STRLOG_MethodName);
 
+            int initialiseDelay = 0;
+            bool hardwarePresent = true;
+
             try
             {
-                int initialiseDelay = 0;
+                //
+                // Determine if hardware is to be used or whether this is running without hardware
+                // for testing and debugging
+                //
+                try
+                {
+                    hardwarePresent = XmlUtilities.GetBoolValue(this.xmlNodeEquipmentConfig, Consts.STRXML_hardwarePresent, false);
+                }
+                catch
+                {
+                    // Key not found or invalid so assume hardware is present
+                }
+
+                //
+                // Create an instance of the FlexMotion class, must be done before creating the Radiation Counter class
+                //
+                if (hardwarePresent == true)
+                {
+                    this.flexMotion = new FlexMotionCntl(this.xmlNodeEquipmentConfig);
+                }
+                else
+                {
+                    this.flexMotion = new FlexMotionNone(this.xmlNodeEquipmentConfig);
+                }
+                initialiseDelay += this.flexMotion.InitialiseDelay;
 
                 //
                 // Get the serial LCD communication type
@@ -92,24 +121,34 @@ namespace Library.LabEquipment
                 //
                 // Create an instance of the SerialLcd class, must be done before creating the Radiation Counter class
                 //
-                if (this.serialLcdCommType == CommunicationTypes.Network)
+                if (hardwarePresent == true)
                 {
-                    this.serialLcdTcp = new SerialLcdTcp(this.xmlNodeEquipmentConfig);
-                    this.serialLcd = this.serialLcdTcp;
-                    this.serialLcdSer = null;
-                    initialiseDelay += this.serialLcdTcp.InitialiseDelay;
-                }
-                else if (this.serialLcdCommType == CommunicationTypes.Serial)
-                {
-                    this.serialLcdSer = new SerialLcdSer(this.xmlNodeEquipmentConfig);
-                    this.serialLcd = this.serialLcdSer;
-                    this.serialLcdTcp = null;
-                    initialiseDelay += this.serialLcdSer.InitialiseDelay;
+                    if (this.serialLcdCommType == CommunicationTypes.Network)
+                    {
+                        this.serialLcdTcp = new SerialLcdTcp(this.xmlNodeEquipmentConfig);
+                        this.serialLcd = this.serialLcdTcp;
+                    }
+                    else if (this.serialLcdCommType == CommunicationTypes.Serial)
+                    {
+                        this.serialLcdSer = new SerialLcdSer(this.xmlNodeEquipmentConfig);
+                        this.serialLcd = this.serialLcdSer;
+                    }
+                    else if (this.serialLcdCommType == CommunicationTypes.None)
+                    {
+                        this.serialLcdNone = new SerialLcdNone(this.xmlNodeEquipmentConfig);
+                        this.serialLcd = this.serialLcdNone;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(STRERR_SerialLcdCommsTypeNotSpecified);
+                    }
                 }
                 else
                 {
-                    throw new ArgumentException(STRERR_SerialLcdCommsTypeNotSpecified);
+                    this.serialLcdNone = new SerialLcdNone(this.xmlNodeEquipmentConfig);
+                    this.serialLcd = this.serialLcdNone;
                 }
+                initialiseDelay += this.serialLcd.InitialiseDelay;
 
                 //
                 // Get the radiation counter type
@@ -117,12 +156,6 @@ namespace Library.LabEquipment
                 XmlNode xmlNodeRadiationCounter = XmlUtilities.GetXmlNode(this.xmlNodeEquipmentConfig, Consts.STRXML_radiationCounter, false);
                 string strCounterType = XmlUtilities.GetXmlValue(xmlNodeRadiationCounter, Consts.STRXML_type, false);
                 this.radiationCounterType = (RadiationCounterTypes)Enum.Parse(typeof(RadiationCounterTypes), strCounterType);
-
-                //
-                // Get execution time adjustments
-                //
-                XmlNode xmlNode = XmlUtilities.GetXmlNode(xmlNodeRadiationCounter, Consts.STRXML_execTimeAdjustment, false);
-                double adjustDuration = XmlUtilities.GetRealValue(xmlNode, Consts.STRXML_duration, 0.0);
 
                 //
                 // Create an instance of the radiation counter class
@@ -139,42 +172,52 @@ namespace Library.LabEquipment
                     //
                     // Create an instance of the ST360 counter class depending on the communication type
                     //
-                    if (this.st360CounterCommType == CommunicationTypes.Network)
+                    if (hardwarePresent == true)
                     {
-                        this.st360CounterTcp = new ST360CounterTcp(this.xmlNodeEquipmentConfig);
-                        this.st360Counter = st360CounterTcp;
-                        this.st360CounterSer = null;
-                        initialiseDelay += this.st360CounterTcp.InitialiseDelay;
-                        this.st360CounterTcp.AdjustDuration = adjustDuration;
-                    }
-                    else if (this.st360CounterCommType == CommunicationTypes.Serial)
-                    {
-                        this.st360CounterSer = new ST360CounterSer(this.xmlNodeEquipmentConfig);
-                        this.st360Counter = st360CounterTcp;
-                        this.st360CounterTcp = null;
-                        initialiseDelay += this.st360CounterSer.InitialiseDelay;
-                        this.st360CounterSer.AdjustDuration = adjustDuration;
+                        if (this.st360CounterCommType == CommunicationTypes.Network)
+                        {
+                            this.st360CounterTcp = new ST360CounterTcp(this.xmlNodeEquipmentConfig);
+                            this.st360Counter = st360CounterTcp;
+                        }
+                        else if (this.st360CounterCommType == CommunicationTypes.Serial)
+                        {
+                            this.st360CounterSer = new ST360CounterSer(this.xmlNodeEquipmentConfig);
+                            this.st360Counter = st360CounterSer;
+                        }
+                        else
+                        {
+                            throw new ArgumentException(STRERR_ST360CounterCommsTypeNotSpecified);
+                        }
                     }
                     else
                     {
-                        throw new ArgumentException(STRERR_ST360CounterCommsTypeNotSpecified);
+                        this.st360CounterNone = new ST360CounterNone(this.xmlNodeEquipmentConfig);
+                        this.st360Counter = st360CounterNone;
                     }
-                    this.radiationCounter = null;
+                    initialiseDelay += this.st360Counter.InitialiseDelay;
                 }
                 else if (this.radiationCounterType == RadiationCounterTypes.Physics)
                 {
-                    this.st360CounterTcp = null;
-                    this.st360CounterSer = null;
-                    if (this.serialLcdCommType == CommunicationTypes.Network)
+                    if (hardwarePresent == true)
                     {
-                        this.radiationCounter = new RadiationCounter(this.serialLcdTcp);
+                        if (this.serialLcdCommType == CommunicationTypes.Network)
+                        {
+                            this.physicsCounter = new PhysicsCounter(this.xmlNodeEquipmentConfig, this.serialLcdTcp, this.flexMotion);
+                        }
+                        else if (this.serialLcdCommType == CommunicationTypes.Serial)
+                        {
+                            this.physicsCounter = new PhysicsCounter(this.xmlNodeEquipmentConfig, this.serialLcdSer, this.flexMotion);
+                        }
+                        else
+                        {
+                            throw new ArgumentException(STRERR_SerialLcdCommsTypeNotSpecified);
+                        }
                     }
-                    else if (this.serialLcdCommType == CommunicationTypes.Serial)
+                    else
                     {
-                        this.radiationCounter = new RadiationCounter(this.serialLcdSer);
+                        this.physicsCounter = new PhysicsCounter(this.xmlNodeEquipmentConfig, this.serialLcdNone, this.flexMotion);
                     }
-                    initialiseDelay += this.radiationCounter.InitialiseDelay;
-                    this.radiationCounter.AdjustDuration = adjustDuration;
+                    initialiseDelay += this.physicsCounter.InitialiseDelay;
                 }
                 else
                 {
@@ -182,29 +225,10 @@ namespace Library.LabEquipment
                 }
 
                 //
-                // Create an instance of the FlexMotion class
+                // Update the power initialisation delay
                 //
-                this.flexMotion = new FlexMotion(this.xmlNodeEquipmentConfig);
-                initialiseDelay += this.flexMotion.InitialiseDelay;
-
-                //
-                // Check the minimum powerup delay and update if necessary
-                //
-                int powerupDelay = this.flexMotion.PowerupDelay;
-                if (powerupDelay > this.PowerupDelay)
-                {
-                    this.PowerupDelay = powerupDelay;
-                    Logfile.Write(STRLOG_PowerupDelay + powerupDelay.ToString() + STRLOG_Seconds);
-                }
-
-                //
-                // Check the minimum initialise delay and update if necessary
-                //
-                if (initialiseDelay > this.InitialiseDelay)
-                {
-                    this.InitialiseDelay = initialiseDelay;
-                    Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString() + STRLOG_Seconds);
-                }
+                this.powerupInitialiseDelay = initialiseDelay;
+                Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString() + STRLOG_Seconds);
             }
             catch (Exception ex)
             {
@@ -232,10 +256,7 @@ namespace Library.LabEquipment
 
             bool success = true;
 
-#if NO_HARDWARE
-#else
             success = this.flexMotion.EnablePower();
-#endif
 
             string logMessage = STRLOG_Success + success.ToString();
 
@@ -260,24 +281,21 @@ namespace Library.LabEquipment
 
             try
             {
-                SerialLcd serialLcd;
-                if (this.serialLcdCommType == CommunicationTypes.Network)
-                {
-                    serialLcd = this.serialLcdTcp;
-                }
-                else if (this.serialLcdCommType == CommunicationTypes.Serial)
-                {
-                    serialLcd = this.serialLcdSer;
-                }
-
                 //
                 // The initialisation delay may change once the equipment has been initialised
                 // for the first time, so recalculate it
                 //
                 int initialiseDelay = 0;
 
-#if NO_HARDWARE
-#else
+                //
+                // Initialise the FlexMotion controller
+                //
+                if (this.flexMotion.PowerInitialise() == false)
+                {
+                    throw new Exception(STRERR_FailedToInitialiseFlexMotion);
+                }
+                initialiseDelay += this.flexMotion.InitialiseDelay;
+
                 //
                 // Initialise the SerialLcd
                 //
@@ -298,7 +316,7 @@ namespace Library.LabEquipment
                 //
                 if (this.radiationCounterType == RadiationCounterTypes.ST360)
                 {
-                    this.radiationCounter = null;
+                    this.physicsCounter = null;
                     if (this.st360Counter.Initialise(true) == false)
                     {
                         throw new Exception(STRERR_FailedToInitialiseST360Counter);
@@ -308,28 +326,18 @@ namespace Library.LabEquipment
                 else if (this.radiationCounterType == RadiationCounterTypes.Physics)
                 {
                     this.st360Counter = null;
-                    if (this.radiationCounter.Initialise() == false)
+                    if (this.physicsCounter.Initialise() == false)
                     {
-                        throw new Exception(STRERR_FailedToInitialiseRadiationCounter);
+                        throw new Exception(STRERR_FailedToInitialisePhysicsCounter);
                     }
-                    initialiseDelay += this.radiationCounter.InitialiseDelay;
+                    initialiseDelay += this.physicsCounter.InitialiseDelay;
                 }
 
                 //
-                // Initialise the FlexMotion controller
+                // Update the power initialisation delay for TimeUntilReady()
                 //
-                if (this.flexMotion.Initialise() == false)
-                {
-                    throw new Exception(STRERR_FailedToInitialiseFlexMotion);
-                }
-                initialiseDelay += this.flexMotion.InitialiseDelay;
-#endif
-
-                //
-                // Update the initialisation delay
-                //
-                this.InitialiseDelay = initialiseDelay;
-                Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString());
+                this.powerupInitialiseDelay = initialiseDelay;
+                Logfile.Write(STRLOG_InitialiseDelay + initialiseDelay.ToString() + STRLOG_Seconds);
 
                 success = true;
             }
@@ -359,8 +367,6 @@ namespace Library.LabEquipment
 
             bool success = true;
 
-#if NO_HARDWARE
-#else
             //
             // Close the Serial LCD and ST360 counter before powering down
             //
@@ -375,7 +381,6 @@ namespace Library.LabEquipment
 #if NO_POWERDOWN
 #else
             success = this.flexMotion.DisablePower();
-#endif
 #endif
 
             string logMessage = STRLOG_Success + success.ToString();
@@ -393,12 +398,11 @@ namespace Library.LabEquipment
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            LabStatus labStatus = new LabStatus(true, STR_LabEquipmentIsReady);
-
-            labStatus.online = this.flexMotion.Online;
-            if (labStatus.online == false)
+            LabStatus labStatus = new LabStatus(this.flexMotion.Online, this.flexMotion.StatusMessage);
+            if (labStatus.online == true)
             {
-                labStatus.labStatusMessage = this.flexMotion.StatusMessage;
+                labStatus.online = this.slOnline;
+                labStatus.labStatusMessage = this.slStatusMessage;
             }
 
             string logMessage = STRLOG_Online + labStatus.online.ToString() +
@@ -488,7 +492,7 @@ namespace Library.LabEquipment
                         }
                         else if (this.radiationCounterType == RadiationCounterTypes.Physics)
                         {
-                            count = this.radiationCounter.CaptureData(duration);
+                            count = this.physicsCounter.CaptureData(duration);
                         }
 
                         //
@@ -554,36 +558,6 @@ namespace Library.LabEquipment
 
         //-------------------------------------------------------------------------------------------------//
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing == true)
-            {
-                //
-                // Dispose managed resources here. Anything that has a Dispose() method.
-                //
-#if NO_HARDWARE
-#else
-                if (this.serialLcd != null)
-                {
-                    this.serialLcd.Close();
-                }
-                if (this.st360Counter != null)
-                {
-                    this.st360Counter.Close();
-                }
-#endif
-            }
-
-            //
-            // Release unmanaged resources here. Set large fields to null.
-            //
-
-            // Call Dispose on your base class.
-            base.Dispose(disposing);
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
         public int GetTubeHomeDistance()
         {
             return this.flexMotion.TubeHomeDistance;
@@ -640,6 +614,13 @@ namespace Library.LabEquipment
 
         //-------------------------------------------------------------------------------------------------//
 
+        public double GetLcdWriteLineTime()
+        {
+            return this.serialLcd.GetWriteLineTime();
+        }
+
+        //-------------------------------------------------------------------------------------------------//
+
         public double GetCaptureDataTime(int duration)
         {
             double captureDataTime = 0;
@@ -649,7 +630,7 @@ namespace Library.LabEquipment
             }
             else if (this.radiationCounterType == RadiationCounterTypes.Physics)
             {
-                captureDataTime = this.radiationCounter.GetCaptureDataTime(duration);
+                captureDataTime = this.physicsCounter.GetCaptureDataTime(duration);
             }
             return captureDataTime;
         }

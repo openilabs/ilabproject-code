@@ -156,7 +156,7 @@ namespace Library.LabEquipment
 
             //
             // YOUR CODE HERE
-            LabStatus labStatus = new LabStatus(true, STR_LabEquipmentIsReady);
+            LabStatus labStatus = new LabStatus(true, StatusCodes.Ready.ToString());
             //
 
             string logMessage = STRLOG_Online + labStatus.online.ToString() +

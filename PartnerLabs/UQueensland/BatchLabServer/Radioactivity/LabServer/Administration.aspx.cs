@@ -9,7 +9,6 @@ namespace LabServer
         {
             Master.HeaderTitle = this.Title;
             this.Title = Master.PageTitle + this.Title;
-
         }
 
         //-------------------------------------------------------------------------------------------------//

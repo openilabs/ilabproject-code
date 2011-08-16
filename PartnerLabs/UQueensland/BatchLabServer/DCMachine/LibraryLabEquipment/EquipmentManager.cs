@@ -56,21 +56,6 @@ namespace Library.LabEquipment
 
         //-------------------------------------------------------------------------------------------------//
 
-        public override LabStatus GetLabEquipmentStatus()
-        {
-            const string STRLOG_MethodName = "GetLabEquipmentStatus";
-
-            Logfile.WriteCalled(this.logLevel, STRLOG_ClassName, STRLOG_MethodName);
-
-            LabStatus labStatus = this.labEquipmentEngine.GetLabEquipmentStatus();
-
-            Logfile.WriteCompleted(this.logLevel, STRLOG_ClassName, STRLOG_MethodName);
-
-            return labStatus;
-        }
-
-        //-------------------------------------------------------------------------------------------------//
-
         public override string ExecuteXmlRequest(string xmlRequest)
         {
             string strXmlResponse = string.Empty;

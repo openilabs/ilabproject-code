@@ -35,10 +35,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Drivers\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Modbus, Version=1.4.0.3, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Drivers\Modbus.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -64,7 +60,11 @@
       <Project>{7266AE91-D308-40AC-947C-486745471E84}</Project>
       <Name>LibraryLab</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LibraryUnmanaged\LibraryUnmanaged.csproj">
+    <ProjectReference Include="..\..\LabLibraries\LibraryModbus\LibraryModbus.csproj">
+      <Project>{FF96B252-2B24-44A1-A09C-6401B5D7ED23}</Project>
+      <Name>LibraryModbus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\LabLibraries\LibraryUnmanaged\LibraryUnmanaged.csproj">
       <Project>{78592E38-C0CD-4732-9DDF-9A5A712E7E5C}</Project>
       <Name>LibraryUnmanaged</Name>
     </ProjectReference>

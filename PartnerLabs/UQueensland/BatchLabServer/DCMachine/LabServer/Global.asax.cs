@@ -11,7 +11,7 @@ namespace LabServer
     {
         private const string STRLOG_ClassName = "Global";
 
-        public static AllowedCallers allowedCallers = null;
+        public static AllowedServiceBrokersDB allowedServiceBrokers = null;
         public static Configuration configuration = null;
         public static ExperimentManager experimentManager = null;
 
@@ -25,7 +25,7 @@ namespace LabServer
             // Set the filepath for the log files 
             //
             string rootFilePath = HostingEnvironment.ApplicationPhysicalPath;
-            string logFilesPath = Utilities.GetAppSetting(Library.LabServerEngine.Consts.STRCFG_LogFilesPath);
+            string logFilesPath = Utilities.GetAppSetting(Consts.STRCFG_LogFilesPath);
             Logfile.SetFilePath(Path.Combine(rootFilePath, logFilesPath));
 
             Logfile.Write("");
@@ -34,9 +34,9 @@ namespace LabServer
             //
             // Create the experiment manager
             //
-            allowedCallers = new AllowedCallers();
+            allowedServiceBrokers = new AllowedServiceBrokersDB();
             configuration = new Configuration(rootFilePath);
-            experimentManager = new ExperimentManager(allowedCallers, configuration);
+            experimentManager = new ExperimentManager(allowedServiceBrokers, configuration);
             experimentManager.Create();
 
             //

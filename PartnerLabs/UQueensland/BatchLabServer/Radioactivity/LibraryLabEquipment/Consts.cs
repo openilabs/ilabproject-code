@@ -20,6 +20,7 @@ namespace Library.LabEquipment
         //
         // XML elements in the equipment response strings
         //
+        public const string STRXML_RspLcdWriteLineTime = "LcdWriteLineTime";
         public const string STRXML_RspTubeHomeDistance = "TubeHomeDistance";
         public const string STRXML_RspTubeMoveTime = "TubeMoveTime";
         public const string STRXML_RspSourceHomeLocation = "SourceHomeLocation";
@@ -34,7 +35,10 @@ namespace Library.LabEquipment
         //
         // XML elements in the EquipmentConfig.xml file
         //
-        public const string STRXML_flexMotionBoardID = "flexMotionBoardID";
+        public const string STRXML_hardwarePresent = "hardwarePresent";
+        public const string STRXML_flexMotion = "flexMotion";
+        public const string STRXML_boardID = "boardID";
+        public const string STRXML_axisId = "axisId";
         public const string STRXML_tube = "tube";
         public const string STRXML_offsetDistance = "offsetDistance";
         public const string STRXML_homeDistance = "homeDistance";
@@ -47,6 +51,7 @@ namespace Library.LabEquipment
         public const string STRXML_returnTimes = "returnTimes";
         public const string STRXML_firstLocation = "firstLocation";
         public const string STRXML_homeLocation = "homeLocation";
+        public const string STRXML_initialiseDelay = "initialiseDelay";
         public const string STRXML_serialLcd = "serialLcd";
         public const string STRXML_type = "type";
         public const string STRXML_network = "network";
@@ -54,12 +59,14 @@ namespace Library.LabEquipment
         public const string STRXML_port = "port";
         public const string STRXML_serial = "serial";
         public const string STRXML_baud = "baud";
+        public const string STRXML_writeLineTime = "writeLineTime";
         public const string STRXML_radiationCounter = "radiationCounter";
         public const string STRXML_st360Counter = "st360Counter";
         public const string STRXML_voltage = "voltage";
         public const string STRXML_volume = "volume";
-        public const string STRXML_execTimeAdjustment = "execTimeAdjustment";
-        public const string STRXML_duration = "duration";
+        public const string STRXML_physicsCounter = "physicsCounter";
+        public const string STRXML_timeAdjustment = "timeAdjustment";
+        public const string STRXML_capture = "capture";
 
     }
 

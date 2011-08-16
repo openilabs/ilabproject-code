@@ -212,7 +212,7 @@ namespace Library.LabServer.Drivers.Setup
                             //
                             // Get absorber location from specification
                             //
-                            char absorberLocation = specification.AbsorberLocation;
+                            char absorberLocation = specification.AbsorberList[0].location;
                             Logfile.Write(STRLOG_AbsorberLocation + absorberLocation.ToString());
 
                             //

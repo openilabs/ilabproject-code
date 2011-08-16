@@ -7,24 +7,19 @@ namespace Library.LabServerEngine
         //
         // Application configuration file key strings
         //
+        public const string STRCFG_SqlConnection = "SqlConnection";
+
         public const string STRCFG_LabServerGuid = "LabServerGuid";
-        public const string STRCFG_LogFilesPath = "LogFilesPath";
         public const string STRCFG_XmlLabConfigurationFilename = "XmlLabConfigurationFilename";
-        public const string STRCFG_AllowedCaller = "AllowedCaller";
         public const string STRCFG_AuthenticateCaller = "AuthenticateCaller";
         public const string STRCFG_LogCallerIdPasskey = "LogCallerIdPasskey";
-        public const string STRCFG_SqlConnection = "SqlConnection";
         public const string STRCFG_FarmSize = "FarmSize";
         public const string STRCFG_EquipmentService = "EquipmentService";
+        public const string STRCFG_EmailAddressLabServer = "EmailAddressLabServer";
+        public const string STRCFG_EmailAddressesExperimentCompleted = "EmailAddressesExperimentCompleted";
+        public const string STRCFG_EmailAddressesExperimentFailed = "EmailAddressesExperimentFailed";
 
-        //
-        // ServiceBroker name to use when caller authentication is set to false. Used when
-        // developing and running the LabServer
-        public const string STR_SbNameLocalHost = "localhost";
-
-        //
-        // Application configuration file key strings for LabServer administration
-        //
+        public const string STR_LocalhostIP = "127.0.0.1";
 
         // Comma-seperated-value string splitter character
         public const char CHR_CsvSplitterChar = ',';
@@ -70,15 +65,6 @@ namespace Library.LabServerEngine
         public const string STRXML_Response = "Response";
         public const string STRXML_RspSuccess = "Success";
         public const string STRXML_RspErrorMessage = "ErrorMessage";
-
-        //
-        // Results XML download response
-        //
-        public const string StrRsp_ContentType_TextXml = "text/xml";
-        public const string StrRsp_Disposition = "content-disposition";
-        public const string StrRsp_Attachment_ExperimentQueueXml = "attachment; filename=\"ExperimentQueue.xml\"";
-        public const string StrRsp_Attachment_ExperimentResultsXml = "attachment; filename=\"ExperimentResults.xml\"";
-        public const string StrRsp_Attachment_ExperimentStatisticsXml = "attachment; filename=\"ExperimentStatistics.xml\"";
 
         //
         // XML Configuration only used for development

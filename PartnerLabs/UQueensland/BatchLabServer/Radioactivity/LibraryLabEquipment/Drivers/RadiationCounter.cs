@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Xml;
 using Library.Lab;
 
 namespace Library.LabEquipment.Drivers
@@ -14,15 +15,24 @@ namespace Library.LabEquipment.Drivers
         //
         // String constants for logfile messages
         //
+        private const string STRLOG_StartingRadiationCounter = " Starting radiation counter...";
         private const string STRLOG_Success = " Success: ";
         private const string STRLOG_CaptureTimeout = " Capture timeout!";
         private const string STRLOG_InvalidData = " Invalid data!";
 
         //
+        // String constants for error messages
+        //
+        private const string STRERR_NumberIsNegative = "Number cannot be negative!";
+        private const string STRERR_NumberIsInvalid = "Number is invalid!";
+        private const string STRERR_InitialiseDelayNotSpecified = "Initialise delay is not specified!";
+
+        //
         // Local variables
         //
-        private bool initialised;
+        private int initialiseDelay;
         private SerialLcd serialLcd;
+        private FlexMotion flexMotion;
 
         public const int DELAY_CAPTURE_DATA = 1; // seconds
 
@@ -39,7 +49,7 @@ namespace Library.LabEquipment.Drivers
         /// </summary>
         public int InitialiseDelay
         {
-            get { return (this.initialised == false) ? DELAY_INITIALISE : 0; }
+            get { return this.initialiseDelay; }
         }
 
         public double AdjustDuration
@@ -52,7 +62,7 @@ namespace Library.LabEquipment.Drivers
 
         //-------------------------------------------------------------------------------------------------//
 
-        public RadiationCounter(SerialLcd serialLcd)
+        public RadiationCounter(XmlNode xmlNodeEquipmentConfig, SerialLcd serialLcd, FlexMotion flexMotion)
         {
             const string STRLOG_MethodName = "RadiationCounter";
 
@@ -61,8 +71,35 @@ namespace Library.LabEquipment.Drivers
             //
             // Initialise local variables
             //
-            this.initialised = false;
             this.serialLcd = serialLcd;
+            this.flexMotion = flexMotion;
+
+            //
+            // Get initialisation delay
+            //
+            XmlNode xmlNodePhysicsCounter = XmlUtilities.GetXmlNode(xmlNodeEquipmentConfig, Consts.STRXML_st360Counter);
+            try
+            {
+                this.initialiseDelay = XmlUtilities.GetIntValue(xmlNodePhysicsCounter, Consts.STRXML_initialiseDelay);
+                if (this.initialiseDelay < 0)
+                {
+                    throw new ArgumentException(STRERR_NumberIsNegative);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                throw new ArgumentException(STRERR_InitialiseDelayNotSpecified);
+            }
+            catch (FormatException)
+            {
+                // Value cannot be converted
+                throw new ArgumentException(STRERR_NumberIsInvalid, Consts.STRXML_initialiseDelay);
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+                throw new ArgumentException(ex.Message, Consts.STRXML_initialiseDelay);
+            }
 
             Logfile.WriteCompleted(null, STRLOG_MethodName);
         }
@@ -75,11 +112,13 @@ namespace Library.LabEquipment.Drivers
 
             Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
 
-            bool success = true;
+            bool success;
 
             //
-            // Nothing to do here
+            // Start the radiation counter
             //
+            Logfile.Write(STRLOG_StartingRadiationCounter);
+            success = this.flexMotion.StartCounter();
 
             string logMessage = STRLOG_Success + success.ToString();
 

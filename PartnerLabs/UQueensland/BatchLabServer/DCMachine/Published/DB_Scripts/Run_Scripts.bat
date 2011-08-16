@@ -29,6 +29,16 @@ echo Ok. >> %myTmpfile%
 type %myTmpfile% >> %myLogfile%
 if errorlevel 1 goto error
 
+:cmd3
+set mysqlscript=.\LabServerDefaultValues.sql
+echo Processing %mysqlscript%
+echo Processing %mysqlscript% >> %myLogfile%
+%mydbcmd% -S %myServer%\%myInstance% -E -d %myDatabase% -i %mysqlscript% -b -o %myTmpfile%
+if errorlevel 1 goto error
+echo Ok. >> %myTmpfile%
+type %myTmpfile% >> %myLogfile%
+if errorlevel 1 goto error
+
 :ok
 echo.
 echo OK. See %myLogfile% for details

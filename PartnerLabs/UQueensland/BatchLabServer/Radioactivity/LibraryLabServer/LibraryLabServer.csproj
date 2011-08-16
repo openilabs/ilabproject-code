@@ -42,6 +42,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Drivers\Module\SimActivity.cs" />
+    <Compile Include="Drivers\Setup\DriverAbsorbers.cs" />
+    <Compile Include="Drivers\Setup\DriverAbsorbersExecTime.cs" />
+    <Compile Include="Drivers\Setup\DriverAbsorbersExecute.cs" />
     <Compile Include="Drivers\Setup\DriverRadioactivity.cs" />
     <Compile Include="Drivers\Setup\DriverRadioactivityExecTime.cs" />
     <Compile Include="Drivers\Setup\DriverRadioactivityExecute.cs" />

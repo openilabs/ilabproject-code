@@ -78,6 +78,7 @@
     <Compile Include="Administration.aspx.designer.cs">
       <DependentUpon>Administration.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Consts.cs" />
     <Compile Include="Controls\Banner.ascx.cs">
       <DependentUpon>Banner.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

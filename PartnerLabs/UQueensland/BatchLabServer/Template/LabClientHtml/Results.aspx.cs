@@ -37,7 +37,7 @@ namespace LabClientHtml
 
         private const string STR_SwTblBegin = "<table id=\"results\" cols=\"3\" cellspacing=\"0\" cellpadding=\"0\">";
         private const string STR_SwTblHdrArgument = "<tr align=\"left\"><th colspan=\"3\"><nobr>{0}</nobr></th></tr>";
-        private const string STR_SwTblArgument = "<tr><td class=\"label\"><nobr>{0}:</nobr></td><td class=\"dataright\"><nobr>{1}</nobr></td></tr>";
+        private const string STR_SwTblArgument = "<tr><td class=\"label\"><nobr>{0}:</nobr></td><td class=\"dataright\">{1}</td></tr>";
         private const string STR_SwTblBlankRow = "<tr><td colspan=\"3\">&nbsp;</td></tr>";
         private const string STR_SwTblEnd = "</table>";
 

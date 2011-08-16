@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Mail;
 using System.Threading;
 using Library.Lab;
 using Library.LabServerEngine;
@@ -40,6 +41,11 @@ namespace Library.LabServerEngine
         private const string STRLOG_IsRunning = " IsRunning: ";
         private const string STRLOG_success = "success: ";
         private const string STRLOG_disposing = " disposing: ";
+        private const string STRLOG_MailMessageSubject_arg2 = "[{0} LabServer] Experiment {1}";
+        private const string STRLOG_MailMessageBody_arg7 = "An experiment has completed with the following details:\r\n" +
+            "ServiceBroker: {0}\r\nUsergroup:     {1}\r\nExperiment Id: {2}\r\nUnit Id:       {3}\r\nSetupId:       {4}\r\nStatusCode:    {5}\r\n{6}";
+        private const string STRLOG_MailMessageError_arg = "Error Message: {0}\r\n";
+        private const string STRLOG_SendingEmail_arg3 = "Sending email - To: '{0}  From: '{1}'  Subject: '{2}'";
 
         protected const string STRLOG_online = " online: ";
         protected const string STRLOG_labStatusMessage = " labStatusMessage: ";
@@ -48,7 +54,7 @@ namespace Library.LabServerEngine
         // String constants for exception messages
         //
         private const string STRERR_appData = "appData";
-        private const string STRERR_allowedCallers = "allowedCallers";
+        private const string STRERR_allowedServiceBrokers = "allowedServiceBrokers";
         private const string STRERR_experimentResults = "experimentResults";
         private const string STRERR_experimentStatistics = "experimentStatistics";
         private const string STRERR_labConfiguration = "labConfiguration";
@@ -90,7 +96,7 @@ namespace Library.LabServerEngine
         //
         // Local variables
         //
-        private AllowedCallers allowedCallers;
+        private AllowedServiceBrokersDB allowedServiceBrokers;
         private ExperimentQueueDB experimentQueue;
         private ExperimentResults experimentResults;
         private ExperimentStatistics experimentStatistics;
@@ -99,6 +105,9 @@ namespace Library.LabServerEngine
         private Object statusLock;
         private Thread threadLabExperimentEngine;
         private EquipmentServiceAPI equipmentServiceAPI;
+        private string emailAddressLabServer;
+        private string[] emailAddressesExperimentCompleted;
+        private string[] emailAddressesExperimentFailed;
 
         //
         // Local variables available to a derived class
@@ -200,10 +209,10 @@ namespace Library.LabServerEngine
                     throw new ArgumentNullException(STRERR_appData);
                 }
 
-                this.allowedCallers = appData.allowedCallers;
-                if (this.allowedCallers == null)
+                this.allowedServiceBrokers = appData.allowedServiceBrokers;
+                if (this.allowedServiceBrokers == null)
                 {
-                    throw new ArgumentNullException(STRERR_allowedCallers);
+                    throw new ArgumentNullException(STRERR_allowedServiceBrokers);
                 }
 
                 this.experimentQueue = appData.experimentQueue;
@@ -254,6 +263,13 @@ namespace Library.LabServerEngine
                 {
                     // No equipment service available
                 }
+
+                //
+                // Save email addresses for experiment completion notification
+                //
+                this.emailAddressLabServer = appData.emailAddressLabServer;
+                this.emailAddressesExperimentCompleted = appData.emailAddressesExperimentCompleted;
+                this.emailAddressesExperimentFailed = appData.emailAddressesExperimentFailed;
 
                 //
                 // Create thread objects
@@ -380,30 +396,30 @@ namespace Library.LabServerEngine
             //
             // Check if there is an equipment service
             //
-            //if (this.equipmentServiceProxy == null)
-            //{
+            if (this.equipmentServiceProxy == null)
+            {
                 //
                 // No equipment service, just get the status of this engine
                 //
                 StatusCodes status = (this.IsRunningExperiment == true) ? StatusCodes.Running : StatusCodes.Ready;
                 labStatus = new LabStatus(true, status.ToString());
-            //}
-            //else
-            //{
-            //    //
-            //    // Get the status of the equipment service
-            //    //
-            //    try
-            //    {
-            //        LabEquipmentStatus labEquipmentStatus = this.equipmentServiceProxy.GetLabEquipmentStatus();
-            //        labStatus = new LabStatus(labEquipmentStatus.online, labEquipmentStatus.statusMessage);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        labStatus = new LabStatus(false, ex.Message);
-            //        Logfile.WriteError(ex.Message);
-            //    }
-            //}
+            }
+            else
+            {
+                //
+                // Get the status of the equipment service
+                //
+                try
+                {
+                    LabEquipmentStatus labEquipmentStatus = this.equipmentServiceProxy.GetLabEquipmentStatus();
+                    labStatus = new LabStatus(labEquipmentStatus.online, labEquipmentStatus.statusMessage);
+                }
+                catch (Exception ex)
+                {
+                    labStatus = new LabStatus(false, ex.Message);
+                    Logfile.WriteError(ex.Message);
+                }
+            }
 
             logMessage = STRLOG_online + labStatus.online.ToString() +
                 Logfile.STRLOG_Spacer + STRLOG_labStatusMessage + Logfile.STRLOG_Quote + labStatus.labStatusMessage + Logfile.STRLOG_Quote;
@@ -720,7 +736,8 @@ namespace Library.LabServerEngine
         private enum States
         {
             sStart,
-            sGetExperiment, sPrepareExperiment, sRunExperiment, sConcludeExperiment, sNotifyServiceBroker,
+            sGetExperiment, sPrepareExperiment, sRunExperiment, sConcludeExperiment,
+            sNotifyServiceBroker, sNotifyEmail,
             sExitThread
         }
 
@@ -842,6 +859,14 @@ namespace Library.LabServerEngine
                             // Notify ServiceBroker of experiment completion
                             NotifyServiceBroker(experimentInfo);
 
+                            state = States.sNotifyEmail;
+                            break;
+
+                        case States.sNotifyEmail:
+
+                            // Notify by email of experiment completion
+                            NotifyEmail(experimentInfo);
+
                             // Check for more experiments waiting to run
                             //state = States.sGetExperiment;
                             state = States.sExitThread;
@@ -961,6 +986,7 @@ namespace Library.LabServerEngine
                 {
                     throw new ArgumentException(validationReport.errorMessage);
                 }
+                experimentInfo.setupId = experimentSpecification.SetupId;
 
                 //
                 // Create an instance of the driver for the specified setup and then
@@ -1102,7 +1128,7 @@ namespace Library.LabServerEngine
                 //
                 // Notify the ServiceBroker so that the results can be retrieved
                 //
-                LabServerToSbAPI labServerToSbAPI = new LabServerToSbAPI(this.allowedCallers);
+                LabServerToSbAPI labServerToSbAPI = new LabServerToSbAPI(this.allowedServiceBrokers);
                 if ((success = labServerToSbAPI.Notify(experimentInfo.experimentId, experimentInfo.sbName)) == true)
                 {
                     success = this.experimentResults.UpdateNotified(experimentInfo.experimentId, experimentInfo.sbName);
@@ -1119,6 +1145,95 @@ namespace Library.LabServerEngine
 
             return success;
         }
-        
+
+        //-------------------------------------------------------------------------------------------------//
+
+        private bool NotifyEmail(ExperimentInfo experimentInfo)
+        {
+            const string STRLOG_MethodName = "NotifyEmail";
+
+            Logfile.WriteCalled(STRLOG_ClassName, STRLOG_MethodName);
+
+            bool success = false;
+
+            try
+            {
+                /*
+                 * Send an email to the iLab Administrator stating that an experiment has completed.
+                 * If the experiment failed, send an email to the email address for reporting failed experiments.
+                 */
+                MailMessage mailMessage = null;
+                string errorMessage = String.Empty;
+                StatusCodes statusCode = (StatusCodes)experimentInfo.resultReport.statusCode;
+
+                if (statusCode == StatusCodes.Failed)
+                {
+                    /*
+                     * Email goes to all those listed for when the experiment fails
+                     */
+                    if (this.emailAddressesExperimentFailed != null && this.emailAddressesExperimentFailed.Length > 0)
+                    {
+                        if (mailMessage == null)
+                        {
+                            mailMessage = new MailMessage();
+                        }
+                        for (int i = 0; i < this.emailAddressesExperimentFailed.Length; i++)
+                        {
+                            mailMessage.To.Add(new MailAddress(this.emailAddressesExperimentFailed[i]));
+                        }
+                        errorMessage = String.Format(STRLOG_MailMessageError_arg, experimentInfo.resultReport.errorMessage);
+                    }
+                }
+                else
+                {
+                    /*
+                     * Email goes to all those listed for when the experiment completes successfully or is cancelled
+                     */
+                    if (this.emailAddressesExperimentCompleted != null && this.emailAddressesExperimentCompleted.Length > 0)
+                    {
+                        if (mailMessage == null)
+                        {
+                            mailMessage = new MailMessage();
+                        }
+                        for (int i = 0; i < this.emailAddressesExperimentCompleted.Length; i++)
+                        {
+                            mailMessage.To.Add(new MailAddress(this.emailAddressesExperimentCompleted[i]));
+                        }
+                    }
+                }
+
+                /*
+                 * Check if recipient email addresses have been specified
+                 */
+                if (mailMessage != null)
+                {
+                    mailMessage.From = new MailAddress(this.emailAddressLabServer);
+                    mailMessage.Subject = String.Format(STRLOG_MailMessageSubject_arg2, this.labConfiguration.Title, statusCode);
+                    mailMessage.Body = String.Format(STRLOG_MailMessageBody_arg7,
+                        experimentInfo.sbName, experimentInfo.userGroup, experimentInfo.experimentId, this.unitId, experimentInfo.setupId, statusCode, errorMessage);
+
+                    Logfile.Write(
+                        String.Format(STRLOG_SendingEmail_arg3, mailMessage.To.ToString(), mailMessage.From.Address, mailMessage.Subject));
+
+                    /*
+                     * Send the email
+                     */
+                    SmtpClient smtpClient = new SmtpClient(Consts.STR_LocalhostIP);
+                    smtpClient.Send(mailMessage);
+                }
+
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                Logfile.WriteError(ex.Message);
+            }
+
+            string logMessage = STRLOG_success + success.ToString();
+
+            Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
+
+            return success;
+        }
     }
 }

@@ -14,15 +14,15 @@ namespace Library.LabServer
 
         //-------------------------------------------------------------------------------------------------//
 
-        public ExperimentManager(AllowedCallers allowedCallers, Configuration configuration)
-            : this(allowedCallers, configuration, 0)
+        public ExperimentManager(AllowedServiceBrokersDB allowedServiceBrokers, Configuration configuration)
+            : this(allowedServiceBrokers, configuration, 0)
         {
         }
 
         //-------------------------------------------------------------------------------------------------//
 
-        public ExperimentManager(AllowedCallers allowedCallers, Configuration configuration, int farmSize)
-            : base(allowedCallers, configuration, farmSize)
+        public ExperimentManager(AllowedServiceBrokersDB allowedServiceBrokers, Configuration configuration, int farmSize)
+            : base(allowedServiceBrokers, configuration, farmSize)
         {
         }
 

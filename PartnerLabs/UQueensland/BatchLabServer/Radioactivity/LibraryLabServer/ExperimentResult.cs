@@ -55,29 +55,57 @@ namespace Library.LabServer
                 // Add the specification information
                 //
                 XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_sourceName, specification.SourceName, false);
-                XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_absorberName, specification.AbsorberName, false);
                 XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_duration, specification.Duration);
                 XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_repeat, specification.Repeat);
                 if (specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsTime) ||
-                    specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsDistance) ||
                     specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTime) ||
+                    specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTimeNoDelay))
+                {
+                    Specification.Absorber absorber = specification.AbsorberList[0];
+                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_absorberName, absorber.name, false);
+
+                    int distance = specification.DistanceList[0];
+                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_distance, distance.ToString(), false);
+                }
+                else if (specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsDistance) ||
                     specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsDistance) ||
-                    specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTimeNoDelay) ||
                     specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsDistanceNoDelay))
                 {
+                    Specification.Absorber absorber = specification.AbsorberList[0];
+                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_absorberName, absorber.name, false);
+
                     //
                     // Create a CSV string of distances
                     //
-                    string csvString = string.Empty;
+                    string csvDistances = string.Empty;
                     for (int i = 0; i < specification.DistanceList.Length; i++)
                     {
                         if (i > 0)
                         {
-                            csvString += Consts.CHR_CsvSplitter;
+                            csvDistances += Consts.CHR_CsvSplitter;
                         }
-                        csvString += specification.DistanceList[i].ToString();
+                        csvDistances += specification.DistanceList[i].ToString();
                     }
-                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_distance, csvString, false);
+                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_distance, csvDistances, false);
+                }
+                else if (specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsAbsorber))
+                {
+                    //
+                    // Create a CSV string of absorbers
+                    //
+                    string csvAbsorbers = string.Empty;
+                    for (int i = 0; i < specification.AbsorberList.Length; i++)
+                    {
+                        if (i > 0)
+                        {
+                            csvAbsorbers += Consts.CHR_CsvSplitter;
+                        }
+                        csvAbsorbers += specification.AbsorberList[i].name;
+                    }
+                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_absorberName, csvAbsorbers, false);
+
+                    int distance = specification.DistanceList[0];
+                    XmlUtilities.SetXmlValue(this.xmlNodeExperimentResult, Consts.STRXML_distance, distance.ToString(), false);
                 }
 
                 //
@@ -87,6 +115,7 @@ namespace Library.LabServer
                 {
                     if (specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsTime) ||
                         specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsDistance) ||
+                        specification.SetupId.Equals(Consts.STRXML_SetupId_RadioactivityVsAbsorber) ||
                         specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTime) ||
                         specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsDistance) ||
                         specification.SetupId.Equals(Consts.STRXML_SetupId_SimActivityVsTimeNoDelay) ||

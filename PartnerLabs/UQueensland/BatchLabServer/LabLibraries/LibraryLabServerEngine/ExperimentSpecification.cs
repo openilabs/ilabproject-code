@@ -183,5 +183,12 @@ namespace Library.LabServerEngine
             return validationReport;
         }
 
+        //-------------------------------------------------------------------------------------------------//
+
+        public override string ToString()
+        {
+            return XmlUtilities.ToXmlString(this.xmlNodeSpecification);
+        }
+    
     }
 }

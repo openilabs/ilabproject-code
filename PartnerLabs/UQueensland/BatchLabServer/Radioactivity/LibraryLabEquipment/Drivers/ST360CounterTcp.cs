@@ -21,6 +21,7 @@ namespace Library.LabEquipment.Drivers
         private const string STRLOG_IPaddr = " IPaddr: ";
         private const string STRLOG_Port = " Port: ";
         private const string STRLOG_CreatingTcpClient = " Creating TcpClient ...";
+        private const string STRLOG_ClosingTcpClient = " Closing TcpClient ...";
 
         //
         // Local variables
@@ -218,6 +219,7 @@ namespace Library.LabEquipment.Drivers
                 //
                 // Close the TCP client
                 //
+                Logfile.Write(STRLOG_ClosingTcpClient);
                 this.tcpClientStream.Close();
                 this.tcpClient.Close();
 

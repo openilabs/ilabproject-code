@@ -17,6 +17,7 @@ namespace Library.LabServer.Drivers.Setup
         //
         private enum States_GetExecutionTime
         {
+            sGetLcdWriteLineTime,
             sGetAbsorberSelectTime,
             sGetSourceSelectTime,
             sGetTubeHomeDistance, sGetTubeMoveTime,
@@ -51,6 +52,11 @@ namespace Library.LabServer.Drivers.Setup
         // State machine table
         //
         private SMTableEntry_GetExecutionTime[] smTable_GetExecutionTime = new SMTableEntry_GetExecutionTime[] {
+            //
+            // Get LCD writeline time
+            //
+            new SMTableEntry_GetExecutionTime(States_GetExecutionTime.sGetLcdWriteLineTime, States_GetExecutionTime.sGetAbsorberSelectTime,
+                Consts.STRXML_CmdGetLcdWriteLineTime, null),
             //
             // Get absorber select time
             //
@@ -140,6 +146,7 @@ namespace Library.LabServer.Drivers.Setup
             // Initialise variables used in the state machine
             //
             double executionTime = 0.0;
+            double lcdWriteLineTime = 0.0;
             int tubeHomeDistance = 0;
             int distanceIndex = 0;
 
@@ -193,13 +200,15 @@ namespace Library.LabServer.Drivers.Setup
                     SMTableEntry_GetExecutionTime entry = smTable_GetExecutionTime[index];
                     States_GetExecutionTime nextState = entry.nextState;
 
+                    Trace.Write(" [ " + entry.currentState.ToString() + ": " + entry.currentState.ToString());
+
                     //
                     // Add command arguments where required
                     //
                     switch (entry.currentState)
                     {
                         case States_GetExecutionTime.sGetAbsorberSelectTime:
-                            entry.commandArguments[0, 1] = specification.AbsorberLocation.ToString();
+                            entry.commandArguments[0, 1] = specification.AbsorberList[0].location.ToString();
                             break;
 
                         case States_GetExecutionTime.sGetSourceSelectTime:
@@ -230,7 +239,7 @@ namespace Library.LabServer.Drivers.Setup
                             break;
 
                         case States_GetExecutionTime.sGetAbsorberReturnTime:
-                            entry.commandArguments[0, 1] = specification.AbsorberLocation.ToString();
+                            entry.commandArguments[0, 1] = specification.AbsorberList[0].location.ToString();
                             break;
 
                         case States_GetExecutionTime.sGetTubeReturnTime:
@@ -263,12 +272,21 @@ namespace Library.LabServer.Drivers.Setup
                     double stateExecutionTime = 0.0;
                     switch (entry.currentState)
                     {
+                        case States_GetExecutionTime.sGetLcdWriteLineTime:
+                            lcdWriteLineTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspLcdWriteLineTime, 0);
+
+                            // Time to ready LCD when completed
+                            stateExecutionTime = lcdWriteLineTime * 2;
+                            break;
+
                         case States_GetExecutionTime.sGetAbsorberSelectTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspAbsorberSelectTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
                             break;
 
                         case States_GetExecutionTime.sGetSourceSelectTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspSourceSelectTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
                             break;
 
                         case States_GetExecutionTime.sGetTubeHomeDistance:
@@ -277,11 +295,13 @@ namespace Library.LabServer.Drivers.Setup
 
                         case States_GetExecutionTime.sGetTubeMoveTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspTubeMoveTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
                             break;
 
                         case States_GetExecutionTime.sGetCaptureDataTime:
-                            double captureDataTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspCaptureDataTime, 0.0);
-                            stateExecutionTime = captureDataTime * specification.Repeat;
+                            stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspCaptureDataTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
+                            stateExecutionTime *= specification.Repeat;
                             if (++distanceIndex < specification.DistanceList.Length)
                             {
                                 // Next distance
@@ -291,26 +311,30 @@ namespace Library.LabServer.Drivers.Setup
 
                         case States_GetExecutionTime.sGetSourceReturnTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspSourceReturnTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
                             break;
 
                         case States_GetExecutionTime.sGetAbsorberReturnTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspAbsorberReturnTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
                             break;
 
                         case States_GetExecutionTime.sGetTubeReturnTime:
                             stateExecutionTime = XmlUtilities.GetRealValue(xmlResponseNode, Consts.STRXML_RspTubeMoveTime, 0.0);
+                            stateExecutionTime += lcdWriteLineTime * 2;
                             break;
 
                         default:
                             break;
                     }
 
+                    Trace.WriteLine("  nextState: " + entry.nextState.ToString() + " ]");
+                    Trace.WriteLine(" stateExecutionTime: " + stateExecutionTime.ToString());
+
                     //
                     // Update the execution time so far
                     //
                     executionTime += stateExecutionTime;
-
-                    Trace.WriteLine("nextState: " + entry.nextState.ToString());
 
                     //
                     // Next state
@@ -324,11 +348,16 @@ namespace Library.LabServer.Drivers.Setup
                 throw;
             }
 
-            logMessage = STRLOG_ExecutionTime + executionTime.ToString();
+            //
+            // Round execution time to the nearest integer
+            //
+            int execTime = (int)(executionTime + 0.5);
+
+            logMessage = STRLOG_ExecutionTime + execTime.ToString();
 
             Logfile.WriteCompleted(STRLOG_ClassName, STRLOG_MethodName, logMessage);
 
-            return (int)executionTime;
+            return execTime;
         }
 
     }
