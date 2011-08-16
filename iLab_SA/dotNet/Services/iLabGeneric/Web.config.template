@@ -19,7 +19,7 @@
     
     <!-- the database connection information 
     NOTE: You Must set the database catalog to the database name that you created as part of the instalation process -->
-    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_TOD;Integrated Security=SSPI"/>
+    <add key="sqlConnection" value="data source=(local);initial catalog=iLab_GPA;Integrated Security=SSPI"/>
     <add key="DatabaseProvider" value="System.Data.SqlClient" />
 
     <!-- NOTE Default Recaptcha: Global keys assigned to ilab.mit.edu 
