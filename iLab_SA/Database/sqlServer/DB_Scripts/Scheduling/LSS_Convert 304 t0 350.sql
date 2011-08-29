@@ -18,7 +18,8 @@ BEGIN
 			BEGIN
 				update Reservation_Info set USS_Info_ID = u.USS_Info_ID
 				from Reservation_Info r, USS_Info u, Credential_Sets c
-				where c.Credential_Set_ID = r.Credential_Set_ID AND c.Service_Broker_GUID = u.domain_GUID
+				where c.Credential_Set_ID = r.Credential_Set_ID AND c.USS_GUID = u.USS_GUID
 			END
-	ALTER TABLE  Reservation_Info ALTER COLUMN USS_Info_ID INT NOT NULL;
+	ALTER TABLE Reservation_Info ALTER COLUMN USS_Info_ID INT NOT NULL;
+	ALTER TABLE Credential_Sets ALTER COLUMN USS_GUID VARCHAR(50) NULL;
 END
