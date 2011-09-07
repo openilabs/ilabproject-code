@@ -11,7 +11,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: myClient.aspx,v 1.6 2008/03/17 21:22:06 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
 		<meta content="C#" name="CODE_LANGUAGE"/>

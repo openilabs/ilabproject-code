@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: myClientList.aspx.cs,v 1.2 2007/12/26 05:27:26 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

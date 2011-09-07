@@ -1,6 +1,6 @@
 
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
--- $Id: LSS_Tables.sql 396 2011-06-08 19:22:31Z phbailey $
+-- $Id$
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_LSS_Policy_Credential_Sets]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[LSS_Policy] DROP CONSTRAINT FK_LSS_Policy_Credential_Sets

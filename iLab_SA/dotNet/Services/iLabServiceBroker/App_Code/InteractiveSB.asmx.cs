@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: InteractiveSB.asmx.cs,v 1.52 2008/03/17 21:23:18 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

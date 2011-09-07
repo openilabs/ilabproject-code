@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: I_LabViewInterface.cs,v 1.4 2007/11/06 14:43:56 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

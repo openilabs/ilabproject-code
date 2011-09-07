@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: InternalAdminDB.cs,v 1.22 2008/03/14 16:10:27 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

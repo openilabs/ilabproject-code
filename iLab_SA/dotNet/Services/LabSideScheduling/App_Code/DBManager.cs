@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: DBManager.cs,v 1.19 2007/06/27 22:45:02 pbailey Exp $
+ * $Id$
  */
 
 using System;

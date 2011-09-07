@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: lostPassword.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>MIT iLab Service Broker - Lost Password</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">

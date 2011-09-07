@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: footer.ascx.cs,v 1.1 2007/03/21 00:36:43 tingting Exp $
+ * $Id$
  */
 namespace iLabs.Scheduling.UserSide
 {

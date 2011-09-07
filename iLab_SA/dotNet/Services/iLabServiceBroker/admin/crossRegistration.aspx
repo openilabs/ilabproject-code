@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: Registration.aspx,v 1.5 2007/05/11 04:30:00 pbailey Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>MIT iLab Service Broker - Cross-domain Registration</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">

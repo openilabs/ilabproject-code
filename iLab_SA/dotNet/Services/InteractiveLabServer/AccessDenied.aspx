@@ -10,7 +10,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: AccessDenied.aspx,v 1.4 2006/10/12 21:18:05 pbailey Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>AccessDenied</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">

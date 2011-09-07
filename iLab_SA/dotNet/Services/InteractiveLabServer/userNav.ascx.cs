@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: userNav.ascx.cs,v 1.6 2007/05/14 22:31:40 pbailey Exp $
+ * $Id$
  */
 namespace iLabs.LabServer
 {

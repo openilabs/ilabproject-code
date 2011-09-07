@@ -1,6 +1,6 @@
 <%@ WebService Language="C#" Class="I_ESS" %>
 
-/* $Id: I_ESS.asmx,v 1.14 2008/04/07 20:50:42 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Xml.Serialization;

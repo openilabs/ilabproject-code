@@ -1,4 +1,4 @@
-/* $Id: DownloadAPI.cs,v 1.11 2008/04/07 20:47:36 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: administergroups.aspx,v 1.3 2006/04/10 18:33:16 rabih Exp $ -->
+<!-- $Id$ -->
 	<head>
 		<title>MIT iLab Service Broker - Administer Groups</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>

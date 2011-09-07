@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: LabScheduling.asmx.cs,v 1.9 2007/06/27 22:45:02 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

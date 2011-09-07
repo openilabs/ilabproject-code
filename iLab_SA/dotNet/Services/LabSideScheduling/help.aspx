@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: help.aspx,v 1.4 2006/12/27 23:15:32 pbailey Exp $ -->
+<!-- $Id$ -->
 	<head>
 		<title>MIT iLab Lab Server - Help</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>

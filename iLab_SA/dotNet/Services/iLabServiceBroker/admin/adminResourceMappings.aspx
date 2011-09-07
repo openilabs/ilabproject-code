@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: adminResourceMappings.aspx,v 1.2 2006/12/05 08:06:42 ijabbour Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>MIT iLab Service Broker - Administer Resource Mappings</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">

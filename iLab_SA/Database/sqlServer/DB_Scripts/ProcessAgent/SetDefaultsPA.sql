@@ -1,5 +1,5 @@
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
--- $Id: SetDefaultsPA.sql 398 2011-07-26 19:04:53Z phbailey $
+-- $Id$
 
 /* created by Tingting. */
 

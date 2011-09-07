@@ -1,7 +1,7 @@
 <%@ WebService Language="c#" Class="I_ILS" %>
 
 
-/* $Id: I_ILS.asmx,v 1.1 2007/06/04 01:27:56 pbailey Exp $ */
+/* $Id$ */
 using System;
 using System.Collections;
 using System.Configuration;

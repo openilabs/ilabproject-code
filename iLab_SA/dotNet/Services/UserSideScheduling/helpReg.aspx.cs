@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: help.aspx.cs,v 1.8 2007/03/27 16:04:20 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Collections;

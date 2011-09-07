@@ -11,7 +11,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: groupmembership.aspx,v 1.3 2007/01/29 22:19:38 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
 		<meta content="C#" name="CODE_LANGUAGE"/>
 		<meta content="JavaScript" name="vs_defaultClientScript"/>

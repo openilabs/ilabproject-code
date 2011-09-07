@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: LabViewInterface.cs,v 1.6 2007/11/06 14:43:56 pbailey Exp $ */
+/* $Id$ */
 #define LabVIEW_86
 using System;
 using System.Collections;

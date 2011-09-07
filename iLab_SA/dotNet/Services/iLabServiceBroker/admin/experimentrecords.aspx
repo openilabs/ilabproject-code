@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: experimentrecords.aspx,v 1.5 2008/04/11 19:53:33 pbailey Exp $ -->
+<!-- $Id$ -->
 	<head>
 		<title>MIT iLab Service Broker - Experiment Records</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR" />

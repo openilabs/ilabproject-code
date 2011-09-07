@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: WS_ILabCore.cs,v 1.18 2007/12/26 05:27:22 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

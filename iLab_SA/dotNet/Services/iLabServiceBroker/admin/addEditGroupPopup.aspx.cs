@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: addEditGroupPopup.aspx.cs,v 1.5 2006/12/13 20:19:45 ijabbour Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

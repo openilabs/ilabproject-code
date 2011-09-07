@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: TicketRemover.cs,v 1.3 2007/06/02 13:17:52 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

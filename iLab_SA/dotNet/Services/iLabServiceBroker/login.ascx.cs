@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: login.ascx.cs,v 1.2 2006/07/25 22:14:03 pbailey Exp $
+ * $Id$
  */
 
 using System;

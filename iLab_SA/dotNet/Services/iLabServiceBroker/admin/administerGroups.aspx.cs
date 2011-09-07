@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: administerGroups.aspx.cs,v 1.5 2006/08/11 14:26:17 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

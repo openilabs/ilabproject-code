@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: login.aspx.cs,v 1.2 2006/08/11 14:26:15 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

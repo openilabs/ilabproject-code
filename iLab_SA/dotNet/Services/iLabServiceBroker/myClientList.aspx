@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: myClientList.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
+<!-- $Id$ -->
 	<head>
 		<title>MIT iLab Service Broker - My Labs</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>

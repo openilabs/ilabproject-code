@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: Global.asax.cs,v 1.11 2007/05/31 20:58:47 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

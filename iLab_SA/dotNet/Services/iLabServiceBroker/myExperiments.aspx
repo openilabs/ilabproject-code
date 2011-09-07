@@ -10,7 +10,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: myExperiments.aspx,v 1.9 2008/04/11 19:52:49 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR" />
 		<meta content="C#" name="CODE_LANGUAGE" />
 		<meta content="JavaScript" name="vs_defaultClientScript" />

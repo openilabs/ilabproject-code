@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: addAdminURLPopup.aspx.cs,v 1.6 2007/04/05 21:01:25 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

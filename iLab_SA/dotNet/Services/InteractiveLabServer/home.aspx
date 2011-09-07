@@ -8,7 +8,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: home.aspx,v 1.4 2006/12/27 22:19:43 pbailey Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>MIT iLab Service Broker - Home</title>
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">

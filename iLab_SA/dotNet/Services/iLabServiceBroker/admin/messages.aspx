@@ -10,7 +10,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: messages.aspx,v 1.2 2007/10/18 18:02:13 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
 		<meta content="C#" name="CODE_LANGUAGE"/>
 		<meta content="JavaScript" name="vs_defaultClientScript"/>

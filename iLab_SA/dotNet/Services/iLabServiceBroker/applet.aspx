@@ -5,7 +5,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: applet.aspx,v 1.3 2008/03/14 20:25:36 pbailey Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>applet</title>
 		<meta name="GENERATOR" Content="Microsoft Visual Studio 7.0"/>

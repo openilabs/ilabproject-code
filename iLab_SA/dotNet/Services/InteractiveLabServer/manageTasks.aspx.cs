@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: manageTasks.aspx.cs,v 1.3 2007/03/16 15:44:57 pbailey Exp $
+ * $Id$
  */
 
 using System;

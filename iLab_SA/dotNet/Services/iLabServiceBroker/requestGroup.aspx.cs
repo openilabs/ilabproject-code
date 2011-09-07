@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: requestGroup.aspx.cs,v 1.2 2006/08/11 14:26:15 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Collections;

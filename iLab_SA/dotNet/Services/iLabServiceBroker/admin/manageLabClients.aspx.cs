@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: manageLabClients.aspx.cs,v 1.41 2008/03/11 19:27:04 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Configuration;

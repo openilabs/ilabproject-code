@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: Authorization.cs,v 1.16 2008/03/14 16:05:49 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Data;

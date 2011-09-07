@@ -5,7 +5,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-<!-- $Id: AuthorizationWrapperClass.aspx,v 1.1.1.1 2006/02/07 22:10:50 pbailey Exp $ -->
+<!-- $Id$ -->
 	<HEAD>
 		<title>AuthorizationWrapperClass</title>
 		<meta name="GENERATOR" Content="Microsoft Visual Studio 7.0">

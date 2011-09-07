@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: adminResourceMappings.aspx.cs,v 1.11 2007/06/15 23:14:52 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

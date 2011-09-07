@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: Authentication.cs,v 1.3 2008/03/14 16:04:42 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Web.Security;

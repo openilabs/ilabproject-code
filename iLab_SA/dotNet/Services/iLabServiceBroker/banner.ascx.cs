@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: banner.ascx.cs,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Data;

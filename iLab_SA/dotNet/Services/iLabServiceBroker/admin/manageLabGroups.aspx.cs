@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: manageLabGroups.aspx.cs,v 1.16 2008/05/09 21:04:16 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Collections;

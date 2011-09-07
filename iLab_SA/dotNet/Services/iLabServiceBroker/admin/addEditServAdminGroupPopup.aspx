@@ -11,7 +11,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: addEditServAdminGroupPopup.aspx,v 1.2 2006/04/04 21:41:42 rabih Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
 		<meta content="C#" name="CODE_LANGUAGE">
 		<meta content="JavaScript" name="vs_defaultClientScript">

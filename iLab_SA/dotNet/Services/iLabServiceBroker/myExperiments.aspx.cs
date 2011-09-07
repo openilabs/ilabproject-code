@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: myExperiments.aspx.cs,v 1.21 2008/04/11 19:52:49 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Collections;

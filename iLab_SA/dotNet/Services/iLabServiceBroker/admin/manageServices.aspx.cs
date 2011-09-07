@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: manageServices.aspx.cs,v 1.45 2008/05/07 22:52:32 pbailey Exp $
+ * $Id$
  */
 using System;
 using System.Collections;

@@ -1,6 +1,6 @@
 
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
--- $Id: ProcessAgentTables.sql 348 2011-03-29 17:01:47Z phbailey $
+-- $Id$
 
 --
 -- Tables common to all ticketing services.

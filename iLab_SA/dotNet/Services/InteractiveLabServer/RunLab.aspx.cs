@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: RunLab.aspx.cs,v 1.17 2007/07/24 15:34:17 pbailey Exp $
+ * $Id$
  */
 
 using System;

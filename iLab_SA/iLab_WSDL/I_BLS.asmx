@@ -6,7 +6,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: I_BLS.asmx,v 1.2 2008/03/14 21:13:12 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

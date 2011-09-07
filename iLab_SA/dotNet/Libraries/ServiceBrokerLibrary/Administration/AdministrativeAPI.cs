@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: Administration.cs,v 1.26 2008/03/17 16:21:49 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections;

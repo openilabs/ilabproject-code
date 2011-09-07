@@ -11,7 +11,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: reportBug.aspx,v 1.1.1.1 2006/02/07 22:10:57 pbailey Exp $ -->
+		<!-- $Id$ -->
 		<meta name="GENERATOR" Content="Microsoft Visual Studio .NET 7.1">
 		<meta name="CODE_LANGUAGE" Content="C#">
 		<meta name="vs_defaultClientScript" content="JavaScript">

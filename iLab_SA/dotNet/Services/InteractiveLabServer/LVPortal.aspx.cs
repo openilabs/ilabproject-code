@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: LVPortal.aspx.cs,v 1.36 2007/06/25 20:16:14 pbailey Exp $
+ * $Id$
  */
 
 using System;

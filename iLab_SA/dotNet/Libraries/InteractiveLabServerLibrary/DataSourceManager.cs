@@ -4,7 +4,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: DataSourceManager.cs,v 1.3 2007/05/29 22:37:19 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Data;

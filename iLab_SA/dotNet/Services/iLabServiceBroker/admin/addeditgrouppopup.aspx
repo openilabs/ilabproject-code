@@ -11,7 +11,7 @@
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
-		<!-- $Id: addeditgrouppopup.aspx,v 1.5 2006/12/08 05:03:17 ijabbour Exp $ -->
+		<!-- $Id$ -->
 		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR" />
 		<meta content="C#" name="CODE_LANGUAGE" />
 		<meta content="JavaScript" name="vs_defaultClientScript" />

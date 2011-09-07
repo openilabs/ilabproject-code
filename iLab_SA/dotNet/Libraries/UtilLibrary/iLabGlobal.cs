@@ -1,5 +1,5 @@
 /* Copyright (c) 2008 The Massachusetts Institute of Technology. All rights reserved. */
-/* $Id: iLabGlobal.cs 443 2011-08-29 21:35:54Z phbailey $ */
+/* $Id$ */
 
 using System;
 using System.Collections.Generic;
@@ -13,9 +13,9 @@ namespace iLabs.UtilLib
     public class iLabGlobal
     {
         static private string headUrl = "$HeadURL: https://ilabproject.svn.sourceforge.net/svnroot/ilabproject/trunk/iLab_SA/dotNet/Libraries/UtilLibrary/iLabGlobal.cs $";
-        static private string info = "$Id: iLabGlobal.cs 443 2011-08-29 21:35:54Z phbailey $";
-        static private string date = "$Date: 2011-08-29 17:35:54 -0400 (Mon, 29 Aug 2011) $";
-        static private string revision = "$Revision: 443 $";
+        static private string info = "$Id$";
+        static private string date = "$Date$";
+        static private string revision = "$Revision$";
         static private string iLabRelease = "$ilab:Release$";
 	static private string release = "Release 3.5.1";
         static private string buildDate = "$ilab:BuildDate$";

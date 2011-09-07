@@ -3,7 +3,7 @@
  * Please see license.txt in top level directory for full license.
  */
 
-/* $Id: LVDataSocket.cs,v 1.3 2007/04/17 14:25:45 pbailey Exp $ */
+/* $Id$ */
 
 using System;
 using System.Collections.Generic;
