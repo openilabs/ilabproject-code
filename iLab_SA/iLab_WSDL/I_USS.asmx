@@ -1,5 +1,12 @@
 <%@ WebService Language="c#" Class="I_USS" %>
 
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ */
+
+/* $Id$ */
+
 using System;
 using System.Collections;
 using System.Configuration;
@@ -29,15 +36,15 @@ using iLabs.DataTypes.SchedulingTypes;
 
         
         /// <summary>
-        /// Retrieve available time periods(local time of LSS) This is a pas-through method that gets the information from the LSS.
+        /// Retrieve available time periods(UTC) This is a pass-through method that gets the information from the LSS.
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
-        /// <param name="startTime"></param>the local time of LSS
-        /// <param name="endTime"></param>the local time of LSS
-        /// <returns></returns>return an array of time periods (local time), each of the time periods is longer than the experiment's minimum time 
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>return an array of time periods (UTC), each of the time periods is longer than the experiment's minimum time 
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
@@ -84,7 +91,8 @@ using iLabs.DataTypes.SchedulingTypes;
 		
 		/// <summary>
 		/// Remove all the reservations for a lab server  that match the specification.. 
-        /// The serviceBroker is notified of each reservation so that an email is sent to each of the owners of the removed reservations.
+        /// The serviceBroker is notified of each reservation so that an email is sent 
+        /// to each of the owners of the removed reservations.
         /// If the method is not called by an LSS the LSS is forwarded a RemoveReservation request."
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
@@ -97,7 +105,8 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="message"></param>
         /// <returns>The number of reservations removed or -1 in an error</returns>
         [WebMethod(Description = "Remove all the reservations for a lab server that match the specification."
-            + " The serviceBroker is notified of each reservation so that an email is sent to each of the owners of the removed reservations."
+            + " The serviceBroker is notified of each reservation so that an email is sent "
+            + "to each of the owners of the removed reservations."
             + " If the method is not called by an LSS the LSS is forwarded a RemoveReservation request.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
@@ -130,8 +139,8 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
-		/// <returns></returns>true the credential set has been added 
-        /// successfully, false otherwise
+        /// <returns>1 if the CredentialSet is added successfully, 0 otherwise</returns>1 if the credential set has been added 
+        /// successfully, 0 otherwise
         [WebMethod(Description = "Add a credential set. A credentialSet defines a specific group from a specific ServiceBroker.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -143,8 +152,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// </summary>
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="groupName"></param>
-        /// <returns></returns>true the credential set has been added 
-        /// successfully, false otherwise
+        /// <returns>1 if the CredentialSet is modified successfully, 0 otherwise</returns>
         [WebMethod(Description = "Modify a credential set. This may be called if a ServiceBroker or group name is changed on the ServiceBroker")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -156,8 +164,7 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// </summary>
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
-		/// <returns></returns>true, the credentialset is removed 
-        /// successfully, false otherwise
+        /// <returns>1 if the CredentialSet is removed successfully, 0 otherwise</returns>
         [WebMethod(Description = "Remove a credential set.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -173,8 +180,7 @@ using iLabs.DataTypes.SchedulingTypes;
 		/// <param name="labClientVersion"></param>		
 		/// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
-		/// <returns></returns>true, the experimentInfo is added 
-        /// successfully, false otherwise
+        /// <returns>1 if the experimentInfo is added successfully, 0 otherwise</returns>
         [WebMethod(Description = "Add iformation about an experiment that will have its users managed by the service.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -193,8 +199,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="labClientVersion"></param>		
         /// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
-        /// <returns></returns>true, the experimentInfo is added 
-        /// successfully, false otherwise
+        /// <returns>1 if the experimentInfo is modified successfully, 0 otherwise</returns>
         [WebMethod(Description = "Modify information of a particular experiment")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -208,8 +213,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="labServerGuid"></param>      
         /// <param name="labClientGuid"></param>
         /// <param name="lssGuid"></param>
-        /// <returns></returns>true, the experimentInfo is removed 
-        /// successfully, false otherwise
+        /// <returns>1 if the experimentInfo is removed successfully, 0 otherwise</returns>
         [WebMethod(Description = "Remove a particular experiment")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -221,7 +225,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="lssGuid"></param>
         /// <param name="lssName"></param>
 		/// <param name="lssUrl"></param>
-		/// <returns></returns>true, the LSSInfo is removed successfully, false otherwise
+        /// <returns>1 if the LSSInfo is added successfully, 0 otherwise</returns>
         [WebMethod(Description = "Add information of a particular lab side scheduling server identified by lssID.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -233,7 +237,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="lssGuid"></param>
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
-        /// <returns></returns>true, the LSSInfo is removed successfully, false otherwise
+        /// <returns>1 if the LSSInfo is modified successfully, 0 otherwise</returns>
         [WebMethod(Description = "Modify information of a particular lab side scheduling server identified by lssID")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -245,7 +249,7 @@ using iLabs.DataTypes.SchedulingTypes;
         /// <param name="lssGuid"></param>
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
-        /// <returns></returns>true, the LSSInfo is removed successfully, false otherwise
+        /// <returns>1 if the LSSInfo is removed successfully, 0 otherwise</returns>
         [WebMethod(Description = "Remove information of a particular lab side scheduling server identified by lssID")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]

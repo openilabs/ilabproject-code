@@ -1,7 +1,7 @@
 /**8 ServiceBroker Tables ***/
 
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
--- $Id$
+-- $Id: ServiceBrokerCoreTables.sql 418 2011-08-04 16:18:15Z phbailey $
 
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_AdminURLs_ProcessAgent]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)

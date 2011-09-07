@@ -1,4 +1,10 @@
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ */
+
 /* $Id: LabScheduling.asmx.cs,v 1.9 2007/06/27 22:45:02 pbailey Exp $ */
+
 using System;
 using System.Collections;
 using System.Configuration;
@@ -352,6 +358,7 @@ namespace iLabs.Scheduling.LabSide
 
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
+              
             }
             return status;
         }
@@ -362,7 +369,7 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
-		/// <returns></returns>true if the CredentialSet is added successfully, or already exists, false otherwise
+		/// <returns></returns>1 if the CredentialSet is added successfully, or already exists, 0 otherwise
 		[WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -432,8 +439,8 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="labClientVersion"></param>
         /// <param name="labClientName"></param>
         /// <param name="providerName"></param>
-        /// <returns></returns>true, the experimentInfo is added 
-        /// successfully, false otherwise
+        /// <returns></returns>1 if the experimentInfo is added 
+        /// successfully, 0 otherwise
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -490,8 +497,8 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="clientVersion"></param>
         /// <param name="clientName"></param>
         /// <param name="providerName"></param>
-        /// <returns></returns>true, the experimentInfo is removed 
-        /// successfully, false otherwise
+        /// <returns></returns>1 if the experimentInfo is removed 
+        /// successfully, 0 otherwise
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
@@ -500,6 +507,15 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             int status = 0;
+            int infoID = LSSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+            if (infoID > 0)
+            {
+                int[] remaining = LSSSchedulingAPI.RemoveExperimentInfo(new int[] { infoID });
+                if (remaining == null || remaining.Length = 0)
+                {
+                    status = 1;
+                }
+            }
             return status;
         }
 

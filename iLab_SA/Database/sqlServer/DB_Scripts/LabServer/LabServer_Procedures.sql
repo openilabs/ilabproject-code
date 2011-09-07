@@ -1,5 +1,5 @@
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
--- $Id$
+-- $Id: LabServer_Procedures.sql 346 2011-03-29 16:21:21Z phbailey $
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetActiveTaskIDs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetActiveTaskIDs]

@@ -1,5 +1,5 @@
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
--- $Id$
+-- $Id: ServiceBrokerCoreDefaultValues.sql 353 2011-04-28 14:04:41Z phbailey $
 
 /* created by Charu. Last Modified 12/16/2004 */
 
