@@ -407,6 +407,7 @@ namespace iLabs.Controls
 
         protected override void OnLoad(EventArgs e)
         {
+            
             if (!Page.IsPostBack)
             {
                 StringBuilder message = new StringBuilder();
@@ -477,10 +478,13 @@ namespace iLabs.Controls
                     string serviceName = ConfigurationManager.AppSettings["serviceName"];
                     if (serviceName != null)
                         AgentName = serviceName;
-
+         
                     string codebaseURL = ConfigurationManager.AppSettings["codebaseURL"];
-                    if (codebaseURL != null)
-                        CodebaseUrl = codebaseURL;
+                    //if (codebaseURL != null)
+                    //    CodebaseUrl = codebaseURL;
+                     CodebaseUrl = this.Page.Request.ApplicationPath;
+                     CodebaseUrl = Utilities.ExportUrlPath(this.Page.Request.Url);
+                     //CodebaseUrl = this.Page.Request.Url;
 
                     string str = ConfigurationManager.AppSettings["supportMailAddress"];
                     if (str != null)
@@ -713,6 +717,7 @@ namespace iLabs.Controls
         {
 
             bool error = false;
+            string webURL = null;
             StringBuilder message = new StringBuilder();
             //Check fields for valid input
             if (!(txtServiceName.Text != null && txtServiceName.Text.Length > 0))
@@ -748,7 +753,7 @@ namespace iLabs.Controls
             if (!(txtServiceUrl.Text != null && txtServiceUrl.Text.Length > 0))
             {
                 error = true;
-                message.Append(" You must enter full URL of the Web Service page<br/>");
+                message.Append(" You must enter full or relative URL of the Web Service page<br/>");
             }
             else if (txtServiceUrl.Text.Contains("localhost"))
             {
@@ -756,17 +761,40 @@ namespace iLabs.Controls
                 message.Append(" You must not use localhost in a web service URL, if you must test only on the local machine please use '127.0.0.1'.<br/>");
             }
             else
-            { // Test for valid webService URL
+            { 
+                //Construct webServiceUrl
+                
+                string testURL = txtServiceUrl.Text.Trim();
+                if (testURL.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                    || testURL.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    webURL = testURL;
+                }
+                else if (testURL.StartsWith("~/", StringComparison.OrdinalIgnoreCase))
+                {
+                    webURL = txtCodebaseUrl.Text.Trim() + testURL.Substring(1);
+                }
+                else if (testURL.StartsWith("/", StringComparison.OrdinalIgnoreCase))
+                {
+                    webURL = txtCodebaseUrl.Text.Trim() + testURL;
+                }
+                else
+                {
+                    webURL = txtCodebaseUrl.Text.Trim() + "/" + testURL;
+                }
+                
+                
+                // Test for valid webService URL
                 ProcessAgentProxy paProxy = new ProcessAgentProxy();
-                paProxy.Url = txtServiceUrl.Text.Trim();
+                paProxy.Url = webURL;
                 try
                 {
-                    DateTime serTime = paProxy.GetServiceTime();
+                    DateTime serviceTime = paProxy.GetServiceTime();
                 }
                 catch
                 {
                     error = true;
-                    message.Append(" There is an error with the web service URL: " + txtServiceUrl.Text.Trim() + " Please check that it is valid and the web service is configured correctly.<br/>");
+                    message.Append(" There is an error with the web service URL: " + webURL + " Please check that it is valid and the web service is configured correctly.<br/>");
                 }
             }
             if (error)
@@ -780,7 +808,7 @@ namespace iLabs.Controls
                 // Check if domain is set if so only update mutable Fields
                 dbTicketing.SelfRegisterProcessAgent(txtServiceGuid.Text.Trim(),
                     txtServiceName.Text, lblServiceType.Text, null,
-                    txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
+                    txtCodebaseUrl.Text.Trim(), webURL);
                 if (AgentType == ProcessAgentType.SERVICE_BROKER)
                 {
                     dbTicketing.SetDomainGuid(txtServiceGuid.Text.Trim());
