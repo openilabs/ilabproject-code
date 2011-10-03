@@ -41,7 +41,7 @@ namespace iLabs.ServiceBroker.Internal
 			DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("NativePrincipal_Create", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userName",userName,DbType.String,256));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter("@userName",userName,DbType.String,256));
 			try
 			{
 				myConnection.Open();
@@ -66,7 +66,7 @@ namespace iLabs.ServiceBroker.Internal
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("NativePrincipal_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",null,DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID",null,DbType.Int32));
 
 			/*
 			 * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
@@ -157,8 +157,8 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("NativePassword_Update", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",userID,DbType.Int32));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@password",password,DbType.AnsiString));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID",userID,DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter("@password",password,DbType.AnsiString));
 
 			try 
 			{
@@ -191,7 +191,7 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("NativePassword_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			
-			myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@userID",userID,DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID",userID,DbType.Int32));
 			
 			try 
 			{

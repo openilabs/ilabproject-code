@@ -14,6 +14,7 @@ namespace iLabs.Core
         static private DateTime minDbDate;
         static private DateTime maxDbDate;
         static private DbProviderFactory theFactory;
+        static private bool stripName = false;
 
         static FactoryDB(){
             // try to read connection and provider strings from the app settings
@@ -33,12 +34,23 @@ namespace iLabs.Core
             {
                 connectionStr = null;
             }
-            // Should group this with th providerString processing only sqlServer for now
-            minDbDate = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            maxDbDate = new DateTime(9999, 12, 31, 23, 59, 59, DateTimeKind.Utc);
+           
 
             if (providerStr != null && !providerStr.Equals(""))
             {
+
+                if (providerStr.CompareTo("System.Data.SqlClient") == 0)
+                {
+                    minDbDate = new DateTime(1753, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    maxDbDate = new DateTime(9999, 12, 31, 23, 59, 59, DateTimeKind.Utc);
+                    stripName = false;
+                }
+                else if (providerStr.CompareTo("MySql.Data.MySqlClient") == 0)
+                {
+                    minDbDate = new DateTime(1000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    maxDbDate = new DateTime(9999, 12, 31, 0, 0, 0, DateTimeKind.Utc);
+                    stripName = true;
+                }
 
                 theFactory = DbProviderFactories.GetFactory(providerStr);
             }
@@ -112,13 +124,16 @@ namespace iLabs.Core
 
         public static DbDataAdapter CreateDataAdapter()
         {
-            return new SqlDataAdapter();
+            return theFactory.CreateDataAdapter();
         }
 
-        public static DbParameter CreateParameter(DbCommand cmd, string name, DbType type)
+        public static DbParameter CreateParameter( string name, DbType type)
         {
-            DbParameter param = cmd.CreateParameter();
-            param.ParameterName = name;
+            DbParameter param = theFactory.CreateParameter();
+            if (stripName)
+                param.ParameterName = StripName(name);
+            else
+                param.ParameterName = name;
             param.DbType = type;
             return param;
         }
@@ -131,10 +146,13 @@ namespace iLabs.Core
         /// <param name="type">DbType</param>
         /// <param name="maxSize"></param>
         /// <returns></returns>
-        public static DbParameter CreateParameter(DbCommand cmd, string name, DbType type, int max)
+        public static DbParameter CreateParameter( string name, DbType type, int max)
         {
-            DbParameter param = cmd.CreateParameter();
-            param.ParameterName = name;
+            DbParameter param = theFactory.CreateParameter();
+            if (stripName)
+                param.ParameterName = StripName(name);
+            else
+                param.ParameterName = name;
             param.DbType = type;
             param.Size = max;
             return param;
@@ -149,10 +167,13 @@ namespace iLabs.Core
         /// DateTime values are checked and adjusted to Database min or max if needed.</param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type)
+        public static DbParameter CreateParameter( string name, object value, DbType type)
         {
-            DbParameter param = cmd.CreateParameter();
-            param.ParameterName = name;
+            DbParameter param = theFactory.CreateParameter();
+            if (stripName)
+                param.ParameterName = StripName(name);
+            else
+                param.ParameterName = name;
             param.DbType = type;
            if (value == null || value == System.DBNull.Value)
             {
@@ -187,9 +208,9 @@ namespace iLabs.Core
         /// DateTime values are checked and adjusted to Database min or max if needed.</param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type, int size)
+        public static DbParameter CreateParameter( string name, object value, DbType type, int size)
         {
-            DbParameter param = CreateParameter(cmd, name, value, type);
+            DbParameter param = CreateParameter( name, value, type);
             param.Size = size;
             return param;
         }
@@ -201,12 +222,20 @@ namespace iLabs.Core
                 return minDbDate;
             }
         }
+
         public static DateTime MaxDbDate
         {
             get
             {
                 return maxDbDate;
             }
+        }
+        public static string StripName(string name)
+        {
+            if (name.StartsWith("@"))
+                return name.Substring(1);
+            else
+                return name;
         }
     }
 }

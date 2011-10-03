@@ -27,6 +27,7 @@ namespace iLabs.Scheduling.LabSide
         int localTzOffset = 0;
         StringBuilder buf = null;
         //TimeSpan tzOffset = TimeSpan.MinValue;
+        DBManager dbManager = new DBManager();
 
         public double LocalTZ
         {
@@ -38,6 +39,7 @@ namespace iLabs.Scheduling.LabSide
 
         protected void Page_Load(object sender, EventArgs e)
         {
+           
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             localTzOffset = DateUtil.LocalTzOffset;
             userTZ = (int)Session["userTZ"];
@@ -63,8 +65,8 @@ namespace iLabs.Scheduling.LabSide
                 ddlEndHour.SelectedIndex = 0;
                 ddlStartAM.SelectedIndex = 0;
 
-                credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
-                credentialSets = LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
+                credentialSetIDs = dbManager.ListCredentialSetIDs();
+                credentialSets = dbManager.GetCredentialSets(credentialSetIDs);
                 BuildServerDropDownListBox();
 
             }
@@ -81,9 +83,9 @@ namespace iLabs.Scheduling.LabSide
             {
                 IntTag[] lsTags = null;
                 if(Session["labServerGuid"] != null)
-                    lsTags = LSSSchedulingAPI.GetLSResourceTags(Session["labServerGuid"].ToString());
+                    lsTags = dbManager.GetLSResourceTags(Session["labServerGuid"].ToString());
                 else
-                    lsTags = LSSSchedulingAPI.GetLSResourceTags();
+                    lsTags = dbManager.GetLSResourceTags();
                     ddlLabServers.Items.Add(new ListItem(" ---------- select Lab Server Resource ---------- "));
                 foreach (IntTag tag in lsTags)
                 {
@@ -316,7 +318,7 @@ namespace iLabs.Scheduling.LabSide
                 // this is just another check to throw a meaningful exception
 
                 // should only get & check recurrences on this resource
-                Recurrence[] recurs = LSSSchedulingAPI.GetRecurrence(LSSSchedulingAPI.ListRecurrenceIDsByResourceID(uStartTime, uEndTime,recur.resourceId));
+                Recurrence[] recurs = dbManager.GetRecurrences(dbManager.ListRecurrenceIDsByResourceID(uStartTime, uEndTime, recur.resourceId));
    
                 if (recurs != null && recurs.Length > 0)
                 {
@@ -339,7 +341,7 @@ namespace iLabs.Scheduling.LabSide
                 }
                 //Add recurrence accordingly
                 // if no recurrence is selected
-                int recurID = LSSSchedulingAPI.AddRecurrence(recur);
+                int recurID = dbManager.AddRecurrence(recur);
                 Session["newOccurrenceID"] = recurID;
 
                 //No longer creating TimeBlocks

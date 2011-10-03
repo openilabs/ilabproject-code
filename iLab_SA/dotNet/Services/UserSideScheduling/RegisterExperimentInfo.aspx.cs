@@ -30,16 +30,17 @@ namespace iLabs.Scheduling.UserSide
 		 UssExperimentInfo[] experimentInfos;
 		 int[] lssInfoIds;
 		 LSSInfo[] lssInfos;
+        DBManager dbManager = new DBManager();
 
         string couponID = null, passkey = null, issuerID = null, sbUrl = null; 
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this experiment Information?')== false) return false;");
-			experimentInfoIds=USSSchedulingAPI.ListExperimentInfoIDs();
-			experimentInfos=USSSchedulingAPI.GetExperimentInfos(experimentInfoIds);
-			lssInfoIds=USSSchedulingAPI.ListLSSInfoIDs();
-			lssInfos=USSSchedulingAPI.GetLSSInfos(lssInfoIds);
+			experimentInfoIds=dbManager.ListExperimentInfoIDs();
+			experimentInfos=dbManager.GetExperimentInfos(experimentInfoIds);
+			lssInfoIds=dbManager.ListLSSInfoIDs();
+			lssInfos=dbManager.GetLSSInfos(lssInfoIds);
 
 			if(!IsPostBack)
 			{
@@ -70,9 +71,7 @@ namespace iLabs.Scheduling.UserSide
                     try
                     {
                         Coupon coupon = new Coupon(issuerID, long.Parse(couponID), passkey);
-
-                        ProcessAgentDB dbTicketing = new ProcessAgentDB();
-                        Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.ADMINISTER_USS);
+                        Ticket ticket = dbManager.RetrieveAndVerify(coupon, TicketTypes.ADMINISTER_USS);
 
                         if (ticket.IsExpired() || ticket.isCancelled)
                         {
@@ -146,8 +145,8 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		private void InitializeExperimentDropDown()
 		{
-			experimentInfoIds = USSSchedulingAPI.ListExperimentInfoIDs();
-			experimentInfos = USSSchedulingAPI.GetExperimentInfos(experimentInfoIds);
+			experimentInfoIds = dbManager.ListExperimentInfoIDs();
+			experimentInfos = dbManager.GetExperimentInfos(experimentInfoIds);
 			
 			ddlExperiment.Items.Clear();
 
@@ -322,7 +321,7 @@ namespace iLabs.Scheduling.UserSide
 				int savedIndexforLSS=ddlLSS.SelectedIndex;
 				try
 				{
-                    experimentInfoId = USSSchedulingAPI.AddExperimentInfo(txtLabServerID.Text, txtLabServerName.Text, txtClientGuid.Text, txtLabClientName.Text, txtLabClinetVersion.Text, txtProviderName.Text, ddlLSS.SelectedValue);
+                    experimentInfoId = dbManager.AddExperimentInfo(txtLabServerID.Text, txtLabServerName.Text, txtClientGuid.Text, txtLabClientName.Text, txtLabClinetVersion.Text, txtProviderName.Text, ddlLSS.SelectedValue);
 				}
 				catch (Exception ex)
 				{
@@ -364,7 +363,7 @@ namespace iLabs.Scheduling.UserSide
 				try
 				{
 					// Modify the Experiment
-                    USSSchedulingAPI.ModifyExperimentInfo(experimentInfoId, txtLabServerID.Text, txtClientGuid.Text, txtLabServerName.Text, txtLabClientName.Text, txtLabClinetVersion.Text, txtProviderName.Text, ddlLSS.SelectedValue);
+                    dbManager.ModifyExperimentInfo(experimentInfoId, txtLabServerID.Text, txtClientGuid.Text, txtLabServerName.Text, txtLabClientName.Text, txtLabClinetVersion.Text, txtProviderName.Text, ddlLSS.SelectedValue);
 					lblErrorMessage.Visible = true;
 					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Experiment " + txtLabClientName.Text + " : " + txtLabClinetVersion.Text + " has been modified.");
 					
@@ -397,7 +396,7 @@ namespace iLabs.Scheduling.UserSide
 				experimentInfoId = experimentInfos[ddlExperiment.SelectedIndex-1].experimentInfoId;
 				try
 				{
-					USSSchedulingAPI.RemoveExperimentInfo(new int[]{experimentInfoId});
+					dbManager.RemoveExperimentInfo(new int[]{experimentInfoId});
 					lblErrorMessage.Visible = true;
 					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Experiment '" +txtLabClientName.Text + " : " + txtLabClinetVersion.Text + "' has been deleted");
 					InitializeExperimentDropDown();

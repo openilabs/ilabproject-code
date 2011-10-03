@@ -53,7 +53,7 @@ namespace iLabs.Scheduling.UserSide
          Coupon coupon;
          int userTZ;
         CultureInfo culture;
-        ProcessAgentDB dbTicketing = new ProcessAgentDB();
+        DBManager dbManager = new DBManager();
         List<TimePeriod> periods = null;
         int defaultRange = 30;
         int quantum;
@@ -140,10 +140,10 @@ namespace iLabs.Scheduling.UserSide
                 Session["startTime"] = startTime;
                 endTime = DateUtil.ParseUtc(value2);
                 Session["endTime"] = endTime;
-                int[] policyIDs = USSSchedulingAPI.ListUSSPolicyIDsByGroupAndExperiment(groupName, serviceBrokerGuid, clientGuid, labServerGuid);
+                int[] policyIDs = dbManager.ListUSSPolicyIDsByGroupAndExperiment(groupName, serviceBrokerGuid, clientGuid, labServerGuid);
                 for (int i = 0; i < policyIDs.Length; i++)
                 {
-                    USSPolicy pol = USSSchedulingAPI.GetUSSPolicies(new int[] { policyIDs[i] })[0];
+                    USSPolicy pol = dbManager.GetUSSPolicies(new int[] { policyIDs[i] })[0];
                     string maxstr = PolicyParser.getProperty(pol.rule, "Maximum reservable time");
                     if (maxstr != null)
                     {
@@ -331,7 +331,7 @@ namespace iLabs.Scheduling.UserSide
                 {
                     try
                     {
-                        int status = USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid, groupName, labServerGuid, clientGuid, 
+                        int status = dbManager.AddReservation(userName, serviceBrokerGuid, groupName, labServerGuid, clientGuid, 
                             startReserveTime, endReserveTime);
                         string confirm = "The reservation from<br />" + DateUtil.ToUserTime(startReserveTime,culture,userTZ)
                             + " to " + DateUtil.ToUserTime(endReserveTime, culture, userTZ) + "<br />is confirmed.";
@@ -357,7 +357,7 @@ namespace iLabs.Scheduling.UserSide
             {
                 if (notification == "The reservation is confirmed successfully")
                 {
-                    int experimentInfoId = USSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+                    int experimentInfoId = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
                     DateTime startTimeUTC = startReserveTime.ToUniversalTime();
                     DateTime endTimeUTC = endReserveTime.ToUniversalTime();
                 }

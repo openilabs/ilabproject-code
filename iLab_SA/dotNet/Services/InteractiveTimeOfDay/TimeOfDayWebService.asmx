@@ -40,6 +40,7 @@ namespace iLabs.LabServer.TimeOfDay
 
         public OperationAuthHeader opHeader = new OperationAuthHeader();
         ExperimentStorageProxy essInterface = new ExperimentStorageProxy();
+        ProcessAgentDB dbTicketing = new ProcessAgentDB();
 
         [WebMethod(EnableSession=true)]
         [SoapDocumentMethod(Binding = "ITimeOfDay")]

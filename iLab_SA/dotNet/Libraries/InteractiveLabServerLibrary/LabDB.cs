@@ -89,28 +89,28 @@ namespace iLabs.LabServer.Interactive
                 DbCommand cmd = FactoryDB.CreateCommand("InsertLabApp", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
               
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@title", title,DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", appGuid, DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@version", version, DbType.String, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appKey", appKey, DbType.String, 100));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@path", path, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@application", application, DbType.String, 100));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@page", page, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cgi", cgi,DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@width",width, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@height", height,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@datasource", datasource, DbType.String));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@server", server,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@title", title,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", appGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@version", version, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@appKey", appKey, DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@path", path, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@application", application, DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@page", page, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@cgi", cgi,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@width",width, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@height", height,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@datasource", datasource, DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@server", server,DbType.String, 256));
                 if (port > 0)
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", port,DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@port", port,DbType.Int32));
                 else
-                   cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", null, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@contact", contact, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@description", description, DbType.String, 2048));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@comment", comment,DbType.String,2048));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@extra", extra,DbType.String));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rev", rev, DbType.String, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.Int32));
+                   cmd.Parameters.Add(FactoryDB.CreateParameter("@port", null, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@contact", contact, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@comment", comment,DbType.String,2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@extra", extra,DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@rev", rev, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@type", type, DbType.Int32));
                 
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
@@ -152,29 +152,29 @@ namespace iLabs.LabServer.Interactive
                 // create sql command
                 DbCommand cmd = FactoryDB.CreateCommand("ModifyLabApp", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@title", title,DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", appGuid,DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@version", version, DbType.String, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appKey", appKey,DbType.String, 100));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@path", path,DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@application", application,DbType.String, 100));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@page", page, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cgi", cgi,DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@width", width,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@height", height, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@datasource", datasource, DbType.String));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@server", server, DbType.String, 256));  
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@appId", appId,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@title", title,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", appGuid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@version", version, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@appKey", appKey,DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@path", path,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@application", application,DbType.String, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@page", page, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@cgi", cgi,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@width", width,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@height", height, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@datasource", datasource, DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@server", server, DbType.String, 256));  
                 if (port > 0)
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", port, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@port", port, DbType.Int32));
                 else
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@port", null, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@contact", contact, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@description", description, DbType.String, 2048));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@comment", comment,DbType.String, 2048));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@extra", extra,DbType.String));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rev", rev,DbType.String, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@port", null, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@contact", contact, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@comment", comment,DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@extra", extra,DbType.String));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@rev", rev,DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@type", type, DbType.Int32));
                
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
@@ -204,8 +204,8 @@ namespace iLabs.LabServer.Interactive
                 DbCommand cmd = FactoryDB.CreateCommand("ModifyLabPaths", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@oldPath", oldPath,DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@newPath", newPath,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@oldPath", oldPath,DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@newPath", newPath,DbType.String, 256));
             
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
@@ -233,7 +233,7 @@ namespace iLabs.LabServer.Interactive
                 // create sql command
                 DbCommand cmd = FactoryDB.CreateCommand("RemoveLabApp", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@appId", appId, DbType.Int32));
                
                 connection.Open();
                 Object obj = cmd.ExecuteScalar();
@@ -314,7 +314,7 @@ namespace iLabs.LabServer.Interactive
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@appId", appId, DbType.Int32));
 			
 			DbDataReader dataReader = null;
 			try 
@@ -352,7 +352,7 @@ namespace iLabs.LabServer.Interactive
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@appKey", appKey, DbType.String, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@appKey", appKey, DbType.String, 100));
 			
 			DbDataReader dataReader = null;
             try
@@ -388,7 +388,7 @@ namespace iLabs.LabServer.Interactive
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appId", appId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@appId", appId, DbType.Int32));
 			
 			DbDataReader dataReader = null;
 			try 
@@ -454,7 +454,7 @@ namespace iLabs.LabServer.Interactive
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@appKey", appKey, DbType.String, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@appKey", appKey, DbType.String, 100));
 
             DbDataReader dataReader = null;
             try
@@ -593,8 +593,8 @@ namespace iLabs.LabServer.Interactive
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupName", groupName,DbType.String, 256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", serviceGUID, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@groupName", groupName,DbType.String, 256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", serviceGUID, DbType.AnsiString,50));
             
 			DbDataReader dataReader = null;
 			try 
@@ -662,22 +662,22 @@ namespace iLabs.LabServer.Interactive
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@appid", app_id, DbType.Int32));	
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@appid", app_id, DbType.Int32));	
             if(exp_id < 1)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@expid", null, DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@expid", null, DbType.Int64));
             else
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@expid", exp_id, DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName,DbType.String,256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@expid", exp_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName,DbType.String,256));
              // This must be in UTC
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime,DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", startTime,DbType.DateTime));
             if (duration > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime",startTime.AddTicks(duration * TimeSpan.TicksPerSecond), DbType.DateTime));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime",startTime.AddTicks(duration * TimeSpan.TicksPerSecond), DbType.DateTime));
             else
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime",DateTime.MinValue, DbType.DateTime));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", status,DbType.Int32));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon_ID,DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuidStr, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@data", data,DbType.String,2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime",DateTime.MinValue, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@status", status,DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon_ID,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", issuerGuidStr, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@data", data,DbType.String,2048));
 			
             // id of created task
             long itemID = -1;
@@ -722,7 +722,7 @@ namespace iLabs.LabServer.Interactive
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@taskid",task_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@taskid",task_id, DbType.Int64));
 			
 			DbDataReader dataReader = null;
             // id of created coupon
@@ -771,8 +771,8 @@ namespace iLabs.LabServer.Interactive
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentid", experiment_id,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sbguid", sbGUID, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentid", experiment_id,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@sbguid", sbGUID, DbType.AnsiString,50));
                         
             DbDataReader dataReader = null;
             try
@@ -883,7 +883,7 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
             cmd.CommandType = CommandType.StoredProcedure;
 			// populate parameters
            
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@targetTime", targetTime, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@targetTime", targetTime, DbType.DateTime));
 		
 			DbDataReader dataReader = null;
 			try 
@@ -934,8 +934,8 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@taskid", task_id, DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@data", data, DbType.String,2048));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@taskid", task_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@data", data, DbType.String,2048));
 			
             try
             {
@@ -970,8 +970,8 @@ update task set status = @status where taskID = @taskID
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@taskID", task_id, DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", status, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@taskID", task_id, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@status", status, DbType.Int32));
 			
 			DbDataReader dataReader = null;
             try
@@ -1111,8 +1111,8 @@ update task set status = @status where taskID = @taskID
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", id, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", issuer, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@id", id, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", issuer, DbType.AnsiString, 50));
             
             DbDataReader dataReader = null;
             try

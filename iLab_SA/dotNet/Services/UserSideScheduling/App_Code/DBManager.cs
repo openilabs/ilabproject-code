@@ -58,7 +58,7 @@ namespace iLabs.Scheduling.UserSide
             if (agent.type == ProcessAgentType.LAB_SCHEDULING_SERVER)
             {
                 // LSS path, & name in LSS_Info
-                DBManager.ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl);
+                ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl);
             }
             return status;
 
@@ -117,7 +117,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="experimentInfoId"></param>
         /// <param name="rule"></param>
         /// <returns></returns>the index ID of the USSPolicy added,>0 successfully added, ==-1 otherwise
-        public static int AddUSSPolicy(string groupName, string serviceBrokerGuid, int experimentInfoId, string rule)
+        public int AddUSSPolicy(string groupName, string serviceBrokerGuid, int experimentInfoId, string rule)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
@@ -126,10 +126,10 @@ namespace iLabs.Scheduling.UserSide
             DbCommand cmd = FactoryDB.CreateCommand("AddUSSPolicy", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rule", rule, DbType.AnsiString, 2048));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", experimentInfoId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@rule", rule, DbType.AnsiString, 2048));
             
             int i = -1;
 
@@ -160,7 +160,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="ussPolicyIds"></param>
         /// <returns></returns>the IDs of all UssPolicies not successfully removed
 
-        public static int[] RemoveUSSPolicy(int[] ussPolicyIds)
+        public int[] RemoveUSSPolicy(int[] ussPolicyIds)
         {
             ArrayList arrayList = new ArrayList();
             //create a connection
@@ -169,7 +169,7 @@ namespace iLabs.Scheduling.UserSide
             //command executes the "deleteUSSPolicy" store procedure
             DbCommand cmd = FactoryDB.CreateCommand("DeleteUSSPolicy", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussPolicyId", null, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ussPolicyId", null, DbType.Int32));
             // execute the command
             try
             {
@@ -203,7 +203,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="rule"></param>
         /// <returns></returns>if updated succesfully, return ture, otherwise, return false
 
-        public static bool ModifyUSSPolicy(int ussPolicyId, int experimentInfoId, string rule, int credentialSetId)
+        public bool ModifyUSSPolicy(int ussPolicyId, int experimentInfoId, string rule, int credentialSetId)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
@@ -212,10 +212,10 @@ namespace iLabs.Scheduling.UserSide
             DbCommand cmd = FactoryDB.CreateCommand("ModifyUSSPolicy", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussPolicyId", ussPolicyId, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoID", experimentInfoId, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@rule", rule, DbType.AnsiString, 2048));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetId", credentialSetId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ussPolicyId", ussPolicyId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoID", experimentInfoId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@rule", rule, DbType.AnsiString, 2048));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@credentialSetId", credentialSetId, DbType.Int32));
            
             bool i = false;
 
@@ -250,7 +250,7 @@ namespace iLabs.Scheduling.UserSide
         /// enumerates all IDs of the User side Scheduling Policies 
         /// </summary>
         /// <returns></returns>an array of ints containing the IDs of all the USSPolicies
-        public static int[] ListUSSPolicyIDs()
+        public int[] ListUSSPolicyIDs()
         {
             int[] ussPolicyIds;
             // create sql connection
@@ -294,7 +294,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="groupName"></param>
         /// <param name="serviceBrokerGuid"></param>
         /// <returns></returns>an array of ints containing the IDs of all the USSPolicies applying for the users with a particular credential set
-        public static int[] ListUSSPolicyIDsByGroup(string groupName, string serviceBrokerGuid)
+        public int[] ListUSSPolicyIDsByGroup(string groupName, string serviceBrokerGuid)
         {
             int[] ussPolicyIds;
             // create sql connection
@@ -306,8 +306,8 @@ namespace iLabs.Scheduling.UserSide
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
 
             // execute the command
             DbDataReader dataReader = null;
@@ -344,7 +344,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="groupName"></param>
         /// <param name="serviceBrokerGuid"></param>
         /// <returns></returns>an array of ints containing the IDs of all the USSPolicies applying for the users with a particular credential set to execute a particular experiment
-        public static int[] ListUSSPolicyIDsByGroupAndExperiment(string groupName, string serviceBrokerGuid, string clientGuid, string labServerGuid)
+        public int[] ListUSSPolicyIDsByGroupAndExperiment(string groupName, string serviceBrokerGuid, string clientGuid, string labServerGuid)
         {
             int[] ussPolicyIds;
             // create sql connection
@@ -356,10 +356,10 @@ namespace iLabs.Scheduling.UserSide
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@clientGuid", clientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGuid", labServerGuid, DbType.AnsiString, 50));
             
             // execute the command
             DbDataReader dataReader = null;
@@ -394,7 +394,7 @@ namespace iLabs.Scheduling.UserSide
         /// </summary>
         /// <param name="ussPolicyIds"></param>
         /// <returns></returns>
-        public static USSPolicy[] GetUSSPolicies(int[] ussPolicyIds)
+        public USSPolicy[] GetUSSPolicies(int[] ussPolicyIds)
         {
             USSPolicy[] ussPolicies = new USSPolicy[ussPolicyIds.Length];
             for (int i = 0; i < ussPolicyIds.Length; i++)
@@ -408,7 +408,7 @@ namespace iLabs.Scheduling.UserSide
             // command executes the "RetrieveUSSPolicyByID" stored procedure
             DbCommand cmd = FactoryDB.CreateCommand("RetrieveUSSPolicyByID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ussPolicyId", null, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ussPolicyId", null, DbType.Int32));
             //execute the command
             try
             {
@@ -457,13 +457,14 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="startTime"></param>
 		/// <param name="endTime"></param>
 		/// <returns></returns>the unique id which identifies the reservation added by the user,>0 successfully added, ==-1 otherwise
-        public static int AddReservation(string userName, string serviceBrokerGuid, string groupName,
+        public int AddReservation(string userName, string serviceBrokerGuid, string groupName,
             string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
         {
-            int experId = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+            DBManager dbManager = new DBManager();
+            int experId = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (experId > 0)
             {
-                return DBManager.AddReservation(userName, serviceBrokerGuid, groupName,
+                return dbManager.AddReservation(userName, serviceBrokerGuid, groupName,
                    experId, startTime, endTime);
             }
             else return 0;
@@ -478,7 +479,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="startTime"></param>
 		/// <param name="endTime"></param>
 		/// <returns></returns>the unique id which identifies the reservation added by the user,>0 successfully added, ==-1 otherwise
-        public static int AddReservation(string userName, string serviceBrokerGuid, string groupName, int experimentInfoId, DateTime startTime, DateTime endTime)
+        public int AddReservation(string userName, string serviceBrokerGuid, string groupName, int experimentInfoId, DateTime startTime, DateTime endTime)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -487,12 +488,12 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("AddReservation",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@userName", userName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", experimentInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", startTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", endTime, DbType.DateTime));
 			
 			int i=-1;
 
@@ -516,12 +517,55 @@ namespace iLabs.Scheduling.UserSide
 			}	
 			return i;		
 		}
+
+        /// <summary>
+        /// Returns an existing ReservationInfo or null, indicating whether it is the right time for a particular user to execute a particular experiment
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <returns></returns>true if it is the right time for a particular user to execute a particular experiment
+        public ReservationInfo RedeemReservation(String userName, String serviceBrokerGuid, String clientGuid, String labServerGuid)
+        {
+            return RedeemReservation(userName, serviceBrokerGuid, clientGuid, labServerGuid, DateTime.UtcNow);
+
+        }
+
+        /// <summary>
+        /// Returns an existing ReservationInfo or null, indicating whether it is the right time for a particular user to execute a particular experiment
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="serviceBrokerGuid"></param>
+        /// <param name="clientGuid"></param>
+        /// <param name="labServerGuid"></param>
+        /// <returns></returns>true if it is the right time for a particular user to execute a particular experiment
+        public ReservationInfo RedeemReservation(String userName, String serviceBrokerGuid,
+            String clientGuid, String labServerGuid, DateTime targetTime)
+        {
+            ReservationInfo redeemedRes = null;
+            try
+            {
+                int i = ListReservationIDByUser(userName, serviceBrokerGuid, clientGuid, labServerGuid, targetTime);
+                if (i > 0)
+                {
+                    redeemedRes = GetReservationInfos(new int[] { i })[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in RedeemReservation", ex);
+            }
+
+            return redeemedRes;
+
+        }
 		/// <summary>
 		/// delete the reservations specified by the reservationIDs
 		/// </summary>
 		/// <param name="reservationIDs"></param>
 		/// <returns></returns>an array of ints containing the IDs of all reservation not successfully removed
-		public static int[] RemoveReservation(int[] reservationIDs)
+		public int[] RemoveReservation(int[] reservationIDs)
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
@@ -530,7 +574,7 @@ namespace iLabs.Scheduling.UserSide
 			//command executes the "DeleteReservation" store procedure
 			DbCommand cmd=FactoryDB.CreateCommand("DeleteReservation",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@reservationID", null, DbType.Int32));
 			// execute the command
 			try
 			{
@@ -556,6 +600,36 @@ namespace iLabs.Scheduling.UserSide
 			int[] uIDs = Utilities.ArrayListToIntArray(arrayList);
 			return uIDs;			
 		}
+
+        /// <summary>
+        /// remove all the reservation for certain lab server being covered by the revocation time 
+        /// </summary>
+        /// <param name="labServerGuid"></param>
+        /// <param name="startTime"></param>the local time of USS
+        /// <param name="endTime"></param>the local time of USS
+        /// <returns></returns>true if all the reservations have been removed successfully
+        public bool RevokeReservation(string serviceBrokerGuid, string groupName,
+            string labServerGuid, string labClientGuid,
+            DateTime startTime, DateTime endTime, string message)
+        {
+            try
+            {
+                bool i = false;
+                DateTime startTimeUTC = startTime.ToUniversalTime();
+                DateTime endTimeUTC = endTime.ToUniversalTime();
+                int[] resIDs = ListReservationIDsByLabServer(labServerGuid, startTimeUTC, endTimeUTC);
+                int[] unRemovedResIDs = RemoveReservation(resIDs);
+                if (unRemovedResIDs.Length == 0)
+                {
+                    i = true;
+                }
+                return i;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in RevokeReservation", ex);
+            }
+        }
 /// <summary>
 /// updates the data fields for the reservation specified by the reservationID
 /// </summary>
@@ -564,7 +638,7 @@ namespace iLabs.Scheduling.UserSide
 /// <param name="startTime"></param>
 /// <param name="endTime"></param>
 /// <returns></returns>ture if updated successfully, false otherwise
-		public static bool ModifyReservation(int reservationID,int experimentInfoId,DateTime startTime,DateTime endTime)
+		public bool ModifyReservation(int reservationID,int experimentInfoId,DateTime startTime,DateTime endTime)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -573,10 +647,10 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("ModifyReservation",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", reservationID, DbType.Int32));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@reservationID", reservationID, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", experimentInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", startTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", endTime, DbType.DateTime));
 			
 			bool i=false;
 			// execute the command
@@ -618,7 +692,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public static int[] GetReservationInfoIds(string sbGuid, string userName, string groupName,
+        public int[] GetReservationInfoIds(string sbGuid, string userName, string groupName,
            string lsGuid, string clientGuid, DateTime start, DateTime end)
         {
             List<int> resIDs = new List<int>();
@@ -633,7 +707,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <returns></returns>an array of ints containing the IDs of all the reservation made by the specified user
 
-        public static int[] ListReservationIDsByUser(string userName, string serviceBrokerGuid, int experimentInfoId)
+        public int[] ListReservationIDsByUser(string userName, string serviceBrokerGuid, int experimentInfoId)
 		{
 			int[] reservationIDs;
 			// create sql connection
@@ -645,9 +719,9 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@userName", userName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", experimentInfoId, DbType.Int32));
 			
 			// execute the command
 			DbDataReader dataReader = null;
@@ -683,7 +757,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="groupName"></param>
         /// <param name="serviceBrokerGuid"></param>
 		/// <returns></returns>an array of ints containing the IDs of all the reservations for the specified lab server made by the specified user
-        public static int[] ListReservationIDsByGroup(string groupName, string serviceBrokerGuid)
+        public int[] ListReservationIDsByGroup(string groupName, string serviceBrokerGuid)
 		{
 			int[] reservationIDs;
 			// create sql connection
@@ -695,8 +769,8 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));			
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String,256));			
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
            
 			// execute the command
 			DbDataReader dataReader = null;
@@ -734,7 +808,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="startTime"></param>
 		/// <param name="endTime"></param>
 		/// <returns></returns>/* An array of ints containing the IDs of the reservations made on the particular lab server during a particular time period 
-        public static int[] ListReservationIDsByLabServer(string labServerGuid, DateTime startTime, DateTime endTime)
+        public int[] ListReservationIDsByLabServer(string labServerGuid, DateTime startTime, DateTime endTime)
 		{
 			int[] reservationIDs;
 			// create sql connection
@@ -746,9 +820,9 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@startTime", startTime, DbType.DateTime));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@endTime", endTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGUID", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", startTime, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", endTime, DbType.DateTime));
 			
 			// execute the command
 			DbDataReader dataReader = null;
@@ -788,7 +862,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="labClientVersion"></param>
         /// <param name="time"></param>
         /// <returns></returns>the ID of the reservation if the requested reservation does exist, -1 otherwise
-        public static int ListReservationIDByUser(string userName, string serviceBrokerGuid, string clientGuid, string labServerGuid, DateTime time)
+        public int ListReservationIDByUser(string userName, string serviceBrokerGuid, string clientGuid, string labServerGuid, DateTime time)
 		{
 			int i= 0;
 			// create sql connection
@@ -800,11 +874,11 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGuid", serviceBrokerGuid,DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@timeUTC", time, DbType.DateTime));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@userName", userName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGuid", serviceBrokerGuid,DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@clientGuid", clientGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGuid", labServerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@timeUTC", time, DbType.DateTime));
 			
 			// execute the command
 			try 
@@ -839,7 +913,7 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		/// <param name="reservationIDs"></param>
 		/// <returns></returns>
-		public static ReservationInfo[] GetReservationInfos(int[] reservationIDs)
+		public ReservationInfo[] GetReservationInfos(int[] reservationIDs)
 		{
 			ReservationInfo[] reservations=new ReservationInfo[reservationIDs.Length];
 			for(int i=0; i<reservationIDs.Length;i++)
@@ -853,7 +927,7 @@ namespace iLabs.Scheduling.UserSide
 			// command executes the "RetrieveReservationByID" stored procedure
             DbCommand cmd = FactoryDB.CreateCommand("RetrieveReservationByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@reservationID", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@reservationID", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -893,7 +967,17 @@ namespace iLabs.Scheduling.UserSide
 			return reservations;
 		}
 
-        public static ReservationData[] GetReservations(string sbGuid, string userName, string groupName,
+        /// <summary>
+        /// returns an array of the immutable reservation objects that correspond to the supplied reservation IDs
+        /// </summary>
+        /// <param name="reservationIDs"></param>
+        /// <returns></returns>
+        public ReservationInfo[] GetReservations(int[] reservationIDs)
+        {
+            return GetReservationInfos(reservationIDs);
+        }
+
+        public ReservationData[] GetReservations(string sbGuid, string userName, string groupName,
      string lsGuid, string clientGuid, DateTime start, DateTime end)
         {
             List<ReservationData> reservations = new List<ReservationData>();
@@ -903,19 +987,19 @@ namespace iLabs.Scheduling.UserSide
             cmd = FactoryDB.CreateCommand("RetrieveReservations", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             if (sbGuid != null && sbGuid.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@sbGuid", sbGuid, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@sbGuid", sbGuid, DbType.String, 50));
             if (userName != null && userName.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@userName", userName, DbType.String, 256));
             if (groupName != null && groupName.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupName", groupName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@groupName", groupName, DbType.String, 256));
             if (lsGuid != null && lsGuid.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGuid", lsGuid, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@labServerGuid", lsGuid, DbType.String, 50));
             if (clientGuid != null && clientGuid.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@clientGuid", clientGuid, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@clientGuid", clientGuid, DbType.String, 50));
             if (start != null)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", start, DbType.DateTime));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@start", start, DbType.DateTime));
             if (end != null)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@end", end, DbType.DateTime));
 
             DbDataReader dataReader = null;
             try
@@ -966,7 +1050,7 @@ namespace iLabs.Scheduling.UserSide
         /// <summary>
         /// to select reservation according to given criterion
         /// </summary>
-        public static ReservationInfo[] GetReservationInfos(string sbGuid, string userName, string groupName,
+        public ReservationInfo[] GetReservationInfos(string sbGuid, string userName, string groupName,
             string lsGuid, string clientGuid, DateTime start, DateTime end)
         {
             List<ReservationInfo> reservations = new List<ReservationInfo>();
@@ -976,19 +1060,19 @@ namespace iLabs.Scheduling.UserSide
             cmd = FactoryDB.CreateCommand("RetrieveReservationInfos", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             if(sbGuid != null && sbGuid .Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@sbGuid", sbGuid, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@sbGuid", sbGuid, DbType.String, 50));
             if (userName != null && userName.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@userName", userName, DbType.String, 256));
             if (groupName != null && groupName.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupName", groupName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@groupName", groupName, DbType.String, 256));
             if (lsGuid != null && lsGuid.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGuid", lsGuid, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@labServerGuid", lsGuid, DbType.String, 50));
             if (clientGuid != null && clientGuid.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@clientGuid", clientGuid, DbType.String, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@clientGuid", clientGuid, DbType.String, 50));
             if(start != null)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@start", start, DbType.DateTime));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@start", start, DbType.DateTime));
             if(end != null)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@end", end, DbType.DateTime));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@end", end, DbType.DateTime));
             
             DbDataReader dataReader = null;
             try
@@ -1028,7 +1112,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <summary>
 		/// to select reservation accorrding to given criterion
 		/// </summary>
-        public static ReservationInfo[] GetReservationInfos(string userName, int experimentInfoId, int credentialSetId, DateTime start, DateTime end)
+        public ReservationInfo[] GetReservationInfos(string userName, int experimentInfoId, int credentialSetId, DateTime start, DateTime end)
         {
             List<ReservationInfo> reservations = new List<ReservationInfo>();
             int action = 0;
@@ -1078,35 +1162,35 @@ namespace iLabs.Scheduling.UserSide
                     break;
             }
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@start", start, DbType.DateTime));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@end", end, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@start", start, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@end", end, DbType.DateTime));
             switch (action)
             {
                 case 0:
                     break;
                 case 1:
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experInfoID", experimentInfoId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@experInfoID", experimentInfoId, DbType.Int32));
                     break;
                 case 2:
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@credSetID", credentialSetId, DbType.Int32));
                     break;
                 case 3:
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experInfoID", experimentInfoId, DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@experInfoID", experimentInfoId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@credSetID", credentialSetId, DbType.Int32));
                     break;
                 case 4:
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter( "@userName", userName, DbType.String, 256));
                     break;
                 case 5:
                     break;
                 case 6:
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId,DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@userName", userName, DbType.String, 256));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@credSetID", credentialSetId,DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter( "@userName", userName, DbType.String, 256));
                     break;
                 case 7:
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experInfoID", experimentInfoId, DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credSetID", credentialSetId, DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@userName", userName, DbType.String, 256));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@experInfoID", experimentInfoId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@credSetID", credentialSetId, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@userName", userName, DbType.String, 256));
                     break;
                 default:
                     break;
@@ -1144,6 +1228,30 @@ namespace iLabs.Scheduling.UserSide
             return reservations.ToArray();
         }
 
+        /// <summary>
+        /// Return the time span the user should wait till the start time of the reservation
+        /// </summary>
+        /// <param name="reservationID"></param>the reservation ID to be checked
+        /// <returns></returns>
+        public TimeSpan GetReservationWaitTime(int reservationID)
+        {
+            ReservationInfo redeemedRes = new ReservationInfo();
+            TimeSpan ts = new TimeSpan();
+            try
+            {
+                redeemedRes = GetReservationInfos(new int[] { reservationID })[0];
+                DateTime startTime = redeemedRes.startTime.ToLocalTime();
+                ts = startTime.Subtract(DateTime.Now);
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in RedeemReservation", ex);
+            }
+
+            return ts;
+
+        }
 
 		    /* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information
@@ -1159,7 +1267,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
 		/// <returns></returns>the unique ID which identifies the experiment added,>0 successfully added,==-1 otherwise
-        public static int AddExperimentInfo(string labServerGuid, string labServerName,
+        public int AddExperimentInfo(string labServerGuid, string labServerName,
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
 			//create a connection
@@ -1169,13 +1277,13 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("AddExperimentInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientGUID", labClientGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerName", labServerName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientVersion", labClientVersion, DbType.String,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientName", labClientName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@providerName", providerName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientGUID", labClientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGUID", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerName", labServerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientVersion", labClientVersion, DbType.String,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientName", labClientName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@providerName", providerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString,50));
            
 			int i=-1;
 
@@ -1204,7 +1312,7 @@ namespace iLabs.Scheduling.UserSide
 /// </summary>
 /// <param name="experimentInfoIds"></param>
 /// <returns></returns>an array of ints containing the IDs of all experiments not successfully removed
-		public static int[] RemoveExperimentInfo(int[] experimentInfoIds)
+		public int[] RemoveExperimentInfo(int[] experimentInfoIds)
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
@@ -1213,7 +1321,7 @@ namespace iLabs.Scheduling.UserSide
 			//command executes the "DeleteExperimentInfo" store procedure
 			DbCommand cmd=FactoryDB.CreateCommand("DeleteExperimentInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", null, DbType.Int32));
 			// execute the command
 			try
 			{
@@ -1243,7 +1351,7 @@ namespace iLabs.Scheduling.UserSide
 		///Enumerates IDs of all the experimentInfos 
 		/// </summary>
 		/// <returns></returns> An array of ints containing the IDs of all the experimentInfos 
-		public static int[] ListExperimentInfoIDs()
+		public int[] ListExperimentInfoIDs()
 		{
 			int[] experimentInfoIds;
 			// create sql connection
@@ -1288,7 +1396,7 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		/// <param name="experimentInfoIds"></param>
 		/// <returns></returns>
-		public static UssExperimentInfo[] GetExperimentInfos(int[] experimentInfoIds)
+		public UssExperimentInfo[] GetExperimentInfos(int[] experimentInfoIds)
 		{
 			UssExperimentInfo[] experimentInfos=new UssExperimentInfo[experimentInfoIds.Length];
 			for(int i=0; i<experimentInfoIds.Length;i++)
@@ -1302,7 +1410,7 @@ namespace iLabs.Scheduling.UserSide
 			// command executes the "RetrieveExperimentInfoByID" stored procedure
 			DbCommand cmd = FactoryDB.CreateCommand("RetrieveExperimentInfoByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -1351,7 +1459,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="labClientName"></param>
 		/// <param name="labClientVersion"></param>
 		/// <returns></returns>the ID of the information of a particular experiment, -1 if such a experiment info can not be retrieved
-		public static int ListExperimentInfoIDByExperiment(string labServerGuid, string clientGuid)
+		public int ListExperimentInfoIDByExperiment(string labServerGuid, string clientGuid)
 		{
 			int experimentInfoId=-1;
 			// create sql connection
@@ -1363,8 +1471,8 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@clientGuid", clientGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGuid", labServerGuid, DbType.AnsiString,50));
 			
 			// execute the command
 			
@@ -1395,7 +1503,7 @@ namespace iLabs.Scheduling.UserSide
 		/// <param name="labClientName"></param>
 		/// <param name="labClientVersion"></param>
 		/// <returns></returns>the url of the requested LSS, null if such a experiment info can not be retrieved
-		public static string ListLssUrlByExperiment(string clientGuid,string labServerGuid)
+		public string ListLssUrlByExperiment(string clientGuid,string labServerGuid)
 		{
 			string url = null;
 			// create sql connection
@@ -1407,8 +1515,8 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@clientGuid", clientGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGuid", labServerGuid, DbType.AnsiString,50));
 			
 			// execute the command
 			
@@ -1439,7 +1547,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
         /// <returns></returns>
-        public static string ListLssIdByExperiment(string clientGuid, string labServerGuid)
+        public string ListLssIdByExperiment(string clientGuid, string labServerGuid)
         {
             string lssID = null;
             // create sql connection
@@ -1451,8 +1559,8 @@ namespace iLabs.Scheduling.UserSide
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@clientGuid", clientGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGuid", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@clientGuid", clientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGuid", labServerGuid, DbType.AnsiString, 50));
 
             // execute the command
 
@@ -1488,7 +1596,7 @@ namespace iLabs.Scheduling.UserSide
 /// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
 /// <returns></returns>true modified successfully, false otherwise
-        public static int ModifyExperimentInfo(int experimentInfoId, string labServerGuid, string labServerName, 
+        public int ModifyExperimentInfo(int experimentInfoId, string labServerGuid, string labServerName, 
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
 		{
 			//create a connection
@@ -1498,14 +1606,14 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("ModifyExperimentInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@experimentInfoId", experimentInfoId,DbType.Int32));
-		    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientGUID", labClientGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerName", labServerName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientVersion", labClientVersion, DbType.String,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientName", labClientName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@providerName", providerName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@experimentInfoId", experimentInfoId,DbType.Int32));
+		    cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientGUID", labClientGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGUID", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerName", labServerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientVersion", labClientVersion, DbType.String,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientName", labClientName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@providerName", providerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString,50));
             
 			int i=0;
 
@@ -1542,7 +1650,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="providerName"></param>
         /// <param name="lssGuid"></param>
         /// <returns></returns>true modified successfully, false otherwise
-        public static int ModifyExperimentInfo(string labServerGuid, string labServerName,
+        public int ModifyExperimentInfo(string labServerGuid, string labServerName,
             string labClientGuid, string labClientName, string labClientVersion, string providerName, string lssGuid)
         {
             //create a connection
@@ -1552,13 +1660,13 @@ namespace iLabs.Scheduling.UserSide
             DbCommand cmd = FactoryDB.CreateCommand("ModifyExperimentInfoByGuid", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientGUID", labClientGuid,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerGUID", labServerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labServerName", labServerName, DbType.String, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientVersion", labClientVersion, DbType.String, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@labClientName", labClientName, DbType.String, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@providerName", providerName, DbType.String, 25));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientGUID", labClientGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGUID", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerName", labServerName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientVersion", labClientVersion, DbType.String, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@labClientName", labClientName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@providerName", providerName, DbType.String, 25));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
             
             int i = 0;
 
@@ -1593,7 +1701,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="labServerGuid"></param>
         /// <param name="labServerName"></param>
         /// <returns></returns>true modified successfully, false otherwise
-        public static int ModifyExperimentLabServer(string labServerGuid, string labServerName)
+        public int ModifyExperimentLabServer(string labServerGuid, string labServerName)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
@@ -1603,8 +1711,8 @@ namespace iLabs.Scheduling.UserSide
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
 
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerGUID", labServerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@labServerName", labServerName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@labServerGUID", labServerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@labServerName", labServerName, DbType.String, 256));
             
             int count = -1;
 
@@ -1641,7 +1749,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssGuid"></param>
 		/// <param name="lssUrl"></param>
 		/// <returns></returns>the unique ID which identifies the LSSInfo added,>0 successfully added, ==-1 otherwise
-        public static int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -1650,9 +1758,9 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("AddLSSInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssName", lssName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssURL", lssUrl, DbType.String,512));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String,512));
 			
 			int i=-1;
 
@@ -1685,7 +1793,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
         /// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
-        public static int ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl)
+        public int ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -1694,10 +1802,10 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("ModifyLssInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssInfoId", lssInfoId, DbType.Int32));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssName", lssName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssURL", lssUrl, DbType.String,512));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssInfoId", lssInfoId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String,512));
 			
             int count = -1;
 
@@ -1732,7 +1840,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
         /// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
-        public static int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
@@ -1741,9 +1849,9 @@ namespace iLabs.Scheduling.UserSide
             DbCommand cmd = FactoryDB.CreateCommand("ModifyLssInfoByGuid", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGUID", lssGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssName", lssName, DbType.String, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssURL", lssUrl, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String, 512));
             
             int count = -1;
 
@@ -1774,7 +1882,7 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		/// <param name="lssInfoIds"></param>
 		/// <returns></returns>An array of ints containing the IDs of all LSS whose informations not successfully removed, i.e., those for which the operation failed. 
-		public static int[] RemoveLSSInfo(int[] lssInfoIds)
+		public int[] RemoveLSSInfo(int[] lssInfoIds)
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
@@ -1783,7 +1891,7 @@ namespace iLabs.Scheduling.UserSide
 			//command executes the "DeletLSSInfo" store procedure
 			DbCommand cmd=FactoryDB.CreateCommand("DeletLSSInfo",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssInfoId", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssInfoId", null, DbType.Int32));
 			// execute the command
 			try
 			{
@@ -1815,7 +1923,7 @@ namespace iLabs.Scheduling.UserSide
         /// </summary>
         /// <param name="lssInfoIds"></param>
         /// <returns></returns>An array of ints containing the IDs of all LSS whose informations not successfully removed, i.e., those for which the operation failed. 
-        public static int RemoveLSSInfoByGuid(string lssGuid)
+        public int RemoveLSSInfoByGuid(string lssGuid)
         {
             int status;
             //create a connection
@@ -1824,7 +1932,7 @@ namespace iLabs.Scheduling.UserSide
             //command executes the "DeletLSSInfoByGuid" store procedure
             DbCommand cmd = FactoryDB.CreateCommand("DeletLSSInfoByGuid", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", lssGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", lssGuid, DbType.AnsiString, 50));
             
             // execute the command
             try
@@ -1848,7 +1956,7 @@ namespace iLabs.Scheduling.UserSide
 		/// Enumerates IDs of all the lssInfos 
 		/// </summary>
 		/// <returns></returns>An array of ints containing the IDs of all the lssInfos 
-		public static int[] ListLSSInfoIDs()
+		public int[] ListLSSInfoIDs()
 		{
 			int[] lssInfoIds;
 			// create sql connection
@@ -1892,7 +2000,7 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		/// <param name="lssInfoIds"></param>
 		/// <returns></returns>
-		public static LSSInfo[] GetLSSInfos(int[] lssInfoIds)
+		public LSSInfo[] GetLSSInfos(int[] lssInfoIds)
 		{
 			LSSInfo[] lssInfos=new LSSInfo[lssInfoIds.Length];
 			for(int i=0; i<lssInfoIds.Length;i++)
@@ -1906,7 +2014,7 @@ namespace iLabs.Scheduling.UserSide
 			// command executes the "RetrieveLSSInfoByID" stored procedure
 			DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSInfoByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssInfoId", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssInfoId", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -1947,7 +2055,7 @@ namespace iLabs.Scheduling.UserSide
         /// </summary>
         /// <param name="lssInfoIds"></param>
         /// <returns></returns>
-        public static LSSInfo GetLSSInfo(string lssGuid)
+        public LSSInfo GetLSSInfo(string lssGuid)
         {
             LSSInfo lssInfo = new LSSInfo();
 
@@ -1957,7 +2065,7 @@ namespace iLabs.Scheduling.UserSide
             // create sql command
             DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSInfoByGUID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@lssGuid", lssGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGuid", lssGuid, DbType.AnsiString, 50));
             
             //execute the command
             try
@@ -2000,7 +2108,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
 		/// <returns></returns>return the unique ID identifying the credential set added,>0 successfully added, ==-1 otherwise
-        public static int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
+        public int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -2009,9 +2117,9 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("AddCredentialSet",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerName", serviceBrokerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String,256));
 		
 			int i=-1;
 
@@ -2043,7 +2151,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="serviceBrokerName"></param>
 		/// <returns></returns>true if reservation was successfully modified, ==false otherwise
-        public static bool ModifyCredentialSet(int credentialSetId, string groupName, string serviceBrokerGuid, string serviceBrokerName)
+        public bool ModifyCredentialSet(int credentialSetId, string groupName, string serviceBrokerGuid, string serviceBrokerName)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -2052,10 +2160,10 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("ModifyCredentialSet",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetId", credentialSetId, DbType.Int32));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@credentialSetId", credentialSetId, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerName", serviceBrokerName, DbType.String,256));
 			
 			bool i=false;
 
@@ -2093,7 +2201,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
         /// <param name="serviceBrokerName"></param>
         /// <returns></returns>true if reservation was successfully modified, ==false otherwise
-        public static int ModifyCredentialSetServiceBroker(string originalGuid, string serviceBrokerGuid, string serviceBrokerName)
+        public int ModifyCredentialSetServiceBroker(string originalGuid, string serviceBrokerGuid, string serviceBrokerName)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
@@ -2102,9 +2210,9 @@ namespace iLabs.Scheduling.UserSide
             DbCommand cmd = FactoryDB.CreateCommand("ModifyCredentialSetServiceBroker", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@originalGUID", originalGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@originalGUID", originalGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerName", serviceBrokerName, DbType.String, 256));
            
             int count = -1;
 
@@ -2136,7 +2244,7 @@ namespace iLabs.Scheduling.UserSide
 		/// </summary>
 		/// <param name="credentialSetIds"></param>
 		/// <returns></returns>an array of ints containing the IDs of all credentail sets not successfully removed
-		public static int[] RemoveCredentialSets(int[] credentialSetIds)
+		public int[] RemoveCredentialSets(int[] credentialSetIds)
 		{
 			ArrayList arrayList=new ArrayList();
 			//create a connection
@@ -2145,7 +2253,7 @@ namespace iLabs.Scheduling.UserSide
 			//command executes the "DeleteCredentialSet" store procedure
 			DbCommand cmd=FactoryDB.CreateCommand("DeleteCredentialSetByID",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetId", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@credentialSetId", null, DbType.Int32));
 			
 			// execute the command
 			try
@@ -2178,7 +2286,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="serviceBrokerGuid"></param>
 		/// <param name="groupName"></param>
 		/// <returns></returns>true, the credentialset is removed successfully, false otherwise
-        public static int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
+        public int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName, string groupName)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
@@ -2187,9 +2295,9 @@ namespace iLabs.Scheduling.UserSide
 			DbCommand cmd=FactoryDB.CreateCommand("DeleteCredentialSet",connection);
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerName", serviceBrokerName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerName", serviceBrokerName, DbType.String,256));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String,256));
 			
 			int removed = 0;
 
@@ -2214,7 +2322,7 @@ namespace iLabs.Scheduling.UserSide
 /// Enumerates IDs of all the credential sets 
 /// </summary>
 /// <returns></returns>An array of ints containing the IDs of all the credential sets 
-		public static int[] ListCredentialSetIds()
+		public int[] ListCredentialSetIds()
 		{
 			int[] credentialSetIds;
 			// create sql connection
@@ -2258,7 +2366,7 @@ namespace iLabs.Scheduling.UserSide
 /// </summary>
 /// <param name="credentialSetIds"></param>
 /// <returns></returns>
-		public static UssCredentialSet[] GetCredentialSets(int[] credentialSetIds)
+		public UssCredentialSet[] GetCredentialSets(int[] credentialSetIds)
 		{
 			UssCredentialSet[] credentialSets=new UssCredentialSet[credentialSetIds.Length];
 			for(int i=0; i<credentialSetIds.Length;i++)
@@ -2272,7 +2380,7 @@ namespace iLabs.Scheduling.UserSide
 			// command executes the "RetrieveCredentialSetByID" stored procedure
 			DbCommand cmd = FactoryDB.CreateCommand("RetrieveCredentialSetByID", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@credentialSetID", null, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@credentialSetID", null, DbType.Int32));
 			//execute the command
 			try 
 			{
@@ -2315,7 +2423,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
         /// <returns></returns>the unique ID which identifies the credential set, 0 otherwise
-        public static int GetCredentialSetID(string serviceBrokerGuid, string groupName)
+        public int GetCredentialSetID(string serviceBrokerGuid, string groupName)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
@@ -2324,8 +2432,8 @@ namespace iLabs.Scheduling.UserSide
             DbCommand cmd = FactoryDB.CreateCommand("GetCredentialSetID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@groupName", groupName, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@serviceBrokerGUID", serviceBrokerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String, 256));
                        
             int i = 0;
 

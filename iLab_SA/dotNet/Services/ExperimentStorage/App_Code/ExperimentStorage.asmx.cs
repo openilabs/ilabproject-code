@@ -44,6 +44,8 @@ namespace iLabs.ExpStorage.ESS
 
         private ExperimentsAPI experimentsAPI = new ExperimentsAPI();
         private BlobsAPI blobsAPI = new BlobsAPI();
+        private ProcessAgentDB dbTicketing = new ProcessAgentDB();
+
 
         ////////////////////////////////////////////////////
         ///       IESS Methods - Experiment methods      ///

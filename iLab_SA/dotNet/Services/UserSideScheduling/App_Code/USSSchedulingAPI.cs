@@ -303,7 +303,7 @@ namespace iLabs.Scheduling.UserSide
          *							CALLS FOR USSPolicy
          * !------------------------------------------------------------------------------!
          */
-        /// <summary>
+    /*    /// <summary>
         /// add user side scheduling policy that governs whether a reservation request to execute an experiment at a certain time will be accept from a student with a particular credential set
         /// </summary>
         /// <param name="groupName"></param>
@@ -377,10 +377,13 @@ namespace iLabs.Scheduling.UserSide
         {
             return DBManager.ListUSSPolicyIDsByGroupAndExperiment(groupName, serviceBrokerGuid, labClientName, labClientVersion);
         }
+     * */
         /* !------------------------------------------------------------------------------!
 			 *							CALLS FOR ReservationInfo
 			 * !------------------------------------------------------------------------------!
 			 */
+
+        /*
         /// <summary>
         /// add reservation by user
         /// </summary>
@@ -506,11 +509,12 @@ namespace iLabs.Scheduling.UserSide
         {
             return DBManager.GetReservations(sbGuid, userName, groupName, lsGuid, clientGuid, start, end);
         }
-      
+      */
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Experiment Information
 			 * !------------------------------------------------------------------------------!
 			 * */
+        /*
 		/// <summary>
 		/// add information of a particular experiment
 		/// </summary>
@@ -552,7 +556,7 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="labClientGuid"></param>
         /// <param name="labServerGuid"></param>
         /// <returns></returns>
-        public static string ListLSSIDbyExperiment(string clientGuid, string labServerGuid)
+        public static string ListLssIdByExperiment(string clientGuid, string labServerGuid)
         {
             return DBManager.ListLssIdByExperiment(clientGuid, labServerGuid);
         }
@@ -605,15 +609,16 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="clientGuid"></param>
         /// <param name="labServerGuid"></param>
         /// <returns>the url of the requested LSS, null if such a experiment info can not be retrieved</returns>
-		public static string ListLSSURLbyExperiment(string clientGuid,string labServerGuid)
+		public static string ListLssUrlByExperiment(string clientGuid,string labServerGuid)
 		{
 			return DBManager.ListLssUrlByExperiment(clientGuid, labServerGuid);
 		}
-        
+        */
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR LSSInfo
 			 * !------------------------------------------------------------------------------!
 			 * */
+        /*
 		/// <summary>
 		/// add information of a particular lab side scheduling server identified by lssID
 		/// </summary>
@@ -694,10 +699,13 @@ namespace iLabs.Scheduling.UserSide
         {
             return DBManager.GetLSSInfo(lssGuid);
         }
+         * */
 		/* !------------------------------------------------------------------------------!
 			 *							CALLS FOR Credential Set
 			 * !------------------------------------------------------------------------------!
 			 * */
+
+        /*
 		/// <summary>
 		///  add a credential set
 		/// </summary>
@@ -877,6 +885,7 @@ namespace iLabs.Scheduling.UserSide
             return ts;
 
         }
+         * */
 
 	}
 }

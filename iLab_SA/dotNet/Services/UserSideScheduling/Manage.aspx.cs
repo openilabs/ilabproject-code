@@ -36,20 +36,19 @@ namespace iLabs.Scheduling.UserSide
          UssExperimentInfo[] experimentInfos;
          int[] credentialSetIds;
          UssCredentialSet[] credentials;
-        
-         
+        DBManager dbManager = new DBManager();
 
         string couponID = null, passkey = null, issuerID = null, sbUrl = null, groupName = null, sbGuid = null;
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
             btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this experiment Information?')== false) return false;");
-            policyIDs = USSSchedulingAPI.ListUSSPolicyIDs();
-            policies = USSSchedulingAPI.GetUSSPolicies(policyIDs);
-            experimentInfoIds = USSSchedulingAPI.ListExperimentInfoIDs();
-            experimentInfos = USSSchedulingAPI.GetExperimentInfos(experimentInfoIds);
-            credentialSetIds = USSSchedulingAPI.ListCredentialSetIds();
-            credentials = USSSchedulingAPI.GetCredentialSets(credentialSetIds);
+            policyIDs = dbManager.ListUSSPolicyIDs();
+            policies = dbManager.GetUSSPolicies(policyIDs);
+            experimentInfoIds = dbManager.ListExperimentInfoIDs();
+            experimentInfos = dbManager.GetExperimentInfos(experimentInfoIds);
+            credentialSetIds = dbManager.ListCredentialSetIds();
+            credentials = dbManager.GetCredentialSets(credentialSetIds);
             
             if (!IsPostBack)
             {
@@ -125,9 +124,9 @@ namespace iLabs.Scheduling.UserSide
                     ddlPolicy.Items.Add(new ListItem(" ---------- select Policy ---------- "));
                     for (int i = 0; i < policies.Length; i++)
                     {
-                        UssExperimentInfo exp = USSSchedulingAPI.GetExperimentInfos(new int[] { policies[i].experimentInfoId })[0];
+                        UssExperimentInfo exp = dbManager.GetExperimentInfos(new int[] { policies[i].experimentInfoId })[0];
                         string expStr = exp.labClientName + " " + exp.labClientVersion;
-                        UssCredentialSet cre = USSSchedulingAPI.GetCredentialSets(new int[] { policies[i].credentialSetId })[0];
+                        UssCredentialSet cre = dbManager.GetCredentialSets(new int[] { policies[i].credentialSetId })[0];
                         string creStr = cre.serviceBrokerName + " " + cre.groupName;
                         string pol = creStr + " _ " + expStr;
                         ddlPolicy.Items.Add(new ListItem(pol, policies[i].ussPolicyId.ToString()));
@@ -188,17 +187,17 @@ namespace iLabs.Scheduling.UserSide
         /// </summary>
         private void InitializePolicyDropDown()
         {
-            policyIDs = USSSchedulingAPI.ListUSSPolicyIDs();
-            policies = USSSchedulingAPI.GetUSSPolicies(policyIDs);
+            policyIDs = dbManager.ListUSSPolicyIDs();
+            policies = dbManager.GetUSSPolicies(policyIDs);
 
             ddlPolicy.Items.Clear();
 
             ddlPolicy.Items.Add(new ListItem(" ---------- select Policy ---------- "));
             for (int i = 0; i < policies.Length; i++)
             {
-                UssExperimentInfo exp = USSSchedulingAPI.GetExperimentInfos(new int[] { policies[i].experimentInfoId })[0];
+                UssExperimentInfo exp = dbManager.GetExperimentInfos(new int[] { policies[i].experimentInfoId })[0];
                 string expStr = exp.labClientName + " " + exp.labClientVersion;
-                UssCredentialSet cre = USSSchedulingAPI.GetCredentialSets(new int[] { policies[i].credentialSetId })[0];
+                UssCredentialSet cre = dbManager.GetCredentialSets(new int[] { policies[i].credentialSetId })[0];
                 string creStr = cre.serviceBrokerName + " " + cre.groupName;
                 string pol = creStr + " _ " + expStr;
                 ddlPolicy.Items.Add(new ListItem(pol, policies[i].ussPolicyId.ToString()));
@@ -375,8 +374,8 @@ namespace iLabs.Scheduling.UserSide
                 try
                 {
 
-                    UssCredentialSet cre = USSSchedulingAPI.GetCredentialSets(new int[] { Int32.Parse(ddlGroup.SelectedValue) })[0];
-                    policyID = USSSchedulingAPI.AddUSSPolicy(cre.groupName, cre.serviceBrokerGuid, Int32.Parse(ddlExperiment.SelectedValue), PolicyParser.GenerateRule(ruleFields, properties));
+                    UssCredentialSet cre = dbManager.GetCredentialSets(new int[] { Int32.Parse(ddlGroup.SelectedValue) })[0];
+                    policyID = dbManager.AddUSSPolicy(cre.groupName, cre.serviceBrokerGuid, Int32.Parse(ddlExperiment.SelectedValue), PolicyParser.GenerateRule(ruleFields, properties));
                 }
                 catch (Exception ex)
                 {
@@ -421,7 +420,7 @@ namespace iLabs.Scheduling.UserSide
                 try
                 {
                     // Modify the Policy
-                    USSSchedulingAPI.ModifyUSSPolicy(policyID, Int32.Parse(ddlExperiment.SelectedValue), PolicyParser.GenerateRule(ruleFields, properties), Int32.Parse(ddlGroup.SelectedValue));
+                    dbManager.ModifyUSSPolicy(policyID, Int32.Parse(ddlExperiment.SelectedValue), PolicyParser.GenerateRule(ruleFields, properties), Int32.Parse(ddlGroup.SelectedValue));
                     lblErrorMessage.Visible = true;
                     string mesHead = setMessageHeader();
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage(mesHead + " has been modified.");
@@ -458,7 +457,7 @@ namespace iLabs.Scheduling.UserSide
                 policyID = policies[ddlExperiment.SelectedIndex - 1].ussPolicyId;
                 try
                 {
-                    USSSchedulingAPI.RemoveUSSPolicy(new int[] { policyID });
+                    dbManager.RemoveUSSPolicy(new int[] { policyID });
                     lblErrorMessage.Visible = true;
                     string mesHead = setMessageHeader();
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage(mesHead + " has been deleted. ");
@@ -477,9 +476,9 @@ namespace iLabs.Scheduling.UserSide
 
         private string setMessageHeader()
         {
-            UssExperimentInfo exp = USSSchedulingAPI.GetExperimentInfos(new int[] { Int32.Parse(ddlExperiment.SelectedValue) })[0];
+            UssExperimentInfo exp = dbManager.GetExperimentInfos(new int[] { Int32.Parse(ddlExperiment.SelectedValue) })[0];
             string expStr = exp.labClientName + " " + exp.labClientVersion;
-            UssCredentialSet cre = USSSchedulingAPI.GetCredentialSets(new int[] { Int32.Parse(ddlGroup.SelectedValue) })[0];
+            UssCredentialSet cre = dbManager.GetCredentialSets(new int[] { Int32.Parse(ddlGroup.SelectedValue) })[0];
             string creStr = cre.serviceBrokerName + " " + cre.groupName;
             string mesHead = "The policy for " + creStr + " executing " + expStr;
             return mesHead;

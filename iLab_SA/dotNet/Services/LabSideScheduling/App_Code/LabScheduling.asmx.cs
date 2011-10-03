@@ -93,9 +93,10 @@ namespace iLabs.Scheduling.LabSide
             Coupon inCoupon, Coupon outCoupon)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                DBManager dbManager = new DBManager();
+                
                 try
                 {
                     status = dbManager.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
@@ -125,9 +126,10 @@ namespace iLabs.Scheduling.LabSide
         public virtual int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                DBManager dbManager = new DBManager();
+               
                 status = dbManager.ModifyProcessAgent(originalGuid, agent, extra);
             }
             return status;
@@ -152,14 +154,15 @@ namespace iLabs.Scheduling.LabSide
             string groupName, string ussGuid,
             string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
 		{
+            DBManager dbManager = new DBManager();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
-                TimePeriod[] array = LSSSchedulingAPI.RetrieveAvailableTimePeriods(serviceBrokerGuid, groupName, ussGuid,
+                Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
+                TimePeriod[] array = dbManager.RetrieveAvailableTimePeriods(serviceBrokerGuid, groupName, ussGuid,
                     labServerGuid, clientGuid, startTime, endTime);
                 return array;
             }
@@ -191,14 +194,15 @@ namespace iLabs.Scheduling.LabSide
             DateTime startTime, DateTime endTime)
 		{
             string confirm = null;
+            DBManager dbManager = new DBManager();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
-                confirm = LSSSchedulingAPI.ConfirmReservation(serviceBrokerGuid, groupName, ussGuid,
+                Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.REQUEST_RESERVATION);
+                confirm = dbManager.ConfirmReservation(serviceBrokerGuid, groupName, ussGuid,
                     labServerGuid, clientGuid, startTime, endTime);
                 return confirm;
             }
@@ -250,6 +254,7 @@ namespace iLabs.Scheduling.LabSide
             DateTime startTime, DateTime endTime)
 		{
             int count = -1;
+            DBManager dbManager = new DBManager();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -259,11 +264,11 @@ namespace iLabs.Scheduling.LabSide
             {
                 // Ticket retrievedTicket = ticketRetrieval.RetrieveAndVerify(opCoupon, type, "LAB SCHEDULING SERVER");
 
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
+                Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
 
                 DateTime startTimeUTC = startTime.ToUniversalTime();
                 DateTime endTimeUTC = endTime.ToUniversalTime();
-                count = LSSSchedulingAPI.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
+                count = dbManager.RemoveReservationInfo(serviceBrokerGuid, groupName, ussGuid,
                     labServerGuid, clientGuid, startTimeUTC, endTimeUTC);
                 
             }
@@ -291,23 +296,24 @@ namespace iLabs.Scheduling.LabSide
         public int AddUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
 		{
             int status = 0;
+            DBManager dbManager = new DBManager();
             try
             {
-                if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+                if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
                 {
-                    int ussId = LSSSchedulingAPI.ListUSSInfoID(ussGuid);
+                    int ussId =dbManager.ListUSSInfoID(ussGuid);
                     if (ussId > 0)
                     {
-                        USSInfo[] info = LSSSchedulingAPI.GetUSSInfos(new int[] { ussId });
+                        USSInfo[] info = dbManager.GetUSSInfos(new int[] { ussId });
                         if(info != null && info.Length > 0){
                             if(info[0].ussGuid.Equals(ussGuid) // && info[0].ussUrl.Equals(ussUrl) 
                                 && info[0].domainGuid.Equals(coupon.issuerGuid)){
                                 if(info[0].couponId != coupon.couponId){
                                     // A new revokeTicket coupon has been created,
                                     // Add it to the database & update USSinfo
-                                    if (!dbTicketing.AuthenticateCoupon(coupon))
-                                        dbTicketing.InsertCoupon(coupon);
-                                    status = LSSSchedulingAPI.ModifyUSSInfo(ussId, ussGuid,ussName,ussUrl,
+                                    if (!dbManager.AuthenticateCoupon(coupon))
+                                        dbManager.InsertCoupon(coupon);
+                                    status = dbManager.ModifyUSSInfo(ussId, ussGuid,ussName,ussUrl,
                                         coupon.couponId,coupon.issuerGuid);
                                 }
                                 
@@ -317,9 +323,9 @@ namespace iLabs.Scheduling.LabSide
                     }
                     if(status <= 0)
                     {
-                        if( !dbTicketing.AuthenticateCoupon(coupon))
-                            dbTicketing.InsertCoupon(coupon);
-                        int uID = LSSSchedulingAPI.AddUSSInfo(ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
+                        if( !dbManager.AuthenticateCoupon(coupon))
+                            dbManager.InsertCoupon(coupon);
+                        int uID = dbManager.AddUSSInfo(ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
                         if (uID > 0)
                             status = 1;
                     }
@@ -339,12 +345,13 @@ namespace iLabs.Scheduling.LabSide
         public int ModifyUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
         {
             int status = 0;
+            DBManager dbManager = new DBManager();
            
-                if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+                if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
                 {
-                    int id = DBManager.ListUSSInfoID(ussGuid);
+                    int id = dbManager.ListUSSInfoID(ussGuid);
                     if(id > 0)
-            status = DBManager.ModifyUSSInfo(id,ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
+            status = dbManager.ModifyUSSInfo(id,ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
                 }
             return status;
         }
@@ -355,7 +362,7 @@ namespace iLabs.Scheduling.LabSide
         public int RemoveUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
         {
             int status = 0;
-
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
               
@@ -370,29 +377,25 @@ namespace iLabs.Scheduling.LabSide
 		/// <param name="groupName"></param>
         /// <param name="ussGuid"></param>
 		/// <returns></returns>1 if the CredentialSet is added successfully, or already exists, 0 otherwise
-		[WebMethod]
+        [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName, 
+        public int AddCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid)
-		{
-            int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+        {
+            int status = -1;
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                int test = LSSSchedulingAPI.GetCredentialSetID(serviceBrokerGuid, groupName);
-                if (test > 0)
+
+                int cID = dbManager.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
+                if (cID != -1)
                 {
                     status = 1;
                 }
-                else
-                {
-                    int cID = LSSSchedulingAPI.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
-                    if (cID != -1)
-                        status = 1;
-                }
             }
-			return status;
-		}
+            return status;
+        }
 
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
@@ -400,10 +403,11 @@ namespace iLabs.Scheduling.LabSide
         public int ModifyCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid)
         {
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+           DBManager dbManager= new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                int id = DBManager.GetCredentialSetID(serviceBrokerGuid, groupName);
-                return LSSSchedulingAPI.ModifyCredentialSet(id, serviceBrokerGuid, serviceBrokerName, groupName);
+                int id = dbManager.GetCredentialSetID(serviceBrokerGuid, groupName);
+                return dbManager.ModifyCredentialSet(id, serviceBrokerGuid, serviceBrokerName, groupName);
             }
             else
                 return 0;
@@ -422,9 +426,10 @@ namespace iLabs.Scheduling.LabSide
         public int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid)
         {
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                return LSSSchedulingAPI.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
+                return dbManager.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
             }
             else 
                 return 0;
@@ -449,18 +454,19 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             bool status = false;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                int id = LSSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+                int id = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
                 if (id <= 0)
                 {
-                    id = LSSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
+                    id = dbManager.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
                         clientVersion, providerName, null, 0, 0, 1, 0);
-                    int ok = LSSSchedulingAPI.CheckForLSResource(labServerGuid, labServerName);
+                    int ok = dbManager.CheckForLSResource(labServerGuid, labServerName);
                 }
                 else
                 {
-                    status = LSSSchedulingAPI.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName);
+                    status = dbManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName, clientVersion, providerName);
                 }
                 return (status)? 1:0;
             }
@@ -476,11 +482,12 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             int status = 0;
-            int id = DBManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+            DBManager dbManager = new DBManager();
+            int id = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (id > 0)
             {
                 
-                    if (DBManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName,
+                    if (dbManager.ModifyExperimentInfo(id, labServerGuid, labServerName, clientGuid, clientName,
                         clientVersion, providerName))
                         status++;
                 
@@ -507,11 +514,12 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             int status = 0;
-            int infoID = LSSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
+            DBManager dbManager = new DBManager();
+            int infoID = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (infoID > 0)
             {
-                int[] remaining = LSSSchedulingAPI.RemoveExperimentInfo(new int[] { infoID });
-                if (remaining == null || remaining.Length = 0)
+                int[] remaining = dbManager.RemoveExperimentInfo(new int[] { infoID });
+                if (remaining == null || remaining.Length == 0)
                 {
                     status = 1;
                 }

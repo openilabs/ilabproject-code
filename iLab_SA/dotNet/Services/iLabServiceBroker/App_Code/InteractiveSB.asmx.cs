@@ -84,6 +84,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// </summary>
         public OperationAuthHeader opHeader = new OperationAuthHeader();
         protected AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+        public BrokerDB brokerDB = new BrokerDB();
 
  
 
@@ -135,13 +136,13 @@ namespace iLabs.ServiceBroker.iLabSB
             Coupon inCoupon, Coupon outCoupon)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
-                BrokerDB brokerDB = new BrokerDB();
                 status = brokerDB.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
 
                 //Notify all ProcessAgents about the change
-                ProcessAgentInfo[] domainServices = dbTicketing.GetProcessAgentInfos();
+                ProcessAgentInfo[] domainServices = brokerDB.GetProcessAgentInfos();
                 ProcessAgentProxy proxy = null;
                 foreach (ProcessAgentInfo pi in domainServices)
                 {
@@ -177,12 +178,10 @@ namespace iLabs.ServiceBroker.iLabSB
         public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
-                BrokerDB brokerDB = new BrokerDB();
                 status = brokerDB.ModifyProcessAgent(originalGuid, agent, extra);
-
-             
             }
             return status;
         }
@@ -202,7 +201,8 @@ namespace iLabs.ServiceBroker.iLabSB
         public override int RetireProcessAgent(string domainGuid, string serviceGuid, bool state)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = retireProcessAgent(domainGuid, serviceGuid, state);
             }
@@ -236,7 +236,7 @@ namespace iLabs.ServiceBroker.iLabSB
         {
             int status = 0;
             BrokerDB brokerDB = new BrokerDB();
-            int id = dbTicketing.GetProcessAgentID(originalGuid);
+            int id = brokerDBGetProcessAgentID(originalGuid);
             if(id > 1){
                 status = brokerDB.ModifyProcessAgent(originalGuid, agent, extra);
             }
@@ -254,10 +254,11 @@ namespace iLabs.ServiceBroker.iLabSB
         public override bool CancelTicket(Coupon coupon, string type, string redeemer)
         {
             bool status = false;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            BrokerDB agentDB = new BrokerDB();
+            if (agentDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 // Move all this into BrokerDB
-                BrokerDB agentDB = new BrokerDB();
+                
                 if (ProcessAgentDB.ServiceGuid.Equals(redeemer))
                 {
                     // this ServiceBroker is the redeemer
@@ -864,6 +865,40 @@ namespace iLabs.ServiceBroker.iLabSB
             return DataStorageAPI.ListClientItems(clientID, userID);
         }
 
+
+        /// <summary>
+        /// An authority requests the launching of a specific client for a user.
+        /// </summary>
+        /// <param name="clientGuid">The GUID of the client, this client must be registered on the serviceBroker.</param>
+        /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
+        /// id that the authority will always use to identify this user</param>
+        /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
+        /// <param name="startTime"></param>
+        /// <param name="duration"></param>
+        /// <param name="autoStart">Determine if the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
+        /// <returns>an IntTag with a status code in the interger and a URLto be used by the authority to redirect the request.</returns>
+        [WebMethod(Description = "An authority requests the launching of a specific client for a user.", EnableSession = true)]
+        [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In, Required = true)]
+        [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
+        public IntTag LaunchLabClient(string clientGuid, string userName, string groupName,
+              DateTime startTime, long duration, int autoStart)
+        {
+            IntTag tag = new IntTag();
+            tag.id =-1;
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                string authGuid = agentAuthHeader.agentGuid;
+                int clientID = -1;
+                int groupID = -1;
+                if (groupName != null && groupName.Length > 0)
+                {
+                    groupID = AdministrativeAPI.GetGroupID(groupName);
+                }
+
+            }
+            return tag;
+        }
+
         
         /// <summary>
         /// Request authorization for the specified types of access, for the specified group and optional user. At this time remote SB's are not supported.
@@ -1255,7 +1290,7 @@ namespace iLabs.ServiceBroker.iLabSB
             StorageStatus status = null;
             bool experimentClosed = false;
 
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
                 {

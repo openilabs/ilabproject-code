@@ -2,8 +2,8 @@
 <%@ Register Assembly="iLabControls" Namespace="iLabs.Controls" TagPrefix="iLab" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
-<HTML>
-	<HEAD>
+<html>
+	<head>
 		<title>selfRegistration</title> 
 		<!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
@@ -15,7 +15,7 @@ Please see license.txt in top level directory for full license.
 		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />
 		<style type="text/css">@import url( css/main.css );
 		</style>
-	</HEAD>
+	</head>
 	<body>
 	    <form id="Form1" method="post" runat="server">
 	    <a name="top"></a>
@@ -27,4 +27,4 @@ Please see license.txt in top level directory for full license.
 		</div>
 		</form>
 	</body>
-</HTML>
+</html>

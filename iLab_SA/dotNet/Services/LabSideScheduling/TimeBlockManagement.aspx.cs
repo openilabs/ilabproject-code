@@ -25,7 +25,7 @@ namespace iLabs.Scheduling.LabSide
 	/// </summary>
 	public partial class TimeBlockManagement : System.Web.UI.Page
 	{
-		//int[] groupIDs=LSSSchedulingAPI.ListCredentialSetIDs();
+		//int[] groupIDs=dbManager.ListCredentialSetIDs();
 		 int[] credentialSetIDs;
 		 LssCredentialSet[] credentialSets;
 	   
@@ -35,6 +35,7 @@ namespace iLabs.Scheduling.LabSide
         int userTZ = 0;
         int localTzOffset = 0;
         CultureInfo culture;
+        DBManager dbManager = new DBManager();
         
 	
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -42,8 +43,8 @@ namespace iLabs.Scheduling.LabSide
 
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             localTzOffset = DateUtil.LocalTzOffset;
-			credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
-			credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
+			credentialSetIDs = dbManager.ListCredentialSetIDs();
+			credentialSets=dbManager.GetCredentialSets(credentialSetIDs);
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this recurring time block?')== false) return false;");
            
             btnNew.Attributes.Add("onclick","javascript:window.open('NewTimeBlockPopUp.aspx','NewTimeBlockPopUp','width=910,height=600,left=270,top=180,modal=yes,resizable=yes').focus()");
@@ -171,9 +172,9 @@ namespace iLabs.Scheduling.LabSide
             lbxSelectTimeBlock.Items.Clear();
             lbxPermittedExperiments.Items.Clear();
             lbxSelectExperiment.Items.Clear();
-            LSResource[] resources = LSSSchedulingAPI.GetLSResources(Session["labServerGuid"].ToString());
-            int[] recurrenceIDs = LSSSchedulingAPI.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resources[0].resourceID);
-            Recurrence[] recurs = LSSSchedulingAPI.GetRecurrence(recurrenceIDs);
+            LSResource[] resources = dbManager.GetLSResources(Session["labServerGuid"].ToString());
+            int[] recurrenceIDs = dbManager.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resources[0].resourceID);
+            Recurrence[] recurs = dbManager.GetRecurrences(recurrenceIDs);
 			//if related recurrence have been found
 			if (recurs.Length > 0)
 			{
@@ -203,8 +204,8 @@ namespace iLabs.Scheduling.LabSide
                 buf = new StringBuilder();
                 //buf.Append("<pre>");
 				ListItem recurItem = new ListItem();
-				//string ussName = LSSSchedulingAPI.GetUSSInfos(new int[]{LSSSchedulingAPI.ListUSSInfoID(cs.ussGuid)})[0].ussName;
-               // string labServerName = LSSSchedulingAPI.RetrieveLabServerName(recur.labServerGuid);
+				//string ussName = dbManager.GetUSSInfos(new int[]{dbManager.ListUSSInfoID(cs.ussGuid)})[0].ussName;
+               // string labServerName = dbManager.RetrieveLabServerName(recur.labServerGuid);
                 buf.Append(String.Format("{0,-30}",Session["labServerName"].ToString() + ": "));
                
                 buf.Append(String.Format("{0,-10}",DateUtil.ToUserTime(recur.startDate, culture, localTzOffset)));
@@ -231,11 +232,11 @@ namespace iLabs.Scheduling.LabSide
         {
             lbxSelectExperiment.Items.Clear();
             lbxPermittedExperiments.Items.Clear();
-            int[] permittedExperimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByRecurrence(recurrenceID);
-            LssExperimentInfo[] permittedExperimentInfos = LSSSchedulingAPI.GetExperimentInfos(permittedExperimentInfoIDs);
+            int[] permittedExperimentInfoIDs = dbManager.ListExperimentInfoIDsByRecurrence(recurrenceID);
+            LssExperimentInfo[] permittedExperimentInfos = dbManager.GetExperimentInfos(permittedExperimentInfoIDs);
             // the experiments available in the lab server which the recurrence belongs to
-            //String labServerID = LSSSchedulingAPI.GetRecurrence(new int[]{recurrenceID})[0].labServerGuid;
-            int[] availableExperimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
+            //String labServerID = dbManager.GetRecurrence(new int[]{recurrenceID})[0].labServerGuid;
+            int[] availableExperimentInfoIDs = dbManager.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
             ArrayList unPermittedExperimentIDs = new ArrayList();
             foreach (int aeID in availableExperimentInfoIDs)
             {
@@ -254,7 +255,7 @@ namespace iLabs.Scheduling.LabSide
                 }
             }
             int[] unPEIDs = Utilities.ArrayListToIntArray(unPermittedExperimentIDs);
-            LssExperimentInfo[] unPermittedExperimentInfos = LSSSchedulingAPI.GetExperimentInfos(unPEIDs);
+            LssExperimentInfo[] unPermittedExperimentInfos = dbManager.GetExperimentInfos(unPEIDs);
             if (permittedExperimentInfos != null && permittedExperimentInfos.Length > 0)
             {
                 foreach (LssExperimentInfo pep in permittedExperimentInfos)
@@ -281,11 +282,11 @@ namespace iLabs.Scheduling.LabSide
         {
             lbxSelectGroup.Items.Clear();
             lbxPermittedGroups.Items.Clear();
-            int[] permittedGroupIDs = LSSSchedulingAPI.ListCredentialSetIDsByRecurrence(recurrenceID);
-            LssCredentialSet[] permittedGroups = LSSSchedulingAPI.GetCredentialSets(permittedGroupIDs);
+            int[] permittedGroupIDs = dbManager.ListCredentialSetIDsByRecurrence(recurrenceID);
+            LssCredentialSet[] permittedGroups = dbManager.GetCredentialSets(permittedGroupIDs);
             // the Groups available in the lab server which the recurrence belongs to
-            //String labServerID = LSSSchedulingAPI.GetRecurrence(new int[]{recurrenceID})[0].labServerGuid;
-            int[] availableGroupIDs = LSSSchedulingAPI.ListCredentialSetIDs();
+            //String labServerID = dbManager.GetRecurrence(new int[]{recurrenceID})[0].labServerGuid;
+            int[] availableGroupIDs = dbManager.ListCredentialSetIDs();
             ArrayList unPermittedGroupIDs = new ArrayList();
             foreach (int aeID in availableGroupIDs)
             {
@@ -304,7 +305,7 @@ namespace iLabs.Scheduling.LabSide
                 }
             }
             int[] unPGIDs = Utilities.ArrayListToIntArray(unPermittedGroupIDs);
-            LssCredentialSet[] unPermittedGroups = LSSSchedulingAPI.GetCredentialSets(unPGIDs);
+            LssCredentialSet[] unPermittedGroups = dbManager.GetCredentialSets(unPGIDs);
 
             foreach (LssCredentialSet pep in permittedGroups)
             {
@@ -389,7 +390,7 @@ namespace iLabs.Scheduling.LabSide
 			}
 			try
 			{
-				if(LSSSchedulingAPI.RemoveRecurrence(Int32.Parse(lbxSelectTimeBlock.SelectedValue)) <= 0)
+				if(dbManager.RemoveRecurrence(Int32.Parse(lbxSelectTimeBlock.SelectedValue)) <= 0)
 				{
 					string msg = "The time block '"+ lbxSelectTimeBlock.SelectedItem.Text + "' was not deleted.";
                     lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
@@ -435,7 +436,7 @@ namespace iLabs.Scheduling.LabSide
 			string savedExprimentText=lbxSelectExperiment.SelectedItem.Text;
 			try
 			{
-				int ptbID = LSSSchedulingAPI.AddPermittedExperiment(Int32.Parse(lbxSelectExperiment.SelectedValue),Int32.Parse(lbxSelectTimeBlock.SelectedValue));
+				int ptbID = dbManager.AddPermittedExperiment(Int32.Parse(lbxSelectExperiment.SelectedValue),Int32.Parse(lbxSelectTimeBlock.SelectedValue));
 				DisplayPermittedExperiments(Int32.Parse(lbxSelectTimeBlock.SelectedValue));
 				string msg = "The permission has been given to the experiment ' " + savedExprimentText + ". ";
                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
@@ -466,8 +467,8 @@ namespace iLabs.Scheduling.LabSide
 			try
 			{
                 int recurrenceID = Int32.Parse(lbxSelectTimeBlock.SelectedValue);
-				int permittedExperimentID=LSSSchedulingAPI.ListPermittedExperimentIDByRecur(Int32.Parse(lbxPermittedExperiments.SelectedValue),Int32.Parse(lbxSelectTimeBlock.SelectedValue));
-				int[] eID = LSSSchedulingAPI.RemovePermittedExperiments(new int[]{permittedExperimentID},recurrenceID);
+				int permittedExperimentID=dbManager.ListPermittedExperimentIDByRecur(Int32.Parse(lbxPermittedExperiments.SelectedValue),Int32.Parse(lbxSelectTimeBlock.SelectedValue));
+				int[] eID = dbManager.RemovePermittedExperiments(new int[]{permittedExperimentID},recurrenceID);
 				if (eID.Length>0)
 				{
 					string msg = "The permission to the experiment ' " + savedExprimentText + "' can not been deleted. ";
@@ -503,7 +504,7 @@ namespace iLabs.Scheduling.LabSide
             string savedGroupText = lbxSelectGroup.SelectedItem.Text;
             try
             {
-                int ptbID = LSSSchedulingAPI.AddPermittedCredentialSet(Int32.Parse(lbxSelectGroup.SelectedValue), Int32.Parse(lbxSelectTimeBlock.SelectedValue));
+                int ptbID = dbManager.AddPermittedCredentialSet(Int32.Parse(lbxSelectGroup.SelectedValue), Int32.Parse(lbxSelectTimeBlock.SelectedValue));
                 DisplayPermittedGroups(Int32.Parse(lbxSelectTimeBlock.SelectedValue));
                 string msg = "The permission has been given to the group ' " + savedGroupText + ". ";
                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
@@ -535,7 +536,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 int recurrenceId = Int32.Parse(lbxSelectTimeBlock.SelectedValue);
                 int permittedGroupID = Int32.Parse(lbxPermittedGroups.SelectedValue);
-                int[] eID = LSSSchedulingAPI.RemovePermittedCredentialSets(new int[] { permittedGroupID },recurrenceId);
+                int[] eID = dbManager.RemovePermittedCredentialSets(new int[] { permittedGroupID },recurrenceId);
                 if (eID.Length > 0)
                 {
                     string msg = "The permission to the group ' " + savedGroupText + "' can not been deleted. ";

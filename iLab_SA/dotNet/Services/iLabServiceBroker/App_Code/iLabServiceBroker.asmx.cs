@@ -303,7 +303,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     clientID = Convert.ToInt32(Session["ClientID"]);
                 string effectiveGroup = Session["GroupName"].ToString();
 
-                ProcessAgentInfo infoLS = dbTicketing.GetProcessAgentInfo(labServerID);
+                ProcessAgentInfo infoLS = brokerDB.GetProcessAgentInfo(labServerID);
                 if (infoLS.retired)
                 {
                     throw new Exception("The Batch Lab Server is retired");
@@ -331,7 +331,6 @@ namespace iLabs.ServiceBroker.iLabSB
                     clientSReport.vReport = new ValidationReport();
                     clientSReport.wait = new WaitEstimate();
 
-                    BrokerDB brokerDB = new BrokerDB();
                     // 1. Create Coupon for ExperimentCollection
                     Coupon coupon = brokerDB.CreateCoupon();
 
@@ -935,7 +934,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				//retrieve userID from the session
 				int userID = Convert.ToInt32(Session["UserID"]);
 
-                ProcessAgentInfo info = dbTicketing.GetProcessAgentInfo(labServerGuid);
+                ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(labServerGuid);
                 if (info.retired)
                 {
                     throw new Exception("The Batch Lab Server is retired");
@@ -990,7 +989,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 //retrieve userID from the session
                 int userID = Convert.ToInt32(Session["UserID"]);
 
-                ProcessAgentInfo info = dbTicketing.GetProcessAgentInfo(labServerID);
+                ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(labServerID);
                 if (info.retired)
                 {
                     throw new Exception("The ProcessAgent is retired");

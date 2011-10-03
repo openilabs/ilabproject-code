@@ -46,7 +46,7 @@ namespace iLabs.Web
     public class WS_ILabCore : System.Web.Services.WebService
     {
 
-        protected ProcessAgentDB dbTicketing;
+        //protected ProcessAgentDB dbTicketing;
 
         /// <summary>
         /// Instantiated to recieve soap header objects in SOAP requests
@@ -61,7 +61,7 @@ namespace iLabs.Web
         {
             //CODEGEN: This call is required by the ASP.NET Web Services Designer
             InitializeComponent();
-            dbTicketing = new ProcessAgentDB();
+            //dbTicketing = new ProcessAgentDB();
         }
 
         #region Component Designer generated code
@@ -135,6 +135,7 @@ namespace iLabs.Web
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public virtual void StatusNotification(StatusNotificationReport report)
         {
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 // No default processing of the StatusNotification message has been specified
@@ -158,11 +159,11 @@ namespace iLabs.Web
         public virtual bool CancelTicket(Coupon coupon, string type, string redeemer)
         {
             bool status = false;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (ProcessAgentDB.ServiceGuid.Equals(redeemer))
                 {
-                    ProcessAgentDB ticketing = new ProcessAgentDB();
                     status = dbTicketing.DeleteTicket(coupon, type, ProcessAgentDB.ServiceGuid);
                 }
                 else
@@ -206,6 +207,7 @@ namespace iLabs.Web
             Coupon inCoupon, Coupon outCoupon)
         {
             int status = 0;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = dbTicketing.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
@@ -222,6 +224,7 @@ namespace iLabs.Web
         {
             int status = -1;
             DomainCredentials returnCred = null;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = removeDomainCredentials(domainGuid, serviceGuid);
@@ -244,6 +247,7 @@ namespace iLabs.Web
         public virtual int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = dbTicketing.ModifyProcessAgent(originalGuid, agent, extra);
@@ -267,6 +271,7 @@ namespace iLabs.Web
         public virtual int RetireProcessAgent(string domainGuid, string serviceGuid, bool state)
         {
             int status = 0;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = retireProcessAgent(domainGuid, serviceGuid, state);
@@ -279,6 +284,7 @@ namespace iLabs.Web
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public void Register(string registerGuid, ServiceDescription[] info)
         {
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
             {
                 // This is an optional method, the base method is a no-op.
@@ -290,6 +296,7 @@ namespace iLabs.Web
             Coupon inIdentCoupon, Coupon outIdentCoupon)
         {
             ProcessAgent agent = null;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             try
             {
                 if (ProcessAgentDB.ServiceAgent == null)
@@ -361,6 +368,7 @@ namespace iLabs.Web
         protected virtual int removeDomainCredentials(string domainGuid, string agentGuid)
         {
             int status = 0;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             status = dbTicketing.RemoveDomainCredentials(domainGuid, agentGuid);
             return status;
         }
@@ -370,6 +378,7 @@ namespace iLabs.Web
         protected virtual int retireProcessAgent(string domainGuid, string serviceGuid, bool state)
         {
             int status = 0;
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             status = dbTicketing.RetireProcessAgent(domainGuid, serviceGuid, state);
             return status;
         }
@@ -382,6 +391,7 @@ namespace iLabs.Web
         protected virtual void register(string registerGuid, ServiceDescription[] info)
         {
             StringBuilder message = new StringBuilder();
+            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             message.AppendLine("Register called on " + ProcessAgentDB.ServiceAgent.codeBaseUrl);
 
             if (info != null && info.Length > 0)

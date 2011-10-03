@@ -97,39 +97,7 @@ namespace iLabs.Core
 
         }
 
-        //public DbCommand CreateCommand(string text, DbConnection connection)
-        //{
-        //    DbCommand cmd = connection.CreateCommand()
-        //    cmd.CommandText = text;
-        //    return cmd;
-        //}
-
-        //public DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type)
-        //{
-        //    DbParameter param = cmd.CreateParameter();
-        //    param.ParameterName = name;
-        //    param.DbType = type;
-        //    if (value == null)
-        //        param.Value = System.DBNull.Value;
-        //    else
-        //    {
-        //        if((value is string) && (((string)value).Length ==0)){
-        //            param.Value = System.DBNull.Value;
-        //        }
-        //        else{
-        //            param.Value = value;
-        //        }
-        //    }
-        //    return param;
-        //}
-
-        //public DbParameter CreateParameter(DbCommand cmd, string name, object value, DbType type, int size)
-        //{
-        //    DbParameter param = CreateParameter(cmd,name,value,type);
-        //    param.Size = size;
-        //    return param;
-        //}
-
+     
         /// <summary>
         /// Inserts or updates the domain ServiceBroker record in the database.
         /// </summary>
@@ -143,7 +111,7 @@ namespace iLabs.Core
 			 cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guid, DbType.AnsiString, 50));
 				
 				
 			try{
@@ -203,9 +171,9 @@ namespace iLabs.Core
 				cmd.CommandType = CommandType.StoredProcedure;
 				// populate parameters
              
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponid", coupon.couponId, DbType.Int64));
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", coupon.passkey, DbType.AnsiString, 100));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@couponid", coupon.couponId, DbType.Int64));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.AnsiString, 100));
 			
 				status = Convert.ToBoolean(cmd.ExecuteScalar());
 			}
@@ -260,9 +228,9 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", id,DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuid, DbType.AnsiString, 50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", pass, DbType.AnsiString, 100));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", id,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", issuerGuid, DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", pass, DbType.AnsiString, 100));
 			try 
 			{
 				
@@ -301,8 +269,8 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID",coupon.issuerGuid, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID",coupon.issuerGuid, DbType.Int64));
 			// execute the command
             try
             {
@@ -336,7 +304,7 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString,50));
             
             // execute the command
             try
@@ -411,8 +379,8 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", issuerGuid,DbType.AnsiString, 50));
 
 			// read the result
 			DbDataReader dataReader = null;
@@ -455,7 +423,7 @@ namespace iLabs.Core
             DbCommand cmd = connection.CreateCommand();
             cmd.CommandText ="GetIdentInCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", agentGUID,DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGUID", agentGUID,DbType.AnsiString,50));
 			
 			// execute the command
 			DbDataReader dataReader = null;
@@ -504,7 +472,7 @@ namespace iLabs.Core
             DbCommand cmd = connection.CreateCommand();
             cmd.CommandText =  "GetIdentOutCoupon";
 			cmd.CommandType = CommandType.StoredProcedure;
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", agentGUID, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGUID", agentGUID, DbType.AnsiString,50));
 			
 			
 			// execute the command
@@ -637,8 +605,8 @@ namespace iLabs.Core
             cmd.CommandText = "CancelTicketByID";
 			cmd.CommandType = CommandType.StoredProcedure;
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketID", ticket.ticketId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", ticket.issuerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketID", ticket.ticketId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@issuer", ticket.issuerGuid, DbType.AnsiString,50));
 			
 			// execute the command
 			//DbDataReader dataReader = null;
@@ -681,10 +649,10 @@ namespace iLabs.Core
             cmd.CommandText = "CancelTicket";
 			cmd.CommandType = CommandType.StoredProcedure;
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type, DbType.AnsiString,100));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGuid", redeemerGUID, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGuid", coupon.issuerGuid,DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", type, DbType.AnsiString,100));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemerGuid", redeemerGUID, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", coupon.issuerGuid,DbType.AnsiString,50));
 						
 			// execute the command
             try
@@ -727,10 +695,10 @@ namespace iLabs.Core
             cmd.CommandText = "DeleteTicket";
             cmd.CommandType = CommandType.StoredProcedure;
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type,DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGuid", redeemerGUID,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@couponID", coupon.couponId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGuid", coupon.issuerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemerGuid", redeemerGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@couponID", coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", coupon.issuerGuid, DbType.AnsiString, 50));
 
             // execute the command
 
@@ -743,8 +711,8 @@ namespace iLabs.Core
                     cmd =  connection.CreateCommand();
                     cmd.CommandText = "GetCouponCollectionCount";
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", coupon.issuerGuid, DbType.AnsiString,50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId,DbType.Int64));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", coupon.issuerGuid, DbType.AnsiString,50));
                     
                     int collectioncount = Convert.ToInt32(cmd.ExecuteScalar());
                     if (collectioncount == 0)
@@ -755,8 +723,8 @@ namespace iLabs.Core
                         cmd.CommandText = "DeleteCoupon";
                         cmd.CommandType = CommandType.StoredProcedure;
                         //cmd.Transaction = transaction;
-                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
-                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGuid", coupon.issuerGuid,DbType.AnsiString, 50));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId,DbType.Int64));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", coupon.issuerGuid,DbType.AnsiString, 50));
                         
                         ccount = Convert.ToInt32(cmd.ExecuteScalar());
                           
@@ -792,7 +760,7 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
 
             // execute the command
             try
@@ -831,16 +799,16 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketID", ticket.ticketId,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticket.type,DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", ticket.couponId,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", ticket.issuerGuid,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGUID", ticket.redeemerGuid,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sponsorGUID", ticket.sponsorGuid,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@payload",ticket.payload, DbType.String));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cancelled",0, DbType.Boolean));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@creationTime",ticket.creationTime, DbType.DateTime));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@duration", ticket.duration,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketID", ticket.ticketId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", ticket.type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", ticket.couponId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", ticket.issuerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemerGUID", ticket.redeemerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@sponsorGUID", ticket.sponsorGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@payload",ticket.payload, DbType.String));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@cancelled",0, DbType.Boolean));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@creationTime",ticket.creationTime, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@duration", ticket.duration,DbType.Int64));
             
             long id = -1;
             try
@@ -883,10 +851,10 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", coupon.issuerGuid,DbType.AnsiString, 50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerGUID,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType,DbType.AnsiString, 100)); 
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId,DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuer", coupon.issuerGuid,DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemer", redeemerGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", ticketType,DbType.AnsiString, 100)); 
 
 			// execute the command
 			DbDataReader dataReader = null;
@@ -953,7 +921,7 @@ namespace iLabs.Core
             cmd.CommandText= "RetrieveTicketsByType";
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType,DbType.AnsiString,100));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", ticketType,DbType.AnsiString,100));
 
 			// execute the command
 			DbDataReader dataReader = null;
@@ -1024,8 +992,8 @@ namespace iLabs.Core
             cmd.CommandText = "RetrieveTickets";
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", coupon.issuerGuid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuer", coupon.issuerGuid, DbType.AnsiString,50));
 			
 			// execute the command
 			DbDataReader dataReader = null;
@@ -1197,9 +1165,9 @@ namespace iLabs.Core
                     cmd.CommandText = "DeleteTicketByID";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Transaction = transaction;
-                    DbParameter ticketIDParam = FactoryDB.CreateParameter(cmd,"@ticketID", null, DbType.Int64);
+                    DbParameter ticketIDParam = FactoryDB.CreateParameter("@ticketID", null, DbType.Int64);
                     cmd.Parameters.Add(ticketIDParam);
-                    DbParameter issuerParam = FactoryDB.CreateParameter(cmd,"@issuer", null, DbType.AnsiString, 50);
+                    DbParameter issuerParam = FactoryDB.CreateParameter("@issuer", null, DbType.AnsiString, 50);
                     cmd.Parameters.Add(issuerParam);
                     foreach (LongTag tag in tickets)
                     {
@@ -1214,9 +1182,9 @@ namespace iLabs.Core
                     cmd.CommandText = "GetCouponCollectionCount";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Transaction = transaction;
-                    DbParameter couponIDParam = FactoryDB.CreateParameter(cmd,"@couponID", null, DbType.Int64);
+                    DbParameter couponIDParam = FactoryDB.CreateParameter("@couponID", null, DbType.Int64);
                     cmd.Parameters.Add(couponIDParam);
-                    DbParameter guidParam = FactoryDB.CreateParameter(cmd,"@guid", null, DbType.AnsiString, 50);
+                    DbParameter guidParam = FactoryDB.CreateParameter("@guid", null, DbType.AnsiString, 50);
                     cmd.Parameters.Add(guidParam);
 
                     foreach (Coupon c in coupons)
@@ -1238,9 +1206,9 @@ namespace iLabs.Core
                         cmd.CommandText = "DeleteCoupon";
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Transaction = transaction;
-                        couponIDParam = FactoryDB.CreateParameter(cmd,"@couponID", null, DbType.Int64);
+                        couponIDParam = FactoryDB.CreateParameter("@couponID", null, DbType.Int64);
                         cmd.Parameters.Add(couponIDParam);
-                        guidParam = FactoryDB.CreateParameter(cmd,"@guid", null, DbType.AnsiString, 50);
+                        guidParam = FactoryDB.CreateParameter("@guid", null, DbType.AnsiString, 50);
                         cmd.Parameters.Add(guidParam);
                         foreach (Coupon co in remove)
                         {
@@ -1286,20 +1254,20 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate params
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", agentGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGUID", agentGuid, DbType.AnsiString, 50));
             
             if(inId > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", inId,DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@inID", inId,DbType.Int64));
             else
-               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", null,DbType.Int64));
+               cmd.Parameters.Add(FactoryDB.CreateParameter("@inID", null,DbType.Int64));
             if(outId > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", outId,DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@outID", outId,DbType.Int64));
             else
-               cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", null,DbType.Int64));
+               cmd.Parameters.Add(FactoryDB.CreateParameter("@outID", null,DbType.Int64));
             if (issuerGuid != null && issuerGuid.Length > 0)
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", issuerGuid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", issuerGuid,DbType.AnsiString, 50));
             else
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuerGUID", null, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", null, DbType.AnsiString, 50));
             // execute the command
             try
             {
@@ -1332,10 +1300,10 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate GUID param
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGUID", guid, DbType.AnsiString, 50));
 
             // populate coupon id param
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", id, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ID", id, DbType.Int64));
 
             // execute the command
             try
@@ -1368,10 +1336,10 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate GUID param
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID", guid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGUID", guid,DbType.AnsiString, 50));
 
             // populate coupon id param
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", id,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ID", id,DbType.Int64));
 
             // execute the command
             try
@@ -1463,8 +1431,8 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText = "RemoveDomainCredentials";
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domainGuid", domainGuid,DbType.AnsiString,50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGuid",agentGuid, DbType.AnsiString,50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domainGuid", domainGuid,DbType.AnsiString,50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGuid",agentGuid, DbType.AnsiString,50));
                 
                 // execute the command
                 connection.Open();
@@ -1525,7 +1493,7 @@ namespace iLabs.Core
                 cmd.CommandText = "GetProcessAgentName";
 				cmd.CommandType = CommandType.StoredProcedure;
 				
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentID", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@agentID", id, DbType.Int32));
           
 				// execute the command
                 connection.Open();
@@ -1557,7 +1525,7 @@ namespace iLabs.Core
                 cmd.CommandText = "GetProcessAgentNameWithType";
                 cmd.CommandType = CommandType.StoredProcedure;
 
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@agentID", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@agentID", id, DbType.Int32));
 
                 // execute the command
                 DbDataReader dataReader = null;
@@ -1639,7 +1607,7 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText = "GetDomainProcessAgentTags";
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
                 
                 // execute the command
                 DbDataReader dataReader = null;
@@ -1725,7 +1693,7 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText = "GetDomainProcessAgentTagsWithType";
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain",domainGuid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domain",domainGuid,DbType.AnsiString, 50));
                 
                 // execute the command
                 DbDataReader dataReader = null;
@@ -1765,7 +1733,7 @@ namespace iLabs.Core
             DbCommand cmd = connection.CreateCommand();
             cmd.CommandText = "GetProcessAgentTagByGuid";
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guid, DbType.AnsiString, 50));
             
             DbDataReader dataReader = null;
             try
@@ -1807,7 +1775,7 @@ namespace iLabs.Core
             DbCommand cmd = connection.CreateCommand();
             cmd.CommandText = "GetProcessAgentTagsWithTypeByGuid";
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@guid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@guid", guid, DbType.AnsiString, 50));
             
             DbDataReader dataReader = null;
             try
@@ -1848,7 +1816,7 @@ namespace iLabs.Core
             DbCommand cmd = connection.CreateCommand();
             cmd.CommandText = "GetProcessAgentTagsWithTypeById";
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@agentID", paId, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@agentID", paId, DbType.AnsiString, 50));
 
             DbDataReader dataReader = null;
             try
@@ -1890,7 +1858,7 @@ namespace iLabs.Core
             DbCommand cmd = connection.CreateCommand();
             cmd.CommandText = "GetProcessAgentTagsWithTypeById";
             cmd.CommandType = CommandType.StoredProcedure;
-            DbParameter processAgentIdParam = FactoryDB.CreateParameter(cmd,"@agentID", null, DbType.AnsiString, 50);
+            DbParameter processAgentIdParam = FactoryDB.CreateParameter("@agentID", null, DbType.AnsiString, 50);
             cmd.Parameters.Add(processAgentIdParam);
             
             DbDataReader dataReader = null;
@@ -1941,7 +1909,7 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText = "GetProcessAgentTagsByTypeID";
 				cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@typeID", typeID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@typeID", typeID, DbType.Int32));
 				
 				// execute the command
 				DbDataReader dataReader = null;
@@ -1984,7 +1952,7 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText =  "GetProcessAgentTagsByTypeID";
 				cmd.CommandType = CommandType.StoredProcedure;
-				DbParameter typeParam = FactoryDB.CreateParameter(cmd,"@typeID", null, DbType.Int32);
+				DbParameter typeParam = FactoryDB.CreateParameter("@typeID", null, DbType.Int32);
                 cmd.Parameters.Add(typeParam);
 				
 				// execute the command
@@ -2032,7 +2000,7 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText= "GetProcessAgentTagsByType";
 				cmd.CommandType = CommandType.StoredProcedure;
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type,DbType.AnsiString,100));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@type", type,DbType.AnsiString,100));
 				
 				// execute the command
 				DbDataReader dataReader = null;
@@ -2075,8 +2043,8 @@ namespace iLabs.Core
                 DbCommand cmd = connection.CreateCommand();
                 cmd.CommandText = "GetDomainProcessAgentTagsByType";
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type,DbType.AnsiString, 100));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@type", type,DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
                
                 // execute the command
                 DbDataReader dataReader = null;
@@ -2122,7 +2090,7 @@ namespace iLabs.Core
 
 			// populate parameter
 			// 1. type
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", processAgentType,DbType.AnsiString, 100));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@type", processAgentType,DbType.AnsiString, 100));
 			
 			// execute the command
 			DbDataReader dataReader = null;
@@ -2243,7 +2211,7 @@ namespace iLabs.Core
         cmd.CommandText = "GetProcessAgentsByType";
 	    cmd.CommandType = CommandType.StoredProcedure;	
 
-	    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentType",agentType, DbType.AnsiString, 100));
+	    cmd.Parameters.Add(FactoryDB.CreateParameter("@agentType",agentType, DbType.AnsiString, 100));
 	    
 
 	    // execute the command
@@ -2307,7 +2275,7 @@ namespace iLabs.Core
             cmd.CommandText =  "GetProcessAgentByID";
             cmd.CommandType = CommandType.StoredProcedure;
 
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ID", id, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ID", id, DbType.Int32));
 
             // execute the command
             DbDataReader dataReader = null;
@@ -2354,7 +2322,7 @@ namespace iLabs.Core
             cmd.CommandText =  "GetProcessAgent";
 			cmd.CommandType = CommandType.StoredProcedure;
 
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentGUID",guid, DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@agentGUID",guid, DbType.AnsiString, 50));
 
 			// execute the command
 			DbDataReader dataReader = null;
@@ -2476,7 +2444,7 @@ namespace iLabs.Core
 
 			// populate parameter
 			// 1. type
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", processAgentType, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@type", processAgentType, DbType.AnsiString, 100));
 
 			// execute the command
 			typeID  = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2503,35 +2471,35 @@ namespace iLabs.Core
 
 					// populate parameters
 					// 2. processAgentType
-					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentType", processAgentType,DbType.AnsiString,100));
+					cmd.Parameters.Add(FactoryDB.CreateParameter("@processAgentType", processAgentType,DbType.AnsiString,100));
 					
 					// 1. guid
-					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
+					cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guid, DbType.AnsiString, 50));
 					
-					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name, DbType.String, 256));
+					cmd.Parameters.Add(FactoryDB.CreateParameter("@name", name, DbType.String, 256));
                     
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
                     
 					// 4. webServiceURL
-					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceURL", webServiceUrl, DbType.String, 512));
+					cmd.Parameters.Add(FactoryDB.CreateParameter("@webServiceURL", webServiceUrl, DbType.String, 512));
 					
 					// 5. redirectURL
-					cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseURL", codeBaseUrl, DbType.String, 512));
+					cmd.Parameters.Add(FactoryDB.CreateParameter("@codeBaseURL", codeBaseUrl, DbType.String, 512));
                     
                     // 9. issuerGUID
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@issuer", issuerGuid, DbType.AnsiString, 50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@issuer", issuerGuid, DbType.AnsiString, 50));
                    
                     // if inCoupon is null and outCoupon is null, then the processAgent is from another domain
                     // 10. inCouponID
                     if (inCoupon != null)
-                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", inCoupon.couponId, DbType.Int64));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter("@inID", inCoupon.couponId, DbType.Int64));
                     else
-                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@inID", null, DbType.Int64));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter("@inID", null, DbType.Int64));
                     // 11. OutCouponID
                     if (outCoupon != null) 
-                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", outCoupon.couponId, DbType.Int64));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter("@outID", outCoupon.couponId, DbType.Int64));
                     else
-                        cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@outID", null, DbType.Int64));
+                        cmd.Parameters.Add(FactoryDB.CreateParameter("@outID", null, DbType.Int64));
 
 					// execute the command
 			    	itemID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2558,8 +2526,8 @@ namespace iLabs.Core
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid,DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@state", state, DbType.Boolean));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@state", state, DbType.Boolean));
                
                 // execute the command
                 status = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2592,8 +2560,8 @@ namespace iLabs.Core
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid,DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@state",state, DbType.Boolean));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@state",state, DbType.Boolean));
 
                 // execute the command
                 connection.Open();
@@ -2718,7 +2686,7 @@ namespace iLabs.Core
 
                 // populate parameter
                 // 1. type
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", processAgentType, DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@type", processAgentType, DbType.AnsiString, 100));
            
                 // execute the command
                 typeID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2740,18 +2708,18 @@ namespace iLabs.Core
 
                     // populate parameters
                     // 2. processAgentType
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@processAgentType", processAgentType, DbType.AnsiString, 100));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@processAgentType", processAgentType, DbType.AnsiString, 100));
                   
                     // 1. guid
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString, 50));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name, DbType.String, 256));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@name", name, DbType.String, 256));
                     
                     // 4. webServiceURL
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceURL",webserviceURL, DbType.String, 512));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@webServiceURL",webserviceURL, DbType.String, 512));
                    
                     // 5. redirectURL
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseURL", codebaseURL, DbType.String, 512));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@codeBaseURL", codebaseURL, DbType.String, 512));
                        
                     // execute the command
                     itemID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2778,12 +2746,12 @@ namespace iLabs.Core
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name,DbType.String, 256));
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type",type, DbType.AnsiString, 100));
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid,DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseUrl", codeBaseURL,DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceUrl",serviceURL, DbType.String, 512));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@name", name,DbType.String, 256));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@type",type, DbType.AnsiString, 100));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid,DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@codeBaseUrl", codeBaseURL,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@webServiceUrl",serviceURL, DbType.String, 512));
 			
                 connection.Open();
 				status = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2811,13 +2779,13 @@ namespace iLabs.Core
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", id, DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid, DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@name", name, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", type, DbType.AnsiString, 100));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@domain", domainGuid, DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@codeBaseUrl", codeBaseURL, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@webServiceUrl", serviceURL, DbType.String,512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@id", id, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@name", name, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@type", type, DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@codeBaseUrl", codeBaseURL, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@webServiceUrl", serviceURL, DbType.String,512));
                 
                 connection.Open();
                 status = Convert.ToInt32(cmd.ExecuteScalar());
@@ -2850,7 +2818,7 @@ namespace iLabs.Core
 
 			// populate parameter
 			// 1. type
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", processAgentType, DbType.AnsiString, 100));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@type", processAgentType, DbType.AnsiString, 100));
 			
 			// execute the command
 		
@@ -2884,7 +2852,7 @@ namespace iLabs.Core
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guidStr, DbType.AnsiString, 50));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guidStr, DbType.AnsiString, 50));
 				
 				// read the result
 				//DbDataReader dataReader = null;
@@ -2921,7 +2889,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guidStr, DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guidStr, DbType.AnsiString, 50));
 			
 
 			// read the result
@@ -2962,7 +2930,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agent_id", id, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@agent_id", id, DbType.Int32));
 			
 
 			// read the result
@@ -3064,7 +3032,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id",id, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@id",id, DbType.Int32));
 
 			// read the result
 			DbDataReader dataReader = null;
@@ -3113,7 +3081,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guidStr, DbType.AnsiString, 50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guidStr, DbType.AnsiString, 50));
 			
 			// read the result
 			DbDataReader dataReader = null;
@@ -3160,8 +3128,8 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@issuer", issuerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@issuer", issuerGuid, DbType.AnsiString, 50));
 
             // read the result
             DbDataReader dataReader = null;
@@ -3255,7 +3223,7 @@ namespace iLabs.Core
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-				cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@agentType",type, DbType.AnsiString, 100));
+				cmd.Parameters.Add(FactoryDB.CreateParameter("@agentType",type, DbType.AnsiString, 100));
 			
 
 				// read the result
@@ -3307,7 +3275,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			DbParameter idParam = FactoryDB.CreateParameter(cmd,"@id",null,DbType.Int64);
+			DbParameter idParam = FactoryDB.CreateParameter("@id",null,DbType.Int64);
             cmd.Parameters.Add(idParam);
 
 			// read the result
@@ -3359,7 +3327,7 @@ namespace iLabs.Core
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", domainGuid,DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", domainGuid,DbType.AnsiString,50));
 
             // read the result
             DbDataReader dataReader = null;
@@ -3423,7 +3391,7 @@ namespace iLabs.Core
 				cmd.CommandType = CommandType.StoredProcedure;
 
 				// populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@typeid", typeID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@typeid", typeID, DbType.Int32));
 				
 				// read the result
 				DbDataReader dataReader = null;
@@ -3464,7 +3432,7 @@ namespace iLabs.Core
                 // command executes the "RetrieveTickets" stored procedure
                 DbCommand cmd = FactoryDB.CreateCommand("GetProcessAgentIdsByTypeID", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
-                DbParameter typeParam = FactoryDB.CreateParameter(cmd,"@typeID", null,DbType.Int32);
+                DbParameter typeParam = FactoryDB.CreateParameter("@typeID", null,DbType.Int32);
                 cmd.Parameters.Add(typeParam);
                 // execute the command
                 DbDataReader dataReader = null;
@@ -3575,7 +3543,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id",id, DbType.Int32));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@id",id, DbType.Int32));
 
 			// read the result
 			DbDataReader dataReader = null;
@@ -3635,7 +3603,7 @@ namespace iLabs.Core
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			// populate parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid",guid, DbType.AnsiString,50));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guid, DbType.AnsiString,50));
 			
 			// read the result
 			DbDataReader dataReader = null;
@@ -3696,12 +3664,12 @@ namespace iLabs.Core
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", id,DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@contactEmail", contactEmail, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@bugEmail", bugEmail, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@info", infoUrl, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@desc", description, DbType.String, 2048));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@location", location, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@id", id,DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@contactEmail", contactEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@bugEmail", bugEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@info", infoUrl, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@desc", description, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@location", location, DbType.String, 256));
                 
                 // read the result
                 DbDataReader dataReader = null;
@@ -3739,12 +3707,12 @@ namespace iLabs.Core
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@guid", guid,DbType.AnsiString,50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@contactEmail",contactEmail, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@bugEmail", bugEmail, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@info", infoUrl,DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@desc",description, DbType.String,2048));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@location", location, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid,DbType.AnsiString,50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@contactEmail",contactEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@bugEmail", bugEmail, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@info", infoUrl,DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@desc",description, DbType.String,2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@location", location, DbType.String, 256));
                 
                 // read the result
                 DbDataReader dataReader = null;

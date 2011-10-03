@@ -27,12 +27,13 @@ namespace iLabs.Scheduling.LabSide
 		 int[] credentialSetIDs;
 	     LssCredentialSet[] credentialSets;
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
+        DBManager dbManager = new DBManager();
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this experiment Information?')== false) return false;");
-			credentialSetIDs=LSSSchedulingAPI.ListCredentialSetIDs();
-			credentialSets=LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
+			credentialSetIDs=dbManager.ListCredentialSetIDs();
+			credentialSets=dbManager.GetCredentialSets(credentialSetIDs);
 			
 			if(!IsPostBack)
 			{
@@ -135,8 +136,8 @@ namespace iLabs.Scheduling.LabSide
 		/// </summary>
 		private void InitializeGroupDropDown()
 		{
-			credentialSetIDs = LSSSchedulingAPI.ListCredentialSetIDs();
-			credentialSets = LSSSchedulingAPI.GetCredentialSets(credentialSetIDs);
+			credentialSetIDs = dbManager.ListCredentialSetIDs();
+			credentialSets = dbManager.GetCredentialSets(credentialSetIDs);
 			
 			ddlGroup.Items.Clear();
 
@@ -269,7 +270,7 @@ namespace iLabs.Scheduling.LabSide
 				// Add the Credential Set
 				try
 				{
-					credentialSetID = LSSSchedulingAPI.AddCredentialSet(txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text);
+					credentialSetID = dbManager.AddCredentialSet(txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text);
 				}
 				catch (Exception ex)
 				{
@@ -307,7 +308,7 @@ namespace iLabs.Scheduling.LabSide
 				try
 				{
 					// Modify the Credential
-					LSSSchedulingAPI.ModifyCredentialSet(credentialSetID, txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text);
+					dbManager.ModifyCredentialSet(credentialSetID, txtServiceBrokerID.Text, txtServiceBrokerName.Text, txtGroupName.Text);
 					
 					lblErrorMessage.Visible = true;
 					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Group " + txtGroupName.Text + " " + txtServiceBrokerName.Text + " has been modified.");
@@ -339,7 +340,7 @@ namespace iLabs.Scheduling.LabSide
 				credentialSetID = credentialSets[ddlGroup.SelectedIndex-1].credentialSetId;
 				try
 				{
-					LSSSchedulingAPI.RemoveCredentialSets(new int[]{credentialSetID});
+					dbManager.RemoveCredentialSets(new int[]{credentialSetID});
 					lblErrorMessage.Visible = true;
 					lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Group '" +txtGroupName.Text + " " + txtServiceBrokerName.Text + "' has been deleted");
 					InitializeGroupDropDown();

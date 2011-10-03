@@ -44,7 +44,7 @@ namespace iLabs.ServiceBroker
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("Experiment_Retrieve EssInfo", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@experimentID", experimentID, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@experimentID", experimentID, DbType.Int64));
             ProcessAgentInfo ess = null;
             try
             {
@@ -211,9 +211,9 @@ namespace iLabs.ServiceBroker
 
                 // populate parameter
                 // 1. type
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", id, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@adminURL", url, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ticketType", ticketType, DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@processAgentID", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@adminURL", url, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@ticketType", ticketType, DbType.AnsiString, 100));
 
 
                 // execute the command
@@ -273,7 +273,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameter
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@adminURLID", Id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@adminURLID", Id, DbType.Int32));
 
                 // execute the command
                 return Convert.ToInt32(cmd.ExecuteScalar());
@@ -299,9 +299,9 @@ namespace iLabs.ServiceBroker
 
                 // populate parameter
                 // 1. type
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", processAgentId, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@adminURL", url, DbType.String, 512));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ticketType", ticketType, DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@processAgentID", processAgentId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@adminURL", url, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@ticketType", ticketType, DbType.AnsiString, 100));
 
 
                 // execute the command
@@ -376,9 +376,9 @@ namespace iLabs.ServiceBroker
 
             // populate parameter
             // 1. type
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", agentID, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@old", oldCodebase, DbType.String, 512));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@new", newCodebase, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@id", agentID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@old", oldCodebase, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@new", newCodebase, DbType.String, 512));
 
             try
             {
@@ -410,7 +410,7 @@ namespace iLabs.ServiceBroker
 
             // populate parameter
             // 1. type
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", clientID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@id", clientID, DbType.Int32));
 
             int count = -1;
             try
@@ -424,8 +424,8 @@ namespace iLabs.ServiceBroker
 
                     DbCommand cmd2 = FactoryDB.CreateCommand("Client_UpdateLoaderScript", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
-                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@id", clientID, DbType.Int32));
-                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@script", loaderScript, DbType.String, 2000));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter("@id", clientID, DbType.Int32));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter("@script", loaderScript, DbType.String, 2000));
 
                     count = cmd2.ExecuteNonQuery();
                 }
@@ -514,7 +514,7 @@ namespace iLabs.ServiceBroker
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@processAgentID", processAgentID, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@processAgentID", processAgentID, DbType.Int32));
 
 
             // read the result
@@ -675,7 +675,7 @@ namespace iLabs.ServiceBroker
                 DbCommand cmd = FactoryDB.CreateCommand("ProcesAgent_RetrieveAdminServiceTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                 // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupId", groupID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@groupId", groupID, DbType.Int32));
 
 
                 // read the result
@@ -717,7 +717,7 @@ namespace iLabs.ServiceBroker
                 DbCommand cmd = FactoryDB.CreateCommand("ProcessAgent_RetrieveAdminTags", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                 // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@groupID", groupID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
 
                 // read the result
                 connection.Open();
@@ -754,8 +754,8 @@ namespace iLabs.ServiceBroker
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("ProcessAgent_RetrieveAdminGrants", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@groupID", groupID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@agentID", agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
 
 
             try
@@ -852,7 +852,7 @@ namespace iLabs.ServiceBroker
                     cmd2.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@string_Value", key, DbType.String, 2048));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter("@string_Value", key, DbType.String, 2048));
 
                     keyID = Convert.ToInt32(cmd2.ExecuteScalar());
                 }
@@ -863,7 +863,7 @@ namespace iLabs.ServiceBroker
                     DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                     cmd2.CommandType = CommandType.StoredProcedure;
 
-                    cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@resourceType_Value", key, DbType.String, 256));
+                    cmd2.Parameters.Add(FactoryDB.CreateParameter("@resourceType_Value", key, DbType.String, 256));
 
                     keyID = Convert.ToInt32(cmd2.ExecuteScalar());
                 }
@@ -875,8 +875,8 @@ namespace iLabs.ServiceBroker
                     throw new ArgumentException("Value for key is invalid");
 
                 // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingKey_Type", keyTypeID, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingKey", keyID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@MappingKey_Type", keyTypeID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@MappingKey", keyID, DbType.Int32));
 
                 // execute the command
                 int mappingID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -903,7 +903,7 @@ namespace iLabs.ServiceBroker
                         cmd2.CommandType = CommandType.StoredProcedure;
 
                         // populate parameters
-                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@string_Value", (string)values[i], DbType.String, 2048));
+                        cmd2.Parameters.Add(FactoryDB.CreateParameter("@string_Value", (string)values[i], DbType.String, 2048));
 
                         valueID = Convert.ToInt32(cmd2.ExecuteScalar());
                     }
@@ -914,7 +914,7 @@ namespace iLabs.ServiceBroker
                         DbCommand cmd2 = FactoryDB.CreateCommand("ResourceMapResourceType_Insert", connection);
                         cmd2.CommandType = CommandType.StoredProcedure;
 
-                        cmd2.Parameters.Add(FactoryDB.CreateParameter(cmd2, "@resourceType_Value", (string)values[i], DbType.String, 256));
+                        cmd2.Parameters.Add(FactoryDB.CreateParameter("@resourceType_Value", (string)values[i], DbType.String, 256));
                         valueID = Convert.ToInt32(cmd2.ExecuteScalar());
                     }
 
@@ -929,9 +929,9 @@ namespace iLabs.ServiceBroker
                     //cmd.Parameters.Clear();
 
                     // populate stored procedure parameters
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@Mapping_ID", mappingID, DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingValue_Type", valueTypeID, DbType.Int32));
-                    cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@MappingValue", valueID, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter( "@Mapping_ID", mappingID, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter( "@MappingValue_Type", valueTypeID, DbType.Int32));
+                    cmd.Parameters.Add(FactoryDB.CreateParameter( "@MappingValue", valueID, DbType.Int32));
 
                     // execute the command
                     int mapValueID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -1007,7 +1007,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@mapping_ID", mappingId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@mapping_ID", mappingId, DbType.Int32));
 
                 connection.Open();
                 cmd.ExecuteNonQuery();
@@ -1075,10 +1075,10 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@keyID", keyId, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@keyType", keyTypeId, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@valueID", valueId, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@valueType", valueTypeId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@keyID", keyId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@keyType", keyTypeId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@valueID", valueId, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@valueType", valueTypeId, DbType.Int32));
 
                 connection.Open();
                 mapId = (int)cmd.ExecuteScalar();
@@ -1123,8 +1123,8 @@ namespace iLabs.ServiceBroker
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", type, DbType.AnsiString, 256));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", value, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@type", type, DbType.AnsiString, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@id", value, DbType.Int32));
 
             // execute the command
             try
@@ -1187,7 +1187,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@mappingID", mappingID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@mappingID", mappingID, DbType.Int32));
 
                 // execute the command
                 dataReader = cmd.ExecuteReader();
@@ -1367,7 +1367,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ID", strID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@ID", strID, DbType.Int32));
 
                 connection.Open();
                 return Convert.ToString(cmd.ExecuteScalar());
@@ -1394,7 +1394,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@string_Value", s, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@string_Value", s, DbType.String, 2048));
 
                 connection.Open();
                 return Convert.ToInt32(cmd.ExecuteScalar());
@@ -1418,8 +1418,8 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@id", id, DbType.Int32));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@string", s, DbType.String, 2048));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@id", id, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@string", s, DbType.String, 2048));
 
                 connection.Open();
                 mappingID = Convert.ToInt32(cmd.ExecuteScalar());
@@ -1448,7 +1448,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@resourceType_Value", s, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@resourceType_Value", s, DbType.String, 256));
 
                 connection.Open();
                 return Convert.ToInt32(cmd.ExecuteScalar());
@@ -1472,7 +1472,7 @@ namespace iLabs.ServiceBroker
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@ID", resourceTypeID, DbType.Int32));
+                cmd.Parameters.Add(FactoryDB.CreateParameter( "@ID", resourceTypeID, DbType.Int32));
 
                 connection.Open();
                 return Convert.ToString(cmd.ExecuteScalar());
@@ -1565,8 +1565,8 @@ namespace iLabs.ServiceBroker
 
             // populate parameters
 
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@type", type, DbType.Int32));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@target", target, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@type", type, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@target", target, DbType.Int32));
 
             try
             {
@@ -1930,17 +1930,17 @@ namespace iLabs.ServiceBroker
         //        DbParameter paramValue = null;
 
         //        // Need to do this in pairs 
-        //        paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyType", DbType.Int);
-        //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@keyValue", DbType.Int);
+        //        paramType = cmd.Parameters.Add(FactoryDB.CreateParameter("@keyType", DbType.Int);
+        //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter("@keyValue", DbType.Int);
         //        paramType.Value = keyType; 
         //        paramValue.Value = keyValue;
-        //        paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@Type0", DbType.Int);
-        //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value0", DbType.Int);
+        //        paramType = cmd.Parameters.Add(FactoryDB.CreateParameter("@Type0", DbType.Int);
+        //        paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter("@value0", DbType.Int);
         //        paramType.Value = type0;
         //        paramValue.Value = value0;
 
-        //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type1", DbType.Int);
-        //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value1", DbType.Int);
+        //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter("@type1", DbType.Int);
+        //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter("@value1", DbType.Int);
         //    if(ResourceMap.IsResourceMapType(type1)){
         //        paramType.Value = type1;   
         //        paramValue.Value = value1;
@@ -1949,8 +1949,8 @@ namespace iLabs.ServiceBroker
         //        paramType.Value = DBNull.Value;   
         //        paramValue.Value =  DBNull.Value;
         //    }
-        //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type2", DbType.Int);
-        //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@value2", DbType.Int);
+        //    paramType = cmd.Parameters.Add(FactoryDB.CreateParameter("@type2", DbType.Int);
+        //    paramValue = cmd.Parameters.Add(FactoryDB.CreateParameter("@value2", DbType.Int);
         //   if(ResourceMap.IsResourceMapType(type2)){
         //        paramType.Value = type2;   
         //        paramValue.Value = value2;
@@ -2142,19 +2142,19 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponId", DbType.Int );
+                    DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", DbType.Int );
                     idParam.Value = couponId;
-                    DbParameter couponGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponGuid", DbType.AnsiString,50 );
+                    DbParameter couponGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@couponGuid", DbType.AnsiString,50 );
                     couponGuidParam.Value = couponGuid;
-                    DbParameter registerGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@registerGuid", DbType.Varchar,50);
+                    DbParameter registerGuidParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@registerGuid", DbType.Varchar,50);
                     registerGuidParam.Value = registerGuid;
-                    DbParameter sourceParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sourceGuid", DbType.Varchar,50);
+                    DbParameter sourceParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@sourceGuid", DbType.Varchar,50);
                     sourceParam.Value = sourceGuid;
-                    DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int );
+                    DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@status", DbType.Int );
                     statusParam.Value = status;
-                    DbParameter emailParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@email", DbType.AnsiString,256 );
+                    DbParameter emailParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@email", DbType.AnsiString,256 );
                     emailParam.Value = email;
-                    DbParameter descriptorParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@descriptor", DbType.Text );
+                    DbParameter descriptorParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@descriptor", DbType.Text );
                     descriptorParam.Value = descriptor;
                     try
                     {
@@ -2180,7 +2180,7 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter("@", DbType.AnsiString);
                     Param.Value = (string)s;
                     try
                     {
@@ -2232,7 +2232,7 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter("@id", DbType.Int);
                     Param.Value = id;
                     try
                     {
@@ -2262,7 +2262,7 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter("@", DbType.AnsiString);
                     Param.Value = (string)s;
                     try
                     {
@@ -2288,7 +2288,7 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter("@", DbType.AnsiString);
                     Param.Value = (string)s;
                     try
                     {
@@ -2313,7 +2313,7 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@", DbType.AnsiString);
+                    DbParameter Param = cmd.Parameters.Add(FactoryDB.CreateParameter("@", DbType.AnsiString);
                     Param.Value = (string)s;
                     try
                     {
@@ -2340,9 +2340,9 @@ namespace iLabs.ServiceBroker
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     // populate parameters
-                    DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@id", DbType.Int);
+                    DbParameter idParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@id", DbType.Int);
                     idParam.Value = id;
-                    DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@status", DbType.Int);
+                    DbParameter statusParam = cmd.Parameters.Add(FactoryDB.CreateParameter("@status", DbType.Int);
                     statusParam.Value = status;
                     try
                     {

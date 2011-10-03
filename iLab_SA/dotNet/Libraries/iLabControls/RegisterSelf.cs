@@ -466,7 +466,8 @@ namespace iLabs.Controls
                     message.Append(" You should use the fully qualified hostname or IP adress inplace of the default 'localhost'.");
 
                     // Need to call selfRegister
-                    AgentType = ConfigurationManager.AppSettings["serviceType"];
+                    if(AgentType == null)
+                        AgentType = ConfigurationManager.AppSettings["serviceType"];
                     string serviceGUID = ConfigurationManager.AppSettings["serviceGUID"];
                     if (serviceGUID != null)
                         AgentGuid = serviceGUID;
@@ -478,14 +479,17 @@ namespace iLabs.Controls
                     string serviceName = ConfigurationManager.AppSettings["serviceName"];
                     if (serviceName != null)
                         AgentName = serviceName;
-         
-                    string codebaseURL = ConfigurationManager.AppSettings["codebaseURL"];
-                    //if (codebaseURL != null)
-                    //    CodebaseUrl = codebaseURL;
-                     CodebaseUrl = this.Page.Request.ApplicationPath;
-                     CodebaseUrl = Utilities.ExportUrlPath(this.Page.Request.Url);
-                     //CodebaseUrl = this.Page.Request.Url;
 
+                    StringBuilder buf = new StringBuilder();
+                    buf.Append(this.Page.Request.Url.Scheme + "://");
+                    buf.Append(this.Page.Request.Url.Host);
+                    if (!this.Page.Request.Url.IsDefaultPort)
+                    {
+                        buf.Append(":" + this.Page.Request.Url.Port);
+                    }
+                    buf.Append(this.Page.Request.ApplicationPath);
+                     CodebaseUrl = buf.ToString();
+                  
                     string str = ConfigurationManager.AppSettings["supportMailAddress"];
                     if (str != null)
                         ContactEmail = str;
@@ -809,6 +813,7 @@ namespace iLabs.Controls
                 dbTicketing.SelfRegisterProcessAgent(txtServiceGuid.Text.Trim(),
                     txtServiceName.Text, lblServiceType.Text, null,
                     txtCodebaseUrl.Text.Trim(), webURL);
+                txtServiceUrl.Text = webURL;
                 if (AgentType == ProcessAgentType.SERVICE_BROKER)
                 {
                     dbTicketing.SetDomainGuid(txtServiceGuid.Text.Trim());

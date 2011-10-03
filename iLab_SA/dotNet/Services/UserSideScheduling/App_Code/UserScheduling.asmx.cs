@@ -82,9 +82,10 @@ namespace iLabs.Scheduling.UserSide
             Coupon inCoupon, Coupon outCoupon)
         {
               int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+              DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                DBManager dbManager = new DBManager();
+               
             try
             {
                 status = dbManager.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
@@ -114,9 +115,9 @@ namespace iLabs.Scheduling.UserSide
         public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
-                DBManager dbManager = new DBManager();
                 status = dbManager.ModifyProcessAgent(originalGuid, agent, extra);
             }
             return status;
@@ -146,10 +147,10 @@ namespace iLabs.Scheduling.UserSide
             try
             {
                 DBManager dbManager = new DBManager();
-                Ticket ssTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.SCHEDULE_SESSION);
+                Ticket ssTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.SCHEDULE_SESSION);
                 
-                string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
-                LSSInfo  lssInfo = DBManager.GetLSSInfo(lssGuid);
+                string lssGuid = dbManager.ListLssIdByExperiment(clientGuid, labServerGuid);
+                LSSInfo  lssInfo = dbManager.GetLSSInfo(lssGuid);
                 LabSchedulingProxy lssProxy = new LabSchedulingProxy();
                 lssProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                 lssProxy.OperationAuthHeaderValue.coupon = opCoupon;
@@ -179,9 +180,9 @@ namespace iLabs.Scheduling.UserSide
         public Reservation[] ListReservations(string serviceBrokerGuid, string userName, 
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime)
         {
-           
-            
-            Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
+
+            DBManager dbManager = new DBManager();
+            Ticket retrievedTicket = dbManager.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
             if (retrievedTicket.IsExpired())
             {
                 throw new AccessDeniedException("The reservation ticket has expired, Please re-login.");
@@ -208,8 +209,8 @@ namespace iLabs.Scheduling.UserSide
             clientGuid = payload.GetElementsByTagName("clientGuid")[0].InnerText;
             labGuid = payload.GetElementsByTagName("labServerGuid")[0].InnerText;
 
-            lssUrl = USSSchedulingAPI.ListLSSURLbyExperiment(clientGuid, labServerGuid);
-            lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
+            lssUrl = dbManager.ListLssUrlByExperiment(clientGuid, labServerGuid);
+            lssGuid = dbManager.ListLssIdByExperiment(clientGuid, labServerGuid);
 
             userTarget = Utilities.ResolveArguments(userName, user, true);
             clientGuidTarget = Utilities.ResolveArguments(labClientGuid, clientGuid, false);
@@ -224,7 +225,7 @@ namespace iLabs.Scheduling.UserSide
                     endTime.Hour, endTime.Minute, 0, endTime.Kind);
             if (targetEnd.Kind != DateTimeKind.Utc)
                 targetEnd = targetEnd.ToUniversalTime();
-            ReservationInfo[] resInfos = USSSchedulingAPI.GetReservationInfos(serviceBrokerGuid, userTarget, group,
+            ReservationInfo[] resInfos = dbManager.GetReservationInfos(serviceBrokerGuid, userTarget, group,
                 labGuidTarget, clientGuidTarget, targetStart, targetEnd);
             if (resInfos != null && resInfos.Length > 0)
             {
@@ -264,13 +265,14 @@ namespace iLabs.Scheduling.UserSide
         {
             string message = null;
              Coupon opCoupon = new Coupon();
+             DBManager dbManager = new DBManager();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             string type = TicketTypes.SCHEDULE_SESSION;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
+                Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, type);
                 if (retrievedTicket.IsExpired())
                 {
                     throw new AccessDeniedException("The reservation ticket has expired, Please re-login.");
@@ -304,8 +306,8 @@ namespace iLabs.Scheduling.UserSide
                 labGuidTarget = Utilities.ResolveArguments(labServerGuid, labGuid, false);
 
                 
-                string lssGuid = USSSchedulingAPI.ListLSSIDbyExperiment(labClientGuid, labServerGuid);
-                LSSInfo lssInfo = DBManager.GetLSSInfo(lssGuid);
+                string lssGuid = dbManager.ListLssIdByExperiment(labClientGuid, labServerGuid);
+                LSSInfo lssInfo = dbManager.GetLSSInfo(lssGuid);
                 DateTime targetStart = new DateTime(startTime.Year, startTime.Month, startTime.Day,
                startTime.Hour, startTime.Minute, 0, startTime.Kind);
                 if (targetStart.Kind != DateTimeKind.Utc)
@@ -322,8 +324,8 @@ namespace iLabs.Scheduling.UserSide
                 message = lssProxy.ConfirmReservation( serviceBrokerGuid, groupName, ProcessAgentDB.ServiceGuid,
                     labServerGuid, labClientGuid, targetStart, targetEnd);
                 if(message.ToLower().Contains("success")){
-                    int infoID = USSSchedulingAPI.ListExperimentInfoIDByExperiment(labServerGuid, labClientGuid);
-                    USSSchedulingAPI.AddReservation(userName, serviceBrokerGuid,groupName,infoID,targetStart,targetEnd);
+                    int infoID = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, labClientGuid);
+                    dbManager.AddReservation(userName, serviceBrokerGuid,groupName,infoID,targetStart,targetEnd);
                 }
                 return message;
             }
@@ -359,9 +361,10 @@ namespace iLabs.Scheduling.UserSide
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
+            DBManager dbManager = new DBManager();
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
+                Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
                 if (retrievedTicket.payload != null && retrievedTicket.payload.Length > 0)
                 {
                     XmlQueryDoc revokeDoc = new XmlQueryDoc(retrievedTicket.payload);
@@ -381,7 +384,7 @@ namespace iLabs.Scheduling.UserSide
                     targetEnd = targetEnd.ToUniversalTime();
                 if (fromISB)
                 { // Need to forward to LSS
-                    string lssUrl = USSSchedulingAPI.ListLSSURLbyExperiment(labClientGuid, labServerGuid);
+                    string lssUrl = dbManager.ListLssUrlByExperiment(labClientGuid, labServerGuid);
                     if (lssUrl != null && lssUrl.Length > 0)
                     {
                         LabSchedulingProxy lssProxy = new LabSchedulingProxy();
@@ -393,14 +396,14 @@ namespace iLabs.Scheduling.UserSide
                     }
                 }
                 
-                ReservationData[] ris = USSSchedulingAPI.GetReservations(serviceBrokerGuid, null, groupName,
+                ReservationData[] ris = dbManager.GetReservations(serviceBrokerGuid, null, groupName,
                     labServerGuid, labClientGuid, targetStart, targetEnd);
            
                 if (ris != null && ris.Length > 0)
                 {
 
                     InteractiveSBProxy sbProxy = new InteractiveSBProxy();
-                    ProcessAgentInfo sbInfo = dbTicketing.GetProcessAgentInfo(ProcessAgentDB.ServiceAgent.domainGuid);
+                    ProcessAgentInfo sbInfo = dbManager.GetProcessAgentInfo(ProcessAgentDB.ServiceAgent.domainGuid);
                     AgentAuthHeader header = new AgentAuthHeader();
                     header.coupon = sbInfo.identOut;
                     header.agentGuid = ProcessAgentDB.ServiceGuid;
@@ -409,7 +412,7 @@ namespace iLabs.Scheduling.UserSide
                     foreach (ReservationData rd in ris)
                     {
                         
-                        status = USSSchedulingAPI.RevokeReservation(rd.sbGuid, rd.groupName, rd.lsGuid, rd.clientGuid,
+                        status = dbManager.RevokeReservation(rd.sbGuid, rd.groupName, rd.lsGuid, rd.clientGuid,
                               rd.startTime, rd.endTime, message);
                         if (status)
                         {
@@ -445,6 +448,7 @@ namespace iLabs.Scheduling.UserSide
         public Reservation RedeemReservation(string serviceBrokerGuid, String userName,  
             String labServerGuid, string clientGuid)
 		{
+            DBManager dbManager = new DBManager();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -452,8 +456,8 @@ namespace iLabs.Scheduling.UserSide
             string type = TicketTypes.REDEEM_RESERVATION;
             try
             {
-                Ticket retrievedTicket = dbTicketing.RetrieveAndVerify(opCoupon, type);
-                ReservationInfo res = USSSchedulingAPI.RedeemReservation(userName, serviceBrokerGuid, clientGuid, labServerGuid);
+                Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, type);
+                ReservationInfo res = dbManager.RedeemReservation(userName, serviceBrokerGuid, clientGuid, labServerGuid);
                 if (res != null)
                 {
                     Reservation reservation = new Reservation(res.startTime, res.endTime);
@@ -484,18 +488,19 @@ namespace iLabs.Scheduling.UserSide
             string groupName)
 		{
            int add = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+           DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    int test = USSSchedulingAPI.GetCredentialSetID(serviceBrokerGuid,groupName);
+                    int test = dbManager.GetCredentialSetID(serviceBrokerGuid,groupName);
                     if(test > 0)
                     {
 
                         add = 1; ;
                     }
                     else{
-                        int i = USSSchedulingAPI.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
+                        int i = dbManager.AddCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
                         add = (i != -1) ? 1 : 0;
                        
                     }
@@ -515,11 +520,12 @@ namespace iLabs.Scheduling.UserSide
             string groupName)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    status = DBManager.ModifyCredentialSetServiceBroker(originalGuid, serviceBrokerGuid, serviceBrokerName);
+                    status = dbManager.ModifyCredentialSetServiceBroker(originalGuid, serviceBrokerGuid, serviceBrokerName);
                 }
                 catch
                 {
@@ -541,11 +547,12 @@ namespace iLabs.Scheduling.UserSide
             string groupName)
         {
             int removed = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    removed = USSSchedulingAPI.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
+                    removed = dbManager.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
                 }
                 catch
                 {
@@ -573,11 +580,12 @@ namespace iLabs.Scheduling.UserSide
             string providerName, string lssGuid)
         {
            int added = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+           DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    int eID = USSSchedulingAPI.AddExperimentInfo(labServerGuid, labServerName,labClientGuid,  labClientName, labClientVersion, providerName, lssGuid);
+                    int eID = dbManager.AddExperimentInfo(labServerGuid, labServerName,labClientGuid,  labClientName, labClientVersion, providerName, lssGuid);
                     added = (eID != -1) ? 1 : 0;
                 }
                 catch
@@ -596,11 +604,12 @@ namespace iLabs.Scheduling.UserSide
             string providerName, string lssGuid)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    status = DBManager.ModifyExperimentInfo(labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion, providerName, lssGuid);
+                    status = dbManager.ModifyExperimentInfo(labServerGuid, labServerName, labClientGuid, labClientName, labClientVersion, providerName, lssGuid);
                 }
                 catch
                 {
@@ -637,11 +646,12 @@ namespace iLabs.Scheduling.UserSide
         public int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
         {
             int added = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    int lID = USSSchedulingAPI.AddLSSInfo(lssGuid, lssName, lssUrl);
+                    int lID = dbManager.AddLSSInfo(lssGuid, lssName, lssUrl);
                     added = (lID != -1) ? 1 : 0;
                 }
                 catch
@@ -658,11 +668,12 @@ namespace iLabs.Scheduling.UserSide
         public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
         {
             int status = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    status = DBManager.ModifyLSSInfo(lssGuid, lssName, lssUrl);
+                    status = dbManager.ModifyLSSInfo(lssGuid, lssName, lssUrl);
                     
                    
                 }
@@ -680,11 +691,12 @@ namespace iLabs.Scheduling.UserSide
         public int RemoveLSSInfo(string lssGuid)
         {
             int added = 0;
-            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            DBManager dbManager = new DBManager();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    added = USSSchedulingAPI.RemoveLSSInfoByGuid(lssGuid);
+                    added = dbManager.RemoveLSSInfoByGuid(lssGuid);
                   
                 }
                 catch

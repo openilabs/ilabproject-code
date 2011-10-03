@@ -51,9 +51,9 @@ namespace iLabs.ServiceBroker.Internal
 			DbCommand myCommand = FactoryDB.CreateCommand("Grant_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", grant.agentID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@functionName", grant.function, DbType.AnsiString,128));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", grant.qualifierID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@agentID", grant.agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@functionName", grant.function, DbType.AnsiString,128));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierID", grant.qualifierID, DbType.Int32));
 			
 			try
 			{
@@ -83,7 +83,7 @@ namespace iLabs.ServiceBroker.Internal
 			DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("Grant_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@grantID", null, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@grantID", null, DbType.Int32));
 
 			/*
 			 * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
@@ -304,9 +304,9 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("Qualifier_Insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierTypeID", qualifier.qualifierType, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierReferenceID", qualifier.qualifierReferenceID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierName", qualifier.qualifierName, DbType.String,512));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierTypeID", qualifier.qualifierType, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierReferenceID", qualifier.qualifierReferenceID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierName", qualifier.qualifierName, DbType.String,512));
 			
 			try
 			{
@@ -339,7 +339,7 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("Qualifier_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", 0, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierID", 0, DbType.Int32));
 			
 			/*
 			 * Note : Alternately ADO.NET could be used. However, the disconnected  DataAdapter object might prove
@@ -396,8 +396,8 @@ namespace iLabs.ServiceBroker.Internal
 				DbCommand myCommand = FactoryDB.CreateCommand("QualifierHierarchy_Insert", myConnection);
 				myCommand.CommandType = CommandType.StoredProcedure;
 
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", qualifierID, DbType.Int32));
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@parentQualifierID", parentQualifierID, DbType.Int32));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierID", qualifierID, DbType.Int32));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter( "@parentQualifierID", parentQualifierID, DbType.Int32));
 			
 				try
 				{
@@ -430,8 +430,8 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("QualifierHierarchy_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierID", qualifierID, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@parentQualifierID", parentQualifierID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierID", qualifierID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@parentQualifierID", parentQualifierID, DbType.Int32));
 			
 			try
 			{
@@ -654,9 +654,9 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("Qualifier_UpdateName", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@qualifierTypeId", qualifierTypeId, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@refid", referenceId, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@newName", name, DbType.String,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@qualifierTypeId", qualifierTypeId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@refid", referenceId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@newName", name, DbType.String,256));
 
             try
             {
@@ -695,7 +695,7 @@ namespace iLabs.ServiceBroker.Internal
 			myCommand.CommandType = CommandType.StoredProcedure;
 			int isGroup = -1;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@agentID", agentID, DbType.Int32));
 			
 			try
 			{
@@ -760,7 +760,7 @@ namespace iLabs.ServiceBroker.Internal
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("Agent_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters .Add(FactoryDB.CreateParameter(myCommand,"@agentID",null,DbType.Int32));
+			myCommand.Parameters .Add(FactoryDB.CreateParameter("@agentID",null,DbType.Int32));
 
 			try 
 			{
@@ -814,7 +814,7 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveGroups", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@userID", agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@userID", agentID, DbType.Int32));
 
             try
             {
@@ -848,7 +848,7 @@ namespace iLabs.ServiceBroker.Internal
             DbCommand myCommand = FactoryDB.CreateCommand("AgentGroup_Retrieve", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@agentID", agentID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@agentID", agentID, DbType.Int32));
 			
 			try
 			{

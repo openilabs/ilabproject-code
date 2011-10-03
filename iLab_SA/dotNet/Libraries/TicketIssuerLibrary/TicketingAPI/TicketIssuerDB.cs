@@ -138,8 +138,8 @@ namespace iLabs.TicketIssuer
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 // populate parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
-                cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", passkey,DbType.AnsiString, 100));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", passkey,DbType.AnsiString, 100));
                 
                 try
                 {
@@ -164,8 +164,8 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", coupon.passkey, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.AnsiString, 100));
            
             try
             {
@@ -249,7 +249,7 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
             string pass = TicketUtil.NewPasskey();
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", pass,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", pass,DbType.AnsiString, 100));
 
             //DbDataReader dataReader = null;
             try
@@ -282,7 +282,7 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@passKey", pass, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", pass, DbType.AnsiString, 100));
 
             //DbDataReader dataReader = null;
             try
@@ -307,7 +307,7 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
 
             try
             {
@@ -333,7 +333,7 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd, "@couponID", couponID, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter( "@couponID", couponID, DbType.Int64));
 
             try
             {
@@ -395,7 +395,7 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
 
             DbDataReader dataReader = null;
             try
@@ -454,7 +454,7 @@ namespace iLabs.TicketIssuer
 
 
             // populate parameters 
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
            
             count = Convert.ToInt32(cmd.ExecuteScalar());
             return count;
@@ -473,14 +473,14 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type,DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", couponID,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemerGUID", redeemerGUID,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sponsorGUID", sponsorGUID,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@payload", payload, DbType.String));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@cancelled", 0,DbType.Boolean));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@creationTime", creation, DbType.DateTime)); 
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@duration", duration,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", couponID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemerGUID", redeemerGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@sponsorGUID", sponsorGUID,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@payload", payload, DbType.String));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@cancelled", 0,DbType.Boolean));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@creationTime", creation, DbType.DateTime)); 
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@duration", duration,DbType.Int64));
          
             long id = -1;
             try
@@ -585,9 +585,9 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", ticket.redeemerGuid, DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticket.type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemer", ticket.redeemerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", ticket.type,DbType.AnsiString, 100));
 
             // execute the command
             try
@@ -616,7 +616,7 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketID", ticketID,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketID", ticketID,DbType.Int64));
             
 
             try
@@ -657,9 +657,9 @@ namespace iLabs.TicketIssuer
 
             // populate the parameters
            
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@type", ticketType,DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerGuid,DbType.AnsiString, 50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@sponsor", sponsorGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@type", ticketType,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemer", redeemerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@sponsor", sponsorGuid,DbType.AnsiString, 50));
 
             // execute the command
             DbDataReader dataReader = null;
@@ -747,9 +747,9 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID",coupon.couponId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", ticketType,DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerID, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID",coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", ticketType,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemer", redeemerID, DbType.AnsiString, 50));
            
             // execute the command
             DbDataReader dataReader = null;
@@ -821,8 +821,8 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID",coupon.couponId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType",  type, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID",coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType",  type, DbType.AnsiString, 100));
 
             DbDataReader dataReader = null;
             try
@@ -878,9 +878,9 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID", coupon.couponId,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type, DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemer,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId,DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", type, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemer", redeemer,DbType.AnsiString, 50));
 
             DbDataReader dataReader = null;
             try
@@ -931,9 +931,9 @@ namespace iLabs.TicketIssuer
             cmd.CommandType = CommandType.StoredProcedure;
 
             // populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@couponID",coupon.couponId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@ticketType", type,DbType.AnsiString, 100));
-            cmd.Parameters.Add(FactoryDB.CreateParameter(cmd,"@redeemer", redeemerGuid,DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID",coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", type,DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemer", redeemerGuid,DbType.AnsiString, 50));
             
             try{
                 connection.Open();

@@ -54,7 +54,7 @@ namespace iLabs.Scheduling.UserSide
 
 
          long expirationTime;
-        ProcessAgentDB dbTicketing = new ProcessAgentDB();
+        DBManager dbManager = new DBManager();
         System.Timers.Timer timer1;
         int n = 0;
 
@@ -101,7 +101,7 @@ namespace iLabs.Scheduling.UserSide
                     coupon = new Coupon(issuerID, couponID, passKey);
                     Session["coupon"] = coupon;
 
-                    Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.SCHEDULE_SESSION);
+                    Ticket ticket = dbManager.RetrieveAndVerify(coupon, TicketTypes.SCHEDULE_SESSION);
                     if (ticket.IsExpired())
                     {
                         string msg = "The reservation ticket has expired, Please re-login.";
@@ -126,8 +126,8 @@ namespace iLabs.Scheduling.UserSide
                     Session["labServerGuid"] = labServerGuid;
                     Session["labClientName"] = payload.GetElementsByTagName("labClientName")[0].InnerText;
                     Session["labClientVersion"] = payload.GetElementsByTagName("labClientVersion")[0].InnerText;
-                    Session["lssURL"] = USSSchedulingAPI.ListLSSURLbyExperiment(clientGuid, labServerGuid);
-                    Session["lssGuid"] = USSSchedulingAPI.ListLSSIDbyExperiment(clientGuid, labServerGuid);
+                    Session["lssURL"] = dbManager.ListLssUrlByExperiment(clientGuid, labServerGuid);
+                    Session["lssGuid"] = dbManager.ListLssIdByExperiment(clientGuid, labServerGuid);
                     Session["userName"] = payload.GetElementsByTagName("userName")[0].InnerText;
                     Session["userTZ"] = payload.GetElementsByTagName("userTZ")[0].InnerText;
 
@@ -220,7 +220,7 @@ namespace iLabs.Scheduling.UserSide
             lbxReservation.Items.Clear();
             try
             {
-                ReservationInfo[] res = DBManager.GetReservationInfos(serviceBrokerGuid, userName, groupName,
+                ReservationInfo[] res = dbManager.GetReservationInfos(serviceBrokerGuid, userName, groupName,
                     labServerGuid, clientGuid, DateTime.UtcNow,DateTime.MaxValue);
                 if (res != null)
                 {
@@ -435,15 +435,15 @@ namespace iLabs.Scheduling.UserSide
                 int[] resIDs = new int[] { Int32.Parse(lbxReservation.SelectedValue) };
                 if (resIDs != null && resIDs.Length > 0)
                 {
-                    ReservationInfo[] remove = USSSchedulingAPI.GetReservations(resIDs);
+                    ReservationInfo[] remove = dbManager.GetReservations(resIDs);
                     if (remove != null && remove.Length > 0)
                     {
                         startTimeUTC = remove[0].startTime;
                         endTimeUTC = remove[0].endTime;
                         experimentInfoId = remove[0].experimentInfoId;
-                        UssExperimentInfo[] exp = USSSchedulingAPI.GetExperimentInfos(new int[] { remove[0].experimentInfoId });
-                        UssCredentialSet[] cSet = USSSchedulingAPI.GetCredentialSets(new int[] { remove[0].credentialSetId });
-                        LSSInfo lss = USSSchedulingAPI.GetLSSInfo(exp[0].lssGuid);
+                        UssExperimentInfo[] exp = dbManager.GetExperimentInfos(new int[] { remove[0].experimentInfoId });
+                        UssCredentialSet[] cSet = dbManager.GetCredentialSets(new int[] { remove[0].credentialSetId });
+                        LSSInfo lss = dbManager.GetLSSInfo(exp[0].lssGuid);
                         if (exp != null && exp.Length > 0 && cSet != null && cSet.Length > 0 && lss.lssUrl != null)
                         {
                             OperationAuthHeader opHeader = new OperationAuthHeader();
@@ -456,7 +456,7 @@ namespace iLabs.Scheduling.UserSide
                                 exp[0].labServerGuid, exp[0].labClientGuid, startTimeUTC, endTimeUTC);
                             if (count > 0)
                             {
-                                USSSchedulingAPI.RemoveReservation(resIDs);
+                                dbManager.RemoveReservation(resIDs);
                                 string msg = "The reservation has been removed successfully! ";
                                 lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
                                 lblErrorMessage.Visible = true;
@@ -561,7 +561,7 @@ namespace iLabs.Scheduling.UserSide
             }
             try
             {
-                TimeSpan ts = USSSchedulingAPI.GetReservationWaitTime(Int32.Parse(lbxReservation.SelectedValue));
+                TimeSpan ts = dbManager.GetReservationWaitTime(Int32.Parse(lbxReservation.SelectedValue));
 
                 string msg = null;
                 if (ts.Ticks > 0)
@@ -595,7 +595,7 @@ namespace iLabs.Scheduling.UserSide
                 if (ts.Milliseconds <= 0)
                 {
                     msg = "You can execute the experiment now!";
-                    ReservationInfo[] res = USSSchedulingAPI.GetReservations(new int[] { Int32.Parse(lbxReservation.SelectedValue) });
+                    ReservationInfo[] res = dbManager.GetReservations(new int[] { Int32.Parse(lbxReservation.SelectedValue) });
                     //res[0].
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
                     lblErrorMessage.Visible = true;

@@ -83,12 +83,12 @@ namespace iLabs.ExpStorage
             myCommand.CommandType = CommandType.StoredProcedure;
             myConnection.Open();
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString, 50));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@description", description, DbType.String,2048));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@byteCount", byteCount, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@checksum", checksum, DbType.AnsiString,256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@checksumAlgorithm", checksumAlgorithm, DbType.AnsiString,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", sbGuid, DbType.AnsiString, 50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String,2048));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@byteCount", byteCount, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@checksum", checksum, DbType.AnsiString,256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@checksumAlgorithm", checksumAlgorithm, DbType.AnsiString,256));
 
             try
             {
@@ -117,7 +117,7 @@ namespace iLabs.ExpStorage
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobExperiment", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId,DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@blobId", blobId,DbType.Int64));
 
             try
             {
@@ -152,7 +152,7 @@ namespace iLabs.ExpStorage
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobAssociation", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@blobId", blobId, DbType.Int64));
 
             try
             {
@@ -187,7 +187,7 @@ namespace iLabs.ExpStorage
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobDownloadStatus", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobId", blobId, DbType.Int64));
 
             int statusCode = -1;
 
@@ -218,8 +218,8 @@ namespace iLabs.ExpStorage
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("SetBlobDownloadStatus", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobStatus", status, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobStatus", status, DbType.Int32));
 
             try
             {
@@ -327,8 +327,8 @@ namespace iLabs.ExpStorage
             DbCommand myCommand = FactoryDB.CreateCommand("AddBlobAccess", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobUrl", blobUrl, DbType.String,512));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobUrl", blobUrl, DbType.String,512));
 
             try
             {
@@ -361,7 +361,7 @@ namespace iLabs.ExpStorage
             DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobData", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobId", blobId, DbType.Int64));
             byte[] data = null;
             try
             {
@@ -411,10 +411,10 @@ namespace iLabs.ExpStorage
             myCommand.CommandText= "AddBlobData";
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobId", blobId, DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@blobStatus", Blob.eStatus.COMPLETE, DbType.Int32));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@mimeType", mimeType, DbType.AnsiString,1024));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand, "@byteCount", blobData.Length, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@blobStatus", Blob.eStatus.COMPLETE, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@mimeType", mimeType, DbType.AnsiString,1024));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@byteCount", blobData.Length, DbType.Int32));
             // BLOB Warning
             SqlParameter blobParam = new SqlParameter("@blobData",SqlDbType.Image, blobData.Length);
             blobParam.Value = blobData;
@@ -446,7 +446,7 @@ namespace iLabs.ExpStorage
         //    DbCommand myCommand = FactoryDB.CreateCommand("AddBlobAccess", myConnection);
         //    myCommand.CommandType = CommandType.StoredProcedure;
 
-        //    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobID));
+        //    myCommand.Parameters.Add(FactoryDB.CreateParameter("@blobId", blobID));
 
         //    try
         //    {
@@ -501,8 +501,8 @@ namespace iLabs.ExpStorage
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlobAccess", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@duration", duration));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@blobId", blobId));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@duration", duration));
 
             try
             {
@@ -540,10 +540,10 @@ namespace iLabs.ExpStorage
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("AddBlobToExperimentRecord", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId, DbType.Int64));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNum, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@experimentId", experimentId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", sbGuid, DbType.AnsiString,50));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@sequenceNo", sequenceNum, DbType.Int32));
 
             try
             {
@@ -587,9 +587,9 @@ namespace iLabs.ExpStorage
 
                 try
                 {
-                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
-                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
-                    myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@sequenceNo", sequenceNum, DbType.Int32));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter("@experimentId", experimentId, DbType.Int64));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", sbGuid, DbType.AnsiString,50));
+                    myCommand.Parameters.Add(FactoryDB.CreateParameter("@sequenceNo", sequenceNum, DbType.Int32));
 
                     DbDataReader myReader = myCommand.ExecuteReader();
                     while (myReader.Read())
@@ -664,8 +664,8 @@ namespace iLabs.ExpStorage
 
             try
             {
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@experimentId", experimentId, DbType.Int64));
-                myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@issuerGuid", sbGuid, DbType.AnsiString,50));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter("@experimentId", experimentId, DbType.Int64));
+                myCommand.Parameters.Add(FactoryDB.CreateParameter("@issuerGuid", sbGuid, DbType.AnsiString,50));
 
                 DbDataReader myReader = myCommand.ExecuteReader();
                 while (myReader.Read())
@@ -738,7 +738,7 @@ namespace iLabs.ExpStorage
             DbCommand myCommand = FactoryDB.CreateCommand("RetrieveBlob", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter(myCommand,"@blobId", blobId, DbType.Int64));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@blobId", blobId, DbType.Int64));
 
             try
             {

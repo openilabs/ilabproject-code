@@ -27,8 +27,7 @@ namespace iLabs.Scheduling.LabSide
         string labServerName = null;
 
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
-        ProcessAgentDB dbTicketing = new ProcessAgentDB();
-
+        DBManager dbManager = new DBManager();
         int userTZ = 0;
 
         protected void Page_Load(object sender, System.EventArgs e)
@@ -69,7 +68,7 @@ namespace iLabs.Scheduling.LabSide
                         Coupon coupon = new Coupon(issuerID, long.Parse(couponID), passkey);
 
 
-                        Ticket ticket = dbTicketing.RetrieveAndVerify(coupon, TicketTypes.MANAGE_LAB);
+                        Ticket ticket = dbManager.RetrieveAndVerify(coupon, TicketTypes.MANAGE_LAB);
 
                         if (ticket.IsExpired() || ticket.isCancelled)
                         {
@@ -151,9 +150,9 @@ namespace iLabs.Scheduling.LabSide
         private void BuildExperimentInfoListBox()
         {
             LssExperimentInfo[] experimentInfos = null;
-            int[] experimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
+            int[] experimentInfoIDs = dbManager.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
             if(experimentInfoIDs != null && experimentInfoIDs.Length > 0)
-                experimentInfos = LSSSchedulingAPI.GetExperimentInfos(experimentInfoIDs);
+                experimentInfos = dbManager.GetExperimentInfos(experimentInfoIDs);
             //if related experiment experiments have been found
             if (experimentInfos != null && experimentInfos.Length > 0)
             {
@@ -245,7 +244,7 @@ namespace iLabs.Scheduling.LabSide
             {
                 try
                 {
-                    LssExperimentInfo[] experimentInfo = LSSSchedulingAPI.GetExperimentInfos(new int[] { Int32.Parse(lbxSelectExperiment.SelectedValue) });
+                    LssExperimentInfo[] experimentInfo = dbManager.GetExperimentInfos(new int[] { Int32.Parse(lbxSelectExperiment.SelectedValue) });
                     DisplayExperimentInfo(experimentInfo[0]);
                 }
                 catch (Exception ex)
@@ -388,7 +387,7 @@ namespace iLabs.Scheduling.LabSide
                     // the database will also throw an exception if the combination of LabClientName and LabClientVersion exists
                     // since combination of LabClientName and LabClientVersion must be unique .
                     // this is just another check to throw a meaningful exception
-                    int eID = LSSSchedulingAPI.ListExperimentInfoIDByExperiment( labServerGuid, txtClientGuid.Text);
+                    int eID = dbManager.ListExperimentInfoIDByExperiment( labServerGuid, txtClientGuid.Text);
                     if (eID >= 0) // then the experiment already exists in database
                     {
                         string msg = "The experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' already exists. Choose another lab client name or lab client version.";
@@ -401,7 +400,7 @@ namespace iLabs.Scheduling.LabSide
                     {
 
                         //Add ExperimentInfo
-                        int experimentInfoID = LSSSchedulingAPI.AddExperimentInfo(Session["labServerGuid"].ToString(),
+                        int experimentInfoID = dbManager.AddExperimentInfo(Session["labServerGuid"].ToString(),
                             Session["labServerName"].ToString(),txtClientGuid.Text, txtLabClientName.Text,
                             txtLabClientVersion.Text, txtProviderName.Text,txtContactEmail.Text,
                             pt, rt, min, et);
@@ -430,7 +429,7 @@ namespace iLabs.Scheduling.LabSide
                 try
                 {
                     //Update Experiment information
-                    LSSSchedulingAPI.ModifyExperimentInfo(LSSSchedulingAPI.ListExperimentInfoIDByExperiment( Session["labServerGuid"].ToString(), txtClientGuid.Text),
+                    dbManager.ModifyExperimentInfo(dbManager.ListExperimentInfoIDByExperiment( Session["labServerGuid"].ToString(), txtClientGuid.Text),
                         Session["labServerGuid"].ToString(), Session["labServerName"].ToString(),
                         txtClientGuid.Text, txtLabClientName.Text, txtLabClientVersion.Text,
                         txtProviderName.Text, txtContactEmail.Text, pt, rt, min, et);
@@ -458,7 +457,7 @@ namespace iLabs.Scheduling.LabSide
             }
             try
             {
-                if (LSSSchedulingAPI.RemoveExperimentInfo(new int[] { LSSSchedulingAPI.ListExperimentInfoIDByExperiment(Session["labServerGuid"].ToString(), txtClientGuid.Text) }).Length > 0)
+                if (dbManager.RemoveExperimentInfo(new int[] { dbManager.ListExperimentInfoIDByExperiment(Session["labServerGuid"].ToString(), txtClientGuid.Text) }).Length > 0)
                 {
                     string msg = "The experiment '" + txtLabClientName.Text + " " + txtLabClientVersion.Text + "' was not deleted.";
                     lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);

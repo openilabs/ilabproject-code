@@ -30,14 +30,14 @@ namespace iLabs.Scheduling.UserSide
          int lssInfoId;
          int[] lssInfoIds;
          LSSInfo[] lssInfos;
-
+        DBManager dbManager = new DBManager();
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
             btnRemove.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to remove this experiment Information?')== false) return false;");
-            lssInfoIds = USSSchedulingAPI.ListLSSInfoIDs();
-            lssInfos = USSSchedulingAPI.GetLSSInfos(lssInfoIds);
+            lssInfoIds = dbManager.ListLSSInfoIDs();
+            lssInfos = dbManager.GetLSSInfos(lssInfoIds);
 
             if (!IsPostBack)
             {
@@ -136,8 +136,8 @@ namespace iLabs.Scheduling.UserSide
         /// </summary>
         private void InitializeDropDown()
         {
-            lssInfoIds = USSSchedulingAPI.ListLSSInfoIDs();
-            lssInfos = USSSchedulingAPI.GetLSSInfos(lssInfoIds);
+            lssInfoIds = dbManager.ListLSSInfoIDs();
+            lssInfos = dbManager.GetLSSInfos(lssInfoIds);
 
             ddlLSS.Items.Clear();
 
@@ -267,7 +267,7 @@ namespace iLabs.Scheduling.UserSide
                 // Add the Lab Side Scheduling Server
                 try
                 {
-                    lssInfoId = USSSchedulingAPI.AddLSSInfo(txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text);
+                    lssInfoId = dbManager.AddLSSInfo(txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text);
                 }
                 catch (Exception ex)
                 {
@@ -309,7 +309,7 @@ namespace iLabs.Scheduling.UserSide
                 try
                 {
                     // Modify the User Side Scheduling Server
-                    USSSchedulingAPI.ModifyLSSInfo(lssInfoId, txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text);
+                    dbManager.ModifyLSSInfo(lssInfoId, txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text);
 
                     lblErrorMessage.Visible = true;
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("User Side Scheduling Server " + txtLSSID.Text + " has been modified.");
@@ -345,7 +345,7 @@ namespace iLabs.Scheduling.UserSide
                 lssInfoId = lssInfos[ddlLSS.SelectedIndex - 1].lssInfoId;
                 try
                 {
-                    USSSchedulingAPI.RemoveLSSInfo(new int[] { lssInfoId });
+                    dbManager.RemoveLSSInfo(new int[] { lssInfoId });
                     lblErrorMessage.Visible = true;
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("User side Scheduling Server '" + txtLSSName.Text + "' has been deleted");
                     InitializeDropDown();

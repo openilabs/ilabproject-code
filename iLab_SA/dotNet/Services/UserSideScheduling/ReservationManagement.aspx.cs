@@ -28,6 +28,7 @@ namespace iLabs.Scheduling.UserSide
 	{
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         CultureInfo culture;
+        DBManager dbManager = new DBManager();
         string dateF = null;
         int userTZ;
 	
@@ -163,7 +164,7 @@ namespace iLabs.Scheduling.UserSide
 			try
 			{
 				txtDisplay.Text=null;
-				ReservationInfo[] reservations = USSSchedulingAPI.GetReservationInfos(userName, ExperimentInfoID, credentialSetId,  time1,  time2);						
+				ReservationInfo[] reservations = dbManager.GetReservationInfos(userName, ExperimentInfoID, credentialSetId,  time1,  time2);						
 				if (reservations.Length==0)
 				{
 					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been made.");
@@ -175,7 +176,7 @@ namespace iLabs.Scheduling.UserSide
 					for(int j = reservations.Length-1; j > -1  ; j--)
 					{
 						string uName = reservations[j].userName;
-						UssExperimentInfo exinfo = USSSchedulingAPI.GetExperimentInfos(new int[]{reservations[j].experimentInfoId})[0];
+						UssExperimentInfo exinfo = dbManager.GetExperimentInfos(new int[]{reservations[j].experimentInfoId})[0];
 						string experimentName = exinfo.labClientName + "  " + exinfo.labClientVersion;
 						buf.AppendLine(DateUtil.ToUserTime(reservations[j].startTime, culture, userTZ,dateF) + " <-> " + DateUtil.ToUserTime(reservations[j].endTime, culture, userTZ,dateF) + " " + uName + ", " + experimentName);
 					}
@@ -268,8 +269,8 @@ namespace iLabs.Scheduling.UserSide
 			try
 			{
 				ddlGroup.Items.Add(new ListItem(" ---------- select Group ---------- "));
-				int[] credentialSetIds = USSSchedulingAPI.ListCredentialSetIds();
-				UssCredentialSet[] credentialSets=USSSchedulingAPI.GetCredentialSets(credentialSetIds);
+				int[] credentialSetIds = dbManager.ListCredentialSetIds();
+				UssCredentialSet[] credentialSets=dbManager.GetCredentialSets(credentialSetIds);
 				for(int i=0; i< credentialSets.Length; i++)
 				{
 					
@@ -290,8 +291,8 @@ namespace iLabs.Scheduling.UserSide
 			try
 			{
 				ddlExperiment.Items.Add(new ListItem(" ---------- select Experiment ---------- "));
-				int[] experimentInfoIds = USSSchedulingAPI.ListExperimentInfoIDs();
-				UssExperimentInfo[] experimentInfos = USSSchedulingAPI.GetExperimentInfos(experimentInfoIds);
+				int[] experimentInfoIds = dbManager.ListExperimentInfoIDs();
+				UssExperimentInfo[] experimentInfos = dbManager.GetExperimentInfos(experimentInfoIds);
 				for(int i=0; i< experimentInfoIds.Length; i++)
 				{
 					

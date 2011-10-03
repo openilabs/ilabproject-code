@@ -36,6 +36,7 @@ namespace iLabs.Scheduling.LabSide
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         int userTZ = 0;
         int localTzOffset;
+        DBManager dbManager = new DBManager();
         
 
 
@@ -178,7 +179,7 @@ namespace iLabs.Scheduling.LabSide
 			txtDisplay.Text=null;
 			try
 			{
-                IntTag[] reservations = LSSSchedulingAPI.ListReservations(labServerGuid, DateTime.MinValue, DateTime.MinValue, culture, localTzOffset);
+                IntTag[] reservations = dbManager.ListReservationTags(labServerGuid, DateTime.MinValue, DateTime.MinValue, culture, localTzOffset);
                 if (reservations == null || reservations.Length == 0)
 				{
 					lblErrorMessage.Text =Utilities.FormatConfirmationMessage("no reservations have been found.");
@@ -208,7 +209,7 @@ namespace iLabs.Scheduling.LabSide
 			try
 			{
 				txtDisplay.Text=null;
-                IntTag[] reservations = LSSSchedulingAPI.ListReservations(resourceID, ExperimentInfoID, CredentialSetID, time1, time2, culture, localTzOffset);
+                IntTag[] reservations = dbManager.ListReservationTags(resourceID, ExperimentInfoID, CredentialSetID, time1, time2, culture, localTzOffset);
                 if (reservations == null || reservations.Length == 0)
                 {
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("no reservations have been found.");
@@ -311,7 +312,7 @@ namespace iLabs.Scheduling.LabSide
         {
             ddlResource.Items.Clear();
             ddlResource.Items.Add(new ListItem(" ---------- All Resources ---------- "));
-            IntTag[] resources = DBManager.GetLSResourceTags(lsGuid);
+            IntTag[] resources = dbManager.GetLSResourceTags(lsGuid);
             foreach (IntTag it in resources)
             {
                 ddlResource.Items.Add(new ListItem(it.tag, it.id.ToString()));
@@ -325,7 +326,7 @@ namespace iLabs.Scheduling.LabSide
 			try
 			{
 				ddlGroup.Items.Add(new ListItem(" ---------- All Groups ---------- "));
-				LssCredentialSet[] credentialSets=LSSSchedulingAPI.GetCredentialSetsByLS(lsGuid);
+				LssCredentialSet[] credentialSets=dbManager.GetCredentialSetsByLS(lsGuid);
 				for(int i=0; i< credentialSets.Length; i++)
 				{
                     string cred = credentialSets[i].groupName + " : " + credentialSets[i].serviceBrokerName;
@@ -345,8 +346,8 @@ namespace iLabs.Scheduling.LabSide
 			try
 			{
 				ddlExperiment.Items.Add(new ListItem(" ---------- Any Experiment ---------- "));
-				int[] experimentInfoIDs = LSSSchedulingAPI.ListExperimentInfoIDsByLabServer(labServerID);
-				LssExperimentInfo[] experimentInfos = LSSSchedulingAPI.GetExperimentInfos(experimentInfoIDs);
+				int[] experimentInfoIDs = dbManager.ListExperimentInfoIDsByLabServer(labServerID);
+				LssExperimentInfo[] experimentInfos = dbManager.GetExperimentInfos(experimentInfoIDs);
 				for(int i=0; i< experimentInfoIDs.Length; i++)
 				{
 					
