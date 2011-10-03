@@ -195,6 +195,11 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Authentica
 drop table [dbo].[Authentication_Types]
 GO
 
+/****** Object:  Table [dbo].[Authorities]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Authorities]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Authorities]
+GO
+
 /****** Object:  Table [dbo].[Blobs_Access]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Blobs_Access]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Blobs_Access]
@@ -403,6 +408,16 @@ GO
 CREATE TABLE [dbo].[Authentication_Types] (
 	[Auth_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+) ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[Authorities] (
+	[Auth_ID] [int] IDENTITY (1, 1) NOT NULL ,
+	[Auth_Type_ID] [int] NOT NULL ,
+	[Default_Group_ID] [int] NOT NULL,
+	[Auth_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	[Auth_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Email_Proxy] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
@@ -691,14 +706,14 @@ GO
 CREATE TABLE [dbo].[Users] (
 	[User_ID] [int] NOT NULL ,
 	[Lock_User] [bit] NOT NULL ,
-	[Auth_Provider] [int] NOT NULL Default 0,
+	[Auth_ID] [int] NOT NULL Default 0,
 	[Xml_Extension] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[User_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[First_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Last_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Affiliation] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[First_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Last_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Affiliation] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Signup_Reason] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
