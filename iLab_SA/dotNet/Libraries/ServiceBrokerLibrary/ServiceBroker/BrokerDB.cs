@@ -42,7 +42,7 @@ namespace iLabs.ServiceBroker
         public ProcessAgentInfo GetExperimentESS(long experimentID)
         {
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Experiment_Retrieve EssInfo", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Experiment_RetrieveEssInfo", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@experimentID", experimentID, DbType.Int64));
             ProcessAgentInfo ess = null;
@@ -2468,7 +2468,283 @@ namespace iLabs.ServiceBroker
             }
             return status;
         }
-        
+
+        /// <summary>
+        /// This examines the specified parameters to resove the next action.
+        /// This may only be called after a user is Authenticated.
+        /// </summary>
+        public IntTag ResolveAction( string clientGuid, string userName, string groupName, DateTime start, long duration, bool autoStart)
+        {
+            int user_ID = 0;
+            int client_ID = 0;
+            int group_ID = 0;
+            IntTag result = new IntTag();
+            result.id = -1;
+            StringBuilder buf = new StringBuilder();
+
+            if (userName != null && userName.Length > 0)
+            {
+                user_ID = AdministrativeAPI.GetUserID(userName);
+                if (user_ID <= 0)
+                {
+                    result.tag = "The user '" + userName + "' does not exist!";
+                    return result;
+                }
+
+            }
+            else
+            {
+                result.tag = "You must specifiy a user name!";
+                return result;
+            }
+            
+            //Get Client_ID
+            if (clientGuid != null && clientGuid.Length > 0)
+            {
+                client_ID = AdministrativeAPI.GetLabClientID(clientGuid);
+                if (user_ID <= 0)
+                {
+                    result.tag = "The clientGUID '" + clientGuid + "' does not exist!";
+                    return result;
+                }
+            }
+            else
+            {
+                result.tag = "You must specifiy a clientGuid!";
+                return result;
+            }
+
+            // Check that the user & is a member of the group
+            if (groupName != null && groupName.Length >0)
+            {
+                int gid = AdministrativeAPI.GetGroupID(group_Name);
+                if (gid > 0)
+                {
+                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    {
+                        group_ID = gid;
+                    }
+                    else
+                    {
+                        // user is not a member of the group
+                        group_ID = -1;
+                        groupName = null;
+                        result.tag = "The user is not a member of the requested group!";
+                        return result;
+                    }
+                }
+                else
+                {
+                    result.tag = "The group '" + groupName + "' does not exist!";
+                    return result;
+                }
+            }
+            else
+            {
+                result.tag = "You must specifiy a group name!";
+                return result;
+            }
+
+
+            // parameters are parsed, do we have enough info to launch
+            int[] clientGroupIDs = null;
+            int[] userGroupIDs = null;
+
+            // Try and resolve any unspecified parameters
+            if (client_ID <= 0 && group_ID <= 0)
+            {
+                userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                Group[] groups = AdministrativeAPI.GetGroups(userGroupIDs);
+                Dictionary<int, int[]> clientMap = new Dictionary<int, int[]>();
+                foreach (Group g in groups)
+                {
+                    if ((g.groupType.CompareTo(GroupType.REGULAR) == 0) )
+                    {
+                        int[] clientIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                        if (clientIDs != null & clientIDs.Length > 0)
+                        {
+                            clientMap.Add(g.groupID, clientIDs);
+                        }
+                    }
+                }
+                if (clientMap.Count > 1) //more than one group with clients
+                {
+                    //modifyUserSession(group_ID, client_ID);
+                    buf.Append(Global.FormatRegularURL(Request, "myGroups.aspx"));
+                }
+                else if (clientMap.Count == 1) // get the group with clients
+                {
+                    Dictionary<int, int[]>.Enumerator en = clientMap.GetEnumerator();
+                    int gid = -1;
+                    int[] clients = null;
+                    while (en.MoveNext())
+                    {
+                        gid = en.Current.Key;
+                        clients = en.Current.Value;
+                    }
+                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    {
+                        group_ID = gid;
+                        group_Name = AdministrativeAPI.GetGroupName(gid);
+
+
+                        if (clients == null || clients.Length > 1)
+                        {
+                           // modifyUserSession(group_ID, client_ID);
+                            buf.Append(Global.FormatRegularURL(Request, "myLabs.aspx"));
+                        }
+                        else
+                        {
+                            client_ID = clients[0];
+                        }
+                    }
+                }
+            }
+
+            else if (client_ID > 0 && group_ID <= 0)
+            {
+                int gid = -1;
+                clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+                if (clientGroupIDs == null || clientGroupIDs.Length == 0)
+                {
+                    //modifyUserSession(group_ID, client_ID);
+                    buf.Append(Global.FormatRegularURL(Request, "myGroups.aspx"));
+                }
+                else if (clientGroupIDs.Length == 1)
+                {
+                    gid = clientGroupIDs[0];
+                }
+                else
+                {
+                    userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                    int count = 0;
+                    foreach (int ci in clientGroupIDs)
+                    {
+                        foreach (int ui in userGroupIDs)
+                        {
+                            if (ci == ui)
+                            {
+                                count++;
+                                gid = ui;
+                            }
+                        }
+                    }
+                    if (count != 1)
+                    {
+                        gid = -1;
+                    }
+                }
+                if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
+                {
+                    group_ID = gid;
+
+                }
+                else
+                {
+                    //modifyUserSession(group_ID, client_ID);
+                }
+            }
+            else if (client_ID <= 0 && group_ID > 0)
+            {
+                int[] clients = AdministrativeUtilities.GetGroupLabClients(group_ID);
+                if (clients == null || clients.Length != 1)
+                {
+                    //modifyUserSession(group_ID, client_ID);
+                    buf.Append(Global.FormatRegularURL(Request, "myLabs.aspx"));
+                }
+                else
+                {
+                    client_ID = clients[0];
+                }
+            }
+            if (user_ID > 0 && group_ID > 0 && client_ID > 0)
+            {
+                int gid = -1;
+                clientGroupIDs = AdministrativeUtilities.GetLabClientGroups(client_ID);
+                foreach (int g_id in clientGroupIDs)
+                {
+                    if (g_id == group_ID)
+                    {
+                        gid = g_id;
+                        break;
+                    }
+                }
+                if (gid == -1)
+                {
+                    result.tag = "The specified group does not have permission to to run the specified client!";
+                    return result;
+                }
+                if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
+                {
+                    result.tag = "The user does not have permission to to run the specified client!";
+                    return result;
+                }
+
+                // is authorized ?
+
+                //modifyUserSession(group_ID, client_ID);
+                launchLab(user_ID, group_ID, client_ID, duration, autoStart);
+
+            }
+        }
+
+
+        protected string launchLab(int userID, int groupID, int clientID, long duration, bool autoLaunch)
+        {
+            // Currently there is not a good solution for checking for an AllowExperiment ticket, will check the USS for reservation
+            StringBuilder buf = new StringBuilder();
+            buf.Append(Global.FormatRegularURL(Request, "myClient.aspx"));
+            buf.Append("?auto=t");
+
+            string userName = null;
+            string groupName = null;
+            Coupon opCoupon = null;
+            Ticket allowTicket = null;
+            int effectiveGroupID = 0;
+           
+            userName = AdministrativeAPI.GetUserName(userID);
+            
+
+            LabClient client = AdministrativeAPI.GetLabClient(clientID);
+            if (client != null && client.clientID > 0) // need to test for valid value
+            {
+                DateTime start = DateTime.UtcNow;
+                long _duration = 36000L; // default is ten hours
+                ProcessAgentInfo[] labServers = null;
+                labServers = AdministrativeAPI.GetLabServersForClient(clientID);
+                if (labServers.Length > 0)
+                {
+                    //labServer = labServers[0];
+                }
+                else
+                {
+                    throw new Exception("The lab server is not specified for lab client " + client.clientName + " version: " + client.version);
+                }
+                groupName = AdministrativeAPI.GetGroupName(groupID);
+                // Find efective group
+                string effectiveGroupName = null;
+                effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(groupID, clientID,
+                    Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
+                if (effectiveGroupID == groupID)
+                {
+                        effectiveGroupName = groupName;
+                }
+                else if (effectiveGroupID > 0)
+                {
+                    effectiveGroupName = AdministrativeAPI.GetGroupName(effectiveGroupID);
+                }
+
+                //Check for Scheduling: Moved to myClient
+
+                Session["ClientID"] = client.clientID;
+                //Response.Redirect(Global.FormatRegularURL(Request, "myClient.aspx"), true);
+                Response.Redirect(buf.ToString(), true);
+            } // End if valid client
+            else
+            {
+                throw new Exception("The specified lab client could not be found");
+            }
+        }
 
 
         //if (clientMap.Count > 1) //more than one group with clients
@@ -2871,19 +3147,6 @@ namespace iLabs.ServiceBroker
             }
          * */
 
-        //public class RegisterRecord
-        //{
-        //    public int recordId;
-        //    public int status;
-        //    public int couponId;
-        //    public DateTime create;
-        //    public DateTime lastModified;
-        //    public string couponGuid;
-        //    public string registerGuid;
-        //    public string sourceGuid;
-        //    public string descriptor;
-        //    public string email;
-        //}
 
     }
 }
