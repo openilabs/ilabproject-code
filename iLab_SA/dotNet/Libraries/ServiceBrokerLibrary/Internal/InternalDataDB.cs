@@ -1694,7 +1694,7 @@ namespace iLabs.ServiceBroker.Internal
             ArrayList clientItems = new ArrayList();
 
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("ClientItem_Retrieve", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("ClientItem_RetrieveValue", myConnection);
             myCommand.CommandType = CommandType.StoredProcedure;
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@clientID", clientID, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@userID", userID, DbType.Int32));
