@@ -237,9 +237,6 @@ namespace iLabs.Web
         /// Informs this processAgent that it should modify all references to a specific processAent. 
         /// This is used to propagate modifications, The agentGuid must remain the same.
         /// </summary>
-        /// <param name="domainGuid">The guid of the services domain ServiceBroker</param>
-        /// <param name="serviceGuid">The guid of the service</param>
-        /// <param name="state">The retired state to be set</param>
         /// <returns>A status value, negative values indicate errors, zero indicates unknown service, positive indicates level of success.</returns>
         [WebMethod,
         SoapDocumentMethod(Binding = "IProcessAgent"),

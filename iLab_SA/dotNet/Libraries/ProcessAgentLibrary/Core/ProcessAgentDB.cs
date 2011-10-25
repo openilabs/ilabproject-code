@@ -3742,7 +3742,7 @@ namespace iLabs.Core
 
         public string FormatRegularURL(HttpRequest r, string relativePath)
         {
-            string protocol = ConfigurationSettings.AppSettings["regularProtocol"];
+            string protocol = ConfigurationManager.AppSettings["regularProtocol"];
             string serverName =
                 HttpUtility.UrlEncode(r.ServerVariables["SERVER_NAME"]);
             string vdirName = r.ApplicationPath;
@@ -3752,7 +3752,7 @@ namespace iLabs.Core
 
         public string FormatSecureURL(HttpRequest r, string relativePath)
         {
-            string protocol = ConfigurationSettings.AppSettings["secureProtocol"];
+            string protocol = ConfigurationManager.AppSettings["secureProtocol"];
             string serverName =
                 HttpUtility.UrlEncode(r.ServerVariables["SERVER_NAME"]);
             string vdirName = r.ApplicationPath;
