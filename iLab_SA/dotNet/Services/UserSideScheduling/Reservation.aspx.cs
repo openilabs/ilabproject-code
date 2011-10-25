@@ -54,7 +54,7 @@ namespace iLabs.Scheduling.UserSide
 
 
          long expirationTime;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         System.Timers.Timer timer1;
         int n = 0;
 

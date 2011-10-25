@@ -27,7 +27,7 @@ namespace iLabs.Scheduling.LabSide
         int localTzOffset = 0;
         StringBuilder buf = null;
         //TimeSpan tzOffset = TimeSpan.MinValue;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
 
         public double LocalTZ
         {

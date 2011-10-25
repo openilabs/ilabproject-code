@@ -1497,7 +1497,7 @@ namespace iLabs.ServiceBroker.admin
                                         string revokePayload = factory.createRevokeReservationPayload("LSS");
                                         Coupon ussCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, uss.agentGuid,
                                             lss.agentGuid, -1L, revokePayload);
-
+                      
                                         // Is this in the domain or cross-domain
                                         if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
                                         {

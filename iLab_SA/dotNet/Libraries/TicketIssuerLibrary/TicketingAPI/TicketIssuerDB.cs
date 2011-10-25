@@ -247,11 +247,10 @@ namespace iLabs.TicketIssuer
             // command executes the "CreateCoupon" stored procedure
             DbCommand cmd = FactoryDB.CreateCommand("CreateCoupon", connection);
             cmd.CommandType = CommandType.StoredProcedure;
-            string pass = TicketUtil.NewPasskey();
+            string pass = Utilities.MakeGuid("N");
             // populate parameters
             cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", pass,DbType.AnsiString, 100));
 
-            //DbDataReader dataReader = null;
             try
             {
                 couponID = Convert.ToInt64(cmd.ExecuteScalar());
@@ -415,6 +414,76 @@ namespace iLabs.TicketIssuer
                 if (!cancel)
                 {
                     coupon = new Coupon(GetIssuerGuid(), couponID, pass);
+                }
+            }
+
+            dataReader.Close();
+            return coupon;
+        }
+
+        /// <summary>
+        /// Checks the IssuedCoupon table and constructs a full Coupon if an 
+        /// Issued coupon is found and is not cancelled.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="couponID"></param>
+        /// <returns>Coupon if found,  null if cancelled or not found</returns>
+        public Coupon GetIssuedCoupon(string passkey)
+        {
+
+            Coupon coupon = null;
+            DbConnection connection = FactoryDB.GetConnection();
+            try
+            {
+
+                connection.Open();
+                coupon = GetIssuedCoupon(connection, passkey);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return coupon;
+
+        }
+
+        /// <summary>
+        /// Checks the IssuedCoupon table and constructs a full Coupon if an 
+        /// Issued coupon is found and is not cancelled.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="passkey"></param>
+        /// <returns>Coupon if found,  null if cancelled or not found</returns>
+        protected Coupon GetIssuedCoupon(DbConnection connection, string passkey)
+        {
+            Coupon coupon = null;
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedCouponByPasskey", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@passkey", passkey, DbType.AnsiString));
+
+            DbDataReader dataReader = null;
+            try
+            {
+                dataReader = cmd.ExecuteReader();
+            }
+            catch (DbException e)
+            {
+                writeEx(e);
+                throw;
+            }
+            while (dataReader.Read())
+            {
+                long couponID = dataReader.GetInt64(0);
+                bool cancel = dataReader.GetBoolean(1);
+                if (!cancel)
+                {
+                    coupon = new Coupon(GetIssuerGuid(), couponID, passkey);
                 }
             }
 

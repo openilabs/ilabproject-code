@@ -53,7 +53,7 @@ namespace iLabs.Scheduling.UserSide
          Coupon coupon;
          int userTZ;
         CultureInfo culture;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         List<TimePeriod> periods = null;
         int defaultRange = 30;
         int quantum;

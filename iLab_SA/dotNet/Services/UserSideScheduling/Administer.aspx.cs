@@ -30,7 +30,7 @@ namespace iLabs.Scheduling.UserSide
          int lssInfoId;
          int[] lssInfoIds;
          LSSInfo[] lssInfos;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
 
         protected void Page_Load(object sender, System.EventArgs e)
@@ -267,7 +267,8 @@ namespace iLabs.Scheduling.UserSide
                 // Add the Lab Side Scheduling Server
                 try
                 {
-                    lssInfoId = dbManager.AddLSSInfo(txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text);
+                    // ToDo: this is no longer used but needs tosupport the revokeReservation ticket
+                    lssInfoId = dbManager.AddLSSInfo(txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text,null);
                 }
                 catch (Exception ex)
                 {

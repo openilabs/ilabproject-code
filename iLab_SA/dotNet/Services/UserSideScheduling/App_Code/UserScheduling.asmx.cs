@@ -82,7 +82,7 @@ namespace iLabs.Scheduling.UserSide
             Coupon inCoupon, Coupon outCoupon)
         {
               int status = 0;
-              DBManager dbManager = new DBManager();
+              UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                
@@ -115,7 +115,7 @@ namespace iLabs.Scheduling.UserSide
         public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = dbManager.ModifyProcessAgent(originalGuid, agent, extra);
@@ -146,7 +146,7 @@ namespace iLabs.Scheduling.UserSide
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
             try
             {
-                DBManager dbManager = new DBManager();
+                UserSchedulingDB dbManager = new UserSchedulingDB();
                 Ticket ssTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.SCHEDULE_SESSION);
                 
                 string lssGuid = dbManager.ListLssIdByExperiment(clientGuid, labServerGuid);
@@ -181,7 +181,7 @@ namespace iLabs.Scheduling.UserSide
             string labServerGuid, string labClientGuid, DateTime startTime, DateTime endTime)
         {
 
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             Ticket retrievedTicket = dbManager.RetrieveAndVerify(opHeader.coupon, TicketTypes.REDEEM_RESERVATION);
             if (retrievedTicket.IsExpired())
             {
@@ -265,7 +265,7 @@ namespace iLabs.Scheduling.UserSide
         {
             string message = null;
              Coupon opCoupon = new Coupon();
-             DBManager dbManager = new DBManager();
+             UserSchedulingDB dbManager = new UserSchedulingDB();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
@@ -361,7 +361,7 @@ namespace iLabs.Scheduling.UserSide
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
             opCoupon.issuerGuid = opHeader.coupon.issuerGuid;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             try
             {
                 Ticket retrievedTicket = dbManager.RetrieveAndVerify(opCoupon, TicketTypes.REVOKE_RESERVATION);
@@ -448,7 +448,7 @@ namespace iLabs.Scheduling.UserSide
         public Reservation RedeemReservation(string serviceBrokerGuid, String userName,  
             String labServerGuid, string clientGuid)
 		{
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -488,7 +488,7 @@ namespace iLabs.Scheduling.UserSide
             string groupName)
 		{
            int add = 0;
-           DBManager dbManager = new DBManager();
+           UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -520,7 +520,7 @@ namespace iLabs.Scheduling.UserSide
             string groupName)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -547,7 +547,7 @@ namespace iLabs.Scheduling.UserSide
             string groupName)
         {
             int removed = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -580,7 +580,7 @@ namespace iLabs.Scheduling.UserSide
             string providerName, string lssGuid)
         {
            int added = 0;
-           DBManager dbManager = new DBManager();
+           UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -604,7 +604,7 @@ namespace iLabs.Scheduling.UserSide
             string providerName, string lssGuid)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -643,15 +643,15 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int AddLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon)
         {
             int added = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
                 {
-                    int lID = dbManager.AddLSSInfo(lssGuid, lssName, lssUrl);
+                    int lID = dbManager.AddLSSInfo(lssGuid, lssName, lssUrl, coupon);
                     added = (lID != -1) ? 1 : 0;
                 }
                 catch
@@ -668,7 +668,7 @@ namespace iLabs.Scheduling.UserSide
         public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try
@@ -691,7 +691,7 @@ namespace iLabs.Scheduling.UserSide
         public int RemoveLSSInfo(string lssGuid)
         {
             int added = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 try

@@ -28,7 +28,7 @@ namespace iLabs.Scheduling.UserSide
 	{
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         CultureInfo culture;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         string dateF = null;
         int userTZ;
 	

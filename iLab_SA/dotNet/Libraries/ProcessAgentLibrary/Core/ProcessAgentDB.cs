@@ -12,6 +12,9 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Web;
+
+
 using iLabs.UtilLib;
 using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
@@ -3734,6 +3737,27 @@ namespace iLabs.Core
 
             return status;
 
+        }
+
+
+        public string FormatRegularURL(HttpRequest r, string relativePath)
+        {
+            string protocol = ConfigurationSettings.AppSettings["regularProtocol"];
+            string serverName =
+                HttpUtility.UrlEncode(r.ServerVariables["SERVER_NAME"]);
+            string vdirName = r.ApplicationPath;
+            string formattedURL = protocol + "://" + serverName + vdirName + "/" + relativePath;
+            return formattedURL;
+        }
+
+        public string FormatSecureURL(HttpRequest r, string relativePath)
+        {
+            string protocol = ConfigurationSettings.AppSettings["secureProtocol"];
+            string serverName =
+                HttpUtility.UrlEncode(r.ServerVariables["SERVER_NAME"]);
+            string vdirName = r.ApplicationPath;
+            string formattedURL = protocol + "://" + serverName + vdirName + "/" + relativePath;
+            return formattedURL;
         }
 
 

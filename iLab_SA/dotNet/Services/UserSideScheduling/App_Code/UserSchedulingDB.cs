@@ -14,13 +14,13 @@ using iLabs.UtilLib;
 namespace iLabs.Scheduling.UserSide
 {
 	/// <summary>
-	/// Summary description for DBManager.
+	/// Summary description for UserSchedulingDB.
 	/// </summary>
-	public class DBManager : ProcessAgentDB
+	public class UserSchedulingDB : ProcessAgentDB
 	{
 		
 
-		public DBManager()
+		public UserSchedulingDB()
 		{
 		}
 
@@ -460,7 +460,7 @@ namespace iLabs.Scheduling.UserSide
         public int AddReservation(string userName, string serviceBrokerGuid, string groupName,
             string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
         {
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             int experId = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (experId > 0)
             {
@@ -1749,35 +1749,46 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssGuid"></param>
 		/// <param name="lssUrl"></param>
 		/// <returns></returns>the unique ID which identifies the LSSInfo added,>0 successfully added, ==-1 otherwise
-        public int AddLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int AddLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon)
 		{
+            int i = -1;
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
 			//create a command
-			//command executes the "AddLSSInfo" store procedure
-			DbCommand cmd=FactoryDB.CreateCommand("AddLSSInfo",connection);
-			cmd.CommandType=CommandType.StoredProcedure;
-			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String,512));
-			
-			int i=-1;
+            DbCommand coupCmd = FactoryDB.CreateCommand("InsertCoupon",connection);
+            coupCmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+            coupCmd.Parameters.Add(FactoryDB.CreateParameter("@coupponID", coupon.couponId, DbType.Int64));
+            coupCmd.Parameters.Add(FactoryDB.CreateParameter("@isuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
+            coupCmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.AnsiString, 100));
+            try
+            {
+                connection.Open();
+                coupCmd.ExecuteNonQuery();
 
-			// execute the command
-			try
-			{
-				connection.Open();
-				Object ob=cmd.ExecuteScalar();
+                //command executes the "AddLSSInfo" store procedure
+                DbCommand cmd = FactoryDB.CreateCommand("AddLSSInfo", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //populate the parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String, 512));
+
+               
+
+                // execute the command
+
+                Object ob = cmd.ExecuteScalar();
                 if (ob != null && ob != System.DBNull.Value)
-				{
-					i= Int32.Parse(ob.ToString());
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in add LSS Information",ex);
-			}
+                {
+                    i = Int32.Parse(ob.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add LSS Information", ex);
+            }
 			finally
 			{
 				connection.Close();

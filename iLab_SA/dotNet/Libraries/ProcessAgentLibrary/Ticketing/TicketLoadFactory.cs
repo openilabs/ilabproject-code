@@ -46,6 +46,31 @@ namespace iLabs.Ticketing
             return writeTicketLoad(rootElemt, TicketTypes.AUTHENTICATE_AGENT, keyValueDictionary);
         }
 
+
+        public string createAuthenticateAgentPayload(string authGuid, string clientGuid, string userName, string groupName)
+        {
+            string rootElemt = "AuthenticateAgentPayload";
+            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            if (authGuid != null && authGuid.Length > 0)
+            {
+                keyValueDictionary.Add("authGuid", authGuid);
+            }
+            if (clientGuid != null && clientGuid.Length > 0)
+            {
+                keyValueDictionary.Add("clientGuid", clientGuid);
+            }
+            if (userName != null && userName.Length > 0)
+            {
+                keyValueDictionary.Add("userName", userName);
+            }
+            if (groupName != null && groupName.Length > 0)
+            {
+                keyValueDictionary.Add("groupName", groupName);
+            }
+
+            return writeTicketLoad(rootElemt, TicketTypes.AUTHENTICATE_AGENT, keyValueDictionary);
+        }
+
         /**
          * service broker tickets
          * */

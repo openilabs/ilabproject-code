@@ -542,8 +542,14 @@ namespace iLabs.ServiceBroker.iLabSB
                     lblLoginErrorMessage.Visible = true;
                     return status;
                 }
-
-                if (AuthenticationAPI.Authenticate(userID, passwd))
+                bool authOK = false;
+                if(authority != null && authority.Length >0){
+                    authOK = AuthenticationAPI.AuthenticateAuthority(authority , passwd) > 0 ? true : false;
+                }
+                else{
+                    authOK = AuthenticationAPI.Authenticate(userID, passwd);
+                }
+                if (authOK)
                 {
                     FormsAuthentication.SetAuthCookie(txtUsername.Text, false);
                     Session["UserID"] = userID;

@@ -27,7 +27,7 @@ namespace iLabs.Scheduling.LabSide
         string labServerName = null;
 
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         int userTZ = 0;
 
         protected void Page_Load(object sender, System.EventArgs e)

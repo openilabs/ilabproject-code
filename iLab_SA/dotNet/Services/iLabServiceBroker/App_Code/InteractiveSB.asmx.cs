@@ -866,6 +866,55 @@ namespace iLabs.ServiceBroker.iLabSB
         }
 
 
+        ///// <summary>
+        ///// An authority requests the launching of a specific client for a user.
+        ///// </summary>
+        ///// <param name="clientGuid">The GUID of the client, this client must be registered on the serviceBroker.</param>
+        ///// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
+        ///// id that the authority will always use to identify this user</param>
+        ///// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
+        ///// <param name="startTime"></param>
+        ///// <param name="duration"></param>
+        ///// <param name="autoStart">Determine if the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
+        ///// <returns>an IntTag with a status code in the interger and a URLto be used by the authority to redirect the request.</returns>
+        //[WebMethod(Description = "An authority requests the launching of a specific client for a user.", EnableSession = true)]
+        //[SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In, Required = true)]
+        //[SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
+        //public IntTag LaunchLabClient(string clientGuid, string userName, string groupName,
+        //      DateTime startTime, long duration, int autoStart)
+        //{
+        //    IntTag tag = new IntTag();
+        //    tag.id = -1;
+        //    try
+        //    {
+        //        if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
+        //        {
+        //            string authGuid = agentAuthHeader.agentGuid;
+        //            IntTag test = brokerDB.ResolveAction(Context, clientGuid, userName, groupName, startTime, duration, autoStart > 0);
+        //            if (test.id >0)
+        //            {
+        //                string requestGuid = Utilities.MakeGuid("N");
+        //                Coupon coupon = brokerDB.CreateCoupon(requestGuid);
+                       
+        //            }
+        //            else
+        //            {
+        //                tag.tag = "Access Denied";
+        //            }
+        //        }
+        //        else
+        //        {
+        //            tag.tag = "Access Denied";
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        tag.tag = e.Message;
+        //    }
+        //    return tag;
+        //}
+
+
         /// <summary>
         /// An authority requests the launching of a specific client for a user.
         /// </summary>
@@ -884,20 +933,55 @@ namespace iLabs.ServiceBroker.iLabSB
               DateTime startTime, long duration, int autoStart)
         {
             IntTag tag = new IntTag();
-            tag.id =-1;
-            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
+            BrokerDB brokerDB = new BrokerDB();
+            StringBuilder buf = new StringBuilder();
+            tag.id = -1;
+            try
             {
-                string authGuid = agentAuthHeader.agentGuid;
-                int clientID = -1;
-                int groupID = -1;
-                if (groupName != null && groupName.Length > 0)
+                if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
                 {
-                    groupID = AdministrativeAPI.GetGroupID(groupName);
-                }
+                    string authGuid = agentAuthHeader.agentGuid;
+                    IntTag test = brokerDB.ResolveAction(Context,clientGuid, userName, groupName, startTime, duration, autoStart > 0);
 
+                    //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
+                    Coupon coupon = brokerDB.CreateCoupon();
+                    TicketLoadFactory tlc = TicketLoadFactory.Instance();
+                    string payload = tlc.createAuthenticateAgentPayload(authGuid, clientGuid, userName, groupName);
+                    brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authGuid, duration, payload);
+                    buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl + "/default.aspx?sso=t");
+                    buf.Append("&usr=" + userName + "&cid=" + clientGuid);
+                    buf.Append("&grp=" + groupName);
+                    buf.Append("&auth=" + authGuid);
+                    buf.Append("&key=" + coupon.passkey);
+                    if (autoStart > 0)
+                        buf.Append("&key=" + coupon.passkey);
+
+
+                    //
+                    //
+                    //if (test.id > 0)
+                    //{
+                    //    string requestGuid = Utilities.MakeGuid("N");
+                    //    
+
+                    //}
+                    //else
+                    //{
+                    //    tag.tag = "Access Denied";
+                    //}
+                }
+                else
+                {
+                    tag.tag = "Access Denied";
+                }
+            }
+            catch (Exception e)
+            {
+                tag.tag = e.Message;
             }
             return tag;
         }
+
 
         
         /// <summary>
@@ -998,7 +1082,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                         //Determine resources available based on supplied fields, note requestGuid is not used to authenticate users at this time
                         // Only return groups that match the inputs, have clients & are not administrative
-                        status = brokerDB.ResolveResources(requestGuid, userName, groupName, serviceGuid, clientGuid, false,
+                        status = brokerDB.ResolveResources(Context, requestGuid, userName, groupName, serviceGuid, clientGuid, false,
                             ref message, out userID, out groupClientsMap);
                         if (userID <= 0 || groupClientsMap.Count == 0)
                         {

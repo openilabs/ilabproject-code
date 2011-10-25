@@ -415,6 +415,7 @@ CREATE TABLE [dbo].[Authorities] (
 	[Auth_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Auth_Type_ID] [int] NOT NULL ,
 	[Default_Group_ID] [int] NOT NULL,
+	[Auth_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Auth_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 	[Auth_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Email_Proxy] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 

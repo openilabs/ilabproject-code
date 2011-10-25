@@ -35,7 +35,7 @@ namespace iLabs.Scheduling.LabSide
         int userTZ = 0;
         int localTzOffset = 0;
         CultureInfo culture;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         
 	
 		protected void Page_Load(object sender, System.EventArgs e)

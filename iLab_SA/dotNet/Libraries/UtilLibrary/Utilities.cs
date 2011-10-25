@@ -229,7 +229,8 @@ namespace iLabs.UtilLib
             buf.Append("\n");
             return ex.InnerException;
         }
- 
+
+
 
         /// <summary>
         /// Formats a Uri  ( URL class ) into a fully specified URL path, with out any query parameters.
@@ -256,8 +257,17 @@ namespace iLabs.UtilLib
         /// <returns></returns>
         public static string MakeGuid()
         {
+            return MakeGuid("D");
+        }
+        /// <summary>
+        /// Simple Guid generator, wraps Microsoft GUID and formats the string as all uppercase.
+        /// </summary>
+        /// <param name="format">"N", "D", "B", or "P", null or empty defaults to D</param>
+        /// <returns></returns>
+        public static string MakeGuid(string format)
+        {
             Guid guid = System.Guid.NewGuid();
-            return guid.ToString("D").ToUpper();
+            return guid.ToString(format).ToUpper();
         }
 
         public static bool WildCardMatch(string searchString, string compareString)

@@ -23,7 +23,9 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIssuedCoupon]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetIssuedCoupon]
 GO
-
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIssuedCouponByPasskey]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetIssuedCouponByPasskey]
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AddTicket]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[AddTicket]
 GO
@@ -190,7 +192,19 @@ SET QUOTED_IDENTIFIER OFF
 GO
 SET ANSI_NULLS OFF 
 GO
+CREATE PROCEDURE GetIssuedCouponByPasskey 
 
+@passkey varchar(100)
+ AS
+
+select Coupon_ID, Cancelled from IssuedCoupon
+where Passkey = @passkey
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
 
 CREATE PROCEDURE GetIssuedCollectionCount
 	@couponID BigInt

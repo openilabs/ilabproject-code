@@ -29,7 +29,7 @@ namespace iLabs.Scheduling.LabSide
          int ussInfoID;
          int[] ussInfoIDs;
          USSInfo[] ussInfos;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
 
         protected void Page_Load(object sender, System.EventArgs e)

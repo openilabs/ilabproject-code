@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Web;
 
 using iLabs.Core;
 using iLabs.DataTypes;
@@ -2368,7 +2369,7 @@ namespace iLabs.ServiceBroker
         /// This examines the specified parameters to resolve the available resources for the user
         /// This may only be called after a user is Authenticated.
         /// </summary>
-        public int ResolveResources(string authStr, string userName, string groupName, string serviceGuid, string clientGuid, bool allGroups,
+        public int ResolveResources(HttpContext context, string authStr, string userName, string groupName, string serviceGuid, string clientGuid, bool allGroups,
             ref StringBuilder message, out int userID, out Dictionary<string, int[]> groupClientsMap)
         {
             int status = -1;
@@ -2473,7 +2474,7 @@ namespace iLabs.ServiceBroker
         /// This examines the specified parameters to resove the next action.
         /// This may only be called after a user is Authenticated.
         /// </summary>
-        public IntTag ResolveAction( string clientGuid, string userName, string groupName, DateTime start, long duration, bool autoStart)
+        public IntTag ResolveAction( HttpContext context, string clientGuid, string userName, string groupName, DateTime start, long duration, bool autoStart)
         {
             int user_ID = 0;
             int client_ID = 0;
@@ -2517,7 +2518,7 @@ namespace iLabs.ServiceBroker
             // Check that the user & is a member of the group
             if (groupName != null && groupName.Length >0)
             {
-                int gid = AdministrativeAPI.GetGroupID(group_Name);
+                int gid = AdministrativeAPI.GetGroupID(groupName);
                 if (gid > 0)
                 {
                     if (AdministrativeAPI.IsAgentMember(user_ID, gid))
@@ -2570,7 +2571,7 @@ namespace iLabs.ServiceBroker
                 if (clientMap.Count > 1) //more than one group with clients
                 {
                     //modifyUserSession(group_ID, client_ID);
-                    buf.Append(Global.FormatRegularURL(Request, "myGroups.aspx"));
+                    buf.Append(FormatRegularURL(context.Request, "myGroups.aspx"));
                 }
                 else if (clientMap.Count == 1) // get the group with clients
                 {
@@ -2585,13 +2586,13 @@ namespace iLabs.ServiceBroker
                     if (AdministrativeAPI.IsAgentMember(user_ID, gid))
                     {
                         group_ID = gid;
-                        group_Name = AdministrativeAPI.GetGroupName(gid);
+                        groupName = AdministrativeAPI.GetGroupName(gid);
 
 
                         if (clients == null || clients.Length > 1)
                         {
                            // modifyUserSession(group_ID, client_ID);
-                            buf.Append(Global.FormatRegularURL(Request, "myLabs.aspx"));
+                            buf.Append(FormatRegularURL(context.Request, "myLabs.aspx"));
                         }
                         else
                         {
@@ -2608,7 +2609,7 @@ namespace iLabs.ServiceBroker
                 if (clientGroupIDs == null || clientGroupIDs.Length == 0)
                 {
                     //modifyUserSession(group_ID, client_ID);
-                    buf.Append(Global.FormatRegularURL(Request, "myGroups.aspx"));
+                    buf.Append(FormatRegularURL(context.Request, "myGroups.aspx"));
                 }
                 else if (clientGroupIDs.Length == 1)
                 {
@@ -2650,7 +2651,7 @@ namespace iLabs.ServiceBroker
                 if (clients == null || clients.Length != 1)
                 {
                     //modifyUserSession(group_ID, client_ID);
-                    buf.Append(Global.FormatRegularURL(Request, "myLabs.aspx"));
+                    buf.Append(FormatRegularURL(context.Request, "myLabs.aspx"));
                 }
                 else
                 {
@@ -2683,18 +2684,23 @@ namespace iLabs.ServiceBroker
                 // is authorized ?
 
                 //modifyUserSession(group_ID, client_ID);
-                launchLab(user_ID, group_ID, client_ID, duration, autoStart);
+                //launchLab(user_ID, group_ID, client_ID, duration, autoStart);
+                result.id = 1;
+                return result;
 
             }
+            return result;
         }
 
 
-        protected string launchLab(int userID, int groupID, int clientID, long duration, bool autoLaunch)
+        public IntTag launchLab(ref HttpContext context, int userID, int groupID, int clientID, long duration, bool autoLaunch)
         {
             // Currently there is not a good solution for checking for an AllowExperiment ticket, will check the USS for reservation
+            IntTag results = new IntTag();
             StringBuilder buf = new StringBuilder();
-            buf.Append(Global.FormatRegularURL(Request, "myClient.aspx"));
-            buf.Append("?auto=t");
+            buf.Append(FormatRegularURL(context.Request,"myClient.aspx"));
+            if(autoLaunch)
+                buf.Append("?auto=t");
 
             string userName = null;
             string groupName = null;
@@ -2736,14 +2742,17 @@ namespace iLabs.ServiceBroker
 
                 //Check for Scheduling: Moved to myClient
 
-                Session["ClientID"] = client.clientID;
+                //Session["ClientID"] = client.clientID;
                 //Response.Redirect(Global.FormatRegularURL(Request, "myClient.aspx"), true);
-                Response.Redirect(buf.ToString(), true);
+                //Response.Redirect(buf.ToString(), true);
+                results.id = 1;
+                results.tag = buf.ToString();
             } // End if valid client
             else
             {
                 throw new Exception("The specified lab client could not be found");
             }
+            return results;
         }
 
 

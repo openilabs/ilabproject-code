@@ -27,7 +27,7 @@ namespace iLabs.Scheduling.LabSide
 		 int[] credentialSetIDs;
 	     LssCredentialSet[] credentialSets;
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

@@ -27,10 +27,10 @@ using iLabs.Proxies.USS;
 
 namespace iLabs.Scheduling.LabSide
 {
-	public class DBManager : ProcessAgentDB
+	public class UserSchedulingDB : ProcessAgentDB
 	{
 
-		public DBManager()
+		public UserSchedulingDB()
 		{
         }
 

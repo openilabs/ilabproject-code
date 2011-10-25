@@ -36,7 +36,7 @@ namespace iLabs.Scheduling.UserSide
          UssExperimentInfo[] experimentInfos;
          int[] credentialSetIds;
          UssCredentialSet[] credentials;
-        DBManager dbManager = new DBManager();
+        UserSchedulingDB dbManager = new UserSchedulingDB();
 
         string couponID = null, passkey = null, issuerID = null, sbUrl = null, groupName = null, sbGuid = null;
 

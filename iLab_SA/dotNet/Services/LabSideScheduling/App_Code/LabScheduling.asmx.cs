@@ -93,7 +93,7 @@ namespace iLabs.Scheduling.LabSide
             Coupon inCoupon, Coupon outCoupon)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 
@@ -126,7 +126,7 @@ namespace iLabs.Scheduling.LabSide
         public virtual int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                
@@ -154,7 +154,7 @@ namespace iLabs.Scheduling.LabSide
             string groupName, string ussGuid,
             string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime)
 		{
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -194,7 +194,7 @@ namespace iLabs.Scheduling.LabSide
             DateTime startTime, DateTime endTime)
 		{
             string confirm = null;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -254,7 +254,7 @@ namespace iLabs.Scheduling.LabSide
             DateTime startTime, DateTime endTime)
 		{
             int count = -1;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             Coupon opCoupon = new Coupon();
             opCoupon.couponId = opHeader.coupon.couponId;
             opCoupon.passkey = opHeader.coupon.passkey;
@@ -296,7 +296,7 @@ namespace iLabs.Scheduling.LabSide
         public int AddUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
 		{
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             try
             {
                 if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
@@ -345,7 +345,7 @@ namespace iLabs.Scheduling.LabSide
         public int ModifyUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
            
                 if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
                 {
@@ -384,7 +384,7 @@ namespace iLabs.Scheduling.LabSide
             string groupName, string ussGuid)
         {
             int status = -1;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
 
@@ -403,7 +403,7 @@ namespace iLabs.Scheduling.LabSide
         public int ModifyCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid)
         {
-           DBManager dbManager= new DBManager();
+           UserSchedulingDB dbManager= new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 int id = dbManager.GetCredentialSetID(serviceBrokerGuid, groupName);
@@ -426,7 +426,7 @@ namespace iLabs.Scheduling.LabSide
         public int RemoveCredentialSet(string serviceBrokerGuid, string serviceBrokerName,
             string groupName, string ussGuid)
         {
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 return dbManager.RemoveCredentialSet(serviceBrokerGuid, serviceBrokerName, groupName);
@@ -454,7 +454,7 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             bool status = false;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
             {
                 int id = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
@@ -482,7 +482,7 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             int id = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (id > 0)
             {
@@ -514,7 +514,7 @@ namespace iLabs.Scheduling.LabSide
             string providerName)
         {
             int status = 0;
-            DBManager dbManager = new DBManager();
+            UserSchedulingDB dbManager = new UserSchedulingDB();
             int infoID = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (infoID > 0)
             {
@@ -551,25 +551,25 @@ namespace iLabs.Scheduling.LabSide
             if (agent.type == ProcessAgentType.SERVICE_BROKER || agent.type == ProcessAgentType.REMOTE_SERVICE_BROKER)
             {
                 //Check for SB names in credential sets
-                DBManager.ModifyCredentialSetServiceBroker(agent.agentGuid, agent.agentName);
+                UserSchedulingDB.ModifyCredentialSetServiceBroker(agent.agentGuid, agent.agentName);
             }
             if (agent.type == ProcessAgentType.LAB_SERVER)
             {
                 // Labserver Names in Experiment info's
                 // Labserver Names in LS_Resource
-                DBManager.ModifyExperimentLabServer(originalGuid,agent.agentGuid, agent.agentName);
+                UserSchedulingDB.ModifyExperimentLabServer(originalGuid,agent.agentGuid, agent.agentName);
             }
             if (agent.type == ProcessAgentType.SCHEDULING_SERVER)
             {
                 // USS path, & name in USS_Info
-                int ussId = DBManager.ListUSSInfoID(agent.agentGuid);
+                int ussId = UserSchedulingDB.ListUSSInfoID(agent.agentGuid);
                 if (ussId > 0)
                 {
                     if (inCoupon == null)
                     {
                         dbTicketing.InsertCoupon(inCoupon);
                     }
-                   status = DBManager.ModifyUSSInfo(ussId, agent.agentGuid,agent.agentName, agent.webServiceUrl,
+                   status = UserSchedulingDB.ModifyUSSInfo(ussId, agent.agentGuid,agent.agentName, agent.webServiceUrl,
                         inCoupon.couponId, inCoupon.issuerGuid);
                 }
             }
