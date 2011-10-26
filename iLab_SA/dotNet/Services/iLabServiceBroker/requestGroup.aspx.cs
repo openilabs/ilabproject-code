@@ -42,14 +42,14 @@ namespace iLabs.ServiceBroker.iLabSB
 		int[] userGroupIDs;
 		int[] groupIDs;
 
-		string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
+		string supportMailAddress = ConfigurationManager.AppSettings["supportMailAddress"];
 		bool adminRequestGroup;
 	
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			userID = Convert.ToInt32(Session["UserID"]);
 
-			if(ConfigurationSettings.AppSettings["adminRequestGroup"].Trim().ToLower() == "true")
+			if(ConfigurationManager.AppSettings["adminRequestGroup"].Trim().ToLower() == "true")
 				adminRequestGroup = true;
 			else
 				adminRequestGroup = false;

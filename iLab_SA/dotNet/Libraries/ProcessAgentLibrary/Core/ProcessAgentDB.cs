@@ -214,12 +214,15 @@ namespace iLabs.Core
             }
 
 		}
-
+      
 		//////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Insert a coupon into the database
 		/// </summary>
-		/// <param name="couponID"></param>
+        /// <param name="connection"></param> 
+        /// <param name="id"></param>
+        /// <param name="issuerGuid"></param>
+        /// <param name="pass"></param>
 		/// <returns>Retrieved Coupon, or null if the ticket cannot be found</returns>
 		public void InsertCoupon(DbConnection connection, long id,string issuerGuid,string pass) 
 		{

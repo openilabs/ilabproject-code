@@ -36,7 +36,7 @@ namespace iLabs.Scheduling.LabSide
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
         int userTZ = 0;
         int localTzOffset;
-        UserSchedulingDB dbManager = new UserSchedulingDB();
+        LabSchedulingDB dbManager = new LabSchedulingDB();
         
 
 

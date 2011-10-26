@@ -27,10 +27,10 @@ using iLabs.Proxies.USS;
 
 namespace iLabs.Scheduling.LabSide
 {
-	public class UserSchedulingDB : ProcessAgentDB
+	public class LabSchedulingDB : ProcessAgentDB
 	{
 
-		public UserSchedulingDB()
+		public LabSchedulingDB()
 		{
         }
 
@@ -2450,7 +2450,7 @@ namespace iLabs.Scheduling.LabSide
 
                         MailMessage mail = new MailMessage();
                         mail.To = exInfo.contactEmail;
-                        mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
+                        mail.From = ConfigurationManager.AppSettings["genericFromMailAddress"];
                         mail.Subject = "New Reservation: " + exInfo.labClientName;
 
                         message.Append("A new reservation for " + exInfo.labClientName + " version: " + exInfo.labClientVersion);
@@ -3826,38 +3826,47 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="ussGuid"></param>
 		/// <param name="ussName"></param>
 		/// <param name="ussURL"></param>
+        /// <param name="coupon"></param>
 		/// <returns></returns>The unique ID which identifies the experiment information added. >0 was successfully added; ==-1 otherwise   
-        public int AddUSSInfo(string ussGuid, string ussName, string ussURL,long couponId,string domainGuid)
+        public int AddUSSInfo(string ussGuid, string ussName, string ussURL,Coupon coupon)
 		{
+            int i = -1;
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
-			//create a command
-			//command executes the "AddUSSInfo" store procedure
-            DbCommand cmd = FactoryDB.CreateCommand("USSInfo_Add", connection);
-			cmd.CommandType=CommandType.StoredProcedure;
-			//populate the parameters
-			cmd.Parameters.Add(FactoryDB.CreateParameter("@ussGUID", ussGuid, DbType.AnsiString,50));
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@ussName", ussName, DbType.String,256));
-			cmd.Parameters.Add(FactoryDB.CreateParameter("@ussURL", ussURL, DbType.String,512));
-			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", couponId, DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@domainGuid", domainGuid, DbType.AnsiString, 50));
-            
-			int i=-1;
+            DbCommand cmd0 = FactoryDB.CreateCommand("Insert_Coupon", connection);
+            cmd0.CommandType = CommandType.StoredProcedure;
+            cmd0.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+            cmd0.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
+            cmd0.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.String, 100));
+            try
+            {
+                connection.Open();
+                cmd0.ExecuteNonQuery();
+                //create a command
+                //command executes the "AddUSSInfo" store procedure
+                DbCommand cmd = FactoryDB.CreateCommand("USSInfo_Add", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //populate the parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@ussGUID", ussGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@ussName", ussName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@ussURL", ussURL, DbType.String, 512));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domainGuid", coupon.issuerGuid, DbType.AnsiString, 50));
 
-			// execute the command
-			try
-			{
-				connection.Open();
-				Object ob=cmd.ExecuteScalar();
+
+
+                // execute the command
+
+                Object ob = cmd.ExecuteScalar();
                 if (ob != null && ob != System.DBNull.Value)
-				{
-					i= Int32.Parse(ob.ToString());
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in add ussInfo",ex);
-			}
+                {
+                    i = Int32.Parse(ob.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add ussInfo", ex);
+            }
 			finally
 			{
 				connection.Close();

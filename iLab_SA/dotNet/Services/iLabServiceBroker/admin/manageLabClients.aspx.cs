@@ -940,7 +940,7 @@ namespace iLabs.ServiceBroker.admin
 
         protected void btnMetadata_Click(object sender, EventArgs e)
         {
-            bool requireSSL = Convert.ToBoolean(ConfigurationSettings.AppSettings["haveSSL"]);
+            bool requireSSL = Convert.ToBoolean(ConfigurationManager.AppSettings["haveSSL"]);
             string URL = "";
             string target = "admin/clientMetadata.aspx?lc=" + Convert.ToInt32(ddlLabClient.SelectedValue);
             if (requireSSL)
@@ -1523,13 +1523,14 @@ namespace iLabs.ServiceBroker.admin
                                         }
                                         //ADD LSS on USS
                                         string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["UserTZ"]));
-
+                                        string ussRevoke = factory.createRevokeReservationPayload("USS");
+                                        Coupon revokeCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, uss.agentGuid, lss.agentGuid, -1L, ussRevoke);
                                         UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                                         ussProxy.Url = uss.webServiceUrl;
                                         ussProxy.AgentAuthHeaderValue = new AgentAuthHeader();
                                         ussProxy.AgentAuthHeaderValue.coupon = uss.identOut;
                                         ussProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                        int lssAdded = ussProxy.AddLSSInfo(lss.agentGuid, lss.agentName, lss.webServiceUrl);
+                                        int lssAdded = ussProxy.AddLSSInfo(lss.agentGuid, lss.agentName, lss.webServiceUrl, revokeCoupon);
 
                                         //Add Experiment Information on USS
                                         int expInfoAdded = ussProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName,

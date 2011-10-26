@@ -55,7 +55,7 @@ namespace iLabs.ServiceBroker.iLabSB
     public partial class ssoAuth : System.Web.UI.Page
     {
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-        string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
+        string supportMailAddress = ConfigurationManager.AppSettings["supportMailAddress"];
         int uTZ = -2000;
 
         BrokerDB issuer = new BrokerDB();

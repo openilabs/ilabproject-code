@@ -36,7 +36,7 @@ namespace iLabs.Scheduling.LabSide
 	{
 		string labServerGuid = null;
         string labServerName = null;
-        UserSchedulingDB dbManager = new UserSchedulingDB();
+        LabSchedulingDB dbManager = new LabSchedulingDB();
 
         
         string couponID = null, passkey = null, issuerID = null, sbUrl = null;
@@ -511,13 +511,13 @@ namespace iLabs.Scheduling.LabSide
                 }
                 //if (resourceId <= 0)
                 //{
-                //    LSResource[] resources = UserSchedulingDB.GetLSResources(Session["labServerGuid"].ToString());
+                //    LSResource[] resources = LabSchedulingDB.GetLSResources(Session["labServerGuid"].ToString());
                 //    if (resources != null && resources.Length > 0)
                 //        resourceId = resources[0].resourceID;
                 //}
                 //else
                 //{
-                //    int[] expIds = UserSchedulingDB.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
+                //    int[] expIds = LabSchedulingDB.ListExperimentInfoIDsByLabServer(Session["labServerGuid"].ToString());
                 //    if (expIds != null && expIds.Length > 0)
                 //        expId = expIds[0];
                 //}

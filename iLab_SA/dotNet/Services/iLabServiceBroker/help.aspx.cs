@@ -40,7 +40,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class help : System.Web.UI.Page
 	{
-		string bugReportMailAddress = ConfigurationSettings.AppSettings["bugReportMailAddress"];
+		string bugReportMailAddress = ConfigurationManager.AppSettings["bugReportMailAddress"];
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
 		int userID = -1;
@@ -74,7 +74,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 ProcessAgentInfo[] ls = wrapper.GetProcessAgentInfosWrapper(lsIDs);
 				//ddlWhichLab.Items.Add("System-wide error");
 			
-				String optList = ConfigurationSettings.AppSettings["helpOptions"];
+				String optList = ConfigurationManager.AppSettings["helpOptions"];
 				if((optList != null)&& (optList.Length >0)){
 					char [] delimiter = {','};
 					String [] options =optList.Split(delimiter,100);
@@ -160,7 +160,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				StringBuilder sb = new StringBuilder();
 
 				MailMessage mail = new MailMessage();
-				mail.To = ConfigurationSettings.AppSettings["supportMailAddress"];
+				mail.To = ConfigurationManager.AppSettings["supportMailAddress"];
 				mail.From = userEmail;
 				mail.Subject = "[iLabs] Help Request: " + helpType;
 
@@ -216,7 +216,7 @@ namespace iLabs.ServiceBroker.iLabSB
 					{
 						MailMessage uMail = new MailMessage();
 						uMail.To = userEmail;
-						uMail.From = ConfigurationSettings.AppSettings["supportMailAddress"];
+						uMail.From = ConfigurationManager.AppSettings["supportMailAddress"];
 						uMail.Subject = "[iLabs] Help Request: " + helpType ;
 						uMail.Body = "Thank you for taking the time to request help from us:\n\r";
 						uMail.Body += txtProblem.Text;
@@ -239,7 +239,7 @@ namespace iLabs.ServiceBroker.iLabSB
 						smtpErrorMsg.Append("<br>" +  ex.InnerException.Message);
 						ex = ex.InnerException;
 					}
-					lblResponse.Text = Utilities.FormatErrorMessage("Error sending your help request, please email " + ConfigurationSettings.AppSettings["supportMailAddress"]+ ".<br>" + smtpErrorMsg.ToString());
+					lblResponse.Text = Utilities.FormatErrorMessage("Error sending your help request, please email " + ConfigurationManager.AppSettings["supportMailAddress"]+ ".<br>" + smtpErrorMsg.ToString());
 					lblResponse.Visible = true;
 				}
 			}

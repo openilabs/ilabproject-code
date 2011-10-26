@@ -31,7 +31,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	{
 		
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-		string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
+		string supportMailAddress = ConfigurationManager.AppSettings["supportMailAddress"];
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

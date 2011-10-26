@@ -85,7 +85,7 @@ namespace iLabs.LabServer.LabView
 		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
-            string path = ConfigurationSettings.AppSettings["logPath"];
+            string path = ConfigurationManager.AppSettings["logPath"];
             if (path != null && path.Length > 0)
             {
                Logger.LogPath = path;

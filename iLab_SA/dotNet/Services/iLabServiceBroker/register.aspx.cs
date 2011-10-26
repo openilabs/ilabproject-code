@@ -41,8 +41,8 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class register : System.Web.UI.Page
 	{
-		string registrationMailAddress = ConfigurationSettings.AppSettings["registrationMailAddress"];
-		string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
+		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
+		string supportMailAddress = ConfigurationManager.AppSettings["supportMailAddress"];
         bool chooseGroup = true;
         bool useRequestGroups = true;
 	
@@ -56,22 +56,22 @@ namespace iLabs.ServiceBroker.iLabSB
             //		made a member of the selected group. If defaultGroups is set the comma delimited list of groups will be used.
             // If chooseGroup is set to false the dropdown list will not be displayed and user will be assigned to the initialGroup
 
-            if (ConfigurationSettings.AppSettings["chooseGroups"] != null)
+            if (ConfigurationManager.AppSettings["chooseGroups"] != null)
             {
-                if (ConfigurationSettings.AppSettings["chooseGroups"].Equals("false"))
+                if (ConfigurationManager.AppSettings["chooseGroups"].Equals("false"))
                     chooseGroup = false;
             }
-            if (ConfigurationSettings.AppSettings["useRequestGroup"] != null)
+            if (ConfigurationManager.AppSettings["useRequestGroup"] != null)
             {
-                if (ConfigurationSettings.AppSettings["useRequestGroup"].Equals("false"))
+                if (ConfigurationManager.AppSettings["useRequestGroup"].Equals("false"))
                     useRequestGroups = false;
             }
 			if(!IsPostBack)
 			{
                 // Set up affiliation options
-				if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+				if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 				{
-					String afList = ConfigurationSettings.AppSettings["affiliationOptions"];
+					String afList = ConfigurationManager.AppSettings["affiliationOptions"];
 					char [] delimiter = {','};
 					String [] options =afList.Split(delimiter,100);
 					for(int i =0;i< options.Length;i++)
@@ -188,7 +188,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 txtPassword.Text = null;
                 txtConfirmPassword.Text = null;
             }
-			if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+			if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
 				if (ddlAffiliation.SelectedIndex < 1)
 				{
@@ -217,7 +217,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				string lastName = txtLastName.Text.Trim() ;
 				string email = txtEmail.Text.Trim() ;
 				string affiliation;
-				if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+				if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 				{
 					affiliation = ddlAffiliation.Items [ddlAffiliation.SelectedIndex ].Value ;
 				}
@@ -228,24 +228,24 @@ namespace iLabs.ServiceBroker.iLabSB
 				string principalString = userName;
 				string authenType = AuthenticationType.NativeAuthentication ;
 				string reason = txtReason.Text.Trim();
-                if (ConfigurationSettings.AppSettings["chooseGroups"] != null)
+                if (ConfigurationManager.AppSettings["chooseGroups"] != null)
                 {
-                    if (ConfigurationSettings.AppSettings["chooseGroups"].Equals("false"))
+                    if (ConfigurationManager.AppSettings["chooseGroups"].Equals("false"))
                         chooseGroup = false;
                 }
                 int initialGroup = wrapper.GetGroupIDWrapper(Group.NEWUSERGROUP);
                 int newUserGroupID = initialGroup;
-                if (ConfigurationSettings.AppSettings["initialGroup"] != null)
+                if (ConfigurationManager.AppSettings["initialGroup"] != null)
                 {
-                    int tmpID = wrapper.GetGroupIDWrapper(ConfigurationSettings.AppSettings["initialGroup"]);
+                    int tmpID = wrapper.GetGroupIDWrapper(ConfigurationManager.AppSettings["initialGroup"]);
                     if (tmpID > 0)
                         initialGroup = tmpID;
                 }
                 if (chooseGroup)
                 {
-                    if (ConfigurationSettings.AppSettings["useRequestGroup"] != null)
+                    if (ConfigurationManager.AppSettings["useRequestGroup"] != null)
                     {
-                        if (ConfigurationSettings.AppSettings["useRequestGroup"].Equals("false"))
+                        if (ConfigurationManager.AppSettings["useRequestGroup"].Equals("false"))
                             useRequestGroups = false;
                     }
 
@@ -306,9 +306,9 @@ namespace iLabs.ServiceBroker.iLabSB
                         Group[] groups = AdministrativeAPI.GetGroups(new int[] { initialGroup });
                         foreach (Group grp in groups)
                         {
-                            if (ConfigurationSettings.AppSettings[grp.groupName + "Item"] != null)
+                            if (ConfigurationManager.AppSettings[grp.groupName + "Item"] != null)
                             {
-                                string docUrl = ConfigurationSettings.AppSettings[grp.groupName + "Item"];
+                                string docUrl = ConfigurationManager.AppSettings[grp.groupName + "Item"];
 
                                 if (docUrl != null)
                                 {

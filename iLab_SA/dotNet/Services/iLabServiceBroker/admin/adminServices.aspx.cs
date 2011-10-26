@@ -408,7 +408,7 @@ namespace iLabs.ServiceBroker.admin
                     return;
                 
                 // get the default ticket duration from web.config
-                long duration = Convert.ToInt64(ConfigurationSettings.AppSettings["serviceAdminTicketDuration"]);
+                long duration = Convert.ToInt64(ConfigurationManager.AppSettings["serviceAdminTicketDuration"]);
 
                 string payload = "";
 

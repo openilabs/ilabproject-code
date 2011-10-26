@@ -319,7 +319,7 @@ namespace iLabs.UtilLib
 
         //    // bugReportMailAddress
         //    // Split the comma-delimited list of email addresses into a string array, to be checked individually in a loop.
-        //    string[] bugReportMailAddresses = ConfigurationSettings.AppSettings["bugReportMailAddress"].Split(comma);
+        //    string[] bugReportMailAddresses = ConfigurationManager.AppSettings["bugReportMailAddress"].Split(comma);
         //    for (int i = 0; i < bugReportMailAddresses.Length; i++)
         //    {
         //        if (!r.IsMatch(bugReportMailAddresses[i].Trim()))
@@ -336,7 +336,7 @@ namespace iLabs.UtilLib
 
         //    // supportMailAddress
         //    // Split the comma-delimited list of email addresses into a string array, to be checked individually in a loop.
-        //    string[] supportMailAddresses = ConfigurationSettings.AppSettings["supportMailAddress"].Split(comma);
+        //    string[] supportMailAddresses = ConfigurationManager.AppSettings["supportMailAddress"].Split(comma);
         //    for (int i = 0; i < supportMailAddresses.Length; i++)
         //    {
         //        if (!r.IsMatch(supportMailAddresses[i].Trim()))
@@ -353,7 +353,7 @@ namespace iLabs.UtilLib
 
         //    // registrationMailAddress
         //    // Split the comma-delimited list of email addresses into a string array, to be checked individually in a loop.
-        //    string[] registrationMailAddresses = ConfigurationSettings.AppSettings["registrationMailAddress"].Split(comma);
+        //    string[] registrationMailAddresses = ConfigurationManager.AppSettings["registrationMailAddress"].Split(comma);
         //    for (int i = 0; i < registrationMailAddresses.Length; i++)
         //    {
         //        if (!r.IsMatch(registrationMailAddresses[i].Trim()))
@@ -381,7 +381,7 @@ namespace iLabs.UtilLib
         //        // Create a Regular Expressions object with which to validate the GUID
         //        Regex r2 = new Regex(@".{1,50}", RegexOptions.Compiled);
         //        // this line will crash if there is not a valid guid in the sbGID key in web.config
-        //        sbGuid = ConfigurationSettings.AppSettings["sbGID"];
+        //        sbGuid = ConfigurationManager.AppSettings["sbGID"];
         //        if ((sbGuid == null) || (!r2.IsMatch(sbGuid)))
         //        {
         //            throw new Exception("sbGUID not set or too long.");

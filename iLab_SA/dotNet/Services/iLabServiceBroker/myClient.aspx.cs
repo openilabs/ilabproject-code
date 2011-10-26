@@ -722,7 +722,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 RecipeExecutor recipeExec = RecipeExecutor.Instance();
                 string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss, lss, username, effectiveGroupName,
                     labServer.agentGuid, lc,
-                    Convert.ToInt64(ConfigurationSettings.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
+                    Convert.ToInt64(ConfigurationManager.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
 
                 schedulingUrl += "&sb_url=" + Utilities.ExportUrlPath(Request.Url);
                 Response.Redirect(schedulingUrl, false);

@@ -31,8 +31,8 @@ namespace iLabs.ServiceBroker.iLabSB
 	/// </summary>
 	public partial class myAccount : System.Web.UI.Page
 	{
-		string supportMailAddress = ConfigurationSettings.AppSettings["supportMailAddress"];
-		string registrationMailAddress = ConfigurationSettings.AppSettings["registrationMailAddress"];
+		string supportMailAddress = ConfigurationManager.AppSettings["supportMailAddress"];
+		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
 		
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

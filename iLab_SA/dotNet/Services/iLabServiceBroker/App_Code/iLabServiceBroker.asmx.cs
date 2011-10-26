@@ -731,7 +731,6 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (sbHeader != null)
                     wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
                 }
-                BrokerDB brokerDB = new BrokerDB();
 				Criterion[] carray = new Criterion[] {new Criterion("record_type", "=", BatchRecordType.SPECIFICATION) };
                 ExperimentRecord[] records = brokerDB.RetrieveExperimentRecords(experimentID, carray);
                 if ((records != null) && (records.Length >= 1) && (records[0].contents != null) && (records[0].contents.Length > 0))
@@ -770,7 +769,6 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
                 //Criterion result = new Criterion("type", "=", BatchRecordType.RESULT);
                 Criterion[] carray = new Criterion[] { new Criterion("record_type", "=", BatchRecordType.RESULT) };
-                BrokerDB brokerDB = new BrokerDB();
                 ExperimentRecord[] records = brokerDB.RetrieveExperimentRecords(experimentID, carray);
                 if ((records != null) && (records.Length >= 1) && (records[0].contents != null) && (records[0].contents.Length > 0))
                 {
@@ -806,7 +804,6 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (sbHeader != null)
                         wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
                 }
-                BrokerDB brokerDB = new BrokerDB();
 				Criterion[] carray = new Criterion[] {new Criterion("record_type", "=", BatchRecordType.LAB_CONFIGURATION) };
                 ExperimentRecord[] records = brokerDB.RetrieveExperimentRecords(experimentID, carray);
                 if ((records != null) && (records.Length >= 1) && (records[0].contents != null) && (records[0].contents.Length > 0))

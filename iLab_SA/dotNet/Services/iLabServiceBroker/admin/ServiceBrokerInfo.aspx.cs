@@ -34,9 +34,9 @@ public partial class admin_ServiceBrokerInfo : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
        
-        txtAgentGUID.Text = System.Configuration.ConfigurationSettings.AppSettings["serviceGUID"].ToString();
-        txtURL.Text = System.Configuration.ConfigurationSettings.AppSettings["codebaseURL"].ToString();
-        txtName.Text = System.Configuration.ConfigurationSettings.AppSettings["serviceName"].ToString();
+        txtAgentGUID.Text = System.Configuration.ConfigurationManager.AppSettings["serviceGUID"].ToString();
+        txtURL.Text = System.Configuration.ConfigurationManager.AppSettings["codebaseURL"].ToString();
+        txtName.Text = System.Configuration.ConfigurationManager.AppSettings["serviceName"].ToString();
         BrokerDB ticketing = new BrokerDB();
         if (ticketing.GetProcessAgent(txtAgentGUID.Text) != null)
         {
@@ -55,9 +55,9 @@ public partial class admin_ServiceBrokerInfo : System.Web.UI.Page
     {
         BrokerDB ticketing = new BrokerDB();
         Coupon coupon = null;
-        string webserviceURL = System.Configuration.ConfigurationSettings.AppSettings["serviceURL"].ToString();
-        //string infoURL = System.Configuration.ConfigurationSettings.AppSettings["infoURL"].ToString();
-        string contactEmail = System.Configuration.ConfigurationSettings.AppSettings["registrationMailAddress"].ToString();
+        string webserviceURL = System.Configuration.ConfigurationManager.AppSettings["serviceURL"].ToString();
+        //string infoURL = System.Configuration.ConfigurationManager.AppSettings["infoURL"].ToString();
+        string contactEmail = System.Configuration.ConfigurationManager.AppSettings["registrationMailAddress"].ToString();
 
         ticketing.SelfRegisterProcessAgent(txtAgentGUID.Text, txtName.Text, ProcessAgentType.SERVICE_BROKER,
             txtAgentGUID.Text, txtURL.Text, webserviceURL);

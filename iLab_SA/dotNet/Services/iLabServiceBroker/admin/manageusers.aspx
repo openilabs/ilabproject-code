@@ -64,7 +64,7 @@ Please see license.txt in top level directory for full license.
 										<th>
 											<label for="affiliation">Affiliation</label></th>
 										<td>
-											<% if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true")){ %>
+											<% if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true")){ %>
 											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server" Width="171px"></asp:dropdownlist>
 											<% }else{ %>
 											<asp:textbox id="txtAffiliation" Runat="server"></asp:textbox>

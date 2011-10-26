@@ -66,7 +66,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				}
 
 
-				String optList = ConfigurationSettings.AppSettings["bugReportOptions"];
+				String optList = ConfigurationManager.AppSettings["bugReportOptions"];
 				if((optList != null)&& (optList.Length >0))
 				{
 					char [] delimiter = {','};
@@ -161,7 +161,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
                 else
                 {
-                    mail.To = ConfigurationSettings.AppSettings["bugReportMailAddress"];
+                    mail.To = ConfigurationManager.AppSettings["bugReportMailAddress"];
                 }
 				mail.From = userEmail;
 				mail.Subject = "[iLabs] " + Server.MachineName + " Bug Report: " + problemArea ;
@@ -216,7 +216,7 @@ namespace iLabs.ServiceBroker.iLabSB
 					{
 						MailMessage uMail = new MailMessage();
 						uMail.To = userEmail;
-						uMail.From = ConfigurationSettings.AppSettings["bugReportMailAddress"];
+						uMail.From = ConfigurationManager.AppSettings["bugReportMailAddress"];
 						uMail.Subject = "[iLabs] Bug Report: " + problemArea ;
 						uMail.Body = "Thank you for taking the time to report the following bug:\n\r";
 						uMail.Body += txtBugReport.Text;
@@ -229,7 +229,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				catch (Exception ex)
 				{
 					lblResponse.Text = Utilities.FormatErrorMessage("Error sending your bug report, please email "
-						+ ConfigurationSettings.AppSettings["bugReportMailAddress"] + ". "+ex.Message);
+						+ ConfigurationManager.AppSettings["bugReportMailAddress"] + ". "+ex.Message);
 					lblResponse.Visible = true;
 				}
 			}

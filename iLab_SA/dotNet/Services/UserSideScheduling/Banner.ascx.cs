@@ -13,7 +13,7 @@ public partial class Banner : System.Web.UI.UserControl
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        lblTitleofUSS.Text = System.Configuration.ConfigurationSettings.AppSettings["ussName"];
+        lblTitleofUSS.Text = System.Configuration.ConfigurationManager.AppSettings["ussName"];
         // Get User Name
         if (Session["UserName"] != null)
         {

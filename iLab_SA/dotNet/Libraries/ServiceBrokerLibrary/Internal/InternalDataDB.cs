@@ -124,7 +124,7 @@ namespace iLabs.ServiceBroker.Internal
                     expCoupon = new Coupon();
                     expCoupon.couponId = myReader.GetInt64(1);
                     expCoupon.passkey = myReader.GetString(2);
-                    expCoupon.issuerGuid = ConfigurationSettings.AppSettings["serviceGUID"];
+                    expCoupon.issuerGuid = ProcessAgentDB.ServiceGuid;
 
                 }
             }
@@ -457,7 +457,7 @@ namespace iLabs.ServiceBroker.Internal
 		/// </summary>
 		public static void DeleteExperimentInformation (long experimentID)
 		{
-			DbConnection myConnection = new DbConnection(ConfigurationSettings.AppSettings ["sqlConnection"]);
+			DbConnection myConnection = new DbConnection(ConfigurationManager.AppSettings ["sqlConnection"]);
 			DbCommand myCommand = FactoryDB.CreateCommand("Experiment_Delete", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure ;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter("@experimentID", experimentID));

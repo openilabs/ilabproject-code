@@ -58,7 +58,7 @@ namespace iLabs.Scheduling.UserSide
             if (agent.type == ProcessAgentType.LAB_SCHEDULING_SERVER)
             {
                 // LSS path, & name in LSS_Info
-                ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl);
+                ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl, null);
             }
             return status;
 
@@ -97,7 +97,7 @@ namespace iLabs.Scheduling.UserSide
             if (agent.type == ProcessAgentType.LAB_SCHEDULING_SERVER)
             {
                 // LSS path, & name in LSS_Info
-                ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl);
+                ModifyLSSInfo(agent.agentGuid, agent.agentName, agent.webServiceUrl,null);
             }
             return status;
 
@@ -1744,46 +1744,30 @@ namespace iLabs.Scheduling.UserSide
 			 * !------------------------------------------------------------------------------!
 			 * */
 		/// <summary>
-		/// add information of a particular lab side scheduling server identified by lssID
+		/// add information of a particular lab side scheduling server identified by lssGuid, if it has already been added.
 		/// </summary>
         /// <param name="lssGuid"></param>
 		/// <param name="lssUrl"></param>
-		/// <returns></returns>the unique ID which identifies the LSSInfo added,>0 successfully added, ==-1 otherwise
+        /// <returns>the unique ID which identifies the LSSInfo added, or the matching lss ID</returns>
         public int AddLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon)
 		{
             int i = -1;
-			//create a connection
+            LSSInfo lssInfo = null;
 			DbConnection connection= FactoryDB.GetConnection();
-			//create a command
-            DbCommand coupCmd = FactoryDB.CreateCommand("InsertCoupon",connection);
-            coupCmd.CommandType = CommandType.StoredProcedure;
-            //populate the parameters
-            coupCmd.Parameters.Add(FactoryDB.CreateParameter("@coupponID", coupon.couponId, DbType.Int64));
-            coupCmd.Parameters.Add(FactoryDB.CreateParameter("@isuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
-            coupCmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.AnsiString, 100));
             try
             {
                 connection.Open();
-                coupCmd.ExecuteNonQuery();
-
-                //command executes the "AddLSSInfo" store procedure
-                DbCommand cmd = FactoryDB.CreateCommand("AddLSSInfo", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                //populate the parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String, 256));
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String, 512));
-
-               
-
-                // execute the command
-
-                Object ob = cmd.ExecuteScalar();
-                if (ob != null && ob != System.DBNull.Value)
+                lssInfo = GetLSSInfo(connection, lssGuid);
+                if (lssInfo == null || lssInfo.lssInfoId <= 0)
                 {
-                    i = Int32.Parse(ob.ToString());
+                    InsertCoupon(connection, coupon.couponId, coupon.issuerGuid, coupon.passkey);
+                    i = InsertLSSInfo(connection, lssGuid, lssName, lssUrl, coupon);
                 }
+                else
+                {
+                    i = lssInfo.lssInfoId;
+                }
+			
             }
             catch (Exception ex)
             {
@@ -1797,6 +1781,43 @@ namespace iLabs.Scheduling.UserSide
 		}
 
         /// <summary>
+        /// add information of a particular lab side scheduling server identified by lssID
+        /// </summary>
+        /// <param name="connection">An open conection</param>
+        /// <param name="lssGuid"></param>
+        /// <param name="lssUrl"></param>
+        /// <param name="coupon"> a RevokeReservation coupon</param>
+        /// <returns></returns>the unique ID which identifies the LSSInfo added,>0 successfully added, ==-1 otherwise
+        public int InsertLSSInfo(DbConnection connection, string lssGuid, string lssName, string lssUrl, Coupon coupon)
+        {
+            int i = -1;
+            try
+            {
+                //command executes the "AddLSSInfo" store procedure
+                DbCommand cmd = FactoryDB.CreateCommand("AddLSSInfo", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //populate the parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String, 256));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String, 512));
+                // execute the command
+
+                Object ob = cmd.ExecuteScalar();
+                if (ob != null && ob != System.DBNull.Value)
+                {
+                    i = Convert.ToInt32(ob);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in insert LSS Information", ex);
+            }
+            
+            return i;
+        }
+
+        /// <summary>
         /// Updates the data fields for the LSSInfo specified by the lssInfoId; note lssInfoId may not be changed
         /// </summary>
         /// <param name="lssInfoId"></param>
@@ -1804,10 +1825,13 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
         /// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
-        public int ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl)
+        public int ModifyLSSInfo(int lssInfoId, string lssGuid, string lssName, string lssUrl, Coupon coupon)
 		{
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
+            if(coupon != null)
+            {
+            }
 			//create a command
 			//command executes the "ModifyLSSInfo" store procedure
 			DbCommand cmd=FactoryDB.CreateCommand("ModifyLssInfo",connection);
@@ -1851,10 +1875,13 @@ namespace iLabs.Scheduling.UserSide
         /// <param name="lssName"></param>
         /// <param name="lssUrl"></param>
         /// <returns></returns>true if lssInfo was successfully modified, ==false otherwise
-        public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
+            if (coupon != null)
+            {
+            }
             //create a command
             //command executes the "ModifyLSSInfo" store procedure
             DbCommand cmd = FactoryDB.CreateCommand("ModifyLssInfoByGuid", connection);
@@ -2062,30 +2089,56 @@ namespace iLabs.Scheduling.UserSide
 		}
 
         /// <summary>
-        /// Returns an array of the immutable LSSInfo objects that correspond to the supplied lssInfo IDs. 
+        /// Returns a LSSInfo object that correspond to the supplied lssInfo Guid. 
         /// </summary>
-        /// <param name="lssInfoIds"></param>
+        /// <param name="lssguid"></param>
         /// <returns></returns>
         public LSSInfo GetLSSInfo(string lssGuid)
         {
-            LSSInfo lssInfo = new LSSInfo();
+            LSSInfo lssInfo = null;
 
             // create sql connection
             DbConnection connection = FactoryDB.GetConnection();
+            try
+            {
+                connection.Open();
+                lssInfo = GetLSSInfo(connection, lssGuid);
+                
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in get lssInfo", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return lssInfo;
+        }
+
+        /// <summary>
+        /// Returns a LSSInfo object that correspond to the supplied lssInfo Guid. 
+        /// </summary>
+        /// <param name="connection">An open connection</param>
+        /// <param name="lssguid"></param>
+        /// <returns></returns>
+        public LSSInfo GetLSSInfo( DbConnection connection, string lssGuid)
+        {
+            LSSInfo lssInfo = null;
 
             // create sql command
             DbCommand cmd = FactoryDB.CreateCommand("RetrieveLSSInfoByGUID", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGuid", lssGuid, DbType.AnsiString, 50));
-            
+
             //execute the command
             try
             {
-                connection.Open();
                 DbDataReader dataReader = null;
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
+                    lssInfo = new LSSInfo();
                     lssInfo.lssInfoId = dataReader.GetInt32(0);
                     if (dataReader[1] != System.DBNull.Value)
                         lssInfo.lssGuid = dataReader.GetString(1);
@@ -2101,12 +2154,9 @@ namespace iLabs.Scheduling.UserSide
             {
                 throw new Exception("Exception thrown in get lssInfo", ex);
             }
-            finally
-            {
-                connection.Close();
-            }
             return lssInfo;
         }
+
 
 
 		/* !------------------------------------------------------------------------------!

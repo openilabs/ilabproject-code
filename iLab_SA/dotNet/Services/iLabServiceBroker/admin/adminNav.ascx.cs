@@ -228,7 +228,7 @@ namespace iLabs.ServiceBroker.admin
 			AdministrativeAPI.SaveUserSessionEndTime (Convert.ToInt64 (Session["SessionID"]));
 			FormsAuthentication.SignOut();
 			Session.Abandon();
-			bool requireSSL = Convert.ToBoolean(ConfigurationSettings.AppSettings["haveSSL"]);
+			bool requireSSL = Convert.ToBoolean(ConfigurationManager.AppSettings["haveSSL"]);
 			string URL = "";
 			if (requireSSL)
 				URL = Global.FormatSecureURL(Request,"login.aspx");

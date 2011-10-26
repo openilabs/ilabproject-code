@@ -665,7 +665,7 @@ namespace iLabs.Scheduling.UserSide
         [WebMethod]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl)
+        public int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon)
         {
             int status = 0;
             UserSchedulingDB dbManager = new UserSchedulingDB();
@@ -673,7 +673,7 @@ namespace iLabs.Scheduling.UserSide
             {
                 try
                 {
-                    status = dbManager.ModifyLSSInfo(lssGuid, lssName, lssUrl);
+                    status = dbManager.ModifyLSSInfo(lssGuid, lssName, lssUrl, coupon);
                     
                    
                 }

@@ -84,7 +84,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// </summary>
         public OperationAuthHeader opHeader = new OperationAuthHeader();
         protected AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-        public BrokerDB brokerDB = new BrokerDB();
+        protected BrokerDB brokerDB = new BrokerDB();
 
  
 
@@ -136,7 +136,7 @@ namespace iLabs.ServiceBroker.iLabSB
             Coupon inCoupon, Coupon outCoupon)
         {
             int status = 0;
-            ProcessAgentDB dbTicketing = new ProcessAgentDB();
+            
             if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = brokerDB.ModifyDomainCredentials(originalGuid, agent, inCoupon, outCoupon, extra);
@@ -178,7 +178,6 @@ namespace iLabs.ServiceBroker.iLabSB
         public override int ModifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
         {
             int status = 0;
-            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = brokerDB.ModifyProcessAgent(originalGuid, agent, extra);
@@ -201,7 +200,6 @@ namespace iLabs.ServiceBroker.iLabSB
         public override int RetireProcessAgent(string domainGuid, string serviceGuid, bool state)
         {
             int status = 0;
-            ProcessAgentDB dbTicketing = new ProcessAgentDB();
             if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 status = retireProcessAgent(domainGuid, serviceGuid, state);
@@ -231,21 +229,6 @@ namespace iLabs.ServiceBroker.iLabSB
 
 
         }
-/*
-        protected override int modifyProcessAgent(string originalGuid, ProcessAgent agent, string extra)
-        {
-            int status = 0;
-            BrokerDB brokerDB = new BrokerDB();
-            int id = brokerDBGetProcessAgentID(originalGuid);
-            if(id > 1){
-                status = brokerDB.ModifyProcessAgent(originalGuid, agent, extra);
-            }
-          
-
-            return status;
-        }
-
-*/
 
         [WebMethod(Description = "CancelTicket -- Try to cancel a cached ticket, should return true if cancelled or not found."
           + " The serviceBroker version - If not the redeemer the call needs to be repackaged and forwarded to the redeemer."),
@@ -254,19 +237,18 @@ namespace iLabs.ServiceBroker.iLabSB
         public override bool CancelTicket(Coupon coupon, string type, string redeemer)
         {
             bool status = false;
-            BrokerDB agentDB = new BrokerDB();
-            if (agentDB.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 // Move all this into BrokerDB
                 
                 if (ProcessAgentDB.ServiceGuid.Equals(redeemer))
                 {
                     // this ServiceBroker is the redeemer
-                    status = agentDB.CancelTicket(coupon, type, redeemer);
+                    status = brokerDB.CancelTicket(coupon, type, redeemer);
                 }
                 else
                 {
-                    ProcessAgentInfo target = agentDB.GetProcessAgentInfo(redeemer);
+                    ProcessAgentInfo target = brokerDB.GetProcessAgentInfo(redeemer);
                     if (target != null)
                     {
                         if (target.retired)
@@ -286,7 +268,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
                         else
                         {
-                            ProcessAgentInfo remoteSB = agentDB.GetProcessAgentInfo(target.domainGuid);
+                            ProcessAgentInfo remoteSB = brokerDB.GetProcessAgentInfo(target.domainGuid);
                             if (remoteSB != null)
                             {
                                 if (remoteSB.retired)
@@ -337,7 +319,6 @@ namespace iLabs.ServiceBroker.iLabSB
             bool hasProvider = false;
             bool hasConsumer = false;
             string ns = "";
-            BrokerDB brokerDB = new BrokerDB();
            
             int lssID = 0;
             int lsID = 0;
@@ -559,9 +540,9 @@ namespace iLabs.ServiceBroker.iLabSB
                 StringBuilder sb = new StringBuilder();
 
                 MailMessage mail = new MailMessage();
-                mail.To = ConfigurationSettings.AppSettings["supportMailAddress"];
+                mail.To = ConfigurationManager.AppSettings["supportMailAddress"];
                 //mail.To = "pbailey@mit.edu";
-                mail.From = ConfigurationSettings.AppSettings["genericFromMailAddress"];
+                mail.From = ConfigurationManager.AppSettings["genericFromMailAddress"];
                 mail.Subject = "Register called on " + ProcessAgentDB.ServiceAgent.agentName;
                 mail.Body = message.ToString();
                 SmtpMail.SmtpServer = "127.0.0.1";
@@ -613,7 +594,6 @@ namespace iLabs.ServiceBroker.iLabSB
         public Ticket AddTicket(Coupon coupon, string type, string redeemerGuid,
             long duration, string payload)
         {
-            BrokerDB brokerDB = new BrokerDB();
             Ticket ticket = null;
             if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
@@ -644,14 +624,14 @@ namespace iLabs.ServiceBroker.iLabSB
         public Coupon CreateTicket(string type, string redeemerGuid,
             long duration, string payload)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
+           
             Coupon coupon = null;
-            if (ticketIssuer.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (agentAuthHeader.coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
                 {
                     // Note: may need to find requesting service for sponsor.
-                    coupon = ticketIssuer.CreateTicket(type, redeemerGuid, agentAuthHeader.agentGuid,
+                    coupon = brokerDB.CreateTicket(type, redeemerGuid, agentAuthHeader.agentGuid,
                         duration, payload);
                 }
             }
@@ -673,17 +653,16 @@ namespace iLabs.ServiceBroker.iLabSB
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public Ticket RedeemTicket(Coupon coupon, string type, string redeemerGuid)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
             Ticket ticket = null;
-            if (ticketIssuer.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
                 {
-                    ticket = ticketIssuer.RetrieveIssuedTicket(coupon, type, redeemerGuid);
+                    ticket = brokerDB.RetrieveIssuedTicket(coupon, type, redeemerGuid);
                 }
                 else
                 {
-                    ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(coupon.issuerGuid);
+                    ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(coupon.issuerGuid);
                     if (paInfo != null)
                     {
                         if (paInfo.retired)
@@ -723,18 +702,17 @@ namespace iLabs.ServiceBroker.iLabSB
         public bool RequestTicketCancellation(Coupon coupon,
             string type, string redeemerGuid)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
             bool status = false;
-            if (ticketIssuer.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
                 {
-                    return ticketIssuer.RequestTicketCancellation(coupon,
+                    return brokerDB.RequestTicketCancellation(coupon,
                         type, redeemerGuid);
                 }
                 else
                 {
-                    ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(coupon.issuerGuid);
+                    ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(coupon.issuerGuid);
                     if (paInfo != null)
                     {
                         if (paInfo.retired)
@@ -933,7 +911,6 @@ namespace iLabs.ServiceBroker.iLabSB
               DateTime startTime, long duration, int autoStart)
         {
             IntTag tag = new IntTag();
-            BrokerDB brokerDB = new BrokerDB();
             StringBuilder buf = new StringBuilder();
             tag.id = -1;
             try
@@ -1012,7 +989,6 @@ namespace iLabs.ServiceBroker.iLabSB
             bool ok = false;
             long minDuration = 120L; // force all requests to have at minimum a relativly short duration, longer requests are supported.
             long ticketDuration = Math.Max(minDuration, duration);
-            BrokerDB brokerDB = new BrokerDB();
             Coupon coupon = null;
 
             int userID = 0;
@@ -1312,11 +1288,10 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public StorageStatus OpenExperiment(long experimentId, long duration)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
             StorageStatus status = null;
-            if (ticketIssuer.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
-                Ticket essTicket = ticketIssuer.RetrieveTicket(opHeader.coupon, TicketTypes.ADMINISTER_EXPERIMENT);
+                Ticket essTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.ADMINISTER_EXPERIMENT);
                 // Check for ESS use
                 if (essTicket != null)
                 {
@@ -1330,7 +1305,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (summary.HasEss)
                     {
                         // Retrieve the ESS Status info and update as needed
-                        ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(summary.essGuid);
+                        ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(summary.essGuid);
                         if (ess.retired)
                         {
                             throw new Exception("The ESS is retired");
@@ -1370,7 +1345,6 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public StorageStatus AgentCloseExperiment(Coupon coupon, long experimentId)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
             StorageStatus status = null;
             bool experimentClosed = false;
 
@@ -1380,10 +1354,10 @@ namespace iLabs.ServiceBroker.iLabSB
                 {
 
                     // Check for ESS use
-                    Ticket essTicket = ticketIssuer.RetrieveTicket(coupon, TicketTypes.ADMINISTER_EXPERIMENT);
+                    Ticket essTicket = brokerDB.RetrieveTicket(coupon, TicketTypes.ADMINISTER_EXPERIMENT);
                     if (essTicket != null)
                     {
-                        ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(essTicket.redeemerGuid);
+                        ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(essTicket.redeemerGuid);
                         if (ess != null)
                         {
                             if (ess.retired)
@@ -1398,7 +1372,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             status = essProxy.CloseExperiment(experimentId);
                             DataStorageAPI.UpdateExperimentStatus(status);
                         }
-                        ticketIssuer.CancelIssuedTicket(coupon, essTicket);
+                        brokerDB.CancelIssuedTicket(coupon, essTicket);
                     }
                     else
                     {
@@ -1412,7 +1386,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
                 else
                 {
-                    ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(coupon.issuerGuid);
+                    ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(coupon.issuerGuid);
                     if (paInfo != null)
                     {
                         if (paInfo.retired)
@@ -1452,22 +1426,21 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public StorageStatus ClientCloseExperiment(long experimentId)
         {
-            BrokerDB ticketIssuer = new BrokerDB();
             StorageStatus status = null;
             bool experimentClosed = false;
 
             //Coupon opCoupon = new Coupon(opHeader.coupon.issuerGuid, opHeader.coupon.couponId,
             //     opHeader.coupon.passkey);
-            if (ticketIssuer.AuthenticateIssuedCoupon(opHeader.coupon))
+            if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
             {
-                Ticket expTicket = ticketIssuer.RetrieveTicket(opHeader.coupon, TicketTypes.EXECUTE_EXPERIMENT);
+                Ticket expTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.EXECUTE_EXPERIMENT);
                 if (expTicket != null)
                 {
                     // Check for ESS use
-                    Ticket essTicket = ticketIssuer.RetrieveTicket(opHeader.coupon, TicketTypes.ADMINISTER_EXPERIMENT);
+                    Ticket essTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.ADMINISTER_EXPERIMENT);
                     if (essTicket != null)
                     {
-                        ProcessAgentInfo ess = ticketIssuer.GetProcessAgentInfo(essTicket.redeemerGuid);
+                        ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(essTicket.redeemerGuid);
                         if (ess != null)
                         {
                             if (ess.retired)
@@ -1481,7 +1454,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             status = essProxy.CloseExperiment(experimentId);
                             DataStorageAPI.UpdateExperimentStatus(status);
                         }
-                        ticketIssuer.CancelIssuedTicket(opHeader.coupon, essTicket);
+                        brokerDB.CancelIssuedTicket(opHeader.coupon, essTicket);
                     }
                     else
                     {
@@ -1506,7 +1479,6 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public long[] RetrieveExperimentIds(Criterion[] carray)
         {
-            BrokerDB brokerDB = new BrokerDB();
 
             long[] expIds = null;
             if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
@@ -1519,7 +1491,6 @@ namespace iLabs.ServiceBroker.iLabSB
 
         protected long[] getExperimentIDs(Coupon opCoupon, Criterion[] carray)
         {
-            BrokerDB brokerDB = new BrokerDB();
             int userID = 0;
             int groupID = 0;
             long[] expIDs = null;
@@ -1554,7 +1525,6 @@ namespace iLabs.ServiceBroker.iLabSB
         public Experiment RetrieveExperiment(long experimentID)
         {
             Experiment experiment = null;
-            BrokerDB brokerDB = new BrokerDB();
             int roles = 0;
             int userID = 0;
             int groupID = 0;
@@ -1620,7 +1590,6 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public ExperimentSummary[] RetrieveExperimentSummary(Criterion[] carray)
         {
-            BrokerDB brokerDB = new BrokerDB();
             ExperimentSummary[] summaries = null;
             if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
             {
@@ -1639,8 +1608,7 @@ EnableSession = true)]
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public ExperimentRecord[] RetrieveExperimentRecords(long experimentID, Criterion[] carray)
         {
-                  ExperimentRecord[]  records = null;
-            BrokerDB brokerDB = new BrokerDB();
+            ExperimentRecord[]  records = null;
             int roles = 0;
             int userID = 0;
             int groupID = 0;
@@ -1686,15 +1654,14 @@ EnableSession = true)]
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         public Coupon RequestExperimentAccess(long experimentID)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
             Coupon coupon = null;
             //first try to recreate session if using a html client
             //if ((Session == null) || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
 
 
-            if (ticketIssuer.AuthenticateIssuedCoupon(opHeader.coupon))
+            if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
             {
-                Ticket sessionTicket = ticketIssuer.RetrieveTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION);
+                Ticket sessionTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION);
                 if (sessionTicket != null)
                 {
 
@@ -1746,8 +1713,7 @@ EnableSession = true)]
             {
                 wrapper.SetServiceSession(opHeader.coupon);
             }
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
-            if (ticketIssuer.AuthenticateIssuedCoupon(opHeader.coupon))
+            if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
             {
                 try
                 {
@@ -1783,8 +1749,7 @@ EnableSession = true)]
             {
                 wrapper.SetServiceSession(opHeader.coupon);
             }
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
-            if (ticketIssuer.AuthenticateIssuedCoupon(opHeader.coupon))
+            if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
             {
                 try
                 {
@@ -1820,9 +1785,8 @@ EnableSession = true)]
         public bool RevokeReservation(string serviceBrokerGuid, string userName, string groupName, string labServerGuid, string labClientGuid,
             DateTime startTime, DateTime endTime, string message)
         {
-            TicketIssuerDB ticketIssuer = new TicketIssuerDB();
             bool status = false;
-            if (ticketIssuer.AuthenticateAgentHeader(agentAuthHeader))
+            if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (agentAuthHeader.coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
                 {
@@ -1839,7 +1803,7 @@ EnableSession = true)]
                                 {
                                     MailMessage uMail = new MailMessage();
                                     uMail.To = users[0].email;
-                                    uMail.From = ConfigurationSettings.AppSettings["supportMailAddress"];
+                                    uMail.From = ConfigurationManager.AppSettings["supportMailAddress"];
                                     uMail.Subject = "[iLabs] A Reservation has been revoked!";
                                     StringBuilder buf = new StringBuilder();
                                     buf.Append("Your scheduled reservation for ");
@@ -1877,7 +1841,7 @@ EnableSession = true)]
             }
             else
             {
-                ProcessAgentInfo paInfo = ticketIssuer.GetProcessAgentInfo(agentAuthHeader.coupon.issuerGuid);
+                ProcessAgentInfo paInfo = brokerDB.GetProcessAgentInfo(agentAuthHeader.coupon.issuerGuid);
                 if (paInfo != null)
                 {
                     if (paInfo.retired)

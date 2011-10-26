@@ -13,7 +13,7 @@ public partial class Banner : System.Web.UI.UserControl
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-        lblTitleofLSS.Text = System.Configuration.ConfigurationSettings.AppSettings["LSSName"];
+        lblTitleofLSS.Text = System.Configuration.ConfigurationManager.AppSettings["LSSName"];
         // Get Lab Server Name
         if (Session["labServerName"] != null)
         {

@@ -31,7 +31,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		protected string showUrl;
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-			bool requireSSL = Convert.ToBoolean(ConfigurationSettings.AppSettings["haveSSL"]);
+			bool requireSSL = Convert.ToBoolean(ConfigurationManager.AppSettings["haveSSL"]);
 			if (requireSSL)
 				showUrl = Global.FormatSecureURL(Request,"home.aspx");
 			else

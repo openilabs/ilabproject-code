@@ -229,7 +229,7 @@ using iLabs.DataTypes.SchedulingTypes;
         [WebMethod(Description = "Add information of a particular lab side scheduling server identified by lssID.")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public abstract int AddLSSInfo(string lssGuid, string lssName, string lssUrl);
+        public abstract int AddLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon);
         
         /// <summary>
         /// Modify information of a particular lab side scheduling server identified by lssID
@@ -241,7 +241,7 @@ using iLabs.DataTypes.SchedulingTypes;
         [WebMethod(Description = "Modify information of a particular lab side scheduling server identified by lssID")]
         [SoapDocumentMethod(Binding = "IUSS"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-        public abstract int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl);
+        public abstract int ModifyLSSInfo(string lssGuid, string lssName, string lssUrl, Coupon coupon);
         
         /// <summary>
         /// rEMOVE information of a particular lab side scheduling server identified by lssID

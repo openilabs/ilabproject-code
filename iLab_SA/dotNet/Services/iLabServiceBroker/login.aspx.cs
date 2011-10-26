@@ -42,7 +42,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 			else
 			{
-				bool requireSSL = Convert.ToBoolean(ConfigurationSettings.AppSettings["haveSSL"]);
+				bool requireSSL = Convert.ToBoolean(ConfigurationManager.AppSettings["haveSSL"]);
 				string Url;
 				if ((requireSSL)&&(!Request.IsSecureConnection))
 				{

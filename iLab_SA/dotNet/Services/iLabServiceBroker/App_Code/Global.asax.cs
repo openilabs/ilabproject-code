@@ -57,7 +57,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		
 		protected void Application_Start(Object sender, EventArgs e)
 		{
-			string path = ConfigurationSettings.AppSettings["logPath"];
+			string path = ConfigurationManager.AppSettings["logPath"];
             if (path != null && path.Length > 0)
             {
                Logger.LogPath = path;
@@ -215,7 +215,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		public static string FormatRegularURL(HttpRequest r, string relativePath)
 		{
-			string protocol = ConfigurationSettings.AppSettings["regularProtocol"];
+			string protocol = ConfigurationManager.AppSettings["regularProtocol"];
 			string serverName = 
 				HttpUtility.UrlEncode(r.ServerVariables["SERVER_NAME"]);
 			string vdirName = r.ApplicationPath;
@@ -225,7 +225,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		public static string FormatSecureURL(HttpRequest r, string relativePath)
 		{
-			string protocol = ConfigurationSettings.AppSettings["secureProtocol"];
+			string protocol = ConfigurationManager.AppSettings["secureProtocol"];
 			string serverName = 
 				HttpUtility.UrlEncode(r.ServerVariables["SERVER_NAME"]);
 			string vdirName = r.ApplicationPath;

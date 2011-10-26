@@ -34,7 +34,7 @@ namespace iLabs.ServiceBroker.admin
 	{
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 	
-		string registrationMailAddress = ConfigurationSettings.AppSettings["registrationMailAddress"];
+		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

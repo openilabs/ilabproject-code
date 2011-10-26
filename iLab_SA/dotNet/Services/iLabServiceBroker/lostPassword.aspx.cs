@@ -37,7 +37,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	public partial class lostPassword : System.Web.UI.Page
 	{
 
-		string registrationMailAddress = ConfigurationSettings.AppSettings["registrationMailAddress"];
+		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{

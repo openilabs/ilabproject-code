@@ -67,9 +67,9 @@ namespace iLabs.ServiceBroker.admin
 				 * Affiliation can either be set up as a drop down list or a text box.
 				 * This is specified in the Web.Config file
 				 */
-				if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+				if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 				{
-					String afList = ConfigurationSettings.AppSettings["affiliationOptions"];
+					String afList = ConfigurationManager.AppSettings["affiliationOptions"];
 					char [] delimiter = {','};
 					String [] options =afList.Split(delimiter,100);
 					for(int i =0;i< options.Length;i++)
@@ -151,7 +151,7 @@ namespace iLabs.ServiceBroker.admin
 
 		private void ResetState()
 		{
-			if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+			if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
 				ddlAffiliation.ClearSelection ();
 			}
@@ -188,7 +188,7 @@ namespace iLabs.ServiceBroker.admin
 					 * For e.g. if you change MIT Student to Student, make sure that the affiliation of 
 					 * all the users is changed from "MIT Student" to "Student in the database.
 					 * Otherwise the next step will throw an exception.*/
-			if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+			if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
 				ddlAffiliation.Items .FindByText (user.affiliation).Selected = true;
 			}
@@ -495,7 +495,7 @@ namespace iLabs.ServiceBroker.admin
 			}
 
 			String strAffiliation = "";
-			if(ConfigurationSettings.AppSettings["useAffiliationDDL"].Equals("true"))
+			if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
 				if (ddlAffiliation.SelectedIndex > 0)
 				{

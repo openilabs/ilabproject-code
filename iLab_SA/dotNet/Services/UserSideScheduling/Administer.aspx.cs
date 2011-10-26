@@ -310,7 +310,7 @@ namespace iLabs.Scheduling.UserSide
                 try
                 {
                     // Modify the User Side Scheduling Server
-                    dbManager.ModifyLSSInfo(lssInfoId, txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text);
+                    dbManager.ModifyLSSInfo(lssInfoId, txtLSSID.Text, txtLSSName.Text, txtLSSURL.Text,null);
 
                     lblErrorMessage.Visible = true;
                     lblErrorMessage.Text = Utilities.FormatConfirmationMessage("User Side Scheduling Server " + txtLSSID.Text + " has been modified.");
