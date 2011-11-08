@@ -80,25 +80,23 @@ namespace iLabs.ServiceBroker.Authentication
             return status;
         }
 
-        public static int AuthenticateAuthority(string authGuid, string passkey)
+        public static Ticket GetAuthenticateAgentTicket(string authGuid, string passkey)
         {
-            int id = -1;
+            Ticket authTicket = null;
             BrokerDB brokerDB = new BrokerDB();
             Coupon authCoupon = brokerDB.GetIssuedCoupon(passkey);
             if (authCoupon != null)
             {
-                Ticket authTicket = brokerDB.RetrieveTicket(authCoupon, TicketTypes.AUTHENTICATE_AGENT);
-                if(authTicket != null){
+                authTicket = brokerDB.RetrieveTicket(authCoupon, TicketTypes.AUTHENTICATE_AGENT);
+                if (authTicket == null || authTicket.sponsorGuid.CompareTo(authGuid) != 0)
+                {
+                    //ToDo: Parse Ticket
 
-                // Parse Ticket
-                    //todo
+                    throw new AccessDeniedException("AccessDenied!");
                 }
+
             }
-            else
-            {
-                throw new AccessDeniedException("AccessDenied!");
-            }
-            return id;
+            return authTicket;
         }
 		/*		
 		public static string Authenticate (string type)

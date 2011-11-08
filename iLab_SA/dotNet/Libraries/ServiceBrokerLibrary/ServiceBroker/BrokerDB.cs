@@ -664,12 +664,231 @@ namespace iLabs.ServiceBroker
             return status;
         }
 
+        /* Authority Methods */
+
+        public IntTag[] GetAuthorityTags()
+        {
+            return GetIntTags("Authorities_RetrieveTags", null);
+        }
+
+        public int AuthorityDelete(int id)
+        {
+            int count = -1;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_Delete", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            try
+            {
+                // populate stored procedure parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityId", id, DbType.Int32));
+                // read the result
+                connection.Open();
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                    count = Convert.ToInt32(result);
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return count;
+        }
+
+        public int AuthorityInsert(int authTypeId, int groupId, string name, string guid, string url, string description,
+            string passPhrase, string emailProxy, string contactEmail, string bugEmail, string location)
+        {
+            int id = -1;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_Insert", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate stored procedure parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authTypeId", authTypeId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@defaultGroupID", groupId, DbType.Int32));
+
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityName", name, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityURL", url, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@emailProxy", emailProxy, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@passPhrase", passPhrase, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@contactEmail", contactEmail, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@bugEmail", bugEmail, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@location", location, DbType.String, 256));
+            try
+            {
+                // read the result
+                connection.Open();
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                    id = Convert.ToInt32(result);
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return id;
+        }
+
+        public Authority AuthorityRetrieve(int id)
+        {
+            Authority auth = null;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_Retrieve", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            try
+            {
+                // populate stored procedure parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityId", id, DbType.Int32));
+                // read the result
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader(); 
+                while (dataReader.Read())
+                {
+                    auth = new Authority();
+                    //Authority_ID,Auth_Type_ID,Default_Group_ID,Authority_Guid,Authority_Name,
+                    //Authority_URL,Pass_Phrase, Email_Proxy,Description,Contact_Email,Bug_Email,Location
+                    auth.authorityID = dataReader.GetInt32(0);
+                    auth.authTypeID = dataReader.GetInt32(1);
+                    auth.defaultGroupID = dataReader.GetInt32(2);
+                    auth.authGuid = dataReader.GetString(3);
+                    auth.authName = dataReader.GetString(4);
+                    auth.authURL = dataReader.GetString(5);
+                    auth.passphrase = dataReader.GetString(6);
+                    auth.emailProxy = dataReader.GetString(7);
+                    auth.description = dataReader.GetString(8);
+                    auth.contactEmail = dataReader.GetString(9);
+                    auth.bugEmail = dataReader.GetString(10);
+                    auth.location = dataReader.GetString(11);
+                }
+                dataReader.Close();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return auth;
+        }
+
+        public Authority AuthorityRetrieve(string guid)
+        {
+            Authority auth = null;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_RetrieveByGuid", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            try
+            {
+                // populate stored procedure parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString,50));
+                // read the result
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader(); 
+                while (dataReader.Read())
+                {
+                    auth = new Authority();
+                    //Authority_ID,Auth_Type_ID,Default_Group_ID,Authority_Guid,Authority_Name,
+                    //Authority_URL,Pass_Phrase, Email_Proxy,Description,Contact_Email,Bug_Email,Location
+                    auth.authorityID = dataReader.GetInt32(0);
+                    auth.authTypeID = dataReader.GetInt32(1);
+                    auth.defaultGroupID = dataReader.GetInt32(2);
+                    auth.authGuid = dataReader.GetString(3);
+                    auth.authName = dataReader.GetString(4);
+                    auth.authURL = dataReader.GetString(5);
+                    auth.passphrase = dataReader.GetString(6);
+                    auth.emailProxy = dataReader.GetString(7);
+                    auth.description = dataReader.GetString(8);
+                    auth.contactEmail = dataReader.GetString(9);
+                    auth.bugEmail = dataReader.GetString(10);
+                    auth.location = dataReader.GetString(11);
+                }
+                dataReader.Close();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return auth;
+        }
+
+        public int AuthorityUpdate(int authorityId, int authTypeId, int groupId, string name, string guid, string url, string description,
+           string passPhrase, string emailProxy, string contactEmail, string bugEmail, string location)
+        {
+            int count = 0;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_Update", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate stored procedure parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityID", authorityId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authTypeID", authTypeId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@defaultGroupID", groupId, DbType.Int32));
+
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityName", name, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityURL", url, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@emailProxy", emailProxy, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@passPhrase", passPhrase, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@contactEmail", contactEmail, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@bugEmail", bugEmail, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@location", location, DbType.String, 256));
+            try
+            {
+                // read the result
+                connection.Open();
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                    count = Convert.ToInt32(result);
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return count;
+        }
+
+        public IntTag[] GetAuthProtocolTags()
+        {
+            return GetIntTags("AuthProtocols_RetrieveTags", null);
+        }
+
+        
+
 
         /* START OF RESOURCE MAPPING */
 
         public IntTag[] GetAdminServiceTags(int groupID)
         {
-            ArrayList list = new ArrayList();
+            List<IntTag> list = new List<IntTag>();
             DbConnection connection = FactoryDB.GetConnection();
             try
             {
@@ -702,10 +921,7 @@ namespace iLabs.ServiceBroker
                 // close the sql connection
                 connection.Close();
             }
-
-            IntTag dummy = new IntTag();
-            IntTag[] tags = (IntTag[])list.ToArray(dummy.GetType());
-            return tags;
+            return list.ToArray();
         }
 
 

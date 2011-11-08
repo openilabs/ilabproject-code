@@ -50,6 +50,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		private void Page_Load(object sender, System.EventArgs e)
 		{
+            lblRevision.Text = "<!--  " + iLabGlobal.Release + "  -->";
 			userID = -1;
 			currentUser = new User();
 			if((Session != null) && (Session["UserID"] != null))

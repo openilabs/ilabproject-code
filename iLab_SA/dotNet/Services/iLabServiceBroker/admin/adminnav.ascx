@@ -38,6 +38,8 @@
 			<li>
 				<A id="aNav3ManageServices" runat="server" href="manageServices.aspx">Manage Process Agents</A></li>
 			<li>
+				<A id="aNav3Authorities" runat="server" href="authorities.aspx">Manage Authorities</A></li>
+			<li>
 				<A id="aNav3ManageLabClients" runat="server" href="manageLabClients.aspx">Manage Lab Clients</A></li>
 			<li>
 				<A id="aNav3ManageLabs" runat="server" href="crossRegistration.aspx">Cross-domain Registration</A></li>

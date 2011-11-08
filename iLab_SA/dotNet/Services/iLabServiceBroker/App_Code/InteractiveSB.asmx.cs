@@ -903,7 +903,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="startTime"></param>
         /// <param name="duration"></param>
         /// <param name="autoStart">Determine if the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
-        /// <returns>an IntTag with a status code in the interger and a URLto be used by the authority to redirect the request.</returns>
+        /// <returns>an IntTag with a status code in the interger and a URL to be used by the authority to redirect the request.</returns>
         [WebMethod(Description = "An authority requests the launching of a specific client for a user.", EnableSession = true)]
         [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In, Required = true)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
@@ -931,7 +931,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     buf.Append("&auth=" + authGuid);
                     buf.Append("&key=" + coupon.passkey);
                     if (autoStart > 0)
-                        buf.Append("&key=" + coupon.passkey);
+                        buf.Append("&auto=t");
 
 
                     //

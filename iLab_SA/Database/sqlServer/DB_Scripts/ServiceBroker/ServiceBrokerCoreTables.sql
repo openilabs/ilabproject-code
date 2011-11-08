@@ -195,9 +195,9 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Authentica
 drop table [dbo].[Authentication_Types]
 GO
 
-/****** Object:  Table [dbo].[Authorities]    Script Date: 8/30/2005 4:07:53 PM ******/
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Authorities]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-drop table [dbo].[Authorities]
+/****** Object:  Table [dbo].[Authority]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Authority]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Authority]
 GO
 
 /****** Object:  Table [dbo].[Blobs_Access]    Script Date: 8/30/2005 4:07:53 PM ******/
@@ -407,19 +407,26 @@ GO
 /****** Object:  Table [dbo].[Authentication_Types]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Authentication_Types] (
 	[Auth_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Auth_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+	[Description] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
 
-CREATE TABLE [dbo].[Authorities] (
-	[Auth_ID] [int] IDENTITY (1, 1) NOT NULL ,
-	[Auth_Type_ID] [int] NOT NULL ,
+CREATE TABLE [dbo].[Authority](
+	[Authority_ID] [int] IDENTITY(1,1) NOT NULL,
+	[Auth_Type_ID] [int] NOT NULL,
 	[Default_Group_ID] [int] NOT NULL,
-	[Auth_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Auth_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-	[Auth_URL] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Email_Proxy] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
+	[Authority_Guid] [varchar](50) NOT NULL,
+	[Authority_Name] [nvarchar](256) NOT NULL,
+	[Authority_URL] [nvarchar](512) NOT NULL,
+	[Pass_Phrase] [varchar](256) NULL,
+	[Email_Proxy] [nvarchar](512) NULL,
+	[Description] [nvarchar](512) NULL,
+	[Contact_Email] [nvarchar](256) NULL,
+	[Bug_Email] [nvarchar](256) NULL,
+	[Location] [nvarchar](256) NULL,
 ) ON [PRIMARY]
+
 GO
 
 
@@ -741,6 +748,12 @@ ALTER TABLE [dbo].[Authentication_Types] WITH NOCHECK ADD
 	)  ON [PRIMARY] 
 GO
 
+ALTER TABLE [dbo].[Authority] WITH NOCHECK ADD 
+	CONSTRAINT [PK_Authority] PRIMARY KEY  CLUSTERED 
+	(
+		[Authority_ID]
+	)  ON [PRIMARY] 
+GO
 
 ALTER TABLE [dbo].[Client_Info] WITH NOCHECK ADD 
 	CONSTRAINT [PK_Client_Info] PRIMARY KEY  CLUSTERED 

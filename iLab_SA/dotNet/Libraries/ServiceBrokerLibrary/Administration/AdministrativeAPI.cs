@@ -38,10 +38,25 @@ namespace iLabs.ServiceBroker.Administration
         public int id;
         public string type;
         public string name;
-
         public const string userType = "User";
         public const string groupType = "Group";
     }
+
+    public class Authority{
+        public int authorityID;
+        public int authTypeID;
+        public int defaultGroupID;
+        public string authGuid;
+        public string authName;
+        public string authURL;
+        public string passphrase;
+        public string emailProxy;
+        public string description;
+        public string contactEmail;
+        public string bugEmail;
+        public string location;
+    }
+    
 
 
 	/// <summary>

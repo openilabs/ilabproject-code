@@ -21,6 +21,7 @@ using System.Web.Mail;
 using iLabs.Ticketing;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.Services;
+using iLabs.UtilLib;
 
 using iLabs.LabServer.Interactive;
 
@@ -40,6 +41,7 @@ namespace iLabs.LabServer
 			if(! IsPostBack)
 			{
 				//int[] lsIDs = AdministrativeAPI.ListLabServerIDs();
+                lblRevision.Text = "<!--  " + iLabGlobal.Release + "  -->";
                 LabDB service = new LabDB();
                 LabAppInfo[] labs = service.GetLabApps();
 				ddlWhichLab.Items.Add("System-wide error");

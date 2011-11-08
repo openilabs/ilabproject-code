@@ -1554,45 +1554,104 @@ namespace iLabs.Core
         }
 
         /// <summary>
+        /// Generic get IntTag
+        /// </summary>
+        /// <param name="procedure">The string name of the procedure to call</param>
+        /// <param name="param">an optional prarameter, with the value set, null for no parameter</param>
+        /// <returns></returns>
+        public IntTag GetIntTag(String procedure, DbParameter param)
+        {
+            IntTag tag = null;
+            DbConnection connection = FactoryDB.GetConnection();
+
+            DbCommand cmd = FactoryDB.CreateCommand(procedure, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (param != null)
+            {
+                cmd.Parameters.Add(param);
+            }
+            try
+            {
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
+                if (dataReader.HasRows)
+                {
+                    tag = new IntTag();
+                    while (dataReader.Read())
+                    {
+                        tag.id = dataReader.GetInt32(0);
+                        tag.tag = dataReader.GetString(1);
+                       
+                    }
+                }
+                dataReader.Close();
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return tag;
+        }
+
+        /// <summary>
+        /// Generic call to retur an array of IntTags
+        /// </summary>
+        /// <param name="procedure">the string name of the procedure to call</param>
+        /// <param name="param">an optional parameter with it's value set, null for no parameter</param>
+        /// <returns></returns>
+        public IntTag[] GetIntTags(String procedure, DbParameter param)
+        {
+            List<IntTag> tags = new List<IntTag>();
+            DbConnection connection = FactoryDB.GetConnection();
+
+            DbCommand cmd = FactoryDB.CreateCommand(procedure, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (param != null)
+            {
+                cmd.Parameters.Add(param);
+            }
+            try
+            {
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
+                if (dataReader.HasRows)
+                {
+                    tags = new List<IntTag>();
+                    while (dataReader.Read())
+                    {
+                        int id = dataReader.GetInt32(0);
+                        string name = dataReader.GetString(1);
+                        tags.Add(new IntTag(id, name));
+                    }
+                }
+                dataReader.Close();
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return tags.ToArray();
+        }
+
+        /// <summary>
         /// Return all processAgent tags, agentName is the tag, local processAgent ID is the id.
         /// </summary>
         /// <returns></returns>
 		public IntTag[] GetProcessAgentTags()
 		{
-			ArrayList list = new ArrayList();
-			IntTag tag = new IntTag();
-			// create sql connection
-			DbConnection connection = FactoryDB.GetConnection();
-			try
-			{
-				// create sql command
-				// command executes the "RetrieveTickets" stored procedure
-                DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText = "GetProcessAgentTags";
-				cmd.CommandType = CommandType.StoredProcedure;
-				
-				// execute the command
-				DbDataReader dataReader = null;
-                connection.Open();
-				dataReader = cmd.ExecuteReader();
-				while (dataReader.Read()) 
-				{
-					tag = new IntTag();
-					tag.id = dataReader.GetInt32(0);
-					tag.tag = dataReader.GetString(1);
-					list.Add(tag);
-				}			
-			}
-			catch( DbException)
-			{
-				throw;
-			}
-			finally
-			{
-				connection.Close();
-			}
-			IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-			return info;
+			return GetIntTags("GetProcessAgentTags",null);
 		}
 
 
@@ -1602,83 +1661,16 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag[] GetProcessAgentTagsForDomain(string domainGuid)
         {
-            ArrayList list = new ArrayList();
-            IntTag tag = new IntTag();
-            // create sql connection
-            DbConnection connection = FactoryDB.GetConnection();
-            try
-            {
-                // create sql command
-                // command executes the "RetrieveTickets" stored procedure
-                DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText = "GetDomainProcessAgentTags";
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
-                
-                // execute the command
-                DbDataReader dataReader = null;
-                connection.Open();
-                dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
-                {
-                    tag = new IntTag();
-                    tag.id = dataReader.GetInt32(0);
-                    tag.tag = dataReader.GetString(1);
-                    list.Add(tag);
-                }
-            }
-            catch (DbException)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-            return info;
+            return GetIntTags("GetDomainProcessAgentTags", FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
         }
+
         /// <summary>
         /// Return all ProcessAgent tags with Type appended to the agent name.
         /// </summary>
         /// <returns></returns>
 		public IntTag[] GetProcessAgentTagsWithType()
 		{
-			ArrayList list = new ArrayList();
-			IntTag tag = new IntTag();
-			// create sql connection
-			DbConnection connection = FactoryDB.GetConnection();
-           
-			try
-			{
-				// create sql command
-				// command executes the "RetrieveTickets" stored procedure
-                DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText = "GetProcessAgentTagsWithType";
-				cmd.CommandType = CommandType.StoredProcedure;
-				
-				// execute the command
-				DbDataReader dataReader = null;
-                connection.Open();
-				dataReader = cmd.ExecuteReader();
-				while (dataReader.Read()) 
-				{
-					tag = new IntTag();
-					tag.id = dataReader.GetInt32(0);
-					tag.tag = dataReader.GetString(1) + ": " + dataReader.GetString(2);
-					list.Add(tag);
-				}			
-			}
-			catch( DbException)
-			{
-				throw;
-			}
-			finally
-			{
-				connection.Close();
-			}
-			IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-			return info;
+            return GetIntTags("GetProcessAgentTagsWithType", null);
 		}
 
         /// <summary>
@@ -1687,42 +1679,7 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag[] GetProcessAgentTagsWithTypeForDomain(string domainGuid)
         {
-            ArrayList list = new ArrayList();
-            IntTag tag = new IntTag();
-            // create sql connection
-            DbConnection connection = FactoryDB.GetConnection();
-
-            try
-            {
-                // create sql command
-                // command executes the "RetrieveTickets" stored procedure
-                DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText = "GetDomainProcessAgentTagsWithType";
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@domain",domainGuid,DbType.AnsiString, 50));
-                
-                // execute the command
-                DbDataReader dataReader = null;
-                connection.Open();
-                dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
-                {
-                    tag = new IntTag();
-                    tag.id = dataReader.GetInt32(0);
-                    tag.tag = dataReader.GetString(1) + ": " + dataReader.GetString(2);
-                    list.Add(tag);
-                }
-            }
-            catch (DbException)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-            return info;
+            return GetIntTags("GetDomainProcessAgentTagsWithType", FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
         }
 
         /// <summary>
@@ -1732,39 +1689,8 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag GetProcessAgentTag(string guid)
         {
-
-            IntTag tag = null;
-            // create sql connection
-            DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "GetProcessAgentTagByGuid";
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid",guid, DbType.AnsiString, 50));
-            
-            DbDataReader dataReader = null;
-            try
-            {
-                // execute the command
-                connection.Open();
-                dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
-                {
-                    tag = new IntTag();
-                    tag.id = dataReader.GetInt32(0);
-                    tag.tag = dataReader.GetString(1);
-
-                }
-                dataReader.Close();
-            }
-            catch (DbException)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return tag;
+            return GetIntTag("GetProcessAgentTagByGuid", FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
+           
         }
 
         /// <summary>
@@ -1774,39 +1700,7 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag GetProcessAgentTagWithType(string guid)
         {
-
-            IntTag tag = null;
-            // create sql connection
-            DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "GetProcessAgentTagsWithTypeByGuid";
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter( "@guid", guid, DbType.AnsiString, 50));
-            
-            DbDataReader dataReader = null;
-            try
-            {
-                // execute the command
-                connection.Open();
-                dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
-                {
-                    tag = new IntTag();
-                    tag.id = dataReader.GetInt32(0);
-                    tag.tag = dataReader.GetString(1) + ": " + dataReader.GetString(2);
-
-                }
-                dataReader.Close();
-            }
-            catch (DbException)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return tag;
+            return GetIntTag("GetProcessAgentTagsWithTypeByGuid", FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
         }
 
         /// <summary>
@@ -1816,38 +1710,7 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag GetProcessAgentTagWithType(int paId)
         {
-            IntTag tag = null;
-            // create sql connection
-            DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "GetProcessAgentTagsWithTypeById";
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(FactoryDB.CreateParameter( "@agentID", paId, DbType.AnsiString, 50));
-
-            DbDataReader dataReader = null;
-            try
-            {
-                    // execute the command
-                    connection.Open();
-                    dataReader = cmd.ExecuteReader();
-                    while (dataReader.Read())
-                    {
-                        tag = new IntTag();
-                        tag.id = dataReader.GetInt32(0);
-                        tag.tag = dataReader.GetString(1) + ": " + dataReader.GetString(2);
-                       
-                    }
-                    dataReader.Close();   
-            }
-            catch (DbException)
-            {
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
-            return tag;
+            return GetIntTag("GetProcessAgentTagsWithTypeById", FactoryDB.CreateParameter("@agentID", paId, DbType.AnsiString, 50));
         }
 
         /// <summary>
@@ -1904,41 +1767,7 @@ namespace iLabs.Core
         /// <returns></returns>
 		public IntTag[] GetProcessAgentTagsByType(int typeID)
 		{
-			ArrayList list = new ArrayList();
-			IntTag tag = new IntTag();
-			// create sql connection
-			DbConnection connection = FactoryDB.GetConnection();
-			try
-			{
-				// create sql command
-				// command executes the "RetrieveTickets" stored procedure
-                DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText = "GetProcessAgentTagsByTypeID";
-				cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add(FactoryDB.CreateParameter( "@typeID", typeID, DbType.Int32));
-				
-				// execute the command
-				DbDataReader dataReader = null;
-                connection.Open();
-				dataReader = cmd.ExecuteReader();
-				while (dataReader.Read()) 
-				{
-					tag = new IntTag();
-					tag.id = dataReader.GetInt32(0);
-					tag.tag = dataReader.GetString(1);
-					list.Add(tag);
-				}			
-			}
-			catch( DbException)
-			{
-				throw;
-			}
-			finally
-			{
-				connection.Close();
-			}
-			IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-			return info;
+            return GetIntTags("GetProcessAgentTagsByTypeID", FactoryDB.CreateParameter("@typeID", typeID, DbType.Int32));
 		}
 
         /// <summary>
@@ -1995,42 +1824,9 @@ namespace iLabs.Core
         /// <returns></returns>
 		public IntTag[] GetProcessAgentTagsByType(string type)
 		{
-			ArrayList list = new ArrayList();
-			IntTag tag = new IntTag();
-			// create sql connection
-			DbConnection connection = FactoryDB.GetConnection();
-			try
-			{
-				// create sql command
-                // command executes the "GetProcessAgentTagsByType" stored procedure
-                DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText= "GetProcessAgentTagsByType";
-				cmd.CommandType = CommandType.StoredProcedure;
-				cmd.Parameters.Add(FactoryDB.CreateParameter("@type", type,DbType.AnsiString,100));
-				
-				// execute the command
-				DbDataReader dataReader = null;
-                connection.Open();
-				dataReader = cmd.ExecuteReader();
-				while (dataReader.Read()) 
-				{
-					tag = new IntTag();
-					tag.id = dataReader.GetInt32(0);
-					tag.tag = dataReader.GetString(1);
-					list.Add(tag);
-				}			
-			}
-			catch( DbException)
-			{
-				throw;
-			}
-			finally
-			{
-				connection.Close();
-			}
-			IntTag[] info = (IntTag[])list.ToArray(tag.GetType());
-			return info;
+            return GetIntTags("GetProcessAgentTagsByType", FactoryDB.CreateParameter("@type", type, DbType.AnsiString, 100));
 		}
+
         /// <summary>
         /// Return all ProcessAgent tags for the specified type and domain.
         /// </summary>

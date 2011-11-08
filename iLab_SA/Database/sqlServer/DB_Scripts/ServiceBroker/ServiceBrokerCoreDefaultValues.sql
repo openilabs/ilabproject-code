@@ -6,8 +6,8 @@
 /* ENTERING DEFAULT VALUES IN TABLES */
 
 /* AUTHENTICATION_TYPES */
-INSERT INTO Authentication_Types(description) VALUES ('Native');
-INSERT INTO Authentication_Types(description) VALUES ('Kerberos_MIT');
+INSERT INTO Authentication_Types(Auth_Name) VALUES ('Native');
+INSERT INTO Authentication_Types(Auth_Name) VALUES ('Kerberos_MIT');
 
 /* CLIENT_TYPES */
 INSERT INTO Client_Types(description) VALUES ('Batch Applet');

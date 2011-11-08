@@ -12,15 +12,16 @@ Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserve
 Please see license.txt in top level directory for full license. 
 -->
 		<!-- $Id$ -->
-		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR">
-		<meta content="C#" name="CODE_LANGUAGE">
-		<meta content="JavaScript" name="vs_defaultClientScript">
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta content="Microsoft Visual Studio .NET 7.1" name="GENERATOR"/>
+		<meta content="C#" name="CODE_LANGUAGE"/>
+		<meta content="JavaScript" name="vs_defaultClientScript"/>
+		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<style type="text/css">@import url( css/main.css ); 
 		</style>
 	</HEAD>
 	<body>
+	    <asp:label id="lblRevision" Visible="True" Runat="server"></asp:label>
 		<form id="helpForm" method="post" runat="server">
 			<div id="outerwrapper">
 			    <uc1:banner id="Banner1" runat="server"></uc1:banner>
@@ -84,7 +85,7 @@ Please see license.txt in top level directory for full license.
 									Microelectrionics Weblab please see the <a href="http://weblab2.mit.edu/docs/weblab/v6.1/manual/">
 										Lab specific help</a></p>
 							</div>
-						</div> <!-- end div faq --><br clear="all">
+						</div> <!-- end div faq --><br clear="all"/>
 						<div id="requesthelp">
 								<h2><a id="help" name="help"></a>Request Help with a Lab</h2>
 								<p>Fill out the form below to request help with the iLab system or a particular 
@@ -109,7 +110,7 @@ Please see license.txt in top level directory for full license.
 										</tr>
 										<tr>
 											<th style="width: 192px"><label for="problem">Describe your problem</label></th>
-											<td style="width: 608px"><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine" Width="600px"></asp:textbox>
+											<td style="width: 608px"><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine" Width="600px"></asp:textbox></td>
 										</tr>
 										<tr>
 										    <th style="width: 192px"><label for="enterSecurityCode">Please enter security code</label></th>

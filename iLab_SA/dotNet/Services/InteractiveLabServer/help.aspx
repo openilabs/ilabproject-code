@@ -20,18 +20,18 @@ Please see license.txt in top level directory for full license.
 		</style>
 	</head>
 	<body>
+	     <asp:label id="lblRevision" Visible="True" Runat="server"></asp:label>
 		<form id="helpForm" method="post" runat="server">
 			<a name="top"></a>
-			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all">
+			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Help</h1>
 						<p>On this page you can read the <A href="#faqs">FAQ's</A>, or <A href="#help">Request 
 								Help</A> for a specific problem or lab. <!-- , or <A href="reportBug.aspx">Report a 
 								Bug</A> with the system. --> </p>
-						<!-- Errormessage should appear here:-->
-						<!--div class="errormessage"--><asp:label id="lblErrorMessage" Visible="False" Runat="server"></asp:label>
-						<!--/div--> <!--End error message -->
+						<asp:label id="lblErrorMessage" Visible="False" Runat="server"></asp:label>
+						
 					</div> <!-- end pageintro div -->
 					<div id="pagecontent">
 						<p><b>IMPORTANT:</b> To be able to run the Labs you must have requested access from your Service Broker</p>
@@ -102,7 +102,7 @@ Please see license.txt in top level directory for full license.
 								</div> <!-- end div class simpleform -->
 								<p><a href="#top">Top of Page</a></p>
 							</div> <!-- end div request help -->
-						</div> <!-- end div faq --><br clear="all">
+						</div> <!-- end div faq --><br clear="all"/>
 					</div> <!-- end pagecontent div -->
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>

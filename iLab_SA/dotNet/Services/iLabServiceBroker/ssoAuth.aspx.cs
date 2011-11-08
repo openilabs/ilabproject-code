@@ -58,7 +58,7 @@ namespace iLabs.ServiceBroker.iLabSB
         string supportMailAddress = ConfigurationManager.AppSettings["supportMailAddress"];
         int uTZ = -2000;
 
-        BrokerDB issuer = new BrokerDB();
+        BrokerDB brokerDB = new BrokerDB();
 
         //DateTime startExecution;
         //long duration = -1;
@@ -210,7 +210,7 @@ namespace iLabs.ServiceBroker.iLabSB
         }
 
         /// <summary>
-        /// This examines the specified parameters and current session state to resove the next action.
+        /// This examines the specified parameters and current session state to resolve the next action.
         /// This may only be reached after a user is Authenticated.
         /// </summary>
         private void  ResolveAction(){
@@ -543,8 +543,28 @@ namespace iLabs.ServiceBroker.iLabSB
                     return status;
                 }
                 bool authOK = false;
-                if(authority != null && authority.Length >0){
-                    authOK = AuthenticationAPI.AuthenticateAuthority(authority , passwd) > 0 ? true : false;
+                //Test for an authorized request for a third party agent
+                if(authority != null && authority.Length >0 && authority.CompareTo(ProcessAgentDB.ServiceGuid) !=0){
+                    Coupon authCoupon = brokerDB.GetIssuedCoupon(passwd);
+                    if (authCoupon != null)
+                    {
+                        Ticket authTicket = brokerDB.RetrieveTicket(authCoupon, TicketTypes.AUTHENTICATE_AGENT);
+                        if (authTicket != null && authTicket.sponsorGuid.CompareTo(authority) == 0)
+                        {
+                            XmlQueryDoc authDoc =  new XmlQueryDoc(authTicket.payload);
+                            string authAgent = authDoc.Query("AuthenticateAgentPayload/authGuid");
+                            string authGuid = authDoc.Query("AuthenticateAgentPayload/clientGuid");
+                            string authUser = authDoc.Query("AuthenticateAgentPayload/userName");
+                            string authGroup = authDoc.Query("AuthenticateAgentPayload/groupName");
+
+
+
+                        }
+                    }
+                    else
+                    {
+                        throw new AccessDeniedException("AccessDenied!");
+                    }
                 }
                 else{
                     authOK = AuthenticationAPI.Authenticate(userID, passwd);
