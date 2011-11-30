@@ -3833,7 +3833,7 @@ namespace iLabs.Scheduling.LabSide
             int i = -1;
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
-            DbCommand cmd0 = FactoryDB.CreateCommand("Insert_Coupon", connection);
+            DbCommand cmd0 = FactoryDB.CreateCommand("InsertCoupon", connection);
             cmd0.CommandType = CommandType.StoredProcedure;
             cmd0.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
             cmd0.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));

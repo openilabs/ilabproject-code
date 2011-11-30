@@ -25,9 +25,7 @@
     
     <add key="serviceType" value="LAB SERVER"/>
     <add key="serviceName" value="Default LabServer"/>
-    <add key="serviceGUID" value=""/>
-    <add key="codebaseURL" value="http://localhost/InteractiveLabServer"/>
-    <add key="serviceURL" value="http://localhost/InteractiveLabServer/InteractiveLabServer.asmx"/>
+    <add key="serviceURL" value="~/InteractiveLabServer.asmx"/>
     <add key="defaultPasskey" value="ILS"/>
     
     <!-- email address where various reports are sent -->

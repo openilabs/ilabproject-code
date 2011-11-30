@@ -32,11 +32,11 @@
     <!-- The following optional keys are used by the SelfRegistration page to populate the selfRegistration page
  	which is used to generate the ProcessAgent's Bootstrap ProcessAgent Record, 
 	which must be created before installing domain credientials -->
+    
     <!-- The name of the Service displayed for the user, please change -->
     <add key="serviceName" value="iLab Generic"/>
     
-    <add key="codebaseURL" value="http://localhost/iLabGeneric"/>
-    <add key="serviceURL" value="http://localhost/iLabGeneric/iLabGeneric.asmx"/>
+    <add key="serviceURL" value="~/iLabGeneric.asmx"/>
     <add key="defaultPasskey" value="GPA"/>
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
     <add key="supportMailAddress" value="ilab-bug@mit.edu"/>

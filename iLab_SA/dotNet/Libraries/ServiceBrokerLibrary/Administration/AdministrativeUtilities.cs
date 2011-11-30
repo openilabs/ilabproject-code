@@ -13,6 +13,11 @@ namespace iLabs.ServiceBroker.Administration
 	/// </summary>
 	public struct GroupType
 	{
+        /// <summary>
+		/// Named constant for the Group type.
+		/// </summary>
+       public const string NON_EXISTANT = "Non-existent Group";
+
 		/// <summary>
 		/// Named constant for the Group type.
 		/// </summary>
@@ -32,7 +37,12 @@ namespace iLabs.ServiceBroker.Administration
         /// Named constant for the Group type.
         /// </summary>
         public const string SERVICE_ADMIN = "Service Administration Group";
-        
+
+        /// <summary>
+		/// Named constant for the Group type.
+		/// </summary>
+        public const string BUILT_IN = "Built-in Group";
+
         /// <summary>
 		/// Summary description for AdministrativeUtilities.
 		/// </summary>

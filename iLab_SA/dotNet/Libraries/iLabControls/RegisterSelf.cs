@@ -611,7 +611,11 @@ namespace iLabs.Controls
                         message.Append(ex.Message);
                         message.Append("<br/>");
                     }
-
+                    if (!(txtOutPasskey.Text != null && txtOutPasskey.Text.Length > 0))
+                    {
+                        error = true;
+                        message.Append(" You must enter a default passkey<br/>");
+                    }
                     if (!(txtCodebaseUrl.Text != null && txtCodebaseUrl.Text.Length > 0))
                     {
                         error = true;
@@ -706,6 +710,10 @@ namespace iLabs.Controls
                            txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
                     }
                     ProcessAgentDB.RefreshServiceAgent();
+                //    if (txtOutPasskey.Text.CompareTo(ConfigurationManager.AppSettings["defaultPasskey"]) != 0)
+                //    {
+                //        ConfigurationManager.AppSettings.Set("defaultPasskey", txtOutPasskey.Text);
+                //    }
                 }
             }
             catch (Exception ex)
@@ -743,6 +751,11 @@ namespace iLabs.Controls
                 message.Append("GUID Error: ");
                 message.Append(exc.Message);
                 message.Append("<br/>");
+            }
+            if (!(txtOutPasskey.Text != null && txtOutPasskey.Text.Length > 0))
+            {
+                error = true;
+                message.Append(" You must enter a default passkey<br/>");
             }
             if (!(txtCodebaseUrl.Text != null && txtCodebaseUrl.Text.Length > 0))
             {
@@ -809,6 +822,10 @@ namespace iLabs.Controls
             }
             else
             {
+                //if(txtOutPasskey.Text.CompareTo(ConfigurationManager.AppSettings["defaultPasskey"]) != 0){
+                //    ConfigurationManager.AppSettings.Set("defaultPasskey",txtOutPasskey.Text);
+                //}
+
                 // Check if domain is set if so only update mutable Fields
                 dbTicketing.SelfRegisterProcessAgent(txtServiceGuid.Text.Trim(),
                     txtServiceName.Text, lblServiceType.Text, null,

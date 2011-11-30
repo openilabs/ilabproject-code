@@ -120,7 +120,7 @@ INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (10,'Storage 
 INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (11,'Resource Mapping');
 INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (12,'Authentication Service');
 INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (13,'Generic ProcessAgent');
-INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (13,'Not ProcessAgent');
+INSERT INTO Qualifier_Types(Qualifier_Type_ID, description) VALUES (14,'Not ProcessAgent');
 
 
 /* QUALIFIERS & QUALIFIER HIERARCHY */
@@ -167,7 +167,21 @@ INSERT INTO Principals (User_ID, Principal_String, Auth_Type_ID) VALUES (@Agent_
 
 SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'SuperUserGroup');
 INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES (@Agent_ID, @Parent_Group_ID);
+GO
 
+/* Create Default Authority */
+BEGIN
+DECLARE @defaultType int
+DECLARE @defaultGroupID int
+Select @defaultGroupID =(Select Group_ID From Groups Where Group_Name ='NewUserGroup');
+Select @defaultType = (Select Auth_Type_ID from Authentication_Types where Auth_Name = 'Native');
+SET IDENTITY_INSERT Authority ON
+INSERT INTO Authority (Authority_ID, Auth_Type_ID, Default_Group_ID,Authority_Guid, Authority_Name, Authority_URL)
+	VALUES(0,@defaultType,@defaultGroupID,'','','');
+SET IDENTITY_INSERT Authority ON
+DBCC CHECKIDENT (Authority, RESEED);
+END
+GO
 
 /*ReSourceMappingTypes*/
 SET IDENTITY_INSERT ResourceMappingTypes ON

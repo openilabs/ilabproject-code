@@ -27,11 +27,9 @@
    
     <add key="serviceType" value="SERVICE BROKER"/>
     <!-- The name of the Service displayed for the user, please change -->
-    <add key="serviceName" value="Default iLab ServiceBroker"/>
-    <!-- This Service's GUID You must supply a vaild GUID, see createGUID.exe, may be any string, 50 characters or less. -->
-    <add key="serviceGUID" value=""/>
-    <add key="codebaseURL" value="http://localhost/iLabServiceBroker"/>
-    <add key="serviceURL" value="http://localhost/iLabServiceBroker/iLabServiceBroker.asmx"/>
+    <add key="serviceName" value="iLab ServiceBroker"/>
+   
+    <add key="serviceURL" value="~/iLabServiceBroker.asmx"/>
     <add key="defaultPasskey" value="Let me in!"/>
 
     <!-- email address where various reports are sent -->

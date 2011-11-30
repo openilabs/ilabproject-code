@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Text;
 using System.Web;
@@ -74,6 +75,7 @@ namespace iLabs.ServiceBroker.admin
                 // Get list of services
                 LoadAuthorityList();
                 LoadProtocolList();
+                LoadGroupList();
                 SetInputMode(false);
                 
                
@@ -111,7 +113,7 @@ namespace iLabs.ServiceBroker.admin
         private void LoadAuthorityList()
         {
             ddlAuthorities.Items.Clear();
-            ListItem liHeaderAdminGroup = new ListItem("--- Select Authority ---", "0");
+            ListItem liHeaderAdminGroup = new ListItem("--- Select Authority ---", "-1");
             ddlAuthorities.Items.Add(liHeaderAdminGroup);
             IntTag[] authTags = brokerDB.GetAuthorityTags();
             if(authTags != null && authTags.Length >0){
@@ -139,6 +141,27 @@ namespace iLabs.ServiceBroker.admin
             }
         }
 
+        private void LoadGroupList()
+        {
+            ddlGroup.Items.Clear();
+           // ListItem li = new ListItem("--- Select ---", "0");
+           // ddlGroup.Items.Add(li);
+            int newUserGrpID = AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP);
+            ListItem li = new ListItem(Group.NEWUSERGROUP, newUserGrpID.ToString());
+            ddlGroup.Items.Add(li);
+            DbParameter typeParam = FactoryDB.CreateParameter("@typeName", GroupType.REGULAR, DbType.String, 256);
+            
+            IntTag[] tags = brokerDB.GetIntTags("Group_RetrieveTagsByType",typeParam);
+            if (tags != null && tags.Length > 0)
+            {
+                foreach (IntTag t in tags)
+                {
+                    li = new ListItem(t.tag, t.id.ToString());
+                    ddlGroup.Items.Add(li);
+                }
+            }
+        }
+
      
       
 
@@ -156,7 +179,7 @@ namespace iLabs.ServiceBroker.admin
             txtServiceURL.ReadOnly = isDisplay;
             txtServiceGuid.ReadOnly = isDisplay;
             txtServiceDescription.ReadOnly = isDisplay;
-            txtGroup.ReadOnly = isDisplay;
+            //txtGroup.ReadOnly = isDisplay;
             txtEmailProxy.ReadOnly = isDisplay;
             txtContactEmail.ReadOnly = isDisplay;
             txtBugEmail.ReadOnly = isDisplay;
@@ -166,7 +189,7 @@ namespace iLabs.ServiceBroker.admin
             txtServiceURL.BackColor = isDisplay ? disabled : enabled;
             txtServiceGuid.BackColor = isDisplay ? disabled : enabled;
             txtServiceDescription.BackColor = isDisplay ? disabled : enabled;
-            txtGroup.BackColor = isDisplay ? disabled : enabled;
+            //txtGroup.BackColor = isDisplay ? disabled : enabled;
             txtEmailProxy.BackColor = isDisplay ? disabled : enabled;
             txtContactEmail.BackColor = isDisplay ? disabled : enabled;
             txtBugEmail.BackColor = isDisplay ? disabled : enabled;
@@ -183,7 +206,7 @@ namespace iLabs.ServiceBroker.admin
             txtServiceURL.Text = "";
             txtServiceGuid.Text = "";
             txtServiceDescription.Text = "";
-            txtGroup.Text = "";
+            ddlGroup.SelectedIndex = 0;
             txtEmailProxy.Text = "";
             txtContactEmail.Text = "";
             txtBugEmail.Text = "";
@@ -191,6 +214,7 @@ namespace iLabs.ServiceBroker.admin
             txtPassPhrase.Text = "";
             ddlAuthorities.SelectedValue = "0";
             ddlAuthProtocol.SelectedValue = "0";
+            ddlGroup.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -214,7 +238,7 @@ namespace iLabs.ServiceBroker.admin
 
         protected void displayService(int id)
         {
-            if (id > 0)
+            if (id > -1)
             {
                 Authority auth = brokerDB.AuthorityRetrieve(id);
                 if (auth != null)
@@ -223,7 +247,7 @@ namespace iLabs.ServiceBroker.admin
                     txtServiceURL.Text = auth.authURL;
                     txtServiceGuid.Text = auth.authGuid;
                     txtServiceDescription.Text = auth.description;
-                    txtGroup.Text = AdministrativeAPI.GetGroupName(auth.defaultGroupID);
+                    ddlGroup.SelectedValue = auth.defaultGroupID.ToString();
                     txtEmailProxy.Text = auth.emailProxy;
                     txtContactEmail.Text = auth.contactEmail;
                     txtBugEmail.Text = auth.bugEmail;
@@ -246,6 +270,7 @@ namespace iLabs.ServiceBroker.admin
         {
             ddlAuthorities.SelectedIndex = 0;
             ddlAuthProtocol.SelectedIndex = 0;
+            ddlGroup.SelectedIndex = 0;
             ClearFormFields();
             SetInputMode(false);
         }
@@ -255,18 +280,18 @@ namespace iLabs.ServiceBroker.admin
             int id = -1;
             // check for required fields
             id = Convert.ToInt32(ddlAuthorities.SelectedValue);
-            if (id > 0)
+            if (id >-1)
             {
-                brokerDB.AuthorityUpdate(id,Convert.ToInt32(ddlAuthProtocol.SelectedValue), AdministrativeAPI.GetGroupID(txtGroup.Text),
+                brokerDB.AuthorityUpdate(id, Convert.ToInt32(ddlAuthProtocol.SelectedValue), Convert.ToInt32(ddlGroup.SelectedValue),
                     txtServiceName.Text, txtServiceGuid.Text, txtServiceURL.Text, txtServiceDescription.Text, txtPassPhrase.Text,
                     txtEmailProxy.Text, txtContactEmail.Text, txtBugEmail.Text, txtLocation.Text);
             }
             else {
-                id = brokerDB.AuthorityInsert(Convert.ToInt32(ddlAuthProtocol.SelectedValue), AdministrativeAPI.GetGroupID(txtGroup.Text),
+                id = brokerDB.AuthorityInsert(Convert.ToInt32(ddlAuthProtocol.SelectedValue), Convert.ToInt32(ddlGroup.SelectedValue),
                     txtServiceName.Text, txtServiceGuid.Text, txtServiceURL.Text, txtServiceDescription.Text, txtPassPhrase.Text,
                     txtEmailProxy.Text, txtContactEmail.Text, txtBugEmail.Text, txtLocation.Text);
             }
-            if(id > 0){
+            if(id > -1){
                 LoadAuthorityList();
                 ddlAuthorities.SelectedValue = id.ToString();
                 displayService(id);
@@ -279,6 +304,7 @@ namespace iLabs.ServiceBroker.admin
         {
             ddlAuthorities.SelectedIndex = 0;
             ddlAuthProtocol.SelectedIndex = 0;
+            ddlGroup.SelectedIndex = 0;
 
             ClearFormFields();
             SetInputMode(false);

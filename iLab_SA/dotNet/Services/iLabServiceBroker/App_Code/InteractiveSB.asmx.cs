@@ -86,8 +86,6 @@ namespace iLabs.ServiceBroker.iLabSB
         protected AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         protected BrokerDB brokerDB = new BrokerDB();
 
- 
-
         public InteractiveSB()
         {
             //CODEGEN: This call is required by the ASP.NET Web Services Designer
@@ -897,43 +895,58 @@ namespace iLabs.ServiceBroker.iLabSB
         /// An authority requests the launching of a specific client for a user.
         /// </summary>
         /// <param name="clientGuid">The GUID of the client, this client must be registered on the serviceBroker.</param>
+        /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
         /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
         /// id that the authority will always use to identify this user</param>
-        /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
-        /// <param name="startTime"></param>
+        /// <param name="authorityUrl"></param>
         /// <param name="duration"></param>
         /// <param name="autoStart">Determine if the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
         /// <returns>an IntTag with a status code in the interger and a URL to be used by the authority to redirect the request.</returns>
         [WebMethod(Description = "An authority requests the launching of a specific client for a user.", EnableSession = true)]
-        [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In, Required = true)]
+        [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
-        public IntTag LaunchLabClient(string clientGuid, string userName, string groupName,
-              DateTime startTime, long duration, int autoStart)
+        public IntTag LaunchLabClient(string clientGuid, string groupName,
+               string userName, string authorityUrl, long duration, int autoStart)
         {
             IntTag tag = new IntTag();
             StringBuilder buf = new StringBuilder();
-            tag.id = -1;
+            //tag.id = -1;
             try
             {
-                if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
-                {
-                    string authGuid = agentAuthHeader.agentGuid;
-                    IntTag test = brokerDB.ResolveAction(Context,clientGuid, userName, groupName, startTime, duration, autoStart > 0);
+               
+                // Need to check opHeader
+                if(opHeader != null && opHeader.coupon != null){
+                    try
+                    {
+                        // Coupon is from the client SCORM
+                        Ticket clientAuthority = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
+                        // Check ticket payload
+                    }
+                    catch { 
+                    }
+                
+                    // Get authorityGuid from authorityUrl, if not found exit
+                    string authorityGuid = "UNED-1234567890-4321";
+
+                    //Check for group access & User
+                    //IntTag test = brokerDB.ResolveAction(Context,clientGuid, userName, groupName, startTime, duration, autoStart > 0);
 
                     //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
                     Coupon coupon = brokerDB.CreateCoupon();
                     TicketLoadFactory tlc = TicketLoadFactory.Instance();
-                    string payload = tlc.createAuthenticateAgentPayload(authGuid, clientGuid, userName, groupName);
-                    brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authGuid, duration, payload);
-                    buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl + "/default.aspx?sso=t");
+                    string payload = tlc.createAuthenticateAgentPayload(authorityGuid, clientGuid, userName, groupName);
+                    brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authorityGuid, 600L, payload);
+                    buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                    buf.Append("/default.aspx?sso=t");
                     buf.Append("&usr=" + userName + "&cid=" + clientGuid);
                     buf.Append("&grp=" + groupName);
-                    buf.Append("&auth=" + authGuid);
+                    buf.Append("&auth=" + authorityUrl);
                     buf.Append("&key=" + coupon.passkey);
                     if (autoStart > 0)
                         buf.Append("&auto=t");
 
-
+                    tag.id = 1;
+                    tag.tag = buf.ToString();
                     //
                     //
                     //if (test.id > 0)
@@ -954,8 +967,10 @@ namespace iLabs.ServiceBroker.iLabSB
             }
             catch (Exception e)
             {
+                tag.id = -1;
                 tag.tag = e.Message;
             }
+            Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
             return tag;
         }
 

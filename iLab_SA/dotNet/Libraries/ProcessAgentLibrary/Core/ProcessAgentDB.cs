@@ -1598,6 +1598,52 @@ namespace iLabs.Core
             }
             return tag;
         }
+        /// <summary>
+        /// Generic get IntTag
+        /// </summary>
+        /// <param name="procedure">The string name of the procedure to call</param>
+        /// <param name="param">an optional prarameter, with the value set, null for no parameter</param>
+        /// <returns></returns>
+        public IntTag GetIntTag2(String procedure, DbParameter param)
+        {
+            IntTag tag = null;
+            DbConnection connection = FactoryDB.GetConnection();
+
+            DbCommand cmd = FactoryDB.CreateCommand(procedure, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (param != null)
+            {
+                cmd.Parameters.Add(param);
+            }
+            try
+            {
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
+                if (dataReader.HasRows)
+                {
+                    tag = new IntTag();
+                    while (dataReader.Read())
+                    {
+                        tag.id = dataReader.GetInt32(0);
+                        tag.tag = dataReader.GetString(1) + ": " + dataReader.GetString(2);
+
+                    }
+                }
+                dataReader.Close();
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return tag;
+        }
+
 
         /// <summary>
         /// Generic call to retur an array of IntTags
@@ -1645,6 +1691,54 @@ namespace iLabs.Core
             return tags.ToArray();
         }
 
+
+        /// <summary>
+        /// Generic call to retur an array of IntTags
+        /// </summary>
+        /// <param name="procedure">the string name of the procedure to call</param>
+        /// <param name="param">an optional parameter with it's value set, null for no parameter</param>
+        /// <returns></returns>
+        public IntTag[] GetIntTags2(String procedure, DbParameter param)
+        {
+            StringBuilder buf = new StringBuilder();
+            List<IntTag> tags = new List<IntTag>();
+            DbConnection connection = FactoryDB.GetConnection();
+
+            DbCommand cmd = FactoryDB.CreateCommand(procedure, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (param != null)
+            {
+                cmd.Parameters.Add(param);
+            }
+            try
+            {
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
+                if (dataReader.HasRows)
+                {
+                    tags = new List<IntTag>();
+                    while (dataReader.Read())
+                    {
+                        int id = dataReader.GetInt32(0);
+                        tags.Add(new IntTag(id,dataReader.GetString(1) + ": " + dataReader.GetString(2)));
+                    }
+                }
+                dataReader.Close();
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return tags.ToArray();
+        }
+
+
         /// <summary>
         /// Return all processAgent tags, agentName is the tag, local processAgent ID is the id.
         /// </summary>
@@ -1670,7 +1764,7 @@ namespace iLabs.Core
         /// <returns></returns>
 		public IntTag[] GetProcessAgentTagsWithType()
 		{
-            return GetIntTags("GetProcessAgentTagsWithType", null);
+            return GetIntTags2("GetProcessAgentTagsWithType", null);
 		}
 
         /// <summary>
@@ -1679,7 +1773,7 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag[] GetProcessAgentTagsWithTypeForDomain(string domainGuid)
         {
-            return GetIntTags("GetDomainProcessAgentTagsWithType", FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
+            return GetIntTags2("GetDomainProcessAgentTagsWithType", FactoryDB.CreateParameter("@domain", domainGuid, DbType.AnsiString, 50));
         }
 
         /// <summary>
@@ -1700,7 +1794,7 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag GetProcessAgentTagWithType(string guid)
         {
-            return GetIntTag("GetProcessAgentTagsWithTypeByGuid", FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
+            return GetIntTag2("GetProcessAgentTagsWithTypeByGuid", FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
         }
 
         /// <summary>
@@ -1710,7 +1804,7 @@ namespace iLabs.Core
         /// <returns></returns>
         public IntTag GetProcessAgentTagWithType(int paId)
         {
-            return GetIntTag("GetProcessAgentTagsWithTypeById", FactoryDB.CreateParameter("@agentID", paId, DbType.AnsiString, 50));
+            return GetIntTag2("GetProcessAgentTagsWithTypeById", FactoryDB.CreateParameter("@agentID", paId, DbType.AnsiString, 50));
         }
 
         /// <summary>

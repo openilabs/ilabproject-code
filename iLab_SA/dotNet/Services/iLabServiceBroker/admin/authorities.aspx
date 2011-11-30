@@ -71,7 +71,7 @@ Please see license.txt in top level directory for full license.
 												<th style="width: 120px">
 													<label for="group">Initial Group</label>
 												</th>
-												<td colspan="2" style="width: 560px"><asp:textbox id="txtGroup" Runat="server" Width="560px"></asp:textbox></td>
+												<td colspan="2" style="width: 560px"><asp:dropdownlist id="ddlGroup" Runat="server" Width="560px"></asp:dropdownlist></td>
 											</tr>
 											<tr>
 												<th style="width: 120px">

@@ -51,6 +51,9 @@ namespace iLabs.Ticketing
         public const string EXECUTE_EXPERIMENT = "EXECUTE EXPERIMENT";
         public const string CREATE_EXPERIMENT = "CREATE EXPERIMENT";
 
+        public const string AUTHORIZE_ACCESS = "AUTHORIZE ACCESS";
+        public const string AUTHORIZE_CLIENT = "AUTHORIZE CLIENT";
+
         /// <summary>
         /// static array of ticket types that exist in the DB
         /// </summary>

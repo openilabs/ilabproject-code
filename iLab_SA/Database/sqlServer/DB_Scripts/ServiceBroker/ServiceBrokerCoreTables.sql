@@ -120,6 +120,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Client_
 ALTER TABLE [dbo].[Client_Items] DROP CONSTRAINT FK_Client_Items_Lab_Clients
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Client_Metadata_Lab_Clients]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Client_Metadata] DROP CONSTRAINT FK_Client_Metadata_Lab_Clients
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Lab_Server_To_Client_Map_Lab_Clients]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Lab_Server_To_Client_Map] DROP CONSTRAINT FK_Lab_Server_To_Client_Map_Lab_Clients
 GO
@@ -213,6 +217,10 @@ GO
 /****** Object:  Table [dbo].[Client_Items]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Client_Items]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Client_Items]
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Client_Metadata]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Client_Metadata]
 GO
 
 /****** Object:  Table [dbo].[Client_Types]    Script Date: 8/30/2005 4:07:53 PM ******/
@@ -450,6 +458,17 @@ CREATE TABLE [dbo].[Client_Items] (
 	[Item_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[Item_Value] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
 	 
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[Client_Metadata] (
+	[Client_MD_ID] [int] IDENTITY (1, 1) NOT NULL ,
+	[Client_ID] [int] NOT NULL,
+	[Modification_Time] [datetime] NOT NULL ,
+	[Metadata] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[SCO] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+	[Metadata_Format] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[SCO_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
@@ -769,6 +788,13 @@ ALTER TABLE [dbo].[Client_Items] WITH NOCHECK ADD
 	)  ON [PRIMARY] 
 GO
 
+ALTER TABLE [dbo].[Client_Metadata] WITH NOCHECK ADD 
+	CONSTRAINT [PK_Client_Metadata] PRIMARY KEY  CLUSTERED 
+	(
+		[Client_MD_ID]
+	)  ON [PRIMARY] 
+GO
+
 ALTER TABLE [dbo].[Client_Types] WITH NOCHECK ADD 
 	CONSTRAINT [PK_Client_Types] PRIMARY KEY  CLUSTERED 
 	(
@@ -1023,6 +1049,14 @@ ALTER TABLE [dbo].[Client_Items] ADD
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
 GO
 
+ALTER TABLE [dbo].[Client_Metadata] ADD 
+	CONSTRAINT [FK_Client_Metadata_Lab_Clients] FOREIGN KEY 
+	(
+		[Client_ID]
+	) REFERENCES [dbo].[Lab_Clients] (
+		[Client_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE 
+GO
 
 ALTER TABLE [dbo].[Experiments] ADD 
 	CONSTRAINT [FK_Experiments_Users] FOREIGN KEY 
