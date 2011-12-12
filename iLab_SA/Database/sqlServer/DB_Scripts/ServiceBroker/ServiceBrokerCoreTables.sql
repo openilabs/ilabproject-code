@@ -178,6 +178,14 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Se
 ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Sessions_Users
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Groups_User]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Groups_User
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Groups_Group]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Groups_Group
+GO
+
 /*** DROP TABLES  ***/
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AdminURLs]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
@@ -395,14 +403,9 @@ CREATE TABLE [dbo].[AdminURLs] (
 ) ON [PRIMARY]
 GO
 
-/****** Object:  Table [dbo].[Agent_Hierarchy]    Script Date: 8/30/2005 4:07:54 PM ******/
-CREATE TABLE [dbo].[Agent_Hierarchy] (
-	[Agent_ID] [int] NOT NULL ,
-	[Parent_Group_ID] [int] NOT NULL 
-) ON [PRIMARY]
-GO
 
-/****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM ******/
+
+/****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM 
 CREATE TABLE [dbo].[Agents] (
 	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
 	[Is_Group] [bit] NOT NULL,
@@ -411,6 +414,7 @@ CREATE TABLE [dbo].[Agents] (
 	
 ) ON [PRIMARY]
 GO
+******/
 
 /****** Object:  Table [dbo].[Authentication_Types]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Authentication_Types] (
@@ -527,22 +531,30 @@ CREATE TABLE [dbo].[Grants] (
 ) ON [PRIMARY]
 GO
 
+
+/****** Object:  Table [dbo].[Groups]    Script Date: 8/30/2005 4:07:57 PM ******/
+CREATE TABLE [dbo].[Groups] (
+	[Group_ID] [int] IDENTITY (1, 1) NOT NULL ,
+	[Group_Type_ID] [int] NOT NULL ,
+	[Associated_Group_ID] [int] NULL ,
+	[AccessCode] [int] NOT NULL DEFAULT 0,
+	[Date_Created] [datetime] NOT NULL DEFAULT GETUTCDATE(),
+	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO
+
+CREATE TABLE [dbo].[Group_Hierarchy] (
+	[Group_ID] [int] NOT NULL ,
+	[Parent_Group_ID] [int] NOT NULL 
+) ON [PRIMARY]
+GO
+
 /****** Object:  Table [dbo].[Group_Types]    Script Date: 8/30/2005 4:07:57 PM ******/
 CREATE TABLE [dbo].[Group_Types] (
 	[Group_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Description] [varchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
-) ON [PRIMARY]
-GO
-
-/****** Object:  Table [dbo].[Groups]    Script Date: 8/30/2005 4:07:57 PM ******/
-CREATE TABLE [dbo].[Groups] (
-	[Group_ID] [int] NOT NULL ,
-	[Group_Type_ID] [int] NOT NULL ,
-	[Associated_Group_ID] [int] NULL ,
-	[AccessCode] [int] NOT NULL DEFAULT 0,
-	[Group_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[Email] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Description] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 
@@ -731,9 +743,10 @@ GO
 
 /****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:08:00 PM ******/
 CREATE TABLE [dbo].[Users] (
-	[User_ID] [int] NOT NULL ,
+	[User_ID] [int]  IDENTITY (1, 1) NOT NULL ,
 	[Lock_User] [bit] NOT NULL ,
 	[Auth_ID] [int] NOT NULL Default 0,
+	[Date_Created] [datetime] NOT NULL DEFAULT GETUTCDATE(),
 	[Xml_Extension] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[User_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
@@ -745,19 +758,10 @@ CREATE TABLE [dbo].[Users] (
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[Agent_Hierarchy] WITH NOCHECK ADD 
-	CONSTRAINT [PK_Agent_Hierarchy] PRIMARY KEY  CLUSTERED 
-	(
-		[Agent_ID],
-		[Parent_Group_ID]
-	)  ON [PRIMARY] 
-GO
-
-ALTER TABLE [dbo].[Agents] WITH NOCHECK ADD 
-	CONSTRAINT [PK_Agents] PRIMARY KEY  CLUSTERED 
-	(
-		[Agent_ID]
-	)  ON [PRIMARY] 
+CREATE TABLE [dbo].[User_Groups](
+	Group_ID int NOT NULL,
+	User_ID int NOT NULL
+) ON [PRIMARY]
 GO
 
 ALTER TABLE [dbo].[Authentication_Types] WITH NOCHECK ADD 
@@ -825,12 +829,6 @@ ALTER TABLE [dbo].[Grants] WITH NOCHECK ADD
 	)  ON [PRIMARY] 
 GO
 
-ALTER TABLE [dbo].[Group_Types] WITH NOCHECK ADD 
-	CONSTRAINT [PK_Group_Types] PRIMARY KEY  CLUSTERED 
-	(
-		[Group_Type_ID]
-	)  ON [PRIMARY] 
-GO
 
 ALTER TABLE [dbo].[Groups] WITH NOCHECK ADD 
 	CONSTRAINT [PK_Groups] PRIMARY KEY  CLUSTERED 
@@ -838,6 +836,22 @@ ALTER TABLE [dbo].[Groups] WITH NOCHECK ADD
 		[Group_ID]
 	)  ON [PRIMARY] 
 GO
+
+ALTER TABLE [dbo].[Group_Hierarchy] WITH NOCHECK ADD 
+	CONSTRAINT [PK_Group_Hierarchy] PRIMARY KEY  CLUSTERED 
+	(
+		[Group_ID],
+		[Parent_Group_ID]
+	)  ON [PRIMARY] 
+GO
+
+ALTER TABLE [dbo].[Group_Types] WITH NOCHECK ADD 
+	CONSTRAINT [PK_Group_Types] PRIMARY KEY  CLUSTERED 
+	(
+		[Group_Type_ID]
+	)  ON [PRIMARY] 
+GO
+
 
 ALTER TABLE [dbo].[Lab_Clients] WITH NOCHECK ADD 
 	CONSTRAINT [PK_LabClients] PRIMARY KEY  CLUSTERED 
@@ -849,8 +863,6 @@ ALTER TABLE [dbo].[Lab_Clients] WITH NOCHECK ADD
 		[Client_Guid]
 	)  ON [PRIMARY] 
 GO
-
-
 
 ALTER TABLE [dbo].[Message_Types] WITH NOCHECK ADD 
 	CONSTRAINT [PK_Message_Types] PRIMARY KEY  CLUSTERED 
@@ -865,8 +877,6 @@ ALTER TABLE [dbo].[Principals] WITH NOCHECK ADD
 		[Principal_ID]
 	)  ON [PRIMARY] 
 GO
-
-
 
 ALTER TABLE [dbo].[Qualifier_Hierarchy] WITH NOCHECK ADD 
 	CONSTRAINT [PK_Qualifier_Hierarchy] PRIMARY KEY  CLUSTERED 
@@ -928,13 +938,22 @@ ALTER TABLE [dbo].[Users] WITH NOCHECK ADD
 	)  ON [PRIMARY] 
 GO
 
-ALTER TABLE [dbo].[Agents] ADD 
-	CONSTRAINT [IX_Agents] UNIQUE  NONCLUSTERED 
+
+ALTER TABLE [dbo].[User_Groups] WITH NOCHECK ADD 
+	CONSTRAINT [PK_User_Groups] PRIMARY KEY  CLUSTERED 
 	(
-		[Agent_Name]
+		[Group_ID],
+		[User_ID]
 	)  ON [PRIMARY] 
 GO
 
+
+ALTER TABLE [dbo].[Groups] ADD 
+	CONSTRAINT [IX_Groups] UNIQUE  NONCLUSTERED 
+	(
+		[Group_Name]
+	)  ON [PRIMARY] 
+GO
 
 ALTER TABLE [dbo].[Experiments] ADD 
 	CONSTRAINT [DF_Experiments_CreationTime] DEFAULT (getUtcDate()) FOR [CreationTime]
@@ -1001,19 +1020,27 @@ ALTER TABLE [dbo].[Users] ADD
 	CONSTRAINT [DF_Users_Lock_User] DEFAULT (0) FOR [Lock_User]
 GO
 
-ALTER TABLE [dbo].[Agent_Hierarchy] ADD 
-	CONSTRAINT [FK_Agent_Hierarchy_Agents] FOREIGN KEY 
+ALTER TABLE [dbo].[Users] ADD 
+	CONSTRAINT [IX_User_Name] UNIQUE  NONCLUSTERED 
 	(
-		[Agent_ID]
-	) REFERENCES [dbo].[Agents] (
-		[Agent_ID]
-	) ON DELETE CASCADE  ON UPDATE CASCADE ,
-	CONSTRAINT [FK_Agent_Hierarchy_Groups] FOREIGN KEY 
+		[User_Name],
+		[Auth_ID]
+	)  ON [PRIMARY] 
+GO
+
+ALTER TABLE [dbo].[Group_Hierarchy] ADD 
+	CONSTRAINT [FK_Group_Hierarchy_Group] FOREIGN KEY 
+	(
+		[Group_ID]
+	) REFERENCES [dbo].[Groups] (
+		[Group_ID]
+	)ON DELETE CASCADE  ON UPDATE CASCADE,
+	CONSTRAINT [FK_Group_Hierarchy_Parent] FOREIGN KEY 
 	(
 		[Parent_Group_ID]
 	) REFERENCES [dbo].[Groups] (
 		[Group_ID]
-	) ON DELETE CASCADE  ON UPDATE CASCADE 
+	)
 GO
 
 ALTER TABLE [dbo].[AdminURLs] ADD 
@@ -1044,8 +1071,8 @@ ALTER TABLE [dbo].[Client_Items] ADD
 	CONSTRAINT [FK_Client_Items_Users] FOREIGN KEY 
 	(
 		[User_ID]
-	) REFERENCES [dbo].[Agents] (
-		[Agent_ID]
+	) REFERENCES [dbo].[Users] (
+		[User_ID]
 	) ON DELETE CASCADE  ON UPDATE CASCADE 
 GO
 
@@ -1231,6 +1258,20 @@ ALTER TABLE [dbo].[System_Messages] ADD
 	) ON UPDATE CASCADE 
 GO
 
+ALTER TABLE [dbo].[User_Groups] ADD 
+	CONSTRAINT [FK_User_Groups_Group] FOREIGN KEY 
+	(
+		[Group_ID]
+	) REFERENCES [dbo].[Groups] (
+		[Group_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE ,
+	CONSTRAINT [FK_User_Groups_User] FOREIGN KEY 
+	(
+		[User_ID]
+	) REFERENCES [dbo].[Users] (
+		[User_ID]
+	) ON DELETE CASCADE  ON UPDATE CASCADE 
+GO
 
 ALTER TABLE [dbo].[User_Sessions] ADD 
 	CONSTRAINT [FK_User_Sessions_Groups] FOREIGN KEY 
