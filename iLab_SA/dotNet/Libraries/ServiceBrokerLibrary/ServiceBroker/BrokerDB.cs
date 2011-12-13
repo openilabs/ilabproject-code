@@ -755,24 +755,36 @@ namespace iLabs.ServiceBroker
                 cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityId", id, DbType.Int32));
                 // read the result
                 connection.Open();
-                DbDataReader dataReader = cmd.ExecuteReader(); 
+                DbDataReader dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
                     auth = new Authority();
                     //Authority_ID,Auth_Type_ID,Default_Group_ID,Authority_Guid,Authority_Name,
                     //Authority_URL,Pass_Phrase, Email_Proxy,Description,Contact_Email,Bug_Email,Location
-                    auth.authorityID = dataReader.GetInt32(0);
-                    auth.authTypeID = dataReader.GetInt32(1);
-                    auth.defaultGroupID = dataReader.GetInt32(2);
-                    auth.authGuid = dataReader.GetString(3);
-                    auth.authName = dataReader.GetString(4);
-                    auth.authURL = dataReader.GetString(5);
-                    auth.passphrase = dataReader.GetString(6);
-                    auth.emailProxy = dataReader.GetString(7);
-                    auth.description = dataReader.GetString(8);
-                    auth.contactEmail = dataReader.GetString(9);
-                    auth.bugEmail = dataReader.GetString(10);
-                    auth.location = dataReader.GetString(11);
+                    if (!dataReader.IsDBNull(0))
+                        auth.authorityID = dataReader.GetInt32(0);
+                    if (!dataReader.IsDBNull(1))
+                        auth.authTypeID = dataReader.GetInt32(1);
+                    if (!dataReader.IsDBNull(2))
+                        auth.defaultGroupID = dataReader.GetInt32(2);
+                    if (!dataReader.IsDBNull(3))
+                        auth.authGuid = dataReader.GetString(3);
+                    if (!dataReader.IsDBNull(4))
+                        auth.authName = dataReader.GetString(4);
+                    if (!dataReader.IsDBNull(5))
+                        auth.authURL = dataReader.GetString(5);
+                    if (!dataReader.IsDBNull(6))
+                        auth.passphrase = dataReader.GetString(6);
+                    if (!dataReader.IsDBNull(7))
+                        auth.emailProxy = dataReader.GetString(7);
+                    if (!dataReader.IsDBNull(8))
+                        auth.description = dataReader.GetString(8);
+                    if (!dataReader.IsDBNull(9))
+                        auth.contactEmail = dataReader.GetString(9);
+                    if (!dataReader.IsDBNull(10))
+                        auth.bugEmail = dataReader.GetString(10);
+                    if (!dataReader.IsDBNull(11))
+                        auth.location = dataReader.GetString(11);
                 }
                 dataReader.Close();
             }
@@ -797,31 +809,43 @@ namespace iLabs.ServiceBroker
             try
             {
                 // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString,50));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString, 50));
                 // read the result
                 connection.Open();
-                DbDataReader dataReader = cmd.ExecuteReader(); 
+                DbDataReader dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
                     auth = new Authority();
                     //Authority_ID,Auth_Type_ID,Default_Group_ID,Authority_Guid,Authority_Name,
                     //Authority_URL,Pass_Phrase, Email_Proxy,Description,Contact_Email,Bug_Email,Location
-                    auth.authorityID = dataReader.GetInt32(0);
-                    auth.authTypeID = dataReader.GetInt32(1);
-                    auth.defaultGroupID = dataReader.GetInt32(2);
-                    auth.authGuid = dataReader.GetString(3);
-                    auth.authName = dataReader.GetString(4);
-                    auth.authURL = dataReader.GetString(5);
-                    auth.passphrase = dataReader.GetString(6);
-                    auth.emailProxy = dataReader.GetString(7);
-                    auth.description = dataReader.GetString(8);
-                    auth.contactEmail = dataReader.GetString(9);
-                    auth.bugEmail = dataReader.GetString(10);
-                    auth.location = dataReader.GetString(11);
+                    if (!dataReader.IsDBNull(0))
+                        auth.authorityID = dataReader.GetInt32(0);
+                    if (!dataReader.IsDBNull(1))
+                        auth.authTypeID = dataReader.GetInt32(1);
+                    if (!dataReader.IsDBNull(2))
+                        auth.defaultGroupID = dataReader.GetInt32(2);
+                    if (!dataReader.IsDBNull(3))
+                        auth.authGuid = dataReader.GetString(3);
+                    if (!dataReader.IsDBNull(4))
+                        auth.authName = dataReader.GetString(4);
+                    if (!dataReader.IsDBNull(5))
+                        auth.authURL = dataReader.GetString(5);
+                    if (!dataReader.IsDBNull(6))
+                        auth.passphrase = dataReader.GetString(6);
+                    if (!dataReader.IsDBNull(7))
+                        auth.emailProxy = dataReader.GetString(7);
+                    if (!dataReader.IsDBNull(8))
+                        auth.description = dataReader.GetString(8);
+                    if (!dataReader.IsDBNull(9))
+                        auth.contactEmail = dataReader.GetString(9);
+                    if (!dataReader.IsDBNull(10))
+                        auth.bugEmail = dataReader.GetString(10);
+                    if (!dataReader.IsDBNull(11))
+                        auth.location = dataReader.GetString(11);
                 }
                 dataReader.Close();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;

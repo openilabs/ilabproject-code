@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
+using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Text;

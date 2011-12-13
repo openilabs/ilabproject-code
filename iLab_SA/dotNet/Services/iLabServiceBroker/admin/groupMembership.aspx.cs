@@ -89,6 +89,7 @@ namespace iLabs.ServiceBroker.admin
 		{
 			try
 			{
+                
                 int rootID = AdministrativeAPI.GetGroupID(Group.ROOT);
                 TreeNode rootNodeAgents = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
                 rootNodeAgents.Expanded = true;
@@ -103,27 +104,29 @@ namespace iLabs.ServiceBroker.admin
 				// since all are groups, the processing of these nodes is done separately here
 				// as opposed to doing it in an AddAgentsRecursively(RootNode) call
 				// This reduces the no. of database calls, made from isAgentUser
-                IntTag[] groupTags = brokerDB.GetIntTags("Group_RetrieveChildrenGroupTags",
-                        FactoryDB.CreateParameter("@groupID", rootID, DbType.Int32));
+                Group[] groups = AdministrativeAPI.GetGroups(
+                    brokerDB.GetInts("Group_RetrieveChildrenGroupIDs",
+                        FactoryDB.CreateParameter("@groupID", rootID, DbType.Int32)).ToArray());
 
 				// might want to do some sorting of the Groups List here -- works without sorting
 
 				//foreach node under the root node:
 				//1- Add that node to the tree
 				//2- recursively add children nodes to the tree
-				foreach (IntTag g in groupTags)
+				foreach (Group g in groups)
 				{
-					if (g.id!=0)
+					if (g.groupID !=0)
 					{
 						
-                        TreeNode newNodeGroups = new TreeNode(g.tag, g.id.ToString(),
+                        TreeNode newNodeGroups = new TreeNode(g.groupName, g.groupID.ToString(),
                             "../img/GrantImages/Folder.gif");
                         newNodeGroups.ShowCheckBox = true;
                         newNodeGroups.SelectAction = TreeNodeSelectAction.None;
                         rootNodeGroups.ChildNodes.Add(newNodeGroups);
-                        TreeNode newNodeAgents = new TreeNode(g.tag, g.id.ToString(),
+                        TreeNode newNodeAgents = new TreeNode(g.groupName, g.groupID.ToString(),
                             "../img/GrantImages/Folder.gif");
                         newNodeAgents.Expanded = true;
+                        newNodeAgents.ShowCheckBox = isRegular(g);
                         newNodeAgents.SelectAction = TreeNodeSelectAction.None;
 						AddAgentsRecursively(newNodeAgents, newNodeGroups);
 						rootNodeAgents.ChildNodes.Add(newNodeAgents);
@@ -158,8 +161,9 @@ namespace iLabs.ServiceBroker.admin
                     //Should Filter by Wrapper
                     IntTag[] userTags = brokerDB.GetIntTags("Group_RetrieveUserTags",
                         FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
-                    IntTag[] groupTags = brokerDB.GetIntTags("Group_RetrieveChildrenGroupTags",
-                        FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+                    Group[] groups = AdministrativeAPI.GetGroups(
+                    brokerDB.GetInts("Group_RetrieveChildrenGroupIDs",
+                        FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32)).ToArray());
 
                     //int[] childUserIDs = wrapper.ListUserIDsInGroupWrapper(Convert.ToInt32(nAgents.Value));
                     //int[] childGroupIDs = wrapper.ListSubgroupIDsWrapper(Convert.ToInt32(nAgents.Value));
@@ -185,18 +189,19 @@ namespace iLabs.ServiceBroker.admin
                     }
 
 
-                    if (groupTags == null || groupTags.Length < 1)
+                    if (groups == null || groups.Length < 1)
                     {
                         nAgents.Expanded = false;
                     }
-                    foreach (IntTag g in groupTags)
+                    foreach (Group g in groups)
                     {
-                        if (g.id > 0)
+                        if (g.groupID > 0)
                         {
-                            TreeNode childNode = new TreeNode(g.tag, g.id.ToString(), groupImage);
+                            TreeNode childNode = new TreeNode(g.groupName, g.groupID.ToString(), groupImage);
                             childNode.SelectAction = TreeNodeSelectAction.None;
+                            childNode.ShowCheckBox = isRegular(g);
                             childNode.Collapse();
-                            TreeNode groupChildNode = new TreeNode(g.tag, g.id.ToString(), groupImage);
+                            TreeNode groupChildNode = new TreeNode(g.groupName, g.groupID.ToString(), groupImage);
                             groupChildNode.ShowCheckBox = true;
                             groupChildNode.SelectAction = TreeNodeSelectAction.None;
                             this.AddAgentsRecursively(childNode, groupChildNode);
@@ -257,7 +262,11 @@ namespace iLabs.ServiceBroker.admin
 				ExpandParent(parent);
 		}
 
-   
+        private bool isRegular(Group g)
+        {
+            return (GroupType.REGULAR.CompareTo(g.GroupType) == 0);
+        }
+
         private void ibtnRemoveCB_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             lblResponse.Visible = false;
@@ -313,35 +322,43 @@ namespace iLabs.ServiceBroker.admin
 
         private string removeAgentNodes(TreeNodeCollection agentNodes, ref List<int> parentIDs)
         {
+            bool status = false;
             StringBuilder msg = new StringBuilder();
             List<int> agents = new List<int>();
             List<int> users = new List<int>();
             foreach (TreeNode agentNode in agentNodes)
             {
+                status = false;
                 int memberID = Convert.ToInt32(agentNode.Value);
                 string memberName = agentNode.Text;
                 int parentID = Convert.ToInt32(agentNode.Parent.Value);
                 bool isUser = (agentNode.ImageUrl.CompareTo(userImage) == 0);
                 string parentName = agentNode.Parent.Text;
-
+                if(!isUser){
                 // Note that because of the business logic you may not remove built-in groups
-                if (memberName.Equals(Group.ROOT)
-                    || (memberID == parentID)
-                    || (memberName.Equals(Group.NEWUSERGROUP))
-                    || (memberName.Equals(Group.ORPHANEDGROUP))
-                    || (memberName.Equals(Group.SUPERUSER)))
-                {
-                    // if they're trying to remove the ROOT, superUser etc.
-                    if (memberID != parentID)
+                    if (memberName.Equals(Group.ROOT)
+                        || (memberName.Equals(Group.NEWUSERGROUP))
+                        || (memberName.Equals(Group.ORPHANEDGROUP))
+                        || (memberName.Equals(Group.SUPERUSER)))
                     {
+                        // if they're trying to remove the ROOT, superUser etc.
                         msg.Append("The '" + memberName + "' group cannot be removed from the system.<br />");
-                    }
-                    else //if parent=groupname
+                    } 
+                    else if (memberID == parentID)
                     {
-                        msg.Append("'" + memberName + "'  cannot be removed from itself.<br />");
+                           msg.Append("'" + memberName + "'  cannot be removed from itself.<br />");
+                    }
+                    else //if parent!=groupname
+                    {
+                        status = AdministrativeAPI.RemoveGroupFromGroup(memberID, parentID);
+                        if (status)
+                        {
+                            lblResponse.Visible = true;
+                            msg.Append("'" + memberName + "' was successfully removed from '" + parentName + "'.<br />");
+                        }
                     }
                 }
-                else
+                else //User
                 {
                     try
                     {
@@ -349,23 +366,16 @@ namespace iLabs.ServiceBroker.admin
                         //This can get annoying, so maybe it should be configurable in web.config
                         // If yes.. then put code in here  - CV, 2/15/05
                         //Logic for this is as follows - if user get email address, otherwise get email addresses of all users in a group (GetUserIDsRecursively call?)
-                        bool status = false;
+                      
                         //if it has removed all the members
-                        if (isUser)
-                        {
-                            status =AdministrativeAPI.RemoveUserFromGroup(memberID,parentID);
-                            if (!users.Contains(memberID))
-                                users.Add(memberID);
-                        }
-                        else
-                        {
-                            status = AdministrativeAPI.RemoveGroupFromGroup(memberID, parentID);
-                        }
+                       
+                        status =AdministrativeAPI.RemoveUserFromGroup(memberID,parentID);
                         if (status)
                         {
-                           
-                            if (!parentIDs.Contains(parentID))
-                                parentIDs.Add(memberID);
+                            if (!users.Contains(memberID))
+                                users.Add(memberID);
+                            //if (!parentIDs.Contains(parentID))
+                           //     parentIDs.Add(parentID);
                             lblResponse.Visible = true;
                             msg.Append("'" + memberName + "' was successfully removed from '" + parentName + "'.<br />");
                         }

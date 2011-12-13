@@ -758,7 +758,7 @@ namespace iLabs.ServiceBroker.Internal
 		public static DataSet RetrieveAgents()
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Agents_RetrieveTable", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveHierarchyTable", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			DataSet ds = new DataSet();
 

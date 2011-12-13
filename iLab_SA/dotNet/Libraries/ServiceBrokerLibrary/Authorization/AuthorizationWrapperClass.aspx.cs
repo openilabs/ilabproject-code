@@ -88,7 +88,7 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 		}
 
-        private bool IsSuperuserGroup()
+        public bool IsSuperuserGroup()
         {
             int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
             return IsSuperuserGroup(sessionGroupID);
