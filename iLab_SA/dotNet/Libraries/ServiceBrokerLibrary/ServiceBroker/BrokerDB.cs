@@ -2619,7 +2619,7 @@ namespace iLabs.ServiceBroker
                     groupID = AdministrativeAPI.GetGroupID(groupName);
                     if (groupID > 0)
                     {
-                        if (AdministrativeAPI.IsAgentMember(userID, groupID))
+                        if (AdministrativeAPI.IsUserMember(groupID, userID))
                         {
                             grpIDs.Add(groupID);
                             //status = 1;
@@ -2632,7 +2632,7 @@ namespace iLabs.ServiceBroker
                 }
                 else
                 {
-                    grpIDs.AddRange(AdministrativeAPI.ListGroupsForAgentRecursively(userID));
+                    grpIDs.AddRange(AdministrativeAPI.ListParentGroupsForGroupRecursively(userID));
                 }
                 
                 if (clientGuid != null && clientGuid.Length > 0)
@@ -2737,7 +2737,7 @@ namespace iLabs.ServiceBroker
                 int gid = AdministrativeAPI.GetGroupID(groupName);
                 if (gid > 0)
                 {
-                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    if (AdministrativeAPI.IsUserMember(gid, user_ID))
                     {
                         group_ID = gid;
                     }
@@ -2770,7 +2770,7 @@ namespace iLabs.ServiceBroker
             // Try and resolve any unspecified parameters
             if (client_ID <= 0 && group_ID <= 0)
             {
-                userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                userGroupIDs = AdministrativeAPI.ListGroupIDsForUserRecursively(user_ID);
                 Group[] groups = AdministrativeAPI.GetGroups(userGroupIDs);
                 Dictionary<int, int[]> clientMap = new Dictionary<int, int[]>();
                 foreach (Group g in groups)
@@ -2799,7 +2799,7 @@ namespace iLabs.ServiceBroker
                         gid = en.Current.Key;
                         clients = en.Current.Value;
                     }
-                    if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    if (AdministrativeAPI.IsUserMember(gid, user_ID))
                     {
                         group_ID = gid;
                         groupName = AdministrativeAPI.GetGroupName(gid);
@@ -2833,7 +2833,7 @@ namespace iLabs.ServiceBroker
                 }
                 else
                 {
-                    userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                    userGroupIDs = AdministrativeAPI.ListParentGroupsForGroupRecursively(user_ID);
                     int count = 0;
                     foreach (int ci in clientGroupIDs)
                     {
@@ -2851,7 +2851,7 @@ namespace iLabs.ServiceBroker
                         gid = -1;
                     }
                 }
-                if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
+                if (gid > 0 && AdministrativeAPI.IsUserMember(gid, user_ID))
                 {
                     group_ID = gid;
 
@@ -2891,7 +2891,7 @@ namespace iLabs.ServiceBroker
                     result.tag = "The specified group does not have permission to to run the specified client!";
                     return result;
                 }
-                if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
+                if (!AdministrativeAPI.IsUserMember(group_ID, user_ID))
                 {
                     result.tag = "The user does not have permission to to run the specified client!";
                     return result;

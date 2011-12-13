@@ -77,7 +77,7 @@ namespace iLabs.ServiceBroker.Administration
 			}
 
 			// find the grants for all the parent groups, with function useLabClient
-			int[] parentGroups =AdministrativeAPI.ListGroupsForAgentRecursively (groupID);
+			int[] parentGroups =AdministrativeAPI.ListParentGroupsForGroupRecursively (groupID);
 
 			for(int i=0; i< parentGroups.Length ; i++)
 			{
@@ -129,7 +129,7 @@ namespace iLabs.ServiceBroker.Administration
 			}
 
 			// find the grants for all the parent groups, with function useLabServer
-			int[] parentGroups = AdministrativeAPI.ListGroupsForAgentRecursively (groupID);
+			int[] parentGroups = AdministrativeAPI.ListParentGroupsForGroupRecursively (groupID);
 
 			for(int i=0; i< parentGroups.Length ; i++)
 			{

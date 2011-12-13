@@ -913,55 +913,16 @@ namespace iLabs.ServiceBroker.iLabSB
 		/// otherwise the soap header for calls to the lab server is set to allow the SB to access the lab server
 		/// </summary>
 		/// <param name="labServerID"></param>
-		public void CheckAndSetLSAuthorization (string labServerGuid)
-		{
-			try
-			{
-				/* Collecting information to check for authorization */
-
-				//first try to recreate session if using a html client
-                if (Session == null || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-                {
-                    if (sbHeader != null)
-                    {
-                        wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
-                    }
-                }
-
-				//retrieve userID from the session
-				int userID = Convert.ToInt32(Session["UserID"]);
-
-                ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(labServerGuid);
-                if (info.retired)
-                {
-                    throw new Exception("The Batch Lab Server is retired");
-                }
-				// get qualifier ID of labServer
-				int qualifierID = AuthorizationAPI.GetQualifierID (info.agentId, Qualifier .labServerQualifierTypeID );
+        public void CheckAndSetLSAuthorization(string labServerGuid)
+        {
+            ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(labServerGuid);
+            if (info.retired)
+            {
+                throw new Exception("The Batch Lab Server is retired");
+            }
+            CheckAndSetLSAuthorization(info.agentId);
+        }
 			
-				/* End collecting information */
-
-				// Checking if user has permission to use the lab server
-				if(!AuthorizationAPI.CheckAuthorization (userID, Function.useLabServerFunctionType , qualifierID))
-				{
-					// check fails
-                    
-					throw new AccessDeniedException ("Access denied using labServer '" + info.agentName+"'.");
-				}
-				else 
-				{
-					// set soap header authen values
-                    batchLS_Proxy.AuthHeaderValue = new AuthHeader();
-                    batchLS_Proxy.AuthHeaderValue.identifier = ProcessAgentDB.ServiceGuid;
-                    batchLS_Proxy.AuthHeaderValue.passKey = info.identOut.passkey;
-                    batchLS_Proxy.Url = info.webServiceUrl;
-				}
-			}
-			catch
-			{
-				throw;
-			}
-		}
         /// <summary>
         /// Checks if the current session's user has permission to access the labserver.
         /// An access denied exception is thrown if the authorization check fails;
@@ -980,6 +941,18 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (sbHeader != null)
                     {
                         wrapper.SetServiceSession(new Coupon(ProcessAgentDB.ServiceGuid, sbHeader.couponID, sbHeader.couponPassKey));
+                    }
+                    else
+                    {
+                        HttpCookie authCookie = Context.Request.Cookies[ConfigurationManager.AppSettings["isbAuthCookieName"]];
+                        if (authCookie != null)
+                        {
+                            if (authCookie.Value != null)
+                            {
+                                long sid = Convert.ToInt64(authCookie.Value);
+                                wrapper.SetServiceSession(sid);
+                            }
+                        }
                     }
                 }
 

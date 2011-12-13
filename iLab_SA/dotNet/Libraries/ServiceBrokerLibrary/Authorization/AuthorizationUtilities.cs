@@ -68,12 +68,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="descendantID"></param>
 		/// <param name="a"></param>
-		public static void GetAgentAncestors(int descendantID, ArrayList a)
+		public static void GetGroupAncestors(int descendantID, ArrayList a)
 		{
 			int[] ancestorArray = InternalAuthorizationDB.ListAgentParentsFromDS(descendantID);
 			foreach(int ancestor in ancestorArray)
 			{
-				GetAgentAncestors(ancestor, a);
+				GetGroupAncestors(ancestor, a);
 				if(!a.Contains(ancestor))
 				{
 					a.Add(ancestor);
@@ -86,12 +86,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="ancestorID"></param>
 		/// <param name="a">this is required because the method is called recursively</param>
-		public static void GetAgentDescendants(int ancestorID, ArrayList a)
+		public static void GetGroupDescendants(int ancestorID, ArrayList a)
 		{
 			int[] descendantArray = InternalAuthorizationDB.ListAgentChildrenFromDS(ancestorID);
 			foreach(int descendant in descendantArray)
 			{
-				GetAgentDescendants(descendant, a);
+				GetGroupDescendants(descendant, a);
 				if(!a.Contains(descendant))
 				{
 					a.Add(descendant);

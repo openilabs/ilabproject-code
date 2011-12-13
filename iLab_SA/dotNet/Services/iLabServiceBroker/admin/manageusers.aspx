@@ -22,12 +22,11 @@ Please see license.txt in top level directory for full license.
 	<body>
 		<form id="Form1" method="post" runat="server">
 			<a name="top"></a>
-			<div id="outerwrapper" ><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:adminnav id="AdminNav1" runat="server"></uc1:adminnav><br clear="all">
+			<div id="outerwrapper" ><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:adminnav id="AdminNav1" runat="server"></uc1:adminnav><br clear="all" />
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Manage Users</h1>
 						<p>Add or modify a User below.</p>
-						<!-- Errormessage should appear here:-->
 						<asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label>
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
@@ -61,6 +60,11 @@ Please see license.txt in top level directory for full license.
 										<td><asp:textbox id="txtEmail" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
+										<th>
+											<label for="authority">Authority</label></th>
+										<td>
+                                            &nbsp;<asp:dropdownlist CssClass="i18n" id="ddlAuthority" Runat="server" Width="315px"></asp:dropdownlist></td>
+									</tr><tr>
 										<th>
 											<label for="affiliation">Affiliation</label></th>
 										<td>
@@ -108,7 +112,7 @@ Please see license.txt in top level directory for full license.
 							<asp:listbox cssClass="i18n" id="lbxSelectUser" Runat="server" AutoPostBack="true"  OnSelectedIndexChanged="lbxSelectUser_SelectedIndexChanged" Width="380px" Rows="15"  Height="310px"></asp:listbox>
 						</div>
 					</div>
-					<br clear="all">
+					<br clear="all" />
 					<!-- end pagecontent div --></div>
 				<!-- end innerwrapper div --><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
 		</form>

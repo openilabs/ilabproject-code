@@ -18,6 +18,8 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web .Security ;
 using System.Text.RegularExpressions;
+
+using iLabs.DataTypes;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Internal;
@@ -85,8 +87,9 @@ namespace iLabs.ServiceBroker.admin
 				{
 					// Setup default affiliation
 				}
-
+                LoadAuthorityList();
 				BuildUserListBox();
+                ddlAuthority.Enabled = false;
 			}
 		}
 
@@ -110,6 +113,23 @@ namespace iLabs.ServiceBroker.admin
 
 		}
 		#endregion
+
+        private void LoadAuthorityList()
+        {
+            ddlAuthority.Items.Clear();
+            //ListItem liHeaderAdminGroup = new ListItem("--- Select Authority ---", "-1");
+            //ddlAuthorities.Items.Add(liHeaderAdminGroup);
+            BrokerDB brokerDB = new BrokerDB();
+            IntTag[] authTags = brokerDB.GetAuthorityTags();
+            if (authTags != null && authTags.Length > 0)
+            {
+                foreach (IntTag t in authTags)
+                {
+                    ListItem li = new ListItem(t.tag, t.id.ToString());
+                    ddlAuthority.Items.Add(li);
+                }
+            }
+        }
 
 		/* 
 		 * Builds the Select Users List box. 
@@ -164,6 +184,8 @@ namespace iLabs.ServiceBroker.admin
 			txtFirstName.Text = "";
 			txtUsername.Text = "";
 			txtUsername.Enabled=true;
+            ddlAuthority.SelectedValue = "0";
+            ddlAuthority.Enabled = true;
 			lblGroups.Text="";
 			lblRequestGroups.Text="";
 			cbxLockAccount.Checked = false;
@@ -182,6 +204,8 @@ namespace iLabs.ServiceBroker.admin
 			txtFirstName.Text = user.firstName;
 			txtLastName.Text = user.lastName;
 			txtEmail.Text = user.email;
+            ddlAuthority.SelectedValue = user.authID.ToString();
+            ddlAuthority.Enabled = false;
 
 			/* Note if you change your drop down list options after launching the SB, 
 					 * make sure your old affiliation options exist, or change them in the database.
@@ -204,11 +228,12 @@ namespace iLabs.ServiceBroker.admin
 				//Get explicit groups the user belongs to
 				ArrayList nonRequestGroups = new ArrayList();
 				ArrayList requestGroups = new ArrayList();
-				int[] gpIDs = wrapper.ListGroupsForAgentWrapper (user.userID );
+				int[] gpIDs = wrapper.ListGroupsForUserWrapper (user.userID );
+                //int[] gpIDs = wrapper.ListGroupsForUserWrapper(user.userID);
 				ServiceBroker.Administration.Group[] gps=wrapper.GetGroupsWrapper(gpIDs);
 				foreach(ServiceBroker.Administration.Group g in gps)
 				{
-					if (g.groupName.EndsWith("request"))
+					if (g.GroupType.CompareTo(GroupType.REQUEST) == 0)
 						requestGroups.Add(g);
 					else 
 						if(!g.groupName.Equals("NewUserGroup"))

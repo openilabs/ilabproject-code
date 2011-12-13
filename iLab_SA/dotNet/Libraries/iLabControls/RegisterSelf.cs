@@ -702,8 +702,13 @@ namespace iLabs.Controls
                     else
                     {
                         string tmpGuid = null;
-                        if(AgentType == ProcessAgentType.SERVICE_BROKER)
+                        if (AgentType == ProcessAgentType.SERVICE_BROKER)
+                        {
                             tmpGuid = ProcessAgentDB.ServiceAgent.agentGuid;
+                            AuthorityUpdateSelf(txtServiceName.Text,ProcessAgentDB.ServiceAgent.agentGuid,
+                                 txtCodebaseUrl.Text.Trim(), txtDescription.Text, txtContactInfo.Text,
+                                 txtBugEmail.Text, txtLocation.Text);
+                        }
                         dbTicketing.SelfRegisterProcessAgent(ProcessAgentDB.ServiceAgent.agentGuid, txtServiceName.Text, AgentType,
                                 tmpGuid, txtCodebaseUrl.Text.Trim(), txtServiceUrl.Text.Trim());
                         dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
@@ -834,6 +839,9 @@ namespace iLabs.Controls
                 if (AgentType == ProcessAgentType.SERVICE_BROKER)
                 {
                     dbTicketing.SetDomainGuid(txtServiceGuid.Text.Trim());
+                    AuthorityUpdateSelf(txtServiceName.Text, txtServiceGuid.Text.Trim(),
+                                 txtCodebaseUrl.Text.Trim(), txtDescription.Text, txtContactInfo.Text,
+                                 txtBugEmail.Text, txtLocation.Text);
                 }
                 dbTicketing.SaveSystemSupport(ProcessAgentDB.ServiceAgent.agentGuid, txtContactInfo.Text, txtBugEmail.Text,
                             txtInfoUrl.Text, txtDescription.Text, txtLocation.Text);
@@ -933,6 +941,55 @@ namespace iLabs.Controls
         {
             //DisplayForm();
             btnClear.Enabled = true;
+        }
+
+        /// <summary>
+        /// This is a special case that must only be called if the if the Service is a ServiceBroker
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="guid"></param>
+        /// <param name="url"></param>
+        /// <param name="description"></param>
+        /// <param name="contactEmail"></param>
+        /// <param name="bugEmail"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        protected int AuthorityUpdateSelf(string name, string guid, string url, string description,
+           string contactEmail, string bugEmail, string location)
+        {
+            int count = 0;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_UpdateSelf", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate stored procedure parameters
+          
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityName", name, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityURL", url, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@contactEmail", contactEmail, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@bugEmail", bugEmail, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@location", location, DbType.String, 256));
+            try
+            {
+                // read the result
+                connection.Open();
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                    count = Convert.ToInt32(result);
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return count;
         }
 
         #endregion

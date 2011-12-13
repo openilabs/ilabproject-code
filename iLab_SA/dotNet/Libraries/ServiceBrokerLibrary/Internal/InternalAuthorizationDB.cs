@@ -684,198 +684,68 @@ namespace iLabs.ServiceBroker.Internal
 	     * !------------------------------------------------------------------------------!
 	     */
 
-		
-		/// <summary>
-		/// returns true if agent is user
-		/// </summary>
-		public static bool IsAgentUser(int agentID)
-		{
-			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("AgentType_Retrieve", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-			int isGroup = -1;
+	
 
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@agentID", agentID, DbType.Int32));
-			
-			try
-			{
-				myConnection.Open();
-				isGroup = Convert.ToInt16( myCommand.ExecuteScalar());
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in isAgentUser. " + ex.Message, ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-			if (isGroup==0)
-				return true;
-			else
-				return false;
-		}
-		
-		/// <summary>
-		/// returns the AgentHierarchy table in a dataset
-		/// </summary>
-		public static DataSet RetrieveAgentHierarchy()
-		{
-			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("AgentHierarchy_RetrieveTable", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-			DataSet ds = new DataSet();
+      
 
-			try
-			{
-				DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
-				dataAdapter.SelectCommand = myCommand;
-				dataAdapter.TableMappings.Add("Table","Agent_Hierarchy");
+        ///// <summary>
+        ///// to retrieve agent metadata for agents specified by array of agent IDs 
+        ///// </summary>
+        //public static Agent[] SelectAgents ( int[] agentIDs )
+        //{
+        //    Agent[] a = new Agent[agentIDs.Length ];
+        //    for (int i=0; i<agentIDs.Length ; i++)
+        //    {
+        //        a[i] = new Agent();
+        //    }
 
-				dataAdapter.Fill(ds);
-			
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in GetProcessAgentHierarchyTable. " + ex.Message, ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-			return ds;
-		}
+        //    DbConnection myConnection = FactoryDB.GetConnection();
+        //    DbCommand myCommand = FactoryDB.CreateCommand("Agent_Retrieve", myConnection);
+        //    myCommand.CommandType = CommandType.StoredProcedure;
+        //    myCommand.Parameters .Add(FactoryDB.CreateParameter("@agentID",null,DbType.Int32));
 
-		/// <summary>
-		/// to retrieve agent metadata for agents specified by array of agent IDs 
-		/// </summary>
-		public static Agent[] SelectAgents ( int[] agentIDs )
-		{
-			Agent[] a = new Agent[agentIDs.Length ];
-			for (int i=0; i<agentIDs.Length ; i++)
-			{
-				a[i] = new Agent();
-			}
-
-            DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Agent_Retrieve", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-			myCommand.Parameters .Add(FactoryDB.CreateParameter("@agentID",null,DbType.Int32));
-
-			try 
-			{
-				myConnection.Open ();
+        //    try 
+        //    {
+        //        myConnection.Open ();
 				
-				for (int i =0; i < agentIDs.Length ; i++) 
-				{
-					myCommand.Parameters["@agentID"].Value = agentIDs[i];
+        //        for (int i =0; i < agentIDs.Length ; i++) 
+        //        {
+        //            myCommand.Parameters["@agentID"].Value = agentIDs[i];
 
-					// get agent info from table agents
-					DbDataReader myReader = myCommand.ExecuteReader ();
-					while(myReader.Read ())
-					{	
-						a[i].id = agentIDs[i];
+        //            // get agent info from table agents
+        //            DbDataReader myReader = myCommand.ExecuteReader ();
+        //            while(myReader.Read ())
+        //            {	
+        //                a[i].id = agentIDs[i];
 
-						int isGroup=0;
-						if(myReader["is_group"] != System.DBNull.Value )
-							isGroup= Convert.ToByte(myReader["is_group"]);
-						if (isGroup==1)
-							a[i].type=Agent.groupType;
-						else
-							a[i].type = Agent.userType;
-						if(myReader["agent_name"] != System.DBNull.Value )
-							a[i].type= (string)(myReader["agent_name"]);
-						/*if(myReader["date_created"] != System.DBNull .Value )
-							a[i].= (string) myReader["date_created"];*/
-					}
-					myReader.Close ();
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown SelectGroups. " + ex.Message, ex);
-			}
-			finally 
-			{
-				myConnection.Close ();
-			}
+        //                int isGroup=0;
+        //                if(myReader["is_group"] != System.DBNull.Value )
+        //                    isGroup= Convert.ToByte(myReader["is_group"]);
+        //                if (isGroup==1)
+        //                    a[i].type=Agent.groupType;
+        //                else
+        //                    a[i].type = Agent.userType;
+        //                if(myReader["agent_name"] != System.DBNull.Value )
+        //                    a[i].type= (string)(myReader["agent_name"]);
+        //                /*if(myReader["date_created"] != System.DBNull .Value )
+        //                    a[i].= (string) myReader["date_created"];*/
+        //            }
+        //            myReader.Close ();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Exception thrown SelectGroups. " + ex.Message, ex);
+        //    }
+        //    finally 
+        //    {
+        //        myConnection.Close ();
+        //    }
 			
-			return a;
-		}
+        //    return a;
+        //}
 
-        /// <summary>
-        /// to find all the parent groups of an agent
-        /// </summary>
-        public static int[] ListNonRequestGroups(int agentID)
-        {
-            List<Int32> aList = new List<Int32>();
-
-            DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveGroups", myConnection);
-            myCommand.CommandType = CommandType.StoredProcedure;
-
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@userID", agentID, DbType.Int32));
-
-            try
-            {
-                myConnection.Open();
-                DbDataReader myReader = myCommand.ExecuteReader();
-                while (myReader.Read())
-                {
-                    if (!myReader.IsDBNull(0))
-                        aList.Add(myReader.GetInt32(0));
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Exception thrown in finding parent groups of agent", ex);
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return aList.ToArray();
-        }
-
-		/// <summary>
-		/// to find all the parent groups of an agent
-		/// </summary>
-		public static int[] ListAgentParents(int agentID)
-		{
-			ArrayList aList = new ArrayList ();
-
-			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("AgentGroup_Retrieve", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@agentID", agentID, DbType.Int32));
-			
-			try
-			{
-				myConnection.Open();
-				DbDataReader myReader = myCommand.ExecuteReader ();
-				
-
-				while(myReader.Read ())
-				{
-					if(myReader["parent_group_ID"] != System.DBNull.Value )
-						aList.Add(Convert.ToInt32(myReader["parent_group_ID"]));
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in finding parent groups of agent",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
-
-			//Convert to an int array
-			int [] st = Utilities.ArrayListToIntArray(aList);
-
-			return st;
-		}
+       
 
 		/* !------------------------------------------------------------------------------!
 		 *	CALLS FOR AGENTS - DATASETS (Also contains some Dataset versions of the above methods)
@@ -920,16 +790,16 @@ namespace iLabs.ServiceBroker.Internal
 
 		public static int[] ListAgentParentsFromDS(int agentID)
 		{
-			ArrayList directParentList = new ArrayList();
+			List<int> directParentList = new List<int>();
 
 			DataTable agentHierarchyTable = AuthCache.AgentHierarchySet.Tables[0];
-			string query = "agent_id = " + agentID ;
+			string query = "group_id = " + agentID ;
 			DataRow []rows = agentHierarchyTable.Select(query);
 
 			foreach(DataRow dataRow in rows)
 				directParentList.Add(Convert.ToInt32(dataRow["parent_group_id"]));
 
-			return Utilities.ArrayListToIntArray(directParentList);
+			return directParentList.ToArray();
 		}
 		
 		/// <summary>
@@ -939,7 +809,7 @@ namespace iLabs.ServiceBroker.Internal
 		/// <returns></returns>
 		public static int[] ListAgentChildrenFromDS(int agentID)
 		{
-			ArrayList directChildrenList = new ArrayList();
+			List<int> directChildrenList = new List<int>();
 
 			DataTable agentHierarchyTable = AuthCache.AgentHierarchySet.Tables[0];
 
@@ -947,9 +817,9 @@ namespace iLabs.ServiceBroker.Internal
 			DataRow []rows = agentHierarchyTable.Select(query);
 
 			foreach(DataRow dataRow in rows)
-					directChildrenList.Add(Convert.ToInt32(dataRow["agent_id"]));	
+					directChildrenList.Add(Convert.ToInt32(dataRow["group_id"]));	
 			
-			return Utilities.ArrayListToIntArray(directChildrenList);
+			return directChildrenList.ToArray();
 		}
 
 		
@@ -978,7 +848,7 @@ namespace iLabs.ServiceBroker.Internal
 			*/
 			ArrayList agentAncestorList = new ArrayList();
 				
-			AuthorizationUtilities.GetAgentAncestors(agentID, agentAncestorList);
+			AuthorizationUtilities.GetGroupAncestors(agentID, agentAncestorList);
 			//also need to add the agentID itself (it might apply to certain explicit grants)
 			agentAncestorList.Add(agentID);
 	

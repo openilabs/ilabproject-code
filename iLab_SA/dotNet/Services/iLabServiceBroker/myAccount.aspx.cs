@@ -55,7 +55,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 				// To list all the groups a user belongs to
 				int userID = Convert.ToInt32(Session["UserID"]);
-				int[] groupIDs = wrapper.ListGroupsForAgentWrapper (userID);
+				int[] groupIDs = wrapper.ListGroupsForUserWrapper (userID);
 
 				//since we already have the groups a user has access
 				// if we use wrapper here, it will deny authentication

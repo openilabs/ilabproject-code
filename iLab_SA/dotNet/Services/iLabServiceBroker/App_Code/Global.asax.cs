@@ -88,7 +88,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         AdministrativeAPI.ModifyUserSession(sesID, info.groupID,info.clientID, Session.SessionID);
                         Session["SessionID"] = sesID;
                         Session["UserID"] = info.userID;
-                        int[] myGrps = AdministrativeAPI.ListNonRequestGroupsForAgent(info.userID);
+                        int[] myGrps = AdministrativeAPI.ListNonRequestGroupsForUser(info.userID);
                         if (myGrps != null)
                             Session["GroupCount"] = myGrps.Length;
                         Session["UserName"] = info.userName;

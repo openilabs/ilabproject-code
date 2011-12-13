@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
@@ -30,7 +31,7 @@ using iLabs.ServiceBroker;
 namespace iLabs.ServiceBroker.Administration
 {
     /// <summary>
-    /// lass which holds information pertaining to Agents (Users or Groups). 
+    /// class which holds information pertaining to Agents (Users or Groups). 
     /// This is an internal structure and isn't specified in the API.
     /// </summary>
     public class Agent
@@ -73,6 +74,11 @@ namespace iLabs.ServiceBroker.Administration
 		/// The integer ID of the User.
 		/// </summary>
 		public int userID;
+
+        /// <summary>
+        /// The integer ID of the Users Authority. Defaults to zerto.
+        /// </summary>
+        public int authID;
 
 		/// <summary>
 		/// The string user name (this would be analagous to a kerberos name).
@@ -123,7 +129,12 @@ namespace iLabs.ServiceBroker.Administration
 
         public int CompareTo(object obj)
         {
-            return this.userName.CompareTo(((User)obj).userName);
+            int stat = this.authID.CompareTo(((User)obj).authID);
+            if (stat == 0)
+            {
+                stat = this.userName.CompareTo(((User)obj).userName);
+            }
+            return stat;
         }
 	}
 
@@ -394,7 +405,7 @@ namespace iLabs.ServiceBroker.Administration
 
 		/// <summary>
 		/// The type of group. Current values are: 
-		/// 1-Regular Group; 2-Request Group; 3-Course Staff Group. 
+		/// 1-Regular Group; 2-Request Group; 3-Course Staff Group; 4-Service-Admin Group & 5-Built-in Group. 
 		/// These are extensible by adding records to the Group_Types table in the database.
 		/// In the current batched experiment implementation, the authorization mechanism differs according to the type of group.
 		/// </summary>
@@ -1485,7 +1496,7 @@ namespace iLabs.ServiceBroker.Administration
 
 				for (int i= 0; i< groupIDs.Length; i++)
 				{
-					int[] unRemovedMemberIDs = RemoveMembersFromGroup(ListMemberIDsInGroup(groupIDs[i]), groupIDs[i]);
+					int[] unRemovedMemberIDs = RemoveMembersFromGroup(groupIDs[i]);
 				}
 
 				//Delete all experiments related to a group using the ESS API.
@@ -1619,9 +1630,9 @@ namespace iLabs.ServiceBroker.Administration
 		///			except if the parent is ROOT, in which case the subgroup experiment collection node is added under Qualifier ROOT
 		///		- Added to the group in the agent hierarchy
 		/// </remarks>
-		public static bool AddMemberToGroup(int memberID, int groupID)
+		public static bool AddGroupToGroup(int memberID, int groupID)
 		{
-			if( IsAgentMember(groupID, memberID))    // prevents cycles in the AgentHierarchy
+			if( IsGroupMember(groupID, memberID))    // prevents cycles in the AgentHierarchy
 				return false;
 			else
 			{
@@ -1630,7 +1641,7 @@ namespace iLabs.ServiceBroker.Administration
 				try 
 				{
 					//Add member to group in database
-					inserted = InternalAdminDB.InsertMemberInGroup (memberID, groupID);
+					inserted = InternalAdminDB.AddGroupToGroup(memberID, groupID);
 				}
 				catch (Exception ex)
 				{
@@ -1656,9 +1667,9 @@ namespace iLabs.ServiceBroker.Administration
         ///			except if the parent is ROOT, in which case the subgroup experiment collection node is added under Qualifier ROOT
         ///		- Added to the group in the agent hierarchy
         /// </remarks>
-        public static bool MoveMemberToGroup(int memberID, int fromID, int toID)
+        public static bool MoveGroupToGroup(int memberID, int fromID, int toID)
         {
-            if (IsAgentMember(toID, memberID))    // prevents cycles in the AgentHierarchy
+            if (IsGroupMember(toID, memberID))    // prevents cycles in the AgentHierarchy
                 return false;
             else
             {
@@ -1667,7 +1678,7 @@ namespace iLabs.ServiceBroker.Administration
                 try
                 {
                     //Add member to group in database
-                    inserted = InternalAdminDB.MoveMemberToGroup(memberID, fromID, toID);
+                    inserted = InternalAdminDB.MoveGroupToGroup(memberID, fromID, toID);
                 }
                 catch
                 {
@@ -1675,6 +1686,15 @@ namespace iLabs.ServiceBroker.Administration
                 }
                 return inserted;
             }
+        }
+
+        public static bool RemoveGroupFromGroup(int memberID,int groupID){
+            return InternalAdminDB.RemoveGroupFromGroup (memberID, groupID);
+        }
+
+        public static bool RemoveUserFromGroup(int userID, int groupID)
+        {
+            return InternalAdminDB.RemoveUserFromGroup(userID, groupID);
         }
 
 		/// <summary>
@@ -1714,29 +1734,55 @@ namespace iLabs.ServiceBroker.Administration
 		///				experiment collection qualifier relationships are also removed.
 		///
 		///   </remarks>
-		public static int[] RemoveMembersFromGroup(int[] memberIDs, int groupID)
+		public static int[] RemoveMembersFromGroup( int groupID)
 		{
-			ArrayList aList = new ArrayList ();
+			List<int> aList = new List<int> ();
 
 			try
 			{
-				for (int i=0; i<memberIDs.Length ; i++)
-				{
-					bool deleted = InternalAdminDB.DeleteMemberFromGroup (memberIDs[i], groupID);
+                int[] uids = InternalAdminDB.SelectUserIDsInGroup(groupID);
+                foreach (int u in uids)
+                {
+                    InternalAdminDB.RemoveUserFromGroup(u,groupID);
+                }
 
+                int[] gids = InternalAdminDB.SelectGroupIDsInGroup(groupID);
+				foreach (int g in gids)
+				{
+					bool deleted = InternalAdminDB.RemoveGroupFromGroup (g, groupID);
 					if (!deleted)
-						aList.Add(memberIDs[i]);
+						aList.Add(g);
 				}
 
-				int[] unremovedMembers = Utilities.ArrayListToIntArray(aList);
-			
-				return unremovedMembers;
+				
 			}
 			catch (Exception ex)
 			{
 				throw;
 			}
+            return aList.ToArray();
 		}
+
+        public static bool AddUserToGroup(int userID, int groupID)
+        {
+            if (IsUserMember(groupID, userID))    // prevents cycles in the AgentHierarchy
+                return false;
+            else
+            {
+                bool inserted = false;
+
+                try
+                {
+                    //Add member to group in database
+                    inserted = InternalAdminDB.AddUserToGroup(userID, groupID);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+                return inserted;
+            }
+        }
 
 		/// <summary>
 		/// Returns an array of user IDs for all users in the specified group.
@@ -1745,31 +1791,18 @@ namespace iLabs.ServiceBroker.Administration
 		/// <returns>An array containing the user IDs of all users belonging to the Group.</returns>
 		public static int[] ListUserIDsInGroup(int groupID)
 		{
-			ArrayList arrayList = new ArrayList ();
+            int[] ids = null;
 			try
 			{
 				//Lists all members of a group as agent structs
-				Agent[] agent = InternalAdminDB.SelectMembersInGroup (groupID);
-
-				for (int i =0; i < agent.Length ; i++)
-				{
-					//If an Agent is a User
-					if(agent[i].type == Agent.userType )
-					{
-						//Add user to list if it doesn't exist already
-						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add(agent[i].id );
-					}
-				}
+				ids = InternalAdminDB.SelectUserIDsInGroup (groupID);
 			}
 			catch(Exception ex)
 			{
 				throw;
 			}
 
-			int[] userIDs = Utilities.ArrayListToIntArray(arrayList);
-
-			return userIDs;
+            return ids;
 
 		}
 
@@ -1778,48 +1811,38 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		/// <param name="groupID">The ID of the Group whose members are to be listed.</param>
 		/// <returns>An array containing the user IDs of all members of the Group.</returns>
-		public static int[] ListUserIDsInGroupRecursively(int groupID)
-		{
-			ArrayList arrayList = new ArrayList ();
-			try
-			{
-				//Lists all members of a group as agent structs
-				Agent[] agent = InternalAdminDB.SelectMembersInGroup (groupID);
+        public static int[] ListUserIDsInGroupRecursively(int groupID)
+        {
+            List<int> arrayList = new List<int>();
+            try
+            {
+                //Lists all users
+                int[] uid = InternalAdminDB.SelectUserIDsInGroup(groupID);
+                foreach (int i in uid)
+                {
+                    if (!arrayList.Contains(i))
+                        arrayList.Add(i);
+                }
+                int[] gid = InternalAdminDB.SelectGroupIDsInGroup(groupID);
+                foreach (int k in gid)
+                {
+                    //Get the members of the group
+                    int[] list = ListUserIDsInGroupRecursively(k);
 
-				for (int i =0; i < agent.Length ; i++)
-				{
-					//If an Agent is a User
-					if(agent[i].type == Agent.userType )
-					{
-						//Add user to list if it doesn't exist already
-						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add(agent[i].id );
-					}
-					else //If Agent is a group
-					{
-						//Get the members of the group
-						int[] list = ListUserIDsInGroupRecursively(agent[i].id );
-
-						//add them to the list
-						for(int j =0; j < list.Length ; j++)
-						{
-							if(!arrayList.Contains (list[j]))
-								arrayList.Add(list[j]);
-						}
-
-					}
-				}
-			}
-			catch(Exception ex)
-			{
-				throw;
-			}
-
-			int[] userIDs = Utilities.ArrayListToIntArray(arrayList);
-
-			return userIDs;
-
-		}
+                    //add them to the list
+                    foreach (int j in list)
+                    {
+                        if (!arrayList.Contains(j))
+                            arrayList.Add(j);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return arrayList.ToArray();
+        }
 
 		/// <summary>
 		/// Returns an array of group IDs for all subgroups of the specified group
@@ -1832,28 +1855,21 @@ namespace iLabs.ServiceBroker.Administration
 			try
 			{
 				//Lists all subgroups of a group as agent structs
-				Agent[] agent = InternalAdminDB.SelectMembersInGroup (groupID);
+				int[] gids = InternalAdminDB.SelectGroupIDsInGroup(groupID);
 
-				for (int i =0; i < agent.Length ; i++)
+				foreach (int i in gids)
 				{
-					//If an Agent is a Group
-					if(agent[i].type == Agent.groupType)
-					{
-						//Add group to list if it doesn't exist already
-						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add(agent[i].id );
-					}
+				    //Add group to list if it doesn't exist already
+					if(!arrayList.Contains (i))
+						arrayList.Add(i);
 				}
 			}
 			catch(Exception ex)
 			{
 				throw;
 			}
-
 			int[] groupIDs = Utilities.ArrayListToIntArray(arrayList);
-
 			return groupIDs;
-
 		}
 
 		/// <summary>
@@ -1861,79 +1877,62 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		/// <param name="groupID">The ID of the Group whose subgroups are to be listed.</param>
 		/// <returns>An array containing the group IDs of all subgroup of the Group.</returns>
-		public static int[] ListSubgroupIDsRecursively(int groupID)
-		{
-			ArrayList arrayList = new ArrayList ();
-			try
-			{
-				//Lists all members of a group as agent structs
-				Agent[] agent = InternalAdminDB.SelectMembersInGroup (groupID);
+        public static int[] ListSubgroupIDsRecursively(int groupID)
+        {
+            List<int> arrayList = new List<int>();
+            try
+            {
+                //Lists all members of a group as agent structs
+                int[] gids = InternalAdminDB.SelectGroupIDsInGroup(groupID);
 
-				for (int i =0; i < agent.Length ; i++)
-				{
-					//If an Agent is a group
-					if(agent[i].type == Agent.groupType	 )
-					{
-						//Add group to list if it doesn't exist already
-						if(!arrayList.Contains (agent[i].id ))
-							arrayList.Add(agent[i].id );
-					}
-					//Get the members of the group
-					int[] list = ListSubgroupIDsRecursively(agent[i].id );
+                foreach (int i in gids)
+                {
+                    //Add group to list if it doesn't exist already
+                    if (!arrayList.Contains(i))
+                        arrayList.Add(i);
+                    //Get the members of the group
+                    int[] list = ListSubgroupIDsRecursively(i);
 
-					//add them to the list
-					for(int j =0; j < list.Length ; j++)
-					{
-						if(!arrayList.Contains (list[j]))
-							arrayList.Add(list[j]);
-					}
-				}
-			}
-			catch(Exception ex)
-			{
-				throw;
-			}
+                    //add them to the list
+                    foreach (int j in list)
+                    {
+                        if (!arrayList.Contains(j))
+                            arrayList.Add(j);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return arrayList.ToArray();
+        }
 
-			int[] groupIDs = Utilities.ArrayListToIntArray(arrayList);
+	
 
-			return groupIDs;
+        /// <summary>
+        /// Checks whether the specified agent is a member of the specified group. 
+        /// </summary>
+        /// <param name="groupID">The ID of the Group in which the agent's membership is being checked.</param>
+        /// <param name="memberID">The ID of the agent whose membership in the enclosing group is to be checked; note that the agent may be a single user (represented by a userID) or a subgroup of the target group to satisfy the query.</param>
+        /// <returns>true if and only if the specified agent is a member or subgroup or the target group.</returns>
+        public static bool IsGroupMember(int groupID, int memberID)
+        {
+           
+            return InternalAdminDB.IsGroupMember(groupID, memberID);
+        }
 
-		}
-
-		/// <summary>
-		/// Lists the member IDs of all members of the specified group.
-		/// </summary>
-		/// <param name="groupID">The ID of the Group whose members are to be listed.</param>
-		/// <returns>An array containing the memberIDs of all members of the Group. A subgroup is listed by the subgroup ID, not by enumerating all members of the subgroup.</returns>
-		public static int[] ListMemberIDsInGroup(int groupID)
-		{
-			Agent[] agent = InternalAdminDB.SelectMembersInGroup (groupID);
-			int [] memberIDs = new int [agent.Length ];
-			for (int i =0; i < agent.Length ; i++)
-			{
-				memberIDs[i] = agent[i].id  ;
-			}
-			return memberIDs;
-		}
-
-
-		/// <summary>
-		/// Recursively checks whether the specified agent is a member of the specified group. 
-		/// </summary>
-		/// <param name="agentID">The ID of the agent whose membership in the enclosing group is to be checked; note that the agent may be a single user (represented by a userID) or a subgroup of the target group to satisfy the query.</param>
-		/// <param name="groupID">The ID of the Group in which the agent's membership is being checked.</param>
-		/// <returns>true if and only if the specified agent is a member or subgroup or the target group.</returns>
-		public static bool IsAgentMember(int agentID, int groupID)
-		{
-			int[] groupIDs = ListGroupsForAgentRecursively(agentID);
-
-			for(int i=0; i< groupIDs.Length ; i++)
-			{
-				if(groupIDs[i].Equals (groupID))
-					return true;
-			}
-			return false;
-		}
+        /// <summary>
+        /// Checks whether the specified agent is a member of the specified group. 
+        /// </summary>
+        /// <param name="groupID">The ID of the Group in which the agent's membership is being checked.</param>
+        /// <param name="userID">The ID of the user whose membership in the enclosing group is to be checked; note that the agent may be a single user (represented by a userID) or a subgroup of the target group to satisfy the query.</param>
+       
+        /// <returns>true if and only if the specified agent is a member or subgroup or the target group.</returns>
+        public static bool IsUserMember(int groupID, int userID)
+        {
+            return InternalAdminDB.IsUserMember(groupID, userID);
+        }
 
         /// <summary>
         /// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
@@ -1941,9 +1940,9 @@ namespace iLabs.ServiceBroker.Administration
         /// </summary>
         /// <param name="agentID">The ID of the agent whose group membership is being enumerated.</param>
         /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
-        public static int[] ListNonRequestGroupsForAgent(int agentID)
+        public static int[] ListNonRequestGroupsForUser(int agentID)
         {
-            int[] groups = InternalAuthorizationDB.ListAgentParents(agentID);
+            int[] groups = InternalAdminDB.ListGroupParents(agentID);
             return groups;
         }
 
@@ -1952,56 +1951,95 @@ namespace iLabs.ServiceBroker.Administration
 		/// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
 		/// An explicit member is one directly added to the specified group by the adduser() or addmemberToGroup() methods.
 		/// </summary>
-		/// <param name="agentID">The ID of the agent whose group membership is being enumerated.</param>
+		/// <param name="userID">The ID of the agent whose group membership is being enumerated.</param>
 		/// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
-		public static int[] ListGroupsForAgent(int agentID)
+		public static int[] ListGroupIDsForUser(int userID)
 		{
-            int[] groups = InternalAuthorizationDB.ListAgentParents(agentID);
+            int[] groups = InternalAdminDB.ListGroupIDsForUser(userID);
 			return groups;
 		}
+
+        /// <summary>
+        /// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
+        /// An explicit member is one directly added to the specified group by the adduser() or addmemberToGroup() methods.
+        /// </summary>
+        /// <param name="userID">The ID of the agent whose group membership is being enumerated.</param>
+        /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
+        public static int[] ListGroupIDsForUserRecursively(int userID)
+        {
+            Hashtable myHT = new Hashtable();
+            int[] gps = InternalAdminDB.ListGroupIDsForUser(userID);
+            
+
+            for (int i = 0; i < gps.Length; i++)
+            {
+                if (!myHT.Contains(gps[i]))
+                {
+                    myHT.Add(gps[i], "");
+                }
+                int[] groups = ListParentGroupsForGroupRecursively(gps[i]);
+
+                for (int j = 0; j < groups.Length; j++)
+                {
+                    if (!myHT.Contains(groups[j]))
+                    {
+                        myHT.Add(groups[j], "");
+                    }
+                }
+            }
+
+            int[] list = new int[myHT.Count];
+            int count = 0;
+            IDictionaryEnumerator myEnumerator = myHT.GetEnumerator();
+            while (myEnumerator.MoveNext())
+            {
+                list[count] = (int)myEnumerator.Key;
+                count++;
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
+        /// An explicit member is one directly added to the specified group by the adduser() or addmemberToGroup() methods.
+        /// </summary>
+        /// <param name="groupID">The ID of the group whose group membership is being enumerated.</param>
+        /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
+        public static int[] ListParentGroupsForGroup(int groupID)
+        {
+            int[] groups = InternalAdminDB.ListGroupParents(groupID);
+            return groups;
+        }
 
 		/// <summary>
 		/// Lists the IDs of all groups of which the specified agent (group or user) is a member. 
 		/// This includes any superGroups of groups to which the agent was explicityly added as a member.
 		/// </summary>
-		/// <param name="agentID">The ID of the agent whose group membership is being enumerated.</param>
+		/// <param name="groupID">The ID of the group whose group membership is being enumerated.</param>
 		/// <returns>An array containing the group IDs of all Groups and supergroups to which the user belongs.</returns>
-		public static int[] ListGroupsForAgentRecursively(int agentID)
+		public static int[] ListParentGroupsForGroupRecursively(int groupID)
 		{
-			Hashtable myHT = new  Hashtable ();
-			int[] gps = ListGroupsForAgent(agentID);
+			List<int> gids = new List<int>();
+            int[] gps = InternalAdminDB.ListGroupParents(groupID);
 
-			for(int i=0; i<gps.Length ; i++)
+			foreach(int i in gps)
 			{
-				if(!myHT.Contains (gps[i]))
+                if(!gids.Contains (i))
 				{
-					myHT.Add(gps[i],"");
+					gids.Add(i);
 				}
-			}
-			
-			for(int i=0; i<gps.Length ; i++)
-			{
-				int[] groups = ListGroupsForAgentRecursively(gps[i]);
+				int[] groups = ListParentGroupsForGroupRecursively(i);
 				
-				for(int j=0; j<groups.Length ; j++)
+				foreach(int j in groups)
 				{
-					if(!myHT.Contains (	groups[j]))
+					if(!gids.Contains (j))
 					{
-						myHT.Add(groups[j],"");
+						gids.Add(j);
 					}
 				}
 			}
-
-			int[] list = new int[myHT.Count ];
-			int count =0;
-			IDictionaryEnumerator myEnumerator = myHT.GetEnumerator ();
-			while ( myEnumerator.MoveNext() )
-			{	
-				list[count] = (int) myEnumerator.Key ;
-				count++;
-			}
-
-			return list;
+            return gids.ToArray(); ;
 		}
 
 

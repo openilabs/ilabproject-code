@@ -101,7 +101,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			groupIDs = wrapper.ListGroupIDsWrapper();
 			
 			// Gets a list of all the groups a user belongs to
-			userGroupIDs = wrapper.ListGroupsForAgentWrapper(userID);
+			userGroupIDs = AdministrativeAPI.ListGroupIDsForUserRecursively(userID);
 			ArrayList userGroupList = new ArrayList(userGroupIDs);
 			
 			// Clear the list of groups that a user does not yet belong to
@@ -282,7 +282,7 @@ namespace iLabs.ServiceBroker.iLabSB
 					{
 						groupID = canRequestGroups[i].groupID;
 						// have to bypass wrapper class here
-                        AdministrativeAPI.AddMemberToGroup(Convert.ToInt32(Session["UserID"]), groupID);
+                        AdministrativeAPI.AddUserToGroup(Convert.ToInt32(Session["UserID"]), groupID);
 						LoadGroupArrays();
 						LoadRepeater();
 						LoadBlueBox();

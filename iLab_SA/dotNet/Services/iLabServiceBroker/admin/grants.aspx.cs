@@ -567,7 +567,7 @@ namespace iLabs.ServiceBroker.admin
 						foreach(Grant g in explicitGrants)
 						{
 							explicitAgents.Add(g.agentID.ToString());
-							AuthorizationUtilities.GetAgentDescendants(g.agentID, implicitAgentIDs);
+							AuthorizationUtilities.GetGroupDescendants(g.agentID, implicitAgentIDs);
 						}
 
 						//convert to a string array - this is necessary to make the color-coding work

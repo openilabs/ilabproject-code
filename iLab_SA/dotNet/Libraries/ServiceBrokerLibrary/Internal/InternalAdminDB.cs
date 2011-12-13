@@ -1636,7 +1636,7 @@ public static int CountScheduledClients(int labServerID){
 
 			// refresh A & A-H in memory cache
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
-			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+			AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
 
 			return userID;
 		}
@@ -1735,7 +1735,7 @@ public static int CountScheduledClients(int labServerID){
 			}
 
 			// need refresh agent datasets in memory
-			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+			AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
 
 			int[] uIDs = Utilities.ArrayListToIntArray(arrayList);
@@ -1783,6 +1783,47 @@ public static int CountScheduledClients(int labServerID){
 			
 			return userIDs;
 		}
+
+        /// <summary>
+        /// to retrieve a list of all the users in the database
+        /// </summary>
+        public static int[] SelectUserIDsInGroup(int groupID)
+        {
+            List<int> userIDs = new List<int>();
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveUserIDs", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+            try
+            {
+                myConnection.Open();
+
+                // get User ids from table users
+                DbDataReader myReader = myCommand.ExecuteReader();
+               
+
+                while (myReader.Read())
+                {
+                    if (myReader["user_id"] != System.DBNull.Value)
+                        userIDs.Add(Convert.ToInt32(myReader["user_id"]));
+                }
+                myReader.Close();
+
+               
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown SelectUserIDs", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return userIDs.ToArray();
+        }
+
 
 		/// <summary>
 		/// to retrieve a list of all the orphaned users in the database i.e. users which no longer belong to a group
@@ -1855,6 +1896,8 @@ public static int CountScheduledClients(int labServerID){
                         User u = new User();
 						u.userID = userIDs[i];
 
+                        if (myReader["auth_id"] != System.DBNull.Value)
+                            u.authID = Convert.ToInt32(myReader["auth_id"]);
 						if(myReader["user_name"] != System.DBNull.Value )
 							u.userName= (string) myReader["user_name"];
 						if(myReader["first_name"] != System.DBNull.Value )
@@ -2582,7 +2625,7 @@ public static int CountScheduledClients(int labServerID){
 
 			// refresh A & A-H in memory
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
-			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+			AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
 				
 			return groupID;
 		}
@@ -2676,7 +2719,7 @@ public static int CountScheduledClients(int labServerID){
 			}
 
 			// refresh A-H in memory
-			AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+			AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
 			AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
 
 			// refresh in memory Q & Q-H
@@ -3039,10 +3082,10 @@ public static int CountScheduledClients(int labServerID){
 		/// <summary>
 		/// to add a member to a group
 		/// </summary>
-		public static bool InsertMemberInGroup(int memberID, int groupID)
+		public static bool AddGroupToGroup(int memberID, int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Group_AddMember", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_AddGroup", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
@@ -3073,7 +3116,7 @@ public static int CountScheduledClients(int labServerID){
 				else
 				{
 					// refresh Agents & A-H in memory
-					AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+					AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
 					AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
 
 					// refresh in memory Q & Q-H
@@ -3092,14 +3135,121 @@ public static int CountScheduledClients(int labServerID){
 				myConnection.Close();
 			}
 		}
+        /// <summary>
+        /// to add a member to a group
+        /// </summary>
+        public static bool AddUserToGroup(int userID, int groupID)
+        {
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_AddUser", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
 
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", userID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+
+                // Adding a member to the group
+                /*	
+                * IMPORTANT ! 
+                * The stored procedure implements the following functionality:
+                * 1. When a user is to be added a group, he/she is
+                    - Removed into orphaned users group (if they exist there), AND
+                    - Added to the group in the agent hierarchy
+						
+                * 2. When a subgroup is to be added to a group it is,
+                    - The qualifier corresponding to the subgroup is added under the qualifier corresponding to the parent group
+                    - If the subgroup has an experiment collection node, it is moved under the experiment collection node of the parent(if one exists)
+                        except if the parent is ROOT, in which case the subgroup experiment collection node is added under Qualifier ROOT
+                    - Added to the group in the agent hierarchy
+                */
+
+                int i = myCommand.ExecuteNonQuery();
+                if (i <= 0)
+                    return false;
+                else
+                {
+                    //// refresh Agents & A-H in memory
+                    //AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
+                    //AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
+
+                    //// refresh in memory Q & Q-H
+                    //AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
+                    //AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in inserting member to group. ", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+        }
+
+        public static bool IsGroupMember(int groupID, int memberID)
+        {
+            bool status = false;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_IsGroupMember", myConnection);
+			myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@memberID", memberID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                status = Convert.ToBoolean(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in IsGroupMember. ", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return status;
+        }
+
+        public static bool IsUserMember(int groupID, int userID)
+        {
+            bool status = false;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_IsUserMember", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", userID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                status = Convert.ToBoolean(myCommand.ExecuteScalar());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in IsUserMember. ", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return status;
+        }
 		/// <summary>
 		/// to remove a member from a group
 		/// </summary>
-		public static bool DeleteMemberFromGroup(int memberID, int groupID)
+		public static bool RemoveGroupFromGroup(int memberID, int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Group_DeleteMember", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RemoveGroup", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
@@ -3134,7 +3284,7 @@ public static int CountScheduledClients(int labServerID){
 				else
 				{
 					// refresh Agents & A-H in memory
-					AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+					AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
 					AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
 
 					// refresh in memory Q & Q-H
@@ -3155,17 +3305,107 @@ public static int CountScheduledClients(int labServerID){
 		}
 
         /// <summary>
+		/// to remove a usser from a group
+		/// </summary>
+		public static bool RemoveUserFromGroup(int userID, int groupID)
+		{
+            bool status = false;
+			DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RemoveUser", myConnection);
+			myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@userID", userID, DbType.Int32));
+			
+			try
+			{
+				myConnection.Open();
+
+                int i = myCommand.ExecuteNonQuery();
+                status = (i <= 0);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in inserting member to group. ", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return status;
+        }
+
+        /// <summary>
         /// to add a member to a group
         /// </summary>
-        public static bool MoveMemberToGroup(int memberID, int fromID, int groupID)
+        public static bool MoveGroupToGroup(int memberID, int fromID, int groupID)
         {
             bool status = false;
             try
             {
-                status = InsertMemberInGroup(memberID, groupID);
+                status = AddGroupToGroup(memberID, groupID);
                 if (!status)
                 {
                     return false;
+                }
+                else
+                {
+                    int orphanID = -1;
+                    DbConnection myConnection = FactoryDB.GetConnection();
+                    try
+                    {
+                        DbCommand isOrphanCommand = FactoryDB.CreateCommand("Group_RetrieveID", myConnection);
+                        isOrphanCommand.CommandType = CommandType.StoredProcedure;
+                        isOrphanCommand.Parameters.Add(FactoryDB.CreateParameter("@groupName", Group.ORPHANEDGROUP, DbType.AnsiString, 100));
+                        myConnection.Open();
+                        orphanID = Convert.ToInt32(isOrphanCommand.ExecuteScalar());
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Exception thrown in moving member to group. ", e);
+                    }
+                    finally
+                    {
+                        myConnection.Close();
+                    }
+                    if (orphanID == fromID)
+                    {
+                        // if the from group is Orphan the member should already have been removed
+                        // Rebuild the Cache
+                        status = true;
+                        // refresh Agents & A-H in memory
+                        AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
+                        AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
+
+                        // refresh in memory Q & Q-H
+                        AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
+                        AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
+                    }
+                    else
+                    {
+                        status = RemoveGroupFromGroup(memberID, fromID);
+                    }
+                    return status;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in moving member to group. ", ex);
+            }
+
+        }
+        /// <summary>
+        /// to add a member to a group
+        /// </summary>
+        public static bool MoveUserToGroup(int memberID, int fromID, int groupID)
+        {
+            bool status = false;
+            try
+            {
+                status = AddUserToGroup(memberID, groupID);
+                if (!status)
+                {
+                    return status;
                 }
                 else
                 {
@@ -3193,7 +3433,7 @@ public static int CountScheduledClients(int labServerID){
                         // Rebuild the Cache
                         status = true;
                         // refresh Agents & A-H in memory
-                        AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+                        AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
                         AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
 
                         // refresh in memory Q & Q-H
@@ -3202,7 +3442,7 @@ public static int CountScheduledClients(int labServerID){
                     }
                     else
                     {
-                        status = DeleteMemberFromGroup(memberID, fromID);
+                        status = RemoveUserFromGroup(memberID, fromID);
                     }
                     return status;
                 }
@@ -3213,16 +3453,116 @@ public static int CountScheduledClients(int labServerID){
             }
 
         }
+        /// <summary>
+        /// returns the GroupHierarchy table in a dataset
+        /// </summary>
+        public static DataSet RetrieveGroupHierarchy()
+        {
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveHierarchyTable", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            DataSet ds = new DataSet();
+
+            try
+            {
+                DbDataAdapter dataAdapter = FactoryDB.CreateDataAdapter();
+                dataAdapter.SelectCommand = myCommand;
+                dataAdapter.TableMappings.Add("Table", "Agent_Hierarchy");
+
+                dataAdapter.Fill(ds);
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in Group_RetrieveHierarchyTable. " + ex.Message, ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return ds;
+        }
+
+        /// <summary>
+        /// to find all the parent groups of an agent
+        /// </summary>
+        public static int[] ListNonRequestGroups(int userID)
+        {
+            List<Int32> aList = new List<Int32>();
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveNonRequestGroupIDs", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", userID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                DbDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    if (!myReader.IsDBNull(0))
+                        aList.Add(myReader.GetInt32(0));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in finding parent groups of agent", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return aList.ToArray();
+        }
+
+        /// <summary>
+        /// to find all the parent groups of an group
+        /// </summary>
+        public static int[] ListGroupParents(int groupID)
+        {
+            ArrayList aList = new ArrayList();
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveParentIDs", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                DbDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    if (myReader["parent_group_ID"] != System.DBNull.Value)
+                        aList.Add(Convert.ToInt32(myReader["parent_group_ID"]));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in finding parent groups of agent", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            //Convert to an int array
+            int[] st = Utilities.ArrayListToIntArray(aList);
+
+            return st;
+        }
 
 		/// <summary>
 		/// to retrieve a list of all the members of a group
 		/// </summary>
-		public static Agent[] SelectMembersInGroup (int groupID)
+		public static int[] SelectGroupIDsInGroup (int groupID)
 		{
-			Agent[] members;
-
+            List<int> mIDs = new List<int>();
             DbConnection myConnection = FactoryDB.GetConnection();
-            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveMembers", myConnection);
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveChildrenGroupIDs", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@groupID", groupID, DbType.Int32));
@@ -3233,33 +3573,15 @@ public static int CountScheduledClients(int labServerID){
 
 				// get Member IDs from table Agent_Hierarchy
 				DbDataReader myReader = myCommand.ExecuteReader ();
-				ArrayList mIDs = new ArrayList();
-
+				
+                int id = 0;
 				while(myReader.Read ())
-				{	
-					Agent a = new Agent();
-					if(myReader["agent_id"] != System.DBNull.Value )
-						a.id = Convert.ToInt32(myReader["agent_ID"]);
-					if(myReader["agent_name"] != System.DBNull.Value )
-						a.name = ((string)myReader["agent_name"]);
-					if(Convert.ToInt16(myReader["is_group"]) ==1 )
-						a.type = "Group";
-					else
-						a.type = "User";
-				//	memberIDs [i] = (string) myReader["agent_id"];
-
-					mIDs.Add(a);
+				{
+                    id = myReader.GetInt32(0); 
+                    mIDs.Add(id);
 				}
 				myReader.Close ();
 
-				// Converting to an Agent array
-				members = new Agent[mIDs.Count];
-				for (int i=0;i <mIDs.Count ; i++) 
-				{
-					members[i] = (Agent) mIDs[i];
-				}
-											
-				//mIDs.ToArray();
 			}
 			catch (Exception ex)
 			{
@@ -3269,9 +3591,46 @@ public static int CountScheduledClients(int labServerID){
 			{
 				myConnection.Close ();
 			}
-			
-			return members;
+			return mIDs.ToArray();
 		}
+
+        /// <summary>
+        /// </summary>
+        /// <param name="groupID">the ID of the Group whose members are to be listed</param>
+        /// <returns>a string array containing the member IDs of all members of the Group. A subgroup is listed by the subgroup ID, not by enumerating all members of the subgroup</returns>
+        public static int[] ListGroupIDsForUser(int userID)
+        {
+           List<int> groupIds = new List<int>();
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("User_RetrieveGroupIDs", myConnection);
+			myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@userID", userID, DbType.Int32));
+
+			try 
+			{
+				myConnection.Open ();
+
+				// get Member IDs from table Agent_Hierarchy
+				DbDataReader myReader = myCommand.ExecuteReader ();
+				while(myReader.Read ())
+				{	
+					groupIds.Add(myReader.GetInt32(0));
+				}
+				myReader.Close ();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Exception thrown Select User's Groups",ex);
+			}
+			finally 
+			{
+				myConnection.Close ();
+			}
+            return groupIds.ToArray();
+        }
+	
+
 		/// <summary>
 		/// Method is equivalent to "ListMemberIDsInGroup", except that it acts upon a DataSet rather than on the Database
 		/// </summary>
@@ -3558,7 +3917,7 @@ public static int CountScheduledClients(int labServerID){
             ArrayList groups = new ArrayList();
 
             //int[] groups = InternalAuthorizationDB.ListAgentParents(groupID);
-            AuthorizationUtilities.GetAgentAncestors(groupID, groups);
+            AuthorizationUtilities.GetGroupAncestors(groupID, groups);
             if(!groups.Contains(groupID))
                 groups.Add(groupID);
             List<SystemMessage> systemMessages = new List<SystemMessage>();

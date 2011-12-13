@@ -73,12 +73,7 @@ namespace iLabs.ServiceBroker.admin
 				foreach(Group g in groups)
 				{
 					if(g.groupID >0) 
-						if (
-                            (!g.groupName.Equals(Group.ROOT))
-                          &&(!g.groupName.Equals(Group.SUPERUSER))
-					      &&(!g.groupName.Equals(Group.ORPHANEDGROUP))&&(!g.groupName.Equals(Group.NEWUSERGROUP))
-						  &&(g.groupType.Equals(GroupType.REGULAR) || g.groupType.Equals(GroupType.SERVICE_ADMIN)))
-
+						if (g.groupType.Equals(GroupType.REGULAR) || g.groupType.Equals(GroupType.SERVICE_ADMIN))
                             groupList.Add(g);
 				}
                 groupList.Sort();

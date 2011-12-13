@@ -679,7 +679,7 @@ namespace iLabs.ServiceBroker.Authorization
             else
             {
                 ArrayList groups = new ArrayList();
-                AuthorizationUtilities.GetAgentAncestors(currentGroupID, groups);
+                AuthorizationUtilities.GetGroupAncestors(currentGroupID, groups);
                 if (groups.Count > 0)
                 {
                     // Inverse order processing

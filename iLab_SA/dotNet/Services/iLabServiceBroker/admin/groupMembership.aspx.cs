@@ -19,6 +19,9 @@ using System.Web.Mail;
 using System.Text;
 using System.Configuration;
 //using Microsoft.Web.UI.WebControls;
+
+using iLabs.Core;
+using iLabs.DataTypes;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Authorization;
@@ -32,8 +35,11 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class groupMembership : System.Web.UI.Page
 	{
+        string groupImage = "../img/GrantImages/Folder.gif";
+        string userImage = "../img/GrantImages/user.gif";
+
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-	
+        BrokerDB brokerDB = new BrokerDB();
 		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
 
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -83,7 +89,7 @@ namespace iLabs.ServiceBroker.admin
 		{
 			try
 			{
-                int rootID = wrapper.GetGroupIDWrapper(Group.ROOT);
+                int rootID = AdministrativeAPI.GetGroupID(Group.ROOT);
                 TreeNode rootNodeAgents = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
                 rootNodeAgents.Expanded = true;
                 rootNodeAgents.SelectAction = TreeNodeSelectAction.None;
@@ -91,35 +97,31 @@ namespace iLabs.ServiceBroker.admin
                 TreeNode rootNodeGroups = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
 				rootNodeGroups.Expanded = true;
                 rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
-
+                
 			
 				//nodes under root node (all these are groups)
 				// since all are groups, the processing of these nodes is done separately here
 				// as opposed to doing it in an AddAgentsRecursively(RootNode) call
 				// This reduces the no. of database calls, made from isAgentUser
-				int[] gIDs = AdministrativeAPI.ListSubgroupIDs (rootID);
-				Group[] groups = wrapper.GetGroupsWrapper(gIDs);
-                List<Group> gList = new List<Group>();
-                gList.AddRange(groups);
-                gList.Sort();
-               
+                IntTag[] groupTags = brokerDB.GetIntTags("Group_RetrieveChildrenGroupTags",
+                        FactoryDB.CreateParameter("@groupID", rootID, DbType.Int32));
 
 				// might want to do some sorting of the Groups List here -- works without sorting
 
 				//foreach node under the root node:
 				//1- Add that node to the tree
 				//2- recursively add children nodes to the tree
-				foreach (Group g in gList)
+				foreach (IntTag g in groupTags)
 				{
-					if (g.groupID!=0)
+					if (g.id!=0)
 					{
 						
-                        TreeNode newNodeGroups = new TreeNode(g.groupName, g.groupID.ToString(),
+                        TreeNode newNodeGroups = new TreeNode(g.tag, g.id.ToString(),
                             "../img/GrantImages/Folder.gif");
                         newNodeGroups.ShowCheckBox = true;
                         newNodeGroups.SelectAction = TreeNodeSelectAction.None;
                         rootNodeGroups.ChildNodes.Add(newNodeGroups);
-                        TreeNode newNodeAgents = new TreeNode(g.groupName, g.groupID.ToString(),
+                        TreeNode newNodeAgents = new TreeNode(g.tag, g.id.ToString(),
                             "../img/GrantImages/Folder.gif");
                         newNodeAgents.Expanded = true;
                         newNodeAgents.SelectAction = TreeNodeSelectAction.None;
@@ -146,53 +148,63 @@ namespace iLabs.ServiceBroker.admin
 		 */
 		private void AddAgentsRecursively(TreeNode nAgents, TreeNode nGroups)
 		{
+           
 			try
 			{
-				int[] childUserIDs = wrapper.ListUserIDsInGroupWrapper(Convert.ToInt32(nAgents.Value));
-				int[] childGroupIDs = wrapper.ListSubgroupIDsWrapper(Convert.ToInt32(nAgents.Value));
-
-				User[] usersList = wrapper.GetUsersWrapper(childUserIDs);
-                List<User> childUsersList = new List<User>();
-                childUsersList.AddRange(usersList);
-                childUsersList.Sort();
-
-				Group[] groupsList = wrapper.GetGroupsWrapper(childGroupIDs);
-                List<Group> childGroupsList = new List<Group>();
-                childGroupsList.AddRange(groupsList);
-                childGroupsList.Sort();
-				//might want to sort arraylist here -- works without sorting
-				foreach (User u in childUsersList)
-				{
-					TreeNode childNode = new TreeNode(u.userName, u.userID.ToString(),
-					    "../img/GrantImages/user.gif");
-                    childNode.ShowCheckBox = true;
-                    childNode.SelectAction = TreeNodeSelectAction.None;
-                    childNode.Expanded = false;
-					nAgents.ChildNodes.Add(childNode);
-				}
-
-				//might want to sort arraylist here -- works without sorting
-                if (childGroupsList == null || childGroupsList.Count< 1)
+                if (nAgents.ImageUrl.CompareTo(groupImage) == 0)// Do not process if it is a user
                 {
-                    nAgents.Expanded = false;
-                }
-				foreach (Group g in childGroupsList)
-				{
-					if (g.groupID>0)
-					{
-						TreeNode childNode = new TreeNode(g.groupName,g.groupID.ToString(),
-                            "../img/GrantImages/Folder.gif");
+                    int groupID = Convert.ToInt32(nAgents.Value);
+
+                    //Should Filter by Wrapper
+                    IntTag[] userTags = brokerDB.GetIntTags("Group_RetrieveUserTags",
+                        FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+                    IntTag[] groupTags = brokerDB.GetIntTags("Group_RetrieveChildrenGroupTags",
+                        FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+
+                    //int[] childUserIDs = wrapper.ListUserIDsInGroupWrapper(Convert.ToInt32(nAgents.Value));
+                    //int[] childGroupIDs = wrapper.ListSubgroupIDsWrapper(Convert.ToInt32(nAgents.Value));
+
+                    //User[] usersList = wrapper.GetUsersWrapper(childUserIDs);
+                    //List<User> childUsersList = new List<User>();
+                    //childUsersList.AddRange(usersList);
+                    //childUsersList.Sort();
+
+                    //Group[] groupsList = wrapper.GetGroupsWrapper(childGroupIDs);
+                    //List<Group> childGroupsList = new List<Group>();
+                    //childGroupsList.AddRange(groupsList);
+                    //childGroupsList.Sort();
+
+                    foreach (IntTag u in userTags)
+                    {
+                        TreeNode childNode = new TreeNode(u.tag, u.id.ToString(), userImage);
+                        //childNode.Status = 1;
+                        childNode.ShowCheckBox = true;
                         childNode.SelectAction = TreeNodeSelectAction.None;
-                        childNode.Collapse();
-                        TreeNode groupChildNode = new TreeNode(g.groupName, g.groupID.ToString(),
-                            "../img/GrantImages/Folder.gif");
-                        groupChildNode.ShowCheckBox = true;
-                        groupChildNode.SelectAction = TreeNodeSelectAction.None;
-						this.AddAgentsRecursively(childNode, groupChildNode);
-						nAgents.ChildNodes.Add(childNode);
-						nGroups.ChildNodes.Add(groupChildNode);
-					}
-				}
+                        childNode.Expanded = false;
+                        nAgents.ChildNodes.Add(childNode);
+                    }
+
+
+                    if (groupTags == null || groupTags.Length < 1)
+                    {
+                        nAgents.Expanded = false;
+                    }
+                    foreach (IntTag g in groupTags)
+                    {
+                        if (g.id > 0)
+                        {
+                            TreeNode childNode = new TreeNode(g.tag, g.id.ToString(), groupImage);
+                            childNode.SelectAction = TreeNodeSelectAction.None;
+                            childNode.Collapse();
+                            TreeNode groupChildNode = new TreeNode(g.tag, g.id.ToString(), groupImage);
+                            groupChildNode.ShowCheckBox = true;
+                            groupChildNode.SelectAction = TreeNodeSelectAction.None;
+                            this.AddAgentsRecursively(childNode, groupChildNode);
+                            nAgents.ChildNodes.Add(childNode);
+                            nGroups.ChildNodes.Add(groupChildNode);
+                        }
+                    }
+                }
 			}
 			catch (Exception ex)
 			{
@@ -245,413 +257,7 @@ namespace iLabs.ServiceBroker.admin
 				ExpandParent(parent);
 		}
 
-		private void ibtnCopyTo_Click(object sender, System.Web.UI.ImageClickEventArgs e)
-		{
-			lblResponse.Visible=false;
-		    TreeNode agentNode = agentsTreeView.SelectedNode;
-			TreeNode groupNode = groupsTreeView.SelectedNode;
-            if(agentNode == null || groupNode == null){
-                string msg = "Error: You must select an item from each list";
-				lblResponse.Text = Utilities.FormatErrorMessage(msg);
-				lblResponse.Visible = true;
-                return;
-            }
-			int memberID = Convert.ToInt32(agentNode.Value);
-			string memberName = agentNode.Text;
-			int destinationID = Convert.ToInt32(groupNode.Value);
-			string destinationName = groupNode.Text;
-			
-			// Note that because of the business logic, no agent can be copied to the ROOT node.
-			// The business logic says that agents cannot simultaneuosly exist under the ROOT node
-			// and under some other group node.
-			if(!memberName.Equals(Group.ROOT) &&
-				(memberID!= destinationID) &&
-				!memberName.Equals(Group.NEWUSERGROUP) &&
-				!memberName.Equals(Group.ORPHANEDGROUP) &&
-				!memberName.Equals(Group.SUPERUSER))
-			{
-				try
-				{
-					//Does anyone want functionality to send email once a user has been moved to a new group.
-					//This can get annoying, so maybe it should be configurable in web.config
-					// If yes.. then put code in here  - CV, 2/15/05
-					//Logic for this is as follows - if user get email address, otherwise get email addresses of all users in a group (GetUserIDsRecursively call?)
-					
-					if(wrapper.AddMemberToGroupWrapper(memberID, destinationID))
-					{
-						lblResponse.Visible=true;
-						string msg = "'"+memberName + "' was successfully copied to '" + destinationName+"'.";
-						//send email message to moved user/group if given access from a request group
-						//Now get the ID of the group to remove the memberID from
-						TreeNode parentNode = (TreeNode) agentNode.Parent;
-						int parentGroupID = Convert.ToInt32(parentNode.Value);
-						string parentGroupName = parentNode.Text;
-						Group parentGroup = wrapper.GetGroupsWrapper(new int[] {parentGroupID})[0];
-
-						if ((parentGroup.groupType.Equals(GroupType.REQUEST)) &&(wrapper.GetAssociatedGroupIDWrapper(parentGroupID)== destinationID))
-						{
-							MailMessage mail = new MailMessage();
-
-							string email = "";
-							if (InternalAuthorizationDB.IsAgentUser(memberID))
-							{
-								email = wrapper.GetUsersWrapper(new int[] {memberID})[0].email;
-							}
-							else
-							{
-								email = wrapper.GetGroupsWrapper(new int[] {memberID})[0].email;
-							}
-							mail.To = email;
-							mail.From = registrationMailAddress;
-
-							mail.Subject = "[iLabs] Request to join '" + destinationName+"' approved" ;
-							mail.Body = "You have been given permission to access the '"+ destinationName +"' group.";
-							mail.Body += "\n\r\n\r";
-							mail.Body += "Login with the username and password that you registered with to use the lab.";
-							mail.Body += "\n\r\n\r";	
-							mail.Body += "-------------------------------------------------\n\r";
-							mail.Body += "This is an automatically generated message. ";
-							mail.Body += "DO NOT reply to the sender. \n\n";
-							//mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
-							SmtpMail.SmtpServer = "127.0.0.1";
-							try
-							{
-								SmtpMail.Send(mail);
-								msg+=" An email has been sent confirming the move." ;
-								lblResponse.Text=Utilities.FormatConfirmationMessage(msg);
-							}
-							catch (Exception ex)
-							{
-								// Report detailed SMTP Errors
-								StringBuilder smtpErrorMsg = new StringBuilder();
-								smtpErrorMsg.Append("Exception: " + ex.Message);
-								//check the InnerException
-								if (ex.InnerException != null)
-									smtpErrorMsg.Append("<br>Inner Exceptions:");
-								while( ex.InnerException != null )
-								{
-									smtpErrorMsg.Append("<br>" +  ex.InnerException.Message);
-									ex = ex.InnerException;
-								}
-								msg+=" However an error occurred while sending email to the member."+ ".<br>" + smtpErrorMsg.ToString();
-								lblResponse.Text = Utilities.FormatErrorMessage(msg);
-							}
-						}
-						else
-						{
-							lblResponse.Text=Utilities.FormatConfirmationMessage(msg);;
-						}
-						
-						//Refresh tree views
-						agentsTreeView.Nodes.Clear();
-						groupsTreeView.Nodes.Clear();
-						this.BuildTrees();
-
-						//expand the user tree to show the state of the destination group
-						//& select the node that was just moved
-						ExpandNode(agentsTreeView.Nodes,destinationID);
-					}
-						
-					else // addmembertogroup failed because the member was already a part of the group
-					{
-						lblResponse.Visible=true;
-						string msg = "'"+memberName + "' could not be copied to '" + destinationName+"'";
-
-						int[] parents = wrapper.ListGroupsForAgentWrapper(memberID);
-						ArrayList parentList = new ArrayList(parents);
-						if (parentList.Contains(destinationID))
-							msg += ", since it already exists in '" + destinationName+"'";
-
-						lblResponse.Text=Utilities.FormatErrorMessage(msg);
-					}
-				}
-				catch(Exception ex)
-				{
-					lblResponse.Visible=true;
-					string msg = "Exception thrown when trying to copy '" + memberName + "' to '" + destinationName+"'. "+ex.Message+". "+ex.GetBaseException();
-					lblResponse.Text=Utilities.FormatErrorMessage(msg);
-
-				}
-			}
-			else // if they're trying to transfer the ROOT, superUser etc.
-			{
-				lblResponse.Visible=true;
-				string msg = "";
-				if (memberID != destinationID)
-				{
-					msg = "The '"+memberName + "' group cannot be copied to another group.";
-				}
-				else
-				{
-					msg = "'"+memberName + "'  cannot be copied to itself.";
-				}
-				lblResponse.Text=Utilities.FormatErrorMessage(msg);
-			}
-		}
-
-		private void ibtnMoveTo_Click(object sender, System.Web.UI.ImageClickEventArgs e)
-		{
-            bool status = false;
-			lblResponse.Visible=false;
-			TreeNode agentNode = agentsTreeView.SelectedNode;
-            TreeNode groupNode = groupsTreeView.SelectedNode;
-            if(agentNode == null || groupNode == null){
-                string msg = "Error: You must select an item from each list";
-				lblResponse.Text = Utilities.FormatErrorMessage(msg);
-				lblResponse.Visible = true;
-                return;
-            }
-			int memberID = Convert.ToInt32(agentNode.Value);
-			string memberName = agentNode.Text;
-			int destinationID = Convert.ToInt32(groupNode.Value);
-			string destinationName = groupNode.Text;
-			
-			//Now get the ID of the group to remove the memberID from
-			TreeNode parentNode = (TreeNode) agentNode.Parent;
-			int parentGroupID = Convert.ToInt32(parentNode.Value);
-			string parentGroupName = parentNode.Text;
-			
-			// Note that because of the business logic, no agent can be moved to the ROOT node.
-			// The business logic says that agents cannot simultaneuosly exist under the ROOT node
-			// and under some other group node.
-			if(!memberName.Equals(Group.ROOT) &&
-				(memberID!=destinationID) &&
-				!memberName.Equals(Group.NEWUSERGROUP) &&
-				!memberName.Equals(Group.ORPHANEDGROUP) &&
-				!memberName.Equals(Group.SUPERUSER))
-			{
-                StringBuilder msg = new StringBuilder();
-				try
-				{
-					if(wrapper.AddMemberToGroupWrapper(memberID, destinationID))
-					{
-                        status = true;
-                        msg.Append("'" + memberName + "' was successfully added to '" + destinationName + "'");
-						
-						
-						//send email message to moved user/group if given access from a request group
-						Group parentGroup = wrapper.GetGroupsWrapper(new int[] {parentGroupID})[0];
-
-                        if (parentGroupID == InternalAdminDB.SelectGroupID(Group.ORPHANEDGROUP))
-                        {
-                            status = true;
-                        }
-                        else
-                        {
-                            status = (wrapper.RemoveMembersFromGroupWrapper(new int[] { memberID }, parentGroupID).Length == 0);
-                            if (status)
-                            {
-                                msg.Append(", and has been removed from '" + parentGroupName + "'.");
-                            }
-                            else
-                            {
-                                msg.Append(", but there was a problem removing the member from '" + parentGroupName + "'.");
-                            }
-                        }
-                        //send email message to moved user/group if given access from a request group
-                        if ((parentGroup.groupType.Equals(GroupType.REQUEST)) && (wrapper.GetAssociatedGroupIDWrapper(parentGroupID) == destinationID))
-                        {
-                            MailMessage mail = new MailMessage();
-
-                            string email = "";
-                            if (InternalAuthorizationDB.IsAgentUser(memberID))
-                            {
-                                email = wrapper.GetUsersWrapper(new int[] { memberID })[0].email;
-                            }
-                            else
-                            {
-                                email = wrapper.GetGroupsWrapper(new int[] { memberID })[0].email;
-                            }
-                            mail.To = email;
-                            mail.From = registrationMailAddress;
-
-                            mail.Subject = "[iLabs] Request to join '" + destinationName + "' approved";
-                            mail.Body = "You have been given permission to access the '" + destinationName + "' group.";
-                            mail.Body += "\n\r\n\r";
-                            mail.Body += "Login with the username and password that you registered with to use the lab.";
-                            mail.Body += "\n\r\n\r";
-                            mail.Body += "-------------------------------------------------\n\r";
-                            mail.Body += "This is an automatically generated message. ";
-                            mail.Body += "DO NOT reply to the sender. \n\n";
-                            //mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
-                            SmtpMail.SmtpServer = "127.0.0.1";
-                            try
-                            {
-                                SmtpMail.Send(mail);
-                                msg.Append(" An email has been sent confirming the move.");
-
-                            }
-                            catch (Exception ex)
-                            {
-                                // Report detailed SMTP Errors
-                                StringBuilder smtpErrorMsg = new StringBuilder();
-                                smtpErrorMsg.Append("Exception: " + ex.Message);
-                                //check the InnerException
-                                if (ex.InnerException != null)
-                                    smtpErrorMsg.Append("<br>Inner Exceptions:");
-                                while (ex.InnerException != null)
-                                {
-                                    smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
-                                    ex = ex.InnerException;
-                                }
-                                msg.Append(" However an error occurred while sending email to the member." + ".<br>" + smtpErrorMsg.ToString());
-
-                            }
-                        }
-
-                        if (status)
-                        {
-                            lblResponse.Text = Utilities.FormatConfirmationMessage(msg.ToString());
-                        }
-                        else
-                        {
-                            lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
-                        }
-				
-						//Refresh tree views
-						agentsTreeView.Nodes.Clear();
-						groupsTreeView.Nodes.Clear();
-						this.BuildTrees();
-
-						//expand the user tree to show the state of the destination group
-						//& select the node that was just moved
-						ExpandNode(agentsTreeView.Nodes,destinationID);
-					}
-						
-					else // addmembertogroup failed because the member was already a part of the group
-					{
-						lblResponse.Visible=true;
-						string errmsg = "'"+memberName + "' could not be moved to '" + destinationName+"' from '"+parentGroupName+"'";
-
-						int[] parents = wrapper.ListGroupsForAgentWrapper(memberID);
-						ArrayList parentList = new ArrayList(parents);
-						if (parentList.Contains(destinationID))
-							errmsg += ", since it already exists in '" + destinationName+"'";
-
-						lblResponse.Text=Utilities.FormatErrorMessage(errmsg);
-					}
-				}
-				catch(Exception ex)
-				{
-					//Should ideally roll back, but if there's a problem in removemembers then rollback isn't possible in any case!
-					//wrapper.RemoveMembersFromGroupWrapper(new int[] {memberID},destinationID);
-					lblResponse.Visible=true;
-					string errmsg = "Exception thrown when trying to move " + memberName + " to '" + destinationName+"' from '"+parentGroupName+"'. "+ex.Message+". "+ex.GetBaseException();
-					lblResponse.Text=Utilities.FormatErrorMessage(errmsg);
-
-				}
-			}
-			else // if they're trying to transfer the ROOT, superUser etc.
-			{
-				lblResponse.Visible=true;
-				string errmsg = "";
-				if (memberID != destinationID)
-				{
-					errmsg = "The '"+memberName + "' group cannot be moved to another group.";
-				}
-				else
-				{
-					errmsg = "'"+memberName + "'  cannot be moved to itself.";
-				}
-				lblResponse.Text=Utilities.FormatErrorMessage(errmsg);
-			}
-		}
-
-		private void ibtnRemove_Click(object sender, System.Web.UI.ImageClickEventArgs e)
-		{
-            StringBuilder msg = new StringBuilder();
-			lblResponse.Visible=false;
-			TreeNode agentNode = agentsTreeView.SelectedNode;
-            TreeNode groupNode = groupsTreeView.SelectedNode;
-            if(agentNode == null || groupNode == null){
-                msg.Append("Error: You must select an item from each list");
-				lblResponse.Text = Utilities.FormatErrorMessage(msg.ToString());
-				lblResponse.Visible = true;
-                return;
-            }
-			int memberID = Convert.ToInt32(agentNode.Value);
-			string memberName = agentNode.Text;
-			int parentID = Convert.ToInt32(groupNode.Value);
-			string parentName = groupNode.Text;
-			
-			// Note that because of the business logic, no agent can be copied to the ROOT node.
-			// The business logic says that agents cannot simultaneuosly exist under the ROOT node
-			// and under some other group node.
-			if(memberName.Equals(Group.ROOT) ||
-				(memberID== parentID)||
-				(memberName.Equals(Group.NEWUSERGROUP)) ||
-				(memberName.Equals(Group.ORPHANEDGROUP)) ||
-				(memberName.Equals(Group.SUPERUSER)))
-			{
-				// if they're trying to transfer the ROOT, superUser etc.
-				if (memberID != parentID)
-				{
-					msg.Append( "The '"+memberName + "' group cannot be removed from the system.");
-				}
-				else //if parent=groupname
-				{
-					msg.Append("'"+memberName + "'  cannot be removed from itself.");
-				}
-				lblResponse.Text=Utilities.FormatErrorMessage(msg.ToString());
-                lblResponse.Visible = true;
-			}
-			else
-			{
-				try
-				{
-					//Does anyone want functionality to send email once a user has been moved to a new group.
-					//This can get annoying, so maybe it should be configurable in web.config
-					// If yes.. then put code in here  - CV, 2/15/05
-                    //Logic for this is as follows - if user get email address, otherwise get email addresses of all users in a group (GetUserIDsRecursively call?)
-					
-					//if it has removed all the members
-					if(wrapper.RemoveMembersFromGroupWrapper(new int[] {memberID}, parentID).Length==0)
-					{
-						lblResponse.Visible=true;
-						msg.Append("'"+memberName + "' was successfully removed from '" + parentName+"'.");
-						lblResponse.Text=Utilities.FormatConfirmationMessage(msg.ToString());
-					
-						//Refresh tree views
-						agentsTreeView.Nodes.Clear();
-						groupsTreeView.Nodes.Clear();
-						this.BuildTrees();
-
-						//expand the user tree to show the state of the parent group
-						ExpandNode (agentsTreeView.Nodes, parentID);
-					}
-						
-					else 
-					{
-						lblResponse.Visible=true;
-						
-
-						int[] parents = wrapper.ListGroupsForAgentWrapper(memberID);
-						ArrayList parentList = new ArrayList(parents);
-						if (parentList.Contains(parentID))
-						{
-							if (parentName.Equals(Group.ROOT))
-								// then it's only parent was ROOT & it cannot be removed here
-								msg.Append("The only group '"+memberName+"' belongs to is ROOT. It cannot be removed from ROOT using the 'Group Membership' functionality. Use the 'Delete' functionality in the User/Groups pages instead.");
-							else
-								msg.Append("'"+memberName+"' could not be removed from '"+parentName+"'");
-						}
-						else
-							// remove member failed because the member was not part of the group
-							msg.Append("'"+memberName + "' does not belong to '"+ parentName+"' and cannot be removed from it.");
-
-						
-						lblResponse.Text=Utilities.FormatErrorMessage(msg.ToString());
-					}
-				}
-				catch(Exception ex)
-				{
-					lblResponse.Visible=true;
-					msg.Append("Exception thrown when trying to remove '" + memberName + "' from '" + parentName+"'. "+ex.Message+". " +ex.GetBaseException());
-					lblResponse.Text=Utilities.FormatErrorMessage(msg.ToString());
-				}
-			}
-		}
-
+   
         private void ibtnRemoveCB_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             lblResponse.Visible = false;
@@ -709,11 +315,13 @@ namespace iLabs.ServiceBroker.admin
         {
             StringBuilder msg = new StringBuilder();
             List<int> agents = new List<int>();
+            List<int> users = new List<int>();
             foreach (TreeNode agentNode in agentNodes)
             {
                 int memberID = Convert.ToInt32(agentNode.Value);
                 string memberName = agentNode.Text;
                 int parentID = Convert.ToInt32(agentNode.Parent.Value);
+                bool isUser = (agentNode.ImageUrl.CompareTo(userImage) == 0);
                 string parentName = agentNode.Parent.Text;
 
                 // Note that because of the business logic you may not remove built-in groups
@@ -741,12 +349,21 @@ namespace iLabs.ServiceBroker.admin
                         //This can get annoying, so maybe it should be configurable in web.config
                         // If yes.. then put code in here  - CV, 2/15/05
                         //Logic for this is as follows - if user get email address, otherwise get email addresses of all users in a group (GetUserIDsRecursively call?)
-
+                        bool status = false;
                         //if it has removed all the members
-                        if (wrapper.RemoveMembersFromGroupWrapper(new int[] { memberID }, parentID).Length == 0)
+                        if (isUser)
                         {
-                            if (!agents.Contains(memberID))
-                                agents.Add(memberID);
+                            status =AdministrativeAPI.RemoveUserFromGroup(memberID,parentID);
+                            if (!users.Contains(memberID))
+                                users.Add(memberID);
+                        }
+                        else
+                        {
+                            status = AdministrativeAPI.RemoveGroupFromGroup(memberID, parentID);
+                        }
+                        if (status)
+                        {
+                           
                             if (!parentIDs.Contains(parentID))
                                 parentIDs.Add(memberID);
                             lblResponse.Visible = true;
@@ -760,12 +377,12 @@ namespace iLabs.ServiceBroker.admin
                 }
             } // END foreach agent
 
-            foreach (int id in agents)
+            foreach (int id in users)
             {
-                int[] parents = wrapper.ListGroupsForAgentWrapper(id);
+                int[] parents = wrapper.ListGroupsForUserWrapper(id);
                 if ((parents == null) || (parents.Length == 0))
                 {
-                    wrapper.AddMemberToGroupWrapper(id, InternalAdminDB.SelectGroupID(Group.ORPHANEDGROUP));
+                   AdministrativeAPI.AddUserToGroup(id, InternalAdminDB.SelectGroupID(Group.ORPHANEDGROUP));
                 }
             }
             return msg.ToString();
@@ -791,7 +408,7 @@ namespace iLabs.ServiceBroker.admin
                 bool status = false;
                 int agentID = Convert.ToInt32(agentNode.Value);
                 string agentName = agentNode.Text;
-
+                bool isUser = (agentNode.ImageUrl.CompareTo(userImage) == 0);
                 //Now get the ID of the Parent group
                 TreeNode parentNode = (TreeNode)agentNode.Parent;
                 Group parentGroup = wrapper.GetGroupsWrapper(new int[] { Convert.ToInt32(parentNode.Value) })[0];
@@ -818,13 +435,29 @@ namespace iLabs.ServiceBroker.admin
 
                         try
                         {
-                            if (AdministrativeAPI.IsAgentMember(agentID, destinationID))
+                            bool isMember = false;
+                            if(isUser){
+                                isMember =AdministrativeAPI.IsUserMember(agentID, destinationID);
+                            }
+                            else{
+                                isMember =AdministrativeAPI.IsGroupMember(agentID, destinationID);
+                            }
+                            if (isMember)
                             {
                                 msg.Append("Warning: '" + agentName + "' is already a member of '" + destinationName + "'<br />");
                             }
                             else
                             {
-                                if (wrapper.AddMemberToGroupWrapper(agentID, destinationID))
+                                bool added = false;
+                                if (isUser)
+                                {
+                                    added = AdministrativeAPI.AddUserToGroup(agentID, destinationID);
+                                }
+                                else
+                                {
+                                   added = AdministrativeAPI.AddGroupToGroup(agentID, destinationID);
+                                }
+                                if (added)
                                 {
                                     count++;
                                     if (!expandIDs.Contains(destinationID))
@@ -834,10 +467,10 @@ namespace iLabs.ServiceBroker.admin
                                     //send email message to moved user/group if given access from a request group
                                     if ((parentGroup.groupType.Equals(GroupType.REQUEST)) && (wrapper.GetAssociatedGroupIDWrapper(parentGroup.GroupID) == destinationID))
                                     {
-                                        MailMessage mail = new MailMessage();
 
-                                        string email = "";
-                                        if (InternalAuthorizationDB.IsAgentUser(agentID))
+
+                                        string email = null;
+                                        if (isUser)
                                         {
                                             email = wrapper.GetUsersWrapper(new int[] { agentID })[0].email;
                                         }
@@ -845,42 +478,46 @@ namespace iLabs.ServiceBroker.admin
                                         {
                                             email = wrapper.GetGroupsWrapper(new int[] { agentID })[0].email;
                                         }
-                                        mail.To = email;
-                                        mail.From = registrationMailAddress;
-
-                                        mail.Subject = "[iLabs] Request to join '" + destinationName + "' approved";
-                                        mail.Body = "You have been given permission to access the '" + destinationName + "' group.";
-                                        mail.Body += "\n\r\n\r";
-                                        mail.Body += "Login with the username and password that you registered with to use the lab.";
-                                        mail.Body += "\n\r\n\r";
-                                        mail.Body += "-------------------------------------------------\n\r";
-                                        mail.Body += "This is an automatically generated message. ";
-                                        mail.Body += "DO NOT reply to the sender. \n\n";
-                                        //mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
-                                        SmtpMail.SmtpServer = "127.0.0.1";
-                                        try
+                                        if (email != null && email.Length > 0)
                                         {
-                                            SmtpMail.Send(mail);
-                                            msg.Append(" An email has been sent confirming the move.<br />");
+                                            MailMessage mail = new MailMessage();
+                                            mail.To = email;
+                                            mail.From = registrationMailAddress;
 
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            // Report detailed SMTP Errors
-                                            StringBuilder smtpErrorMsg = new StringBuilder();
-                                            smtpErrorMsg.Append("Exception: " + ex.Message);
-                                            //check the InnerException
-                                            if (ex.InnerException != null)
-                                                smtpErrorMsg.Append("<br>Inner Exceptions:");
-                                            while (ex.InnerException != null)
+                                            mail.Subject = "[iLabs] Request to join '" + destinationName + "' approved";
+                                            mail.Body = "You have been given permission to access the '" + destinationName + "' group.";
+                                            mail.Body += "\n\r\n\r";
+                                            mail.Body += "Login with the username and password that you registered with to use the lab.";
+                                            mail.Body += "\n\r\n\r";
+                                            mail.Body += "-------------------------------------------------\n\r";
+                                            mail.Body += "This is an automatically generated message. ";
+                                            mail.Body += "DO NOT reply to the sender. \n\n";
+                                            //mail.Body += "For questions regarding this service, email ilab-debug@mit.edu";
+                                            SmtpMail.SmtpServer = "127.0.0.1";
+                                            try
                                             {
-                                                smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
-                                                ex = ex.InnerException;
-                                            }
-                                            msg.Append(" However an error occurred while sending email to the member." + ". Exception: " + smtpErrorMsg.ToString() + "<br />");
+                                                SmtpMail.Send(mail);
+                                                msg.Append(" An email has been sent confirming the move.<br />");
 
-                                        }
-                                    } //End Send Mail
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                // Report detailed SMTP Errors
+                                                StringBuilder smtpErrorMsg = new StringBuilder();
+                                                smtpErrorMsg.Append("Exception: " + ex.Message);
+                                                //check the InnerException
+                                                if (ex.InnerException != null)
+                                                    smtpErrorMsg.Append("<br>Inner Exceptions:");
+                                                while (ex.InnerException != null)
+                                                {
+                                                    smtpErrorMsg.Append("<br>" + ex.InnerException.Message);
+                                                    ex = ex.InnerException;
+                                                }
+                                                msg.Append(" However an error occurred while sending email to the member." + ". Exception: " + smtpErrorMsg.ToString() + "<br />");
+
+                                            }
+                                        } //End Send Mail
+                                    }
                                 }
                                 else
                                 {
@@ -916,4 +553,22 @@ namespace iLabs.ServiceBroker.admin
        
 
 	}
+
+    //public class TreeNodeStatus : TreeNode
+    //{
+    //    protected int status = 0;
+    //    public TreeNodeStatus(string text, string value, string imageUrl) : base(text,value,imageUrl){}
+       
+    //    public int Status
+    //    {
+    //        get
+    //        {
+    //            return status;
+    //        }
+    //        set
+    //        {
+    //            status = value;
+    //        }
+    //    }
+    //}
 }

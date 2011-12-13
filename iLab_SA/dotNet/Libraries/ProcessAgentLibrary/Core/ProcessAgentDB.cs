@@ -1644,9 +1644,48 @@ namespace iLabs.Core
             return tag;
         }
 
+        /// <summary>
+        /// Generic call to return an array of Ints
+        /// </summary>
+        /// <param name="procedure">the string name of the procedure to call</param>
+        /// <param name="param">an optional parameter with it's value set, null for no parameter</param>
+        /// <returns></returns>
+        public List<int> GetInts(String procedure, DbParameter param)
+        {
+            List<int> ints = new List<int>();
+            DbConnection connection = FactoryDB.GetConnection();
+
+            DbCommand cmd = FactoryDB.CreateCommand(procedure, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (param != null)
+            {
+                cmd.Parameters.Add(param);
+            }
+            try
+            {
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    ints.Add(dataReader.GetInt32(0));
+                }
+                dataReader.Close();
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return ints;
+        }
 
         /// <summary>
-        /// Generic call to retur an array of IntTags
+        /// Generic call to return an array of IntTags
         /// </summary>
         /// <param name="procedure">the string name of the procedure to call</param>
         /// <param name="param">an optional parameter with it's value set, null for no parameter</param>
@@ -1666,15 +1705,11 @@ namespace iLabs.Core
             {
                 connection.Open();
                 DbDataReader dataReader = cmd.ExecuteReader();
-                if (dataReader.HasRows)
+                while (dataReader.Read())
                 {
-                    tags = new List<IntTag>();
-                    while (dataReader.Read())
-                    {
-                        int id = dataReader.GetInt32(0);
-                        string name = dataReader.GetString(1);
-                        tags.Add(new IntTag(id, name));
-                    }
+                    int id = dataReader.GetInt32(0);
+                    string name = dataReader.GetString(1);
+                    tags.Add(new IntTag(id, name));
                 }
                 dataReader.Close();
             }

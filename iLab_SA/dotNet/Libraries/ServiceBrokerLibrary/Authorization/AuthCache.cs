@@ -12,8 +12,8 @@ namespace iLabs.ServiceBroker.Authorization
 		private static DataSet _GrantSet;
 		private static DataSet _QualifierSet; 
 		private static DataSet _QualifierHierarchySet;
-		private static DataSet _AgentHierarchySet;
-		private static DataSet _AgentsSet;
+        private static DataSet _AgentHierarchySet;
+        private static DataSet _AgentsSet;
 
 		private AuthCache()
 		{
@@ -25,8 +25,12 @@ namespace iLabs.ServiceBroker.Authorization
             AuthCache.GrantSet = InternalAuthorizationDB.RetrieveGrants();
             AuthCache.QualifierSet = InternalAuthorizationDB.RetrieveQualifiers();
             AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy();
-            AuthCache.AgentHierarchySet = InternalAuthorizationDB.RetrieveAgentHierarchy();
+            AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
             AuthCache.AgentsSet = InternalAuthorizationDB.RetrieveAgents();
+        }
+        public static void RefreshGroupHierarchy()
+        {
+            AuthCache.AgentHierarchySet = InternalAdminDB.RetrieveGroupHierarchy();
         }
 
 		public static DataSet GrantSet
@@ -63,27 +67,27 @@ namespace iLabs.ServiceBroker.Authorization
 				_QualifierHierarchySet = value;
 			}
 		}
-		public static DataSet AgentHierarchySet
-		{
-			get
-			{
-				return _AgentHierarchySet;
-			}
-			set
-			{
-				_AgentHierarchySet = value;
-			}
-		}
-		public static DataSet AgentsSet
-		{
-			get
-			{
-				return _AgentsSet;
-			}
-			set
-			{
-				_AgentsSet = value;
-			}
-		}
+        public static DataSet AgentHierarchySet
+        {
+            get
+            {
+                return _AgentHierarchySet;
+            }
+            set
+            {
+                _AgentHierarchySet = value;
+            }
+        }
+        public static DataSet AgentsSet
+        {
+            get
+            {
+                return _AgentsSet;
+            }
+            set
+            {
+                _AgentsSet = value;
+            }
+        }
 	}
 }

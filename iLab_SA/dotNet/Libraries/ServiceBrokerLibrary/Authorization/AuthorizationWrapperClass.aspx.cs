@@ -81,14 +81,21 @@ namespace iLabs.ServiceBroker.Authorization
 		///
 		public void AuthenticateSuperuser(string message)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			if(!IsSuperuserGroup(sessionGroupID))
+			
+			if(!IsSuperuserGroup())
 			{
 				throw new AccessDeniedException (message);
 			}
 		}
 
-        private bool IsSuperuserGroup(int groupID){
+        private bool IsSuperuserGroup()
+        {
+            int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            return IsSuperuserGroup(sessionGroupID);
+        }
+
+        private bool IsSuperuserGroup(int groupID)
+        {
             return (superuserGroupID == groupID);
         }
 
@@ -433,18 +440,10 @@ namespace iLabs.ServiceBroker.Authorization
             string contactEmail, string contactFirstName, string contactLastName, string notes,
             bool needsESS, bool needsScheduling, bool isReentrant)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-				return Administration.AdministrativeAPI .AddLabClient (clientGuid, clientName,  version, clientShortDescription,
+			AuthenticateSuperuser("Access denied adding Lab Client.");
+			return Administration.AdministrativeAPI .AddLabClient (clientGuid, clientName,  version, clientShortDescription,
                     clientLongDescription, clientType, loaderScript, documentationURL, contactEmail, contactFirstName,
                     contactLastName, notes, needsESS, needsScheduling, isReentrant);
-			}
-			else
-			{
-				throw new AccessDeniedException ("Access denied adding lab client.");
-			}
 		}
 
 		/// <summary>
@@ -454,16 +453,9 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] RemoveLabClientsWrapper (int[] labClientIDs)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-				return Administration.AdministrativeAPI .RemoveLabClients (labClientIDs);
-			}
-			else
-			{
-				throw new AccessDeniedException ("Access denied removing lab clients.");
-			}
+			AuthenticateSuperuser("Access denied removing lab clients.");
+			return Administration.AdministrativeAPI .RemoveLabClients (labClientIDs);
+			
 		}
 
 		/// <summary>
@@ -486,17 +478,10 @@ namespace iLabs.ServiceBroker.Authorization
             string contactEmail, string contactFirstName, string contactLastName, string notes,
             bool needsESS, bool needsScheduling, bool isReentrant)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-                Administration.AdministrativeAPI.ModifyLabClient(clientID, clientGuid, clientName, version, clientShortDescription, clientLongDescription,
+			AuthenticateSuperuser("Access denied modifying lab client.");
+            AdministrativeAPI.ModifyLabClient(clientID, clientGuid, clientName, version, clientShortDescription, clientLongDescription,
                     clientType, loaderScript, documentationURL, contactEmail, contactFirstName, contactLastName, notes, needsESS, needsScheduling, isReentrant);
-			}
-			else
-			{
-				throw new AccessDeniedException ("Access denied modifying lab client.");
-			}
+			
 		}
 
 		/// <summary>
@@ -535,25 +520,22 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int AddUserWrapper (string userName, string principalString, string authenticationType, string firstName, string lastName, string email, string affiliation,string reason, string xmlExtension, int initialGroupID, bool lockAccount)
 		{
-			
-			int sessionGroupID =Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
-				return Administration.AdministrativeAPI .AddUser ( userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation, reason,xmlExtension,  initialGroupID,  lockAccount);
+				return AdministrativeAPI .AddUser ( userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation, reason,xmlExtension,  initialGroupID,  lockAccount);
 			}
 			else
 			{
 				// can only add user to group that you have permission for
-				int associatedGroupID = Administration.AdministrativeAPI.GetAssociatedGroupID(Convert.ToInt32(Session["GroupID"]));
+				int associatedGroupID = AdministrativeAPI.GetAssociatedGroupID(Convert.ToInt32(Session["GroupID"]));
 				if (associatedGroupID > 0)
 				{
-					int qID = Authorization.AuthorizationAPI .GetQualifierID (associatedGroupID, Qualifier .groupQualifierTypeID );
-					if ((Authorization.AuthorizationAPI .CheckAuthorization (loginUserID, Function .administerGroupFunctionType , qID))||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function .addMemberFunctionType , qID)))
+					int qID = AuthorizationAPI .GetQualifierID (associatedGroupID, Qualifier .groupQualifierTypeID );
+					if ((AuthorizationAPI .CheckAuthorization (loginUserID, Function .administerGroupFunctionType , qID))||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function .addMemberFunctionType , qID)))
 					{
-						return Administration.AdministrativeAPI .AddUser ( userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation, reason,xmlExtension,  associatedGroupID,  lockAccount);
+						return AdministrativeAPI .AddUser ( userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation, reason,xmlExtension,  associatedGroupID,  lockAccount);
 					}
 					else
 						throw new AccessDeniedException ("Access denied adding users.");
@@ -571,16 +553,16 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] RemoveUsersWrapper (int[] userIDs)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
-				return Administration.AdministrativeAPI .RemoveUsers (userIDs);
+				return AdministrativeAPI .RemoveUsers (userIDs);
 			}
 			else
 			{
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 				//current implementation
 				//deletes each user from the group (& subgroups of that group) that one is administering
 
@@ -589,14 +571,14 @@ namespace iLabs.ServiceBroker.Authorization
 				foreach (int userID in userIDs)
 				{
 					// get groups the user belongs to
-					int[] userGroups = Administration.AdministrativeAPI.ListGroupsForAgent(userID);
+					int[] userGroups = AdministrativeAPI.ListGroupIDsForUser(userID);
 
 					ArrayList groupsToBeRemovedFrom = new ArrayList();
 					
 					foreach (int groupID in userGroups)
 					{
-						int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
-						if (Authorization.AuthorizationAPI.CheckAuthorization(sessionGroupID, Function.administerGroupFunctionType, qID))
+						int qID = AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
+						if (AuthorizationAPI.CheckAuthorization(sessionGroupID, Function.administerGroupFunctionType, qID))
 						{
 							groupsToBeRemovedFrom.Add(groupID);
 						}
@@ -604,7 +586,7 @@ namespace iLabs.ServiceBroker.Authorization
 
 					if (groupsToBeRemovedFrom.Count>0)
 						foreach (int groupID in groupsToBeRemovedFrom)
-							Administration.AdministrativeAPI.RemoveMembersFromGroup(new int[] {userID}, groupID);
+                            AdministrativeAPI.RemoveUserFromGroup(userID, groupID);
 					else
 						notRemovedList.Add(userID);
 				}
@@ -633,13 +615,10 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public void ModifyUserWrapper (int userID,string userName, string principalString, string authenticationType, string firstName, string lastName, string email, string affiliation, string reason,string xmlExtension, bool lockAccount)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = "";
-			if (sessionGroupID>0)
-				sessionGroupName = Session["GroupName"].ToString();
+			
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
-			if ((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(loginUserID.CompareTo(userID)==0))
+			if ((IsSuperuserGroup())||(loginUserID.CompareTo(userID)==0))
 			{
 				 Administration.AdministrativeAPI .ModifyUser( userID, userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation,  reason, xmlExtension, lockAccount);
 			}
@@ -655,13 +634,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListUserIDsWrapper()
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName=Session["GroupName"].ToString();
+			
 			int loginUserID = Convert.ToInt32(Session["UserID"].ToString());
 
 			try
 			{
-				if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+				if(IsSuperuserGroup())
 				{
 					return Administration.AdministrativeAPI.ListUserIDs();
 				}
@@ -702,9 +680,7 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListOrphanedUserIDsWrapper()
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				return Administration.AdministrativeAPI .ListOrphanedUserIDs ();
 			}
@@ -745,14 +721,15 @@ namespace iLabs.ServiceBroker.Authorization
 		public int AddGroupWrapper (string groupName, int parentGroupID, string description, string email, string groupType, int associatedGroupID)
 		{
 			bool haveAccess = false;
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			
+			//string sessionGroupName = Session["GroupName"].ToString();
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
 			else
 			{
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 				// can add request groups
 				if ((groupType.Equals(GroupType.REQUEST))&&(parentGroupID == Administration.AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP)))
 					haveAccess = true;
@@ -781,15 +758,16 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="email"></param>
 		public void ModifyGroupWrapper(int groupID,string groupName, string description, string email)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
+			if(IsSuperuserGroup())
 			{
 				Administration.AdministrativeAPI .ModifyGroup (groupID,groupName,description, email);
 			}
 			else
 			{
 				// modify group if you have permission to administer it
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 				int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
 				if(Authorization.AuthorizationAPI .CheckAuthorization (sessionGroupID, Function .administerGroupFunctionType , qID))
 				{
@@ -807,14 +785,15 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] RemoveGroupsWrapper(int[] groupIDs)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
+			if(IsSuperuserGroup())
 			{
 				return Administration.AdministrativeAPI .RemoveGroups (groupIDs);
 			}
 			else
 			{
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 				ArrayList removeGroups = new ArrayList();
 				ArrayList notRemoved = new ArrayList();
 				// remove groups to one you have permission to administer
@@ -863,22 +842,23 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="groupIDs"></param>
 		/// <returns></returns>
-		public Group[] GetGroupsWrapper(int[] groupIDs)
+		public Group[]  GetGroupsWrapper(int[] groupIDs)
 		{
 			if (groupIDs.Length>0)
 			{
-				int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-				string sessionGroupName = Session["GroupName"].ToString();
+				
+				//string sessionGroupName = Session["GroupName"].ToString();
 				int loginUserID = Convert.ToInt32(Session["UserID"]);
 			
 				Group[] allowedGroups;
 
-				if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+				if(IsSuperuserGroup())
 				{
 					allowedGroups= Administration.AdministrativeAPI .GetGroups (groupIDs);
 				}
 				else
 				{
+                    int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 					// if you have permission to access group listing (i.e you are part of course staff)
 					ArrayList allowedGroupList = new ArrayList();
 
@@ -953,34 +933,33 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="memberID"></param>
 		/// <param name="groupID"></param>
 		/// <returns></returns>
-		public bool AddMemberToGroupWrapper(int memberID, int groupID)
+		public bool AddGroupToGroupWrapper(int memberID, int groupID)
 		{
 			/* Check to prevent adding subGroups to superUser Group */
 			if (groupID == GetGroupIDWrapper(Group.SUPERUSER))
-				if (!InternalAuthorizationDB.IsAgentUser(memberID))
-				{
-					throw new Exception ("Cannot add subgroups to the SuperUser Group.");
-				}
+			{
+				throw new Exception ("Cannot add subgroups to the SuperUser Group.");
+			}
 		
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 			string sessionGroupName = Session["GroupName"].ToString();
 			int userID = Convert.ToInt32(Session["UserID"]);
 
 			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
 			else
 			{
-				int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
-				if ((Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))||(Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .addMemberFunctionType , qID)))
+				int qID = AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
+				if ((AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))||(Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .addMemberFunctionType , qID)))
 					haveAccess = true;
 			}
 			
 			if (haveAccess)
 			{
-				return Administration.AdministrativeAPI .AddMemberToGroup (memberID, groupID);
+				return AdministrativeAPI .AddGroupToGroup (memberID, groupID);
 			}
 			else
 			{
@@ -994,21 +973,20 @@ namespace iLabs.ServiceBroker.Authorization
         /// <param name="memberID"></param>
         /// <param name="groupID"></param>
         /// <returns></returns>
-        public bool MoveMemberToGroupWrapper(int memberID, int fromID, int groupID)
+        public bool MoveGroupToGroupWrapper(int memberID, int fromID, int groupID)
         {
             /* Check to prevent adding subGroups to superUser Group */
-            if (groupID == GetGroupIDWrapper(Group.SUPERUSER))
-                if (!InternalAuthorizationDB.IsAgentUser(memberID))
-                {
-                    throw new Exception("Cannot add subgroups to the SuperUser Group.");
-                }
+            if (IsSuperuserGroup(groupID))
+            {
+               throw new Exception("Cannot add subgroups to the SuperUser Group.");
+            }
 
-            int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-            string sessionGroupName = Session["GroupName"].ToString();
+            //int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            //string sessionGroupName = Session["GroupName"].ToString();
             int userID = Convert.ToInt32(Session["UserID"]);
 
             bool haveAccess = false;
-            if (sessionGroupName.CompareTo(Group.SUPERUSER) == 0)
+            if (IsSuperuserGroup())
             {
                 haveAccess = true;
             }
@@ -1021,7 +999,7 @@ namespace iLabs.ServiceBroker.Authorization
 
             if (haveAccess)
             {
-                return Administration.AdministrativeAPI.MoveMemberToGroup(memberID, fromID, groupID);
+                return Administration.AdministrativeAPI.MoveGroupToGroup(memberID, fromID, groupID);
             }
             else
             {
@@ -1029,41 +1007,41 @@ namespace iLabs.ServiceBroker.Authorization
             }
         }
 
-		/// <summary>
-		/// superUser and administerGroup privilege
-		/// </summary>
-		/// <param name="memberIDs"></param>
-		/// <param name="groupID"></param>
-		/// <returns></returns>
-		public int[] RemoveMembersFromGroupWrapper(int[] memberIDs, int groupID)
-		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			int userID = Convert.ToInt32(Session["UserID"]);
+        ///// <summary>
+        ///// superUser and administerGroup privilege
+        ///// </summary>
+        ///// <param name="memberIDs"></param>
+        ///// <param name="groupID"></param>
+        ///// <returns></returns>
+        //public int[] RemoveMembersFromGroupWrapper(int[] memberIDs, int groupID)
+        //{
+        //    int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+        //    string sessionGroupName = Session["GroupName"].ToString();
+        //    int userID = Convert.ToInt32(Session["UserID"]);
 
-			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
-			{
-				haveAccess = true;
-			}
-			else
-			{
-				int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
-				if(Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))
-				{
-					haveAccess = true;
-				}
-			}
+        //    bool haveAccess = false;
+        //    if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+        //    {
+        //        haveAccess = true;
+        //    }
+        //    else
+        //    {
+        //        int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
+        //        if(Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))
+        //        {
+        //            haveAccess = true;
+        //        }
+        //    }
 
-			if (haveAccess)
-			{
-				return Administration.AdministrativeAPI .RemoveMembersFromGroup (memberIDs, groupID);
-			}
-			else
-			{
-				throw new AccessDeniedException ("Access denied removing member from group.");
-			}
-		}
+        //    if (haveAccess)
+        //    {
+        //        return Administration.AdministrativeAPI .RemoveMembersFromGroup (memberIDs, groupID);
+        //    }
+        //    else
+        //    {
+        //        throw new AccessDeniedException ("Access denied removing member from group.");
+        //    }
+        //}
 
 		/// <summary>
 		/// superUser and administerGroup privilege
@@ -1078,7 +1056,7 @@ namespace iLabs.ServiceBroker.Authorization
 
 			bool haveAccess = false;
 			bool haveRequestGroupAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
@@ -1133,12 +1111,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListUserIDsInGroupRecursivelyWrapper(int groupID)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
 			int userID = Convert.ToInt32(Session["UserID"]);
 
 			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
@@ -1168,22 +1146,23 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListSubgroupIDsWrapper(int groupID)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
 			int userID = Convert.ToInt32(Session["UserID"]);
 
 			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
 			else
 			{
-				int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
-				if (! (groupID == Administration.AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP)))
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+				int qID = AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
+				if (! (groupID == AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP)))
 
 				{
-					if(Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))
+					if(AuthorizationAPI.CheckAuthorization (userID, Function .administerGroupFunctionType , qID))
 					{
 						haveAccess=true;
 					}
@@ -1192,11 +1171,11 @@ namespace iLabs.ServiceBroker.Authorization
 				{
 					// checking for request groups of course staff.
 					//add new user to allowedgroup list if there exist a request group
-					int[] newUserSubGroups = Administration.AdministrativeAPI.ListSubgroupIDs(groupID);
+					int[] newUserSubGroups = AdministrativeAPI.ListSubgroupIDs(groupID);
 					foreach (int sgID in newUserSubGroups)
 					{
-						int sqID = Authorization.AuthorizationAPI .GetQualifierID (sgID, Qualifier .groupQualifierTypeID );
-						if(Authorization.AuthorizationAPI .CheckAuthorization (sessionGroupID, Function .administerGroupFunctionType , sqID))
+						int sqID = AuthorizationAPI .GetQualifierID (sgID, Qualifier .groupQualifierTypeID );
+						if(AuthorizationAPI .CheckAuthorization (sessionGroupID, Function .administerGroupFunctionType , sqID))
 						{
 							haveAccess = true;
 							break;
@@ -1207,7 +1186,7 @@ namespace iLabs.ServiceBroker.Authorization
 			
 			if (haveAccess)
 			{
-				return Administration.AdministrativeAPI .ListSubgroupIDs (groupID);
+				return AdministrativeAPI.ListSubgroupIDs (groupID);
 			}
 			else
 			{
@@ -1222,17 +1201,18 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListSubgroupIDsRecursivelyWrapper(int groupID)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
 			int userID = Convert.ToInt32(Session["UserID"]);
 
 			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
 			else
 			{
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 				int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
 				if (! (groupID == Administration.AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP)))
 
@@ -1275,21 +1255,22 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="groupID"></param>
 		/// <returns></returns>
-		public int[] ListMemberIDsInGroupWrapper(int groupID)
+		public int[] ListGroupIDsInGroupWrapper(int groupID)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
-			int userID = Convert.ToInt32(Session["UserID"]);
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
+			
 
 			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
 			else
 			{
-				int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID);
-				if (Authorization.AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))
+                int userID = Convert.ToInt32(Session["UserID"]);
+				int qID = AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID);
+				if (AuthorizationAPI .CheckAuthorization (userID, Function .administerGroupFunctionType , qID))
 				{
 					haveAccess = true;
 				}
@@ -1297,14 +1278,14 @@ namespace iLabs.ServiceBroker.Authorization
 
 			if (haveAccess)
 			{
-				return Administration.AdministrativeAPI .ListMemberIDsInGroup (groupID);
+				return AdministrativeAPI.ListSubgroupIDs(groupID);
 			}
 			else
 			{
-				throw new AccessDeniedException ("Access denied listing memberIDs in group.");
+				throw new AccessDeniedException ("Access denied listing groupIDs in group.");
 			}
 		}
-
+      
 		/// <summary>
 		/// superUser and administerGroup privilege
 		/// </summary>
@@ -1312,12 +1293,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] ListMemberIDsInGroupFromDSWrapper(int groupID)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
 			int userID = Convert.ToInt32(Session["UserID"]);
 
 			bool haveAccess = false;
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				haveAccess = true;
 			}
@@ -1345,18 +1326,18 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="agentID"></param>
 		/// <returns></returns>
-		public int[] ListGroupsForAgentWrapper(int agentID)
+		public int[] ListGroupsForUserWrapper(int agentID)
 		{
-			return Administration.AdministrativeAPI.ListGroupsForAgent (agentID);
+			return Administration.AdministrativeAPI.ListGroupIDsForUser (agentID);
 		}
         /// <summary>
         /// anyone access
         /// </summary>
         /// <param name="agentID"></param>
         /// <returns></returns>
-        public int[] ListNonRequestGroupsForAgentWrapper(int agentID)
+        public int[] ListNonRequestGroupsForUserWrapper(int agentID)
         {
-            return Administration.AdministrativeAPI.ListGroupsForAgent(agentID);
+            return Administration.AdministrativeAPI.ListGroupIDsForUser(agentID);
         }
 
 		/// <summary>
@@ -1364,21 +1345,33 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="agentID"></param>
 		/// <returns></returns>
-		public int[] ListGroupsForAgentRecursivelyWrapper(int agentID)
+		public int[] ListGroupsForGroupRecursivelyWrapper(int agentID)
 		{
-			return Administration.AdministrativeAPI .ListGroupsForAgentRecursively (agentID);
+			return AdministrativeAPI.ListParentGroupsForGroupRecursively (agentID);
 		}
 
 		/// <summary>
 		/// anyone access
 		/// </summary>
-		/// <param name="agentID"></param>
-		/// <param name="groupID"></param>
+        /// <param name="groupID"></param>
+		/// <param name="membeID"></param>
 		/// <returns></returns>
-		public bool IsAgentMemberWrapper(int agentID, int groupID)
+		public bool IsGroupMemberWrapper( int groupID,int memberID)
 		{
-			return Administration.AdministrativeAPI .IsAgentMember (agentID, groupID);
+			return AdministrativeAPI.IsGroupMember (groupID, memberID);
 		}
+
+
+        /// <summary>
+        /// anyone access
+        /// </summary>
+        /// <param name="groupID"></param>
+        /// <param name="agentID"></param>
+        /// <returns></returns>
+        public bool IsUserMemberWrapper(int groupID, int userID)
+        {
+            return AdministrativeAPI.IsUserMember(groupID, userID);
+        }
 
 		/// <summary>
 		/// administerGroup and superUser access  - currently implemented as anyone access
@@ -1441,14 +1434,14 @@ namespace iLabs.ServiceBroker.Authorization
 		public int AddGrantWrapper( int agentID, string function, int qualifierID )
 		{
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			//string sessionGroupName = Session["GroupName"].ToString();
 
-			Qualifier q = Authorization.AuthorizationAPI.GetQualifier(qualifierID);
+			Qualifier q = AuthorizationAPI.GetQualifier(qualifierID);
 			if ((q.qualifierName.Equals(Group.NEWUSERGROUP))||(q.qualifierType.Equals(Group.SUPERUSER))
 				||(q.qualifierName.Equals(Group.ORPHANEDGROUP))||(q.qualifierName.Equals(Group.ROOT)))
 				throw new AccessDeniedException ("Cannot add grant. Insufficient permission.");
 
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				return Authorization.AuthorizationAPI .AddGrant (agentID, function, qualifierID);
 			}
@@ -1456,10 +1449,10 @@ namespace iLabs.ServiceBroker.Authorization
 			{
 				bool haveAccess = false;
 				// special case. give administrator group privilege to add request group grants
-				int mainGroupID = Administration.AdministrativeAPI.GetAssociatedGroupID(sessionGroupID);
+				int mainGroupID = AdministrativeAPI.GetAssociatedGroupID(sessionGroupID);
 				if (mainGroupID >0)
 				{
-					int reqQualID = Authorization.AuthorizationAPI.GetQualifierID(AdministrativeUtilities.GetGroupRequestGroup(mainGroupID),Qualifier.groupQualifierTypeID);
+					int reqQualID = AuthorizationAPI.GetQualifierID(AdministrativeUtilities.GetGroupRequestGroup(mainGroupID),Qualifier.groupQualifierTypeID);
 					if (qualifierID == reqQualID)
 						haveAccess = true;
 				}
@@ -1497,15 +1490,16 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public int[] RemoveGrantsWrapper ( int[] grantIDs )
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+			//int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+			//string sessionGroupName = Session["GroupName"].ToString();
 
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
 				return Authorization.AuthorizationAPI .RemoveGrants (grantIDs);
 			}
 			else
 			{
+                int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
 				ArrayList grantsToBeRemoved = new ArrayList();
 				ArrayList notRemoved = new ArrayList();
 				Grant[] grants = Authorization.AuthorizationAPI.GetGrants(grantIDs);
@@ -1579,14 +1573,14 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public bool SetNativePasswordWrapper (int userID, string password)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = "";
-			if (sessionGroupID>0)
-				sessionGroupName = Session["GroupName"].ToString();
+            //int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            //string sessionGroupName = "";
+            //if (sessionGroupID>0)
+            //    sessionGroupName = Session["GroupName"].ToString();
 
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
-			if((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(loginUserID.CompareTo(userID)==0))
+			if((IsSuperuserGroup())||(loginUserID.CompareTo(userID)==0))
 			{
 				return Authentication.AuthenticationAPI .SetNativePassword (userID, password);
 			}
@@ -1665,7 +1659,7 @@ namespace iLabs.ServiceBroker.Authorization
 			bool haveAccess = false;
 
 			//superUser or owner check
-			if(IsSuperuserGroup(sessionGroupID) ||(loginUserID==userID))
+			if(IsSuperuserGroup() ||(loginUserID==userID))
 			{
 				haveAccess = true;
 			}
@@ -2338,10 +2332,10 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="newUserID"></param>
 		public void ModifyExperimentOwnerWrapper (long experimentID, int newUserID)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+            //int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            //string sessionGroupName = Session["GroupName"].ToString();
 
-			if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+			if(IsSuperuserGroup())
 			{
                 InternalDataDB.UpdateExperimentOwner(experimentID, newUserID);
 			}
@@ -2364,12 +2358,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
         public int AddSystemMessageWrapper(string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageTitle, string messageBody)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+            //int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            //string sessionGroupName = Session["GroupName"].ToString();
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
 			int qID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.groupQualifierTypeID);
-			if((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))			
+			if((IsSuperuserGroup())||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))			
 			{
                 return Administration.AdministrativeAPI.AddSystemMessage(messageType, toBeDisplayed, groupID, clientID, agentID, messageTitle, messageBody);
 			}
@@ -2399,12 +2393,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="messageTitle"></param>
 		public void ModifySystemMessageWrapper (int messageID, string messageType, bool toBeDisplayed, int groupID, int clientID, int agentID, string messageBody, string messageTitle)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName = Session["GroupName"].ToString();
+            //int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            //string sessionGroupName = Session["GroupName"].ToString();
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
 			int qID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.groupQualifierTypeID);
-			if((sessionGroupName.CompareTo(Group.SUPERUSER)==0)||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))
+			if((IsSuperuserGroup())||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qID)))
 			{
 				Administration.AdministrativeAPI.ModifySystemMessage(messageID, messageType, toBeDisplayed, groupID, clientID, agentID, messageBody, messageTitle);
 			}
@@ -2424,6 +2418,15 @@ namespace iLabs.ServiceBroker.Authorization
 			return Administration.AdministrativeAPI.GetSystemMessages(messageType, groupID, clientID, agentID);
 		}
 
+        /// <summary>
+        /// Retrieves session information via the sessionID and resets session variables.
+        /// </summary>
+        /// <param name="coupon"></param>
+        public void SetServiceSession(long sessionID)
+        {
+            SessionInfo sessionInfo = AdministrativeAPI.GetSessionInfo(sessionID);
+            SessionInfoToSession(sessionInfo);
+        }
  
         /// <summary>
         /// Retrieves session information via the coupon's RedeemSesssion ticket and resets session variables.
@@ -2432,6 +2435,12 @@ namespace iLabs.ServiceBroker.Authorization
         public void SetServiceSession(Coupon coupon)
         {
             SessionInfo sessionInfo = AdministrativeAPI.GetSessionInfo(coupon);
+            SessionInfoToSession(sessionInfo);
+
+        }
+
+        private void SessionInfoToSession(SessionInfo sessionInfo)
+        {
 
             if (sessionInfo != null)
             {
@@ -2454,8 +2463,8 @@ namespace iLabs.ServiceBroker.Authorization
                 }
                 else
                     Session.Remove("ClientID");
-               
-                
+
+
             }
             else
             {
@@ -2465,9 +2474,7 @@ namespace iLabs.ServiceBroker.Authorization
                 Session.Remove("UserName");
                 Session.Remove("GroupName");
             }
-
         }
-
  
 
 
@@ -2477,13 +2484,13 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <returns></returns>
 		public UserSession[] GetUserSessionsWrapper(int userID, int groupID, DateTime timeAfter, DateTime timeBefore)
 		{
-			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-			string sessionGroupName=Session["GroupName"].ToString();
+            int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            //string sessionGroupName=Session["GroupName"].ToString();
 			int loginUserID = Convert.ToInt32(Session["UserID"].ToString());
 
 			try
 			{
-				if(sessionGroupName.CompareTo(Group.SUPERUSER)==0)
+				if(IsSuperuserGroup())
 				{
 					return Administration.AdministrativeAPI.GetUserSessions(userID, groupID, timeAfter, timeBefore);
 				}
@@ -2505,7 +2512,7 @@ namespace iLabs.ServiceBroker.Authorization
 						ArrayList userSessions = new ArrayList();
 						if (userID>=0)
 						{
-							int[] userParents = Administration.AdministrativeAPI.ListGroupsForAgent(userID);
+							int[] userParents = Administration.AdministrativeAPI.ListGroupIDsForUser(userID);
 							foreach (int parent in userParents)
 							{
 								int qID = Authorization.AuthorizationAPI .GetQualifierID (parent, Qualifier .groupQualifierTypeID );
@@ -2561,12 +2568,5 @@ namespace iLabs.ServiceBroker.Authorization
 		}	
 
 	}
-/*
-	public class AccessDeniedException: System.ApplicationException 
-	{
-		public AccessDeniedException(string message): base(message)
-		{
-		}
-	}
-*/
+
 }

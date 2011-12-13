@@ -473,7 +473,7 @@ namespace iLabs.ServiceBroker.admin
                 {
                     for (int i = 1; i < lbxParentGroups.Items.Count; i++)
                     {
-                        wrapper.AddMemberToGroupWrapper(groupInfo.id, Convert.ToInt32(lbxParentGroups.Items[i].Value));
+                        wrapper.AddGroupToGroupWrapper(groupInfo.id, Convert.ToInt32(lbxParentGroups.Items[i].Value));
                     }
                 }
 
@@ -647,7 +647,7 @@ namespace iLabs.ServiceBroker.admin
                 // 
                 ArrayList removeParentList = new ArrayList();
                 ArrayList addParentList = new ArrayList();
-                int[] parIDs = AdministrativeAPI.ListGroupsForAgent(groupInfo.id);
+                int[] parIDs = AdministrativeAPI.ListParentGroupsForGroup(groupInfo.id);
                 for (int i = 0; i < parIDs.Length; i++)
                 {
                     ListItem it = lbxParentGroups.Items.FindByValue(parIDs[i].ToString());
@@ -664,15 +664,13 @@ namespace iLabs.ServiceBroker.admin
 
                 foreach (ListItem li in lbxParentGroups.Items)
                 {
-                    wrapper.AddMemberToGroupWrapper(groupInfo.id, Convert.ToInt32(li.Value));
+                    wrapper.AddGroupToGroupWrapper(groupInfo.id, Convert.ToInt32(li.Value));
                 }
                 if (removeParentList.Count > 0)
                 {
-                    int[] rem = new int[] { groupInfo.id };
-
                     foreach (int k in removeParentList)
                     {
-                        wrapper.RemoveMembersFromGroupWrapper(rem, k);
+                        AdministrativeAPI.RemoveGroupFromGroup(groupInfo.id, k);
                     }
                 }
                 //refreshing the parents list box - otherwise removed items wont appear

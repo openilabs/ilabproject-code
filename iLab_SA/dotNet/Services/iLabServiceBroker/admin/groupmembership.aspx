@@ -69,11 +69,11 @@ Please see license.txt in top level directory for full license.
 										SelectedNodeStyle-ForeColor="White" SelectedNodeStyle-Font-Bold="true"   SelectedNodeStyle-BackColor="BlueViolet"></asp:TreeView>
 									</td>
 									<td class="buttonstyle"><asp:ImageButton ID="ibtnCopyTo" Runat="server" Width="74" Height="22" CssClass="buttonstyle" ImageUrl="../img/copy-btn.gif"
-											AlternateText="Copy To"></asp:ImageButton><!--img src="../img/copy-btn.gif" alt="Copy to" width="74" height="22" class="buttonstyle"--><br/>
+											AlternateText="Copy To"></asp:ImageButton><br/>
 										<asp:ImageButton ID="ibtnMoveTo" Runat="server" Width="74" Height="22" CssClass="buttonstyle" ImageUrl="../img/move-btn.gif"
-											AlternateText="Move to"></asp:ImageButton><!--img src="../img/move-btn.gif" alt="Move to" width="74" height="22" class="buttonstyle"--><br/>
+											AlternateText="Move to"></asp:ImageButton><br/>
 										<asp:ImageButton ID="ibtnRemove" Runat="server" Width="74" Height="22" CssClass="buttonstyle" ImageUrl="../img/remove-btn.gif"
-											AlternateText="Remove"></asp:ImageButton><!--img src="../img/remove-btn.gif" alt="Remove" width="74" height="22" class="buttonstyle"-->
+											AlternateText="Remove"></asp:ImageButton>
 									</td>
 									<td style="WIDTH: 310px">
 										<!-- Check to see if default style can be set from the css -->

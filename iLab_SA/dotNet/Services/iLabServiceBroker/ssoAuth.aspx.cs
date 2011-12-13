@@ -268,7 +268,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     int gid = AdministrativeAPI.GetGroupID(group_Name);
                     if (gid > 0)
                     {
-                        if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                        if (AdministrativeAPI.IsUserMember(user_ID, gid))
                         {
                             group_ID = gid;
                             //Session["GroupID"] = group_ID;
@@ -291,14 +291,12 @@ namespace iLabs.ServiceBroker.iLabSB
                 // Try and resolve any unspecified parameters
                 if (client_ID <= 0 && group_ID <= 0)
                 {
-                    userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                    userGroupIDs = AdministrativeAPI.ListGroupIDsForUserRecursively(user_ID);
                     Group[] groups = AdministrativeAPI.GetGroups(userGroupIDs);
                     Dictionary<int, int[]> clientMap = new Dictionary<int, int[]>();
                     foreach (Group g in groups)
                     {
-                        if ((g.groupType.CompareTo(GroupType.REGULAR) == 0) && (g.groupName.CompareTo("ROOT") != 0)
-                            && (g.groupName.CompareTo("NewUserGroup") != 0) && (g.groupName.CompareTo("OrphanedUserGroup") != 0)
-                             && (g.groupName.CompareTo("SuperUserGroup") != 0))
+                        if ((g.groupType.CompareTo(GroupType.REGULAR) == 0))
                         {
                             int[] clientIDs = AdministrativeUtilities.GetGroupLabClients(g.groupID);
                             if (clientIDs != null & clientIDs.Length > 0)
@@ -322,7 +320,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             gid = en.Current.Key;
                             clients = en.Current.Value;
                         }
-                        if (AdministrativeAPI.IsAgentMember(user_ID, gid))
+                        if (AdministrativeAPI.IsUserMember(user_ID, gid))
                         {
                             group_ID = gid;
                             group_Name = AdministrativeAPI.GetGroupName(gid);
@@ -356,7 +354,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     }
                     else
                     {
-                        userGroupIDs = AdministrativeAPI.ListGroupsForAgentRecursively(user_ID);
+                        userGroupIDs = AdministrativeAPI.ListGroupIDsForUserRecursively(user_ID);
                         int count = 0;
                         foreach (int ci in clientGroupIDs)
                         {
@@ -374,7 +372,7 @@ namespace iLabs.ServiceBroker.iLabSB
                             gid = -1;
                         }
                     }
-                    if (gid > 0 && AdministrativeAPI.IsAgentMember(user_ID, gid))
+                    if (gid > 0 && AdministrativeAPI.IsUserMember(user_ID, gid))
                     {
                         group_ID = gid;
                        
@@ -416,7 +414,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         lblMessages.Text = Utilities.FormatErrorMessage(buf.ToString());
                         return;
                     }
-                    if (!AdministrativeAPI.IsAgentMember(user_ID, group_ID))
+                    if (!AdministrativeAPI.IsUserMember(user_ID, group_ID))
                     {
                         buf.Append("You do not have permission to to run the specified client!");
                         lblMessages.Visible = true;
