@@ -8,14 +8,14 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_AdminUR
 ALTER TABLE [dbo].[AdminURLs] DROP CONSTRAINT FK_AdminURLs_ProcessAgent
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Agent_Hierarchy_Agents]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Agent_Hierarchy] DROP CONSTRAINT FK_Agent_Hierarchy_Agents
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Grants_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Grants] DROP CONSTRAINT FK_Grants_Groups
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Grants_Agents]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Grants] DROP CONSTRAINT FK_Grants_Agents
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Group_Hierarchy_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Agent_Hierarchy] DROP CONSTRAINT FK_Group_Hierarchy_Groups
 GO
-
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Principals_Authentication_Types]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
 ALTER TABLE [dbo].[Principals] DROP CONSTRAINT FK_Principals_Authentication_Types
 GO
@@ -66,8 +66,8 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Groups_
 ALTER TABLE [dbo].[Groups] DROP CONSTRAINT FK_Groups_Group_Types
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Agent_Hierarchy_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[Agent_Hierarchy] DROP CONSTRAINT FK_Agent_Hierarchy_Groups
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Group_Hierarchy_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[Group_Hierarchy] DROP CONSTRAINT FK_Group_Hierarchy_Groups
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_Experiments_ESS]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
@@ -179,13 +179,21 @@ ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Sessions_Users
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Groups_User]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Groups_User
+ALTER TABLE [dbo].[User_Groups] DROP CONSTRAINT FK_User_Groups_User
 GO
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Groups_Group]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
-ALTER TABLE [dbo].[User_Sessions] DROP CONSTRAINT FK_User_Groups_Group
+ALTER TABLE [dbo].[User_Groups] DROP CONSTRAINT FK_User_Groups_Group
 GO
 
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Groups_Groups]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[User_Groups] DROP CONSTRAINT FK_FK_User_Groups_Groups
+GO
+
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[FK_User_Groups_User]') and OBJECTPROPERTY(id, N'IsForeignKey') = 1)
+ALTER TABLE [dbo].[User_Groups] DROP CONSTRAINT FK_FK_User_Groups_User
+GO
 /*** DROP TABLES  ***/
 
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[AdminURLs]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
@@ -275,6 +283,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Group_Type
 drop table [dbo].[Group_Types]
 GO
 
+/****** Object:  Table [dbo].[Agent_Hierarchy]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Group_Hierarchy]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Group_Hierarchy]
+GO
 /****** Object:  Table [dbo].[Groups]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Groups]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Groups]
@@ -352,6 +364,11 @@ GO
 /****** Object:  Table [dbo].[Session_History]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Session_History]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[Session_History]
+GO
+
+/****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:07:53 PM ******/
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[User_Groups]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[User_Groups]
 GO
 
 /****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:07:53 PM ******/
@@ -1135,11 +1152,11 @@ ALTER TABLE [dbo].[ExperimentCoupon] ADD
 GO
 
 ALTER TABLE [dbo].[Grants] ADD 
-	CONSTRAINT [FK_Grants_Agents] FOREIGN KEY 
+	CONSTRAINT [FK_Grants_Groups] FOREIGN KEY 
 	(
 		[Agent_ID]
-	) REFERENCES [dbo].[Agents] (
-		[Agent_ID]
+	) REFERENCES [dbo].[Groups] (
+		[Group_ID]
 	) ON DELETE CASCADE  ON UPDATE CASCADE ,
 	CONSTRAINT [FK_Grants_Functions] FOREIGN KEY 
 	(

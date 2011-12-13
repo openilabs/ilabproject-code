@@ -59,46 +59,18 @@ SET IDENTITY_INSERT Group_Types OFF
 DBCC CHECKIDENT (GROUP_TYPES, RESEED);
 
 /* GROUPS & CORRESPONDING AGENTS*/
-SET IDENTITY_INSERT Agents ON
-INSERT INTO Agents (Agent_ID,Agent_Name, Is_Group) VALUES (0,'No Group', 1);
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (0, 'No Group','If a groupID does not exist. This is an illegal group.',0);
-SET IDENTITY_INSERT Agents OFF
-DBCC CHECKIDENT (AGENTS, RESEED);
+SET IDENTITY_INSERT Groups ON
+INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (0, 0, 'No Group','If a groupID does not exist. This is an illegal group.',0);
+INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (1, 0, 'ROOT','Root Group', 5);
+INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (2, 0, 'NewUserGroup','New registered users who have not been moved to any group yet', 5);
+INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (3, 0, 'OrphanedUserGroup','Users who no longer belong to any group',5);
+INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (4, 0, 'SuperUserGroup','Administrators',5);
+SET IDENTITY_INSERT Groups OFF
+DBCC CHECKIDENT (GROUPS, RESEED);
 
-BEGIN
-DECLARE @Agent_ID NUMERIC
-DECLARE @Parent_Group_ID NUMERIC
-
-INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('ROOT', 1);
-SELECT @Agent_ID = (SELECT ident_current('Agents'));
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID, 'ROOT','Root Group', 5);
-
-INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('NewUserGroup', 1);
-SELECT @Agent_ID = (SELECT ident_current('Agents'));
-SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT');
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID, 'NewUserGroup','New registered users who have not been moved to any group yet', 5);
-INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
-
-INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('OrphanedUserGroup', 1);
-SELECT @Agent_ID = (SELECT ident_current('Agents'));
-SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT');
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'OrphanedUserGroup','Users who no longer belong to any group',5);
-INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
-
-INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('SuperUserGroup', 1);
-SELECT @Agent_ID = (SELECT ident_current('Agents'));
-SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'ROOT');
-INSERT INTO Groups(Group_ID, Group_Name, description, group_type_ID) VALUES (@Agent_ID,'SuperUserGroup','Administrators',5);
-INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES(@Agent_ID, @Parent_Group_ID);
-
-DBCC CHECKIDENT (AGENTS, RESEED);
-
-END
-
-UPDATE GROUPS SET associated_group_id = 0
-DBCC CHECKIDENT (AGENTS, RESEED, 10) ;
-
-
+INSERT INTO Group_Hierarchy (Group_ID, Parent_Group_ID) VALUES(2, 1);
+INSERT INTO Group_Hierarchy (Group_ID, Parent_Group_ID) VALUES(3, 1);
+INSERT INTO Group_Hierarchy (Group_ID, Parent_Group_ID) VALUES(4, 1);
 
 /* MESSAGE_TYPES */
 INSERT INTO Message_Types(description) VALUES ('Lab');
@@ -146,6 +118,7 @@ END
 BEGIN
 DECLARE @qualID int
 DECLARE @parentid INT 
+DECLARE @userID INT 
 /* Orphaned User group is a member of New User Group */
 SELECT @qualID =(select qualifier_id from Qualifiers where qualifier_name = 'OrphanedUserGroup')
 SELECT @parentid =(select qualifier_id from Qualifiers where qualifier_name = 'NewUserGroup')
@@ -156,18 +129,6 @@ SELECT @parentid =(select qualifier_id from Qualifiers where qualifier_name = 'R
 INSERT INTO Qualifier_Hierarchy (Qualifier_ID, Parent_Qualifier_ID) VALUES (@qualID, @parentid)
 END
 
-/* USERS & CORRESPONDING AGENTS & PRINCIPALS */
-/* Default SuperUser password is ilab */
-INSERT INTO Agents (Agent_Name, Is_Group) VALUES ('superUser', 0);
-select @Agent_ID = (select ident_current('Agents'))
-INSERT INTO Users (User_ID, User_Name, First_Name, Last_Name, Email, Affiliation, password, signup_reason) VALUES
-(@Agent_ID, 'superUser', 'Super', 'User', 'ilab-debug@mit.edu', 'Other', '3759F4FF14D8494DF3B58671FF9251A9D0C41D54', 'Default Value');
-
-INSERT INTO Principals (User_ID, Principal_String, Auth_Type_ID) VALUES (@Agent_ID, 'superUser', 1);
-
-SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'SuperUserGroup');
-INSERT INTO Agent_Hierarchy (Agent_ID, Parent_Group_ID) VALUES (@Agent_ID, @Parent_Group_ID);
-GO
 
 /* Create Default Authority */
 BEGIN
@@ -177,11 +138,27 @@ Select @defaultGroupID =(Select Group_ID From Groups Where Group_Name ='NewUserG
 Select @defaultType = (Select Auth_Type_ID from Authentication_Types where Auth_Name = 'Native');
 SET IDENTITY_INSERT Authority ON
 INSERT INTO Authority (Authority_ID, Auth_Type_ID, Default_Group_ID,Authority_Guid, Authority_Name, Authority_URL)
-	VALUES(0,@defaultType,@defaultGroupID,'','','');
+	VALUES(0,@defaultType,@defaultGroupID,'','','localhost');
 SET IDENTITY_INSERT Authority ON
 DBCC CHECKIDENT (Authority, RESEED);
 END
 GO
+/* USERS & CORRESPONDING AGENTS & PRINCIPALS */
+/* Default SuperUser password is ilab */
+BEGIN
+DECLARE @Parent_Group_ID int
+DECLARE @userID int
+INSERT INTO Users (Auth_ID,User_Name, First_Name, Last_Name, Email, Affiliation, password, signup_reason) VALUES
+(0, 'superUser', 'Super', 'User', 'ilab-debug@mit.edu', 'Other', '3759F4FF14D8494DF3B58671FF9251A9D0C41D54', 'Default Value');
+select @userID = (select ident_current('Users'))
+INSERT INTO Principals (User_ID, Principal_String, Auth_Type_ID) VALUES (@userID, 'superUser', 1);
+
+SELECT @Parent_Group_ID = (SELECT Group_ID FROM Groups WHERE Group_Name = 'SuperUserGroup');
+INSERT INTO User_Groups (User_ID, Group_ID) VALUES (@userID, @Parent_Group_ID);
+END
+GO
+
+
 
 /*ReSourceMappingTypes*/
 SET IDENTITY_INSERT ResourceMappingTypes ON
