@@ -49,7 +49,7 @@ namespace iLabs.ServiceBroker.Authorization
         static AuthorizationWrapperClass()
         {
             superuserGroupID = Administration.AdministrativeAPI.GetGroupID(Group.SUPERUSER);
-            superuserID = Administration.AdministrativeAPI.GetUserID("superUser");
+            superuserID = Administration.AdministrativeAPI.GetUserID("superUser",0);
         }
 
 		private void Page_Load(object sender, System.EventArgs e)
@@ -518,13 +518,13 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="initialGroupID"></param>
 		/// <param name="lockAccount"></param>
 		/// <returns></returns>
-		public int AddUserWrapper (string userName, string principalString, string authenticationType, string firstName, string lastName, string email, string affiliation,string reason, string xmlExtension, int initialGroupID, bool lockAccount)
+		public int AddUserWrapper (string userName, int authID, int authenticationTypeID, string firstName, string lastName, string email, string affiliation,string reason, string xmlExtension, int initialGroupID, bool lockAccount)
 		{
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
 
 			if(IsSuperuserGroup())
 			{
-				return AdministrativeAPI .AddUser ( userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation, reason,xmlExtension,  initialGroupID,  lockAccount);
+				return AdministrativeAPI .AddUser ( userName,  authID, authenticationTypeID, firstName,  lastName, email,  affiliation, reason,xmlExtension,  initialGroupID,  lockAccount);
 			}
 			else
 			{
@@ -535,7 +535,7 @@ namespace iLabs.ServiceBroker.Authorization
 					int qID = AuthorizationAPI .GetQualifierID (associatedGroupID, Qualifier .groupQualifierTypeID );
 					if ((AuthorizationAPI .CheckAuthorization (loginUserID, Function .administerGroupFunctionType , qID))||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function .addMemberFunctionType , qID)))
 					{
-						return AdministrativeAPI .AddUser ( userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation, reason,xmlExtension,  associatedGroupID,  lockAccount);
+						return AdministrativeAPI .AddUser ( userName,  authID, authenticationTypeID, firstName,  lastName, email,  affiliation, reason,xmlExtension,  associatedGroupID,  lockAccount);
 					}
 					else
 						throw new AccessDeniedException ("Access denied adding users.");
@@ -705,9 +705,9 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="userName"></param>
 		/// <returns></returns>
-		public int GetUserIDWrapper (string userName)
+		public int GetUserIDWrapper (string userName, int authID)
 		{
-			return Administration.AdministrativeAPI.GetUserID(userName);
+			return Administration.AdministrativeAPI.GetUserID(userName,authID);
 		}
 
 		/// <summary>

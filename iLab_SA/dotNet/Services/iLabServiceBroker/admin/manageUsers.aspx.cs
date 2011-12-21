@@ -198,7 +198,7 @@ namespace iLabs.ServiceBroker.admin
 		private void DisplayUserInfo(User user)
 		{
 			ResetState();
-
+            hdnUserId.Value = user.userID.ToString();
 			txtUsername.Text = user.userName;
 			txtUsername.Enabled = false;
 			txtFirstName.Text = user.firstName;
@@ -549,7 +549,7 @@ namespace iLabs.ServiceBroker.admin
 					// the database will also throw an exception if the agentName exists
 					// since username must be unique across both users and groups.
 					// this is just another check to throw a meaningful exception
-					if (wrapper.GetUserIDWrapper(txtUsername.Text)>0) // then the user already exists in database
+					if (wrapper.GetUserIDWrapper(txtUsername.Text,Convert.ToInt32(ddlAuthority.SelectedValue))>0) // then the user already exists in database
 					{
 						string msg = "The username '"+txtUsername.Text+"' already exists. Choose another username.";
 						lblResponse.Text = Utilities.FormatErrorMessage(msg);
@@ -585,14 +585,14 @@ namespace iLabs.ServiceBroker.admin
 						}
 
 						//Add User
-						int userID= wrapper.AddUserWrapper(txtUsername.Text, txtUsername.Text, AuthenticationType.NativeAuthentication,
+                        int userID = wrapper.AddUserWrapper(txtUsername.Text, Convert.ToInt32(ddlAuthority.SelectedValue), (int) AuthenticationType.AuthTypeID.Native,
 							txtFirstName.Text, txtLastName.Text, txtEmail.Text,strAffiliation, "No reason specified - User added through Administrative interface",
 							"", defaultGroupID, cbxLockAccount.Checked);
 
 						//Set Password - Can only change password if you're superuser
 						if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))
 						{
-							wrapper.SetNativePasswordWrapper (wrapper.GetUserIDWrapper(txtUsername.Text) , txtPassword.Text );
+							wrapper.SetNativePasswordWrapper(userID , txtPassword.Text );
 						}
 
 						string msg = "The record for "+txtUsername.Text + " has been created successfully.";
@@ -617,7 +617,7 @@ namespace iLabs.ServiceBroker.admin
 				try
 				{
 					//Update user information
-					wrapper.ModifyUserWrapper (wrapper.GetUserIDWrapper(txtUsername.Text) ,txtUsername.Text , txtUsername.Text , AuthenticationType.NativeAuthentication, txtFirstName.Text ,txtLastName.Text , txtEmail.Text , strAffiliation, "","", cbxLockAccount.Checked );
+                    wrapper.ModifyUserWrapper(Convert.ToInt32(lbxSelectUser.SelectedValue), txtUsername.Text, txtUsername.Text, AuthenticationType.NativeAuthentication, txtFirstName.Text, txtLastName.Text, txtEmail.Text, strAffiliation, "", "", cbxLockAccount.Checked);
 
 					//Update password information only if the old password has not been changed
 					if(txtPassword.Text.CompareTo("")!=0 )
@@ -637,7 +637,7 @@ namespace iLabs.ServiceBroker.admin
 						}
 
 						//Update password
-						wrapper.SetNativePasswordWrapper (wrapper.GetUserIDWrapper(txtUsername.Text) , txtPassword.Text );
+                        wrapper.SetNativePasswordWrapper(Convert.ToInt32(lbxSelectUser.SelectedValue), txtPassword.Text);
 					}
 									
 					string msg = "The record for '"+txtUsername.Text + "' has been updated.";
@@ -663,7 +663,7 @@ namespace iLabs.ServiceBroker.admin
 			}
 			try
 			{
-				if(wrapper.RemoveUsersWrapper (new int[] {wrapper.GetUserIDWrapper(txtUsername.Text) }).Length > 0)
+                if (wrapper.RemoveUsersWrapper(new int[] { Convert.ToInt32(lbxSelectUser.SelectedValue) }).Length > 0)
 				{
 					string msg = "'" + txtUsername.Text + "' was not deleted.";
 					lblResponse.Text = Utilities.FormatErrorMessage(msg);

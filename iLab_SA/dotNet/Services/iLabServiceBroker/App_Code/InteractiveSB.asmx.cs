@@ -861,70 +861,118 @@ namespace iLabs.ServiceBroker.iLabSB
         public IntTag LaunchLabClient(string clientGuid, string groupName,
                string userName, string authorityUrl, long duration, int autoStart)
         {
-            IntTag tag = new IntTag();
+            IntTag result = new IntTag(-1, "Access Denied");
             StringBuilder buf = new StringBuilder();
-            //tag.id = -1;
+            int userID = -1;
+            int clientID = -1;
+            int groupID = -1;
+
             try
             {
-               
+                Ticket clientAuthTicket = null;
+                Authority authority = null;
                 // Need to check opHeader
-                if(opHeader != null && opHeader.coupon != null){
-                    try
-                    {
-                        // Coupon is from the client SCORM
-                        Ticket clientAuthority = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
-                        // Check ticket payload
-                    }
-                    catch { 
-                    }
-                
-                    // Get authorityGuid from authorityUrl, if not found exit
-                    string authorityGuid = "UNED-1234567890-4321";
-
-                    //Check for group access & User
-                    //IntTag test = brokerDB.ResolveAction(Context,clientGuid, userName, groupName, startTime, duration, autoStart > 0);
-
-                    //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
-                    Coupon coupon = brokerDB.CreateCoupon();
-                    TicketLoadFactory tlc = TicketLoadFactory.Instance();
-                    string payload = tlc.createAuthenticateAgentPayload(authorityGuid, clientGuid, userName, groupName);
-                    brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authorityGuid, 600L, payload);
-                    buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
-                    buf.Append("/default.aspx?sso=t");
-                    buf.Append("&usr=" + userName + "&cid=" + clientGuid);
-                    buf.Append("&grp=" + groupName);
-                    buf.Append("&auth=" + authorityUrl);
-                    buf.Append("&key=" + coupon.passkey);
-                    if (autoStart > 0)
-                        buf.Append("&auto=t");
-
-                    tag.id = 1;
-                    tag.tag = buf.ToString();
-                    //
-                    //
-                    //if (test.id > 0)
-                    //{
-                    //    string requestGuid = Utilities.MakeGuid("N");
-                    //    
-
-                    //}
-                    //else
-                    //{
-                    //    tag.tag = "Access Denied";
-                    //}
-                }
-                else
+                if (opHeader != null && opHeader.coupon != null)
                 {
-                    tag.tag = "Access Denied";
+
+                    authority = brokerDB.AuthorityRetrieveByUrl(authorityUrl);
+                    // Coupon is from the client SCORM
+                    clientAuthTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
+                    if (authority == null || clientAuthTicket == null)
+                    {
+                        return result;
+                    }
+                    if ((clientAuthTicket.redeemerGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0) && (clientAuthTicket.issuerGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0)
+                        && !clientAuthTicket.IsExpired() && !clientAuthTicket.isCancelled)
+                    {
+                        XmlQueryDoc xDoc = new XmlQueryDoc(clientAuthTicket.payload);
+                        string cGuid = xDoc.Query("AuthorizeClientPayload/clientGuid");
+                        string gName = xDoc.Query("AuthorizeClientPayload/groupName");
+                        if ((cGuid.CompareTo(clientGuid) == 0) && (gName.CompareTo(groupName) == 0))
+                        {
+
+                            userID = AdministrativeAPI.GetUserID(userName, authority.authorityID);
+                            if (userID <= 0)
+                            { //User does not exist
+                                //Check if Authority has a default group
+                                if (authority.defaultGroupID > 0)
+                                {
+                                    //Should try & Query Authority for more information
+                                    userID = AdministrativeAPI.AddUser(userName, authority.authorityID, authority.authTypeID, null, null, null,
+                                        authority.authName, null, null, authority.defaultGroupID, false);
+                                }
+                            }
+                            if (userID > 0)
+                            {
+                                if (cGuid != null && clientGuid != null && cGuid.Length > 0 && (cGuid.CompareTo(clientGuid) == 0))
+                                {
+                                    clientID = AdministrativeAPI.GetLabClientID(clientGuid);
+                                }
+                                else
+                                {
+                                    return result;
+                                }
+                                if (gName != null && groupName != null && gName.Length > 0 && (gName.CompareTo(groupName) == 0))
+                                {
+                                    groupID = AdministrativeAPI.GetGroupID(groupName);
+                                }
+                                else
+                                {
+                                    return result;
+                                }
+                            }
+                            else
+                            {
+                                return result;
+                            }
+
+                            if (userID > 0 && clientID > 0 && groupID > 0)
+                            {
+
+                                //Check for group access & User
+                                result = brokerDB.ResolveAction(Context, clientID, userID, groupID, DateTime.UtcNow, duration, autoStart > 0);
+                                //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
+                            }
+                        }
+                    }
                 }
+                //    Coupon coupon = brokerDB.CreateCoupon();
+                //    TicketLoadFactory tlc = TicketLoadFactory.Instance();
+                //    string payload = tlc.createAuthenticateAgentPayload(authorityGuid, clientGuid, userName, groupName);
+                //    brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authorityGuid, 600L, payload);
+                //    buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                //    buf.Append("/default.aspx?sso=t");
+                //    buf.Append("&usr=" + userName + "&cid=" + clientGuid);
+                //    buf.Append("&grp=" + groupName);
+                //    buf.Append("&auth=" + authorityUrl);
+                //    buf.Append("&key=" + coupon.passkey);
+                //    if (autoStart > 0)
+                //        buf.Append("&auto=t");
+
+                //    tag.id = 1;
+                //    tag.tag = buf.ToString();
+                //    //
+                //    //
+                //    //if (test.id > 0)
+                //    //{
+                //    //    string requestGuid = Utilities.MakeGuid("N");
+                //    //    
+
+                //    //}
+                //    //else
+                //    //{
+                //    //    tag.tag = "Access Denied";
+                //    //}
+                //}
+
             }
             catch (Exception e)
             {
-                tag.id = -1;
-                tag.tag = e.Message;
+                result.id = -1;
+                result.tag = e.Message;
             }
             Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
-            return tag;
+            return result;
         }
 
 
@@ -1019,14 +1067,26 @@ namespace iLabs.ServiceBroker.iLabSB
                 {
                     requestGuid = agentAuthHeader.agentGuid;
                     authPA = brokerDB.GetProcessAgentInfo(requestGuid);
+                    int authID = -1;
                     // check if the The requesting service is known to the domain
                     if (authPA != null)
                     {
                         // What type of PA is it, any additional processing?
-
+                        if (requestGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0)
+                        {
+                            authID = 0;
+                        }
+                        else
+                        {
+                            Authority auth = brokerDB.AuthorityRetrieve(requestGuid);
+                            if (auth != null)
+                            {
+                                authID = auth.authorityID;
+                            }
+                        }
                         //Determine resources available based on supplied fields, note requestGuid is not used to authenticate users at this time
                         // Only return groups that match the inputs, have clients & are not administrative
-                        status = brokerDB.ResolveResources(Context, requestGuid, userName, groupName, serviceGuid, clientGuid, false,
+                        status = brokerDB.ResolveResources(Context, authID, userName, groupName, serviceGuid, clientGuid, false,
                             ref message, out userID, out groupClientsMap);
                         if (userID <= 0 || groupClientsMap.Count == 0)
                         {
@@ -1754,21 +1814,34 @@ EnableSession = true)]
             DateTime startTime, DateTime endTime, string message)
         {
             bool status = false;
+            int authID = -1;
+            if(serviceBrokerGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0){
+                authID = 0;
+            }
+            else{
+            Authority auth = brokerDB.AuthorityRetrieve(serviceBrokerGuid);
+            if (auth != null)
+            {
+                authID = auth.authorityID;
+            }
+            }
+
             if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
             {
                 if (agentAuthHeader.coupon.issuerGuid == ProcessAgentDB.ServiceGuid)
                 {
+               
                     try
                     {
-                        int userId = AdministrativeAPI.GetUserID(userName);
+                        int userId = AdministrativeAPI.GetUserID(userName,authID);
                         if (userId > 0)
                         {
                             User[] users = AdministrativeAPI.GetUsers(new int[] { userId });
                             if (users != null && users.Length > 0)
                             {
-                                SmtpMail.SmtpServer = "127.0.0.1";
-                                if (users[0].email != null)
+                                if (users[0] != null && users[0].email != null)
                                 {
+                                    SmtpMail.SmtpServer = "127.0.0.1";
                                     MailMessage uMail = new MailMessage();
                                     uMail.To = users[0].email;
                                     uMail.From = ConfigurationManager.AppSettings["supportMailAddress"];

@@ -800,6 +800,34 @@ namespace iLabs.ServiceBroker
             return auth;
         }
 
+        public Authority AuthorityRetrieveByUrl(string url)
+        {
+            Authority auth = null;
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("Authority_RetrieveByUrl", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            try
+            {
+                // populate stored procedure parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityUrl", url, DbType.String, 256));
+                // read the result
+                connection.Open();
+                DbDataReader dataReader = cmd.ExecuteReader();
+                auth = readAuthority(dataReader);
+                dataReader.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return auth;
+        }
+
         public Authority AuthorityRetrieve(string guid)
         {
             Authority auth = null;
@@ -813,7 +841,24 @@ namespace iLabs.ServiceBroker
                 // read the result
                 connection.Open();
                 DbDataReader dataReader = cmd.ExecuteReader();
-                while (dataReader.Read())
+                auth = readAuthority(dataReader);
+                dataReader.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return auth;
+        }
+
+        protected Authority readAuthority(DbDataReader dataReader){
+            Authority auth = null;
+          while (dataReader.Read())
                 {
                     auth = new Authority();
                     //Authority_ID,Auth_Type_ID,Default_Group_ID,Authority_Guid,Authority_Name,
@@ -843,20 +888,8 @@ namespace iLabs.ServiceBroker
                     if (!dataReader.IsDBNull(11))
                         auth.location = dataReader.GetString(11);
                 }
-                dataReader.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            finally
-            {
-                connection.Close();
-            }
             return auth;
         }
-
         public int AuthorityUpdate(int authorityId, int authTypeId, int groupId, string name, string guid, string url, string description,
            string passPhrase, string emailProxy, string contactEmail, string bugEmail, string location)
         {
@@ -2609,7 +2642,7 @@ namespace iLabs.ServiceBroker
         /// This examines the specified parameters to resolve the available resources for the user
         /// This may only be called after a user is Authenticated.
         /// </summary>
-        public int ResolveResources(HttpContext context, string authStr, string userName, string groupName, string serviceGuid, string clientGuid, bool allGroups,
+        public int ResolveResources(HttpContext context, int authID, string userName, string groupName, string serviceGuid, string clientGuid, bool allGroups,
             ref StringBuilder message, out int userID, out Dictionary<string, int[]> groupClientsMap)
         {
             int status = -1;
@@ -2622,13 +2655,9 @@ namespace iLabs.ServiceBroker
             if (userName != null && userName.Length > 0)
             {
                 status = 0;
-                // Note not using the authStr since all users are local at this time. Will need to create logic for checking authentication.
-                //if (authStr == null || authStr.Length == 0 || (authStr.CompareTo(ProcessAgentDB.ServiceGuid) == 0))
-                //{
-                    // Local user
-                    userID = AdministrativeAPI.GetUserID(userName);
-                    
-                //}
+                // Local user
+                userID = AdministrativeAPI.GetUserID(userName, authID);
+
             }
             else
             {
@@ -2710,23 +2739,17 @@ namespace iLabs.ServiceBroker
             return status;
         }
 
-        /// <summary>
-        /// This examines the specified parameters to resove the next action.
-        /// This may only be called after a user is Authenticated.
-        /// </summary>
-        public IntTag ResolveAction( HttpContext context, string clientGuid, string userName, string groupName, DateTime start, long duration, bool autoStart)
+        public IntTag ResolveAction(HttpContext context, string clientGuid, int authID, string userName, string groupName, DateTime start, long duration, bool autoStart)
         {
-            int user_ID = 0;
-            int client_ID = 0;
-            int group_ID = 0;
-            IntTag result = new IntTag();
-            result.id = -1;
-            StringBuilder buf = new StringBuilder();
+            int userID = -1;
+            int clientID = -1;
+            int groupID = -1;
+            IntTag result = new IntTag(-1,"Access Denied");
 
             if (userName != null && userName.Length > 0)
             {
-                user_ID = AdministrativeAPI.GetUserID(userName);
-                if (user_ID <= 0)
+                userID = AdministrativeAPI.GetUserID(userName, authID);
+                if (userID <= 0)
                 {
                     result.tag = "The user '" + userName + "' does not exist!";
                     return result;
@@ -2738,12 +2761,11 @@ namespace iLabs.ServiceBroker
                 result.tag = "You must specifiy a user name!";
                 return result;
             }
-            
             //Get Client_ID
             if (clientGuid != null && clientGuid.Length > 0)
             {
-                client_ID = AdministrativeAPI.GetLabClientID(clientGuid);
-                if (user_ID <= 0)
+                clientID = AdministrativeAPI.GetLabClientID(clientGuid);
+                if (clientID <= 0)
                 {
                     result.tag = "The clientGUID '" + clientGuid + "' does not exist!";
                     return result;
@@ -2754,31 +2776,52 @@ namespace iLabs.ServiceBroker
                 result.tag = "You must specifiy a clientGuid!";
                 return result;
             }
-
             // Check that the user & is a member of the group
-            if (groupName != null && groupName.Length >0)
+            if (groupName != null && groupName.Length > 0)
             {
-                int gid = AdministrativeAPI.GetGroupID(groupName);
-                if (gid > 0)
-                {
-                    if (AdministrativeAPI.IsUserMember(gid, user_ID))
-                    {
-                        group_ID = gid;
-                    }
-                    else
-                    {
-                        // user is not a member of the group
-                        group_ID = -1;
-                        groupName = null;
-                        result.tag = "The user is not a member of the requested group!";
-                        return result;
-                    }
-                }
-                else
+                groupID = AdministrativeAPI.GetGroupID(groupName);
+                if (groupID <= 0)
                 {
                     result.tag = "The group '" + groupName + "' does not exist!";
                     return result;
                 }
+            }
+            else
+            {
+                result.tag = "You must specifiy a group name!";
+                return result;
+            }
+            result = ResolveAction(context, clientID, userID, groupID, start, duration, autoStart);
+
+            return result;
+        }
+
+        /// <summary>
+        /// This examines the specified parameters to resove the next action.
+        /// This may only be called after a user is Authenticated.
+        /// </summary>
+        public IntTag ResolveAction( HttpContext context, int clientID, int  userID, int groupID, DateTime start, long duration, bool autoStart)
+        {
+            int user_ID = -1;
+            int group_ID = -1;
+            int client_ID = -1;
+            string groupName;
+            IntTag result = new IntTag(-1,"Access Denied");        
+            StringBuilder buf = new StringBuilder();
+            int[] userGroups = AdministrativeAPI.ListGroupIDsForUserRecursively(userID);
+            if (groupID > 0)
+            {
+                    if (AdministrativeAPI.IsUserMember(groupID, userID))
+                    {
+                        group_ID = groupID;
+                    }
+                    else
+                    {
+                        // user is not a member of the group
+                        result.tag = "The user is not a member of the requested group!";
+                        return result;
+                    }
+               
             }
             else
             {

@@ -74,6 +74,22 @@ namespace iLabs.Ticketing
         /**
          * service broker tickets
          * */
+
+        public string createAuthorizeClientPayload(string clientGuid, string groupName)
+        {
+            string rootElemt = "AuthorizeClientPayload";
+            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            if (clientGuid != null && clientGuid.Length > 0)
+            {
+                keyValueDictionary.Add("clientGuid", clientGuid);
+            }
+            if (groupName != null && groupName.Length > 0)
+            {
+                keyValueDictionary.Add("groupName", groupName);
+            }
+            return writeTicketLoad(rootElemt, TicketTypes.AUTHORIZE_CLIENT, keyValueDictionary);
+        }
+
         public string createRedeemSessionPayload(int userID, int groupID, int clientID)
         {
             return createRedeemSessionPayload(userID, groupID, clientID, null, null);

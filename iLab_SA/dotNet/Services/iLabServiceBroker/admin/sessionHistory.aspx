@@ -38,13 +38,19 @@ Please see license.txt in top level directory for full license.
 								<TBODY>
 									<tr>
 										<th style="HEIGHT: 35px">
-											<label for="timeis">Username</label></th>
+											<label for="useris">Username</label></th>
 										<td style="HEIGHT: 35px" colSpan="4"><asp:textbox id="txtUserName" Runat="server"></asp:textbox>
 											<!--input name="textfield" type="text" size="20"--></td>
 										<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list --></tr>
 									<tr>
 										<th style="HEIGHT: 31px">
-											<label for="timeis">Groupname</label></th>
+											<label for="authorityis">Authority</label></th>
+										<td style="HEIGHT: 31px" colSpan="4"><asp:dropdownlist id="ddlAuthority" Runat="server" Width="412px"></asp:dropdownlist>
+											<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list --></td>
+									</tr>
+									<tr>
+										<th style="HEIGHT: 31px">
+											<label for="groupis">Groupname</label></th>
 										<td style="HEIGHT: 31px" colSpan="4"><asp:textbox id="txtGroupName" Runat="server"></asp:textbox>
 											<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list --></td>
 									</tr>

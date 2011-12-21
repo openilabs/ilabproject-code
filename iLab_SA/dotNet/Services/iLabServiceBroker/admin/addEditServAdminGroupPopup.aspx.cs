@@ -453,10 +453,10 @@ namespace iLabs.ServiceBroker.admin
                     throw new Exception("Group: " + txtName.Text + " exists, choose another name.");
                 }
 
-                if (wrapper.GetUserIDWrapper(txtName.Text) > 0) // user record exists, choose another name
-                {
-                    throw new Exception("The name '" + txtName.Text + "' is not available, choose another name.");
-                }
+                //if (wrapper.GetUserIDWrapper(txtName.Text) > 0) // user record exists, choose another name
+                //{
+                //    throw new Exception("The name '" + txtName.Text + "' is not available, choose another name.");
+                //}
 
 
                 int groupRootID = AdministrativeAPI.GetGroupID(Group.ROOT); //Group.ROOT;

@@ -50,6 +50,10 @@ Please see license.txt in top level directory for full license.
 									<th style="width: 100px"><label for="useris">Username</label></th>
 									<td colspan="2"><asp:textbox id="txtUsername" Runat="server" Width="330px"></asp:textbox></td>
 								</tr>
+								<tr>
+									<th><label for="authority">Authority</label></th>
+									<td colspan="2"><asp:dropdownlist id="ddlAuthority" Runat="server" Width="330px"></asp:dropdownlist></td>
+								</tr>
 								<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
 								<tr>
 									<th><label for="groupis">Groupname</label></th>

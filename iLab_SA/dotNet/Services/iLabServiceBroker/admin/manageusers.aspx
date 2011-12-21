@@ -30,6 +30,7 @@ Please see license.txt in top level directory for full license.
 						<asp:label id="lblResponse" EnableViewState="False" Visible="False" Runat="server"></asp:label>
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
+					    <asp:HiddenField ID="hdnUserId" Runat="server" />
 						<div id="itemdisplay">
 							<h4>Selected User</h4>
 							<div class="message">

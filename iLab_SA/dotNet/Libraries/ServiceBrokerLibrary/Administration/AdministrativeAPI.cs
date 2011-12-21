@@ -1205,7 +1205,22 @@ namespace iLabs.ServiceBroker.Administration
 
 
 		///*********************** USERS **************************///
-		
+
+        //public static int AddUser(string userName, string authorityGuid, string authenticationType, string firstName, string lastName,
+        //    string email, string affiliation, string reason, string xmlExtension, int initialGroupID, bool lockAccount)
+        //{
+        //    int authorityID = -1;
+        //    int authTypeID = -1;
+        //    if (authorityGuid == null || authorityGuid.Length < 1 || authorityGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0)
+        //    {
+        //        authorityID = 0;
+        //    }
+        //    else{
+        //        Authority auth = BrokerDB.
+        //    return AddUser(userName, authorityID, authTypeID, firstName, lastName,
+        //        email, affiliation, reason, xmlExtension, initialGroupID, lockAccount);
+        //}
+
 		/// <summary>
 		/// Registers a new user with the supplied information; makes the user a member of the group specified by initialGroupID.
 		/// </summary>
@@ -1227,7 +1242,8 @@ namespace iLabs.ServiceBroker.Administration
 		/// 3. principalID must be unique within the specified authentication type 
 		/// 4. xmlExtension must be successfully validated against the current User XML Extension schema specified by the SetUserXMLExtensionSchema method 
 		/// 5. initialGroupID must designate a Group registered with the Service Broker</returns>
-		public static int AddUser (string userName, string principalString, string authenticationType, string firstName, string lastName, string email, string affiliation,string reason, string xmlExtension, int initialGroupID, bool lockAccount)
+		public static int AddUser (string userName, int authorityID, int authenticationTypeID, string firstName, string lastName, 
+            string email, string affiliation,string reason, string xmlExtension, int initialGroupID, bool lockAccount)
 		{
 			User user = new User ();
 			user.userName = userName;
@@ -1244,7 +1260,8 @@ namespace iLabs.ServiceBroker.Administration
 				//Inserts agents too. See InternalDB method for details.
 
 				// Add user to the database
-				user.userID = InternalAdminDB.InsertUser (user, principalString, authenticationType, initialGroupID);
+				user.userID = InternalAdminDB.InsertUser( userName, authorityID, firstName, lastName, email,
+                    affiliation,reason,xmlExtension, lockAccount, authenticationTypeID, initialGroupID);
 			}
 			catch (Exception ex)
 			{
@@ -1353,9 +1370,9 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		/// <param name="userName">The userName identifying the user whose user ID is requested.</param>
 		/// <returns>The integer userID of the requested user.</returns>
-		public static int GetUserID (string userName)
+		public static int GetUserID (string userName, int authorityID)
 		{
-			return InternalAdminDB.SelectUserID(userName);
+			return InternalAdminDB.SelectUserID(userName,authorityID);
 		}
 
         /// <summary>

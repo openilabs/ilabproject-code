@@ -100,8 +100,23 @@ namespace iLabs.ServiceBroker.admin
 
 		}
 		#endregion
-		
-        
+
+        private void LoadAuthorityList()
+        {
+            ddlAuthority.Items.Clear();
+            //ListItem liHeaderAdminGroup = new ListItem("--- All Authorities ---", "-1");
+            //ddlAuthorities.Items.Add(liHeaderAdminGroup);
+            BrokerDB brokerDB = new BrokerDB();
+            IntTag[] authTags = brokerDB.GetAuthorityTags();
+            if (authTags != null && authTags.Length > 0)
+            {
+                foreach (IntTag t in authTags)
+                {
+                    ListItem li = new ListItem(t.tag, t.id.ToString());
+                    ddlAuthority.Items.Add(li);
+                }
+            }
+        }
         protected void clearExperimentDisplay()
         {
             txtExperimentID.Text = null;
@@ -126,6 +141,7 @@ namespace iLabs.ServiceBroker.admin
 			//	 get all criteria in place
 			lbxSelectExperiment.Items .Clear ();
             clearExperimentDisplay();
+            int authorityID = 0;
 
 			int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
             DateTime time1 = FactoryDB.MinDbDate;
@@ -140,7 +156,8 @@ namespace iLabs.ServiceBroker.admin
 
 				if(txtUsername.Text != "")
 				{
-					int uID = wrapper.GetUserIDWrapper(txtUsername.Text);
+                    authorityID = Convert.ToInt32(ddlAuthority.SelectedValue);
+					int uID = wrapper.GetUserIDWrapper(txtUsername.Text, authorityID);
 					cList.Add(new Criterion ("User_ID", "=", uID.ToString() ));
 				}
 			if((ddlTimeAttribute.SelectedIndex > 0))

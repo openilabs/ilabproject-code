@@ -10,6 +10,7 @@ using System.Web.Security;
 
 using iLabs.Core;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.ServiceBroker.Administration;
 using iLabs.ServiceBroker.Internal;
 using iLabs.Ticketing;
 
@@ -18,8 +19,16 @@ namespace iLabs.ServiceBroker.Authentication
 {
 	public class AuthenticationType
 	{
+        // Warning if additional types are added need to update the database
+        public enum AuthTypeID : int
+        {
+            Undefined = 0, Native = 1,
+            Kerberos = 2, ThirdParty = 3
+
+        }
 		public const string NativeAuthentication = "Native";
 		public const string Kerberos = "Kerberos_MIT";
+        public const string ThirdParty = "Third_Party";
 	}
 
 
@@ -62,19 +71,36 @@ namespace iLabs.ServiceBroker.Authentication
         /// <returns>true if the user has been authenticated; false otherwise</returns>
         public static bool Authenticate(string userName, string authGuid, string password)
         {
+            BrokerDB brokerDB = new BrokerDB();
+            Authority auth = null;
             bool status = false;
             int userID = -1;
-            if (authGuid == null || authGuid.Length == 0)
+            if (authGuid != null && authGuid.Length > 0)
             {
-                userID = InternalAdminDB.SelectUserID(userName);
-                string hashedDBPassword = InternalAuthenticationDB.ReturnNativePassword(userID);
-                if (hashedDBPassword != null && hashedDBPassword.Length > 0)
+                auth = brokerDB.AuthorityRetrieve(authGuid);
+            }
+            else{
+                auth = brokerDB.AuthorityRetrieve(0);
+            }
+            if(auth != null){
+                userID = InternalAdminDB.SelectUserID(userName,auth.authorityID);
+                if (auth.authorityID == 0 && auth.authTypeID == 1) //Test for local authentication
                 {
-                    string hashedPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(password, "sha1");
-                    if (hashedPassword == hashedDBPassword)
+                    string hashedDBPassword = InternalAuthenticationDB.ReturnNativePassword(userID);
+                    if (hashedDBPassword != null && hashedDBPassword.Length > 0)
                     {
-                        status = true;
+                        string hashedPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(password, "sha1");
+                        if (hashedPassword == hashedDBPassword)
+                        {
+                            status = true;
+                        }
                     }
+                }
+                else
+                {
+                    // For now accept third party authentication
+                    if(userID > 0)
+                        status = true;
                 }
             }
             return status;

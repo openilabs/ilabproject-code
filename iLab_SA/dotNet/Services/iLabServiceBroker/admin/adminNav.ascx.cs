@@ -78,37 +78,44 @@ namespace iLabs.ServiceBroker.admin
                 case "SelfRegistration.aspx":
                     aManageServices.Attributes.Add("class", "topactive");
                     ulNav3Labs.Visible = true;
-                    aNav3ServiceBrokerInfo.Attributes.Add("class", "first");
+                    //aNav3ServiceBrokerInfo.Attributes.Add("class", "first");
                     aNav3ServiceBrokerInfo.Attributes.Add("class", "nav3active");
-                    aNav3ManageLabs.Attributes.Add("class", "last"); 
+                    aNav3Authorities.Attributes.Add("class", "last"); 
                     break;
 				case "manageServices.aspx":
 					aManageServices.Attributes.Add("class", "topactive");
 					ulNav3Labs.Visible = true;
                     aNav3ServiceBrokerInfo.Attributes.Add("class", "first");
 					aNav3ManageServices.Attributes.Add("class", "nav3active");
-					aNav3ManageLabs.Attributes.Add("class", "last");
+                    aNav3Authorities.Attributes.Add("class", "last"); 
 					break;
 				case "manageLabClients.aspx":
 					aManageServices.Attributes.Add("class", "topactive");
 					ulNav3Labs.Visible = true;
                     aNav3ServiceBrokerInfo.Attributes.Add("class", "first"); ;
 					aNav3ManageLabClients.Attributes.Add("class", "nav3active");
-					aNav3ManageLabs.Attributes.Add("class", "last");
+                    aNav3Authorities.Attributes.Add("class", "last"); 
 					break;
 				case "crossRegistration.aspx":
 					aManageServices.Attributes.Add("class", "topactive");
 					ulNav3Labs.Visible = true;
                     aNav3ServiceBrokerInfo.Attributes.Add("class", "first");
 					aNav3ManageLabs.Attributes.Add("class", "nav3active");
-					aNav3ManageLabs.Attributes.Add("class", "last");
+                    aNav3Authorities.Attributes.Add("class", "last"); 
 					break;
-
+                case "authorities.aspx":
+                    aManageServices.Attributes.Add("class", "topactive");
+                    ulNav3Labs.Visible = true;
+                    aNav3ServiceBrokerInfo.Attributes.Add("class", "first");
+                    aNav3Authorities.Attributes.Add("class", "nav3active");
+                    //aNav3Authorities.Attributes.Add("class", "last");
+                    break;
 					// Users Group
 					//   Nav level
 				case "manageUsers.aspx":
 					aManageUsers.Attributes.Add("class", "topactive");
 					ulNav3UsersGroups.Visible = true;
+                    aNav3ManageUsers.Attributes.Add("class", "first");
 					aNav3ManageUsers.Attributes.Add("class", "nav3active");
 					// aNav3AdministerGroups
 					aNav3GroupMembership.Attributes.Add("class", "last");
@@ -128,6 +135,7 @@ namespace iLabs.ServiceBroker.admin
 					aNav3ManageUsers.Attributes.Add("class", "first");
 					// aNav3AdministerGroups.Attributes.Add("class", "");
 					aNav3GroupMembership.Attributes.Add("class", "nav3active");
+                    aNav3GroupMembership.Attributes.Add("class", "last");
 					break;
 
 					// Grants Group

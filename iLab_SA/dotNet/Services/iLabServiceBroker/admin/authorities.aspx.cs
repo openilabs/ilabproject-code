@@ -176,25 +176,25 @@ namespace iLabs.ServiceBroker.admin
         private void SetInputMode(bool isDisplay)
         {
             txtServiceName.ReadOnly = isDisplay;
-            txtServiceURL.ReadOnly = isDisplay;
+            //txtServiceURL.ReadOnly = isDisplay;
             txtServiceGuid.ReadOnly = isDisplay;
-            txtServiceDescription.ReadOnly = isDisplay;
+            //txtServiceDescription.ReadOnly = isDisplay;
             //txtGroup.ReadOnly = isDisplay;
-            txtEmailProxy.ReadOnly = isDisplay;
-            txtContactEmail.ReadOnly = isDisplay;
-            txtBugEmail.ReadOnly = isDisplay;
-            txtLocation.ReadOnly = isDisplay;
-            txtPassPhrase.ReadOnly = isDisplay;
+            //txtEmailProxy.ReadOnly = isDisplay;
+            //txtContactEmail.ReadOnly = isDisplay;
+            //txtBugEmail.ReadOnly = isDisplay;
+            //txtLocation.ReadOnly = isDisplay;
+            //txtPassPhrase.ReadOnly = isDisplay;
             txtServiceName.BackColor = isDisplay ? disabled : enabled;
-            txtServiceURL.BackColor = isDisplay ? disabled : enabled;
+            //txtServiceURL.BackColor = isDisplay ? disabled : enabled;
             txtServiceGuid.BackColor = isDisplay ? disabled : enabled;
-            txtServiceDescription.BackColor = isDisplay ? disabled : enabled;
+            //txtServiceDescription.BackColor = isDisplay ? disabled : enabled;
             //txtGroup.BackColor = isDisplay ? disabled : enabled;
-            txtEmailProxy.BackColor = isDisplay ? disabled : enabled;
-            txtContactEmail.BackColor = isDisplay ? disabled : enabled;
-            txtBugEmail.BackColor = isDisplay ? disabled : enabled;
-            txtLocation.BackColor = isDisplay ? disabled : enabled;
-            txtPassPhrase.BackColor = isDisplay ? disabled : enabled;
+            //txtEmailProxy.BackColor = isDisplay ? disabled : enabled;
+            //txtContactEmail.BackColor = isDisplay ? disabled : enabled;
+            //txtBugEmail.BackColor = isDisplay ? disabled : enabled;
+            //txtLocation.BackColor = isDisplay ? disabled : enabled;
+            //txtPassPhrase.BackColor = isDisplay ? disabled : enabled;
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace iLabs.ServiceBroker.admin
             txtBugEmail.Text = "";
             txtLocation.Text = "";
             txtPassPhrase.Text = "";
-            ddlAuthorities.SelectedValue = "0";
+            ddlAuthorities.SelectedValue = "-1";
             ddlAuthProtocol.SelectedValue = "0";
             ddlGroup.SelectedIndex = 0;
         }
@@ -243,6 +243,7 @@ namespace iLabs.ServiceBroker.admin
                 Authority auth = brokerDB.AuthorityRetrieve(id);
                 if (auth != null)
                 {
+                    SetInputMode(true);
                     txtServiceName.Text = auth.authName;
                     txtServiceURL.Text = auth.authURL;
                     txtServiceGuid.Text = auth.authGuid;
@@ -253,8 +254,8 @@ namespace iLabs.ServiceBroker.admin
                     txtBugEmail.Text = auth.bugEmail;
                     txtLocation.Text = auth.location;
                     txtPassPhrase.Text = auth.passphrase;
+                    ddlAuthorities.SelectedValue = auth.authorityID.ToString();
                     ddlAuthProtocol.SelectedValue = auth.authTypeID.ToString();
-                    SetInputMode(true);
                     return;
                 }
             }

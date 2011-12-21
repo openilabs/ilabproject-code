@@ -75,8 +75,8 @@ namespace iLabs.ServiceBroker.iLabSB
 			else
 			{
 				string userName = txtUsername.Text;
-				int userID = wrapper.GetUserIDWrapper(userName) ;
-				if (txtEmail.Text == "")
+				int userID = wrapper.GetUserIDWrapper(userName, 0) ;
+				if (txtEmail.Text == null || txtEmail.Text == "")
 				{
 					lblResponse.Text = Utilities.FormatErrorMessage("Missing email field.");
 					lblResponse.Visible = true;

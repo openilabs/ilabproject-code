@@ -68,7 +68,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 			
 			int userID = -1;
-			userID = wrapper.GetUserIDWrapper(txtUsername.Text);
+			userID = wrapper.GetUserIDWrapper(txtUsername.Text,0);
 
 			if (userID >0)
 			{

@@ -180,7 +180,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				txtConfirmPassword.Text = null;
 			}
             userName = txtUsername.Text.Trim();
-            int curUser = AdministrativeAPI.GetUserID(userName);
+            int curUser = AdministrativeAPI.GetUserID(userName,0);
             if (curUser > 0)
             {
                 msg.Append("The username you entered is already registered. Please check to see if you have a forgotten password, or choose another username.<br/>");
@@ -262,13 +262,13 @@ namespace iLabs.ServiceBroker.iLabSB
                     if ((useRequestGroups) && (initialGroup != newUserGroupID))
                     {
                         initialGroup = AdministrativeUtilities.GetGroupRequestGroup(initialGroup);
-                        userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
+                        userID = AdministrativeAPI.AddUser(userName, 0, (int) AuthenticationType.AuthTypeID.Native, firstName, lastName, email,
                             affiliation.Trim(), reason, "",initialGroup, false);
                         msg.Append("Added user: " + userName + " into request group ");
                     }
                     else
                     {
-                        userID = AdministrativeAPI.AddUser(userName, principalString, authenType, firstName, lastName, email,
+                        userID = AdministrativeAPI.AddUser(userName, 0, (int) AuthenticationType.AuthTypeID.Native, firstName, lastName, email,
                             affiliation.Trim(), reason, "", initialGroup, false);
                         msg.Append("Added user: " + userName + " ");
                     }

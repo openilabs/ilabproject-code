@@ -18,6 +18,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.Security;
 
+using iLabs.DataTypes;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Administration;
@@ -72,6 +73,23 @@ namespace iLabs.ServiceBroker.admin
 
         }
         #endregion
+
+        private void LoadAuthorityList()
+        {
+            ddlAuthority.Items.Clear();
+            //ListItem liHeaderAdminGroup = new ListItem("--- All Authorities ---", "-1");
+            //ddlAuthorities.Items.Add(liHeaderAdminGroup);
+            BrokerDB brokerDB = new BrokerDB();
+            IntTag[] authTags = brokerDB.GetAuthorityTags();
+            if (authTags != null && authTags.Length > 0)
+            {
+                foreach (IntTag t in authTags)
+                {
+                    ListItem li = new ListItem(t.tag, t.id.ToString());
+                    ddlAuthority.Items.Add(li);
+                }
+            }
+        }
 
         protected void ddlTimeIs_SelectedIndexChanged(object sender, System.EventArgs e)
         {
@@ -135,6 +153,7 @@ namespace iLabs.ServiceBroker.admin
         {
             int userID = -1;
             int groupID = -1;
+            int authID = 0;
             DateTime startTime = DateTime.MinValue;
             DateTime endTime = DateTime.MaxValue;
             txtLoginDisplay.Text = null;
@@ -142,7 +161,8 @@ namespace iLabs.ServiceBroker.admin
             {
                 if (txtUserName.Text != "")
                 {
-                    userID = wrapper.GetUserIDWrapper(txtUserName.Text);
+                    authID = Convert.ToInt32(ddlAuthority.SelectedValue);
+                    userID = wrapper.GetUserIDWrapper(txtUserName.Text,authID);
                     if (userID == -1)
                     {
                         lblResponse.Text = "<div class=errormessage><p>no user with the username '" + txtUserName.Text + "'found</p></div>";
