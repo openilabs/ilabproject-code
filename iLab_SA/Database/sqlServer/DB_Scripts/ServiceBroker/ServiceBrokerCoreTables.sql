@@ -485,11 +485,13 @@ GO
 CREATE TABLE [dbo].[Client_Metadata] (
 	[Client_MD_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Client_ID] [int] NOT NULL,
+	[Auth_Coupon_ID] [bigint] NOT NULL,
 	[Modification_Time] [datetime] NOT NULL ,
+	[SCO_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
 	[Metadata] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[SCO] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-	[Metadata_Format] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[SCO_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
+	[Metadata_Format] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+	
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 

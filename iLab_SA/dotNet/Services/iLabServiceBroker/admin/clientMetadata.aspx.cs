@@ -27,16 +27,13 @@ using iLabs.ServiceBroker.iLabSB;
 
 using iLabs.UtilLib;
 using iLabs.Ticketing;
-//using iLabs.Services;
 
 namespace iLabs.ServiceBroker.admin 
 {
 
     public partial class ClientMetadata : System.Web.UI.Page
     {
-        protected BrokerDB brokerDb = new BrokerDB();
-
-
+        protected BrokerDB brokerDB = new BrokerDB();
         AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
         int labClientID;
@@ -47,7 +44,6 @@ namespace iLabs.ServiceBroker.admin
         {
             if (!Page.IsPostBack)
             {
-                Session.Remove("CrossRegLSS");
                 initialDropDownList();
             }
         }
@@ -56,34 +52,19 @@ namespace iLabs.ServiceBroker.admin
         {
            
             ddlClient.Items.Clear();
-            labClientIDs = wrapper.ListLabClientIDsWrapper();
+            IntTag [] clientTags = brokerDB.GetIntTags("Client_RetrieveTags", null);
 
             ddlClient.Items.Add(new ListItem(" ------------- select Client ------------ ", "0"));
-            if (labClientIDs != null)
+            if (clientTags != null)
             {
-                labClients = wrapper.GetLabClientsWrapper(labClientIDs);
-                foreach (LabClient lc in labClients)
+                foreach (IntTag tag in clientTags)
                 {
-                    // Check that the client is not a 6.1 Batch client and that it is from this domain
-                    if ((lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0) && (lc.clientType.CompareTo(LabClient.BATCH_APPLET) != 0))
-                    {
-                        ProcessAgentInfo[] labServers = AdministrativeAPI.GetLabServersForClient(lc.clientID);
-                        if (labServers != null && (labServers.Length > 0) && (labServers[0].agentId > 0))
-                        {
-                            if (labServers[0].domainGuid.Equals(ProcessAgentDB.ServiceGuid))
-                            {
-                                ddlClient.Items.Add(new ListItem(lc.clientName, lc.clientID.ToString()));
-                            }
-                        }
-                    }
+                   ddlClient.Items.Add(new ListItem(tag.tag, tag.id.ToString()));
                 }
             }
         }
 
-        protected void ddlServiceBroker_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            lblResponse.Visible = false;
-        }
+      
         protected void ddlClient_SelectedIndexChanged(object sender, EventArgs e)
         {
             lblResponse.Visible = false;
@@ -122,8 +103,6 @@ namespace iLabs.ServiceBroker.admin
                 {
                  
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -133,6 +112,21 @@ namespace iLabs.ServiceBroker.admin
 
         }
 
+        protected void btnGuid_Click(object sender, System.EventArgs e)
+        {
+            Guid guid = System.Guid.NewGuid();
+            txtPasscode.Text = Utilities.MakeGuid();
+        }
+
+        protected void checkGuid(object sender, ServerValidateEventArgs args)
+        {
+            if (args.Value.Length > 0 && args.Value.Length <= 50)
+                args.IsValid = true;
+            else
+                args.IsValid = false;
+        }
+
     }
+    
 
 }

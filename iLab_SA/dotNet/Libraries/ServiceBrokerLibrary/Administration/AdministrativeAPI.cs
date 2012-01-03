@@ -56,6 +56,14 @@ namespace iLabs.ServiceBroker.Administration
         public string contactEmail;
         public string bugEmail;
         public string location;
+
+        public string Origin
+        {
+            get
+            {
+                return "*";
+            }
+        }
     }
     
 

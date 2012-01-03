@@ -49,24 +49,7 @@ Please see license.txt in top level directory for full license.
 													<label for="Service">Service</label></th>
 												<td colspan="2" style="width: 560px;"><asp:dropdownlist CssClass="i18n" id="ddlService" Runat="server" AutoPostBack="True" Width="560px" onselectedindexchanged="ddlService_SelectedIndexChanged"></asp:dropdownlist></td>
 											</tr>
-											<tr>
-												<th style="width: 120px">
-													<label for="AgentType">Agent Type </label>
-												</th>
-												<td colspan="2" style="width: 560px"><asp:textbox id="txtServiceType" Runat="server" Width="560px"></asp:textbox></td>
-											</tr>
-											<tr>
-												<th style="width: 120px">
-													<label for="Servicename">Service Name </label>
-												</th>
-												<td colspan="2" style="width: 560px"><asp:textbox id="txtServiceName" Runat="server" Width="560px"></asp:textbox></td>
-											</tr>
-											<tr>
-												<th style="width: 120px">
-													<label for="codebaseurl">Codebase URL </label>
-												</th>
-												<td colspan="2" style="width: 560px"><asp:textbox id="txtApplicationURL" Runat="server" Width="560px"></asp:textbox></td>
-											</tr>
+											
 											<tr>
 												<th style="width: 120px">
 													<label for="webserviceurl">Web Service URL</label></th>
@@ -77,6 +60,24 @@ Please see license.txt in top level directory for full license.
 													<label for="outpasskey">Initial Passkey </label>
 												</th>
 												<td colspan="2" style="width: 560px"><asp:textbox id="txtOutPassKey" Runat="server" Width="560px"></asp:textbox></td>
+											</tr>
+											<tr>
+												<th style="width: 120px">
+													<label for="codebaseurl">Codebase URL </label>
+												</th>
+												<td colspan="2" style="width: 560px"><asp:textbox id="txtApplicationURL" Runat="server" Width="560px"></asp:textbox></td>
+											</tr>
+											<tr>
+												<th style="width: 120px">
+													<label for="Servicename">Service Name </label>
+												</th>
+												<td colspan="2" style="width: 560px"><asp:textbox id="txtServiceName" Runat="server" Width="560px"></asp:textbox></td>
+											</tr>
+											<tr>
+												<th style="width: 120px">
+													<label for="AgentType">Agent Type </label>
+												</th>
+												<td colspan="2" style="width: 560px"><asp:textbox id="txtServiceType" Runat="server" Width="560px"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th style="width: 120px">

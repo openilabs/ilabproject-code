@@ -851,10 +851,11 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
         /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
         /// id that the authority will always use to identify this user</param>
-        /// <param name="authorityUrl"></param>
+        /// <param name="authorityUrl">The codebase of the authority site this does need to match the information in the database</param>
         /// <param name="duration"></param>
         /// <param name="autoStart">If the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
-        /// <returns>an IntTag with a status code in the interger and a URL to be used by the authority to redirect the request.</returns>
+        /// <returns>an IntTag with a status code in the interger depending on the code there is an error or an action to be performed within the 
+        /// SCO which may be a URL to be used by the authority to redirect the request.</returns>
         [WebMethod(Description = "An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
@@ -866,11 +867,11 @@ namespace iLabs.ServiceBroker.iLabSB
             int userID = -1;
             int clientID = -1;
             int groupID = -1;
-
+            Authority authority = null;
             try
             {
                 Ticket clientAuthTicket = null;
-                Authority authority = null;
+               
                 // Need to check opHeader
                 if (opHeader != null && opHeader.coupon != null)
                 {
@@ -882,15 +883,13 @@ namespace iLabs.ServiceBroker.iLabSB
                     {
                         return result;
                     }
-                    if ((clientAuthTicket.redeemerGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0) && (clientAuthTicket.issuerGuid.CompareTo(ProcessAgentDB.ServiceGuid) == 0)
-                        && !clientAuthTicket.IsExpired() && !clientAuthTicket.isCancelled)
+                    if (!clientAuthTicket.IsExpired() && !clientAuthTicket.isCancelled)
                     {
                         XmlQueryDoc xDoc = new XmlQueryDoc(clientAuthTicket.payload);
                         string cGuid = xDoc.Query("AuthorizeClientPayload/clientGuid");
                         string gName = xDoc.Query("AuthorizeClientPayload/groupName");
                         if ((cGuid.CompareTo(clientGuid) == 0) && (gName.CompareTo(groupName) == 0))
                         {
-
                             userID = AdministrativeAPI.GetUserID(userName, authority.authorityID);
                             if (userID <= 0)
                             { //User does not exist
@@ -898,8 +897,12 @@ namespace iLabs.ServiceBroker.iLabSB
                                 if (authority.defaultGroupID > 0)
                                 {
                                     //Should try & Query Authority for more information
-                                    userID = AdministrativeAPI.AddUser(userName, authority.authorityID, authority.authTypeID, null, null, null,
-                                        authority.authName, null, null, authority.defaultGroupID, false);
+                                    string firstName = null;
+                                    string lastName = null;
+                                    string email = null;
+                                    string reason = null;
+                                    userID = AdministrativeAPI.AddUser(userName, authority.authorityID, authority.authTypeID,
+                                        firstName, lastName, email, authority.authName, reason, null, authority.defaultGroupID, false);
                                 }
                             }
                             if (userID > 0)
@@ -971,7 +974,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 result.id = -1;
                 result.tag = e.Message;
             }
-            Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+            Context.Response.AddHeader("Access-Control-Allow-Origin", authority.Origin);
             return result;
         }
 

@@ -31,22 +31,34 @@ Please see license.txt in top level directory for full license.
                         Client Metadata
                     </h1>
                     <p>
-                        Create, modify and publish client metadata.
+                        Create, modify and publish client metadata. Note: This page is not integrated into the ServiceBroker and currently may only be used to create a ClientAuthorization Ticket.
                     </p>
                     <p>
                         <asp:Label ID="lblResponse" runat="server" Visible="False"></asp:Label></p>
                 </div>
                 <div id="pagecontent">
                     <div class="simpleform">
-                        <table cellspacing="5" cellpadding="0" border="0">
+                        <table cellspacing="5" cellpadding="0" border="0" style="width: 793px">
                             <tr>
-                                <th><label for="client">Client</label></th>
-                                <td><asp:DropDownList CssClass="i18n" ID="ddlClient" runat="server" Width="260px" AutoPostBack="True"
-                                        OnSelectedIndexChanged="ddlClient_SelectedIndexChanged"></asp:DropDownList></td>
+                                <th><label for="client">Client </label></th>
+                                <td colspan="2"><asp:DropDownList CssClass="i18n" ID="ddlClient" runat="server"  AutoPostBack="True"
+                                        OnSelectedIndexChanged="ddlClient_SelectedIndexChanged" Width="672px"></asp:DropDownList></td>
+                            </tr>
+                            <tr>
+                                <th rowspan="2"><label for="client">Client Authorization </label></th>
+                                <td style="width: 336px"><asp:Textbox CssClass="i18n" ID="txtCouponID" runat="server" Width="200px"></asp:Textbox></td>
+                                <td style="width: 180px"><asp:Textbox CssClass="i18n" ID="txtIssuer" runat="server" Columns="50"></asp:Textbox></td>
+                            </tr>
+                            <tr>
+                                <td style="width: 336px"><asp:Textbox CssClass="i18n" ID="txtPasscode" runat="server" Columns="50"></asp:Textbox>&nbsp;&nbsp;&nbsp;</td><td><asp:Button ID="btnGuid" runat="server" CssClass="button" Text="Make Guid" OnClick="btnGuid_Click" /></td>
+                            </tr>
+                            <tr>
+                                <th><label for="client">Client SCORM </label></th>
+                                <td colspan="2"><asp:Textbox CssClass="i18n" ID="txtScorm" runat="server" Width="667px" Rows="8" TextMode="MultiLine"></asp:Textbox></td>
                             </tr>
                             <tr>
                                 <td>&nbsp;</td>
-                                <td><asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="button" OnClick="btnRegister_Click" /></td>
+                                <td colspan="2"><asp:Button ID="btnRegister" runat="server" Text="Register" CssClass="button" OnClick="btnRegister_Click" /></td>
                             </tr>
                         </table>
                     </div>
