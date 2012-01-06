@@ -53,6 +53,7 @@ namespace iLabs.ExpStorage.ESS
             }
             ProcessAgentDB.RefreshServiceAgent();
             ticketRemover = new TicketRemover();
+            ticketRemover.ProcessTickets();
 
 		}
  

@@ -126,7 +126,7 @@ namespace iLabs.ServiceBroker
                                 TicketTypes.STORE_RECORDS, essAgent.agentGuid, labServer.agentGuid, ticketDuration, factory.StoreRecordsPayload(true, experimentID, essAgent.webServiceUrl));
 
                          //3.C create retrieve experiment ticket, retrieve Experiment Records never expires, unless experiment deleted
-                         //    This should be changed to a long but finite period once eadExisting Expermint is in place.
+                         //    This should be changed to a long but finite period once ReadExisting Expermint is in place.
                          brokerDB.AddTicket(coupon,
                                 TicketTypes.RETRIEVE_RECORDS, essAgent.agentGuid, brokerDB.GetIssuerGuid(), -1, factory.RetrieveRecordsPayload(experimentID, essAgent.webServiceUrl));
 

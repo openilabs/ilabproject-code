@@ -34,14 +34,14 @@ namespace iLabs.ServiceBroker.Administration
     /// class which holds information pertaining to Agents (Users or Groups). 
     /// This is an internal structure and isn't specified in the API.
     /// </summary>
-    public class Agent
-    {
-        public int id;
-        public string type;
-        public string name;
-        public const string userType = "User";
-        public const string groupType = "Group";
-    }
+    //public class Agent
+    //{
+    //    public int id;
+    //    public string type;
+    //    public string name;
+    //    public const string userType = "User";
+    //    public const string groupType = "Group";
+    //}
 
     public class Authority{
         public int authorityID;
@@ -84,7 +84,7 @@ namespace iLabs.ServiceBroker.Administration
 		public int userID;
 
         /// <summary>
-        /// The integer ID of the Users Authority. Defaults to zerto.
+        /// The integer ID of the Users Authority. Defaults to zero which is defined as the local ServiceBroker.
         /// </summary>
         public int authID;
 
@@ -2258,7 +2258,7 @@ namespace iLabs.ServiceBroker.Administration
             Ticket sessionTicket = ticketIssuer.RetrieveIssuedTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid);
             if (sessionTicket != null)
             {
-                if (sessionTicket.IsExpired())
+                if (sessionTicket.isCancelled || sessionTicket.IsExpired())
                 {
                     throw new AccessDeniedException("The ticket has expired.");
                 }

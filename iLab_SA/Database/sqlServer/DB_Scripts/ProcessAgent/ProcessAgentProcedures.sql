@@ -263,6 +263,9 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetTicket]
 drop procedure [dbo].[GetTicket]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[DropExpiredTicketsCoupons]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[DropExpiredTicketsCoupons]
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetExpiredTickets]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetExpiredTickets]
 GO
@@ -1718,14 +1721,40 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS OFF 
 GO
+
+CREATE PROCEDURE DropExpiredTicketsCoupons
+AS
+BEGIN
+Create Table #ticks  (tId bigint,cId bigint, isGuid varchar (50))
+create Table #coups (cId bigint,  isGuid varchar (50))
+create Table #remove (cnt int, cid bigint, isGuid varchar (50))
+
+insert #ticks Exec('select ticket_id, Coupon_ID, issuer_guid from ticket
+	where cancelled = 1 OR 
+	(duration != -1 and (DATEDIFF(second,creation_Time,GETUTCDATE()) > duration))')
+	
+insert #coups Exec('select distinct cid,isGuid from #ticks')
+
+delete from Ticket where Ticket_ID IN (select tId from #ticks)
+insert #remove Exec( 'select COUNT(coupon_ID), coupon_ID, issuer_guid from Ticket
+where Coupon_ID in (Select cid from #coups)  group by coupon_ID,issuer_guid')
+
+delete from Coupon where Coupon_ID in ( select cid from #remove where cnt = 0 )
+
+Drop Table #ticks
+Drop Table #coups
+Drop Table #remove
+END
+GO
+
 -- Returns the TicketID and coupon for an expired ticket
 CREATE PROCEDURE GetExpiredTickets
 AS
 select t.ticket_id, t.coupon_id, t.Issuer_guid, c.passkey
 from ticket t, coupon c
 where t.cancelled = 1 OR
-(t.cancelled = 0 and duration != -1 and DATEDIFF(second,creation_Time,GETUTCDATE()) > duration
-and t.coupon_id = c.Coupon_id and t.issuer_guid = c.issuer_guid)
+(duration != -1 and (DATEDIFF(second,creation_Time,GETUTCDATE()) > duration))
+and (t.coupon_id = c.Coupon_id and t.issuer_guid = c.issuer_guid)
 
 go
 SET QUOTED_IDENTIFIER OFF 

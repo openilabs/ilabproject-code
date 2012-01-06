@@ -841,6 +841,128 @@ namespace iLabs.ServiceBroker.iLabSB
             return DataStorageAPI.ListClientItems(clientID, userID);
         }
 
+        ///////////////////////
+        //// Authority Methods
+        ///////////////////////
+
+        /// <summary>
+        /// An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM.
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="authorityKey">May be a URL or GUID, not sure what it will actually be</param>
+        /// <returns>An IntTag, depending on the id the tag maybe used differently.</returns>
+        [WebMethod(Description = "An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+        [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
+        [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/GetUserStatus", Binding = "IServiceBroker")]
+        public IntTag GetUserStatus(string userName, string authorityKey)
+        {
+            IntTag tag = new IntTag(-1,"Not Found");
+            int authID = 0;
+            int userID = -1;
+            Authority auth = brokerDB.AuthorityRetrieve(authorityKey);
+            if(auth != null){
+                authID = auth.authorityID;
+            }
+            userID = AdministrativeAPI.GetUserID(userName, authID);
+            if (userID > 0)
+            {
+                User [] users =  AdministrativeAPI.GetUsers(new int[]{userID});
+                if (users != null && users.Length > 0)
+                {
+                    int status = 0;
+                    tag.tag = "User Found";
+                    if (users[0].firstName == null || users[0].firstName.Length == 0)
+                    {
+                        status |= 1;
+                    }
+                    if (users[0].lastName == null || users[0].lastName.Length == 0)
+                    {
+                        status |= 2;
+                    }
+                    if (users[0].email == null || users[0].email.Length == 0)
+                    {
+                        status |= 4;
+                    }
+                    if (users[0].affiliation == null || users[0].affiliation.Length == 0)
+                    {
+                        status |= 8;
+                    }
+                    tag.id = status;
+                }
+            }
+            return tag;
+        }
+
+        /// <summary>
+        /// An authority updates a user. This will most likely only be supported for requests from a SCORM.
+        /// </summary>
+        /// <param name="userName">>A string token reperesenting the user, this may be a user name, or an anonymous unique 
+        /// id that the authority will always use to identify this user</param>
+        /// <param name="authorityKey">May be a URL or GUID, not sure what it will actually be</param>
+        /// <param name="firstName"></param>
+        /// <param name="lastName"></param>
+        /// <param name="email"></param>
+        /// <param name="affiliation"></param>
+        /// <param name="autoCreate">create the user if it does not exist & is true</param>
+        /// <returns></returns>
+        [WebMethod(Description = "An authority updates a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+        [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
+        [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/ModifyUser", Binding = "IServiceBroker")]
+        public IntTag ModifyUser(string userName, string authorityKey, string firstName, string lastName,
+            string email, string affiliation, bool autoCreate)
+        {
+            IntTag tag = new IntTag(-1,"Not Found");
+            int authID = 0;
+            int userID = -1;
+            Authority auth = brokerDB.AuthorityRetrieve(authorityKey);
+            if(auth != null){
+                authID = auth.authorityID;
+            }
+            userID = AdministrativeAPI.GetUserID(userName, authID);
+            if (userID > 0)
+            {
+                User[] users = AdministrativeAPI.GetUsers(new int[] { userID });
+                if (users != null && users.Length > 0)
+                {
+                    string fName = users[0].firstName;
+                    string lName = users[0].lastName;
+                    string eMail = users[0].email;
+                    string affil = users[0].affiliation;
+                    if (firstName != null && firstName.Length > 0)
+                        fName = firstName;
+                    if (lastName != null && lastName.Length > 0)
+                        lName = firstName;
+                    if (email != null && email.Length > 0)
+                        eMail = email;
+                    if (affiliation != null && affiliation.Length > 0)
+                        affil = affiliation;
+                    try
+                    {
+                        AdministrativeAPI.ModifyUser(userID, userName, null, null, fName, lName, eMail, affil, users[0].reason, users[0].xmlExtension, false);
+                    }
+                    catch
+                    {
+                        tag.tag = "Error Updating User";
+                    }
+                    tag.id = 0;
+                    tag.tag = "User Updated";
+                }
+            }
+            else
+            {
+                if (autoCreate)
+                {
+                    int newID = AdministrativeAPI.AddUser(userName, auth.authorityID, auth.authTypeID, firstName, lastName, email,
+                        auth.authName, null, null, auth.defaultGroupID, false);
+                    if (newID > 0)
+                    {
+                        tag.id = 1;
+                        tag.tag = "User Created";
+                    }
+                }
+            }
+            return tag;
+        }
 
        
         /// <summary>
@@ -860,7 +982,7 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
         public IntTag LaunchLabClient(string clientGuid, string groupName,
-               string userName, string authorityUrl, long duration, int autoStart)
+               string userName, string authorityKey, DateTime start, long duration, int autoStart)
         {
             IntTag result = new IntTag(-1, "Access Denied");
             StringBuilder buf = new StringBuilder();
@@ -875,8 +997,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 // Need to check opHeader
                 if (opHeader != null && opHeader.coupon != null)
                 {
-
-                    authority = brokerDB.AuthorityRetrieveByUrl(authorityUrl);
+                    authority = brokerDB.AuthorityRetrieve(authorityKey);
                     // Coupon is from the client SCORM
                     clientAuthTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
                     if (authority == null || clientAuthTicket == null)
@@ -933,40 +1054,42 @@ namespace iLabs.ServiceBroker.iLabSB
                             {
 
                                 //Check for group access & User
-                                result = brokerDB.ResolveAction(Context, clientID, userID, groupID, DateTime.UtcNow, duration, autoStart > 0);
+                                //THis is the planned future need to deal with Session varables before it works
+                                //result = brokerDB.ResolveAction(Context, clientID, userID, groupID, DateTime.UtcNow, duration, autoStart > 0);
+
+                                // Currently use the ssoAuth page
                                 //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
-                            }
+                                Coupon coupon = brokerDB.CreateCoupon();
+                                TicketLoadFactory tlc = TicketLoadFactory.Instance();
+                                string payload = tlc.createAuthenticateAgentPayload(authority.authGuid, clientGuid, userName, groupName);
+                                brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authority.authGuid, 600L, payload);
+                                buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                                buf.Append("/default.aspx?sso=t");
+                                buf.Append("&usr=" + userName + "&cid=" + clientGuid);
+                                buf.Append("&grp=" + groupName);
+                                buf.Append("&auth=" + authority.authGuid);
+                                buf.Append("&key=" + coupon.passkey);
+                                if (autoStart > 0)
+                                    buf.Append("&auto=t");
+
+                                result.id = 1;
+                                result.tag = buf.ToString();
+                                //
+                                //
+                                //if (test.id > 0)
+                                //{
+                                //    string requestGuid = Utilities.MakeGuid("N");
+                                //    
+
+                                //}
+                                //else
+                                //{
+                                //    tag.tag = "Access Denied";
+                                //}
+                             }
                         }
                     }
                 }
-                //    Coupon coupon = brokerDB.CreateCoupon();
-                //    TicketLoadFactory tlc = TicketLoadFactory.Instance();
-                //    string payload = tlc.createAuthenticateAgentPayload(authorityGuid, clientGuid, userName, groupName);
-                //    brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authorityGuid, 600L, payload);
-                //    buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
-                //    buf.Append("/default.aspx?sso=t");
-                //    buf.Append("&usr=" + userName + "&cid=" + clientGuid);
-                //    buf.Append("&grp=" + groupName);
-                //    buf.Append("&auth=" + authorityUrl);
-                //    buf.Append("&key=" + coupon.passkey);
-                //    if (autoStart > 0)
-                //        buf.Append("&auto=t");
-
-                //    tag.id = 1;
-                //    tag.tag = buf.ToString();
-                //    //
-                //    //
-                //    //if (test.id > 0)
-                //    //{
-                //    //    string requestGuid = Utilities.MakeGuid("N");
-                //    //    
-
-                //    //}
-                //    //else
-                //    //{
-                //    //    tag.tag = "Access Denied";
-                //    //}
-                //}
 
             }
             catch (Exception e)

@@ -321,7 +321,7 @@ namespace iLabs.Scheduling.LabSide
                         }
 
                     }
-                    if(status <= 0)
+                    else
                     {
                         if( !dbManager.AuthenticateCoupon(coupon))
                             dbManager.InsertCoupon(coupon);

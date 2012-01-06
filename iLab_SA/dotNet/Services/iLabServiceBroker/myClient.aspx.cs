@@ -496,7 +496,7 @@ namespace iLabs.ServiceBroker.iLabSB
         }
 
         /// <summary>
-        /// This returns the LabbServer for the client. In future may use effectiveGroupID to select if there are multiple lab servers.
+        /// This returns the LabServer for the client. In future may use effectiveGroupID to select if there are multiple lab servers.
         /// </summary>
         /// <returns>primary labServer for group or null</returns>
         ProcessAgentInfo getLabServer(int clientID, int effectiveGrpID)
@@ -541,7 +541,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         Session["ClientID"] = client.clientID;
 
                         DateTime start = DateTime.UtcNow;
-                        long duration = -1L; // default is never timeout
+                        long duration = 7L * 24L * 60L *60L; // default is one week
 
                         //Check for Scheduling: 
                         //The scheduling Ticket should exist and been parsed into the session

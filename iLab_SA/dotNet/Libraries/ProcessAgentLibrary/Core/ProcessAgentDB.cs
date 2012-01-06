@@ -1139,7 +1139,8 @@ namespace iLabs.Core
 
                 // create sql command
                 DbCommand cmd = connection.CreateCommand();
-                cmd.CommandText =  "GetExpiredTickets";
+                //cmd.CommandText = "GetExpiredTickets";
+                cmd.CommandText = "DropExpiredTicketsCoupons";
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Transaction = transaction;
 

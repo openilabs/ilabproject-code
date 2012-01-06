@@ -68,16 +68,19 @@ namespace iLabs.TicketIssuer
                     XmlQueryDoc xDoc = null;
                     Ticket sessionTicket = RetrieveIssuedTicket(coupon,TicketTypes.REDEEM_SESSION,GetIssuerGuid());
                     if(sessionTicket != null){
-                        xDoc = new XmlQueryDoc(sessionTicket.payload);
-                        string user = xDoc.Query("RedeemSessionPayload/userID");
-                        string group = xDoc.Query("RedeemSessionPayload/groupID");
-                        string client = xDoc.Query("RedeemSessionPayload/clientID");
-                        if (user != null && user.Length > 0)
-                            userId = Convert.ToInt32(user);
-                        if (group != null && group.Length > 0)
-                            groupId = Convert.ToInt32(group);
-                        if (client != null && client.Length > 0)
-                            clientId = Convert.ToInt32(client);
+                        if (!sessionTicket.isCancelled && !sessionTicket.IsExpired())
+                        {
+                            xDoc = new XmlQueryDoc(sessionTicket.payload);
+                            string user = xDoc.Query("RedeemSessionPayload/userID");
+                            string group = xDoc.Query("RedeemSessionPayload/groupID");
+                            string client = xDoc.Query("RedeemSessionPayload/clientID");
+                            if (user != null && user.Length > 0)
+                                userId = Convert.ToInt32(user);
+                            if (group != null && group.Length > 0)
+                                groupId = Convert.ToInt32(group);
+                            if (client != null && client.Length > 0)
+                                clientId = Convert.ToInt32(client);
+                        }
                     }
                 }
             }

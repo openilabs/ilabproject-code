@@ -3821,7 +3821,7 @@ namespace iLabs.Scheduling.LabSide
 			 * !------------------------------------------------------------------------------!
 			 */
 		/// <summary>
-		/// Add information of a particular user side scheduling server identified by ussID 
+		/// Add information of a particular user side scheduling server identified by ussID, theCOupon should have already been Inserted. 
 		/// </summary>
         /// <param name="ussGuid"></param>
 		/// <param name="ussName"></param>
@@ -3833,15 +3833,14 @@ namespace iLabs.Scheduling.LabSide
             int i = -1;
 			//create a connection
 			DbConnection connection= FactoryDB.GetConnection();
-            DbCommand cmd0 = FactoryDB.CreateCommand("InsertCoupon", connection);
-            cmd0.CommandType = CommandType.StoredProcedure;
-            cmd0.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
-            cmd0.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
-            cmd0.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.String, 100));
-            try
-            {
-                connection.Open();
-                cmd0.ExecuteNonQuery();
+            //DbCommand cmd0 = FactoryDB.CreateCommand("InsertCoupon", connection);
+            //cmd0.CommandType = CommandType.StoredProcedure;
+            //cmd0.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+            //cmd0.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", coupon.issuerGuid, DbType.AnsiString, 50));
+            //cmd0.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.String, 100));
+           
+               
+            //    cmd0.ExecuteNonQuery();
                 //create a command
                 //command executes the "AddUSSInfo" store procedure
                 DbCommand cmd = FactoryDB.CreateCommand("USSInfo_Add", connection);
@@ -3856,7 +3855,9 @@ namespace iLabs.Scheduling.LabSide
 
 
                 // execute the command
-
+                try
+                {
+                    connection.Open();
                 Object ob = cmd.ExecuteScalar();
                 if (ob != null && ob != System.DBNull.Value)
                 {

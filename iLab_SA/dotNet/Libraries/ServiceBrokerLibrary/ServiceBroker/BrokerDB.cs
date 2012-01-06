@@ -828,30 +828,53 @@ namespace iLabs.ServiceBroker
             return auth;
         }
 
-        public Authority AuthorityRetrieve(string guid)
+        public Authority AuthorityRetrieve(string authorityKey)
         {
             Authority auth = null;
-            DbConnection connection = FactoryDB.GetConnection();
-            DbCommand cmd = FactoryDB.CreateCommand("Authority_RetrieveByGuid", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-            try
+            int status = -1;
+            if (authorityKey != null && authorityKey.Length > 0)
             {
+                if (authorityKey.Contains("://"))
+                {
+                    status = 0;
+                }
+                else
+                {
+                    status = 1;
+                }
+                DbConnection connection = FactoryDB.GetConnection();
+                DbCommand cmd = null;
+               
                 // populate stored procedure parameters
-                cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", guid, DbType.AnsiString, 50));
-                // read the result
-                connection.Open();
-                DbDataReader dataReader = cmd.ExecuteReader();
-                auth = readAuthority(dataReader);
-                dataReader.Close();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            finally
-            {
-                connection.Close();
+                if (status == 1)
+                {
+                    cmd = FactoryDB.CreateCommand("Authority_RetrieveByGuid", connection);
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityGuid", authorityKey, DbType.AnsiString, 50));
+                    cmd.CommandType = CommandType.StoredProcedure;
+                }
+                else
+                {
+                    cmd = FactoryDB.CreateCommand("Authority_RetrieveByUrl", connection);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(FactoryDB.CreateParameter("@authorityUrl", authorityKey, DbType.String, 256));
+                }
+                 try
+                {
+                    // read the result
+                    connection.Open();
+                    DbDataReader dataReader = cmd.ExecuteReader();
+                    auth = readAuthority(dataReader);
+                    dataReader.Close();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
             }
             return auth;
         }
@@ -2637,6 +2660,23 @@ namespace iLabs.ServiceBroker
 
                 }
         */
+        /// <summary>
+        /// This returns the LabServer for the client. In future may use effectiveGroupID to select if there are multiple lab servers.
+        /// </summary>
+        /// <returns>primary labServer for group or null</returns>
+       public ProcessAgentInfo GetClientLabServer(int clientID, int effectiveGrpID)
+        {
+            ProcessAgentInfo pai = null;
+            if (clientID >0)
+            {
+                ProcessAgentInfo[] paInfos = AdministrativeAPI.GetLabServersForClient(clientID);
+                if (paInfos != null && paInfos.Length > 0)
+                {
+                    pai = paInfos[0];
+                }
+            }
+            return pai;
+        }
 
         /// <summary>
         /// This examines the specified parameters to resolve the available resources for the user
@@ -2975,7 +3015,7 @@ namespace iLabs.ServiceBroker
             return result;
         }
 
-        public Coupon RequestAuthorization(string[] types, long duration, string userName, string authority, string groupName, string serviceGuid, string clientGuid)
+        public Coupon RequestAuthorization(HttpContext context, string[] types, long duration, string userName, string authKey, string groupName, string serviceGuid, string clientGuid)
         {
             int status = -1;
             bool ok = false;
@@ -2983,67 +3023,29 @@ namespace iLabs.ServiceBroker
             long ticketDuration = Math.Max(minDuration, duration);
             Coupon coupon = null;
 
-            int userID = 0;
-            int groupID = 0;
-            int clientID = 0;
+            int userID = -1;
+            int authID = -1;
+            int groupID = -1;
+            int clientID = -1;
             int[] clientIDs;
 
             string curGroup = null;
             string eGroupName = null;
             LabClient theClient = null;
             string requestGuid = null;
+            string agentGuid = null;
             ProcessAgentInfo authPA = null;
             StringBuilder message = new StringBuilder();
             Dictionary<string, int[]> groupClientsMap = null;
 
-            if (agentAuthHeader.coupon == null && opHeader.coupon == null)
-            {
-                throw new AccessDeniedException("Missing Header Information, access denied!");
-            }
-            if (opHeader.coupon != null)
-            {
-                //SessionInfo sessionInfo = null;
-                //Ticket sessionTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid);
-                //if (sessionTicket != null)
-                //{
-                //    if (sessionTicket.IsExpired())
-                //    {
-                //        throw new AccessDeniedException("The ticket has expired.");
-                //    }
-                //    sessionInfo = AdministrativeAPI.ParseRedeemSessionPayload(sessionTicket.payload);
-                //    if(sessionInfo != null){
-                //        requestGuid = sessionTicket.sponsorGuid; // Not sure this works except for a ticket created in this method
-                //        if(userName != null && userName.Trim().Length > 0){
-                //            if(userName.Trim().ToLower().CompareTo(sessionInfo.userName) != 0){
-                //                throw new AccessDeniedException("The user is is not associated with this request.");
-                //            }
-                //        }
-                //        userID = sessionInfo.userID;
-                //        if (groupName != null && groupName.Trim().Length > 0)
-                //        {
-                //            if(sessionInfo.groupName.CompareTo(groupName.Trim()) == 0){
-                //            }
-                //            else{
-                //            }
-                //        }
-                //        else // No group specified
-                //        {
-                //        }
-                //        if(clientGuid != null && clientGuid.Trim().Length >0){
-                //        }
-                //        else{
-                //        }
-                //    }
-                //}
-            }
-            else if (agentAuthHeader.coupon != null)
+          if (authKey != null && authKey.Length > 0)
             {
                 // Request is from a ProcessAgent 
-                if (brokerDB.AuthenticateAgentHeader(agentAuthHeader))
-                {
-                    requestGuid = agentAuthHeader.agentGuid;
-                    authPA = brokerDB.GetProcessAgentInfo(requestGuid);
-                    int authID = -1;
+                //if (AuthenticateAgentHeader(agentAuthHeader))
+                //{
+                    requestGuid = authKey;
+                    authPA = GetProcessAgentInfo(requestGuid);
+                    
                     // check if the The requesting service is known to the domain
                     if (authPA != null)
                     {
@@ -3054,7 +3056,7 @@ namespace iLabs.ServiceBroker
                         }
                         else
                         {
-                            Authority auth = brokerDB.AuthorityRetrieve(requestGuid);
+                            Authority auth = AuthorityRetrieve(requestGuid);
                             if (auth != null)
                             {
                                 authID = auth.authorityID;
@@ -3062,7 +3064,7 @@ namespace iLabs.ServiceBroker
                         }
                         //Determine resources available based on supplied fields, note requestGuid is not used to authenticate users at this time
                         // Only return groups that match the inputs, have clients & are not administrative
-                        status = brokerDB.ResolveResources(Context, authID, userName, groupName, serviceGuid, clientGuid, false,
+                        status = ResolveResources(context, authID, userName, groupName, serviceGuid, clientGuid, false,
                             ref message, out userID, out groupClientsMap);
                         if (userID <= 0 || groupClientsMap.Count == 0)
                         {
@@ -3141,12 +3143,12 @@ namespace iLabs.ServiceBroker
 
                         }
                         //Resolve user/group/client/services
-                        coupon = brokerDB.CreateCoupon();
+                        coupon = CreateCoupon();
 
                         //create REDEEM_SESSION ticket
                         //string payload = TicketLoadFactory.Instance().createRedeemSessionPayload(userID, groupID, clientID, userName, groupName);
                         //brokerDB.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid, agentAuthHeader.agentGuid, duration, payload);
-                    }
+                    //}
 
 
 
@@ -3166,7 +3168,7 @@ namespace iLabs.ServiceBroker
                             lsIDs = AdministrativeAPI.GetLabServerIDsForClient(theClient.clientID);
                             if (lsIDs != null && lsIDs.Length > 0)
                             {
-                                ls = brokerDB.GetProcessAgent(lsIDs[0]);
+                                ls = GetProcessAgent(lsIDs[0]);
                             }
                             if (theClient.needsScheduling)
                             {
@@ -3175,20 +3177,20 @@ namespace iLabs.ServiceBroker
                                     lssID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.PROCESS_AGENT, lsIDs[0], ProcessAgentType.LAB_SCHEDULING_SERVER);
                                     if (lssID > 0)
                                     {
-                                        lss = brokerDB.GetProcessAgent(lssID);
+                                        lss = GetProcessAgent(lssID);
                                     }
                                 }
                                 ussID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.SCHEDULING_SERVER);
                                 if (ussID > 0)
                                 {
-                                    uss = brokerDB.GetProcessAgent(ussID);
+                                    uss = GetProcessAgent(ussID);
                                 }
                             }
                             if (theClient.needsESS)
                             {
                                 essID = ResourceMapManager.FindResourceProcessAgentID(ResourceMappingTypes.CLIENT, theClient.clientID, ProcessAgentType.EXPERIMENT_STORAGE_SERVER);
                                 if (essID > 0)
-                                    ess = brokerDB.GetProcessAgent(essID);
+                                    ess = GetProcessAgent(essID);
                             }
                         }
                         TicketLoadFactory tlf = TicketLoadFactory.Instance();
@@ -3204,7 +3206,7 @@ namespace iLabs.ServiceBroker
                             {
                                 case TicketTypes.REDEEM_SESSION:
                                     payload = tlf.createRedeemSessionPayload(userID, AdministrativeAPI.GetGroupID(curGroup), clientID, userName, curGroup);
-                                    brokerDB.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid, agentAuthHeader.agentGuid, duration, payload);
+                                    AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid, agentGuid, duration, payload);
                                     break;
                                 //case TicketTypes.ALLOW_EXPERIMENT_EXECUTION:
                                 //    payload = tlf.createAllowExperimentExecutionPayload(start,duration,groupName,theClient.clientGuid);
@@ -3228,13 +3230,13 @@ namespace iLabs.ServiceBroker
                                         payload = tlf.createScheduleSessionPayload(userName, curGroup, ProcessAgentDB.ServiceGuid,
                                             ls.agentGuid, theClient.clientGuid, theClient.ClientName, theClient.version, uss.webServiceUrl, 0);
                                         // Create USS ticket
-                                        brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentAuthHeader.agentGuid,
+                                        AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentGuid,
                                             duration, payload);
                                         // Create Requester ticket
-                                        brokerDB.AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentAuthHeader.agentGuid, uss.agentGuid,
+                                        AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, agentGuid, uss.agentGuid,
                                              ticketDuration, payload);
                                         // Create the USS to LSS REQUEST_RESERVATION Ticket
-                                        brokerDB.AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, ticketDuration,
+                                        AddTicket(coupon, TicketTypes.REQUEST_RESERVATION, lss.agentGuid, uss.agentGuid, ticketDuration,
                                             tlf.createRequestReservationPayload());
 
                                         ok = true;
@@ -3244,7 +3246,7 @@ namespace iLabs.ServiceBroker
                                     if (theClient != null && uss != null)
                                     {
                                         payload = tlf.createRedeemReservationPayload(start, start.AddMinutes(duration), userName, curGroup, theClient.clientGuid);
-                                        brokerDB.AddTicket(coupon, TicketTypes.REDEEM_RESERVATION, agentAuthHeader.agentGuid, uss.agentGuid,
+                                        AddTicket(coupon, TicketTypes.REDEEM_RESERVATION, agentGuid, uss.agentGuid,
                                             ticketDuration, payload);
                                         ok = true;
                                     }
@@ -3254,7 +3256,7 @@ namespace iLabs.ServiceBroker
                                     {
                                         payload = tlf.createRevokeReservationPayload("", userName, curGroup, ProcessAgentDB.ServiceGuid,
                                             theClient.clientGuid, uss.webServiceUrl);
-                                        brokerDB.AddTicket(coupon, TicketTypes.REVOKE_RESERVATION, agentAuthHeader.agentGuid, uss.agentGuid,
+                                        AddTicket(coupon, TicketTypes.REVOKE_RESERVATION, agentGuid, uss.agentGuid,
                                             ticketDuration, payload);
                                         ok = true;
                                     }
@@ -3273,7 +3275,7 @@ namespace iLabs.ServiceBroker
                 return null;
         }
 
-        public IntTag LaunchLabClient(string clientGuid, string groupName,
+        public IntTag LaunchLabClient(Coupon coupon, HttpContext context, string clientGuid, string groupName,
        string userName, string authorityUrl, long duration, int autoStart)
         {
             IntTag result = new IntTag(-1, "Access Denied");
@@ -3287,12 +3289,12 @@ namespace iLabs.ServiceBroker
                 Ticket clientAuthTicket = null;
                 Authority authority = null;
                 // Need to check opHeader
-                if (opHeader != null && opHeader.coupon != null)
+                if (coupon != null)
                 {
 
-                    authority = brokerDB.AuthorityRetrieveByUrl(authorityUrl);
+                    authority = AuthorityRetrieveByUrl(authorityUrl);
                     // Coupon is from the client SCORM
-                    clientAuthTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
+                    clientAuthTicket = RetrieveIssuedTicket(coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
                     if (authority == null || clientAuthTicket == null)
                     {
                         return result;
@@ -3347,7 +3349,7 @@ namespace iLabs.ServiceBroker
                             {
 
                                 //Check for group access & User
-                                result = brokerDB.ResolveAction(Context, clientID, userID, groupID, DateTime.UtcNow, duration, autoStart > 0);
+                                result = ResolveAction(context, clientID, userID, groupID, DateTime.UtcNow, duration, autoStart > 0);
                                 //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
                             }
                         }
@@ -3388,10 +3390,153 @@ namespace iLabs.ServiceBroker
                 result.id = -1;
                 result.tag = e.Message;
             }
-            Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
             return result;
         }
+/*
+        private IntTag launchLabClient(int c_id, int u_id, int g_id, DateTime startEx, long dur)
+        {
+            bool addReturn = true;
+            IntTag results = new IntTag(-1, "Access Denied");
+            StringBuilder message = new StringBuilder();
+            LabClient client = AdministrativeAPI.GetLabClient(c_id);
+            if (client != null)
+            {
+                string effectiveGroupName = null;
+                int effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(g_id, c_id,
+                    Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
+                if (effectiveGroupID >0)
+                {
+                    effectiveGroupName = AdministrativeAPI.GetGroupName(effectiveGroupID);
+                }
+               
+                // [GeneralTicketing] get lab servers metadata from lab server ids
+                ProcessAgentInfo labServer = GetClientLabServer(client.clientID, effectiveGroupID);
+                if (labServer != null)
+                {
+                    TicketLoadFactory factory = TicketLoadFactory.Instance();
+                    // 1. Create Coupon for ExperimentCollection
+                    Coupon coupon = CreateCoupon();
 
+                    iLabProperties properties = new iLabProperties();
+                    properties.Add("sb", ProcessAgentDB.ServiceAgent);
+                    properties.Add("ls", labServer);
+                    properties.Add("op", coupon);
+
+                    //Session["ClientID"] = client.clientID;
+
+                    DateTime start = DateTime.UtcNow;
+                    long duration = -1L; // default is never timeout
+
+                    //Check for Scheduling: 
+                    //The scheduling Ticket should exist and been parsed into the session
+                    if (client.needsScheduling)
+                    {
+                        start = startEx;
+                        duration = dur;
+                    }
+
+                    //payload includes username and current group name & client id.
+                    string sessionPayload = factory.createRedeemSessionPayload(u_id, g_id,
+                               client.clientID, (string)Session["UserName"], (string)Session["GroupName"]);
+                    // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
+                    Ticket sessionTicket = AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
+                                 ProcessAgentDB.ServiceGuid, duration, sessionPayload);
+
+                    AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), g_id, client.clientID, Session.SessionID);
+
+                    if (client.clientType == LabClient.INTERACTIVE_HTML_REDIRECT)
+                    {
+                        // execute the "experiment execution recipe
+                        RecipeExecutor executor = RecipeExecutor.Instance();
+                        string redirectURL = null;
+
+                        // loaderScript not parsed in Recipe
+                        redirectURL = executor.ExecuteExperimentExecutionRecipe(coupon, labServer, client,
+                         start, duration, Convert.ToInt32(Session["UserTZ"]), u_id,
+                         effectiveGroupID, effectiveGroupName);
+
+                        // Add the return url to the redirect
+                        if(addReturn){
+                            if (redirectURL.IndexOf("?") == -1)
+                                redirectURL += "?";
+                            else
+                                redirectURL += "&";
+                            redirectURL += "sb_url=" + Utilities.ExportUrlPath(Request.Url);
+                        }
+                        // Parse & check that the default auth tokens are added
+                        string tmpUrl = iLabParser.Parse(redirectURL, properties, true);
+
+                        // Now open the lab within the current Window/frame
+                        //Response.Redirect(tmpUrl, true);
+                        results.id = 1;
+                        results.tag = tmpUrl;
+                        return results;
+                    }
+
+
+                    else if (client.clientType == LabClient.INTERACTIVE_APPLET)
+                    {
+
+                        // Note: Currently Interactive applets
+                        // use the Loader script for Batch experiments
+                        // Applets do not use default query string parameters, parametes must be in the loader script
+                        Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
+                        Session.Remove("RedirectURL");
+
+                        string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
+                            + "applet.aspx" + @"'</script>";
+                        Page.RegisterStartupScript("ReloadFrame", jScript);
+                    }
+
+                    // Support for Batch 6.1 Lab Clients
+                    else if (client.clientType == LabClient.BATCH_HTML_REDIRECT)
+                    {
+                        // use the Loader script for Batch experiments
+
+                        //use ticketing & redirect to url in loader script
+
+                        // [GeneralTicketing] retrieve static process agent corresponding to the first
+                        // association lab server
+
+
+                        // New comments: The HTML Client is not a static process agent, so we don't search for that at the moment.
+                        // Presumably when the interactive SB is merged with the batched, this should check for a static process agent.
+                        // - CV, 7/22/05
+                        {
+                            Session.Remove("LoaderScript");
+
+                            // This is the original batch-redirect using a pop-up
+                            // check that the default auth tokens are added
+                            string jScript = @"<script language='javascript'> window.open ('" + iLabParser.Parse(client.loaderScript, properties, true) + "')</script>";
+                            Page.RegisterStartupScript("HTML Client", jScript);
+
+                            // This is the batch-redirect with a simple redirect, this may not work as we need to preserve session-state
+                            //string redirectURL = lc.loaderScript + "?couponID=" + coupon.couponId + "&passkey=" + coupon.passkey;
+                            //Response.Redirect(redirectURL,true);
+                        }
+                    }
+                    // use the Loader script for Batch experiments
+                    else if (client.clientType == LabClient.BATCH_APPLET)
+                    {
+                        // Do not append defaults
+                        Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
+                        Session.Remove("RedirectURL");
+
+                        string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
+                            + ProcessAgentDB.ServiceAgent.codeBaseUrl + @"/applet.aspx" + @"'</script>";
+                        ClientScript.RegisterClientScriptBlock(this.GetType(), "ReloadFrame", jScript);
+                    }
+                } // labserver != null
+            }
+            else
+            {
+                message.Append(" LabServer = null");
+            }
+           
+            return results;
+        }
+*/
         public IntTag launchLab(ref HttpContext context, int userID, int groupID, int clientID, long duration, bool autoLaunch)
         {
             // Currently there is not a good solution for checking for an AllowExperiment ticket, will check the USS for reservation

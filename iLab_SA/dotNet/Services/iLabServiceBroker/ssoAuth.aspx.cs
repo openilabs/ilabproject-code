@@ -232,7 +232,11 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (hdnUser.Value.ToLower().CompareTo(Session["UserName"].ToString().ToLower()) == 0)
                     {
                         user_Name = hdnUser.Value;
-                        user_ID = AdministrativeAPI.GetUserID(user_Name);
+                        Authority auth = brokerDB.AuthorityRetrieve(hdnAuthority.Value);
+                        if(auth!= null)
+                            user_ID = AdministrativeAPI.GetUserID(user_Name,auth.authorityID);
+                        else 
+                            user_ID = AdministrativeAPI.GetUserID(user_Name, 0);
                     }
                     else
                     {
@@ -528,7 +532,11 @@ namespace iLabs.ServiceBroker.iLabSB
           
 
             int userID = -1;
-            userID = wrapper.GetUserIDWrapper(userName);
+            Authority auth = brokerDB.AuthorityRetrieve(hdnAuthority.Value);
+            if (auth != null)
+                userID = wrapper.GetUserIDWrapper(userName, auth.authorityID);
+            else
+                userID = wrapper.GetUserIDWrapper(userName, 0);
 
             if (userID > 0)
             {
