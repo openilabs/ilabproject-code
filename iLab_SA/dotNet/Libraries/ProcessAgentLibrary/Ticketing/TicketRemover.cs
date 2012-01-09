@@ -25,8 +25,8 @@ namespace iLabs.Ticketing
 	{
         private Thread theThread;
         // waitTime in milliseconds
-        //private int waitTime = 3600000; // Default is once an hour
-        private int waitTime = 600000; // Every 10 minutes
+        private int waitTime = 3600000; // Default is once an hour
+        //private int waitTime = 600000; // Every 10 minutes
         private bool go = true;
  
         

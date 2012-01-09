@@ -1121,10 +1121,6 @@ namespace iLabs.Core
         /// <returns></returns>
         public int ProcessExpiredTickets()
         {
-            List<Coupon> coupons = new List<Coupon>();
-            List<Coupon> remove = new List<Coupon>();
-            List<LongTag> tickets = new List<LongTag>();
-
             int ticketCount = 0;
             int couponCount = 0;
 
@@ -1146,97 +1142,21 @@ namespace iLabs.Core
 
                 // execute the command
                 DbDataReader dataReader = null;
-
-
                 dataReader = cmd.ExecuteReader();
                 while (dataReader.Read())
                 {
-                    long ticketID = dataReader.GetInt64(0);
-                    long couponID = dataReader.GetInt64(1);
-                    string guid = dataReader.GetString(2);
-                    string pass = dataReader.GetString(3);
-                    tickets.Add(new LongTag(ticketID, guid));
-                    Coupon coupon = new Coupon(guid, couponID, pass);
-                    if (!coupons.Contains(coupon))
-                    {
-                        coupons.Add(coupon);
-                    }
+                    ticketCount = dataReader.GetInt32(0);
+                    couponCount = dataReader.GetInt32(1);
                 }
                 dataReader.Close();
-                cmd.Dispose();
-
-                if (tickets.Count > 0)
-                {
-                   Logger.WriteLine("ProcessExpiredTickets: expired count = " + tickets.Count);
-                    cmd = connection.CreateCommand();
-                    cmd.CommandText = "DeleteTicketByID";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Transaction = transaction;
-                    DbParameter ticketIDParam = FactoryDB.CreateParameter("@ticketID", null, DbType.Int64);
-                    cmd.Parameters.Add(ticketIDParam);
-                    DbParameter issuerParam = FactoryDB.CreateParameter("@issuer", null, DbType.AnsiString, 50);
-                    cmd.Parameters.Add(issuerParam);
-                    foreach (LongTag tag in tickets)
-                    {
-                        ticketIDParam.Value = tag.id;
-                        issuerParam.Value = tag.tag;
-                        int count = Convert.ToInt32(cmd.ExecuteScalar());
-                        ticketCount++;
-
-                    }
-                    cmd.Dispose();
-                    cmd = connection.CreateCommand();
-                    cmd.CommandText = "GetCouponCollectionCount";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Transaction = transaction;
-                    DbParameter couponIDParam = FactoryDB.CreateParameter("@couponID", null, DbType.Int64);
-                    cmd.Parameters.Add(couponIDParam);
-                    DbParameter guidParam = FactoryDB.CreateParameter("@guid", null, DbType.AnsiString, 50);
-                    cmd.Parameters.Add(guidParam);
-
-                    foreach (Coupon c in coupons)
-                    {
-                        couponIDParam.Value = c.couponId;
-                        guidParam.Value = c.issuerGuid;
-                        Object objCount = cmd.ExecuteScalar();
-                        int collectioncount = 0;
-                        if (objCount != null)
-                            collectioncount = Convert.ToInt32(objCount);
-                        if (collectioncount == 0)
-                        {
-                            remove.Add(c);
-                        }
-                    }
-                    cmd.Dispose();
-                    if (remove.Count > 0){
-                        cmd = connection.CreateCommand();
-                        cmd.CommandText = "DeleteCoupon";
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Transaction = transaction;
-                        couponIDParam = FactoryDB.CreateParameter("@couponID", null, DbType.Int64);
-                        cmd.Parameters.Add(couponIDParam);
-                        guidParam = FactoryDB.CreateParameter("@guid", null, DbType.AnsiString, 50);
-                        cmd.Parameters.Add(guidParam);
-                        foreach (Coupon co in remove)
-                        {
-                            couponIDParam.Value = co.couponId;
-                            guidParam.Value = co.issuerGuid;
-                            int ccount = Convert.ToInt32(cmd.ExecuteScalar());
-                            if (ccount > 0)
-                            {
-                                couponCount++;
-                            }
-                        }
-                    }
-                }
                 transaction.Commit();
-               Logger.WriteLine("ProcessExpiredTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
+                Logger.WriteLine("ProcessExpiredTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
 
             }
             catch (Exception e)
             {
                 transaction.Rollback();
-               Logger.WriteLine("ProcessExpiredTickets:  transaction Failed - Rollback- ticketCount=" + ticketCount + " \tcouponCount=" + couponCount +"\n" + e.Message);
+                Logger.WriteLine("ProcessExpiredTickets:  transaction Failed - Rollback- ticketCount=" + ticketCount + " \tcouponCount=" + couponCount + "\n" + e.Message);
             }
             finally
             {
