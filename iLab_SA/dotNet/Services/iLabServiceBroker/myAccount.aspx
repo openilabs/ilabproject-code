@@ -61,6 +61,11 @@ Please see license.txt in top level directory for full license.
 								</tr>
 								<tr>
 									<th>
+										<label for="Authorities">Authority </label></th>
+									<td><asp:dropdownlist CssClass="i18n" id="ddlAuthorities" Runat="server" AutoPostBack="True"></asp:dropdownlist></td>
+								</tr>
+								<tr>
+									<th>
 										<label for="firstname">First Name </label>
 									</th>
 									<td><asp:TextBox ID="txtFirstName" Runat="server"></asp:TextBox>

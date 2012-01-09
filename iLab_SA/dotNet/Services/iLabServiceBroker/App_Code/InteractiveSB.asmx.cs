@@ -911,58 +911,59 @@ namespace iLabs.ServiceBroker.iLabSB
         public IntTag ModifyUser(string userName, string authorityKey, string firstName, string lastName,
             string email, string affiliation, bool autoCreate)
         {
-            IntTag tag = new IntTag(-1,"Not Found");
+            IntTag tag = new IntTag(-1,"User Not Found");
             int authID = 0;
             int userID = -1;
             Authority auth = brokerDB.AuthorityRetrieve(authorityKey);
-            if(auth != null){
-                authID = auth.authorityID;
-            }
-            userID = AdministrativeAPI.GetUserID(userName, authID);
-            if (userID > 0)
+            if (auth != null)
             {
-                User[] users = AdministrativeAPI.GetUsers(new int[] { userID });
-                if (users != null && users.Length > 0)
+
+                userID = AdministrativeAPI.GetUserID(userName, auth.authorityID);
+                if (userID > 0)
                 {
-                    string fName = users[0].firstName;
-                    string lName = users[0].lastName;
-                    string eMail = users[0].email;
-                    string affil = users[0].affiliation;
-                    if (firstName != null && firstName.Length > 0)
-                        fName = firstName;
-                    if (lastName != null && lastName.Length > 0)
-                        lName = firstName;
-                    if (email != null && email.Length > 0)
-                        eMail = email;
-                    if (affiliation != null && affiliation.Length > 0)
-                        affil = affiliation;
-                    try
+                    User user = AdministrativeAPI.GetUser(userID);
+                    if (user != null)
                     {
-                        AdministrativeAPI.ModifyUser(userID, userName, null, null, fName, lName, eMail, affil, users[0].reason, users[0].xmlExtension, false);
+                        string fName = user.firstName;
+                        string lName = user.lastName;
+                        string eMail = user.email;
+                        string affil = user.affiliation;
+                        if (firstName != null && firstName.Length > 0)
+                            fName = firstName;
+                        if (lastName != null && lastName.Length > 0)
+                            lName = firstName;
+                        if (email != null && email.Length > 0)
+                            eMail = email;
+                        if (affiliation != null && affiliation.Length > 0)
+                            affil = affiliation;
+                        try
+                        {
+                            AdministrativeAPI.ModifyUser(userID, userName, auth.authorityID, auth.authTypeID, fName, lName, eMail, affil, user.reason, user.xmlExtension, false);
+                        }
+                        catch
+                        {
+                            tag.tag = "Error Updating User";
+                        }
+                        tag.id = 0;
+                        tag.tag = "User Updated";
                     }
-                    catch
-                    {
-                        tag.tag = "Error Updating User";
-                    }
-                    tag.id = 0;
-                    tag.tag = "User Updated";
                 }
-            }
-            else
-            {
-                if (autoCreate)
+                else
                 {
-                    int newID = AdministrativeAPI.AddUser(userName, auth.authorityID, auth.authTypeID, firstName, lastName, email,
-                        auth.authName, null, null, auth.defaultGroupID, false);
-                    if (newID > 0)
+                    if (autoCreate)
                     {
-                        tag.id = 1;
-                        tag.tag = "User Created";
+                        int newID = AdministrativeAPI.AddUser(userName, auth.authorityID, auth.authTypeID, firstName, lastName, email,
+                            auth.authName, null, null, auth.defaultGroupID, false);
+                        if (newID > 0)
+                        {
+                            tag.id = 1;
+                            tag.tag = "User Created";
+                        }
                     }
                 }
             }
             return tag;
-        }
+            }
 
        
         /// <summary>
@@ -1682,54 +1683,44 @@ namespace iLabs.ServiceBroker.iLabSB
             int roles = 0;
             int userID = 0;
             int groupID = 0;
+            int clientID = 0;
             long[] expIDs = null;
-            Ticket expTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION);
-            if (expTicket != null && !expTicket.IsExpired())
+            if (brokerDB.RedeemSessionInfo(opHeader.coupon, out userID, out groupID, out clientID))
             {
-                //Parse payload, only get what is needed 	
-
-                XmlQueryDoc expDoc = new XmlQueryDoc(expTicket.payload);
-                long expID = -1;
-
-                string userStr = expDoc.Query("RedeemSessionPayload/userID");
-                if ((userStr != null) && (userStr.Length > 0))
-                    userID = Convert.ToInt32(userStr);
-                string groupStr = expDoc.Query("RedeemSessionPayload/groupID");
-                if ((groupStr != null) && (groupStr.Length > 0))
-                    groupID = Convert.ToInt32(groupStr);
 
                 if (userID > 0)
                 {
 
                     AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
                     roles = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
-                }
-                if ((roles | ExperimentAccess.READ) == ExperimentAccess.READ)
-                {
-                    experiment = new Experiment();
-                    experiment.experimentId = experimentID;
-                    experiment.issuerGuid = ProcessAgentDB.ServiceGuid;
-                    ProcessAgentInfo ess = brokerDB.GetExperimentESS(experimentID);
-                    if (ess != null)
-                    {
-                        ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                        Coupon opCoupon = brokerDB.GetEssOpCoupon(experimentID, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
-                        if (opCoupon == null)
-                        {
-                            string payload = TicketLoadFactory.Instance().RetrieveRecordsPayload(experimentID, ess.webServiceUrl);
-                            opCoupon = brokerDB.CreateTicket(TicketTypes.RETRIEVE_RECORDS, ess.agentGuid, ProcessAgentDB.ServiceGuid,
-                                60, payload);
-                        }
-                        essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
-                        essProxy.OperationAuthHeaderValue.coupon = opCoupon;
-                        essProxy.Url = ess.webServiceUrl;
-                        essProxy.GetRecords(experimentID, null);
-                    }
 
-                }
-                else
-                {
-                    throw new AccessDeniedException("You do not have permission to read this experiment");
+                    if ((roles | ExperimentAccess.READ) == ExperimentAccess.READ)
+                    {
+                        experiment = new Experiment();
+                        experiment.experimentId = experimentID;
+                        experiment.issuerGuid = ProcessAgentDB.ServiceGuid;
+                        ProcessAgentInfo ess = brokerDB.GetExperimentESS(experimentID);
+                        if (ess != null)
+                        {
+                            ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                            Coupon opCoupon = brokerDB.GetEssOpCoupon(experimentID, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
+                            if (opCoupon == null)
+                            {
+                                string payload = TicketLoadFactory.Instance().RetrieveRecordsPayload(experimentID, ess.webServiceUrl);
+                                opCoupon = brokerDB.CreateTicket(TicketTypes.RETRIEVE_RECORDS, ess.agentGuid, ProcessAgentDB.ServiceGuid,
+                                    60, payload);
+                            }
+                            essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                            essProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                            essProxy.Url = ess.webServiceUrl;
+                            essProxy.GetRecords(experimentID, null);
+                        }
+
+                    }
+                    else
+                    {
+                        throw new AccessDeniedException("You do not have permission to read this experiment");
+                    }
                 }
             }
             return experiment;
@@ -1766,21 +1757,10 @@ EnableSession = true)]
             int roles = 0;
             int userID = 0;
             int groupID = 0;
+            int clientID = 0;
             long[] expIDs = null;
-            Ticket expTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION);
-            if (expTicket != null && !expTicket.IsExpired())
+            if (brokerDB.RedeemSessionInfo(opHeader.coupon, out userID, out groupID, out clientID))
             {
-                //Parse payload, only get what is needed 	
-
-                XmlQueryDoc expDoc = new XmlQueryDoc(expTicket.payload);
-                long expID = -1;
-
-                string userStr = expDoc.Query("RedeemSessionPayload/userID");
-                if ((userStr != null) && (userStr.Length > 0))
-                    userID = Convert.ToInt32(userStr);
-                string groupStr = expDoc.Query("RedeemSessionPayload/groupID");
-                if ((groupStr != null) && (groupStr.Length > 0))
-                    groupID = Convert.ToInt32(groupStr);
 
                 if (userID > 0)
                 {
@@ -1809,44 +1789,17 @@ EnableSession = true)]
         public Coupon RequestExperimentAccess(long experimentID)
         {
             Coupon coupon = null;
-            //first try to recreate session if using a html client
-            //if ((Session == null) || (Session["UserID"] == null) || (Session["UserID"].ToString() == ""))
-
-
-            if (brokerDB.AuthenticateIssuedCoupon(opHeader.coupon))
+            int roles =0;
+            int userID = 0;
+            int groupID = 0;
+            int clientID = 0;
+            if (brokerDB.RedeemSessionInfo(opHeader.coupon, out userID, out groupID, out clientID))
             {
-                Ticket sessionTicket = brokerDB.RetrieveTicket(opHeader.coupon, TicketTypes.REDEEM_SESSION);
-                if (sessionTicket != null)
-                {
-
-
-                    if (sessionTicket.IsExpired())
-                    {
-                        throw new AccessDeniedException("The ticket has expired.");
-                    }
-
-                    //Parse payload 	
-                    XmlQueryDoc expDoc = new XmlQueryDoc(sessionTicket.payload);
-                    // Get User & Group
-                    int userID = -1;
-                    int groupID = -1;
-                    string group = expDoc.Query("RedeemSessionPayload/groupID");
-                    string user = expDoc.Query("RedeemSessionPayload/userID");
-                    if (group != null && group.Length > 0)
-                    {
-                        groupID = Convert.ToInt32(group);
-                    }
-                    if (user != null && user.Length > 0)
-                    {
-                        userID = Convert.ToInt32(user);
-                    }
-
-
-
                     //Check Qualifiers on experiment
-                    int status = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
-                    //if accessable by user create new TicketCollection
-                }
+                   roles = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
+                    //if accessable by user create new TicketCollection a ticket for each role
+                // TODO:
+                
             }
             return coupon;
         }

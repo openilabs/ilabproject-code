@@ -75,7 +75,7 @@ Please see license.txt in top level directory for full license.
 											</tr>
 											<tr>
 												<th style="width: 120px">
-													<label for="cont"emailproxy>Email Proxy</label>
+													<label for="emailproxy">Email Proxy</label>
 												</th>
 												<td colspan="2" style="width: 560px"><asp:textbox id="txtEmailProxy" Runat="server" Width="560px"></asp:textbox></td>
 											</tr>

@@ -180,15 +180,15 @@ namespace iLabs.ExpStorage.ESS
                 catch (TicketExpiredException expEx)
                 {
                     if (statusCode < StorageStatus.CLOSED)
-                        throw;
+                        throw expEx;
                 }
                 catch (TicketNotFoundException nfEx)
                 {
-                    throw;
+                    throw nfEx;
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    throw ex;
                 }
 
                 if ((statusCode & StorageStatus.CLOSED) == StorageStatus.CLOSED)
@@ -829,7 +829,7 @@ namespace iLabs.ExpStorage.ESS
 
             catch (Exception e)
             {
-                throw;
+                throw e;
             }
         }
 

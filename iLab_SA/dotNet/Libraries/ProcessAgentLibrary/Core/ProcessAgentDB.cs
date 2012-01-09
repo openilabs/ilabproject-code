@@ -1646,6 +1646,46 @@ namespace iLabs.Core
         }
 
         /// <summary>
+        /// Generic call to return an Int
+        /// </summary>
+        /// <param name="procedure">the string name of the procedure to call</param>
+        /// <param name="param">an optional parameter with it's value set, null for no parameter</param>
+        /// <returns></returns>
+        public int GetInt(String procedure, DbParameter param)
+        {
+            int value = -1;
+            DbConnection connection = FactoryDB.GetConnection();
+
+            DbCommand cmd = FactoryDB.CreateCommand(procedure, connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if (param != null)
+            {
+                cmd.Parameters.Add(param);
+            }
+            try
+            {
+                connection.Open();
+                Object result = cmd.ExecuteScalar();
+                if (result != null)
+                {
+                    value = Convert.ToInt32(result);
+                }
+            }
+            catch (DbException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+            return value;
+        }
+
+
+        /// <summary>
         /// Generic call to return an array of Ints
         /// </summary>
         /// <param name="procedure">the string name of the procedure to call</param>

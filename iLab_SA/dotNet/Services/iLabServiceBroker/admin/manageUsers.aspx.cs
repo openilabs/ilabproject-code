@@ -36,7 +36,9 @@ namespace iLabs.ServiceBroker.admin
 	public partial class manageUser : System.Web.UI.Page
 	{
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+        BrokerDB brokerDB = new BrokerDB();
         int defaultGroupID;
+        int userGroupID = 0;
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -53,7 +55,7 @@ namespace iLabs.ServiceBroker.admin
             {
                 if (Session["GroupName"].ToString().Contains("-admin"))
                 {
-                    defaultGroupID = AdministrativeAPI.GetAssociatedGroupID(Convert.ToInt32(Session["GroupID"]));
+                    userGroupID = AdministrativeAPI.GetAssociatedGroupID(Convert.ToInt32(Session["GroupID"]));
                 }
             }
             else{
@@ -89,7 +91,7 @@ namespace iLabs.ServiceBroker.admin
 				}
                 LoadAuthorityList();
 				BuildUserListBox();
-                ddlAuthority.Enabled = false;
+                ResetState();
 			}
 		}
 
@@ -119,7 +121,7 @@ namespace iLabs.ServiceBroker.admin
             ddlAuthority.Items.Clear();
             //ListItem liHeaderAdminGroup = new ListItem("--- Select Authority ---", "-1");
             //ddlAuthorities.Items.Add(liHeaderAdminGroup);
-            BrokerDB brokerDB = new BrokerDB();
+           
             IntTag[] authTags = brokerDB.GetAuthorityTags();
             if (authTags != null && authTags.Length > 0)
             {
@@ -139,7 +141,12 @@ namespace iLabs.ServiceBroker.admin
 		{
 			try
 			{
-				int[] userIDs = wrapper.ListUserIDsWrapper ();
+                int[] userIDs = null;
+                if (userGroupID == 0)
+                    userIDs = wrapper.ListUserIDsWrapper();
+                else
+                    userIDs = AdministrativeAPI.ListUserIDsInGroupRecursively(userGroupID);
+
 				List<User> users = new List<User>(wrapper.GetUsersWrapper(userIDs));
                 BuildUserListBox(users);
 			}
@@ -207,14 +214,15 @@ namespace iLabs.ServiceBroker.admin
             ddlAuthority.SelectedValue = user.authID.ToString();
             ddlAuthority.Enabled = false;
 
-			/* Note if you change your drop down list options after launching the SB, 
-					 * make sure your old affiliation options exist, or change them in the database.
-					 * For e.g. if you change MIT Student to Student, make sure that the affiliation of 
-					 * all the users is changed from "MIT Student" to "Student in the database.
-					 * Otherwise the next step will throw an exception.*/
+			/* Note if you change your drop down list options after launching the SB, */
 			if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
-				ddlAffiliation.Items .FindByText (user.affiliation).Selected = true;
+                ListItem liAffil = ddlAffiliation.Items.FindByText(user.affiliation);
+                if (liAffil == null)
+                {
+                    ddlAffiliation.Items.Add(user.affiliation);
+                }
+				ddlAffiliation.Items.FindByText (user.affiliation).Selected = true;
 			}
 			else
 			{
@@ -488,6 +496,7 @@ namespace iLabs.ServiceBroker.admin
 	
 		protected void btnSaveChanges_Click(object sender, System.EventArgs e)
 		{
+            Authority auth = brokerDB.AuthorityRetrieve(Convert.ToInt32(ddlAuthority.SelectedValue));
             lblResponse.Text = "";
             lblResponse.Visible = false; 
 			//Error checking for empty fields
@@ -497,28 +506,57 @@ namespace iLabs.ServiceBroker.admin
 				lblResponse.Visible=true;
 				return;
 			}
+            if (auth.authorityID == 0)
+            {
+                if (txtFirstName.Text.CompareTo("") == 0)
+                {
+                    lblResponse.Text = Utilities.FormatErrorMessage("You must enter the user's first name.");
+                    lblResponse.Visible = true;
+                    return;
+                }
 
-			if(txtFirstName.Text.CompareTo("")==0 )
-			{
-				lblResponse.Text = Utilities.FormatErrorMessage("You must enter the user's first name.");
-				lblResponse.Visible=true;
-				return;
-			}
+                if (txtLastName.Text.CompareTo("") == 0)
+                {
+                    lblResponse.Text = Utilities.FormatErrorMessage("You must enter the user's last name.");
+                    lblResponse.Visible = true;
+                    return;
+                }
 
-			if(txtLastName.Text.CompareTo("")==0 )
-			{
-				lblResponse.Text = Utilities.FormatErrorMessage("You must enter the user's last name.");
-				lblResponse.Visible=true;
-				return;
-			}
+                if (txtEmail.Text.CompareTo("") == 0)
+                {
+                    lblResponse.Text = Utilities.FormatErrorMessage("You must enter the user's email.");
+                    lblResponse.Visible = true;
+                    return;
+                }
+            }
+            if (Convert.ToBoolean(Session["IsAdmin"]))
+            //if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))
+            {
+                if (auth.authTypeID == (int) AuthenticationType.AuthTypeID.Native)
+                {
+                    //Password checks
+                    if (txtPassword.Text.CompareTo("") == 0)
+                    {
+                        lblResponse.Text = Utilities.FormatErrorMessage("You must enter a password.");
+                        lblResponse.Visible = true;
+                        return;
+                    }
 
-			if(txtEmail.Text.CompareTo("")==0 )
-			{
-				lblResponse.Text = Utilities.FormatErrorMessage("You must enter the user's email.");
-				lblResponse.Visible=true;
-				return;
-			}
+                    if (txtConfirmPassword.Text.CompareTo("") == 0)
+                    {
+                        lblResponse.Text = Utilities.FormatErrorMessage("Retype the password in the 'Confirm Password' field.");
+                        lblResponse.Visible = true;
+                        return;
+                    }
 
+                    if (txtPassword.Text != txtConfirmPassword.Text)
+                    {
+                        lblResponse.Text = Utilities.FormatErrorMessage("Password fields do not match. Retype password.");
+                        lblResponse.Visible = true;
+                        return;
+                    }
+                }
+            }
 			String strAffiliation = "";
 			if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true"))
 			{
@@ -551,48 +589,27 @@ namespace iLabs.ServiceBroker.admin
 					// this is just another check to throw a meaningful exception
 					if (wrapper.GetUserIDWrapper(txtUsername.Text,Convert.ToInt32(ddlAuthority.SelectedValue))>0) // then the user already exists in database
 					{
-						string msg = "The username '"+txtUsername.Text+"' already exists. Choose another username.";
+						string msg = "The username '"+txtUsername.Text+"' already exists. Please choose another username.";
 						lblResponse.Text = Utilities.FormatErrorMessage(msg);
 						lblResponse.Visible=true;
 						return;
 					}
 					else
 					{
-                        if (Convert.ToBoolean(Session["IsAdmin"]))
-						//if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))
-						{
-							//Password checks
-							if(txtPassword.Text.CompareTo("")==0 )
-							{
-								lblResponse.Text = Utilities.FormatErrorMessage("You must enter a password.");
-								lblResponse.Visible=true;
-								return;
-							}
-			
-							if(txtConfirmPassword.Text.CompareTo("")==0 )
-							{
-								lblResponse.Text = Utilities.FormatErrorMessage("Retype the password in the 'Confirm Password' field.");
-								lblResponse.Visible=true;
-								return;
-							}
-
-							if(txtPassword.Text != txtConfirmPassword.Text )
-							{
-								lblResponse.Text = Utilities.FormatErrorMessage("Password fields do not match. Retype password.");
-								lblResponse.Visible=true;
-								return;
-							}
-						}
+                     
 
 						//Add User
                         int userID = wrapper.AddUserWrapper(txtUsername.Text, Convert.ToInt32(ddlAuthority.SelectedValue), (int) AuthenticationType.AuthTypeID.Native,
-							txtFirstName.Text, txtLastName.Text, txtEmail.Text,strAffiliation, "No reason specified - User added through Administrative interface",
-							"", defaultGroupID, cbxLockAccount.Checked);
+							txtFirstName.Text, txtLastName.Text, txtEmail.Text,strAffiliation, null,
+							"", auth.defaultGroupID, cbxLockAccount.Checked);
 
 						//Set Password - Can only change password if you're superuser
 						if (Session["GroupName"].Equals(ServiceBroker.Administration.Group.SUPERUSER))
 						{
-							wrapper.SetNativePasswordWrapper(userID , txtPassword.Text );
+                            if (auth.authTypeID == (int) AuthenticationType.AuthTypeID.Native)
+                            {
+                                wrapper.SetNativePasswordWrapper(userID, txtPassword.Text);
+                            }
 						}
 
 						string msg = "The record for "+txtUsername.Text + " has been created successfully.";
@@ -617,29 +634,31 @@ namespace iLabs.ServiceBroker.admin
 				try
 				{
 					//Update user information
-                    wrapper.ModifyUserWrapper(Convert.ToInt32(lbxSelectUser.SelectedValue), txtUsername.Text, txtUsername.Text, AuthenticationType.NativeAuthentication, txtFirstName.Text, txtLastName.Text, txtEmail.Text, strAffiliation, "", "", cbxLockAccount.Checked);
+                    wrapper.ModifyUserWrapper(Convert.ToInt32(lbxSelectUser.SelectedValue), txtUsername.Text, auth.authorityID, auth.authTypeID, txtFirstName.Text, txtLastName.Text, txtEmail.Text, strAffiliation, "", "", cbxLockAccount.Checked);
 
 					//Update password information only if the old password has not been changed
-					if(txtPassword.Text.CompareTo("")!=0 )
-					{
-						if(txtConfirmPassword.Text.CompareTo("")==0 )
-						{
-							lblResponse.Text = Utilities.FormatErrorMessage("Retype the password in the 'Confirm Password' field.");
-							lblResponse.Visible=true;
-							return;
-						}
+                    if (auth.authTypeID == (int) AuthenticationType.AuthTypeID.Native)
+                    {
+                        if (txtPassword.Text.CompareTo("") != 0)
+                        {
+                            if (txtConfirmPassword.Text.CompareTo("") == 0)
+                            {
+                                lblResponse.Text = Utilities.FormatErrorMessage("Retype the password in the 'Confirm Password' field.");
+                                lblResponse.Visible = true;
+                                return;
+                            }
 
-						if(txtPassword.Text != txtConfirmPassword.Text )
-						{
-							lblResponse.Text = Utilities.FormatErrorMessage("Password fields do not match. Retype password.");
-							lblResponse.Visible=true;
-							return;
-						}
+                            if (txtPassword.Text != txtConfirmPassword.Text)
+                            {
+                                lblResponse.Text = Utilities.FormatErrorMessage("Password fields do not match. Retype password.");
+                                lblResponse.Visible = true;
+                                return;
+                            }
 
-						//Update password
-                        wrapper.SetNativePasswordWrapper(Convert.ToInt32(lbxSelectUser.SelectedValue), txtPassword.Text);
-					}
-									
+                            //Update password
+                            wrapper.SetNativePasswordWrapper(Convert.ToInt32(lbxSelectUser.SelectedValue), txtPassword.Text);
+                        }
+                    }			
 					string msg = "The record for '"+txtUsername.Text + "' has been updated.";
 					lblResponse.Text= Utilities.FormatConfirmationMessage(msg);
 					lblResponse.Visible=true;

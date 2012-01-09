@@ -149,9 +149,7 @@ namespace iLabs.ServiceBroker.admin
             int newUserGrpID = AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP);
             ListItem li = new ListItem(Group.NEWUSERGROUP, newUserGrpID.ToString());
             ddlGroup.Items.Add(li);
-            DbParameter typeParam = FactoryDB.CreateParameter("@typeName", GroupType.REGULAR, DbType.String, 256);
-            
-            IntTag[] tags = brokerDB.GetIntTags("Group_RetrieveTagsByType",typeParam);
+            IntTag[] tags = brokerDB.GetIntTags("Group_RetrieveUserGroupTags",null);
             if (tags != null && tags.Length > 0)
             {
                 foreach (IntTag t in tags)

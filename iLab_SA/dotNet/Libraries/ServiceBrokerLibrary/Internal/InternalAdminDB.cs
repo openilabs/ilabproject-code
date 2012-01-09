@@ -1627,7 +1627,7 @@ public static int CountScheduledClients(int labServerID){
             if (xmlExtension != null && xmlExtension.Length > 0)
 			myCommand.Parameters.Add(FactoryDB.CreateParameter( "@XMLExtension", xmlExtension, DbType.AnsiString));
 			myCommand.Parameters.Add(FactoryDB.CreateParameter( "@lockUser",lockAccount,DbType.Boolean));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter( "@authTypeID", authenticationTypeID,DbType.Int32));
+			myCommand.Parameters.Add(FactoryDB.CreateParameter( "@authenTypeID", authenticationTypeID,DbType.Int32));
 			myCommand.Parameters.Add(FactoryDB.CreateParameter( "@initialGroupID", initialGroupID,DbType.Int32));
 
 			try
@@ -1661,40 +1661,54 @@ public static int CountScheduledClients(int labServerID){
 		/// public static void UpdateUser(User user, string principalID, string authenticationType)
 		/// principalID was changed to principalString a while ago
 		/// </summary>
-		public static void UpdateUser(User user, string principalString, string authenticationType)
+		public static void UpdateUser(User user, int authorityID, int authenticationTypeID)
 		{
-			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("User_Update", myConnection);
-			myCommand.CommandType = CommandType.StoredProcedure;
-
-			myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", user.userID, DbType.Int32));
-			myCommand.Parameters.Add(FactoryDB.CreateParameter( "@userName", user.userName, DbType.String,256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@firstName", user.firstName, DbType.String, 256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@lastName", user.lastName, DbType.String, 256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@email", user.email, DbType.String, 256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@affiliation", user.affiliation, DbType.String, 256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@reason", user.reason, DbType.String, 2048));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@XMLExtension", user.xmlExtension, DbType.AnsiString));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@lockUser", user.lockAccount, DbType.Boolean));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@principalString", principalString, DbType.String, 256));
-            myCommand.Parameters.Add(FactoryDB.CreateParameter( "@authenType", authenticationType, DbType.AnsiString, 256));
+            UpdateUser(user.userID,user.userName,authorityID,authenticationTypeID,user.firstName,user.lastName,user.email,
+                user.affiliation,user.reason,user.xmlExtension,user.lockAccount);
            
-			try
-			{
-				myConnection.Open();
-				int i = myCommand.ExecuteNonQuery();
-				if (i == 0)
-					throw new Exception ("No record exists exception");   //throws an exception if No records can be modified
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Exception thrown in updating user record",ex);
-			}
-			finally
-			{
-				myConnection.Close();
-			}
 		}
+        /// <summary>
+        /// to modify a user
+        /// The previous call used to be
+        /// public static void UpdateUser(User user, string principalID, string authenticationType)
+        /// principalID was changed to principalString a while ago
+        /// </summary>
+        public static void UpdateUser(int userID,string userName, int authorityID, int authenticationTypeID,
+            string firstName,string lastName, string email, string affiliation, string reason, string xmlExtension,bool lockAccount)
+        {
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("User_Update", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", userID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userName", userName, DbType.String, 256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@firstName", firstName, DbType.String, 256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@lastName", lastName, DbType.String, 256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@email", email, DbType.String, 256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@affiliation", affiliation, DbType.String, 256));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@reason", reason, DbType.String, 2048));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@XMLExtension", xmlExtension, DbType.AnsiString));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@lockUser", lockAccount, DbType.Boolean));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@authorityID", authorityID, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@authenTypeID", authenticationTypeID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                int i = myCommand.ExecuteNonQuery();
+                if (i == 0)
+                    throw new Exception("No record exists exception");   //throws an exception if No records can be modified
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in updating user record", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+        }
+
 
 		/// <summary>
 		/// to delete all user records specified by the array of user IDs
@@ -1881,6 +1895,62 @@ public static int CountScheduledClients(int labServerID){
 			return userIDs;
 		}
 
+        /// <summary>
+        /// to retrieve user metadata for user specified by userID
+        /// </summary>
+        public static User SelectUser(int userID)
+        {
+            User u = null;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("User_Retrieve", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", userID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                // get User info from table users 
+                DbDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    u = new User();
+                    u.userID = userID;
+                    if (myReader["auth_id"] != System.DBNull.Value)
+                        u.authID = Convert.ToInt32(myReader["auth_id"]);
+                    if (myReader["user_name"] != System.DBNull.Value)
+                        u.userName = (string)myReader["user_name"];
+                    if (myReader["first_name"] != System.DBNull.Value)
+                        u.firstName = (string)myReader["first_name"];
+                    if (myReader["last_name"] != System.DBNull.Value)
+                        u.lastName = (string)myReader["last_name"];
+                    if (myReader["email"] != System.DBNull.Value)
+                        u.email = (string)myReader["email"];
+                    if (myReader["affiliation"] != System.DBNull.Value)
+                        u.affiliation = (string)myReader["affiliation"];
+                    if (myReader["xml_extension"] != System.DBNull.Value)
+                        u.xmlExtension = (string)myReader["xml_extension"];
+                    if (myReader["signup_reason"] != System.DBNull.Value)
+                        u.reason = (string)myReader["signup_reason"];
+                    if (myReader["date_created"] != System.DBNull.Value)
+                        u.registrationDate = (DateTime)myReader["date_created"];
+                    if (Convert.ToInt16(myReader["lock_user"]) == 0)
+                        u.lockAccount = false;
+                    else u.lockAccount = true;
+                }
+                myReader.Close();
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown SelectUser", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return u;
+        }
 
 		/// <summary>
 		/// to retrieve user metadata for users specified by array of users 
@@ -2864,6 +2934,51 @@ public static int CountScheduledClients(int labServerID){
 
             return groupIDs;
         }
+
+        /// <summary>
+        /// to retrieve group metadata for groups specified by array of group IDs 
+        /// </summary>
+        public static Group SelectGroup(int groupID)
+        {
+            Group g = null;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_Retrieve", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                    DbDataReader myReader = myCommand.ExecuteReader();
+                    while (myReader.Read())
+                    {
+                        g = new Group();
+                        g.groupID = groupID;
+                        if (myReader["group_name"] != System.DBNull.Value)
+                            g.groupName = (string)myReader["group_name"];
+                        if (myReader["description"] != System.DBNull.Value)
+                            g.description = (string)myReader["description"];
+                        if (myReader["email"] != System.DBNull.Value)
+                            g.email = (string)myReader["email"];
+                        if (myReader["group_type"] != System.DBNull.Value)
+                            g.groupType = (string)myReader["group_type"];
+                        /*if(myReader["date_created"] != System.DBNull .Value )
+                            g[i].= (string) myReader["date_created"];*/
+                    }
+                    myReader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown SelectGroups", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return g;
+        }
+
 
 		/// <summary>
 		/// to retrieve group metadata for groups specified by array of group IDs 

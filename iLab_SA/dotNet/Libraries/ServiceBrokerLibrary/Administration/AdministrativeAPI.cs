@@ -1253,22 +1253,13 @@ namespace iLabs.ServiceBroker.Administration
 		public static int AddUser (string userName, int authorityID, int authenticationTypeID, string firstName, string lastName, 
             string email, string affiliation,string reason, string xmlExtension, int initialGroupID, bool lockAccount)
 		{
-			User user = new User ();
-			user.userName = userName;
-			user.firstName = firstName;
-			user.lastName = lastName;
-			user.email = email;
-			user.reason=reason;
-			user.affiliation = affiliation;
-			user.xmlExtension = xmlExtension;
-			user.lockAccount = lockAccount;
-			
+            int userID = -1;
 			try
 			{
 				//Inserts agents too. See InternalDB method for details.
 
 				// Add user to the database
-				user.userID = InternalAdminDB.InsertUser( userName, authorityID, firstName, lastName, email,
+				userID = InternalAdminDB.InsertUser( userName, authorityID, firstName, lastName, email,
                     affiliation,reason,xmlExtension, lockAccount, authenticationTypeID, initialGroupID);
 			}
 			catch (Exception ex)
@@ -1276,7 +1267,7 @@ namespace iLabs.ServiceBroker.Administration
 				throw;
 			}
 
-			return user.userID;
+			return userID;
 
 		}
 		
@@ -1319,23 +1310,14 @@ namespace iLabs.ServiceBroker.Administration
 		/// <remarks>The user's registrationDate cannot be modified.
 		/// A "No record exists exception" is thrown if no record exists in the database to be modified.
 		/// </remarks>
-		public static void ModifyUser (int userID,string userName, string principalString, string authenticationType, string firstName, string lastName, string email, string affiliation, string reason,string xmlExtension, bool lockAccount)
+		public static void ModifyUser (int userID, string userName, int authorityID, int authenticationTypeID, 
+            string firstName, string lastName, string email, string affiliation, string reason,string xmlExtension, bool lockAccount)
 		{
-			User user = new User ();
-			user.userID = userID;
-			user.userName = userName;
-			user.firstName = firstName;
-			user.lastName = lastName;
-			user.reason = reason;
-			user.email = email;
-			user.affiliation = affiliation;
-			user.xmlExtension = xmlExtension;
-			user.lockAccount = lockAccount;
-
 			try
 			{
 				// modified by charu on 5/22/04, since principal id should not be passed here. refer method for more information.
-				InternalAdminDB.UpdateUser (user, principalString, authenticationType);
+				InternalAdminDB.UpdateUser(userID,userName, authorityID, authenticationTypeID, firstName, lastName,
+                    email,affiliation,reason,xmlExtension,lockAccount);
 			}
 			catch(Exception e)
 			{
@@ -1362,6 +1344,12 @@ namespace iLabs.ServiceBroker.Administration
 			return InternalAdminDB.SelectOrphanedUserIDs ();
 		}
 
+
+        public static User GetUser(int userID)
+        {
+            User user = InternalAdminDB.SelectUser(userID);
+            return user;
+        }
 		/// <summary>
 		/// Returns an array of the immutable user objects that correspond to the supplied user IDs.
 		/// </summary>
@@ -1591,6 +1579,12 @@ namespace iLabs.ServiceBroker.Administration
         {
             return InternalAdminDB.SelectAdminGroupIDs();
         }
+
+        public static Group GetGroup(int groupID)
+        {
+            return InternalAdminDB.SelectGroup(groupID);
+        }
+
 
 		/// <summary>
 		/// Returns an array of the immutable Group objects for the registered groups whose IDs are supplied in groupIDs.

@@ -551,10 +551,10 @@ namespace iLabs.ServiceBroker.iLabSB
                 bool authOK = false;
                 //Test for an authorized request for a third party agent
                 if(authority != null && authority.Length >0 && authority.CompareTo(ProcessAgentDB.ServiceGuid) !=0){
-                    Coupon authCoupon = brokerDB.GetIssuedCoupon(passwd);
-                    if (authCoupon != null)
+                    Coupon[] authCoupon = brokerDB.GetIssuedCoupons(passwd);
+                    if (authCoupon != null && authCoupon.Length >0)
                     {
-                        Ticket authTicket = brokerDB.RetrieveTicket(authCoupon, TicketTypes.AUTHENTICATE_AGENT);
+                        Ticket authTicket = brokerDB.RetrieveTicket(authCoupon[0], TicketTypes.AUTHENTICATE_AGENT);
                         if (authTicket != null && authTicket.sponsorGuid.CompareTo(authority) == 0)
                         {
                             XmlQueryDoc authDoc =  new XmlQueryDoc(authTicket.payload);

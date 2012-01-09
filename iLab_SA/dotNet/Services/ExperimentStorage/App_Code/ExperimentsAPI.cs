@@ -671,6 +671,7 @@ namespace iLabs.ExpStorage
                 }
                 }
                 catch(Exception ex){
+                    throw ex;
                 }
                 finally{
                     myConnection.Close();
@@ -797,6 +798,7 @@ namespace iLabs.ExpStorage
                 }
                 catch (Exception ex)
                 {
+                    throw ex;
                 }
                 finally
                 {

@@ -17,6 +17,8 @@ using System.Web.UI.HtmlControls;
 using System.Web.Security;
 using System.Configuration;
 using System.Web.Mail;
+
+using iLabs.DataTypes;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
 using iLabs.ServiceBroker.Administration;
@@ -40,7 +42,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
 			if(! IsPostBack)
 			{
-
+                LoadAuthorityList();
 				//Populate textboxes with User's data
 				User sessionUser = new User();
 				sessionUser = wrapper.GetUsersWrapper(new int[]{Convert.ToInt32(Session["UserID"])})[0];
@@ -52,6 +54,8 @@ namespace iLabs.ServiceBroker.iLabSB
 				txtEmail.Text = sessionUser.email;
 				txtNewPassword.Text = "";
 				txtConfirmPassword.Text = "";
+                ddlAuthorities.SelectedValue = sessionUser.authID.ToString();
+                ddlAuthorities.Enabled = false;
 
 				// To list all the groups a user belongs to
 				int userID = Convert.ToInt32(Session["UserID"]);
@@ -126,8 +130,26 @@ namespace iLabs.ServiceBroker.iLabSB
 		}
 		#endregion
 
+        private void LoadAuthorityList()
+        {
+            BrokerDB brokerDB = new BrokerDB();
+            ddlAuthorities.Items.Clear();
+            ListItem liHeaderAdminGroup = new ListItem("--- Select Authority ---", "-1");
+            ddlAuthorities.Items.Add(liHeaderAdminGroup);
+            IntTag[] authTags = brokerDB.GetAuthorityTags();
+            if (authTags != null && authTags.Length > 0)
+            {
+                foreach (IntTag t in authTags)
+                {
+                    ListItem li = new ListItem(t.tag, t.id.ToString());
+                    ddlAuthorities.Items.Add(li);
+                }
+            }
+        }
 		protected void btnSaveChanges_Click(object sender, System.EventArgs e)
 		{
+            BrokerDB brokerDB = new BrokerDB();
+            
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
 			if(txtNewPassword.Text.CompareTo(txtConfirmPassword.Text) != 0 )
@@ -143,7 +165,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				try
 				{
 					User userInfo = wrapper.GetUsersWrapper(new int[] {Convert.ToInt32(Session["UserID"])})[0];
-						
+                    Authority auth = brokerDB.AuthorityRetrieve(userInfo.authID);	
 					if (txtUsername.Text.Trim()=="")
 					{
 						txtUsername.Text = userInfo.userName;
@@ -168,14 +190,16 @@ namespace iLabs.ServiceBroker.iLabSB
 					if (userInfo.xmlExtension==null)
 						userInfo.xmlExtension="";
 
-					wrapper.ModifyUserWrapper (userInfo.userID,txtUsername.Text , txtUsername.Text , AuthenticationType.NativeAuthentication, txtFirstName.Text , txtLastName.Text , txtEmail.Text ,userInfo.affiliation, userInfo.reason, userInfo.xmlExtension,userInfo.lockAccount );
+					wrapper.ModifyUserWrapper (userInfo.userID,txtUsername.Text,auth.authorityID,auth.authTypeID, txtFirstName.Text , txtLastName.Text , txtEmail.Text ,userInfo.affiliation, userInfo.reason, userInfo.xmlExtension,userInfo.lockAccount );
 					lblResponse.Text = Utilities.FormatConfirmationMessage("User \"" + txtUsername.Text  + "\" information has been updated.");
 					lblResponse.Visible = true;
-					if(txtNewPassword.Text != "")
-					{
-						wrapper.SetNativePasswordWrapper(Convert.ToInt32(Session["UserID"]), txtNewPassword.Text );
-					}
-
+                    if (auth.authTypeID == (int) AuthenticationType.AuthTypeID.Native)
+                    {
+                        if (txtNewPassword.Text != "")
+                        {
+                            wrapper.SetNativePasswordWrapper(Convert.ToInt32(Session["UserID"]), txtNewPassword.Text);
+                        }
+                    }
 					if (txtUsername.Text.CompareTo(Session["UserName"].ToString())!= 0)
 						Session["UserName"]= txtUsername.Text;
 
@@ -190,27 +214,30 @@ namespace iLabs.ServiceBroker.iLabSB
 					{
 						email = txtEmail.Text.Trim();
 					}
-					MailMessage mail = new MailMessage();
-					mail.From = registrationMailAddress;
-					mail.To = email;
-					mail.Subject = "[iLabs] Service Broker Account Update Confirmation" ;
-					mail.Body = "Your Service Broker account has been updated to the following:\n\r";
-					mail.Body += "-------------------------------------------------------------\n\r\n\r";
-					mail.Body += "User Name: " + txtUsername.Text + "\n\r";
-					mail.Body += "First Name: " + txtFirstName.Text + "\n\r";
-					mail.Body += "Last Name: " + txtLastName.Text + "\n\r";
-					mail.Body += "Email: " + txtEmail.Text + "\n\r\n\r";
-					mail.Body += "For security reasons, your password has not been included in this message." + "\n\r";
+                    if (email != null && email.Length > 0)
+                    {
+                        MailMessage mail = new MailMessage();
+                        mail.From = registrationMailAddress;
+                        mail.To = email;
+                        mail.Subject = "[iLabs] Service Broker Account Update Confirmation";
+                        mail.Body = "Your Service Broker account has been updated to the following:\n\r";
+                        mail.Body += "-------------------------------------------------------------\n\r\n\r";
+                        mail.Body += "User Name: " + txtUsername.Text + "\n\r";
+                        mail.Body += "First Name: " + txtFirstName.Text + "\n\r";
+                        mail.Body += "Last Name: " + txtLastName.Text + "\n\r";
+                        mail.Body += "Email: " + txtEmail.Text + "\n\r\n\r";
+                        mail.Body += "For security reasons, your password has not been included in this message." + "\n\r";
 
-					SmtpMail.SmtpServer = "127.0.0.1";
-					try
-					{	
-						SmtpMail.Send(mail);
-					}
-					catch
-					{
-						// if the confirmation message fails, c'est la vie...
-					}
+                        SmtpMail.SmtpServer = "127.0.0.1";
+                        try
+                        {
+                            SmtpMail.Send(mail);
+                        }
+                        catch
+                        {
+                            // if the confirmation message fails, c'est la vie...
+                        }
+                    }
 				}
 				catch (Exception ex)
 				{

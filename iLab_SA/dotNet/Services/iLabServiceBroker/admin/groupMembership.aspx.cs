@@ -8,17 +8,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.Mail;
-using System.Text;
-using System.Configuration;
-//using Microsoft.Web.UI.WebControls;
 
 using iLabs.Core;
 using iLabs.DataTypes;
@@ -35,9 +35,11 @@ namespace iLabs.ServiceBroker.admin
 	/// </summary>
 	public partial class groupMembership : System.Web.UI.Page
 	{
+        string rootImage = "../img/GrantImages/root.gif";
         string groupImage = "../img/GrantImages/Folder.gif";
         string userImage = "../img/GrantImages/user.gif";
-
+        //int userGroupID = -1;
+        //int requestGroupID = -1;
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         BrokerDB brokerDB = new BrokerDB();
 		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
@@ -46,13 +48,11 @@ namespace iLabs.ServiceBroker.admin
 		{
 			if (Session["UserID"]==null)
 				Response.Redirect("../login.aspx");
-
+            
 			if(!IsPostBack)
 			{
-				//Since both trees essentially have the same contents 
-				//(except that the target groups tree doesn't have users, 
-				//use 1 method to build both of them
-				this.BuildTrees();
+
+                BuildTrees();
 			}
 		}
 
@@ -80,69 +80,69 @@ namespace iLabs.ServiceBroker.admin
 		}
 		#endregion
 
-		/* This method builds both the trees. Since they basically have similar contents
-		 * except for the fact that the group tree doesn't need to list the users.
-		 * A node cannot be added to 2 trees at the same time. So a clone needs to be created.
-		 * Hence we have 2 rootNodes (one for each tree).
-		 */
-		private void BuildTrees()
-		{
-			try
-			{
+	
+        private void BuildTrees()
+        {
+            List<int> groupIDs = new List<int>();
+            int groupID = Convert.ToInt32(Session["GroupID"]);
+           
+            if (Convert.ToBoolean(Session["IsAdmin"]))
+            {
+                if (Session["GroupName"].ToString().Contains("-admin"))
+                {
+                    int gID = AdministrativeAPI.GetAssociatedGroupID(groupID);
+                    if (gID > 0)
+                    {
+
+                        DbParameter param = FactoryDB.CreateParameter("@groupID", gID, DbType.Int32);
+                        int rgID = brokerDB.GetInt("Group_RetrieveRequestGroupID", param);
+                        if (rgID > 0)
+                        {
+                            groupIDs.Add(rgID);
+                        }
+                        groupIDs.Add(gID);
+
+                    }
+                }
+
+                else
+                {
+                    int rootID = AdministrativeAPI.GetGroupID(Group.ROOT);
+                    groupIDs.Add(rootID);
+                }
+            }
+            try
+            {
+                foreach (int i in groupIDs)
+                {
+                    Group startGroup = AdministrativeAPI.GetGroup(i);
+                    string startImage = null;
+                    if (startGroup.groupName.CompareTo(Group.ROOT) == 0)
+                        startImage = rootImage;
+                    else
+                        startImage = groupImage;
+
+                    TreeNode rootNodeAgents = new TreeNode(startGroup.groupName, startGroup.groupID.ToString(), startImage);
+                    rootNodeAgents.Expanded = true;
+                    rootNodeAgents.SelectAction = TreeNodeSelectAction.None;
+
+                    TreeNode rootNodeGroups = new TreeNode(startGroup.groupName, startGroup.groupID.ToString(), startImage);
+                    rootNodeGroups.Expanded = true;
+                    rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
+                    AddAgentsRecursively(rootNodeAgents, rootNodeGroups);
+
+                    agentsTreeView.Nodes.Add(rootNodeAgents);
+                    groupsTreeView.Nodes.Add(rootNodeGroups);
+                }
                 
-                int rootID = AdministrativeAPI.GetGroupID(Group.ROOT);
-                TreeNode rootNodeAgents = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
-                rootNodeAgents.Expanded = true;
-                rootNodeAgents.SelectAction = TreeNodeSelectAction.None;
-
-                TreeNode rootNodeGroups = new TreeNode("ROOT", rootID.ToString(), "../img/GrantImages/root.gif");
-				rootNodeGroups.Expanded = true;
-                rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
-                
-			
-				//nodes under root node (all these are groups)
-				// since all are groups, the processing of these nodes is done separately here
-				// as opposed to doing it in an AddAgentsRecursively(RootNode) call
-				// This reduces the no. of database calls, made from isAgentUser
-                Group[] groups = AdministrativeAPI.GetGroups(
-                    brokerDB.GetInts("Group_RetrieveChildrenGroupIDs",
-                        FactoryDB.CreateParameter("@groupID", rootID, DbType.Int32)).ToArray());
-
-				// might want to do some sorting of the Groups List here -- works without sorting
-
-				//foreach node under the root node:
-				//1- Add that node to the tree
-				//2- recursively add children nodes to the tree
-				foreach (Group g in groups)
-				{
-					if (g.groupID !=0)
-					{
-						
-                        TreeNode newNodeGroups = new TreeNode(g.groupName, g.groupID.ToString(),
-                            "../img/GrantImages/Folder.gif");
-                        newNodeGroups.ShowCheckBox = true;
-                        newNodeGroups.SelectAction = TreeNodeSelectAction.None;
-                        rootNodeGroups.ChildNodes.Add(newNodeGroups);
-                        TreeNode newNodeAgents = new TreeNode(g.groupName, g.groupID.ToString(),
-                            "../img/GrantImages/Folder.gif");
-                        newNodeAgents.Expanded = true;
-                        newNodeAgents.ShowCheckBox = isRegular(g);
-                        newNodeAgents.SelectAction = TreeNodeSelectAction.None;
-						AddAgentsRecursively(newNodeAgents, newNodeGroups);
-						rootNodeAgents.ChildNodes.Add(newNodeAgents);
-						
-					}
-				}
-				agentsTreeView.Nodes.Add(rootNodeAgents);
-				groupsTreeView.Nodes.Add(rootNodeGroups);
-			}
-			catch (Exception ex)
-			{
-				string msg = "Exception: Cannot list groups. "+ex.Message+". "+ex.GetBaseException();
-				lblResponse.Text = Utilities.FormatErrorMessage(msg);
-				lblResponse.Visible = true;
-			}
-		}
+            }
+            catch (Exception ex)
+            {
+                string msg = "Exception: Cannot list groups. " + ex.Message + ". " + ex.GetBaseException();
+                lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                lblResponse.Visible = true;
+            }
+        }
 
 		/* 
 		 * We need to pass in 2 nodes here, since the Groups tree is different from the agents tree
@@ -154,7 +154,7 @@ namespace iLabs.ServiceBroker.admin
            
 			try
 			{
-                if (nAgents.ImageUrl.CompareTo(groupImage) == 0)// Do not process if it is a user
+                if (nAgents.ImageUrl.CompareTo(userImage) != 0)// Do not process if it is a user
                 {
                     int groupID = Convert.ToInt32(nAgents.Value);
 
@@ -244,10 +244,11 @@ namespace iLabs.ServiceBroker.admin
                     if (nID == nodeID)
                     {
                         n.Expanded = true;
-                        TreeNode parent = (TreeNode)n.Parent;
+                        //TreeNode parent = (TreeNode)n.Parent;
                         //parent.Expanded = true;
-                        if (!parent.Text.Equals("ROOT"))
-                            ExpandParent(parent);
+                        //if (parent != null && parent.Text != null && !parent.Text.Equals("ROOT"))
+                        //    ExpandParent(parent);
+                        ExpandParent(n);
                     }
                 }
                 ExpandNodes(n.ChildNodes, nodeIDs);
@@ -258,7 +259,7 @@ namespace iLabs.ServiceBroker.admin
 		{
 			n.Expanded=true;
 			TreeNode parent = (TreeNode)n.Parent;
-			if (!parent.Text.Equals("ROOT"))
+            if (parent != null && parent.Text != null && !parent.Text.Equals("ROOT"))
 				ExpandParent(parent);
 		}
 

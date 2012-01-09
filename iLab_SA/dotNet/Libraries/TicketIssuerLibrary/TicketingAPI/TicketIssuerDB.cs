@@ -23,14 +23,19 @@ namespace iLabs.TicketIssuer
     public class TicketIssuerDB : ProcessAgentDB
     {
        
-
+        /// <summary>
+        /// 
+        /// </summary>
         public TicketIssuerDB()
         {
     
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public string GetIssuerGuid()
         {
             if (serviceAgent != null)
@@ -53,33 +58,44 @@ namespace iLabs.TicketIssuer
         //    return false;
         //}
 
-
-        public bool RedeemSessionInfo(Coupon coupon, out int userId, out int groupId, out int clientId)
+        /// <summary>
+        /// Uses the reference ticketCollection to find a REDEEM_SESSION ticket and parse it
+        /// </summary>
+        /// <param name="sessionCoupon"></param>
+        /// <param name="userId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="clientId"></param>
+        /// <returns>True if ticket found</returns>
+        public bool RedeemSessionInfo(Coupon sessionCoupon, out int userId, out int groupId, out int clientId)
         {
             bool status = false;
             userId = -1;
             groupId = -1;
             clientId = -1;
-            if (String.Compare(coupon.issuerGuid, GetIssuerGuid(), true) == 0)
+            if (sessionCoupon != null)
             {
-                status = AuthenticateIssuedCoupon( coupon);
-                if (status)
+                if (sessionCoupon.issuerGuid.CompareTo(GetIssuerGuid()) == 0)
                 {
-                    XmlQueryDoc xDoc = null;
-                    Ticket sessionTicket = RetrieveIssuedTicket(coupon,TicketTypes.REDEEM_SESSION,GetIssuerGuid());
-                    if(sessionTicket != null){
-                        if (!sessionTicket.isCancelled && !sessionTicket.IsExpired())
+                    status = AuthenticateIssuedCoupon(sessionCoupon);
+                    if (status)
+                    {
+                        XmlQueryDoc xDoc = null;
+                        Ticket sessionTicket = RetrieveIssuedTicket(sessionCoupon, TicketTypes.REDEEM_SESSION, GetIssuerGuid());
+                        if (sessionTicket != null)
                         {
-                            xDoc = new XmlQueryDoc(sessionTicket.payload);
-                            string user = xDoc.Query("RedeemSessionPayload/userID");
-                            string group = xDoc.Query("RedeemSessionPayload/groupID");
-                            string client = xDoc.Query("RedeemSessionPayload/clientID");
-                            if (user != null && user.Length > 0)
-                                userId = Convert.ToInt32(user);
-                            if (group != null && group.Length > 0)
-                                groupId = Convert.ToInt32(group);
-                            if (client != null && client.Length > 0)
-                                clientId = Convert.ToInt32(client);
+                            if (!sessionTicket.isCancelled && !sessionTicket.IsExpired())
+                            {
+                                xDoc = new XmlQueryDoc(sessionTicket.payload);
+                                string user = xDoc.Query("RedeemSessionPayload/userID");
+                                string group = xDoc.Query("RedeemSessionPayload/groupID");
+                                string client = xDoc.Query("RedeemSessionPayload/clientID");
+                                if (user != null && user.Length > 0)
+                                    userId = Convert.ToInt32(user);
+                                if (group != null && group.Length > 0)
+                                    groupId = Convert.ToInt32(group);
+                                if (client != null && client.Length > 0)
+                                    clientId = Convert.ToInt32(client);
+                            }
                         }
                     }
                 }
@@ -91,7 +107,8 @@ namespace iLabs.TicketIssuer
         /// <summary>
         /// Verifies that an issued  coupon corresponding to the argument exists, and is not cancelled
         /// </summary>
-        /// <param name="coupon"></param>
+        /// <param name="couponID"></param>
+        /// <param name="passkey"></param>
         /// <returns></returns>
         public bool AuthenticateIssuedCoupon(long couponID, string passkey)
         {
@@ -117,22 +134,32 @@ namespace iLabs.TicketIssuer
         public bool AuthenticateIssuedCoupon(Coupon coupon)
         {
             bool status = false;
-            if (String.Compare(coupon.issuerGuid, GetIssuerGuid(), true) == 0)
+            if (coupon != null)
             {
-                DbConnection connection = FactoryDB.GetConnection();
-                try
+                if (String.Compare(coupon.issuerGuid, GetIssuerGuid(), true) == 0)
                 {
-                    connection.Open();
-                    status = AuthenticateIssuedCoupon(connection, coupon.couponId, coupon.passkey);
-                }
-                finally
-                {
-                    connection.Close();
+                    DbConnection connection = FactoryDB.GetConnection();
+                    try
+                    {
+                        connection.Open();
+                        status = AuthenticateIssuedCoupon(connection, coupon.couponId, coupon.passkey);
+                    }
+                    finally
+                    {
+                        connection.Close();
+                    }
                 }
             }
             return status;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="couponID"></param>
+        /// <param name="passkey"></param>
+        /// <returns></returns>
         protected bool AuthenticateIssuedCoupon(DbConnection connection, long couponID, string passkey)
         {
             bool status = false;
@@ -159,33 +186,43 @@ namespace iLabs.TicketIssuer
             return status;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="coupon"></param>
+        /// <returns></returns>
         protected bool AuthenticateIssuedCoupon(DbConnection connection, Coupon coupon)
         {
             bool status = false;
-
-            DbCommand cmd = FactoryDB.CreateCommand("AuthenticateIssuedCoupon", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-
-            // populate parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId,DbType.Int64));
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.AnsiString, 100));
-           
-            try
+            if (String.Compare(coupon.issuerGuid, GetIssuerGuid(), true) == 0)
             {
-                DbDataReader reader = cmd.ExecuteReader();
-                status = reader.HasRows;
-                reader.Close();
-            }
-            catch (DbException e)
-            {
-                writeEx(e);
-                throw;
-            }
+                DbCommand cmd = FactoryDB.CreateCommand("AuthenticateIssuedCoupon", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
 
+                // populate parameters
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon.couponId, DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@passKey", coupon.passkey, DbType.AnsiString, 100));
+
+                try
+                {
+                    DbDataReader reader = cmd.ExecuteReader();
+                    status = reader.HasRows;
+                    reader.Close();
+                }
+                catch (DbException e)
+                {
+                    writeEx(e);
+                    throw e;
+                }
+            }
             return status;
         }
 
-       
+       /// <summary>
+       /// 
+       /// </summary>
+       /// <returns></returns>
         public Coupon CreateCoupon()
         {
             DbConnection connection = FactoryDB.GetConnection();
@@ -211,6 +248,11 @@ namespace iLabs.TicketIssuer
             
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="passcode"></param>
+        /// <returns></returns>
         public Coupon CreateCoupon(string passcode)
         {
             DbConnection connection = FactoryDB.GetConnection();
@@ -301,6 +343,10 @@ namespace iLabs.TicketIssuer
             return coupon;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="couponID"></param>
         public void CancelIssuedCoupon(long couponID)
         {
             bool status = false;
@@ -327,6 +373,11 @@ namespace iLabs.TicketIssuer
                 connection.Close();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="couponID"></param>
         public void DeleteIssuedCoupon(long couponID)
         {
             bool status = false;
@@ -357,7 +408,6 @@ namespace iLabs.TicketIssuer
         /// Checks the IssuedCoupon table and constructs a full Coupon if an 
         /// Issued coupon is found and is not cancelled.
         /// </summary>
-        /// <param name="connection"></param>
         /// <param name="couponID"></param>
         /// <returns>Coupon if found,  null if cancelled or not found</returns>
         public Coupon GetIssuedCoupon(long couponID)
@@ -373,7 +423,7 @@ namespace iLabs.TicketIssuer
             }
             catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
             finally
             {
@@ -426,21 +476,20 @@ namespace iLabs.TicketIssuer
 
         /// <summary>
         /// Checks the IssuedCoupon table and constructs a full Coupon if an 
-        /// Issued coupon is found and is not cancelled.
+        /// Issued coupon is found and is not cancelled. Passkeys must be unique
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="couponID"></param>
-        /// <returns>Coupon if found,  null if cancelled or not found</returns>
-        public Coupon GetIssuedCoupon(string passkey)
+        /// <param name="passkey"
+        /// <returns>Coupons if found,  null if cancelled or not found</returns>
+        public Coupon[] GetIssuedCoupons(string passkey)
         {
 
-            Coupon coupon = null;
+            Coupon[] coupons = null;
             DbConnection connection = FactoryDB.GetConnection();
             try
             {
 
                 connection.Open();
-                coupon = GetIssuedCoupon(connection, passkey);
+                coupons = GetIssuedCoupons(connection, passkey);
             }
             catch (Exception ex)
             {
@@ -450,20 +499,20 @@ namespace iLabs.TicketIssuer
             {
                 connection.Close();
             }
-            return coupon;
+            return coupons;
 
         }
 
         /// <summary>
-        /// Checks the IssuedCoupon table and constructs a full Coupon if an 
-        /// Issued coupon is found and is not cancelled.
+        /// Checks the IssuedCoupon table and constructs a full Coupon if a 
+        /// matching Issued coupon is found and is not cancelled. May reurm multiple Coupons but there should only be one.
         /// </summary>
         /// <param name="connection"></param>
         /// <param name="passkey"></param>
-        /// <returns>Coupon if found,  null if cancelled or not found</returns>
-        protected Coupon GetIssuedCoupon(DbConnection connection, string passkey)
+        /// <returns>Coupons if found,  null if cancelled or not found</returns>
+        protected Coupon[] GetIssuedCoupons(DbConnection connection, string passkey)
         {
-            Coupon coupon = null;
+            List<Coupon> coupons = new List<Coupon>();
             DbCommand cmd = FactoryDB.CreateCommand("GetIssuedCouponByPasskey", connection);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -474,25 +523,30 @@ namespace iLabs.TicketIssuer
             try
             {
                 dataReader = cmd.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    long couponID = dataReader.GetInt64(0);
+                    bool cancel = dataReader.GetBoolean(1);
+                    if (!cancel)
+                    {
+                        Coupon coupon = new Coupon(GetIssuerGuid(), couponID, passkey);
+                        coupons.Add(coupon);
+                    }
+                }
             }
             catch (DbException e)
             {
                 writeEx(e);
                 throw;
             }
-            while (dataReader.Read())
+            finally
             {
-                long couponID = dataReader.GetInt64(0);
-                bool cancel = dataReader.GetBoolean(1);
-                if (!cancel)
-                {
-                    coupon = new Coupon(GetIssuerGuid(), couponID, passkey);
-                }
+                dataReader.Close();
             }
-
-            dataReader.Close();
-            return coupon;
+            return coupons.ToArray();
         }
+
         /// <summary>
         /// Counts the number of tickets remaining in the coupon collection, returns -1 on error;
         /// </summary>
@@ -610,12 +664,13 @@ namespace iLabs.TicketIssuer
         /// <summary>
         /// Creates a new coupon and adds a new ticket to it.
         /// </summary>
-        /// <param name="redeemerInfo"></param>
         /// <param name="ticketType"></param>
-        /// <param name="expiration"></param>
-        /// <param name="payload"></param>
+        /// <param name="redeemerGUID"></param>
+        /// <param name="sponsorGUID"></param>
+        /// <param name="duration"></param>
+        /// <param name="payload"
         /// <returns>Coupon corresponding to the created Ticket</returns>
-        public Coupon CreateTicket(string ticketType, string redeemerID, string sponsorID,
+        public Coupon CreateTicket(string ticketType, string redeemerGUID, string sponsorGUID,
              long duration, string payload)
         {
             DbConnection connection = FactoryDB.GetConnection();
@@ -626,7 +681,7 @@ namespace iLabs.TicketIssuer
                 connection.Open();
                 Coupon newCoupon = CreateCoupon(connection);
 
-                Ticket ticket = InsertIssuedTicket(connection, newCoupon.couponId, redeemerID, sponsorID, ticketType, duration, payload);
+                Ticket ticket = InsertIssuedTicket(connection, newCoupon.couponId, redeemerGUID, sponsorGUID, ticketType, duration, payload);
                 return newCoupon;
 
             }

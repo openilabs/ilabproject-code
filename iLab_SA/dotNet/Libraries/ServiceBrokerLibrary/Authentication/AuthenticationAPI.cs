@@ -110,13 +110,13 @@ namespace iLabs.ServiceBroker.Authentication
         {
             Ticket authTicket = null;
             BrokerDB brokerDB = new BrokerDB();
-            Coupon authCoupon = brokerDB.GetIssuedCoupon(passkey);
-            if (authCoupon != null)
+            Coupon[] authCoupons = brokerDB.GetIssuedCoupons(passkey);
+            if (authCoupons != null && authCoupons.Length > 0)
             {
-                authTicket = brokerDB.RetrieveTicket(authCoupon, TicketTypes.AUTHENTICATE_AGENT);
+                authTicket = brokerDB.RetrieveTicket(authCoupons[0], TicketTypes.AUTHENTICATE_AGENT);
                 if (authTicket == null || authTicket.sponsorGuid.CompareTo(authGuid) != 0)
                 {
-                    //ToDo: Parse Ticket
+                    //TODO: Parse Ticket
 
                     throw new AccessDeniedException("AccessDenied!");
                 }

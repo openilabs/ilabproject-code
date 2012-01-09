@@ -613,14 +613,12 @@ namespace iLabs.ServiceBroker.Authorization
 		/// <param name="xmlExtension"></param>
 		/// <param name="lockAccount"></param>
 		/// <returns></returns>
-		public void ModifyUserWrapper (int userID,string userName, string principalString, string authenticationType, string firstName, string lastName, string email, string affiliation, string reason,string xmlExtension, bool lockAccount)
+		public void ModifyUserWrapper (int userID,string userName, int authorityID, int authenticationTypeID, string firstName, string lastName, string email, string affiliation, string reason,string xmlExtension, bool lockAccount)
 		{
-			
 			int loginUserID = Convert.ToInt32(Session["UserID"]);
-
 			if ((IsSuperuserGroup())||(loginUserID.CompareTo(userID)==0))
 			{
-				 Administration.AdministrativeAPI .ModifyUser( userID, userName,  principalString, authenticationType, firstName,  lastName, email,  affiliation,  reason, xmlExtension, lockAccount);
+				 Administration.AdministrativeAPI.ModifyUser( userID, userName, authorityID, authenticationTypeID, firstName,  lastName, email,  affiliation,  reason, xmlExtension, lockAccount);
 			}
 			else
 			{
