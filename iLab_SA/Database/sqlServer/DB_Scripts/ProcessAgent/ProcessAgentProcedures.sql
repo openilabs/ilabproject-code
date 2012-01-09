@@ -1728,22 +1728,36 @@ BEGIN
 Create Table #ticks  (tId bigint,cId bigint, isGuid varchar (50))
 create Table #coups (cId bigint,  isGuid varchar (50))
 create Table #remove (cnt int, cid bigint, isGuid varchar (50))
-
+Declare @numTicks int
+Declare @numCoupons int
 insert #ticks Exec('select ticket_id, Coupon_ID, issuer_guid from ticket
 	where cancelled = 1 OR 
 	(duration != -1 and (DATEDIFF(second,creation_Time,GETUTCDATE()) > duration))')
 	
 insert #coups Exec('select distinct cid,isGuid from #ticks')
-
+BEGIN
+BEGIN TRANSACTION
 delete from Ticket where Ticket_ID IN (select tId from #ticks)
+if (@@error > 0)
+			goto on_error
+SET @numTicks = @@ROWCOUNT;
+
+
 insert #remove Exec( 'select COUNT(coupon_ID), coupon_ID, issuer_guid from Ticket
 where Coupon_ID in (Select cid from #coups)  group by coupon_ID,issuer_guid')
 
 delete from Coupon where Coupon_ID in ( select cid from #remove where cnt = 0 )
-
+if (@@error > 0)
+			goto on_error
+SET @numCoupons = @@ROWCOUNT
+COMMIT TRANSACTION
+END
 Drop Table #ticks
 Drop Table #coups
 Drop Table #remove
+select @numTicks, @numCoupons
+on_error: 
+	ROLLBACK TRANSACTION
 END
 GO
 
