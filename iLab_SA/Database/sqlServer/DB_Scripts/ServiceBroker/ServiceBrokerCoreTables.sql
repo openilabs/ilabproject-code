@@ -1,4 +1,4 @@
-/**8 ServiceBroker Tables ***/
+/*** ServiceBroker Tables ***/
 
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 -- $Id$
@@ -366,7 +366,6 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Session_Hi
 drop table [dbo].[Session_History]
 GO
 
-/****** Object:  Table [dbo].[Users]    Script Date: 8/30/2005 4:07:53 PM ******/
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[User_Groups]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[User_Groups]
 GO
@@ -422,16 +421,16 @@ GO
 
 
 
-/****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM 
-CREATE TABLE [dbo].[Agents] (
-	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
-	[Is_Group] [bit] NOT NULL,
-	[Date_Created] [datetime] NOT NULL DEFAULT GETUTCDATE(),
-	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
-	
-) ON [PRIMARY]
-GO
-******/
+/****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM ****/
+--CREATE TABLE [dbo].[Agents] (
+--	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
+--	[Is_Group] [bit] NOT NULL,
+--	[Date_Created] [datetime] NOT NULL DEFAULT GETUTCDATE(),
+--	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+--	
+--) ON [PRIMARY]
+--GO
+
 
 /****** Object:  Table [dbo].[Authentication_Types]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Authentication_Types] (
