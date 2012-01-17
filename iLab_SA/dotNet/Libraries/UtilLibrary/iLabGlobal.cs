@@ -20,7 +20,7 @@ namespace iLabs.UtilLib
 	static private string release = "Release 4.0 RC2";
         static private string buildDate = "$ilab:BuildDate$";
         /// <summary>
-        /// Returns the date and svn revision last set, still not auto setting....
+        /// Returns the date and svn revision last set, still not auto setting
         /// </summary>
         public static string Revision
         {
