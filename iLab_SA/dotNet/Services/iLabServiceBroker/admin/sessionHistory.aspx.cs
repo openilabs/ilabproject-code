@@ -39,14 +39,19 @@ namespace iLabs.ServiceBroker.admin
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            
             if (Session["UserID"] == null)
                 Response.Redirect("../login.aspx");
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             if (Session["userTZ"] != null)
             {
                 userTZ = Convert.ToInt32(Session["userTZ"]);
             }
-            lblTimezone.Text = "Times are GMT " + userTZ / 60.0;
+            if (!IsPostBack)
+            {
+                lblTimezone.Text = "Times are GMT " + userTZ / 60.0;
+                LoadAuthorityList();
+            }
             if (ddlTimeIs.SelectedIndex != 4)
             {
                 txtTime2.ReadOnly = true;
@@ -77,8 +82,6 @@ namespace iLabs.ServiceBroker.admin
         private void LoadAuthorityList()
         {
             ddlAuthority.Items.Clear();
-            //ListItem liHeaderAdminGroup = new ListItem("--- All Authorities ---", "-1");
-            //ddlAuthorities.Items.Add(liHeaderAdminGroup);
             BrokerDB brokerDB = new BrokerDB();
             IntTag[] authTags = brokerDB.GetAuthorityTags();
             if (authTags != null && authTags.Length > 0)
@@ -88,6 +91,7 @@ namespace iLabs.ServiceBroker.admin
                     ListItem li = new ListItem(t.tag, t.id.ToString());
                     ddlAuthority.Items.Add(li);
                 }
+                ddlAuthority.SelectedValue = "0";
             }
         }
 
@@ -161,7 +165,8 @@ namespace iLabs.ServiceBroker.admin
             {
                 if (txtUserName.Text != "")
                 {
-                    authID = Convert.ToInt32(ddlAuthority.SelectedValue);
+                    if(ddlAuthority.SelectedValue != null)
+                        authID = Convert.ToInt32(ddlAuthority.SelectedValue);
                     userID = wrapper.GetUserIDWrapper(txtUserName.Text,authID);
                     if (userID == -1)
                     {

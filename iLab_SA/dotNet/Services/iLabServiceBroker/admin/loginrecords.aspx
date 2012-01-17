@@ -45,7 +45,7 @@ Please see license.txt in top level directory for full license.
 									</tr>
 									<tr>
 										<th style="HEIGHT: 31px">
-											<label for="authorityis">Authority</label></th>
+											<label for="authority">Authority</label></th>
 										<td style="HEIGHT: 31px" colSpan="4"><asp:dropdownlist id="ddlAuthority" Runat="server" Width="412px"></asp:dropdownlist>
 											<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list --></td>
 									</tr>

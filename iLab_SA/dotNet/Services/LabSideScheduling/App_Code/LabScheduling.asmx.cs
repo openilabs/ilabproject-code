@@ -290,46 +290,45 @@ namespace iLabs.Scheduling.LabSide
 		/// <param name="ussUrl"></param>
         /// <param name="coupon"></param>
         /// <returns>true if the USSInfo is added successfully or is already in the database, false otherwise</returns>
-		[WebMethod]
+        [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public int AddUSSInfo(string ussGuid, string ussName, string ussUrl, Coupon coupon)
-		{
+        {
             int status = 0;
             LabSchedulingDB dbManager = new LabSchedulingDB();
+            USSInfo info = null;
             try
             {
                 if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
                 {
-                    int ussId =dbManager.ListUSSInfoID(ussGuid);
-                    if (ussId > 0)
+                    info = dbManager.GetUSSInfo(ussGuid);
+                    if (info != null)
                     {
-                        USSInfo[] info = dbManager.GetUSSInfos(new int[] { ussId });
-                        if(info != null && info.Length > 0){
-                            if(info[0].ussGuid.Equals(ussGuid) // && info[0].ussUrl.Equals(ussUrl) 
-                                && info[0].domainGuid.Equals(coupon.issuerGuid)){
-                                if(info[0].couponId != coupon.couponId){
-                                    // A new revokeTicket coupon has been created,
-                                    // Add it to the database & update USSinfo
-                                    if (!dbManager.AuthenticateCoupon(coupon))
-                                        dbManager.InsertCoupon(coupon);
-                                    status = dbManager.ModifyUSSInfo(ussId, ussGuid,ussName,ussUrl,
-                                        coupon.couponId,coupon.issuerGuid);
-                                }
-                                
+                        if (info.ussGuid.CompareTo(ussGuid) != 0
+                            || info.ussUrl.CompareTo(ussUrl) != 0
+                            || info.revokeCouponId != coupon.couponId
+                            || info.domainGuid.CompareTo(coupon.issuerGuid) != 0)
+                        {
+                            if (info.revokeCouponId != coupon.couponId)
+                            {
+                                // A new revokeTicket coupon has been created,
+                                // Add it to the database & update USSinfo
+                                if (!dbManager.AuthenticateCoupon(coupon))
+                                    dbManager.InsertCoupon(coupon);
                             }
+                            status = dbManager.ModifyUSSInfo(info.ussInfoId, ussGuid, ussName, ussUrl,
+                                coupon.couponId, coupon.issuerGuid);
                         }
-
                     }
                     else
                     {
-                        if( !dbManager.AuthenticateCoupon(coupon))
+                        if (!dbManager.AuthenticateCoupon(coupon))
                             dbManager.InsertCoupon(coupon);
                         int uID = dbManager.AddUSSInfo(ussGuid, ussName, ussUrl, coupon);
                         if (uID > 0)
                             status = 1;
                     }
-
                 }
             }
             catch
@@ -337,7 +336,7 @@ namespace iLabs.Scheduling.LabSide
                 throw;
             }
             return status;
-		}
+        }
 
         [WebMethod]
         [SoapDocumentMethod(Binding = "ILSS"),
@@ -346,13 +345,40 @@ namespace iLabs.Scheduling.LabSide
         {
             int status = 0;
             LabSchedulingDB dbManager = new LabSchedulingDB();
-           
+            USSInfo info = null;
+            try
+            {
                 if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
                 {
-                    int id = dbManager.ListUSSInfoID(ussGuid);
-                    if(id > 0)
-            status = dbManager.ModifyUSSInfo(id,ussGuid, ussName, ussUrl, coupon.couponId, coupon.issuerGuid);
+                    info = dbManager.GetUSSInfo(ussGuid);
+                    if (info != null)
+                    {
+                        if (info.ussGuid.CompareTo(ussGuid) != 0
+                            || info.ussUrl.CompareTo(ussUrl) != 0
+                            || info.revokeCouponId != coupon.couponId
+                            || info.domainGuid.CompareTo(coupon.issuerGuid) != 0)
+                        {
+                            if (info.revokeCouponId != coupon.couponId)
+                            {
+                                // A new revokeTicket coupon has been created,
+                                // Add it to the database & update USSinfo
+                                if (!dbManager.AuthenticateCoupon(coupon))
+                                    dbManager.InsertCoupon(coupon);
+                            }
+                            status = dbManager.ModifyUSSInfo(info.ussInfoId, ussGuid, ussName, ussUrl,
+                                coupon.couponId, coupon.issuerGuid);
+                        }
+                    }
+                    else
+                    {
+                        status = -1;
+                    }
                 }
+            }
+            catch
+            {
+                throw;
+            }
             return status;
         }
 
@@ -570,7 +596,7 @@ namespace iLabs.Scheduling.LabSide
                         dbTicketing.InsertCoupon(inCoupon);
                     }
                    status = LabSchedulingDB.ModifyUSSInfo(ussId, agent.agentGuid,agent.agentName, agent.webServiceUrl,
-                        inCoupon.couponId, inCoupon.issuerGuid);
+                        inCoupon.revokeCouponId, inCoupon.issuerGuid);
                 }
             }
             //return dbTicketing.GetProcessAgent(credentials.agent.agentGuid);

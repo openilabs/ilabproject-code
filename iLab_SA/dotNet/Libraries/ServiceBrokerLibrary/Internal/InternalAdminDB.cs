@@ -3638,7 +3638,7 @@ public static int CountScheduledClients(int labServerID){
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in finding parent groups of agent", ex);
+                throw new Exception("Exception thrown in finding nonRequestGroupIDs", ex);
             }
             finally
             {

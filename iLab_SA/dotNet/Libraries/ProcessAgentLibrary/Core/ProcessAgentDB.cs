@@ -1127,18 +1127,18 @@ namespace iLabs.Core
             // Get all Expired Ticket information
             // create sql connection
             DbConnection connection = FactoryDB.GetConnection();
-            DbTransaction transaction = null;
+            //DbTransaction transaction = null;
             try
             {
                 connection.Open();
-                transaction = connection.BeginTransaction();
+                //transaction = connection.BeginTransaction();
 
                 // create sql command
                 DbCommand cmd = connection.CreateCommand();
                 //cmd.CommandText = "GetExpiredTickets";
                 cmd.CommandText = "DropExpiredTicketsCoupons";
                 cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Transaction = transaction;
+                //cmd.Transaction = transaction;
 
                 // execute the command
                 DbDataReader dataReader = null;
@@ -1149,13 +1149,13 @@ namespace iLabs.Core
                     couponCount = dataReader.GetInt32(1);
                 }
                 dataReader.Close();
-                transaction.Commit();
+                //transaction.Commit();
                 Logger.WriteLine("ProcessExpiredTickets: ticketCount=" + ticketCount + " \tcouponCount=" + couponCount);
 
             }
             catch (Exception e)
             {
-                transaction.Rollback();
+                //transaction.Rollback();
                 Logger.WriteLine("ProcessExpiredTickets:  transaction Failed - Rollback- ticketCount=" + ticketCount + " \tcouponCount=" + couponCount + "\n" + e.Message);
             }
             finally

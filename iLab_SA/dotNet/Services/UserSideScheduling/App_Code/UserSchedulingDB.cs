@@ -19,7 +19,6 @@ namespace iLabs.Scheduling.UserSide
 	public class UserSchedulingDB : ProcessAgentDB
 	{
 		
-
 		public UserSchedulingDB()
 		{
 		}
@@ -1766,6 +1765,18 @@ namespace iLabs.Scheduling.UserSide
                 else
                 {
                     i = lssInfo.lssInfoId;
+                    if (!(lssInfo.revokeCouponID == coupon.couponId
+                        && lssInfo.domainGuid.CompareTo(coupon.issuerGuid) == 0))
+                    {
+                        InsertCoupon(connection, coupon.couponId, coupon.issuerGuid, coupon.passkey);
+                    }
+                    if (lssInfo.lssName.CompareTo(lssName) = !0
+                        || lssInfo.lssUrl.CompareTo(lssUrl) != 0
+                        || (lssInfo.revokeCouponID != coupon.couponId
+                            || lssInfo.domainGuid.CompareTo(coupon.issuerGuid) != 0))
+                    {
+                        ModifyLSSInfo(lssGuid, lssName, lssUrl, coupon);
+                    }
                 }
 			
             }
@@ -1800,6 +1811,7 @@ namespace iLabs.Scheduling.UserSide
                 cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
                 cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String, 256));
                 cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@domainGUID", coupon.issuerGuid, DbType.AnsiString, 50));
                 cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String, 512));
                 // execute the command
 
@@ -1838,6 +1850,8 @@ namespace iLabs.Scheduling.UserSide
 			cmd.CommandType=CommandType.StoredProcedure;
 			//populate the parameters
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssInfoId", lssInfoId, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@domainGUID", coupon.issuerGuid, DbType.AnsiString, 50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString,50));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String,256));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String,512));
@@ -1888,6 +1902,8 @@ namespace iLabs.Scheduling.UserSide
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
             cmd.Parameters.Add(FactoryDB.CreateParameter("@lssGUID", lssGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponId", coupon.couponId, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@domainGUID", coupon.issuerGuid, DbType.AnsiString, 50));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@lssName", lssName, DbType.String, 256));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@lssURL", lssUrl, DbType.String, 512));
             
@@ -2065,13 +2081,18 @@ namespace iLabs.Scheduling.UserSide
 					dataReader=cmd.ExecuteReader();
 					while(dataReader.Read())
 					{	
-						lssInfos[i].lssInfoId=lssInfoIds[i];
-						if(dataReader[0] != System.DBNull.Value )
-							lssInfos[i].lssGuid=dataReader.GetString(0);
-						if(dataReader[1] != System.DBNull.Value )
-							lssInfos[i].lssName=dataReader.GetString(1);
-						if(dataReader[2] != System.DBNull.Value )
-							lssInfos[i].lssUrl=dataReader.GetString(2);
+                        if (!dataReader.IsDBNull(0))
+                           lssInfos[i].lssInfoId = dataReader.GetInt32(0);
+                       if (!dataReader.IsDBNull(1))
+							lssInfos[i].lssGuid=dataReader.GetString(1);
+                        if (!dataReader.IsDBNull(2))
+							lssInfos[i].lssName=dataReader.GetString(2);
+                        if (!dataReader.IsDBNull(3))
+							lssInfos[i].lssUrl=dataReader.GetString(3);
+                        if (!dataReader.IsDBNull(4))
+                            lssInfos[i].revokeCouponID = dataReader.GetInt64(4);
+                        if (!dataReader.IsDBNull(5))
+                            lssInfos[i].domainGuid = dataReader.GetString(5);
 					}
 					dataReader.Close();
 				}	
@@ -2140,12 +2161,15 @@ namespace iLabs.Scheduling.UserSide
                 {
                     lssInfo = new LSSInfo();
                     lssInfo.lssInfoId = dataReader.GetInt32(0);
-                    if (dataReader[1] != System.DBNull.Value)
+                    if (!dataReader.IsDBNull(1))
                         lssInfo.lssGuid = dataReader.GetString(1);
-                    if (dataReader[2] != System.DBNull.Value)
+                    if (!dataReader.IsDBNull(2))
                         lssInfo.lssName = dataReader.GetString(2);
-                    if (dataReader[3] != System.DBNull.Value)
+                    if (!dataReader.IsDBNull(3))
                         lssInfo.lssUrl = dataReader.GetString(3);
+                    lssInfo.revokeCouponID = dataReader.GetInt64(4);
+                    if (!dataReader.IsDBNull(5))
+                        lssInfo.domainGuid = dataReader.GetString(5);
                 }
                 dataReader.Close();
             }

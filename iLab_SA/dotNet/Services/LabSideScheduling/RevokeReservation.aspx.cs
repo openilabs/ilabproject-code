@@ -575,7 +575,7 @@ namespace iLabs.Scheduling.LabSide
                         {
                             UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                             OperationAuthHeader header = new OperationAuthHeader();
-                            header.coupon = dbManager.GetCoupon(uss.couponId, uss.domainGuid);
+                            header.coupon = dbManager.GetCoupon(uss.revokeCouponId, uss.domainGuid);
                             ussProxy.OperationAuthHeaderValue = header;
                             ussProxy.Url = uss.ussUrl;
                             foreach (ReservationData res in reservations[uid])
@@ -736,7 +736,7 @@ namespace iLabs.Scheduling.LabSide
                     USSInfo[] ussArray = dbManager.GetUSSInfos(new int[] { uInfoID });
                     if (ussArray.Length > 0)
                     {
-                        Coupon revokeCoupon = dbManager.GetCoupon(ussArray[0].couponId, ussArray[0].domainGuid);
+                        Coupon revokeCoupon = dbManager.GetCoupon(ussArray[0].revokeCouponId, ussArray[0].domainGuid);
 
                         UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                         ussProxy.Url = ussArray[0].ussUrl;

@@ -22,6 +22,7 @@ Please see license.txt in top level directory for full license.
 </head>
 <body>
     <form id="Form1" method="post" runat="server">
+        <asp:HiddenField ID="hdnMetaId" runat="server" />
         <div id="outerwrapper">
             <uc1:banner ID="Banner1" runat="server"></uc1:banner>
             <br clear="all">
@@ -45,6 +46,11 @@ Please see license.txt in top level directory for full license.
                                         OnSelectedIndexChanged="ddlClient_SelectedIndexChanged" Width="672px"></asp:DropDownList></td>
                             </tr>
                             <tr>
+                                <th><label for="groups">Client Groups</label></th>
+                                <td colspan="2"><asp:DropDownList CssClass="i18n" ID="ddlGroups" runat="server"  AutoPostBack="True"
+                                        Width="672px"></asp:DropDownList></td>
+                            </tr>
+                            <tr>
                                 <th rowspan="2"><label for="client">Client Authorization </label></th>
                                 <td style="width: 336px"><asp:Textbox CssClass="i18n" ID="txtCouponID" runat="server" Width="200px"></asp:Textbox></td>
                                 <td style="width: 180px"><asp:Textbox CssClass="i18n" ID="txtIssuer" runat="server" Columns="50"></asp:Textbox></td>
@@ -53,8 +59,16 @@ Please see license.txt in top level directory for full license.
                                 <td style="width: 336px"><asp:Textbox CssClass="i18n" ID="txtPasscode" runat="server" Columns="50"></asp:Textbox>&nbsp;&nbsp;&nbsp;</td><td><asp:Button ID="btnGuid" runat="server" CssClass="button" Text="Make Guid" OnClick="btnGuid_Click" /></td>
                             </tr>
                             <tr>
+                                <th><label for="client">Metadata </label></th>
+                                <td colspan="2"><asp:Textbox CssClass="i18n" ID="txtMetadata" runat="server" Width="667px" Rows="8" TextMode="MultiLine"></asp:Textbox></td>
+                            </tr>
+                            <tr>
                                 <th><label for="client">Client SCORM </label></th>
                                 <td colspan="2"><asp:Textbox CssClass="i18n" ID="txtScorm" runat="server" Width="667px" Rows="8" TextMode="MultiLine"></asp:Textbox></td>
+                            </tr>
+                            <tr>
+                                <th><label for="client">Metadata Format </label></th>
+                                <td colspan="2"><asp:Textbox CssClass="i18n" ID="txtFormat" runat="server" Width="667px" Rows="3" TextMode="MultiLine"></asp:Textbox></td>
                             </tr>
                             <tr>
                                 <td>&nbsp;</td>

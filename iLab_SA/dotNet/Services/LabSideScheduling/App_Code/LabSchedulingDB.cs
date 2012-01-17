@@ -56,7 +56,7 @@ namespace iLabs.Scheduling.LabSide
                     if (uss != null && uss.Length > 0)
 
                         status += ModifyUSSInfo(ussId, agent.agentGuid, agent.agentName, agent.webServiceUrl,
-                             uss[0].couponId, uss[0].domainGuid);
+                             uss[0].revokeCouponId, uss[0].domainGuid);
                 }
             }
             if (agent.type == ProcessAgentType.SERVICE_BROKER || agent.type == ProcessAgentType.REMOTE_SERVICE_BROKER)
@@ -3231,7 +3231,7 @@ namespace iLabs.Scheduling.LabSide
    
                     UserSchedulingProxy ussProxy = new UserSchedulingProxy();
                     OperationAuthHeader header = new OperationAuthHeader();
-                    header.coupon = GetCoupon(uss.couponId, uss.domainGuid);
+                    header.coupon = GetCoupon(uss.revokeCouponId, uss.domainGuid);
                     ussProxy.OperationAuthHeaderValue = header;
                     ussProxy.Url = uss.ussUrl;
 
@@ -4085,7 +4085,7 @@ namespace iLabs.Scheduling.LabSide
                         if (dataReader[2] != System.DBNull.Value)
                             ussInfo.ussUrl = dataReader.GetString(2);
                         if (dataReader[3] != System.DBNull.Value)
-                            ussInfo.couponId = dataReader.GetInt64(3);
+                            ussInfo.revokeCouponId = dataReader.GetInt64(3);
                         if (dataReader[4] != System.DBNull.Value)
                             ussInfo.domainGuid = dataReader.GetString(4);
 
@@ -4137,7 +4137,7 @@ namespace iLabs.Scheduling.LabSide
                     if (dataReader[3] != System.DBNull.Value)
                         ussInfo.ussUrl = dataReader.GetString(3);
                     if (dataReader[4] != System.DBNull.Value)
-                        ussInfo.couponId = dataReader.GetInt64(4);
+                        ussInfo.revokeCouponId = dataReader.GetInt64(4);
                     if (dataReader[5] != System.DBNull.Value)
                         ussInfo.domainGuid = dataReader.GetString(5);
 
@@ -4195,7 +4195,7 @@ namespace iLabs.Scheduling.LabSide
 						if(dataReader[2] != System.DBNull.Value )
 							ussInfo.ussUrl=dataReader.GetString(2);
                         if (dataReader[3] != System.DBNull.Value)
-                            ussInfo.couponId = dataReader.GetInt64(3);
+                            ussInfo.revokeCouponId = dataReader.GetInt64(3);
                         if (dataReader[4] != System.DBNull.Value)
                             ussInfo.domainGuid = dataReader.GetString(4);
                         ussInfos.Add(ussInfo); 

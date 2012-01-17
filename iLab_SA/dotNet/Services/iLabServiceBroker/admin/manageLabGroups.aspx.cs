@@ -875,6 +875,49 @@ namespace iLabs.ServiceBroker.admin
                         string domainGuid = ProcessAgentDB.ServiceGuid;
                         string sbName = ProcessAgentDB.ServiceAgent.agentName;
 
+
+                        // Check for existing RevokeReservation tickets
+                        Coupon[] ussRevokeCoupons = issuer.RetrieveIssuedTicketCoupon(
+                            TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid);
+                        Coupon[] lssRevokeCoupons = issuer.RetrieveIssuedTicketCoupon(
+                            TicketTypes.REVOKE_RESERVATION, uss.agentGuid, lss.agentGuid);
+                        Coupon ussRevokeCoupon = null;
+                        Coupon lssRevokeCoupon = null;
+                        Coupon revokeCoupon = null;
+                        if (ussRevokeCoupons != null && ussRevokeCoupons.Length > 0)
+                        {
+                            ussRevokeCoupon = ussRevokeCoupons[0];
+                        }
+                        if (lssRevokeCoupons != null && lssRevokeCoupons.Length > 0)
+                        {
+                            lssRevokeCoupon = lssRevokeCoupons[0];
+                        }
+                        if (ussRevokeCoupon == null && lssRevokeCoupon == null)
+                        {
+                            revokeCoupon = issuer.CreateCoupon();
+                            // Create RevokeReservation ticket
+                            issuer.AddTicket(revokeCoupon, TicketTypes.REVOKE_RESERVATION,
+                                 uss.agentGuid, lss.agentGuid, -1L, factory.createRevokeReservationPayload("LSS"));
+                            ussRevokeCoupon = revokeCoupon;
+                            issuer.AddTicket(revokeCoupon, TicketTypes.REVOKE_RESERVATION,
+                                 lss.agentGuid, uss.agentGuid, -1L, factory.createRevokeReservationPayload("USS"));
+                            lssRevokeCoupon = revokeCoupon;
+                        }
+                        else if (ussRevokeCoupon == null)
+                        {
+                            ussRevokeCoupon = issuer.CreateCoupon();
+                            // Create RevokeReservation ticket
+                            issuer.AddTicket(ussRevokeCoupon, TicketTypes.REVOKE_RESERVATION,
+                                 uss.agentGuid, lss.agentGuid, -1L, factory.createRevokeReservationPayload("LSS"));
+                        }
+                        else if (lssRevokeCoupon == null)
+                        {
+                            lssRevokeCoupon = issuer.CreateCoupon();
+                            // Create RevokeReservation ticket
+                            issuer.AddTicket(lssRevokeCoupon, TicketTypes.REVOKE_RESERVATION,
+                                 lss.agentGuid, uss.agentGuid, -1L, factory.createRevokeReservationPayload("USS"));
+                        }
+
                         //Add Credential set on the USS
 
                         //string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["userTZ"]));
@@ -887,21 +930,7 @@ namespace iLabs.ServiceBroker.admin
                         ussProxy.AgentAuthHeaderValue.agentGuid = domainGuid;
 
                         ussProxy.AddCredentialSet(domainGuid, sbName, userGroupName);
-
-                        // Check for existing RevokeReservation ticket redeemer = USS, sponsor = LSS
-                        Coupon[] revokeCoupons = issuer.RetrieveIssuedTicketCoupon(
-                            TicketTypes.REVOKE_RESERVATION, uss.agentGuid, lss.agentGuid);
-                        Coupon revokeCoupon = null;
-                        if (revokeCoupons != null && revokeCoupons.Length > 0)
-                        {
-                            revokeCoupon = revokeCoupons[0];
-                        }
-                        else
-                        {
-                            // Create RevokeReservation ticket
-                            revokeCoupon = issuer.CreateTicket(TicketTypes.REVOKE_RESERVATION,
-                                 uss.agentGuid, lss.agentGuid, -1L, factory.createRevokeReservationPayload("USS"));
-                        }
+                        ussProxy.AddLSSInfo(lss.AgentGuid, lss.agentName, lss.webServiceUrl, lssRevokeCoupon);
 
                         //Add Credential set on the LSS
 
@@ -914,7 +943,7 @@ namespace iLabs.ServiceBroker.admin
                             lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
                             lssProxy.AgentAuthHeaderValue.agentGuid = domainGuid;
                             // Add the USS to the LSS, this may be called multiple times with duplicate data
-                            lssProxy.AddUSSInfo(uss.AgentGuid, uss.agentName, uss.webServiceUrl, revokeCoupon);
+                            lssProxy.AddUSSInfo(uss.AgentGuid, uss.agentName, uss.webServiceUrl, ussRevokeCoupon);
                             int credentialSetAdded = lssProxy.AddCredentialSet(domainGuid,
                                 sbName, userGroupName, uss.agentGuid);
                             // not sure this is the correct way to handle reserving a block for Lab Maintainance
@@ -933,8 +962,8 @@ namespace iLabs.ServiceBroker.admin
                             string groupDescriptor = resourceFactory.CreateGroupCredentialDescriptor(domainGuid, sbName, userGroupName, uss.agentGuid, lss.agentGuid);
 
                             ServiceDescription[] info = new ServiceDescription[3];
-                            info[0] = new ServiceDescription(null, revokeCoupon, ussDescriptor);
-                            info[1] = new ServiceDescription(null, null, lssDescriptor);
+                            info[0] = new ServiceDescription(null, lssRevokeCoupon, ussDescriptor);
+                            info[1] = new ServiceDescription(null, ussRevokeCoupon, lssDescriptor);
                             info[2] = new ServiceDescription(null, null, groupDescriptor);
 
                             ProcessAgentProxy sbProxy = new ProcessAgentProxy();

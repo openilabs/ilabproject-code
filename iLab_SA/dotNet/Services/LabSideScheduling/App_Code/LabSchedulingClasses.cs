@@ -171,7 +171,7 @@ namespace iLabs.Scheduling.LabSide
         /// the ID of the user side scheduling server information
         /// </summary>
         public int ussInfoId;
-        public long couponId;
+        public long revokeCouponId;
         public string domainGuid;
         /// <summary>
         /// the GUID of the user side scheduling server

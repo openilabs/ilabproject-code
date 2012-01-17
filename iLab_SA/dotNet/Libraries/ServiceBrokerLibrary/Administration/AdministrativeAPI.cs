@@ -1961,7 +1961,7 @@ namespace iLabs.ServiceBroker.Administration
         /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
         public static int[] ListNonRequestGroupsForUser(int agentID)
         {
-            int[] groups = InternalAdminDB.ListGroupParents(agentID);
+            int[] groups = InternalAdminDB.ListNonRequestGroups(agentID);
             return groups;
         }
 

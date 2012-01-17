@@ -98,16 +98,27 @@ namespace iLabs.Scheduling.UserSide
 		{
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             cntrScheduling.setBrowser(Request.Headers["User-Agent"]);
+            if (Session["serviceBrokerGuid"] != null)
 			serviceBrokerGuid = Session["serviceBrokerGuid"].ToString();
+            if(Session["groupName"] != null)
 			groupName = Session["groupName"].ToString();
+            if(Session["clientGuid"] != null)
             clientGuid = Session["clientGuid"].ToString();
+            if(Session["labServerGuid"] != null)
             labServerGuid = Session["labServerGuid"].ToString();
+            if(Session["labClientName"] != null)
 			labClientName = Session["labClientName"].ToString();
+            if(Session["labClientVersion"] != null)
 			labClientVersion = Session["labClientVersion"].ToString();
+            if(Session["userName"] != null)
 			userName = Session["userName"].ToString();
+            if(Session["lssURL"] != null)
 			lssURL = Session["lssURL"].ToString();
+            if(Session["lssGuid"] != null)
             lssGuid = Session["lssGuid"].ToString();
+            if(Session["userTZ"] != null)
             userTZ = Convert.ToInt32(Session["userTZ"]);
+            if(Session["coupon"] != null)
             coupon = (Coupon) Session["coupon"];
 
             if (IsPostBack){
@@ -136,8 +147,10 @@ namespace iLabs.Scheduling.UserSide
             else{
                 string value1 = Request.QueryString["start"];
                 string value2 = Request.QueryString["end"];
+                if(value1 != null)
                 startTime = DateUtil.ParseUtc(value1);
                 Session["startTime"] = startTime;
+                if (value2 != null)
                 endTime = DateUtil.ParseUtc(value2);
                 Session["endTime"] = endTime;
                 int[] policyIDs = dbManager.ListUSSPolicyIDsByGroupAndExperiment(groupName, serviceBrokerGuid, clientGuid, labServerGuid);

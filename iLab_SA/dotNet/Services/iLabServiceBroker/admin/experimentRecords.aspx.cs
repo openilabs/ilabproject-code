@@ -58,27 +58,29 @@ namespace iLabs.ServiceBroker.admin
                 Response.Redirect("../login.aspx");
             }
             userId = Convert.ToInt32(Session["UserID"]);
+            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
+            dateF = DateUtil.DateTime24(culture);
 
+            if (Session["UserTZ"] != null)
+                userTZ = Convert.ToInt32(Session["UserTZ"]);
+            if (!IsPostBack)
+            {
+                // "Are you sure" javascript for DeleteExperiment button
+                btnDeleteExperiment.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to delete this experiment?')== false) return false;");
+
+                StringBuilder buf = new StringBuilder();
+                buf.Append("Select criteria for the experiments to be displayed.  Enter date values using this format: '");
+                buf.Append(dateF + " [PM]");
+                buf.Append("' time may be entered as 24 or 12 hour format.");
+                buf.Append("<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0 + "&nbsp;&nbsp; and use a 24 hour clock.");
+                lblDescription.Text = buf.ToString();
+                LoadAuthorityList();
+            }
 			if(ddlTimeAttribute.SelectedValue!="between")                
 			{
 				txtTime2.ReadOnly=true;
 				txtTime2.BackColor=Color.Lavender;
 			}
-            culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
-            dateF = DateUtil.DateTime24(culture);
-
-            if(Session["UserTZ"] != null)
-                userTZ = Convert.ToInt32(Session["UserTZ"]);
-            // "Are you sure" javascript for DeleteExperiment button
-            btnDeleteExperiment.Attributes.Add("onclick", "javascript:if(confirm('Are you sure you want to delete this experiment?')== false) return false;");
-            
-
-            StringBuilder buf = new StringBuilder();
-            buf.Append("Select criteria for the experiments to be displayed.  Enter date values using this format: '");
-            buf.Append(dateF + " [PM]");
-            buf.Append("' time may be entered as 24 or 12 hour format.");
-            buf.Append("<br/><br/>Times shown are GMT:&nbsp;&nbsp;&nbsp;" + userTZ / 60.0 + "&nbsp;&nbsp; and use a 24 hour clock.");
-            lblDescription.Text = buf.ToString();
 		}
 
 		#region Web Form Designer generated code
@@ -115,6 +117,7 @@ namespace iLabs.ServiceBroker.admin
                     ListItem li = new ListItem(t.tag, t.id.ToString());
                     ddlAuthority.Items.Add(li);
                 }
+                ddlAuthority.SelectedValue = "0";
             }
         }
         protected void clearExperimentDisplay()

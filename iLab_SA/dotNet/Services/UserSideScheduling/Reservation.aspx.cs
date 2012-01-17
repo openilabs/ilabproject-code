@@ -23,8 +23,6 @@ using iLabs.Proxies.Ticketing;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
-
-
 namespace iLabs.Scheduling.UserSide
 {
     /// <summary>
@@ -39,11 +37,8 @@ namespace iLabs.Scheduling.UserSide
          string labClientName = null;
          string labClientVersion = null;
          string userName = null;
-        
-         
          string lssURL = null;
          string lssGuid = null;
-         Coupon coupon;
 
         int userTZ;
         long couponID = -1;
@@ -51,7 +46,6 @@ namespace iLabs.Scheduling.UserSide
         string issuerID = null;
         CultureInfo culture = null;
         //string tzOff = null;
-
 
          long expirationTime;
         UserSchedulingDB dbManager = new UserSchedulingDB();
@@ -65,8 +59,6 @@ namespace iLabs.Scheduling.UserSide
             
             Page.ClientScript.RegisterStartupScript( this.GetType(), "onClose", 
             "function ReloadPage(){" + Page.ClientScript.GetPostBackEventReference(this.hiddenPopupOnMakeRev, hiddenPopupOnMakeRev.ID.ToString()) + "}", true);
-
-
 
             //txtStartTimePeriod.Attributes.Add("OnKeyPress", "return false;");
             //txtEndTimePeriod.Attributes.Add("OnKeyPress", "return false;");
@@ -98,7 +90,7 @@ namespace iLabs.Scheduling.UserSide
                         Response.Redirect("UnauthorizedReg.aspx", true);
                     }
 
-                    coupon = new Coupon(issuerID, couponID, passKey);
+                    Coupon coupon = new Coupon(issuerID, couponID, passKey);
                     Session["coupon"] = coupon;
 
                     Ticket ticket = dbManager.RetrieveAndVerify(coupon, TicketTypes.SCHEDULE_SESSION);
@@ -143,7 +135,7 @@ namespace iLabs.Scheduling.UserSide
                     calDate.TodaysDate = DateTime.UtcNow.AddMinutes(Convert.ToInt32(Session["userTZ"])).Date;
                 }
             }
-            coupon = (Coupon)Session["coupon"];
+            //coupon = (Coupon)Session["coupon"];
             lssURL = Session["lssURL"].ToString();
             lssGuid = Session["lssGuid"].ToString();
             serviceBrokerGuid = Session["serviceBrokerGuid"].ToString();
@@ -241,52 +233,7 @@ namespace iLabs.Scheduling.UserSide
             }
 
         }
-/*
-        private void showDefaultAvailableTime()
-        {
-            DateTime startTime;
-            DateTime endTime;
-            //if (txtStartTimePeriod.Text == culture.DateTimeFormat.ShortDatePattern
-            //    && txtEndTimePeriod.Text == culture.DateTimeFormat.ShortDatePattern)
-            //{
-            //    startTime = DateUtil.ParseUserToUtc(txtStartTimePeriod.Text + " 00:00:00", culture, userTZ);
-            //    endTime = DateUtil.ParseUserToUtc(txtEndTimePeriod.Text + " 00:00:00", culture, userTZ);
-            //}
-            //else
-            //{
-                startTime = DateUtil.ParseUserToUtc(txtStartTimePeriod.Text, culture, userTZ);
-                endTime = DateUtil.ParseUserToUtc(txtEndTimePeriod.Text, culture, userTZ);
- 
-            //}
-                if (startTime > endTime)
-                {
-                    string msg = "The start time should be earlier than the end time";
-                    lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
-                    lblErrorMessage.Visible = true;
-                    lblTimeSlotsInfo.Visible = false;
-                    return;
-                }
-                if (startTime < DateTime.UtcNow)
-                {  
-                    startTime = DateTime.UtcNow;
-                    TimeSpan ts = new TimeSpan(0, 0, 60-startTime.Second);
-                    startTime = startTime.Add(ts);
-                }
-                if (startTime > endTime)
-                {
-                    string msg2 = "The end time should be later than the current time";
-                    lblErrorMessage.Text = Utilities.FormatWarningMessage(msg2);
-                    lblErrorMessage.Visible = true;
-                    lblTimeSlotsInfo.Visible = false;
-                    return;
-                }
-                
-                showAvailableTimeBlock(startTime, endTime);
 
-            
-
-        }
- * /
  /*
         // startTime and endTime are all UTC
         private void showAvailableTimeBlock(DateTime startTime, DateTime endTime)
@@ -412,8 +359,6 @@ namespace iLabs.Scheduling.UserSide
             return;
         }
 
-
-
         protected void btnRemoveReservation_Click(object sender, System.EventArgs e)
         {
             DateTime startTime = DateTime.MinValue;
@@ -444,26 +389,37 @@ namespace iLabs.Scheduling.UserSide
                         UssExperimentInfo[] exp = dbManager.GetExperimentInfos(new int[] { remove[0].experimentInfoId });
                         UssCredentialSet[] cSet = dbManager.GetCredentialSets(new int[] { remove[0].credentialSetId });
                         LSSInfo lss = dbManager.GetLSSInfo(exp[0].lssGuid);
+                        
                         if (exp != null && exp.Length > 0 && cSet != null && cSet.Length > 0 && lss.lssUrl != null)
                         {
-                            OperationAuthHeader opHeader = new OperationAuthHeader();
-                            opHeader.coupon = coupon;
-                            LabSchedulingProxy lssProxy = new LabSchedulingProxy();
-                            lssProxy.OperationAuthHeaderValue = opHeader;
-                            lssProxy.Url = lss.lssUrl;
-
-                            int count = lssProxy.RemoveReservation(cSet[0].serviceBrokerGuid, cSet[0].groupName, ProcessAgentDB.ServiceGuid,
-                                exp[0].labServerGuid, exp[0].labClientGuid, startTimeUTC, endTimeUTC);
-                            if (count > 0)
+                            Coupon coupon = dbManager.GetCoupon(lss.revokeCouponID, lss.domainGuid);
+                            if (coupon != null)
                             {
-                                dbManager.RemoveReservation(resIDs);
-                                string msg = "The reservation has been removed successfully! ";
-                                lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
-                                lblErrorMessage.Visible = true;
+                                OperationAuthHeader opHeader = new OperationAuthHeader();
+                                opHeader.coupon = coupon;
+                                LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                                lssProxy.OperationAuthHeaderValue = opHeader;
+                                lssProxy.Url = lss.lssUrl;
+
+                                int count = lssProxy.RemoveReservation(cSet[0].serviceBrokerGuid, cSet[0].groupName, ProcessAgentDB.ServiceGuid,
+                                    exp[0].labServerGuid, exp[0].labClientGuid, startTimeUTC, endTimeUTC);
+                                if (count > 0)
+                                {
+                                    dbManager.RemoveReservation(resIDs);
+                                    string msg = "The reservation has been removed successfully! ";
+                                    lblErrorMessage.Text = Utilities.FormatConfirmationMessage(msg);
+                                    lblErrorMessage.Visible = true;
+                                }
+                                else
+                                {
+                                    string msg = "The reservation has not been removed successfully.";
+                                    lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
+                                    lblErrorMessage.Visible = true;
+                                }
                             }
                             else
                             {
-                                string msg = "The reservation has not been removed successfully.";
+                                string msg = "Access denied: The reservation has not been removed successfully.";
                                 lblErrorMessage.Text = Utilities.FormatErrorMessage(msg);
                                 lblErrorMessage.Visible = true;
                             }

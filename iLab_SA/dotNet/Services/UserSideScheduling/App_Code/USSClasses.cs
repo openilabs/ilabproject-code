@@ -109,7 +109,6 @@ namespace iLabs.Scheduling.UserSide
         private string lsGuidField;
         private string lssGuidField;
 
-
         public string sbGuid
         {
             get
@@ -177,6 +176,14 @@ namespace iLabs.Scheduling.UserSide
         /// the ID of the lab side scheduling server information
         /// </summary>
         public int lssInfoId;
+        /// <summary>
+        /// The coupon ID of the persitant REVOKE_RESERVATION ticket
+        /// </summary>
+        public long revokeCouponID;
+        /// <summary>
+        /// The domain of the revokeCoupon
+        /// </summary>
+        public string domainGuid;
         /// <summary>
         /// the GUID of the lab side scheduling server 
         /// </summary>

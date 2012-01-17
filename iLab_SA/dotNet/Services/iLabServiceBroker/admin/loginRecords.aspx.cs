@@ -47,6 +47,10 @@ namespace iLabs.ServiceBroker.admin
                 userTZ = Convert.ToInt32(Session["userTZ"]);
             }
             lblTimezone.Text = "Times are GMT " + userTZ / 60.0;
+            if (!IsPostBack)
+            {
+                LoadAuthorityList();
+            }
             if (ddlTimeIs.SelectedIndex != 4)
             {
                 txtTime2.ReadOnly = true;
@@ -88,6 +92,7 @@ namespace iLabs.ServiceBroker.admin
                     ListItem li = new ListItem(t.tag, t.id.ToString());
                     ddlAuthority.Items.Add(li);
                 }
+                ddlAuthority.SelectedValue = "0";
             }
         }
 
@@ -150,7 +155,10 @@ namespace iLabs.ServiceBroker.admin
             {
                 if (txtUserName.Text != "")
                 {
-                    authID = Convert.ToInt32(ddlAuthority.SelectedValue);
+                    if (ddlAuthority.SelectedValue != null)
+                        authID = Convert.ToInt32(ddlAuthority.SelectedValue);
+                    else
+                        authID = 0;
                     userID = wrapper.GetUserIDWrapper(txtUserName.Text,authID);
                     if (userID == -1)
                     {
