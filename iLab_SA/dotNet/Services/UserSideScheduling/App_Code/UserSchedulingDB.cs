@@ -1770,7 +1770,7 @@ namespace iLabs.Scheduling.UserSide
                     {
                         InsertCoupon(connection, coupon.couponId, coupon.issuerGuid, coupon.passkey);
                     }
-                    if (lssInfo.lssName.CompareTo(lssName) = !0
+                    if (lssInfo.lssName.CompareTo(lssName)!= 0
                         || lssInfo.lssUrl.CompareTo(lssUrl) != 0
                         || (lssInfo.revokeCouponID != coupon.couponId
                             || lssInfo.domainGuid.CompareTo(coupon.issuerGuid) != 0))
