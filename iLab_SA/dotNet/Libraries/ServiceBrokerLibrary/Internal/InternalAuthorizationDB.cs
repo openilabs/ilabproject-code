@@ -838,8 +838,8 @@ namespace iLabs.ServiceBroker.Internal
 		public static bool CheckAuthorizationFromDS (int agentID, string function, int qualifierID )
 		{	
 			int[] explicitGrants = FindGrantsIDsFromDS(agentID, function, qualifierID);
-			
-			if (explicitGrants.Length>0)
+
+            if (explicitGrants != null && explicitGrants.Length > 0)
 				return true;
 
 			/* 

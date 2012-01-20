@@ -65,7 +65,9 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIssuedTicket]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetIssuedTicket]
 GO
-
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIssuedTicketByFunction]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetIssuedTicketByFunction]
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetIssuedTicketByID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetIssuedTicketByID]
 GO
@@ -330,6 +332,32 @@ GO
 SET ANSI_NULLS ON 
 GO
 
+
+CREATE PROCEDURE [dbo].[GetIssuedTicketByFunction]
+		@duration bigint,
+        @ticketType varchar(100),
+        @redeemerGuid varchar(50),
+        @sponsorGuid varchar(50)
+  AS
+        DECLARE @ticketTypeID int
+        select @ticketTypeID = (select Ticket_Type_ID  from Ticket_Type where upper( Name ) = upper(@ticketType) )
+        if(@duration > 0)
+        BEGIN
+        select  Ticket_ID, upper(@ticketType), Coupon_ID, Redeemer_GUID, Sponsor_GUID, 
+			Creation_Time, Duration, Payload, Cancelled
+			from IssuedTicket  where Redeemer_GUID = @redeemerGuid 
+			AND Sponsor_Guid = @sponsorGuid and Ticket_Type_ID = @ticketTypeID
+			AND duration > 0 AND (DateADD(ss,duration,creation_time) >= DateADD(ss,@duration,GetUTCDate()))
+		END
+		ELSE
+		BEGIN
+        select  Ticket_ID, upper(@ticketType), Coupon_ID, Redeemer_GUID, Sponsor_GUID, 
+			Creation_Time, Duration, Payload, Cancelled
+			from IssuedTicket  where Redeemer_GUID = @redeemerGuid 
+			AND Sponsor_Guid = @sponsorGuid and Ticket_Type_ID = @ticketTypeID
+			AND Duration = -1 
+		END
+GO
 
 CREATE PROCEDURE GetIssuedTicketByID
              @ticketID bigint

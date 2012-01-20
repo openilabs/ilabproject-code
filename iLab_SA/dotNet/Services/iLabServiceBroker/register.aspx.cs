@@ -74,6 +74,7 @@ namespace iLabs.ServiceBroker.iLabSB
 					String afList = ConfigurationManager.AppSettings["affiliationOptions"];
 					char [] delimiter = {','};
 					String [] options =afList.Split(delimiter,100);
+                    ddlAffiliation.Items.Clear();
 					for(int i =0;i< options.Length;i++)
 					{
 						ddlAffiliation.Items.Add(options[i]);
@@ -90,7 +91,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 if (chooseGroup)
                 {
-
+                    ddlGroup.Items.Clear();
                     ddlGroup.Items.Add("-- None --");
                     //Don' t use wrapper since it only lists a user's group
                     int[] gpIDs = wrapper.ListGroupIDsWrapper();

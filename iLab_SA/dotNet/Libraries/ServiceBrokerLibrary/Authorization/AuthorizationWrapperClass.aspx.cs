@@ -1188,7 +1188,8 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 			else
 			{
-				throw new AccessDeniedException ("Access denied listing subgroupIDs from group.");
+				//throw new AccessDeniedException ("Access denied listing subgroupIDs from group.");
+                return null;
 			}
 		}
 
@@ -1244,7 +1245,8 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 			else
 			{
-				throw new AccessDeniedException ("Access denied listing subgroupIDs from group.");
+				//throw new AccessDeniedException ("Access denied listing subgroupIDs from group.");
+                return null;
 			}
 		}
 
@@ -1280,7 +1282,8 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 			else
 			{
-				throw new AccessDeniedException ("Access denied listing groupIDs in group.");
+				//throw new AccessDeniedException ("Access denied listing groupIDs in group.");
+                return null;
 			}
 		}
       
@@ -1315,7 +1318,8 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 			else
 			{
-				throw new AccessDeniedException ("Access denied listing memberIDs in group.");
+				//throw new AccessDeniedException ("Access denied listing memberIDs in group.");
+                return null;
 			}
 		}
 

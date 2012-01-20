@@ -230,6 +230,7 @@ namespace iLabs.ServiceBroker.iLabSB
            // cList.Add(new Criterion("Record_Count", ">", "0"));
 
             long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userID,groupID, cList.ToArray());
+                                            //RetrieveExperimentTags(eIDs, userTZ, culture, false, false, true, false, true, false, true, false);
             LongTag[] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture, false, false, true, false, true, false, true, false);
 
             for (int i = 0; i < expTags.Length; i++)
@@ -374,7 +375,7 @@ namespace iLabs.ServiceBroker.iLabSB
 				}
 
 				long[] eIDs = wrapper.FindExperimentIDsWrapper(carray);
-				LongTag [] eTags = DataStorageAPI.RetrieveExperimentTags(eIDs,userTZ,culture);
+                LongTag[] eTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture, false, false, true, false, true, false, true, false);
 			
 				for(int i =0; i< eTags.Length ; i++)
 				{

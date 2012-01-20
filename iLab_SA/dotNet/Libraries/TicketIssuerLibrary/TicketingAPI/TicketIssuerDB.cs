@@ -856,6 +856,83 @@ namespace iLabs.TicketIssuer
 
         /// <summary>
         /// Retrieve a ticket from the database.
+        /// The triple 
+        /// </summary>
+        /// <param name="duration"> minimum remaining time (seconds) to expire or -1 for never expiring tickets</param>
+        /// <param name="ticketType"></param>
+        /// <param name="redeemerGuid"></param>
+        /// <param name="sponsorGuid"></param>
+        /// <returns>Retrieved Tickets, or null if  the ticket cannot be found</returns>
+        public Ticket[] RetrieveIssuedTickets(long duration, string ticketType, 
+            string redeemerGuid, string sponsorGuid)
+        {
+            List<Ticket> tickets = new List<Ticket>();
+            // create sql connection
+            DbConnection connection = FactoryDB.GetConnection();
+
+            // create sql command
+            // command executes the "RetrieveTicket" stored procedure
+            DbCommand cmd = FactoryDB.CreateCommand("GetIssuedTicketByFunction", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate the parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@duration", duration, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@ticketType", ticketType, DbType.AnsiString, 100));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@redeemerGuid", redeemerGuid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@sponsorGuid", sponsorGuid, DbType.AnsiString, 50));
+
+            // execute the command
+            DbDataReader dataReader = null;
+            try
+            {
+                connection.Open();
+                dataReader = cmd.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    Ticket ticket = new Ticket();
+                    ticket.issuerGuid = ServiceGuid;
+                    // read ticket id
+                    ticket.ticketId = (long)dataReader.GetInt64(0);
+                    ticket.type = dataReader.GetString(1);
+                    // read coupon id
+                    ticket.couponId = (long)dataReader.GetInt64(2);
+                    // read redeemer id
+                    ticket.redeemerGuid = dataReader.GetString(3);
+                    // read sponsor id
+                    ticket.sponsorGuid = dataReader.GetString(4);
+                    // read expiration
+                    ticket.creationTime = dataReader.GetDateTime(5);
+                    ticket.duration = dataReader.GetInt64(6);
+                    // read payload
+                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
+                        ticket.payload = dataReader.GetString(7);
+                    // read Cancelled
+                    bool cancelled = dataReader.GetBoolean(8);
+                    if (!cancelled)
+                        tickets.Add(ticket);
+                }
+
+            }
+            catch (DbException e)
+            {
+                writeEx(e);
+                throw;
+            }
+
+            finally
+            {
+                connection.Close();
+            }
+            if (tickets.Count > 0)
+                return tickets.ToArray();
+            else
+                return null;
+        }
+
+
+        /// <summary>
+        /// Retrieve a ticket from the database.
         /// The triple (couponID, redeemerID, type) uniquely identifies the ticket.
         /// </summary>
         /// <param name="coupon"></param>

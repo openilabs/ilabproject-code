@@ -202,7 +202,7 @@ namespace iLabs.ServiceBroker.admin
 
 			int []subGroupIDs = wrapper.ListSubgroupIDsWrapper(groupInfo.id);
 
-			if (subGroupIDs.Length>0)
+            if (subGroupIDs != null && subGroupIDs.Length > 0)
 			{
 				subGroups = wrapper.GetGroupsWrapper(subGroupIDs);
 				if(displaySubgroups)

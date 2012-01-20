@@ -2574,16 +2574,15 @@ public static int CountScheduledClients(int labServerID){
     //from   agent_hierarchy ah, agents ag
     //where ah.parent_group_ID = @groupID and ah.agent_id=ag.agent_id
 
-                sqlWhere.Append(" AND s.user_ID in (select ah.agent_ID from agent_hierarchy ah, agents ag ");
-                sqlWhere.Append(" where ah.parent_group_ID = ");
+                sqlWhere.Append(" AND s.user_ID in (select ug.user_ID from User_Groups ug");
+                sqlWhere.Append(" where ug.group_ID = ");
                 sqlWhere.Append(groupID);
-                sqlWhere.Append(" AND ag.is_group = 0 )");
+                sqlWhere.Append(") ");
                // orderCode |= 2;
             }
 
             if (timeBefore.CompareTo(DateTime.MinValue) != 0)
             {
-
                 sqlWhere.Append(" AND session_start_time <= '");
                 sqlWhere.Append(timeBefore);
                 sqlWhere.Append("'");
