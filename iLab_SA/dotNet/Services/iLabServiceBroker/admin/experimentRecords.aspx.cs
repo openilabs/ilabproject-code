@@ -76,7 +76,7 @@ namespace iLabs.ServiceBroker.admin
                 lblDescription.Text = buf.ToString();
                 LoadAuthorityList();
             }
-			if(ddlTimeAttribute.SelectedValue!="between")                
+			if(ddlTimeAttribute.SelectedValue!="Between")                
 			{
 				txtTime2.ReadOnly=true;
 				txtTime2.BackColor=Color.Lavender;
@@ -188,7 +188,7 @@ namespace iLabs.ServiceBroker.admin
             else if(ddlTimeAttribute.SelectedIndex ==3){ // After
                  cList.Add(new Criterion ("CreationTime", ">=", time1.ToString()));
             }
-            else if(ddlTimeAttribute.SelectedIndex ==2){ // Between
+            else if(ddlTimeAttribute.SelectedIndex ==4){ // Between
                 DateTime time2 = FactoryDB.MaxDbDate;
                 try{
 						    time2 = DateUtil.ParseUserToUtc(txtTime2.Text,culture,Convert.ToInt32(Session["UserTZ"]));
@@ -312,9 +312,9 @@ namespace iLabs.ServiceBroker.admin
 
 		protected void ddlTimeAttribute_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
-			txtTime1.Text=null;
-			txtTime2.Text=null;
-			if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("between")==0)
+			//txtTime1.Text=null;
+			//txtTime2.Text=null;
+			if (ddlTimeAttribute.SelectedValue.ToString().CompareTo("Between")==0)
 			{
 				txtTime2.ReadOnly=false;
 				txtTime2.BackColor=Color.White;

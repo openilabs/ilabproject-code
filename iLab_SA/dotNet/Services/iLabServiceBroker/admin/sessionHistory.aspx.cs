@@ -108,7 +108,7 @@ namespace iLabs.ServiceBroker.admin
         //list the log-in sessions according to the selected criterion
         private void BuildListBox(int userID, int groupID, DateTime time1, DateTime time2, bool cvs)
         {
-            string pad = ",\t";
+            string pad = "  ";
             try
             {
                 DataSet sessionData = InternalAdminDB.SelectSessionHistory(userID, groupID, time1, time2);
@@ -122,25 +122,35 @@ namespace iLabs.ServiceBroker.admin
                 else
                 {
                     StringBuilder buf = new StringBuilder();
+                    buf.AppendLine(String.Format("{0,-14}{1,-18}{2,-10}{3,-10}{4,-26}{5,-24}",
+                        "User Name", "Create Time", "End Time","Modify","Group","Client"));
+                    
                     DataTableReader dtr = new DataTableReader(sessionHistory);
                     while(dtr.Read())
                     {
-                        buf.Append(dtr.GetInt64(0) + pad);
-                        buf.Append(dtr.GetString(1) + pad);
+                        //buf.Append(dtr.GetInt64(0) + pad);
+                        buf.Append(String.Format("{0,-12:12}", dtr.GetString(1)) + pad);
                         if(!dtr.IsDBNull(2))
-                            buf.Append(DateUtil.ToUserTime(dtr.GetDateTime(2),culture,userTZ) +pad);
+                            buf.Append(DateUtil.ToUserTime(dtr.GetDateTime(2),
+                                CultureInfo.InvariantCulture,userTZ,"g") +pad);
                         else
-                            buf.Append("Create Time Not Set" +pad);
+                            buf.Append(String.Format("{0,-9:9}", "Not Set") + pad);
                         if (!dtr.IsDBNull(3))
-                            buf.Append(DateUtil.ToUserTime(dtr.GetDateTime(3), culture, userTZ) + pad);
+                            buf.Append(DateUtil.ToUserTime(dtr.GetDateTime(3), CultureInfo.InvariantCulture, userTZ, "T") + pad);
                         else
-                            buf.Append("End Time Not Set" +pad);
+                            buf.Append(String.Format("{0,-8}", "Not Set") + pad);
                         if (!dtr.IsDBNull(4))
-                            buf.Append(DateUtil.ToUserTime(dtr.GetDateTime(4),culture,userTZ) +pad);
+                            buf.Append(DateUtil.ToUserTime(dtr.GetDateTime(4), CultureInfo.InvariantCulture, userTZ, "T") + pad);
                         else
-                            buf.Append("Modify Time Not Set" +pad);
-                        buf.Append(dtr.GetString(5) + pad);
-                        buf.Append(dtr.GetString(6));
+                            buf.Append(String.Format("{0,-8}", "Not Set") + pad);
+                        string tmp = dtr.GetString(5);
+                        if (tmp != null && tmp.Length > 24)
+                            tmp = tmp.Substring(0, 24);
+                        buf.Append(String.Format("{0,-24}",tmp) + pad);
+                        tmp = dtr.GetString(6);
+                        if (tmp != null && tmp.Length > 24)
+                            tmp = tmp.Substring(0, 24);
+                        buf.Append(String.Format("{0,-24}",tmp));
                         
                         buf.AppendLine();
                     }

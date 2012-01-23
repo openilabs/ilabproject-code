@@ -363,7 +363,8 @@ namespace iLabs.ServiceBroker.DataStorage
             long[] expIDs = null;
             List<Criterion> sbList = new List<Criterion>();
             List<Criterion> essList = new List<Criterion>();
-            
+           
+
             if (carray != null && carray.Length > 0)
             {
                 // Parse the criterion

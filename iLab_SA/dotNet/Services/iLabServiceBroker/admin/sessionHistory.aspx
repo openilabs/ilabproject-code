@@ -22,7 +22,7 @@ Please see license.txt in top level directory for full license.
 	<body>
 		<form id="Form1" method="post" runat="server">
 			<a name="top"></a>
-			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:adminnav id="AdminNav1" runat="server"></uc1:adminnav><br clear="all">
+			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:adminnav id="AdminNav1" runat="server"></uc1:adminnav><br clear="all" />
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Session History Records
@@ -70,14 +70,14 @@ Please see license.txt in top level directory for full license.
 										<!-- the following field uses the class "noneditable" if the user does not select between from the drop-down list -->
 										<td style="WIDTH: 130px; HEIGHT: 31px"><asp:textbox id="txtTime2" Runat="server" Width="127px" ReadOnly="true"></asp:textbox>
 											<!--input name="textfield" type="text" class="noneditable" size="10"--></td>
-										<td style="HEIGHT: 31px"><asp:button id="btnGo" Runat="server" Width="25px" CssClass="button" Text="Go" onclick="btnGo_Click"></asp:button>
+										<td style="HEIGHT: 31px"><asp:button id="btnGo" Runat="server" Width="50px" CssClass="button" Text=" Go " onclick="btnGo_Click"></asp:button>
 											<!--input name="Submit" type="submit" class="button" value="Go"--></td>
 									</tr>
 								</TBODY>
 							</table>
 						</div>
 						<asp:textbox id="txtLoginDisplay" Runat="server"  Height="300px" TextMode="MultiLine"
-							Columns="132" Rows="20"></asp:textbox>
+							Rows="20" Width="900px"></asp:textbox>
 						<!--textarea name="logindisplay" cols="50" rows="20" id="logindisplay"--> 
 						</div>
 					<br clear="all"/>

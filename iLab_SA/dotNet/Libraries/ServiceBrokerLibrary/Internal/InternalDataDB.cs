@@ -659,7 +659,6 @@ namespace iLabs.ServiceBroker.Internal
         /// <returns></returns>
         public static long[] RetrieveExperimentIDs(int userID, int groupID)
         {
-
             StringBuilder whereClause = null;
             List<long> expIDs = new List<long>();
 
