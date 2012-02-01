@@ -434,7 +434,7 @@ namespace iLabs.ServiceBroker.admin
                     // The business logic says that agents cannot simultaneuosly exist under the ROOT node
                     // and under some other group node.
                     if (agentName.Equals(Group.ROOT)
-                       || (agentID == destinationID)
+                       || ( !isUser && agentID == destinationID)
                        || agentName.Equals(Group.NEWUSERGROUP)
                        || agentName.Equals(Group.ORPHANEDGROUP)
                        || agentName.Equals(Group.SUPERUSER))

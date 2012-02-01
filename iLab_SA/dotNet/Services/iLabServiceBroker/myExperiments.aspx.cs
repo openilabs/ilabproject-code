@@ -88,12 +88,12 @@ namespace iLabs.ServiceBroker.iLabSB
                 if (Session["UserID"] != null)
                 {
                     cList.Add(new Criterion("User_ID", "=", Session["UserID"].ToString()));
-                    
+
                 }
-                if (Session["GroupID"] != null)
-                {
-                    cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
-                }
+                //if (Session["GroupID"] != null)
+                //{
+                //    cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
+                //}
                 long[] eIDs = DataStorageAPI.RetrieveAuthorizedExpIDs(userID, groupID, cList.ToArray());
 				LongTag [] expTags = DataStorageAPI.RetrieveExperimentTags(eIDs, userTZ, culture, false, false, true, false, true, false, true, false);
 			
@@ -178,10 +178,10 @@ namespace iLabs.ServiceBroker.iLabSB
                 cList.Add(new Criterion("User_ID", "=", Session["UserID"].ToString()));
             }
 
-            if (Session["GroupID"] != null)
-            {
-                cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
-            }
+            //if (Session["GroupID"] != null)
+            //{
+            //    cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
+            //}
 			
 			if((ddlTimeAttribute.SelectedIndex >0))
 			{

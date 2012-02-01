@@ -216,7 +216,7 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
 			try
 			{   
-
+              
 				// Checking if user has permission to use the lab server. The method will set headers for lab server calls
 				//if authorization is successful.
                 CheckAndSetLSAuthorization(labServerID);
@@ -302,26 +302,26 @@ namespace iLabs.ServiceBroker.iLabSB
                 if (Session["ClientID"] != null )
                     clientID = Convert.ToInt32(Session["ClientID"]);
                 string effectiveGroup = Session["GroupName"].ToString();
-
                 ProcessAgentInfo infoLS = brokerDB.GetProcessAgentInfo(labServerID);
-                if (infoLS.retired)
-                {
-                    throw new Exception("The Batch Lab Server is retired");
-                }
-                // get qualifier ID of labServer
-                int qualifierID = AuthorizationAPI.GetQualifierID(infoLS.agentId, Qualifier.labServerQualifierTypeID);
 
-                /* End collecting information */
+                //if (infoLS.retired)
+                //{
+                //    throw new Exception("The Batch Lab Server is retired");
+                //}
+                //// get qualifier ID of labServer
+                //int qualifierID = AuthorizationAPI.GetQualifierID(infoLS.agentId, Qualifier.labServerQualifierTypeID);
 
-                // Checking if user has permission to use the lab server
-                if (!AuthorizationAPI.CheckAuthorization(userID, Function.useLabServerFunctionType, qualifierID))
-                {
-                    // check fails
+                ///* End collecting information */
 
-                    throw new AccessDeniedException("Access denied using labServer '" + infoLS.agentName + "'.");
-                }
-                else
-                {
+                //// Checking if user has permission to use the lab server
+                //if (!AuthorizationAPI.CheckAuthorization(effectiveGroupID, Function.useLabServerFunctionType, qualifierID))
+                //{
+                //    // check fails
+
+                //    throw new AccessDeniedException("Access denied using labServer '" + infoLS.agentName + "'.");
+                //}
+                //else
+                //{
                     int[] groupIDs = new int[1];
                     groupIDs[0] = effectiveGroupID;
 
@@ -431,8 +431,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         clientSReport.wait.effectiveQueueLength = sReport.wait.effectiveQueueLength;
                         clientSReport.wait.estWait = sReport.wait.estWait;
                     }
-                }
-
+                //}
                 return clientSReport;
             }
 
@@ -958,7 +957,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                 //retrieve userID from the session
                 int userID = Convert.ToInt32(Session["UserID"]);
-
+                int groupID = Convert.ToInt32(Session["GroupID"]);
                 ProcessAgentInfo info = brokerDB.GetProcessAgentInfo(labServerID);
                 if (info.retired)
                 {
@@ -970,7 +969,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 /* End collecting information */
 
                 // Checking if user has permission to use the lab server
-                if (!AuthorizationAPI.CheckAuthorization(userID, Function.useLabServerFunctionType, qualifierID))
+                if (!AuthorizationAPI.CheckAuthorization(groupID, Function.useLabServerFunctionType, qualifierID))
                 {
                     // check fails
 

@@ -3451,7 +3451,7 @@ public static int CountScheduledClients(int labServerID){
 				myConnection.Open();
 
                 int i = myCommand.ExecuteNonQuery();
-                status = (i <= 0);
+                status = (i > 0);
             }
             catch (Exception ex)
             {
