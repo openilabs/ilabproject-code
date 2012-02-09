@@ -110,6 +110,7 @@ Please see license.txt in top level directory for full license.
 									<th><label for="captcha">Please enter the security code </label>
 										</th>
 									    <td>
+									    <!-- This has been patched to support the EmbedJavascript property for IE 6 and 7 -->
 										<div><recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/></div>
 										</td>
 									</tr>

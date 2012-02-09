@@ -50,6 +50,10 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		private void Page_Load(object sender, System.EventArgs e)
 		{
+            if (Request.UserAgent.Contains("MSIE 6") || Request.UserAgent.Contains("MSIE 7"))
+            {
+               recaptcha.EmbedJavascript = true;
+            }
             lblRevision.Text = "<!--  " + iLabGlobal.Release + "  -->";
 			userID = -1;
 			currentUser = new User();

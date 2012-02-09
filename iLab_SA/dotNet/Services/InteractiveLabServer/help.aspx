@@ -1,6 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
+<%@ Register TagPrefix="recaptcha" Namespace="Recaptcha" Assembly="Recaptcha" %>
 <%@ Page language="c#" Inherits="iLabs.LabServer.help" CodeFile="help.aspx.cs" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -92,6 +93,11 @@ Please see license.txt in top level directory for full license.
 												<label for="problem">Describe your problem</label></th>
 											<td><asp:textbox id="txtProblem" Runat="server" Rows="6" Columns="50" TextMode="MultiLine"></asp:textbox>
 												<!--textarea name="problem" cols="50" rows="6" id="problem"></textarea--></td>
+										</tr>
+										<tr>
+										    <th style="width: 192px"><label for="enterSecurityCode">Please enter security code</label></th>
+										    <!-- This has been patched to support the EmbedJavascript property for IE 6 and 7 -->
+										    <td style="width: 608px"><recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/></td>
 										</tr>
 										<tr>
 											<th colspan="2">

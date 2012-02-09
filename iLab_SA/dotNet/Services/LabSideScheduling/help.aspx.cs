@@ -20,6 +20,7 @@ using System.Web.Mail;
 
 using iLabs.Ticketing;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.UtilLib;
 
 namespace iLabs.Scheduling.LabSide
 {
@@ -34,6 +35,10 @@ namespace iLabs.Scheduling.LabSide
 		
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+            if (Request.UserAgent.Contains("MSIE 6") || Request.UserAgent.Contains("MSIE 7"))
+            {
+                recaptcha.EmbedJavascript = true;
+            }
 			if(! IsPostBack)
 			{
 			
@@ -77,6 +82,12 @@ namespace iLabs.Scheduling.LabSide
 
 		protected void btnRequestHelp_Click(object sender, System.EventArgs e)
 		{
+            if (!recaptcha.IsValid)
+            {
+                lblErrorMessage.Text = Utilities.FormatErrorMessage("You must respond to the security question!");
+                lblErrorMessage.Visible = true;
+                return;
+            }
 			if(ddlWhichLab.SelectedItem.Text.CompareTo("") == 0)
 			{
 				lblErrorMessage.Text = "<div class=errormessage><p>Please select a lab.</p></div>";

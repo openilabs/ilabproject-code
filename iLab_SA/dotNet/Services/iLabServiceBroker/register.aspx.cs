@@ -49,7 +49,10 @@ namespace iLabs.ServiceBroker.iLabSB
 		private void Page_Load(object sender, System.EventArgs e)
 		{
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-
+            if (Request.UserAgent.Contains("MSIE 6") || Request.UserAgent.Contains("MSIE 7"))
+            {
+                recaptcha.EmbedJavascript = true;
+            }
             // Group options -- Default is to use the DropDownList with request groups, if no request group is selected
             //		the specified initialGroup will be used. Default to newUserGroup if no initialGroup
             // If useRequestGroup is set to false the dropdownList will be populated with actual groups and user will be

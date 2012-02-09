@@ -10,6 +10,7 @@ using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -20,6 +21,7 @@ using System.Web.Mail;
 
 using iLabs.Ticketing;
 using iLabs.DataTypes.TicketingTypes;
+using iLabs.UtilLib;
 
 namespace iLabs.Scheduling.UserSide
 {
@@ -34,6 +36,10 @@ namespace iLabs.Scheduling.UserSide
 		
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+            if (Request.UserAgent.Contains("MSIE 6") || Request.UserAgent.Contains("MSIE 7"))
+            {
+                recaptcha.EmbedJavascript = true;
+            }
 			if(! IsPostBack)
 			{
 				//int[] lsIDs = AdministrativeAPI.ListLabServerIDs();
@@ -79,71 +85,85 @@ namespace iLabs.Scheduling.UserSide
 
 		protected void btnRequestHelp_Click(object sender, System.EventArgs e)
 		{
+            if (!recaptcha.IsValid)
+            {
+                lblErrorMessage.Text = Utilities.FormatErrorMessage("You must respond to the security question!");
+                lblErrorMessage.Visible = true;
+                return;
+            }
 			if(ddlWhichLab.SelectedItem.Text.CompareTo("") == 0)
 			{
 				lblErrorMessage.Text = "<div class=errormessage><p>Please select a lab.</p></div>";
 				lblErrorMessage.Visible = true;
 			}
-			else if (txtProblem.Text == "")
-			{
-				lblErrorMessage.Text = "<div class=errormessage><p>Enter a description of the problem!</p></div>";
-				lblErrorMessage.Visible = true;
-			}
-			else
-			{
-				int userID = Convert.ToInt32(Session["UserID"]);
-				
-				string email = txtEmail.Text;
-				
-				string lab = ddlWhichLab.SelectedItem.Text;
-				
-				//Send email
-				MailMessage mail = new MailMessage();
-				mail.From = email;
-				mail.To = ConfigurationManager.AppSettings["supportMailAddress"];
-				if(email != "")
-				{
-					mail.Cc = email;
-				}
-				mail.Subject = "[iLabs] Bug Report: " + lab ;
-				//mail.Body = fname + " "+ lname +"\n\r";
-				//mail.Body +="User ID: " + uname + "\n\r";
-				mail.Body += "Email:  " + email + "\n\r";
-				mail.Body += "Group: " + Session["groupName"].ToString()+ "\n\r\n\r";
-                mail.Body += "BrokerGUID: " + Session["brokerGUID"].ToString() + "\n\r\n\r";
-				mail.Body += "reports the following bug for the lab '"+lab+"':  \n\r\n\r";
-				mail.Body += txtProblem.Text ;
-				mail.Body += "\n\r\n\r";
-				mail.Body += "Additional Information:\n\r";
-				mail.Body += "User Browser: "+Request.Browser.Type +"\n\r";
-				mail.Body += "User Browser Agent: "+Request.UserAgent +"\n\r";
-				mail.Body += "User Platform: "+Request.Browser.Platform+"\n\r";
-				mail.Body += "URL used to access page: "+Request.Url+"\n\r";
+            else if (txtProblem.Text == "")
+            {
+                lblErrorMessage.Text = "<div class=errormessage><p>Enter a description of the problem!</p></div>";
+                lblErrorMessage.Visible = true;
+            }
+            else
+            {
+                //int userID = Convert.ToInt32(Session["UserID"]);
 
-				//				mail.Body += "-------------------------------------------------\n\r";
-				//				mail.Body += "This is an automatically generated message. ";
-				//				mail.Body += "DO NOT reply to the sender. \n\n";
-				//				mail.Body += "For questions regarding this service, email smwang@mit.edu";
-				SmtpMail.SmtpServer = "127.0.0.1";
-				try
-				{
-					SmtpMail.Send(mail);
-					lblErrorMessage.Text = "<div class=errormessage><p>Thank-you! Your request has been submitted. An administrator will contact you within 24-48 hours.</p></div>";
-					lblErrorMessage.Visible = true;
+                string email = txtEmail.Text;
 
-				}
-				catch (Exception ex)
-				{
-					lblErrorMessage.Text = "<div class=errormessage><p>Error sending your help request, please email ilab-debug@mit.edu. "+ex.Message+"</p></div>";
-					lblErrorMessage.Visible = true;
-				}
-			}
-		
+                string lab = ddlWhichLab.SelectedItem.Text;
+                
+                    //Send email
+                    MailMessage mail = new MailMessage();
+                    mail.From = email;
+                    mail.To = ConfigurationManager.AppSettings["supportMailAddress"];
+                    if (email != "")
+                    {
+                        mail.Cc = email;
+                    }
+                    mail.Subject = "[iLabs] Bug Report: " + lab;
+                    StringBuilder buf = new StringBuilder();
+                    //mail.Body = fname + " "+ lname +"\n\r";
+                    //mail.Body +="User ID: " + uname + "\n\r";
+                    buf.AppendLine("Email:  " + email);
+                    buf.Append("Group: ");
+                    if( Session["groupName"] != null)
+                        buf.AppendLine(Session["groupName"].ToString());
+                    else 
+                        buf.AppendLine("No group");
+                    buf.Append("BrokerGUID: ");
+                    if(Session["brokerGUID"] != null)
+                      buf.AppendLine(Session["brokerGUID"].ToString());
+                    else
+                      buf.AppendLine();
+                    buf.AppendLine();
+                    buf.AppendLine("reports the following bug for the lab '" + lab + "':  ");
+                    buf.AppendLine(txtProblem.Text);
+                    buf.AppendLine();
+                    buf.AppendLine("Additional Information:");
+                    buf.AppendLine("User Browser: " + Request.Browser.Type);
+                    buf.AppendLine("User Browser Agent: " + Request.UserAgent);
+                    buf.AppendLine("User Platform: " + Request.Browser.Platform);
+                    buf.AppendLine("URL used to access page: " + Request.Url);
+                    buf.AppendLine();
+                    buf.AppendLine("-------------------------------------------------");
+                    buf.AppendLine("This is an automatically generated message. ");
+                    buf.AppendLine("DO NOT reply to the sender.");
+                    buf.AppendLine();
+                   //buf.AppendLine("For questions regarding this service, email smwang@mit.edu");
+                    mail.Body = buf.ToString();
+                    SmtpMail.SmtpServer = "127.0.0.1";
+                    try
+                    {
+                        SmtpMail.Send(mail);
+                        lblErrorMessage.Text = Utilities.FormatConfirmationMessage("Thank-you! Your request has been submitted. An administrator will contact you within 24-48 hours.");
+                        lblErrorMessage.Visible = true;
+
+                    }
+                    catch (Exception ex)
+                    {
+                        lblErrorMessage.Text =  Utilities.FormatErrorMessage("Error sending your help request, please email ilab-debug@mit.edu. " + ex.Message);
+                        lblErrorMessage.Visible = true;
+                    }
+                
+            }
 		}
-        //protected void btnReportBug_Click(object sender, System.EventArgs e)
-        //{
-        //    Response.Redirect("reportBug.aspx");
-        //}
-		
+   
 	}
 }

@@ -37,12 +37,17 @@ namespace iLabs.ServiceBroker.iLabSB
 	public partial class reportBug : System.Web.UI.Page
 	{
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
+       
 		int userID = -1;
 		User currentUser;
 		Exception excep;
 
 		private void Page_Load(object sender, System.EventArgs e)
 		{
+            if (Request.UserAgent.Contains("MSIE 6") || Request.UserAgent.Contains("MSIE 7"))
+            {
+                recaptcha.EmbedJavascript = true;
+            }
 			userID = -1;
 			currentUser = new User();
 			if((Session != null) && (Session["UserID"] != null))

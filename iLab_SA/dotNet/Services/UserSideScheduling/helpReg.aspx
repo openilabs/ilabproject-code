@@ -1,6 +1,7 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="NavBarReg.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
+<%@ Register TagPrefix="recaptcha" Namespace="Recaptcha" Assembly="Recaptcha" %>
 <%@ Page language="c#" Inherits="iLabs.Scheduling.UserSide.helpReg" CodeFile="helpReg.aspx.cs" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -22,7 +23,7 @@ Please see license.txt in top level directory for full license.
 	<body>
 		<form id="helpForm" method="post" runat="server">
 			<a name="top"></a>
-			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all">
+			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><uc1:usernav id="UserNav1" runat="server"></uc1:usernav><br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Help</h1>
@@ -94,6 +95,11 @@ Please see license.txt in top level directory for full license.
 												<!--textarea name="problem" cols="50" rows="6" id="problem"></textarea--></td>
 										</tr>
 										<tr>
+										    <th style="width: 192px"><label for="enterSecurityCode">Please enter security code</label></th>
+										    <!-- This has been patched to support the EmbedJavascript property for IE 6 and 7 -->
+										    <td style="width: 608px"><recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/></td>
+										</tr>
+										<tr>
 											<th colspan="2">
 												<asp:button id="btnRequestHelp" Runat="server" CssClass="buttonright" Text="Request Help" onclick="btnRequestHelp_Click"></asp:button>
 											</th>
@@ -102,7 +108,7 @@ Please see license.txt in top level directory for full license.
 								</div> <!-- end div class simpleform -->
 								<p><a href="#top">Top of Page</a></p>
 							</div> <!-- end div request help -->
-						</div> <!-- end div faq --><br clear="all">
+						</div> <!-- end div faq --><br clear="all"/>
 					</div> <!-- end pagecontent div -->
 				</div> <!-- end innerwrapper div -->
 				<uc1:footer id="Footer1" runat="server"></uc1:footer>

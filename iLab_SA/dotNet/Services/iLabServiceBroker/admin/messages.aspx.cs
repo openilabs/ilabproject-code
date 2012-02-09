@@ -211,7 +211,7 @@ namespace iLabs.ServiceBroker.admin
 						ddlMessageTarget.Items .Clear ();
 						ddlMessageTarget.Items .Add("--Select one--");
 						int[] labServerIDs = wrapper.ListLabServerIDsWrapper();
-                        DbParameter param = FactoryDB.CreateParameter("@typeMask", ProcessAgentType.LAB_SERVER);
+                        DbParameter param = FactoryDB.CreateParameter("@typeMask", ProcessAgentType.LAB_SERVER,DbType.Int32);
                         IntTag[] labServers = brokerDB.GetIntTags("GetProcessAgentTagsByTypeMask", param);
 						foreach(IntTag ls in labServers)
 						{

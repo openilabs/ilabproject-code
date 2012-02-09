@@ -114,6 +114,7 @@ Please see license.txt in top level directory for full license.
 										</tr>
 										<tr>
 										    <th style="width: 192px"><label for="enterSecurityCode">Please enter security code</label></th>
+										    <!-- This has been patched to support the EmbedJavascript property for IE 6 and 7 -->
 										    <td style="width: 608px"><recaptcha:RecaptchaControl  ID="recaptcha" runat="server"  Theme="blackglass"/></td>
 										</tr>
 										<tr>
