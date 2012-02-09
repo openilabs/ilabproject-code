@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Web;
@@ -206,10 +207,12 @@ namespace iLabs.ServiceBroker.admin
 				case "lab":
 					try
 					{
+                        BrokerDB brokerDB = new BrokerDB();
 						ddlMessageTarget.Items .Clear ();
 						ddlMessageTarget.Items .Add("--Select one--");
-						//int[] labServerIDs = wrapper.ListLabServerIDsWrapper();
-						IntTag[] labServers = wrapper.GetProcessAgentTagsByTypeWrapper(ProcessAgentType.LAB_SERVER);
+						int[] labServerIDs = wrapper.ListLabServerIDsWrapper();
+                        DbParameter param = FactoryDB.CreateParameter("@typeMask", ProcessAgentType.LAB_SERVER);
+                        IntTag[] labServers = brokerDB.GetIntTags("GetProcessAgentTagsByTypeMask", param);
 						foreach(IntTag ls in labServers)
 						{
 							if (ls.id > 0)

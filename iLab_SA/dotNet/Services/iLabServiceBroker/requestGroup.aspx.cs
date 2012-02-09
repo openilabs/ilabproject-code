@@ -6,9 +6,12 @@
  */
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -18,6 +21,7 @@ using System.Web.Security;
 using System.Web.Mail;
 using System.Configuration;
 
+using iLabs.DataTypes;
 using iLabs.Core;
 using iLabs.ServiceBroker;
 using iLabs.ServiceBroker.Internal;
@@ -33,10 +37,12 @@ namespace iLabs.ServiceBroker.iLabSB
 	public partial class requestGroup : System.Web.UI.Page
 	{
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-		ArrayList nonRequestGroups = new ArrayList();
-		ArrayList requestGroups = new ArrayList();
-		ArrayList canRequestGroupIDs = new ArrayList();
-		Group[] canRequestGroups;
+        BrokerDB brokerDB = new BrokerDB();
+		
+        List<IntTag> nonRequestGroups = new List<IntTag>();
+		List<IntTag> requestGroups = new List<IntTag>();
+        List<IntTag> currentGroups = new List<IntTag>();
+		List<Group> canRequestGroups = new List<Group>();
 
 		int userID;
 		int[] userGroupIDs;
@@ -96,68 +102,40 @@ namespace iLabs.ServiceBroker.iLabSB
 		/// </summary>
 		private void LoadGroupArrays()
 		{
+            currentGroups.Clear();
+            nonRequestGroups.Clear();
+            requestGroups.Clear();
+            canRequestGroups.Clear();
+            // Gets a list of all the groups a user belongs to
+            DbParameter idParam = FactoryDB.CreateParameter("@userID", userID, DbType.Int32);
+            currentGroups.AddRange(brokerDB.GetIntTags("User_RetrieveGroupTags", idParam));
 
-			// Gets the list of all groupIDs
-			groupIDs = wrapper.ListGroupIDsWrapper();
-			
-			// Gets a list of all the groups a user belongs to
-			userGroupIDs = AdministrativeAPI.ListGroupIDsForUserRecursively(userID);
-			ArrayList userGroupList = new ArrayList(userGroupIDs);
-			
-			// Clear the list of groups that a user does not yet belong to
-			canRequestGroupIDs.Clear();
+            int[] curIDs = AdministrativeAPI.ListGroupIDsForUserRecursively(userID);
+            List<int> curGroupIDs = new List<int>();
+            curGroupIDs.AddRange(curIDs);
 
-			// Each group has a twin group that ends with the suffix "request".
-			// This group is used to store users who have requested membership in a group,
-			// pending administrator approval.
-			// This is an ArrayList of those groups
-			requestGroups.Clear();
-			
-			// This is an ArrayList of regualar groups, i.e. those that do not end with "request"
-			nonRequestGroups.Clear();
-
-			//since we already have the groups a user has access
-			// if we use wrapper here, it will deny authentication
-			Group[] gps = AdministrativeAPI.GetGroups(groupIDs);
-
-			foreach(Group g in gps)
+			// Gets the list of all requestGroups
+           
+			Group [] reqGroups = InternalAdminDB.SelectGroupsByType(GroupType.REQUEST);
+            if(reqGroups != null && reqGroups.Length > 0){
+                foreach(Group g in reqGroups){
+                    if(!curGroupIDs.Contains(g.associatedGroupID) && !curGroupIDs.Contains(g.groupID)){
+                        canRequestGroups.Add(g);
+                    }
+                }
+            }
+		
+			foreach(IntTag g in currentGroups)
 			{
-				// If the user belongs to the group
-				if (userGroupList.Contains(g.groupID))
-				{
-					if(g.groupType.CompareTo(GroupType.REQUEST)==0)
-						requestGroups.Add(g);
-					else
-						if ((g.groupName.ToUpper()).CompareTo("ROOT")!=0)
-						nonRequestGroups.Add(g);
-				}
-				else
-				{
-					// If user doesn't belong to group & if it is a request group
-					// add to list of groups that they can request
-					if(g.groupType.CompareTo(GroupType.REQUEST)==0)
-					{
-                        int origGroupID = AdministrativeAPI.GetAssociatedGroupID(g.groupID);
-						//string origGroupName= AdministrativeAPI.GetGroups(new int[] {origGroupID})[0].groupName;
-							
-						if (!userGroupList.Contains(origGroupID))
-						{	
-							// Add the "request" group to the list of groups a user can be added to.
-							// An Administrator will have to review the request and move the user
-							// to the "real" group.
-							// This is a setting that can be changed in web.config.
-							if(adminRequestGroup)
-							{
-								canRequestGroupIDs.Add(g.groupID);
-							}
-							// Add the "real" group to the list of groups a user can be added to.
-							else
-							{
-								canRequestGroupIDs.Add(origGroupID);
-							}
-						}
-					}
-				}
+                if (g.tag.EndsWith("-request"))
+                {
+                    requestGroups.Add(g);
+                }
+                else
+                {
+                    if ((g.tag.ToUpper()).CompareTo("ROOT") != 0)
+                        nonRequestGroups.Add(g);
+                }
 			}
 		}
 
@@ -167,15 +145,18 @@ namespace iLabs.ServiceBroker.iLabSB
 		private void LoadBlueBox()
 		{
 			//List Groups that user belongs to in blue box
+            lblGroups.Text = "";
 			if ((nonRequestGroups!=null)&& (nonRequestGroups.Count>0))
 			{
-				lblGroups.Text = "";
+				
+                StringBuilder buf = new StringBuilder();
 				for (int i=0;i<nonRequestGroups.Count;i++)
 				{
-					lblGroups.Text+= ((Group)nonRequestGroups[i]).groupName;
+					buf.Append(nonRequestGroups[i].tag);
 					if (i != nonRequestGroups.Count-1)
-						lblGroups.Text +=", ";
+						buf.Append(", ");
 				}
+                lblGroups.Text = buf.ToString();
 			}
 			else
 			{
@@ -183,17 +164,17 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 
 			//List Groups that user has requested to in blue box
+            lblRequestGroups.Text = "";
 			if ((requestGroups!=null)&& (requestGroups.Count>0))
 			{
-				lblRequestGroups.Text = "";
+                StringBuilder buf2 = new StringBuilder();
 				for (int i=0;i<requestGroups.Count;i++)
 				{
-                    int origGroupID = AdministrativeAPI.GetAssociatedGroupID(((Group)requestGroups[i]).groupID);
-                    string origGroupName = AdministrativeAPI.GetGroups(new int[] { origGroupID })[0].groupName;
-					lblRequestGroups.Text+= origGroupName;
+                    buf2.Append(requestGroups[i].tag.Remove(requestGroups[i].tag.LastIndexOf("-request")));
 					if (i != requestGroups.Count-1)
-						lblRequestGroups.Text +=", ";
+						buf2.Append(", ");
 				}
+                lblRequestGroups.Text = buf2.ToString();
 			}
 			else
 			{
@@ -204,88 +185,95 @@ namespace iLabs.ServiceBroker.iLabSB
 		/// <summary>
 		/// Load the repAvailableGroups repeater from the canRequestGroups ArrayList
 		/// </summary>
-		private void LoadRepeater()
-		{
-			if ((canRequestGroupIDs==null ) ||(canRequestGroupIDs.Count ==0))
-			{
-				lblNoGroups.Text = "<p>You cannot request membership in any more groups. Contact " + supportMailAddress + " if you wish to be added to any other group.</p>";
-				lblNoGroups.Visible = true;
-				repAvailableGroups.Visible = false;
-				btnRequestMembership.Visible = false;
-			}
-			else
-			{
-				try
-				{
-					// have to bypass wrapper class here				
-                    canRequestGroups = AdministrativeAPI.GetGroups(Utilities.ArrayListToIntArray(canRequestGroupIDs));
-					for(int i=0; i<canRequestGroups.Length; i++)
-					{
-                        int origGroupID = AdministrativeAPI.GetAssociatedGroupID(((Group)canRequestGroups[i]).groupID);
-                        string origGroupName = AdministrativeAPI.GetGroups(new int[] { origGroupID })[0].groupName;
-						canRequestGroups[i].groupName = origGroupName;
-					}
-					repAvailableGroups.DataSource = canRequestGroups;
+        private void LoadRepeater()
+        {
+            if ((canRequestGroups == null) || (canRequestGroups.Count == 0))
+            {
+                lblNoGroups.Text = "<p>No groups exist that you may request membership. Contact " + supportMailAddress + " if you wish to be added to any other group.</p>";
+                lblNoGroups.Visible = true;
+                repAvailableGroups.Visible = false;
+                btnRequestMembership.Visible = false;
+            }
+            else
+            {
+                try
+                {
+                    foreach (Group g in canRequestGroups)
+                    {
+                        g.groupName = g.groupName.Remove(g.groupName.LastIndexOf("-request"));
+                    }
+                    repAvailableGroups.DataSource = canRequestGroups;
 					repAvailableGroups.DataBind();
 				
-					int repCount =1;
-					// To list all the labs belonging to a group
-					foreach (Group g in canRequestGroups)
-					{
-						int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(g.groupID);
+                    // have to bypass wrapper class here				
+                    //canRequestGroups = AdministrativeAPI.GetGroups(Utilities.ArrayListToIntArray(canRequestGroupIDs));
+                    int itemIdx = 0;
+                    int repCount = 1;
+                    foreach (Group g in canRequestGroups)
+                    {
+                       
+                        //HiddenField reqID = new HiddenField();
+                        //reqID.Value = g.groupID.ToString();
+                        //repAvailableGroups.Controls.AddAt(itemIdx, reqID);
+                       
 
-						LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                        Label lblGroupLabs = new Label();
+                        lblGroupLabs.Visible = true;
+                        int[] lcIDsList = AdministrativeUtilities.GetGroupLabClients(g.associatedGroupID);
+                        LabClient[] lcList = wrapper.GetLabClientsWrapper(lcIDsList);
+                        StringBuilder buf = new StringBuilder();
+                        if (lcList != null && lcList.Length > 0)
+                        {
+                            buf.Append("<p>Associated Labs</p><ul>");
+                            for (int i = 0; i < lcList.Length; i++)
+                            {
+                                buf.Append("<li><strong class=lab>" +
+                                    lcList[i].clientName + "</strong> - " +
+                                    lcList[i].clientShortDescription + "</li>");
+                            }
+                            buf.AppendLine("</ul>");
+                        }
+                        else
+                        {
+                            buf.AppendLine("<p>No Associated Labs</p>");
+                        }
+                        lblGroupLabs.Text = buf.ToString();
 
-						Label lblGroupLabs = new Label();
-						lblGroupLabs.Visible=true;
-						lblGroupLabs.Text="<p>Associated Labs</p><ul>";
-
-						for(int i=0;i<lcList.Length;i++)
-						{
-							lblGroupLabs.Text += "<li><strong class=lab>"+
-								lcList[i].clientName+"</strong> - "+
-								lcList[i].clientShortDescription+ "</li>";
-						}
-						lblGroupLabs.Text +="</ul>";
-
-						repAvailableGroups.Controls.AddAt(repCount, lblGroupLabs);
-						
+                        repAvailableGroups.Controls.AddAt(repCount, lblGroupLabs);
+                        //HiddenField hdnReqID = new HiddenField();
+                        //hdnReqID.Value = g.groupID.ToString();
+                        //repAvailableGroups.Controls.AddAt(repCount, hdnReqID);
 						repCount += 3;
-					}
-				}
-				catch (AccessDeniedException adex)
-				{
-					lblResponse.Visible = true;
-					lblResponse.Text = Utilities.FormatErrorMessage(adex.Message);
-				}
-			}
-		}
+
+                        //repAvailableGroups.Controls.AddAt(itemIdx, lblGroupLabs);
+                        //Label lblG = new Label();
+                        //lblG.Text = g.groupName.Remove(g.groupName.LastIndexOf("-request"));
+                        //repAvailableGroups.Controls.AddAt(itemIdx, lblG);
+                        //repAvailableGroups.Controls.AddAt(itemIdx, new CheckBox());
+
+                    }
+                }
+                catch (AccessDeniedException adex)
+                {
+                    lblResponse.Visible = true;
+                    lblResponse.Text = Utilities.FormatErrorMessage(adex.Message);
+                }
+            }
+        }
 
 		
 		protected void btnRequestMembership_Click(object sender, System.EventArgs e)
 		{
-			//Load Array of Groups that can be requested. This is needed to obtain the groupID, which is not 
-			// stored in the repeater.
-			// canRequestGroupIDs is created in LoadGroupArrays()
-			// have to bypass wrapper class here
-            canRequestGroups = AdministrativeAPI.GetGroups(Utilities.ArrayListToIntArray(canRequestGroupIDs));
-			
 			bool atLeastOneGroupSelected = false;
-			int groupID;
-
 			for (int i=0; i<repAvailableGroups.Items.Count; i++)
 			{
 				if(((CheckBox)repAvailableGroups.Items[i].Controls[1]).Checked == true)
 				{
 					atLeastOneGroupSelected = true;
 					try
-					{
-						groupID = canRequestGroups[i].groupID;
-						// have to bypass wrapper class here
-                        AdministrativeAPI.AddUserToGroup(Convert.ToInt32(Session["UserID"]), groupID);
-						LoadGroupArrays();
-						LoadRepeater();
-						LoadBlueBox();
+					{ 
+                        AdministrativeAPI.AddUserToGroup(Convert.ToInt32(Session["UserID"]), canRequestGroups[i].groupID);
+						
 					}
 				catch (Exception ex)
 					{
@@ -294,12 +282,16 @@ namespace iLabs.ServiceBroker.iLabSB
 					}
 				}
 			}
-
-			// If no groups were selected - throw an error
-			if(!atLeastOneGroupSelected)
-			{
+            if (atLeastOneGroupSelected)
+            {
+                LoadGroupArrays();
+                LoadRepeater();
+                LoadBlueBox();
+            }
+            else
+            { // If no groups were selected - show a warning
 				lblResponse.Visible = true;
-				lblResponse.Text = Utilities.FormatErrorMessage("No groups selected!");
+				lblResponse.Text = Utilities.FormatWarningMessage("No groups selected!");
 				LoadRepeater();
 				return;
 			}

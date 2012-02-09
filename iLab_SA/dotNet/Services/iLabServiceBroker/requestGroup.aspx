@@ -3,28 +3,28 @@
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Page language="c#" Inherits="iLabs.ServiceBroker.iLabSB.requestGroup" CodeFile="requestGroup.aspx.cs" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<HTML>
-	<HEAD>
+<html>
+	<head>
 		<title>MIT iLab Service Broker - Request Membership in a New Group</title> 
 		<!-- 
 Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 Please see license.txt in top level directory for full license. 
 -->
 		<!-- $Id$ -->
-		<meta name="GENERATOR" Content="Microsoft Visual Studio .NET 7.1">
-		<meta name="CODE_LANGUAGE" Content="C#">
-		<meta name="vs_defaultClientScript" content="JavaScript">
-		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
-		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1"/>
+		<meta name="CODE_LANGUAGE" content="C#"/>
+		<meta name="vs_defaultClientScript" content="JavaScript"/>
+		<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
 		<style type="text/css"> @import url( css/main.css );  </style>
-	</HEAD>
+	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
 			<a name="top"></a>
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
 				<uc1:userNav id="UserNav1" runat="server"></uc1:userNav>
-				<br clear="all">
+				<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1>Request Membership in a New Group</h1>
@@ -43,11 +43,16 @@ Please see license.txt in top level directory for full license.
 									<asp:label id="lblRequestGroups" Runat="server"></asp:label></strong></p>
 						</div>
 						<div class="group">
-							<asp:label id="lblNoGroups" runat="server"></asp:label>
-							<asp:repeater id="repAvailableGroups" runat="server">
+						    <asp:label id="lblNoGroups" runat="server"></asp:label>
+						    <asp:CheckBoxList ID="cblGroups" runat="server" Width="455px" />
+						    
+						    <asp:repeater id="repAvailableGroups" runat="server">
 								<ItemTemplate>
-									<asp:CheckBox ID="cbxGroup" Runat="server" CssClass="checkbox"></asp:CheckBox>
-									<label for="group1">
+									<p><asp:CheckBox ID="cbxGroup" Runat="server" CssClass="checkbox"></asp:CheckBox>
+									<label for="ReqGroup" runat="server" visible="false">
+									<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "GroupID")) %>
+									</label>
+									<label for="group1" >
 										<%# Convert.ToString(DataBinder.Eval(Container.DataItem, "groupName")) %>
 									</label>
 								</ItemTemplate>
@@ -55,10 +60,11 @@ Please see license.txt in top level directory for full license.
 									<p></p>
 								</SeparatorTemplate>
 							</asp:repeater>
+							
 						</div>
-						<asp:Button ID="btnRequestMembership" Runat="server" Text="Request Membership" CssClass="button" onclick="btnRequestMembership_Click"></asp:Button>
+						<asp:Button ID="btnRequestMembership" Runat="server" Text="Request Membership"  CssClass="button"  OnClick="btnRequestMembership_Click"></asp:Button>
 					</div>
-					<br clear="all">
+					<br clear="all"/>
 					<!-- end pagecontent div -->
 				</div>
 				<!-- end innerwrapper div -->
@@ -66,4 +72,4 @@ Please see license.txt in top level directory for full license.
 			</div>
 		</form>
 	</body>
-</HTML>
+</html>

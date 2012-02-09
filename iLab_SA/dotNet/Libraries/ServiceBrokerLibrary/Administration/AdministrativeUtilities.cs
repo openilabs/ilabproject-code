@@ -294,7 +294,7 @@ namespace iLabs.ServiceBroker.Administration
 		/// <returns></returns>
 		public static int GetGroupAdminGroup (int groupID)
 		{
-			return InternalAdminDB.SelectGroupAdminGroup(groupID);
+			return InternalAdminDB.SelectGroupAdminGroupID(groupID);
 		}
 
 

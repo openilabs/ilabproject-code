@@ -2093,7 +2093,7 @@ namespace iLabs.ServiceBroker.Authorization
                     else
                     {
                         // Check if group administer
-                        int adminID = InternalAdminDB.SelectGroupAdminGroup(expInfo.groupID);
+                        int adminID = InternalAdminDB.SelectGroupAdminGroupID(expInfo.groupID);
                         if (adminID == groupID)
                         {
                             //Check for group collection rights

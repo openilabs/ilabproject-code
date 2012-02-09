@@ -87,6 +87,9 @@ namespace iLabs.ServiceBroker.iLabSB
 		{
             // check that this user has admin privilidges, in which case, the manageUsers page should be sent to it.
             object adminState = Session["IsAdmin"];
+            bool isSuperUser = false;
+            if(Session["GroupName"] != null)
+                isSuperUser = (Session["GroupName"].ToString().Equals(Group.SUPERUSER));
 			liNavlistAdmin.Visible = ((adminState != null) && Convert.ToBoolean(adminState));
 
             // check that this user has service admin privilidges, in which case, the adminServices page should be sent to it.
@@ -98,8 +101,8 @@ namespace iLabs.ServiceBroker.iLabSB
 			{
 				if ((bool)adminState)
 				{
-                    liNavlistMyLabs.Visible = !(Session["GroupName"].ToString().Equals(Group.SUPERUSER));
-					liNavlistExperiments.Visible = false;
+                    liNavlistMyLabs.Visible = !isSuperUser;
+                    liNavlistExperiments.Visible = !isSuperUser;
 				}
                 else if ((bool)serviceAdminState)
                 {

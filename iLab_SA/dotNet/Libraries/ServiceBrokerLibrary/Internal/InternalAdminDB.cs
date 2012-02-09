@@ -2934,6 +2934,25 @@ public static int CountScheduledClients(int labServerID){
             return groupIDs;
         }
 
+        protected static Group readGroup(DbDataReader reader)
+        {
+            // select  g.Group_ID, g.Group_Type_ID,g.Associated_Group_ID, g.Date_Created, g.group_name, 
+            // g.description AS description, g.email, gt.description AS group_type
+            Group grp = new Group();
+            grp.groupID = reader.GetInt32(0);
+            grp.groupTypeID = reader.GetInt32(1);
+            grp.associatedGroupID = reader.GetInt32(2);
+            grp.createTime = DateUtil.SpecifyUTC(reader.GetDateTime(3));
+            grp.groupName = reader.GetString(4);
+            if(!reader.IsDBNull(5))
+                grp.description = reader.GetString(5);
+            if (!reader.IsDBNull(6))
+                grp.email = reader.GetString(6);
+            grp.groupType = reader.GetString(7);
+
+            return grp;
+        }
+
         /// <summary>
         /// to retrieve group metadata for groups specified by array of group IDs 
         /// </summary>
@@ -2951,18 +2970,7 @@ public static int CountScheduledClients(int labServerID){
                     DbDataReader myReader = myCommand.ExecuteReader();
                     while (myReader.Read())
                     {
-                        g = new Group();
-                        g.groupID = groupID;
-                        if (myReader["group_name"] != System.DBNull.Value)
-                            g.groupName = (string)myReader["group_name"];
-                        if (myReader["description"] != System.DBNull.Value)
-                            g.description = (string)myReader["description"];
-                        if (myReader["email"] != System.DBNull.Value)
-                            g.email = (string)myReader["email"];
-                        if (myReader["group_type"] != System.DBNull.Value)
-                            g.groupType = (string)myReader["group_type"];
-                        /*if(myReader["date_created"] != System.DBNull .Value )
-                            g[i].= (string) myReader["date_created"];*/
+                        g = readGroup(myReader);
                     }
                     myReader.Close();
             }
@@ -2984,11 +2992,7 @@ public static int CountScheduledClients(int labServerID){
 		/// </summary>
 		public static Group[] SelectGroups ( int[] groupIDs )
 		{
-			Group[] g = new Group[groupIDs.Length ];
-			for (int i=0; i<groupIDs.Length ; i++)
-			{
-				g[i] = new Group();
-			}
+            List<Group> groups = new List<Group>();
 
             DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("Group_Retrieve", myConnection);
@@ -3006,19 +3010,8 @@ public static int CountScheduledClients(int labServerID){
 					// get labserver info from table lab_servers
 					DbDataReader myReader = myCommand.ExecuteReader ();
 					while(myReader.Read ())
-					{	
-						g[i].groupID = groupIDs[i];
-
-						if(myReader["group_name"] != System.DBNull.Value )
-							g[i].groupName= (string) myReader["group_name"];
-						if(myReader["description"] != System.DBNull.Value )
-							g[i].description= (string) myReader["description"];
-						if(myReader["email"] != System.DBNull.Value )
-							g[i].email= (string) myReader["email"];
-						if(myReader["group_type"] != System.DBNull.Value )
-							g[i].groupType= (string) myReader["group_type"];
-						/*if(myReader["date_created"] != System.DBNull .Value )
-							g[i].= (string) myReader["date_created"];*/
+					{
+                        groups.Add(readGroup(myReader));
 					}
 					myReader.Close ();
 				}
@@ -3032,8 +3025,41 @@ public static int CountScheduledClients(int labServerID){
 				myConnection.Close ();
 			}
 			
-			return g;
+			return groups.ToArray();
 		}
+
+        /// <summary>
+        /// to retrieve group metadata for groups specified by Type 
+        /// </summary>
+        public static Group[] SelectGroupsByType(string typeName)
+        {
+            List<Group> groups = new List<Group>();
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveByType", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@typeName", typeName, DbType.String));
+
+            try
+            {
+                myConnection.Open();
+                DbDataReader myReader = myCommand.ExecuteReader();
+               while (myReader.Read())
+                {
+                    groups.Add(readGroup(myReader));
+                }
+                myReader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown SelectGroupsByType", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return groups.ToArray();
+        }
 
 		/// <summary>
 		/// to get a group's ID given groupName
@@ -3173,7 +3199,7 @@ public static int CountScheduledClients(int labServerID){
 		/// <summary>
 		/// to get a group's course staff group ID given groupID
 		/// </summary>
-		public static int SelectGroupAdminGroup(int groupID)
+		public static int SelectGroupAdminGroupID(int groupID)
 		{
 			DbConnection myConnection = FactoryDB.GetConnection();
             DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAdminGroupID", myConnection);
@@ -3615,7 +3641,7 @@ public static int CountScheduledClients(int labServerID){
         /// <summary>
         /// to find all the parent groups of an agent
         /// </summary>
-        public static int[] ListNonRequestGroups(int userID)
+        public static int[] ListNonRequestGroupIDs(int userID)
         {
             List<Int32> aList = new List<Int32>();
 
@@ -3649,7 +3675,7 @@ public static int CountScheduledClients(int labServerID){
         /// <summary>
         /// to find all the parent groups of an group
         /// </summary>
-        public static int[] ListGroupParents(int groupID)
+        public static int[] ListGroupParentIDs(int groupID)
         {
             ArrayList aList = new ArrayList();
 

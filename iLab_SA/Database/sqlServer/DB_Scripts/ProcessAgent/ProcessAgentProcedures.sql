@@ -175,6 +175,9 @@ GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentTagsByTypeID]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetProcessAgentTagsByTypeID]
 GO
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentTagsByTypeMask]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[GetProcessAgentTagsByTypeMask]
+GO
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[GetProcessAgentTagsByType]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[GetProcessAgentTagsByType]
 GO
@@ -798,14 +801,10 @@ SET ANSI_NULLS OFF
 GO
 
 CREATE PROCEDURE GetProcessAgentTagsByTypeID
-
 @typeID int
-
  AS
-
 select agent_ID, Agent_Name from ProcessAgent
  where ProcessAgent_Type_id = @typeID  AND retired = 0
-
 GO
 SET QUOTED_IDENTIFIER OFF 
 GO
@@ -816,6 +815,23 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS OFF 
 GO
+
+CREATE PROCEDURE GetProcessAgentTagsByTypeMask
+@typeMask int
+ AS
+select agent_ID, Agent_Name from ProcessAgent
+ where (ProcessAgent_Type_id & @typeMask   > 0) AND retired = 0
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
 
 
 CREATE PROCEDURE GetProcessAgentTagsByType

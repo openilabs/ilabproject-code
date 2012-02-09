@@ -171,7 +171,7 @@ namespace iLabs.ServiceBroker.admin
 				}
 				// find parents
 				parentIDs =
-					InternalAdminDB.ListGroupParents(gp.GroupID);
+					InternalAdminDB.ListGroupParentIDs(gp.GroupID);
 				loadParentLists();
 			}
 			//list lab clients

@@ -387,7 +387,7 @@ namespace iLabs.ServiceBroker.Administration
 
 
 	/// <summary>
-	/// A structure containing information pertaining to a particular group.
+	/// A Class containing information pertaining to a particular group.
 	/// </summary>
 	public class Group : IComparable
 	{
@@ -396,10 +396,29 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public int groupID;
 
+        /// <summary>
+        /// The integer value defining the GroupType
+        /// </summary>
+        public int groupTypeID;
+
+        /// <summary>
+        /// The Associated group for groups of type Course_Staff and Request, otherwise it is Zero
+        /// </summary>
+        public int associatedGroupID;
+
+        public DateTime createTime;
 		/// <summary>
 		/// A string to be used in administrative listings to identify the group on the Service Broker. Must be unique in a namespace shared with User instances.
 		/// </summary>
 		public string groupName;
+
+        /// <summary>
+        /// The type of group. Current values are: 
+        /// 1-Regular Group; 2-Request Group; 3-Course Staff Group; 4-Service-Admin Group & 5-Built-in Group. 
+        /// These are extensible by adding records to the Group_Types table in the database.
+        /// In the current batched experiment implementation, the authorization mechanism differs according to the type of group.
+        /// </summary>
+        public string groupType;
 
 		/// <summary>
 		/// A brief description of the Group suitable for display in a table or a GUI. 
@@ -411,15 +430,11 @@ namespace iLabs.ServiceBroker.Administration
 		/// </summary>
 		public string email;
 
-		/// <summary>
-		/// The type of group. Current values are: 
-		/// 1-Regular Group; 2-Request Group; 3-Course Staff Group; 4-Service-Admin Group & 5-Built-in Group. 
-		/// These are extensible by adding records to the Group_Types table in the database.
-		/// In the current batched experiment implementation, the authorization mechanism differs according to the type of group.
-		/// </summary>
-		public string groupType;
 
-		/// <summary>
+        /**** PROPERTIES 
+         * These are needed in order for a Repeater object to display the values. ***/
+
+        /// <summary>
 		/// Property for the Group ID. 
 		/// This is needed in order for a Repeater object to display the value in the groupID field. 
 		/// </summary>
@@ -427,6 +442,16 @@ namespace iLabs.ServiceBroker.Administration
 		{
 			get{ return groupID; } 
 		}
+
+        public int GroupTypeID
+        {
+            get { return groupTypeID; }
+        }
+
+        public int AssociatedGroupID
+        {
+            get { return associatedGroupID; }
+        }
 
 		/// <summary>
 		/// Property for the Group Name. 
@@ -495,6 +520,18 @@ namespace iLabs.ServiceBroker.Administration
 
         #endregion
     }
+
+    //public class GroupRecord
+    //{
+    //    public int groupID;
+    //    public int groupTypeID;
+    //    public int associatedGroupID;
+    //    public int accessCode;
+    //    public DateTime dateCreated;
+    //    public string groupName;
+    //    public string email;
+    //    public string description;
+    //}
 
     public class GroupInfo
     {
@@ -1961,7 +1998,7 @@ namespace iLabs.ServiceBroker.Administration
         /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
         public static int[] ListNonRequestGroupsForUser(int agentID)
         {
-            int[] groups = InternalAdminDB.ListNonRequestGroups(agentID);
+            int[] groups = InternalAdminDB.ListNonRequestGroupIDs(agentID);
             return groups;
         }
 
@@ -2027,7 +2064,7 @@ namespace iLabs.ServiceBroker.Administration
         /// <returns>An int array containing the group IDs of all Groups to which the user directly belongs.</returns>
         public static int[] ListParentGroupsForGroup(int groupID)
         {
-            int[] groups = InternalAdminDB.ListGroupParents(groupID);
+            int[] groups = InternalAdminDB.ListGroupParentIDs(groupID);
             return groups;
         }
 
@@ -2040,7 +2077,7 @@ namespace iLabs.ServiceBroker.Administration
 		public static int[] ListParentGroupsForGroupRecursively(int groupID)
 		{
 			List<int> gids = new List<int>();
-            int[] gps = InternalAdminDB.ListGroupParents(groupID);
+            int[] gps = InternalAdminDB.ListGroupParentIDs(groupID);
 
 			foreach(int i in gps)
 			{
