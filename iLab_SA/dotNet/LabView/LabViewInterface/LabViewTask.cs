@@ -29,6 +29,11 @@ using iLabs.UtilLib;
 //using iLabs.Ticketing;
 using iLabs.LabServer.Interactive;
 
+#if LabVIEW_2011
+using LabVIEW.lv2011;
+
+namespace iLabs.LabView.LV2011
+#endif
 #if LabVIEW_2010
 using LabVIEW.lv2010;
 
@@ -137,6 +142,18 @@ namespace iLabs.LabView.LV82
             if (!lvi.IsLoaded(appInfo.application))
             {
                 vi = lvi.loadVI(appInfo.path, appInfo.application);
+                string[] names = new string[4];
+                object[] values = new object[4];
+                names[0] = "CouponId";
+                values[0] = expCoupon.couponId;
+                names[0] = "Passcode";
+                values[0] = expCoupon.passkey;
+                names[0] = "IssuerGuid";
+                values[0] = expCoupon.issuerGuid;
+                names[0] = "ExperimentId";
+                values[0] = experimentID;
+
+                lvi.SetControlValues(vi,names, values);
                 vi.OpenFrontPanel(true, FPStateEnum.eVisible);
             }
             else

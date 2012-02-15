@@ -27,6 +27,11 @@ using CWDataServer;
 using CWDSLib;
 using iLabs.LabView;
 
+#if LabVIEW_2011
+using LabVIEW.lv2011;
+namespace iLabs.LabView.LV2011
+{
+#endif
 #if LabVIEW_2010
 using LabVIEW.lv2010;
 namespace iLabs.LabView.LV2010
@@ -63,7 +68,8 @@ namespace iLabs.LabView.LV82
 
         protected string appDir = null;
         protected string viPath = @"\user.lib\iLabs";
-	
+
+ 	
 		/// <summary>
 		/// Connect to the local VI application,  the 'LabView' reference will detremine 
 		/// what version and LabView application will be the target
@@ -72,6 +78,9 @@ namespace iLabs.LabView.LV82
         {
             try
             {
+#if LabVIEW_2011
+                lvVersion = "LabVIEW 2011";
+#endif
 #if LabVIEW_2010
                 lvVersion = "LabVIEW 2010";
 #endif
@@ -366,6 +375,41 @@ namespace iLabs.LabView.LV82
                 {
                     vi.SetControlValue(name, value);
                     status = (int)GetVIStatus(vi);
+                }
+            }
+            return status;
+        }
+
+        public int SetControlValues(VirtualInstrument vi, string[] names, object[] values)
+        {
+            int status = -1;
+            if (vi != null)
+            {
+                object state = null;
+                bool found = false;
+                if (names.Length > 0 && names.Length == values.Length)
+                {
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        try
+                        {
+                            state = vi.GetControlValue(names[i]);
+                            if (state != null)
+                            {
+                                status = 0;
+                                found = true;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.WriteLine(names[i] + " control not found: " + e.Message);
+                        }
+                        if (found)
+                        {
+                            vi.SetControlValue(names[i], values[i]);
+                            status = (int)GetVIStatus(vi);
+                        }
+                    }
                 }
             }
             return status;
@@ -1380,6 +1424,9 @@ namespace iLabs.LabView.LV82
  */
 
     }
+#if LabVIEW_2011
+}
+#endif
 #if LabVIEW_2010
 }
 #endif
