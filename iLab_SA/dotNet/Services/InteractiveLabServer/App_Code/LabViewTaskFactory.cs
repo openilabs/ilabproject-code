@@ -28,6 +28,7 @@ using iLabs.LabView.LV82;
 using iLabs.LabView.LV86;
 using iLabs.LabView.LV2009;
 using iLabs.LabView.LV2010;
+using iLabs.LabView.LV2011;
 
 namespace iLabs.LabServer.LabView
 {
@@ -81,6 +82,10 @@ namespace iLabs.LabServer.LabView
                 else if (appInfo.rev.Contains("2010"))
                 {
                     task = iLabs.LabView.LV2010.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                }
+                else if (appInfo.rev.Contains("2011"))
+                {
+                    task = iLabs.LabView.LV2011.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
                 }
                 else // Default to LV 2009
                 {

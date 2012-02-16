@@ -39,6 +39,7 @@ namespace iLabs.LabView.LV82
 	public class LabViewInterface : I_LabViewInterface
 	{
 
+ 	
 		protected _Application viServer;
 
         protected string appDir = null;

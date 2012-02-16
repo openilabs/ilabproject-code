@@ -44,6 +44,7 @@ namespace iLabs.ServiceBroker.admin
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
         CultureInfo culture;
         int userTZ;
+        string zero = "0";
 		
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -62,7 +63,7 @@ namespace iLabs.ServiceBroker.admin
 					try
 					{
 						ddlMessageTarget.Items .Clear ();
-						ddlMessageTarget.Items .Add("--Select one--");
+						ddlMessageTarget.Items .Add(new ListItem("--Select one--",zero));
 						int[] groupIDs = wrapper.ListGroupIDsWrapper();
 						Group[] groups=wrapper.GetGroupsWrapper(groupIDs);
 						foreach(Group gr in groups)
@@ -187,7 +188,7 @@ namespace iLabs.ServiceBroker.admin
 					try
 					{
 						ddlMessageTarget.Items .Clear ();
-						ddlMessageTarget.Items .Add("--Select one--");
+						ddlMessageTarget.Items .Add(new ListItem("--Select one--",zero));
 						int[] groupIDs = wrapper.ListGroupIDsWrapper();
 						Group[] groups=wrapper.GetGroupsWrapper(groupIDs);
 						foreach(Group gr in groups)
@@ -209,9 +210,9 @@ namespace iLabs.ServiceBroker.admin
 					{
                         BrokerDB brokerDB = new BrokerDB();
 						ddlMessageTarget.Items .Clear ();
-						ddlMessageTarget.Items .Add("--Select one--");
+						ddlMessageTarget.Items .Add(new ListItem("--Select one--",zero));
 						int[] labServerIDs = wrapper.ListLabServerIDsWrapper();
-                        DbParameter param = FactoryDB.CreateParameter("@typeMask", ProcessAgentType.LAB_SERVER,DbType.Int32);
+                        DbParameter param = FactoryDB.CreateParameter("@typeMask", ProcessAgentType.AgentType.LAB_SERVER,DbType.Int32);
                         IntTag[] labServers = brokerDB.GetIntTags("GetProcessAgentTagsByTypeMask", param);
 						foreach(IntTag ls in labServers)
 						{

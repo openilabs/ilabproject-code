@@ -42,13 +42,14 @@ namespace iLabs.ServiceBroker.iLabSB
 				Session["ClientCount"]=labClientIDList.Length;
 				if (labClientIDList.Length>1)
 				{
+                    Session["LabClientList"] = labClientIDList;
 					Response.Redirect("myClientList.aspx");
-					Session["LabClientList"] = labClientIDList;
 				}
 				else if (labClientIDList.Length ==1)
 				{
 					// get the lab client
                     Session["ClientID"] = labClientIDList[0];
+                    AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), groupID, labClientIDList[0], Session.SessionID);
 					Response.Redirect("myClient.aspx");
 				}
 				else if (labClientIDList.Length ==0)

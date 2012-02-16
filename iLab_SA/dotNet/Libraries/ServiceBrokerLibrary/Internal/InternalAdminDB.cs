@@ -2432,13 +2432,13 @@ public static int CountScheduledClients(int labServerID){
 		/// </summary>
 		public static UserSession[] SelectUserSessions(int userID, int groupID, DateTime timeAfter, DateTime timeBefore)
 		{
-			UserSession[] userSessions = null;
-			ArrayList sessions = new ArrayList();
+			//UserSession[] userSessions = null;
+			List<UserSession> sessions = new List<UserSession>();
 			StringBuilder sqlQuery = new StringBuilder();
             int whereCount = 0;
 						
 			sqlQuery.Append("select session_ID, session_start_time, session_end_time,user_ID, effective_group_ID, session_key from user_sessions");
-			if (userID!=-1)
+			if (userID > 0)
 			{
                 if (whereCount== 0 )
                     sqlQuery.Append(" WHERE");
@@ -2448,7 +2448,7 @@ public static int CountScheduledClients(int labServerID){
                 sqlQuery.Append(userID);
                 whereCount++;
 			}
-			if (groupID !=-1)
+			if (groupID > 0)
 			{
                 if (whereCount == 0)
                     sqlQuery.Append(" WHERE");
@@ -2523,11 +2523,7 @@ public static int CountScheduledClients(int labServerID){
 					}
 					myReader.Close ();
 				
-				userSessions = new UserSession[sessions.Count];
-				for (int i=0;i <sessions.Count ; i++) 
-				{
-					userSessions[i] = (UserSession) sessions[i];
-				}
+				
 			}
 			catch (Exception ex)
 			{
@@ -2537,8 +2533,7 @@ public static int CountScheduledClients(int labServerID){
 			{
 				myConnection.Close();
 			}
-
-			return userSessions;
+			return sessions.ToArray();
 		}
 
         /// <summary>
@@ -2562,21 +2557,24 @@ public static int CountScheduledClients(int labServerID){
             StringBuilder sqlWhere = new StringBuilder(" where s.session_id = h.session_id and s.user_ID = u.user_id and h.group_ID = g.Group_ID and h.CLient_ID = c.client_ID");
            
  
-            if (userID != -1)
+            if (userID > 0)
             {
                 sqlWhere.Append(" AND s.user_ID = ");
                 sqlWhere.Append(userID);
                 orderCode = 1;
             }
-            if (groupID != -1)
+            if (groupID > 0)
             {
     //            select ah.agent_ID, ag.is_group, ag.agent_name
     //from   agent_hierarchy ah, agents ag
     //where ah.parent_group_ID = @groupID and ah.agent_id=ag.agent_id
-
-                sqlWhere.Append(" AND s.user_ID in (select ug.user_ID from User_Groups ug");
-                sqlWhere.Append(" where ug.group_ID = ");
-                sqlWhere.Append(groupID);
+                sqlWhere.Append(" AND h.Group_ID = " + groupID);
+                if (orderCode == 0)
+                {
+                    sqlWhere.Append(" AND s.user_ID in (select ug.user_ID from User_Groups ug");
+                    sqlWhere.Append(" where ug.group_ID = ");
+                    sqlWhere.Append(groupID);
+                }
                 sqlWhere.Append(") ");
                // orderCode |= 2;
             }

@@ -67,15 +67,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     
                         if (nonRequestGroups[0] != null)
                         {
-                            Session["GroupID"] = ((Group)nonRequestGroups[0]).groupID;
-                            Session["GroupName"] = ((Group)nonRequestGroups[0]).groupName;
-                            Session["GroupCount"] = 1;
-
-                            int client = 0;
-                            if(Session["ClientID"] != null)
-                                client = Convert.ToInt32(Session["ClientID"]);
-                            AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]),((Group)nonRequestGroups[0]).groupID, client, Session.SessionID);
-                            PageRedirect((Group)nonRequestGroups[0]);
+                           PageRedirect((Group)nonRequestGroups[0]);
                         }
                     
                 }
@@ -153,6 +145,16 @@ namespace iLabs.ServiceBroker.iLabSB
             // initialize boolean session variables that indicate what type of effective group this is
             Session["IsAdmin"] = false;
             Session["IsServiceAdmin"] = false;
+
+            Session["GroupID"] = effectiveGroup.groupID;
+            Session["GroupName"] = effectiveGroup.groupName;
+            Session["GroupCount"] = 1;
+
+            int client = 0;
+            if (Session["ClientID"] != null)
+                client = Convert.ToInt32(Session["ClientID"]);
+            AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), effectiveGroup.groupID, client, Session.SessionID);
+                            
             
             if((effectiveGroup.groupName.Equals(Group.SUPERUSER))||(effectiveGroup.groupType.Equals(GroupType.COURSE_STAFF)))
 			{
@@ -187,17 +189,17 @@ namespace iLabs.ServiceBroker.iLabSB
 					// get the groupID from the nonRequestGroups ArrayList.
 					// The index of the ArrayList will match the index of the repeater
 					// since the repeater was loaded from the ArrayList.
-					int groupID = ((Group)nonRequestGroups[e.Item.ItemIndex]).groupID;
+                    //int groupID = ((Group)nonRequestGroups[e.Item.ItemIndex]).groupID;
 				
-					// Set the GroupID session value and redirect
-					Session["GroupID"] = groupID;
-					Session["GroupName"]= ((Group)nonRequestGroups[e.Item.ItemIndex]).groupName;
-                    int client = 0;
-                    Session.Remove("ClientID");
-                    Session.Remove("ClientCount");
-                    //if (Session["ClientID"] != null)
-                    ///    client = Convert.ToInt32(Session["ClientID"]);
-                    AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), groupID, client, Session.SessionID);
+                    //// Set the GroupID session value and redirect
+                    //Session["GroupID"] = groupID;
+                    //Session["GroupName"]= ((Group)nonRequestGroups[e.Item.ItemIndex]).groupName;
+                    //int client = 0;
+                    //Session.Remove("ClientID");
+                    //Session.Remove("ClientCount");
+                    ////if (Session["ClientID"] != null)
+                    /////    client = Convert.ToInt32(Session["ClientID"]);
+                    //AdministrativeAPI.ModifyUserSession(Convert.ToInt64(Session["SessionID"]), groupID, client, Session.SessionID);
                             
 					PageRedirect ((Group)nonRequestGroups[e.Item.ItemIndex]);
 				}

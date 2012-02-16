@@ -47,6 +47,24 @@ namespace iLabs.LabView.LV82
 	/// </summary>
 	public class LabViewInterface : I_LabViewInterface
 	{
+ 	
+	public static bool CheckDsServer()
+        {
+            bool status = false;
+            try
+            {
+                CWDataServer.CWDataServer server = new CWDataServer.CWDataServer();
+                if (server != null)
+                {
+                    status = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.WriteLine("Error accessing DataSocketServer: " + e.Message);
+            }
+            return status;
+        }
 
 		protected _Application viServer;
 

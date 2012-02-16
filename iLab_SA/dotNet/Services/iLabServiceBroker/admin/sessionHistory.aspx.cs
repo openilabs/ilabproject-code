@@ -116,7 +116,7 @@ namespace iLabs.ServiceBroker.admin
 
                 if (sessionHistory.Rows.Count == 0)
                 {
-                    lblResponse.Text = Utilities.FormatErrorMessage("No sessions found.");
+                    lblResponse.Text = Utilities.FormatWarningMessage(" No sessions found for your criteria.");
                     lblResponse.Visible = true;
                 }
                 else
@@ -159,7 +159,7 @@ namespace iLabs.ServiceBroker.admin
             }
             catch (Exception ex)
             {
-                lblResponse.Text = "<div class=errormessage><p>Cannot retrieve UserSessions. " + ex.GetBaseException() + "</p></div>";
+                lblResponse.Text = Utilities.FormatErrorMessage(" Cannot retrieve UserSessions. " + ex.GetBaseException());
                 lblResponse.Visible = true;
             }
         }
@@ -180,7 +180,7 @@ namespace iLabs.ServiceBroker.admin
                     userID = wrapper.GetUserIDWrapper(txtUserName.Text,authID);
                     if (userID == -1)
                     {
-                        lblResponse.Text = "<div class=errormessage><p>no user with the username '" + txtUserName.Text + "'found</p></div>";
+                        lblResponse.Text = Utilities.FormatWarningMessage(" No user with the username '" + txtUserName.Text + "' found.");
                         lblResponse.Visible = true;
                         return;
                     }
@@ -190,7 +190,7 @@ namespace iLabs.ServiceBroker.admin
                     groupID = wrapper.GetGroupIDWrapper(txtGroupName.Text);
                     if (groupID == -1)
                     {
-                        lblResponse.Text = Utilities.FormatErrorMessage("Group '" + txtGroupName.Text + "' not found.");
+                        lblResponse.Text = Utilities.FormatWarningMessage(" Group '" + txtGroupName.Text + "' not found.");
                         lblResponse.Visible = true;
                         return;
                     }
@@ -205,7 +205,7 @@ namespace iLabs.ServiceBroker.admin
                     }
                     catch
                     {
-                        lblResponse.Text = "<div class=errormessage><p>Please enter a valid time</p></div>";
+                        lblResponse.Text = Utilities.FormatWarningMessage(" Please enter a valid time.");
                         lblResponse.Visible = true;
                         return;
                     }
@@ -234,13 +234,13 @@ namespace iLabs.ServiceBroker.admin
                         }
                         catch
                         {
-                            lblResponse.Text = "<div class=errormessage><p>Please enter a valid time</p></div>";
+                            lblResponse.Text = Utilities.FormatWarningMessage(" Please enter a valid time.");
                             lblResponse.Visible = true;
                             return;
                         }
                         if (time2 < time1)
                         {
-                            lblResponse.Text = "<div class=errormessage><p>The second time must be greater than or equal to the start time</p></div>";
+                            lblResponse.Text = Utilities.FormatWarningMessage(" The second time must be greater than or equal to the start time.");
                             lblResponse.Visible = true;
                             return;
                         }

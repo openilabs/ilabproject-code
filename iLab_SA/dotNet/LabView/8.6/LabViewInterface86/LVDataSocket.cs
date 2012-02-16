@@ -26,6 +26,25 @@ namespace iLabs.LabView
     {
        
         private CWDataSocket theSocket;
+
+	public static bool CheckServer()
+        {
+            bool status = false;
+            try
+            {
+                CWDataServer.CWDataServer server = new CWDataServer.CWDataServer();
+                if (server != null)
+                {
+                    status = true;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.WriteLine("Error accessing DataSocketServer: " + e.Message);
+            }
+            return status;
+        }
+	
         
         public LVDataSocket()
         {

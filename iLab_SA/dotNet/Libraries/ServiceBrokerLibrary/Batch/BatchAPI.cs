@@ -73,8 +73,8 @@ namespace iLabs.ServiceBroker.Batch
                             header.coupon = opCoupon;
                             essProxy.Url = ess.webServiceUrl;
                             essProxy.OperationAuthHeaderValue = header;
-                            Criterion errors = new Criterion("type", "like", "*Message");
-                            Criterion extensions = new Criterion("type", "like", "*Extension");
+                            Criterion errors = new Criterion("record_type", "like", "*Message");
+                            Criterion extensions = new Criterion("record_type", "like", "*Extension");
                             Criterion [] criteria = new Criterion[] {errors,extensions };
                             ExperimentRecord[] records = brokerDB.RetrieveExperimentRecords(expSum.experimentID, criteria);
                             if (records != null)
