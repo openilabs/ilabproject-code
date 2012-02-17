@@ -118,7 +118,13 @@ namespace iLabs.ServiceBroker.admin
             string couponId;
             string passkey;
             string issuerGuid;
-
+            if (!wrapper.IsSuperuserGroup())
+            {
+                string msg = "You must be in the Superuser Group to run these reports.";
+                lblResponse.Text = Utilities.FormatWarningMessage(msg);
+                lblResponse.Visible = true;
+                return;
+            }
             if (!IsPostBack)
             {
 
