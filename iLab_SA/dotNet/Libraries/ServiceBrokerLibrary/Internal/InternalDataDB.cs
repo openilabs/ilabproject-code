@@ -657,7 +657,7 @@ namespace iLabs.ServiceBroker.Internal
         /// <param name="userID"></param>
         /// <param name="groupID"
         /// <returns></returns>
-        public static long[] RetrieveExperimentIDs(int userID, int groupID)
+        public static long[] RetrieveAuthorizedExperimentIDs(int userID, int groupID)
         {
             StringBuilder whereClause = null;
             List<long> expIDs = new List<long>();
@@ -667,6 +667,45 @@ namespace iLabs.ServiceBroker.Internal
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add(FactoryDB.CreateParameter("@userId", userID,DbType.Int32));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@groupId", groupID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                DbDataReader myReader = cmd.ExecuteReader();
+                while (myReader.Read())
+                {
+                    expIDs.Add(myReader.GetInt64(0));
+                }
+            }
+            catch { }
+            finally
+            {
+                myConnection.Close();
+            }
+            return expIDs.ToArray();
+        }
+
+        /// <summary>
+        /// Retrieve experiment IDs that match the intersection of the tree arguments.
+        /// Values less than or equal to 0 are not part of the query
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="groupID"></param>
+        /// <param name="clientID"></param>
+        /// <returns></returns>
+        public static long[] RetrieveExperimentIDs(int userID, int groupID, int clientID)
+        {
+            List<long> expIDs = new List<long>();
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("ExperimentIDs_Retrieve", myConnection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            if(userID > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@userId", userID, DbType.Int32));
+            if(groupID > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@groupId", groupID, DbType.Int32));
+            if(clientID > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@clientId", clientID, DbType.Int32));
 
             try
             {

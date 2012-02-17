@@ -415,7 +415,7 @@ namespace iLabs.ServiceBroker.DataStorage
             if (sbList.Count == 0 && essList.Count == 0)
             {
                 // No search items - Get all experiments allowed
-                expIDs = InternalDataDB.RetrieveExperimentIDs(userID, groupID);
+                expIDs = InternalDataDB.RetrieveAuthorizedExperimentIDs(userID, groupID);
             }
             else
             { // Query SB database to find all possible Experiments and related ESS's
@@ -506,6 +506,20 @@ namespace iLabs.ServiceBroker.DataStorage
             }
             return expIDs;
         }
+
+         /// <summary>
+        /// Retrieve experiment IDs that match the intersection of the tree arguments.
+        /// Values less than or equal to 0 are not part of the query
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="groupID"></param>
+        /// <param name="clientID"></param>
+        /// <returns></returns>
+        public static long[] RetrieveExperimentIDs(int userID, int groupID, int clientID)
+        {
+            return InternalDataDB.RetrieveExperimentIDs(userID, groupID, clientID);
+        }
+
         public static int SaveExperimentRecord(long experimentID, string submitter, string recordType,
              bool xmlSearchable, string contents, RecordAttribute[] attributes)
         {

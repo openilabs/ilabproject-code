@@ -844,7 +844,6 @@ namespace iLabs.ServiceBroker.Authorization
 		{
 			if (groupIDs.Length>0)
 			{
-				
 				//string sessionGroupName = Session["GroupName"].ToString();
 				int loginUserID = Convert.ToInt32(Session["UserID"]);
 			
@@ -863,10 +862,11 @@ namespace iLabs.ServiceBroker.Authorization
 					foreach (int groupID in groupIDs)
 					{
 						// If the group you're logged in has permission to access the group then display it.
-						int qID = Authorization.AuthorizationAPI .GetQualifierID (groupID, Qualifier .groupQualifierTypeID );
+						
 						if (! (groupID == Administration.AdministrativeAPI.GetGroupID(Group.NEWUSERGROUP)))
 
 						{
+                            int qID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.groupQualifierTypeID);
 							if(Authorization.AuthorizationAPI .CheckAuthorization (sessionGroupID, Function .administerGroupFunctionType , qID))
 							{
 								allowedGroupList.Add(groupID);
