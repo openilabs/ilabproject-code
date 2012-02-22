@@ -15,26 +15,7 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
-#if LabVIEW_2011
-using LabVIEW.lv2011;
-namespace iLabs.LabView.LV2011
-#endif
-#if LabVIEW_2010
-using LabVIEW.lv2010;
-namespace iLabs.LabView.LV2010
-#endif
-#if LabVIEW_2009
-using LabVIEW.lv2009;
-namespace iLabs.LabView.LV2009
-#endif
-#if LabVIEW_86
-using LabVIEW.lv86;
-namespace iLabs.LabView.LV86
-#endif
-#if LabVIEW_82
-using LabVIEW.lv821;
-namespace iLabs.LabView.LV82
-#endif
+namespace iLabs.LabView
 {
 
     /// <summary>

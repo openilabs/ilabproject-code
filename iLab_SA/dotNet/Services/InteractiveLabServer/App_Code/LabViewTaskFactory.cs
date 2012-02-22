@@ -50,7 +50,7 @@ namespace iLabs.LabServer.LabView
 
             long experimentID = -1;
             LabTask task = null;
-
+            string revision = null;
             //Parse experiment payload 	
             string payload = expTicket.payload;
             XmlQueryDoc expDoc = new XmlQueryDoc(payload);
@@ -72,40 +72,86 @@ namespace iLabs.LabServer.LabView
                 // Check for an existing experiment using the same resources, if found Close it
 
                 //Create the new Task
-                if(appInfo.rev.Contains("8.2")){
-                   task = iLabs.LabView.LV82.LabViewTask.CreateLabTask(appInfo,expCoupon,expTicket);
-                }
-                else if (appInfo.rev.Contains("8.6"))
+                if (appInfo.rev == null || appInfo.rev.Length < 2)
                 {
-                     task = iLabs.LabView.LV86.LabViewTask.CreateLabTask(appInfo,expCoupon,expTicket);
+                    revision = appInfo.rev;
                 }
-                else if (appInfo.rev.Contains("2009"))
+                else
                 {
-                    task = iLabs.LabView.LV2009.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    revision = ConfigurationManager.AppSettings["LabViewVersion"];
                 }
+                if (revision != null && revision.Length > 2)
+                {
+                    if (revision.Contains("8.2"))
+                    {
+                        task = iLabs.LabView.LV82.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    }
+                    else if (revision.Contains("8.6"))
+                    {
+                        task = iLabs.LabView.LV86.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    }
+                    else if (revision.Contains("2009"))
+                    {
+                        task = iLabs.LabView.LV2009.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    }
 
-                else if (appInfo.rev.Contains("2010"))
-                {
-                    task = iLabs.LabView.LV2010.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
-                }
-                else if (appInfo.rev.Contains("2011"))
-                {
-                    task = iLabs.LabView.LV2011.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    else if (revision.Contains("2010"))
+                    {
+                        task = iLabs.LabView.LV2010.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    }
+                    else if (revision.Contains("2011"))
+                    {
+                        task = iLabs.LabView.LV2011.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    }
                 }
                 else // Default to LV 2009
                 {
-                    //TODO: use web.config
                     task = iLabs.LabView.LV2009.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
                 }
                 
             }
-
             else
             {
                 task =  TaskProcessor.Instance.GetTask(experimentID);
-
             }
             return task;
+        }
+
+        public static I_LabViewInterface GetLabViewInterface()
+        {
+            I_LabViewInterface lvInterface = null;
+            string revision = null;
+            revision = ConfigurationManager.AppSettings["LabViewVersion"];
+
+            if (revision != null && revision.Length > 2)
+            {
+                if (revision.Contains("8.2"))
+                {
+                    lvInterface = new iLabs.LabView.LV82LabViewInterface();
+                }
+                else if (revision.Contains("8.6"))
+                {
+                    lvInterface = new iLabs.LabView.LV86.LabViewInterface();
+                }
+                else if (revision.Contains("2009"))
+                {
+                    lvInterface = new iLabs.LabView.LV2009.LabViewInterface();
+                }
+
+                else if (revision.Contains("2010"))
+                {
+                    lvInterface = new iLabs.LabView.LV2010.LabViewInterface();
+                }
+                else if (revision.Contains("2011"))
+                {
+                    lvInterface = new iLabs.LabView.LV2011.LabViewInterface();
+                }
+            }
+            else // Default to LV 2009
+            {
+                lvInterface = new iLabs.LabView.LV2009.LabViewInterface();
+            }
+            return lvInterface;
         }
 
 

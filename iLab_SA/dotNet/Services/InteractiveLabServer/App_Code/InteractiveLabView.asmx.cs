@@ -5,7 +5,6 @@
  * $Id$
  */
 
-#define LabVIEW_2009
 
 using System;
 using System.Collections;
@@ -26,18 +25,6 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 
 using iLabs.LabView;
-#if LabVIEW_2010
-using iLabs.LabView.LV2010;
-#endif
-#if LabVIEW_2009
-using iLabs.LabView.LV2009;
-#endif
-#if LabVIEW_82
-using iLabs.LabView.LV82;
-#endif
-#if LabVIEW_86
-using iLabs.LabView.LV86;
-#endif
 
 namespace iLabs.LabServer.LabView
 {
@@ -108,7 +95,7 @@ namespace iLabs.LabServer.LabView
         SoapDocumentMethod(Binding = "LabViewLS")]
         public string SubmitCommand(string actionStr, string dataStr)
         {
-            return new LabViewInterface().SubmitAction(actionStr, dataStr);
+            return LabViewTaskFactory.GetLabViewInterface().SubmitAction(actionStr, dataStr);
         }
         /*
                 /// <summary>
@@ -132,7 +119,7 @@ namespace iLabs.LabServer.LabView
         SoapDocumentMethod(Binding = "LabViewLS")]
         public string GetLabViewStatus()
         {
-            return new LabViewInterface().GetViServerStatus();
+            return new LabViewTaskFactory.GetLabViewInterface();
 
         }
 
@@ -180,7 +167,7 @@ namespace iLabs.LabServer.LabView
 SoapDocumentMethod(Binding = "LabViewLS")]
         public int GetLockState(string viName)
         {
-            I_LabViewInterface lvi = new LabViewInterface();
+            I_LabViewInterface lvi = LabViewTaskFactory.GetLabViewInterface();
             return lvi.GetLockState(viName);
 
         }
@@ -189,7 +176,7 @@ SoapDocumentMethod(Binding = "LabViewLS")]
       SoapDocumentMethod(Binding = "LabViewLS")]
         public int SetLockState(string viName, bool state)
         {
-            I_LabViewInterface lvi = new LabViewInterface();
+            I_LabViewInterface lvi = LabViewTaskFactory.GetLabViewInterface();
             return lvi.SetLockState(viName, state);
 
         }
@@ -207,7 +194,7 @@ SoapDocumentMethod(Binding = "LabViewLS")]
 
         protected string getConfiguration(string group)
         {
-            return new LabViewInterface().GetLabConfiguration(group);
+            return LabViewTaskFactory.GetLabViewInterface().GetLabConfiguration(group);
 
         }
 
