@@ -127,7 +127,7 @@ namespace iLabs.LabServer.LabView
             {
                 if (revision.Contains("8.2"))
                 {
-                    lvInterface = new iLabs.LabView.LV82LabViewInterface();
+                    lvInterface = new iLabs.LabView.LV82.LabViewInterface();
                 }
                 else if (revision.Contains("8.6"))
                 {

@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="I_LabViewInterface.cs" />
     <Compile Include="LabViewInterface.cs" />
     <Compile Include="LabViewRemote.cs" />
     <Compile Include="LabViewTask.cs" />

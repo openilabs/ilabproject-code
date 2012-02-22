@@ -119,7 +119,7 @@ namespace iLabs.LabServer.LabView
         SoapDocumentMethod(Binding = "LabViewLS")]
         public string GetLabViewStatus()
         {
-            return new LabViewTaskFactory.GetLabViewInterface();
+            return LabViewTaskFactory.GetLabViewInterface().GetViServerStatus();
 
         }
 
@@ -192,11 +192,11 @@ SoapDocumentMethod(Binding = "LabViewLS")]
                 }
         */
 
-        protected string getConfiguration(string group)
-        {
-            return LabViewTaskFactory.GetLabViewInterface().GetLabConfiguration(group);
+        //protected string getConfiguration(string group)
+        //{
+        //    return LabViewTaskFactory.GetLabViewInterface().GetLabConfiguration(group);
 
-        }
+        //}
 
     } // END OF LabViewLS Class
 }
