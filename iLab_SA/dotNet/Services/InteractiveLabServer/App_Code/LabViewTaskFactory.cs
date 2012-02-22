@@ -79,6 +79,11 @@ namespace iLabs.LabServer.LabView
                 {
                      task = iLabs.LabView.LV86.LabViewTask.CreateLabTask(appInfo,expCoupon,expTicket);
                 }
+                else if (appInfo.rev.Contains("2009"))
+                {
+                    task = iLabs.LabView.LV2009.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                }
+
                 else if (appInfo.rev.Contains("2010"))
                 {
                     task = iLabs.LabView.LV2010.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
@@ -89,6 +94,7 @@ namespace iLabs.LabServer.LabView
                 }
                 else // Default to LV 2009
                 {
+                    //TODO: use web.config
                     task = iLabs.LabView.LV2009.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
                 }
                 
