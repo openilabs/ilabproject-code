@@ -122,9 +122,11 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 
 			// Only show the groups page if the user has more than one lab
-            if (Session["GroupCount"] == null)
+            if (Session["GroupCount"] == null 
+                || Session["GroupCount"].ToString().Length == 0
+                || Convert.ToInt32(Session["GroupCount"]) <= 1)
             {
-                int[] grps = AdministrativeAPI.ListNonRequestGroupsForUser(Convert.ToInt32(Session["USerID"]));
+                int[] grps = AdministrativeAPI.ListNonRequestGroupsForUser(Convert.ToInt32(Session["UserID"]));
                 if (grps != null)
                 {
                     Session["GroupCount"] = grps.Length;

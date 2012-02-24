@@ -66,7 +66,7 @@ INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group
 INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (1, 0, 'ROOT','Root Group', 5);
 INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (2, 0, 'NewUserGroup','New registered users who have not been moved to any group yet', 5);
 INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (3, 0, 'OrphanedUserGroup','Users who no longer belong to any group',5);
-INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (4, 0, 'SuperUserGroup','Administrators',5);
+INSERT INTO Groups(Group_ID, associated_group_id, Group_Name, description, group_type_ID) VALUES (4, 0, 'SuperUserGroup','Administrators',1);
 SET IDENTITY_INSERT Groups OFF
 DBCC CHECKIDENT (GROUPS, RESEED);
 

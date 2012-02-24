@@ -61,6 +61,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			}
 			else
 			{
+                Session["GroupCount"] = nonRequestGroups.Count;
 				//Redirect to single lab single group page?
                 if (nonRequestGroups.Count == 1)
                 {
@@ -70,10 +71,6 @@ namespace iLabs.ServiceBroker.iLabSB
                            PageRedirect((Group)nonRequestGroups[0]);
                         }
                     
-                }
-                else
-                {
-                    Session["GroupCount"] = nonRequestGroups.Count;
                 }
 				repGroups.DataSource = nonRequestGroups;
 				repGroups.DataBind();
