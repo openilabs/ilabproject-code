@@ -142,18 +142,20 @@ namespace iLabs.LabView.LV82
             if (!lvi.IsLoaded(appInfo.application))
             {
                 vi = lvi.loadVI(appInfo.path, appInfo.application);
-                string[] names = new string[4];
-                object[] values = new object[4];
-                names[0] = "CouponId";
-                values[0] = expCoupon.couponId;
-                names[0] = "Passcode";
-                values[0] = expCoupon.passkey;
-                names[0] = "IssuerGuid";
-                values[0] = expCoupon.issuerGuid;
-                names[0] = "ExperimentId";
-                values[0] = experimentID;
-
-                lvi.SetControlValues(vi,names, values);
+                if (false) // Check for controls first
+                {
+                    string[] names = new string[4];
+                    object[] values = new object[4];
+                    names[0] = "CouponId";
+                    values[0] = expCoupon.couponId;
+                    names[1] = "Passcode";
+                    values[1] = expCoupon.passkey;
+                    names[2] = "IssuerGuid";
+                    values[2] = expCoupon.issuerGuid;
+                    names[3] = "ExperimentId";
+                    values[3] = experimentID;
+                    lvi.SetControlValues(vi, names, values);
+                }
                 vi.OpenFrontPanel(true, FPStateEnum.eVisible);
             }
             else
@@ -225,8 +227,7 @@ namespace iLabs.LabView.LV82
            Logger.WriteLine("unlockvi Called: ");
 
 
-            // Set up in-memory and database task control structures
-            DataSourceManager dsManager = null;
+           
 
             // Create the labTask & store in database;
             labTask = dbManager.InsertTask(appInfo.appID, experimentID,
@@ -243,10 +244,10 @@ namespace iLabs.LabView.LV82
             }
 
 
-            if (((essService != null) && (essService.Length > 0)) && ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0)))
+            if (((essService != null) && (essService.Length > 0)) )
             {
                 // Create DataSourceManager to manage dataSocket connections
-                dsManager = new DataSourceManager();
+                DataSourceManager dsManager = new DataSourceManager();
 
                 // set up an experiment storage handler
                 ExperimentStorageProxy ess = new ExperimentStorageProxy();
@@ -256,24 +257,28 @@ namespace iLabs.LabView.LV82
                 dsManager.essProxy = ess;
                 dsManager.ExperimentID = experimentID;
                 dsManager.AppKey = qualName;
-                string[] sockets = appInfo.dataSources.Split(',');
-                // Use the experimentID as the storage parameter
-                foreach (string s in sockets)
+                // Note these dataSources are written to by the application and sent to the ESS
+                if ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0))
                 {
-                    LVDataSocket reader = new LVDataSocket();
-                    dsManager.AddDataSource(reader);
-                    if (s.Contains("="))
+                    string[] sockets = appInfo.dataSources.Split(',');
+                    // Use the experimentID as the storage parameter
+                    foreach (string s in sockets)
                     {
-                        string[] nv = s.Split('=');
-                        reader.Type = nv[1];
-                        reader.Connect(nv[0], LabDataSource.READ_AUTOUPDATE);
+                        LVDataSocket reader = new LVDataSocket();
+                        dsManager.AddDataSource(reader);
+                        if (s.Contains("="))
+                        {
+                            string[] nv = s.Split('=');
+                            reader.Type = nv[1];
+                            reader.Connect(nv[0], LabDataSource.READ_AUTOUPDATE);
+
+                        }
+                        else
+                        {
+                            reader.Connect(s, LabDataSource.READ_AUTOUPDATE);
+                        }
 
                     }
-                    else
-                    {
-                        reader.Connect(s, LabDataSource.READ_AUTOUPDATE);
-                    }
-
                 }
                 TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
             }

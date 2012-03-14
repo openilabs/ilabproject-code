@@ -15,29 +15,39 @@ using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 
-
 using iLabs.Proxies.ESS;
 using iLabs.UtilLib;
 
 namespace iLabs.LabServer.Interactive
 {
+    /// <summary>
+    /// Summary description for Class1
+    /// </summary>
     public class FileDataSource : LabDataSource
     {
         public static List<FileDataSource> theList = new List<FileDataSource>();
 
+        //private Thread theThread;
+        // waitTime in milliseconds
+        //private int waitTime = 60000; // Every 1 minutes
+        //private int waitTime = 1000; // Every 1 second
         private bool go = true;
-
+        int count = 0;
+        private Coupon opCoupon;
+        private long experimentID;
+        private string socketUrl;
         FileSystemWatcher theWatcher;
 
         public FileDataSource()
         {
             // Create a new FileSystemWatcher and set its properties.
             theWatcher = new FileSystemWatcher();
-            /* Watch for changes in LastAccess and LastWrite times, size and
-               the renaming of files or directories. by default */
-            theWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            // Only for testing
-            //AddFileSystemEventHandler(OnChanged);
+            /* Watch for changes in LastAccess and LastWrite times, and
+               the renaming of files or directories. */
+            theWatcher.NotifyFilter = NotifyFilters.LastWrite |  NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            //theThread = new Thread(new ThreadStart(Run));
+            //theThread.IsBackground = true;
+            //theThread.Start();
         }
 
         //void OnCreated(object source, FileSystemEventArgs e)
@@ -49,18 +59,17 @@ namespace iLabs.LabServer.Interactive
         //void OnCreated(object source, FileSystemEventArgs e)
         public void AddFileSystemEventHandler(FileSystemEventHandler onChange, WatcherChangeTypes changeMask)
         {
-            if ((changeMask & WatcherChangeTypes.Changed) == WatcherChangeTypes.Changed)
-                theWatcher.Changed += new FileSystemEventHandler(onChange);
+            if((changeMask & WatcherChangeTypes.Changed) == WatcherChangeTypes.Changed)
+               theWatcher.Changed += new FileSystemEventHandler(onChange);
             if ((changeMask & WatcherChangeTypes.Created) == WatcherChangeTypes.Created)
                 theWatcher.Created += new FileSystemEventHandler(onChange);
             if ((changeMask & WatcherChangeTypes.Deleted) == WatcherChangeTypes.Deleted)
                 theWatcher.Deleted += new FileSystemEventHandler(onChange);
             if ((changeMask & WatcherChangeTypes.Renamed) == WatcherChangeTypes.Renamed)
-                theWatcher.Renamed += new RenamedEventHandler(onChange);
+               theWatcher.Renamed += new RenamedEventHandler(onChange);
         }
 
-        public NotifyFilters NotifyFilter
-        {
+        public NotifyFilters NotifyFilter{
             get
             {
                 return theWatcher.NotifyFilter;
@@ -69,7 +78,7 @@ namespace iLabs.LabServer.Interactive
             {
                 theWatcher.NotifyFilter = value;
             }
-        }
+    }
 
         public string Path
         {
@@ -106,15 +115,28 @@ namespace iLabs.LabServer.Interactive
             }
         }
 
-
+        public int WaitTime
+        {
+            get
+            {
+                return waitTime;
+            }
+            set
+            {
+                waitTime = value;
+            }
+        }
 
         public void Start()
         {
             lock (this)
             {
                 go = true;
+                
             }
             theWatcher.EnableRaisingEvents = true;
+            
+            //Run();
         }
 
         public void Stop()
@@ -126,18 +148,33 @@ namespace iLabs.LabServer.Interactive
             theWatcher.EnableRaisingEvents = false;
         }
 
+        //[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        //public void Run()
+        //{
+        //    while (go)
+        //    {
+        //        int i = 0;
+        //        Thread.Sleep(waitTime);
+        //        i++;
+        //    }
+        //    theWatcher.EnableRaisingEvents = false;
+        //    try
+        //    {
+        //        theThread.Abort();
+        //    }
+        //    catch (ThreadAbortException tEx)
+        //    {
+        //        //terminate the thread
+        //        ;
+        //    }
+        //    theThread = null;
+        //}
+
         public override void Connect(string url, int mode)
         {
             Path = url;
             Start();
         }
-
-        public override bool Write(object data, int timeout)
-        {
-            bool status = false;
-            return status;
-        }
-
         public override void Disconnect()
         {
             Stop();
@@ -157,14 +194,18 @@ namespace iLabs.LabServer.Interactive
         {
             // Specify what is done when a file is changed, created, or deleted.
 
+            DateTime lastWrite = File.GetLastWriteTimeUtc(e.FullPath);
+            //FileInfo fInfo = new FileInfo(e.FullPath);
+            //long  len = fInfo.Length;
             Console.WriteLine("File Created: " + e.FullPath);
+
+
         }
 
-        // This is a default handler and should not be used except for testing
+        // Define the event handlers.
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             // Specify what is done when a file is changed, created, or deleted.
-
             switch (e.ChangeType)
             {
                 case WatcherChangeTypes.Created:
@@ -175,6 +216,8 @@ namespace iLabs.LabServer.Interactive
                     DateTime lastWrite = File.GetLastWriteTimeUtc(e.FullPath);
 
                     FileInfo fInfo = new FileInfo(e.FullPath);
+                    FileStream inFile = fInfo.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+
                     long len = fInfo.Length;
                     Console.WriteLine("File Changed: " + e.FullPath + " size: " + len + " \tDate: " + lastWrite);
                     break;
