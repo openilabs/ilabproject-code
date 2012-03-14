@@ -25,12 +25,6 @@ namespace iLabs.LabServer.Interactive
     /// </summary>
     public class FileDataSource : LabDataSource
     {
-        public static List<FileDataSource> theList = new List<FileDataSource>();
-
-        //private Thread theThread;
-        // waitTime in milliseconds
-        //private int waitTime = 60000; // Every 1 minutes
-        //private int waitTime = 1000; // Every 1 second
         private bool go = true;
         int count = 0;
         private Coupon opCoupon;
@@ -42,12 +36,9 @@ namespace iLabs.LabServer.Interactive
         {
             // Create a new FileSystemWatcher and set its properties.
             theWatcher = new FileSystemWatcher();
-            /* Watch for changes in LastAccess and LastWrite times, and
-               the renaming of files or directories. */
+            // Watch for changes in LastAccess and LastWrite times, and
+            // the renaming of files or directories.
             theWatcher.NotifyFilter = NotifyFilters.LastWrite |  NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            //theThread = new Thread(new ThreadStart(Run));
-            //theThread.IsBackground = true;
-            //theThread.Start();
         }
 
         //void OnCreated(object source, FileSystemEventArgs e)
@@ -115,18 +106,7 @@ namespace iLabs.LabServer.Interactive
             }
         }
 
-        public int WaitTime
-        {
-            get
-            {
-                return waitTime;
-            }
-            set
-            {
-                waitTime = value;
-            }
-        }
-
+       
         public void Start()
         {
             lock (this)
@@ -187,6 +167,11 @@ namespace iLabs.LabServer.Interactive
         public override void Update()
         {
             string test = "YES";
+        }
+
+        public override bool Write(object data, int timeout)
+        {
+            return false;
         }
 
         // Define default event handlers.
