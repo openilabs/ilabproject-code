@@ -27,9 +27,11 @@ namespace iLabs.LabView
     public class LVDataSocket : LabDataSource
     {
         private CWDataSocket theSocket;
+        private bool firstRead = true;
 
         public static bool CheckServer()
         {
+           
             bool status = false;
             try
             {
@@ -64,7 +66,7 @@ namespace iLabs.LabView
 
             if (!(theSocket.Status == CWDSStatus.cwdsUnconnected))
                 theSocket.Disconnect();
-
+            // Note 0x20 or 64 stops the zero first entry on read?
             CWDSAccessModes mode = CWDSAccessModes.cwdsRead;
             switch (accessMode)
             {
@@ -95,13 +97,23 @@ namespace iLabs.LabView
                 default:
                     break;
             }
-
+            this.accessMode = accessMode;
             theSocket.ConnectTo(TargetUrl, mode);
         }
 
         public override void Update()
         {
             theSocket.Update();
+        }
+
+        public override bool Write(object data, int timeout)
+        {
+            bool status = false;
+            if ((accessMode & LabDataSource.WRITE) == LabDataSource.WRITE)
+            {
+                status = theSocket.SyncWrite(data, timeout);
+            }
+            return status;
         }
 
         public override void Disconnect()
@@ -115,6 +127,8 @@ namespace iLabs.LabView
                 theSocket.Disconnect();
         }
 
+
+
         private void OnStatusUpdated(int i, int k, string message)
         {
             Console.WriteLine(message);
@@ -125,7 +139,16 @@ namespace iLabs.LabView
         private void OnDataUpdated(CWData e)
         {
             Object obj = e.Value;
-            manager.essProxy.AddRecord(manager.experimentID, "", recordType, true, obj.ToString(), null);
+            if ((accessMode & LabDataSource.READ) == LabDataSource.READ)
+            {
+                if (firstRead)
+                {
+                    firstRead = false;
+                    if (Convert.ToInt32(e.Value) == 0)
+                        return;
+                }
+                manager.essProxy.AddRecord(manager.experimentID, "", recordType, true, e.Value.ToString(), null);
+            }
 
         }
 

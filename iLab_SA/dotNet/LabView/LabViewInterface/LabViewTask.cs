@@ -313,13 +313,18 @@ namespace iLabs.LabView.LV82
         public override eStatus Expire()
         {
            Logger.WriteLine("Task expired: " + taskID);
-            
-            Close();
+
+            Close(eStatus.Expired);
             status |= eStatus.Expired;
             return base.Expire();
         }
 
         public override eStatus Close()
+        {
+            return Close(eStatus.Closed);
+        }
+
+        public override eStatus Close(eStatus reason)
         {
             LabDB dbService = new LabDB();
             LabViewInterface lvi = null;
@@ -345,7 +350,10 @@ namespace iLabs.LabView.LV82
                     {
                         try
                         {
-                            lvi.DisplayStatus(statusVI, "You are out of time!", "0:00");
+                            if(reason == eStatus.Expired)
+                                lvi.DisplayStatus(statusVI, "You are out of time!", "0:00");
+                            else
+                                lvi.DisplayStatus(statusVI, "Your experiment has been cancelled", "0:00");
                         }
                         catch (Exception ce)
                         {
@@ -376,7 +384,7 @@ namespace iLabs.LabView.LV82
 
                 }
                Logger.WriteLine("TaskID = " + taskID + " has expired");
-                dbService.SetTaskStatus(taskID, (int)eStatus.Expired);
+                dbService.SetTaskStatus(taskID, (int)reason);
                 status = eStatus.Closed;
                
                     DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(taskID);
@@ -443,7 +451,7 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e1)
             {
-               Logger.WriteLine("ProcessTasks Expired: exception:" + e1.Message + e1.StackTrace);
+               Logger.WriteLine("ProcessTasks Cancelled: exception:" + e1.Message + e1.StackTrace);
             }
             finally
             {
