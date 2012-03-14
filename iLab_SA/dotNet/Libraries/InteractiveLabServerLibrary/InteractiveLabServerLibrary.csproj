@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileDataSource.cs" />
     <Compile Include="I_LabViewInterface.cs" />
     <Compile Include="LabDataSource.cs" />
     <Compile Include="DataSourceManager.cs" />

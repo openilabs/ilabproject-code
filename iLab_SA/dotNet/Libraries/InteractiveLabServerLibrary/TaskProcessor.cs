@@ -118,20 +118,20 @@ namespace iLabs.LabServer.Interactive
         }
 
 
-        public LabTask[] GetTasks(LabAppInfo app)
+        public List<LabTask> GetTasks(int appID)
         {
             List<LabTask> active = new List<LabTask>();
             lock (tasks)
             {
                 foreach (LabTask t in tasks)
                 {
-                    if (t.labAppID == app.appID)
+                    if (t.labAppID == appID)
                     {
                         active.Add(t);
                     }
                 }
             }
-            return active.ToArray();
+            return active;
         }
 
         public void AddDataManager(long taskID, DataSourceManager mgr)
@@ -144,7 +144,13 @@ namespace iLabs.LabServer.Interactive
 
         public DataSourceManager GetDataManager(long taskID)
         {
-            return dataManagers[taskID];
+            DataSourceManager dataManager = null;
+            try
+            {
+                dataManager = dataManagers[taskID];
+            }
+            catch (KeyNotFoundException e) { }
+            return dataManager;
         }
 
         public bool RemoveDataManager(long taskID)

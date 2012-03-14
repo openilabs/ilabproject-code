@@ -85,6 +85,11 @@ namespace iLabs.LabServer.Interactive
         {
             return status;
         }
+
+        public virtual eStatus Close(eStatus status)
+        {
+            return status;
+        }
        
         public virtual eStatus Expire(){
             return status;

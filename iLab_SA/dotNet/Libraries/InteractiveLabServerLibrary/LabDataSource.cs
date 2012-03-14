@@ -4,7 +4,8 @@ using System.Text;
 
 namespace iLabs.LabServer.Interactive
 {
-    public abstract class LabDataSource
+    public abstract class LabDataSource : IDisposable
+
     {
         public const int AUTOUPDATE = 0x1;
         public const int BUFFERED = 0x2;
@@ -22,6 +23,7 @@ namespace iLabs.LabServer.Interactive
        
         protected DataSourceManager manager;
         protected string recordType = "xml";
+        protected int accessMode = LabDataSource.READ;
 
         public string Type
         {
@@ -49,5 +51,6 @@ namespace iLabs.LabServer.Interactive
         public abstract void Disconnect();
         public abstract void Dispose();
         public abstract void Update();
+        public abstract bool Write(object data, int timeout);
     }
 }

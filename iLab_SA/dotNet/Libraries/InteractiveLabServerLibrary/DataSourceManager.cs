@@ -23,7 +23,8 @@ namespace iLabs.LabServer.Interactive
     /// <summary>
     /// Summary description for DataSourceManager
     /// </summary>
-    public class DataSourceManager
+    public class DataSourceManager : IDisposable
+
     {
         public long taskID = -1L;
         public long experimentID = -1L;
@@ -59,6 +60,7 @@ namespace iLabs.LabServer.Interactive
             foreach(LabDataSource ds in dataSources)
             {
                 ds.Disconnect();
+                ds.Dispose();
 
             }
         }
@@ -85,6 +87,11 @@ namespace iLabs.LabServer.Interactive
             {
                 appKey = value;
             }
+        }
+
+        public void Dispose()
+        {
+            CloseDataSources();
         }
 
     }
