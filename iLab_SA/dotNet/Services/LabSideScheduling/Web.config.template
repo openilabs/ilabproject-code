@@ -33,7 +33,7 @@
     <add key="defaultPasskey" value="LSS"/>
 
     <!-- email address where various reports are sent -->
-    <add key="genericFromMailAddress" value="donotreply@localhost"/>
+    <add key="genericFromMailAddress" value="ilab-bug@mit.edu"/>
     <!--this for the centralized bug tracking system at MIT. 
 	      Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
