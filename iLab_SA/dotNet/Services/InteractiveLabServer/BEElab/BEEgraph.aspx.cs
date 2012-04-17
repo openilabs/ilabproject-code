@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.Security;
@@ -132,7 +133,7 @@ namespace iLabs.LabServer.LabView
                         buf.AppendLine(",");
                     }
                     else{
-                        buf.ApendLine();
+                        buf.AppendLine();
                         hasRecords = true;
                     }
                     buf.Append(tStamp.Ticks + "," + values[4] + "]");
