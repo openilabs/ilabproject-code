@@ -152,7 +152,7 @@ namespace iLabs.ServiceBroker
  
             // 4.A create payload 
             string payload = factory.createExecuteExperimentPayload(essWebAddress, startExecution, duration,
-                userTZ, groupName, brokerDB.GetIssuerGuid(), experimentID);
+                userTZ, userID, groupName, brokerDB.GetIssuerGuid(), experimentID);
 
             
             // 4.B create experiment execution ticket.
@@ -177,7 +177,7 @@ namespace iLabs.ServiceBroker
         /// <param name="labClientName"></param>
         /// <param name="labClientVersion"></param>
         /// <returns>The redirect url where the user should be redirected, with the coupon appended to it</returns>
-        public string ExecuteExerimentSchedulingRecipe(ProcessAgent uss, ProcessAgent lss, string username, string groupName, 
+        public string ExecuteExerimentSchedulingRecipe(ProcessAgent uss, ProcessAgent lss, string username, int userID, string groupName, 
             string labServerGuid, LabClient labClient, long duration, int userTZ)
         {
             try
@@ -193,7 +193,7 @@ namespace iLabs.ServiceBroker
                 //the SB is the sponsor of the scheduling ticket
                 //string sponsorId = issuer.GetIssuerGuid();
 
-                string payload1 = factory.createScheduleSessionPayload(username, groupName, issuer.GetIssuerGuid(),
+                string payload1 = factory.createScheduleSessionPayload(username, userID, groupName, issuer.GetIssuerGuid(),
                     labServerGuid, labClient.clientGuid, labClient.clientName, labClient.version, uss.webServiceUrl, userTZ);
                 string payload2 = factory.createRequestReservationPayload();
 
