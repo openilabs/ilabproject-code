@@ -12,7 +12,7 @@ namespace iLabs.DataTypes.ProcessAgentTypes
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
-    public class ProcessAgent
+    public class ProcessAgent : IComparable
     {
 
         /// <summary>
@@ -76,6 +76,15 @@ namespace iLabs.DataTypes.ProcessAgentTypes
         {
             return agentGuid.GetHashCode() + webServiceUrl.GetHashCode();
         }
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.agentName.CompareTo(((ProcessAgent)obj).agentName);
+        }
+
+        #endregion
 
     }
 
