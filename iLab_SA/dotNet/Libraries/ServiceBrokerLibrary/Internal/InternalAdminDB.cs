@@ -928,7 +928,7 @@ namespace iLabs.ServiceBroker.Internal
             {
                 myConnection.Close();
             }
-
+            clients.Sort();
             return clients.ToArray();
         }
 
@@ -1246,7 +1246,7 @@ namespace iLabs.ServiceBroker.Internal
 			{
 				myConnection.Close ();
 			}
-			
+            clients.Sort();
 			return clients.ToArray();;
 		}
        
@@ -2014,7 +2014,7 @@ public static int CountScheduledClients(int labServerID){
 			{
 				myConnection.Close ();
 			}
-
+            users.Sort();
             return users.ToArray(); ;
 		}
 
@@ -3022,7 +3022,7 @@ public static int CountScheduledClients(int labServerID){
 			{
 				myConnection.Close ();
 			}
-			
+            groups.Sort();
 			return groups.ToArray();
 		}
 
@@ -3056,6 +3056,7 @@ public static int CountScheduledClients(int labServerID){
             {
                 myConnection.Close();
             }
+            groups.Sort();
             return groups.ToArray();
         }
 
