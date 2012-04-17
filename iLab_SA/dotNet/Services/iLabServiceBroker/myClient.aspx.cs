@@ -154,7 +154,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 // check for current reservation
 
                                 //create a collection & redeemTicket
-                                string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow, Session["UserName"].ToString(), groupName, lc.clientGuid);
+                                string redeemPayload = TicketLoadFactory.Instance().createRedeemReservationPayload(DateTime.UtcNow, DateTime.UtcNow, Session["UserName"].ToString(), Convert.ToInt32(Session["UserID"]),groupName, lc.clientGuid);
                                 if (opCoupon == null)
                                     opCoupon = issuer.CreateCoupon();
 
@@ -519,7 +519,7 @@ namespace iLabs.ServiceBroker.iLabSB
             {
                 Response.Redirect("login.aspx");
             }
-
+            int userID = Convert.ToInt32(Session["UserID"]);
             StringBuilder message = new StringBuilder("Message: clientID = ");
             message.Append(btnLaunchLab.CommandArgument + " ");
             LabClient client = AdministrativeAPI.GetLabClient(c_id);
@@ -552,7 +552,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
 
                         //payload includes username and current group name & client id.
-                        string sessionPayload = factory.createRedeemSessionPayload(Convert.ToInt32(Session["UserID"]), Convert.ToInt32(Session["GroupID"]),
+                        string sessionPayload = factory.createRedeemSessionPayload(userID, Convert.ToInt32(Session["GroupID"]),
                                    Convert.ToInt32(Session["ClientID"]), (string)Session["UserName"], (string)Session["GroupName"]);
                         // SB is the redeemer, ticket type : session_identifcation, no expiration time, payload,SB as sponsor ID, redeemer(SB) coupon
                         issuer.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid,
@@ -568,7 +568,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                             // loaderScript not parsed in Recipe
                            redirectURL = executor.ExecuteExperimentExecutionRecipe(coupon, labServer, client,
-                            start, duration, Convert.ToInt32(Session["UserTZ"]), Convert.ToInt32(Session["UserID"]),
+                            start, duration, Convert.ToInt32(Session["UserTZ"]), userID,
                             effectiveGroupID, effectiveGroupName);
                            
                             // Add the return url to the redirect
@@ -720,7 +720,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 long duration = 36000;
 
                 RecipeExecutor recipeExec = RecipeExecutor.Instance();
-                string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss, lss, username, effectiveGroupName,
+                string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss, lss, username, Convert.ToInt32(Session["UserID"]),effectiveGroupName,
                     labServer.agentGuid, lc,
                     Convert.ToInt64(ConfigurationManager.AppSettings["scheduleSessionTicketDuration"]), Convert.ToInt32(Session["UserTZ"]));
 
