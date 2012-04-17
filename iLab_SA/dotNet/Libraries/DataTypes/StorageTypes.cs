@@ -130,6 +130,70 @@ namespace iLabs.DataTypes.StorageTypes
         public const int CLOSED_USER = CLOSED | USER_ACTION;
         public const int CLOSED_ERROR = CLOSED | ERROR;
 
+        public static string GetStatusString(int status)
+        {
+            string statStr = null;
+            switch (status)
+            {
+                case StorageStatus.BATCH_QUEUED:
+                    statStr = "Queued";
+                    break;
+                case StorageStatus.BATCH_CANCELLED:
+                    statStr = "Cancelled";
+                    break;
+                case StorageStatus.BATCH_NOT_VALID:
+                    statStr = "Not Valid";
+                    break;
+                case StorageStatus.UNKNOWN:
+                case StorageStatus.BATCH_UNKNOWN:
+                    statStr = "Unknown";
+                    break;
+                case StorageStatus.INITIALIZED:
+                    statStr = "Initialized";
+                    break;
+                case StorageStatus.OPEN:
+                    statStr = "Open";
+                    break;
+                case StorageStatus.REOPENED:
+                    statStr = "Re-Opened";
+                    break;
+                case StorageStatus.BATCH_RUNNING:
+                case StorageStatus.RUNNING:
+                    statStr = "Running";
+                    break;
+                case StorageStatus.BATCH_TERMINATED_ERROR:
+                case StorageStatus.CLOSED:
+                    statStr = "Closed";
+                    break;
+                case StorageStatus.BATCH_TERMINATED:
+                case StorageStatus.CLOSED_ERROR:
+                    statStr = "Closed Error";
+                    break;
+                case StorageStatus.BATCH_CANCELLED | StorageStatus.CLOSED:
+                    statStr = "Cancelled";
+                    break;
+                case StorageStatus.BATCH_TERMINATED_ERROR | StorageStatus.CLOSED:
+                    statStr = "Closed Error";
+                    break;
+                case StorageStatus.BATCH_TERMINATED | StorageStatus.CLOSED_ERROR:
+                    statStr = "Closed -Terminated";
+                    break;
+                case StorageStatus.CLOSED_TIMEOUT:
+                    statStr = "Closed Timeout";
+                    break;
+                case StorageStatus.CLOSED_USER:
+                    statStr = "Closed By User";
+                    break;
+                default:
+                    if ((status & StorageStatus.CLOSED) == StorageStatus.CLOSED)
+                        statStr = "Closed";
+                    else
+                        statStr = "StorageStatus Error";
+                    break;
+            }
+            return statStr;
+        }
+
         
         public long experimentId;
         public int status;
