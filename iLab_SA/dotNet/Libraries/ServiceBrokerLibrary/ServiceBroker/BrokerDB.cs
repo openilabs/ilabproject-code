@@ -3227,7 +3227,7 @@ namespace iLabs.ServiceBroker
                                 case TicketTypes.SCHEDULE_SESSION:
                                     if (theClient != null && ls != null && uss != null && lss != null)
                                     {
-                                        payload = tlf.createScheduleSessionPayload(userName, curGroup, ProcessAgentDB.ServiceGuid,
+                                        payload = tlf.createScheduleSessionPayload(userName, userID, curGroup, ProcessAgentDB.ServiceGuid,
                                             ls.agentGuid, theClient.clientGuid, theClient.ClientName, theClient.version, uss.webServiceUrl, 0);
                                         // Create USS ticket
                                         AddTicket(coupon, TicketTypes.SCHEDULE_SESSION, uss.agentGuid, agentGuid,
@@ -3245,7 +3245,7 @@ namespace iLabs.ServiceBroker
                                 case TicketTypes.REDEEM_RESERVATION:
                                     if (theClient != null && uss != null)
                                     {
-                                        payload = tlf.createRedeemReservationPayload(start, start.AddMinutes(duration), userName, curGroup, theClient.clientGuid);
+                                        payload = tlf.createRedeemReservationPayload(start, start.AddMinutes(duration), userName, userID, curGroup, theClient.clientGuid);
                                         AddTicket(coupon, TicketTypes.REDEEM_RESERVATION, agentGuid, uss.agentGuid,
                                             ticketDuration, payload);
                                         ok = true;
@@ -3254,7 +3254,7 @@ namespace iLabs.ServiceBroker
                                 case TicketTypes.REVOKE_RESERVATION:
                                     if (theClient != null && uss != null)
                                     {
-                                        payload = tlf.createRevokeReservationPayload("", userName, curGroup, ProcessAgentDB.ServiceGuid,
+                                        payload = tlf.createRevokeReservationPayload("", userName, userID, curGroup, ProcessAgentDB.ServiceGuid,
                                             theClient.clientGuid, uss.webServiceUrl);
                                         AddTicket(coupon, TicketTypes.REVOKE_RESERVATION, agentGuid, uss.agentGuid,
                                             ticketDuration, payload);
