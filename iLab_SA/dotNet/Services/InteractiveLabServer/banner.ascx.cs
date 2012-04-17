@@ -21,11 +21,15 @@ namespace iLabs.LabServer.LabView
 	public partial class banner : System.Web.UI.UserControl
 	{
 		string referringPage;
+        protected string bannerText = "LabVIEW Interactive iLab Server";
+        protected string imageURL = "~/images/MITiCampus_Logo_White.gif";
 
 		//AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
+            lblTextBanner.Text = bannerText;
+            imgBanner.ImageUrl = imageURL;
 			// Get User Name
 			if(Session["userName"] != null)
 			{
@@ -48,6 +52,18 @@ namespace iLabs.LabServer.LabView
 				lblGroupNameBanner.Visible = false;
 			}
 		}
+
+        public string ImageURL
+        {
+            get { return imageURL; }
+            set { imageURL = value; }
+        }
+
+        public string BannerText
+        {
+            get { return bannerText; }
+            set { bannerText = value; }
+        } 
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
