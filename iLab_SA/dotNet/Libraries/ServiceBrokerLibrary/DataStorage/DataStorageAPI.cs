@@ -38,66 +38,7 @@ namespace iLabs.ServiceBroker.DataStorage
 
         public static string getStatusString(int status)
         {
-            string statStr = null;
-            switch (status)
-            {
-                case StorageStatus.BATCH_QUEUED:
-                    statStr = "Queued";
-                    break;
-                case StorageStatus.BATCH_CANCELLED:
-                    statStr = "Cancelled";
-                    break;
-                case StorageStatus.BATCH_NOT_VALID:
-                    statStr = "Not Valid";
-                    break;
-                case StorageStatus.UNKNOWN:
-                case StorageStatus.BATCH_UNKNOWN:
-                    statStr = "Unknown";
-                    break;
-                case StorageStatus.INITIALIZED:
-                    statStr = "Initialized";
-                    break;
-                case StorageStatus.OPEN:
-                    statStr = "Open";
-                    break;
-                case StorageStatus.REOPENED:
-                    statStr = "Re-Opened";
-                    break;
-                case StorageStatus.BATCH_RUNNING:
-                case StorageStatus.RUNNING:
-                    statStr = "Running";
-                    break;
-                case StorageStatus.BATCH_TERMINATED_ERROR:
-                case StorageStatus.CLOSED:
-                    statStr = "Closed";
-                    break;
-                case StorageStatus.BATCH_TERMINATED:
-                case StorageStatus.CLOSED_ERROR:
-                    statStr = "Closed Error";
-                    break;
-                case StorageStatus.BATCH_CANCELLED | StorageStatus.CLOSED:
-                    statStr = "Cancelled";
-                    break;
-                case StorageStatus.BATCH_TERMINATED_ERROR |StorageStatus.CLOSED:
-                    statStr = "Closed Error";
-                    break;
-                case StorageStatus.BATCH_TERMINATED | StorageStatus.CLOSED_ERROR:
-                    statStr = "Closed -Terminated";
-                    break;
-                case StorageStatus.CLOSED_TIMEOUT:
-                    statStr = "Closed Timeout";
-                    break;
-                case StorageStatus.CLOSED_USER:
-                    statStr = "Closed By User";
-                    break;
-                default:
-                    if ((status & StorageStatus.CLOSED) == StorageStatus.CLOSED)
-                        statStr = "Closed";
-                    else
-                        statStr = "StorageStatus Error";
-                    break;
-            }
-            return statStr;
+            return StorageStatus.GetStatusString(status);
         }
 
 
@@ -372,35 +313,31 @@ namespace iLabs.ServiceBroker.DataStorage
                 {
                     switch (carray[i].attribute.ToLower())
                     {
-                        //these criterion are based on external values, requiring special processing of the fields.
-                        case "username":
-                            sbList.Add(new Criterion("User_ID", carray[i].predicate,
-                            "(select user_id from users where user_name=" + carray[i].value + ")"));
-                            break;
-                        case "groupname":
-                            sbList.Add(new Criterion("Group_ID", carray[i].predicate,
-                            "(select group_id from group where group_name=" + carray[i].value + ")"));
-                            break;
-                        case "clientname":
-                            sbList.Add(new Criterion("Client_ID", carray[i].predicate,
-                                "(select client_id from lab_clients where lab_client_name=" + carray[i].value + ")"));
-                            break;
-                        case "labservername":
-                            sbList.Add(new Criterion("Agent_ID", carray[i].predicate,
-                                "(select agent_id from processAgent where agent_name=" + carray[i].value + ")"));
-                            break;
-                        case "start":
-                            sbList.Add(new Criterion("creationtime", carray[i].predicate, carray[i].value));
-                            break;
-                        case "agent_id":    // Actual SB experiment column names
+                        // ServiceBroker Experiment fields
+                        // Actual SB experiment column names
+                        case "agent_id":    
                         case "annotation":
                         case "client_id":
                         case "creationtime":
+                        case "duration":
                         case "ess_id":
+                        case "experiment_id":
                         case "group_id":
+                        case "labsession_id":
                         case "scheduledstart":
+                        case "status":
                         case "user_id":
+                        //these criterion are based on external values, processed by InternalDB methods.
+                        case "username":
+                        case "groupname":
+                        case "clientguid":
+                        case "clientname":
+                        case "labservername":
                             sbList.Add(carray[i]);
+                            break;
+                        // Rename the Criterion
+                        case "start":
+                            sbList.Add(new Criterion("creationtime", carray[i].predicate, carray[i].value));
                             break;
                         // ESS targets
                         case "record_count":
