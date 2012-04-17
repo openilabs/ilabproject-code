@@ -58,7 +58,7 @@ namespace iLabs.DataTypes
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
-    public class IntTag
+    public class IntTag : IComparable
     {
         /// <summary>
         /// 
@@ -82,6 +82,15 @@ namespace iLabs.DataTypes
             this.id = id;
             this.tag = tag;
         }
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.tag.CompareTo(((IntTag)obj).tag);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -89,7 +98,7 @@ namespace iLabs.DataTypes
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
-    public class LongTag
+    public class LongTag : IComparable
     {
         /// <summary>
         /// 
@@ -113,6 +122,14 @@ namespace iLabs.DataTypes
             this.id = id;
             this.tag = tag;
         }
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.tag.CompareTo(((LongTag)obj).tag);
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -120,7 +137,7 @@ namespace iLabs.DataTypes
     /// </summary>
     [System.Xml.Serialization.XmlTypeAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://ilab.mit.edu/iLabs/type")]
-    public class StringTag
+    public class StringTag : IComparable
     {
         /// <summary>
         /// 
@@ -144,6 +161,16 @@ namespace iLabs.DataTypes
             this.id = id;
             this.tag = tag;
         }
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.tag.CompareTo(((StringTag)obj).tag);
+        }
+
+        #endregion
+      
     }
 
 }
