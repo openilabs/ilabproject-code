@@ -43,7 +43,8 @@ namespace iLabs.ServiceBroker.Administration
     //    public const string groupType = "Group";
     //}
 
-    public class Authority{
+    public class Authority : IComparable
+    {
         public int authorityID;
         public int authTypeID;
         public int defaultGroupID;
@@ -64,6 +65,15 @@ namespace iLabs.ServiceBroker.Administration
                 return "*";
             }
         }
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.authName.CompareTo(((Authority)obj).authName);
+        }
+
+        #endregion
     }
     
 
@@ -150,7 +160,7 @@ namespace iLabs.ServiceBroker.Administration
 	/// <summary>
 	/// Class containing information pertaining to a Lab Client.
 	/// </summary>
-	public class LabClient
+    public class LabClient : IComparable
 	{
         /// <summary>
         /// A string limited to 50 characters used for identification across domains, 
@@ -297,6 +307,15 @@ namespace iLabs.ServiceBroker.Administration
         /// Named constant for the Client type.
         /// </summary>
         public const string WEB_SERVICE_REDIRECT = "Web Service Redirect";
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            return this.ClientName.CompareTo(((LabClient)obj).ClientName);
+        }
+
+        #endregion
 	}
 
 	/// <summary>
