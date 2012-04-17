@@ -167,7 +167,8 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
 EnableSession = true)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
-    public abstract StorageStatus CreateExperiment(DateTime startTime, long duration, string labServerGuid, string clientGuid, string groupName, string userName);
+    public abstract StorageStatus CreateExperiment(DateTime startTime, long duration, 
+        string labServerGuid, string clientGuid, string groupName, string userName);
 
 
     [WebMethod(Description = "Opens an existing Experiment, if an ESS is "
@@ -211,14 +212,14 @@ EnableSession = true)]
     public abstract Experiment RetrieveExperiment(long experimentID);
 
     [WebMethod(Description = "Uses the users qualifiers to select Experiment summaries, no write permissions are created."
-   + " Valid field names include; userName, groupName, labServerName,clientName, scheduledStart,creationTime, status "
+   + " Valid field names include all Experiment Table field names and userName, groupName, labServerName, clientGuid, clientName, scheduledStart,creationTime, status "
    + " and experimentID.",
    EnableSession = true)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract ExperimentSummary[] RetrieveExperimentSummary(Criterion[] carray);
 
-    [WebMethod(Description = "Uses the users qualifiers to select Experiment summaries, no write permissions are created."
+    [WebMethod(Description = "Uses the users qualifiers to select Experiment records, no write permissions are created."
    + " Valid field names include; userName, groupName, labServerName,clientName, scheduledStart,creationTime, status "
    + " and experimentID.",
    EnableSession = true)]
