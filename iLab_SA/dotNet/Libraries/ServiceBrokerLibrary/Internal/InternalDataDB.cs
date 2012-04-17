@@ -828,21 +828,46 @@ namespace iLabs.ServiceBroker.Internal
 
                     switch (carray[i].attribute.ToLower())
                     {
-                        case "agent_id":    // Actual SB experiment column names                        
-                        case "client_id":                       
+                        case "agent_id":    // Actual SB experiment column names  
+                        case "annotation":
+                        case "client_id":
+                        case "creationtime":
+                        case "duration":
                         case "ess_id":
+                        case "experiment_id":
                         case "group_id":
                         case "record_count":
+                        case "scheduledstart":
                         case "status":
                         case "user_id":
                             whereClause.Append(carray[i].ToSQL());
                             break;
-                        case "annotation":
-                        case "creationtime":
-                        case "scheduledstart":
-                            whereClause.Append(carray[i].ToSQL());
+                        //these criterion are based on external values, requiring special processing of the fields.
+                        case "username":
+                            whereClause.Append("User_ID " + carray[i].predicate);
+                            whereClause.Append(" (select user_id from users where user_name='" + carray[i].value + "')");
                             break;
-                        default: // any unhandled attributes are ignored
+                        case "groupname":
+                            whereClause.Append("Group_ID " + carray[i].predicate);
+                            whereClause.Append(" (select group_id from group where group_name='" + carray[i].value + "')");
+                            break;
+                        case "clientguid":
+                            whereClause.Append("Client_ID " +carray[i].predicate);
+                            whereClause.Append(" (select client_id from lab_clients where client_guid='" + carray[i].value + "')");
+                            break;
+                        case "clientname":
+                            whereClause.Append("Client_ID " + carray[i].predicate);
+                            whereClause.Append(" (select client_id from lab_clients where lab_client_name='" + carray[i].value + "')");
+                            break;
+                        case "labservername":
+                            whereClause.Append("Agent_ID " + carray[i].predicate);
+                            whereClause.Append(" (select agent_id from processAgent where agent_name='" + carray[i].value + "')");
+                            break;
+                        case "start":
+                            whereClause.Append("creationtime " + carray[i].predicate + " " + carray[i].value);
+                            break;
+                        // any unhandled attributes are ignored
+                        default: 
                             break;
                     }
                 }
