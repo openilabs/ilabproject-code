@@ -4,6 +4,8 @@
 
   Application = (function() {
 
+    Application.name = 'Application';
+
     function Application() {
       this.chamber = new TestChamber;
     }
@@ -18,31 +20,60 @@
 
   window.TestChamber = TestChamber = (function() {
 
+    TestChamber.name = 'TestChamber';
+
     function TestChamber(channel) {
-      if (channel == null) channel = 'test_chamber';
+      if (channel == null) {
+        channel = 'test_chamber';
+      }
       this.initializeChart = __bind(this.initializeChart, this);
+
       this.chart = 0;
       this.maxPoints = 60;
+      this.series = 0;
       this.initializeChart(window.sampleData, new Date());
+      this.memoSeries();
     }
 
     TestChamber.prototype.prepareData = function(rawData) {
       var $collection;
-      $collection = $(".series-box:checked");
+      $collection = $(".series-box");
       return _.map($collection, function(checkbox) {
+        var jBox;
+        jBox = $(checkbox);
         return _.map(rawData, function(data) {
-          return [Date.parse(data[0]), data[checkbox.value]];
+          return [Date.parse(data[0]), data[jBox.data('array-index')]];
         });
       });
+    };
+
+    TestChamber.prototype.series = function() {
+      return this.series;
+    };
+
+    TestChamber.prototype.memoSeries = function() {
+      var _this = this;
+      this.series = {};
+      _.each(this.chart.series, function(serie, index) {
+        return _this.series[serie.name] = index;
+      });
+      return this.series;
     };
 
     TestChamber.prototype.chart = function() {
       return this.chart;
     };
 
+    TestChamber.prototype.getSeries = function() {
+      var $collection;
+      $collection = $(".series-box");
+      return _.pluck($collection, 'name');
+    };
+
     TestChamber.prototype.initializeChart = function(chartData, startDate) {
-      var preparedData;
+      var preparedData, seriesNames;
       preparedData = this.prepareData(chartData);
+      seriesNames = this.getSeries();
       return this.chart = new Highcharts.StockChart({
         chart: {
           renderTo: 'container',
@@ -83,24 +114,12 @@
             text: "Temperature (C)"
           }
         },
-        series: [
-          {
-            name: 'Test Chamber Avg Temp',
-            data: preparedData[0]
-          }, {
-            name: 'External Air Temp',
-            data: preparedData[1]
-          }, {
-            name: 'Air 2 Temp',
-            data: preparedData[2]
-          }, {
-            name: 'Air 3 Temp',
-            data: preparedData[3]
-          }, {
-            name: 'Air 4 Temp',
-            data: preparedData[4]
-          }
-        ]
+        series: _.map(seriesNames, function(name, index) {
+          return {
+            name: name,
+            data: preparedData[index]
+          };
+        })
       });
     };
 
@@ -113,7 +132,7 @@
     application = new Application;
     return ($('.series-box')).change(function(event) {
       var index, serie;
-      index = +($(this)).val() - 1;
+      index = application.chamber.series[this.name];
       serie = application.chamber.chart.series[index];
       if (serie.visible) {
         return serie.hide();
