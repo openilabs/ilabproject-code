@@ -88,8 +88,17 @@
             name: 'Test Chamber Avg Temp',
             data: preparedData[0]
           }, {
-            name: "External Air Temp",
+            name: 'External Air Temp',
             data: preparedData[1]
+          }, {
+            name: 'Air 2 Temp',
+            data: preparedData[2]
+          }, {
+            name: 'Air 3 Temp',
+            data: preparedData[3]
+          }, {
+            name: 'Air 4 Temp',
+            data: preparedData[4]
           }
         ]
       });
