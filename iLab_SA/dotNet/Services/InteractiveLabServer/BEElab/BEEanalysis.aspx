@@ -4,8 +4,8 @@
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="../labNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
-<html>
+<!DOCTYPE HTML >
+<html lang="en">
 	<head>
 		<title>Building Energy Efficiency Lab</title> 
 		<!-- 

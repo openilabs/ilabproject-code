@@ -94,7 +94,12 @@ namespace iLabs.LabServer.LabView
                     {
                         theExperiment = expInfo[0];
                     }
-                    processRecords(getRecords(sbProxy, theExperiment.experimentId, new Criterion[] { }));
+                    ExperimentRecord[] profileRecords = getRecords(sbProxy, Convert.ToInt64(hdnExperimentID.Value),
+                      new Criterion[] { new Criterion("Record_Type", "=", "profile") });
+                    ExperimentRecord[] records = getRecords(sbProxy,Convert.ToInt64(hdnExperimentID.Value),
+                       new Criterion[] { new Criterion("Record_Type", "=", "data")});
+                    processProfile(profileRecords);
+                    processRecords(records);
                 }
             }
 		}
@@ -106,9 +111,54 @@ namespace iLabs.LabServer.LabView
         /// <param name="cList"></param>
         protected ExperimentRecord[] getRecords(InteractiveSBProxy sbProxy, long expID, Criterion[] cList)
         {
-            ExperimentRecord[] records = sbProxy.RetrieveExperimentRecords(expID, cList);
-
+            ExperimentRecord[] records = null;
+            records = sbProxy.RetrieveExperimentRecords(expID,cList);
             return records;
+        }
+
+        protected void processProfile(ExperimentRecord[] records)
+        {
+            bool hasProfile = false;
+            StringBuilder buf = new StringBuilder();
+            char[] delim = ",".ToCharArray();
+            if (records.Length > 0)
+            {
+                buf.AppendLine("<script type=\"text/javascript\">");
+                buf.AppendLine(" window.profileData = [");
+                
+                //DateTime epoc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+                // This a simple solution it expects that there will be an even number of values
+                foreach (ExperimentRecord rec in records)
+                {
+                   // TODO: Change to new profile format
+                    string content = rec.contents;
+                    string[] values = content.Split(delim);
+                    int i = 0;
+                    while( i< values.Length){
+                        if(i> 0)
+                            buf.Append(",");
+                        buf.Append("[" + values[i++]);
+                        buf.Append("," + values[i++] + "]");
+                    }
+
+                    if (hasProfile)
+                    {
+                        buf.AppendLine(",");
+                    }
+                    else
+                    {
+                        buf.AppendLine();
+                        hasProfile = true;
+                    }
+                }
+                buf.AppendLine();
+                buf.AppendLine("];");
+                buf.AppendLine("</script>");
+            }
+            
+            //Page.ClientScript.RegisterStartupScript(this.GetType(), "profileData", buf.ToString(), false);
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "profileData", buf.ToString(), false);
         }
 
         protected void processRecords(ExperimentRecord[] records)
@@ -118,17 +168,22 @@ namespace iLabs.LabServer.LabView
             char[] delim = ",".ToCharArray();
             if (records.Length > 0)
             {
-                buf.AppendLine(" window.sampleData = [");
-
+                buf.AppendLine("<script type=\"text/javascript\">");
+                buf.Append(" window.sampleData = [");
+                //int i = 1;
+                DateTime epoc = new DateTime(1970,1,1,0,0,0,DateTimeKind.Utc);
+                //for(int i =0; i < 100;i++){
+                //    ExperimentRecord rec = records[i];
                 foreach(ExperimentRecord rec in records){
                     string content = rec.contents;
-
                     string[] values = content.Split(delim, 5);
                     DateTime tStamp = new DateTime(0L, DateTimeKind.Utc);
-                    tStamp = tStamp.AddYears(Convert.ToInt32(values[1]));
-                    tStamp = tStamp.AddDays(Convert.ToDouble(values[2]));
-                    tStamp = tStamp.AddHours(Convert.ToDouble(values[3].Substring(0,2)));
-                    tStamp = tStamp.AddMinutes(Convert.ToDouble(values[3].Substring(2, 2)));
+                    tStamp = tStamp.AddYears(Convert.ToInt32(values[1]) - 1);
+                    tStamp = tStamp.AddDays(Convert.ToDouble(values[2]) - 1.0);
+                    string hhmm = values[3].PadLeft(4, '0');
+                    tStamp = tStamp.AddHours(Convert.ToDouble(hhmm.Substring(0, 2)));
+                    tStamp = tStamp.AddMinutes(Convert.ToDouble(hhmm.Substring(2, 2)));
+                  
                     if(hasRecords){
                         buf.AppendLine(",");
                     }
@@ -136,12 +191,15 @@ namespace iLabs.LabServer.LabView
                         buf.AppendLine();
                         hasRecords = true;
                     }
-                    buf.Append(tStamp.Ticks + "," + values[4] + "]");
+                    buf.Append("[" + rec.sequenceNum.ToString() + ",'" + DateUtil.ToUtcString(tStamp) + "'," + values[4] + "]");                  
                 }
                 buf.AppendLine();
                 buf.AppendLine("];");
+                 buf.AppendLine("</script>");
             }
-            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "graphData", buf.ToString() , true);
+            //Page.ClientScript.RegisterStartupScript(this.GetType(), "graphData", buf.ToString(), false);
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "graphData", buf.ToString() , false);
+            
         }
 
 		#region Web Form Designer generated code
