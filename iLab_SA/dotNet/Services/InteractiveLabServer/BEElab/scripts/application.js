@@ -23,8 +23,16 @@
       baseSerie = chart.xAxis[0];
       extremes = baseSerie.getExtremes();
       indexes = this.getIndexes(extremes);
-      ($('#data-holder')).text(this.extractData(indexes[0], indexes[1]).toString());
-      return ($('.hidden')).show();
+      ($('input#hdnMin')).val(window.sampleData[indexes[0]][0]);
+      ($('input#hdnMax')).val(window.sampleData[indexes[1]][0]);
+      ($('input#hdnSensors')).val(this.getSelectedSensors());
+      $('#btnDownload').click();
+    };
+
+    Application.prototype.getSelectedSensors = function() {
+      return _.map($(this.chamber.seriesSelector), function(checkbox, index) {
+        return checkbox.value;
+      });
     };
 
     Application.prototype.extractData = function(from, to) {
@@ -176,7 +184,7 @@
               text: '1d'
             }
           ],
-          selected: 0
+          selected: 1
         },
         navigator: {},
         title: {
@@ -230,6 +238,7 @@
 
   jQuery(function($) {
     var app;
+    $('#btnDownload').hide();
     ($('.air-north, .air-south')).prop('checked', true);
     ($('.sensor.air')).addClass('on');
     window.app = app = new Application;
