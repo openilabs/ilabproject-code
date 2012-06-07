@@ -85,6 +85,9 @@ namespace iLabs.LabServer.LabView
                     Logger.WriteLine("BEEanaylsis: " + "AccessDenied missing credentials");
                     Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
                 }
+                Session["opCouponID"] = hdnCoupon.Value;
+                Session["opIssuer"] = hdnIssuer.Value;
+                Session["opPasscode"]= hdnPasscode.Value;
                 Coupon expCoupon = new Coupon(hdnIssuer.Value,  Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
 
                 //Check the database for ticket and coupon, if not found Redeem Ticket from
