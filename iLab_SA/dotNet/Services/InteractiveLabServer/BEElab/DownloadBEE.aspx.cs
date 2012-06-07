@@ -33,6 +33,8 @@ public partial class BEElab_DownloadBEE : System.Web.UI.Page
     int maxRecord = -1;
     string indices = null;
     Coupon opCoupon = null;
+    string fileName = "beeLabData.csv";
+
 
     protected void Page_Load(object sender, EventArgs e)
     {
@@ -82,9 +84,13 @@ public partial class BEElab_DownloadBEE : System.Web.UI.Page
             {
                 if (records.Length > 0)
                 {
-                    Response.ContentType = "application/octet-stream";
+                    
                     //processProfile(profileRecords);
                     StringBuilder buf = processRecords(records, indices);
+                    int bufLen = buf.Length * 2;
+                    Response.AddHeader("Content-Disposition", "attachment; filename=" + fileName);
+                    //Response.AddHeader("Content-Length",bufLen.ToString());
+                    Response.ContentType = "application/octet-stream";
                     Response.Write(buf.ToString());
                     Response.Flush();
                 }
