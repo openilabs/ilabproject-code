@@ -25,7 +25,7 @@ Please see license.txt in top level directory for full license.
             <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
             <![endif]-->
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-		 <script src="http://cdn.jquerytools.org/1.2.7/all/jquery.tools.min.js"></script>
+		<script type="text/javascript" src="http://cdn.jquerytools.org/1.2.7/all/jquery.tools.min.js"></script>
         <script type="text/javascript" src="scripts/vendor/underscore.js"></script>
         <script type="text/javascript" src="scripts/vendor/highstock.js"></script>
         <script type="text/javascript" src="scripts/vendor/exporting.src.js"></script>
@@ -35,6 +35,10 @@ Please see license.txt in top level directory for full license.
 	</head>
 	<body>
 		<form method="post" runat="server">
+		    <asp:HiddenField id="hdnExperimentID" runat="server" />
+			<asp:HiddenField id="hdnMin" runat="server" />
+			<asp:HiddenField id="hdnMax" runat="server" />
+			<asp:HiddenField id="hdnSensors" runat="server" />
 			<a name="top"></a>
 			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server" BannerText="Building Energy Lab"></uc1:banner>
 			<uc1:userNav id="UserNav1" runat="server" ></uc1:userNav>
@@ -47,7 +51,7 @@ Please see license.txt in top level directory for full license.
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
 					    <p><asp:HyperLink id="lnkBackSB" Text="Back to InteractiveSB" runat="server" ></asp:HyperLink></p>
-				<form action="">
+				
 
     <input type="checkbox" class="series-box north-interior" id="cb-north-interior" value="58" name="north-interior"/>
     <label for="cb-north-interior">north-interior</label>
@@ -90,9 +94,6 @@ Please see license.txt in top level directory for full license.
 
     <input type="checkbox" class="series-box air-south" id="cb-air-south" value="42" name="air-south"/>
     <label for="cb-air-south">air-south</label>
-
-  </form>
-
   <div class="select-series">
     <a href='#' rel='#bee-modal'>Select Graphed Sensors</a>
   </div>
@@ -165,7 +166,6 @@ Please see license.txt in top level directory for full license.
 					<br clear="all" />
 				</div><!-- end innerwrapper div -->
 				<div><uc1:footer id="Footer1" runat="server"></uc1:footer></div>
-				<asp:HiddenField ID="hdnExperimentID" runat="server" />
 			</div>
 		</form>
 	</body>

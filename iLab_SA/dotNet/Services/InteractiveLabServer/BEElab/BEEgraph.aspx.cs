@@ -203,10 +203,11 @@ namespace iLabs.LabServer.LabView
         }
         protected void downloadClick(object sender, System.EventArgs e)
         {
-            StringBuilder buf = new StringBuilder("downloadBEE.aspx?expid=" + hdnExperimentID.Value);
-            buf.Append("&min=" + 1000);
-            buf.Append("&max=" + 1200);
-            buf.Append("&index=" + "9,8,4,5,7,6");
+            StringBuilder buf = new StringBuilder("downloadBEE.aspx?expid=");
+            buf.Append(hdnExperimentID.Value);
+            buf.Append("&min=" + hdnMin.Value);
+            buf.Append("&max=" + hdnMax.Value);
+            buf.Append("&index=" + hdnSensors.Value);
             Response.Redirect(buf.ToString(),false);
 
         }
