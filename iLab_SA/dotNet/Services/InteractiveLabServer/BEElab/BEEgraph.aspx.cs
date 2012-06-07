@@ -201,6 +201,15 @@ namespace iLabs.LabServer.LabView
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "graphData", buf.ToString() , false);
             
         }
+        protected void downloadClick(object sender, System.EventArgs e)
+        {
+            StringBuilder buf = new StringBuilder("downloadBEE.aspx?expid=" + hdnExperimentID.Value);
+            buf.Append("&min=" + 1000);
+            buf.Append("&max=" + 1200);
+            buf.Append("&index=" + "9,8,4,5,7,6");
+            Response.Redirect(buf.ToString(),false);
+
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)
