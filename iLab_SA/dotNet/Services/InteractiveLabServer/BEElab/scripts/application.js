@@ -17,16 +17,23 @@
       return this.chamber.addSerie(name, index);
     };
 
-    Application.prototype.exportData = function() {
+    Application.prototype.exportData = function(select_all) {
       var baseSerie, chart, extremes, indexes;
+      if (select_all == null) {
+        select_all = true;
+      }
       chart = this.chamber.chart;
       baseSerie = chart.xAxis[0];
       extremes = baseSerie.getExtremes();
       indexes = this.getIndexes(extremes);
       ($('input#hdnMin')).val(window.sampleData[indexes[0]][0]);
       ($('input#hdnMax')).val(window.sampleData[indexes[1]][0]);
-      ($('input#hdnSensors')).val(this.getSelectedSensors());
-      $('#btnDownload').click();
+      if (select_all) {
+        ($('input#hdnSensors')).val("");
+      } else {
+        ($('input#hdnSensors')).val(this.getSelectedSensors(select_all));
+      }
+      return $('#btnDownload').click();
     };
 
     Application.prototype.getSelectedSensors = function() {
@@ -158,15 +165,29 @@
           defaultSeriesType: 'line',
           zoomType: 'x'
         },
+        lang: {
+          dataExportButton: 'Download CSV data'
+        },
         exporting: {
           filename: "BEE Chart",
           width: 1300,
           buttons: {
             dataExportButton: {
+              _titleKey: 'dataExportButton',
+              menuItems: [
+                {
+                  text: 'Export all sensors',
+                  onclick: function() {
+                    return window.app.exportData();
+                  }
+                }, {
+                  text: 'Export selected sensors',
+                  onclick: function() {
+                    return window.app.exportData(false);
+                  }
+                }
+              ],
               hoverSymbolFill: '#768F3E',
-              onclick: function() {
-                return window.app.exportData();
-              },
               symbol: 'exportIcon',
               align: 'right',
               x: -62
@@ -238,7 +259,6 @@
 
   jQuery(function($) {
     var app;
-    $('#btnDownload').hide();
     ($('.air-north, .air-south')).prop('checked', true);
     ($('.sensor.air')).addClass('on');
     window.app = app = new Application;
@@ -250,6 +270,7 @@
         opacity: 0.3
       }
     });
+    ($('#btnDownload')).hide();
     ($('sensor[title]')).tooltip();
     ($('.series-box')).live('change', function(event) {
       return app.addSerie(this);
