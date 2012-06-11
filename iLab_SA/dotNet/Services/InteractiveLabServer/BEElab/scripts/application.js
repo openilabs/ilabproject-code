@@ -205,7 +205,7 @@
               text: '1d'
             }
           ],
-          selected: 1
+          selected: 0
         },
         navigator: {},
         title: {
