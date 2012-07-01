@@ -1768,7 +1768,7 @@ EnableSession = true)]
                     AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
                     roles = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
                 }
-                if ((roles | ExperimentAccess.READ) == ExperimentAccess.READ)
+                if ((roles & ExperimentAccess.READ) == ExperimentAccess.READ)
                 {
                     records = brokerDB.RetrieveExperimentRecords(experimentID, carray);
                 }
@@ -1789,17 +1789,45 @@ EnableSession = true)]
         public Coupon RequestExperimentAccess(long experimentID)
         {
             Coupon coupon = null;
-            int roles =0;
+            int roles = 0;
             int userID = 0;
             int groupID = 0;
             int clientID = 0;
             if (brokerDB.RedeemSessionInfo(opHeader.coupon, out userID, out groupID, out clientID))
             {
-                    //Check Qualifiers on experiment
-                   roles = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
-                    //if accessable by user create new TicketCollection a ticket for each role
+                //Check Qualifiers on experiment
+                roles = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
+                //if accessable by user create new TicketCollection a ticket for each role
                 // TODO:
-                
+                if (roles != 0)
+                {
+                    ProcessAgentInfo ess = brokerDB.GetExperimentESS(experimentID);
+
+                    coupon = brokerDB.CreateCoupon();
+                    TicketLoadFactory tlc = TicketLoadFactory.Instance();
+                    if ((roles & ExperimentAccess.READ) == ExperimentAccess.READ)
+                    {
+                        string readPL = tlc.RetrieveRecordsPayload(experimentID, ess.webServiceUrl);
+                        // This is only for redirects through the SB, Should add LS or Client direct ticket
+                        brokerDB.CreateTicket(TicketTypes.RETRIEVE_RECORDS, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid,
+                            600L, readPL);
+                    }
+                    if ((roles & ExperimentAccess.WRITE) == ExperimentAccess.WRITE)
+                    {
+                        string storePL = tlc.StoreRecordsPayload(true,experimentID, ess.webServiceUrl);
+                        // This is only for redirects through the SB, Should add LS or Client direct ticket
+                        brokerDB.CreateTicket(TicketTypes.STORE_RECORDS, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid,
+                            6000L, storePL);
+                    }
+                    if ((roles & ExperimentAccess.ADMINISTER) == ExperimentAccess.ADMINISTER)
+                    {
+                        string adminPL = tlc.createAdministerESSPayload();
+                        // This is only for redirects through the SB, Should add LS or Client direct ticket
+                        brokerDB.CreateTicket(TicketTypes.ADMINISTER_EXPERIMENT, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid,
+                            600L, adminPL);
+                    }
+                }
+
             }
             return coupon;
         }
