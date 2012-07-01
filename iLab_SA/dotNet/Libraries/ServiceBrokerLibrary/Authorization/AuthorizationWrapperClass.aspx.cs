@@ -2014,7 +2014,8 @@ namespace iLabs.ServiceBroker.Authorization
             //superUser or owner check
             if (IsSuperuserGroup(groupID) || (loginUserID == userID))
             {
-                haveAccess = 7; // All
+
+                haveAccess = ExperimentAccess.ALL; // All
             }
             else
             {
@@ -2024,11 +2025,15 @@ namespace iLabs.ServiceBroker.Authorization
                 int qualifierID = Authorization.AuthorizationAPI.GetQualifierID((int)experimentID, Qualifier.experimentQualifierTypeID);
                 if (Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.readExperimentFunctionType, qualifierID))
                 {
-                    haveAccess = 1;
+                    haveAccess = ExperimentAccess.READ;
                 }
                 if (Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.writeExperimentFunctionType, qualifierID))
                 {
-                    haveAccess |= 2;
+                    haveAccess |= ExperimentAccess.WRITE;
+                }
+                if (Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.administerGroupFunctionType, qualifierID))
+                {
+                    haveAccess |= ExperimentAccess.ADMINISTER;
                 }
             }
 
