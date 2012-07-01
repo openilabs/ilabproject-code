@@ -22,6 +22,7 @@ namespace iLabs.Proxies.ISB {
     using iLabs.DataTypes;
     using iLabs.DataTypes.BatchTypes;
     using iLabs.DataTypes.ProcessAgentTypes;
+    using iLabs.DataTypes.SchedulingTypes;
     using iLabs.DataTypes.SoapHeaderTypes;
     using iLabs.DataTypes.StorageTypes;
     using iLabs.DataTypes.TicketingTypes;
