@@ -632,15 +632,23 @@ namespace iLabs.ExpStorage
                         case "submitter_name":
                             if(hasFields)
                                 sql.Append(" AND ");
-                            sql.Append(criteria[i].ToSQL());
                             hasFields = true;
+                            sql.Append(criteria[i].ToSQL());
+                            break;
+                        case "sequence_no":
+                            if (hasFields)
+                                sql.Append(" AND ");
+                            hasFields = true;
+                            sql.Append("(" + criteria[i].attribute + " ");
+                            sql.Append(criteria[i].predicate + " ");
+                            sql.Append(criteria[i].value + ")");
                             break;
                         default: // it's an attribute
                             if(hasAttributes)
                             attributes.Append(" AND ");
                             attributes.Append("(attribute_name = '" + criteria[i].attribute + "' ");
                             attributes.Append(" AND attribute_value ");
-                           attributes.Append(criteria[i].predicate);
+                            attributes.Append(criteria[i].predicate);
                             attributes.Append(" '" + criteria[i].value + "')");
                             hasAttributes = true;
                             break;
@@ -740,6 +748,14 @@ namespace iLabs.ExpStorage
                                 sql.Append(" AND ");
                             sql.Append(criteria[i].ToSQL());
                             hasFields = true;
+                            break;
+                        case "sequence_no":
+                            if (hasFields)
+                                sql.Append(" AND ");
+                            hasFields = true;
+                            sql.Append("(" + criteria[i].attribute + " ");
+                            sql.Append(criteria[i].predicate + " ");
+                            sql.Append(criteria[i].value + ")");
                             break;
                         default: // it's an attribute
                             if (hasAttributes)
