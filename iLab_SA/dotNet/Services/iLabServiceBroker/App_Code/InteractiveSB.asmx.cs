@@ -1126,6 +1126,7 @@ namespace iLabs.ServiceBroker.iLabSB
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+        // Return new type - RequestAuthStatus with coupon on succes & status from set of 
         public Coupon RequestAuthorization(string[] types, long duration, string userName, string groupName, string serviceGuid, string clientGuid)
         {
             int status = -1;
