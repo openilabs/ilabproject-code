@@ -544,7 +544,7 @@ namespace iLabs.Scheduling.LabSide
             int infoID = dbManager.ListExperimentInfoIDByExperiment(labServerGuid, clientGuid);
             if (infoID > 0)
             {
-                int[] remaining = LSSSchedulingAPI.RemoveExperimentInfo(new int[] { infoID });
+                int[] remaining = dbManager.RemoveExperimentInfo(new int[] { infoID });
                 if (remaining == null || remaining.Length == 0)
 
                 {
