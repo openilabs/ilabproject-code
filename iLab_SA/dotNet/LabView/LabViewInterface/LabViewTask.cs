@@ -232,7 +232,7 @@ namespace iLabs.LabView.LV82
             // Create the labTask & store in database;
             labTask = dbManager.InsertTask(appInfo.appID, experimentID,
            groupName, startTime, duration,
-           LabTask.eStatus.Scheduled, expTicket.couponId, expTicket.issuerGuid, null);
+           LabTask.eStatus.Scheduled, expTicket.couponId, expTicket.issuerGuid, essService, null);
             if (labTask != null)
             {
                 //Convert the generic LabTask to a LabViewTask
