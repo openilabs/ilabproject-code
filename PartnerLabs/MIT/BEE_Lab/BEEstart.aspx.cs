@@ -1,0 +1,199 @@
+/*
+ * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
+ * Please see license.txt in top level directory for full license.
+ * 
+ * $Id: RunExperiment.aspx.cs 450 2011-09-07 20:33:00Z phbailey $
+ */
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Globalization;
+using System.Text;
+using System.Web;
+using System.Web.SessionState;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.HtmlControls;
+
+
+using iLabs.Core;
+using iLabs.DataTypes;
+using iLabs.DataTypes.ProcessAgentTypes;
+using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.DataTypes.StorageTypes;
+using iLabs.DataTypes.TicketingTypes;
+using iLabs.LabServer.Interactive;
+using iLabs.Proxies.ESS;
+using iLabs.Proxies.ISB;
+using iLabs.Ticketing;
+using iLabs.UtilLib;
+
+
+namespace iLabs.LabServer.BEE
+{
+	/// <summary>
+    /// BEEanalysis is a page presenting the results from a completed BEE lab experiment
+    /// The user will have the option of querying for experiments and selecting one to display
+	/// </summary>
+	public partial class BEEstart : System.Web.UI.Page
+	{
+        protected bool showTime;
+		protected System.Web.UI.WebControls.Label lblCoupon;
+		protected System.Web.UI.WebControls.Label lblTicket;
+		protected System.Web.UI.WebControls.Label lblGroupNameTitle;
+        protected string title = "Building Energy Efficiency iLab";
+
+        int userTZ;
+        int userID = -1;
+        int groupID;
+        long couponID = -1;
+        string passKey = null;
+        string issuerID = null;
+        CultureInfo culture = null;
+
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
+            LabDB dbManager = new LabDB();
+            if (!IsPostBack)
+            {
+                // Query values from the request
+                clearSessionInfo();
+                hdnTask.Value = Request.QueryString["taskid"];
+                hdnCoupon.Value = Request.QueryString["coupon_id"];
+                hdnPasscode.Value = Request.QueryString["passkey"];
+                hdnIssuer.Value = Request.QueryString["issuer_guid"];
+                hdnSbUrl.Value = Request.QueryString["sb_url"];
+                string userName = null;
+                string userIdStr = null;
+
+
+                int tz = 0;
+                if (Session["userTZ"] != null)
+                    tz = Convert.ToInt32(Session["userTZ"]);
+                if (Session["returnURL"] != null)
+                {
+                    String returnURL = (string)Session["returnURL"];
+
+
+                    //// this should be the RedeemSession & Experiment Coupon data
+                    if (!(hdnPasscode.Value != null && hdnPasscode.Value != ""
+                        && hdnCoupon.Value != null && hdnCoupon.Value != ""
+                        && hdnIssuer.Value != null && hdnIssuer.Value != ""))
+                    {
+                        Logger.WriteLine("BEEstart: " + "AccessDenied missing credentials");
+                        Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
+                    }
+                    Session["opCouponID"] = hdnCoupon.Value;
+                    Session["opIssuer"] = hdnIssuer.Value;
+                    Session["opPasscode"] = hdnPasscode.Value;
+                    Coupon expCoupon = new Coupon(hdnIssuer.Value, Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
+
+                    //Check the database for ticket and coupon, if not found Redeem Ticket from
+                    // issuer and store in database.
+                    //This ticket should include group, experiment id and be valid for this moment in time??
+                    Ticket expTicket = dbManager.RetrieveAndVerify(expCoupon, TicketTypes.EXECUTE_EXPERIMENT);
+
+                    if (expTicket != null)
+                    {
+                        if (expTicket.IsExpired())
+                        {
+                            Response.Redirect("AccessDenied.aspx?text=The ExperimentExecution+ticket+has+expired.", true);
+
+                        }
+                        Session["exCoupon"] = expCoupon;
+
+                        ////Parse experiment payload, only get what is needed 	
+                        string payload = expTicket.payload;
+                        XmlQueryDoc expDoc = new XmlQueryDoc(payload);
+                        string expIdStr = expDoc.Query("ExecuteExperimentPayload/experimentID");
+                        hdnExpID.Value = expIdStr;
+                        string tzStr = expDoc.Query("ExecuteExperimentPayload/userTZ");
+                        //string userIdStr = expDoc.Query("ExecuteExperimentPayload/userID");
+                        string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
+                        Session["groupName"] = groupName;
+                        string sbStr = expDoc.Query("ExecuteExperimentPayload/sbGuid");
+                        Session["brokerGUID"] = sbStr;
+
+                        if ((tzStr != null) && (tzStr.Length > 0))
+                        {
+                            Session["userTZ"] = tzStr;
+                        }
+                       
+                    }
+                }
+            }
+        }
+
+        protected void clearSessionInfo()
+        {
+            Session.Remove("opCouponID");
+            Session.Remove("opIssuer");
+            Session.Remove("opPasscode");
+        }
+
+   
+	
+  
+       
+        protected void goButton_Click(object sender, System.EventArgs e)
+        {
+            LabDB labDB = new LabDB();
+          
+            LabTask task = labDB.GetTask(Convert.ToInt64(hdnTask.Value));
+            
+                Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, hdnPasscode.Value);
+                XmlQueryDoc taskDoc = new XmlQueryDoc(task.data);
+                string test = taskDoc.ToXML();
+                //if (taskDoc.Found("task/application"))
+                //{
+                //    taskDoc.Replace("task/application", "BEEgraph.aspx");
+                //}
+                //else
+                //{
+                //    taskDoc.Insert("task", "application", "BEEgraph.aspx");
+                //}
+                string test2 = taskDoc.ToXML();
+                labDB.SetTaskData(task.taskID, taskDoc.ToXML());
+                 ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                        essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                        essProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                        essProxy.Url = task.storage;
+                        essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
+            
+            StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
+            buf.Append(task.experimentID);
+            buf.Append("&coupon_id=" + task.couponID);
+            buf.Append("&passcode=" + hdnPasscode.Value);
+            buf.Append("&issuer_guid=" + task.issuerGUID);
+            if(hdnSbUrl.Value != null)
+                buf.Append("&sb_url=" + hdnSbUrl.Value);
+            Response.Redirect(buf.ToString(), false);
+        }
+        
+
+		#region Web Form Designer generated code
+		override protected void OnInit(EventArgs e)
+		{
+			//
+			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
+			//
+			InitializeComponent();
+			base.OnInit(e);
+		}
+		
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{    
+
+		}
+		#endregion
+	}
+}
