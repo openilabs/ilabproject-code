@@ -137,6 +137,12 @@ public class ChecksumUtil
         }
 
    }
+
+    public static string ToMD5Hash(string input)
+    {
+        byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+        return ComputeMD5(inputBytes);
+    }
    
 }
 
