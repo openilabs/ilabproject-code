@@ -1,6 +1,7 @@
 using System;
 using System.Configuration;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Runtime.InteropServices;
@@ -653,7 +654,7 @@ namespace iLabs.LabServer.Interactive
 		}
 
         public LabTask InsertTask(int app_id, long exp_id, string groupName, DateTime startTime, long duration, LabTask.eStatus status,
-			long coupon_ID,string issuerGuidStr, string data)
+			long coupon_ID,string issuerGuidStr, string storage, string data)
 		{
             LabTask task = new LabTask();
 
@@ -677,7 +678,8 @@ namespace iLabs.LabServer.Interactive
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@status", status,DbType.Int32));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon_ID,DbType.Int64));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", issuerGuidStr, DbType.AnsiString,50));
-			cmd.Parameters.Add(FactoryDB.CreateParameter("@data", data,DbType.String,2048));
+			cmd.Parameters.Add(FactoryDB.CreateParameter("@storage", storage,DbType.String,512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@data", data, DbType.AnsiString, 2048));
 			
             // id of created task
             long itemID = -1;
@@ -708,10 +710,88 @@ namespace iLabs.LabServer.Interactive
             task.Status = status;
             task.couponID = coupon_ID;
             task.issuerGUID = issuerGuidStr;
+            task.storage = storage;
             task.data = data;
             return task;
 		}
 
+        public int UpdateTask(long taskID, int app_id, long exp_id, string groupName, DateTime startTime, long duration, LabTask.eStatus status,
+            long coupon_ID, string issuerGuidStr, string storage, string data)
+        {
+            LabTask task = new LabTask();
+
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("UpdateTask", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@taskid", taskID, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@appid", app_id, DbType.Int32));
+            if (exp_id < 1)
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@expid", null, DbType.Int64));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@expid", exp_id, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", groupName, DbType.String, 256));
+            // This must be in UTC
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", startTime, DbType.DateTime));
+            if (duration > 0)
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", startTime.AddTicks(duration * TimeSpan.TicksPerSecond), DbType.DateTime));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", DateTime.MinValue, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@status", status, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", coupon_ID, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", issuerGuidStr, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@storage", storage, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@data", data, DbType.AnsiString, 2048));
+
+            // id of created task
+            int itemCount = -1;
+
+            try
+            {
+                connection.Open();
+                itemCount = Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            catch (DbException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return itemCount;
+        }
+
+        protected LabTask readTask(DbDataReader dataReader)
+        {
+            LabTask taskInfo = new LabTask();
+            try
+            {
+                taskInfo.taskID = dataReader.GetInt64(0);
+                taskInfo.labAppID = dataReader.GetInt32(1);
+                if (!dataReader.IsDBNull(2))
+                    taskInfo.experimentID = dataReader.GetInt64(2);
+                taskInfo.groupName = dataReader.GetString(3);
+                taskInfo.startTime = dataReader.GetDateTime(4);
+                taskInfo.endTime = dataReader.GetDateTime(5);
+                taskInfo.Status = (LabTask.eStatus)dataReader.GetInt32(6);
+                if (!DBNull.Value.Equals(dataReader.GetValue(7)))
+                    taskInfo.couponID = dataReader.GetInt64(7);
+                if (!DBNull.Value.Equals(dataReader.GetValue(8)))
+                    taskInfo.issuerGUID = dataReader.GetString(8);
+                if (!dataReader.IsDBNull(9))
+                    taskInfo.storage = dataReader.GetString(9);
+                if (!dataReader.IsDBNull(10))
+                    taskInfo.data = dataReader.GetString(10);
+            }
+            catch (Exception e)
+            {
+                taskInfo = null;
+            }
+            return taskInfo;
+        }
 
 
 		public LabTask GetTask(long task_id)
@@ -726,28 +806,15 @@ namespace iLabs.LabServer.Interactive
 			
 			DbDataReader dataReader = null;
             // id of created coupon
-            LabTask taskInfo = new LabTask();
+            LabTask taskInfo = null;
             try
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
 
-                taskInfo.taskID = task_id;
                 while (dataReader.Read())
                 {
-                    taskInfo.labAppID = dataReader.GetInt32(0);
-                    if (!dataReader.IsDBNull(1))
-                        taskInfo.experimentID = dataReader.GetInt64(1);
-                    taskInfo.groupName = dataReader.GetString(2);
-                    taskInfo.startTime = dataReader.GetDateTime(3);
-                    taskInfo.endTime = dataReader.GetDateTime(4);
-                    taskInfo.Status = (LabTask.eStatus)dataReader.GetInt32(5);
-                    if (!DBNull.Value.Equals(dataReader.GetValue(6)))
-                        taskInfo.couponID = dataReader.GetInt64(6);
-                    if (!DBNull.Value.Equals(dataReader.GetValue(7)))
-                        taskInfo.issuerGUID = dataReader.GetString(7);
-                    if (!dataReader.IsDBNull(8))
-                        taskInfo.data = dataReader.GetString(8);
+                    taskInfo = readTask(dataReader);
                 }
             }
             catch (DbException e)
@@ -775,40 +842,26 @@ namespace iLabs.LabServer.Interactive
             cmd.Parameters.Add(FactoryDB.CreateParameter("@sbguid", sbGUID, DbType.AnsiString,50));
                         
             DbDataReader dataReader = null;
+            LabTask taskInfo = null;
             try
             {
                 connection.Open();
                 dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    taskInfo = readTask(dataReader);
+                }
             }
             catch (DbException e)
             {
                 writeEx(e);
                 throw e;
             }
-
-            // id of created coupon
-            LabTask taskInfo = new LabTask();
-            while (dataReader.Read())
+            finally
             {
-                taskInfo.taskID = dataReader.GetInt64(0);
-                taskInfo.labAppID = dataReader.GetInt32(1);
-                if (!dataReader.IsDBNull(2))
-                    taskInfo.experimentID = dataReader.GetInt64(2);
-                taskInfo.groupName = dataReader.GetString(3);
-                taskInfo.startTime = dataReader.GetDateTime(4);
-                taskInfo.endTime = dataReader.GetDateTime(5);
-                taskInfo.Status = (LabTask.eStatus)dataReader.GetInt32(6);
-                if (!DBNull.Value.Equals(dataReader.GetValue(7)))
-                    taskInfo.couponID = dataReader.GetInt64(7);
-                if (!DBNull.Value.Equals(dataReader.GetValue(8)))
-                    taskInfo.issuerGUID = dataReader.GetString(8);
-                if (!dataReader.IsDBNull(9))
-                    taskInfo.data = dataReader.GetString(9);
+                // close the sql connection
+                connection.Close();
             }
-
-            // close the sql connection
-            connection.Close();
-
             return taskInfo;
         }
 
@@ -821,51 +874,33 @@ select taskID,Status
 */
 		public LabTask [] GetActiveTasks()
 		{
+            List<LabTask> list = new List<LabTask>();
 			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			DbCommand cmd = FactoryDB.CreateCommand("GetActiveTasks", connection);
 			cmd.CommandType = CommandType.StoredProcedure;
 
 			DbDataReader dataReader = null;
-			try 
-			{
+            try
+            {
                 connection.Open();
-				dataReader = cmd.ExecuteReader();
-			} 
-			catch (DbException e) 
-			{
-				writeEx(e);
-				throw e;
-			}
-
-			// id of created coupon
-			
-			ArrayList list = new ArrayList();
-			while (dataReader.Read()) 
-			{
-				LabTask taskInfo = new LabTask();
-				taskInfo.taskID = dataReader.GetInt64(0);
-                taskInfo.labAppID = dataReader.GetInt32(1);
-                if (!dataReader.IsDBNull(2))
-				    taskInfo.experimentID = dataReader.GetInt64(2);
-                if (!dataReader.IsDBNull(3))
-				    taskInfo.groupName = dataReader.GetString(3);
-				taskInfo.startTime= dataReader.GetDateTime(4);
-                taskInfo.endTime = dataReader.GetDateTime(5);			
-				taskInfo.Status= (LabTask.eStatus) dataReader.GetInt32(6);
-				if(!DBNull.Value.Equals(dataReader.GetValue(7)))
-				    taskInfo.couponID= dataReader.GetInt64(7);
-				if(!DBNull.Value.Equals(dataReader.GetValue(8)))
-				    taskInfo.issuerGUID= dataReader.GetString(8);
-				if(!dataReader.IsDBNull(9))
-				    taskInfo.data= dataReader.GetString(9);
-				list.Add(taskInfo);
-			}
-
-			// close the sql connection
-			connection.Close();
-			LabTask taskInfoTemp = new LabTask();
-			return  (LabTask[]) list.ToArray(taskInfoTemp.GetType());
+                dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    list.Add(readTask(dataReader));
+                }
+            }
+            catch (DbException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+			return  list.ToArray();
 		}
 
 /*
@@ -877,6 +912,7 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
 */
 		public LabTask [] GetExpiredTasks(DateTime targetTime)
 		{
+            List<LabTask> list = new List<LabTask>();
 			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
 			DbCommand cmd = FactoryDB.CreateCommand("GetExpiredTasks", connection);
@@ -886,44 +922,26 @@ select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data
             cmd.Parameters.Add(FactoryDB.CreateParameter( "@targetTime", targetTime, DbType.DateTime));
 		
 			DbDataReader dataReader = null;
-			try 
-			{
+            try
+            {
                 connection.Open();
-				dataReader = cmd.ExecuteReader();
-			} 
-			catch (DbException e) 
-			{
-				writeEx(e);
-				throw e;
-			}
-
-			// id of created coupon
-			
-			ArrayList list = new ArrayList();
-			while (dataReader.Read()) 
-			{
-				LabTask taskInfo = new LabTask();
-				taskInfo.taskID = dataReader.GetInt64(0);
-				taskInfo.labAppID = dataReader.GetInt32(1);
-                if (!dataReader.IsDBNull(2))
-                taskInfo.experimentID = dataReader.GetInt64(2);
-				taskInfo.groupName = dataReader.GetString(3);
-				taskInfo.startTime= dataReader.GetDateTime(4);
-				taskInfo.endTime= dataReader.GetDateTime(5);
-                taskInfo.Status = (LabTask.eStatus)dataReader.GetInt32(6);
-				if(!DBNull.Value.Equals(dataReader.GetValue(7)))
-				    taskInfo.couponID= dataReader.GetInt64(7);
-				if(!dataReader.IsDBNull(8))
-				    taskInfo.issuerGUID= dataReader.GetString(8);
-				if(!dataReader.IsDBNull(9))
-				    taskInfo.data= dataReader.GetString(9);
-				list.Add(taskInfo);
-			}
-
-			// close the sql connection
-			connection.Close();
-			LabTask taskInfoTemp = new LabTask();
-			return  (LabTask[]) list.ToArray(taskInfoTemp.GetType());
+                dataReader = cmd.ExecuteReader();
+                while (dataReader.Read())
+                {
+                    list.Add(readTask(dataReader));
+                }
+            }
+            catch (DbException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                // close the sql connection
+                connection.Close();
+            }
+			return  list.ToArray();
 		}
 
 		public void SetTaskData(long task_id,string data)

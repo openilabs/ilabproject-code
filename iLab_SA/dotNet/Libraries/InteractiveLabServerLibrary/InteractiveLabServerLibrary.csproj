@@ -62,6 +62,10 @@
       <Project>{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}</Project>
       <Name>InteractiveSBProxy</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\TicketIssuerProxy\TicketIssuerProxy.csproj">
+      <Project>{9A2772DF-71D6-44E1-BAA9-87669A9FA942}</Project>
+      <Name>TicketIssuerProxy</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataTypes\iLabsDataTypes.csproj">
       <Project>{ADDE40F3-E299-400B-A842-15ACD58BBF19}</Project>
       <Name>iLabsDataTypes</Name>
