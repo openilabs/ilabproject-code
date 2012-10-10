@@ -469,7 +469,8 @@ CREATE PROCEDURE GetTask
 @taskid bigint
 
 AS
-select LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,data 
+select Task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,storage,data 
 from task where task_ID = @taskID
 
 GO
@@ -488,7 +489,8 @@ CREATE PROCEDURE GetTaskByExperiment
 @sbguid varchar(50)
 
 AS
-select task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,data 
+select task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,storage,data 
 from task where Experiment_ID = @experimentid AND Issuer_GUID = @sbguid
 
 GO
@@ -511,7 +513,8 @@ CREATE PROCEDURE GetExpiredTasks
 @targetTime datetime
 
 AS
-select task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,data 
+select task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID, storage,data 
 from task where Status BETWEEN 1 and 127 and endTime  < @targetTime
 
 GO
@@ -549,7 +552,8 @@ GO
 CREATE PROCEDURE GetActiveTasks
 
 AS
-select task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,data 
+select task_ID,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,storage, data 
 from task where Status BETWEEN 1 and 127
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -571,13 +575,47 @@ CREATE PROCEDURE InsertTask
 @endTime datetime,
 @issuerGUID varchar (50),
 @groupName varchar (128),
-@data nvarchar (2000)
+@storage nvarchar (512),
+@data varchar (2048)
 
 
 AS
-insert into Task (LabApp_ID,Experiment_ID,Coupon_ID,Status,StartTime,endTime,Issuer_GUID,GroupName,Data) 
- values (@appID,@expID,@couponID,@status,@startTime,@endTime,@issuerGUID,@groupName,@data)
+insert into Task (LabApp_ID, Experiment_ID, Coupon_ID, Status, StartTime, EndTime,
+		Issuer_GUID, GroupName, Storage, Data) 
+ values (@appID,@expID,@couponID,@status,@startTime,@endTime,
+		@issuerGUID, @groupName, @storage, @data)
 select ident_current('Task')
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER ON 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE UpdateTask
+@taskID bigint,
+@appID bigint,
+@expID bigint,
+@couponID bigint,
+@status int,
+@startTime datetime,
+@endTime datetime,
+@issuerGUID varchar (50),
+@groupName varchar (128),
+@storage nvarchar (512),
+@data varchar (2048)
+
+AS
+update Task set LabApp_ID=@appID, Experiment_ID=@expID, Coupon_ID=@couponID, 
+	Status=@status, StartTime=@startTime, EndTime=@endTime,Issuer_GUID=@issuerGUID,
+	GroupName= @groupName, Storage= @storage, Data= @data 
+where task_ID = @taskid
+select @@rowcount
 
 GO
 SET QUOTED_IDENTIFIER OFF 
@@ -594,7 +632,8 @@ CREATE PROCEDURE SelectTask
 @taskid bigint
 
 AS
-select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,Data
+select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,Storage,Data
  	from Task where task_id = @taskid
 
 
@@ -604,7 +643,8 @@ CREATE PROCEDURE SelectTaskByExperiment
 @experimentID bigint
 
 AS
-select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,Data
+select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,Storage,Data
  	from Task where Experiment_ID = @experimentID
 
 
@@ -614,7 +654,8 @@ CREATE PROCEDURE SelectTasks
 
 
 AS
-select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,Data
+select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,Storage,Data
  	from Task
 
 
@@ -634,7 +675,8 @@ CREATE PROCEDURE SelectTasksByStatus
 
 
 AS
-select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,Data
+select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,Storage,Data
  	from Task where Status = @status
 
 
@@ -655,7 +697,8 @@ CREATE PROCEDURE SelectTasksByStatusRange
 
 
 AS
-select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,Status,Coupon_ID,Issuer_GUID,Data
+select Task_id,LabApp_ID,Experiment_ID,GroupName,StartTime,endTime,
+	Status,Coupon_ID,Issuer_GUID,storage Data
  	from Task where Status between @Low AND @high
 
 

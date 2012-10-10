@@ -134,8 +134,8 @@ CREATE TABLE [dbo].[Task] (
 	[StartTime] [datetime] NOT NULL ,
 	[EndTime] [datetime] NOT NULL ,
 	[Issuer_GUID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
-	[Storage] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
-	[Data] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+	[Storage] [nvarchar] (512) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
+	[Data] [varchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 	
 ) ON [PRIMARY]
 GO
