@@ -1055,7 +1055,7 @@ namespace iLabs.ServiceBroker.admin
                     status = 0;
                 }
                 else{
-                    int ussId = Convert.ToInt32(hdnUssID);
+                    int ussId = Convert.ToInt32(hdnUssID.Value);
                     if (ussId > 0)
                     {
                         result = dissociateUSS(ussId, ref message);
