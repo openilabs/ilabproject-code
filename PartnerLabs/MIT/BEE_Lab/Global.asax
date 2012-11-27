@@ -1,1 +1,1 @@
-<%@ Application Inherits="iLabs.LabServer.LabView.Global" Language="C#" %>
+<%@ Application Inherits="iLabs.LabServer.Global" Language="C#" %>
