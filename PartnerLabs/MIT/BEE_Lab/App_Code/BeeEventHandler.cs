@@ -76,7 +76,7 @@ namespace iLabs.LabServer.BEE
             }
             set
             {
-                pusherEvent = value;
+                pusherChannel = value;
             }
         }
       
