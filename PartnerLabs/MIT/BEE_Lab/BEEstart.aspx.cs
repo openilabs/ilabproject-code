@@ -202,7 +202,7 @@ namespace iLabs.LabServer.BEE
             hashtable["profile"] = profile;
             hashtable["totalLoads"] = 4;
             
-            string temp = File.ReadAllText(@"c:\logs\test\basicExperimentTemplate.txt");
+            string temp = File.ReadAllText(@"programs\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
             Server cr1000 = new Server();
 
