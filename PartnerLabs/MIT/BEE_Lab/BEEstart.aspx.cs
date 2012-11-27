@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: RunExperiment.aspx.cs 450 2011-09-07 20:33:00Z phbailey $
+ * $Id$
  */
 
 using System;
@@ -33,6 +33,8 @@ using iLabs.Proxies.ISB;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 using iLabs.LabServer;
+
+using CR1000Connection;
 
 namespace iLabs.LabServer.BEE
 {
@@ -202,9 +204,9 @@ namespace iLabs.LabServer.BEE
             
             string temp = File.ReadAllText(@"c:\logs\test\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
-            CR1000ConnectionAPI cr1000 = new CR1000ConnectionAPI();
+            Server cr1000 = new Server();
 
-            cr1000.sendFile(loggerName,programPath,"");
+            cr1000.sendProgramFile(loggerName,programPath,"");
         }
 
 		#region Web Form Designer generated code
