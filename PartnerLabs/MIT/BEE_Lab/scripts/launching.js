@@ -52,21 +52,3 @@
   })();
 
 }).call(this);
-element, index, _i, _len;
-      if (!b) {
-        return false;
-      }
-      for (index = _i = 0, _len = a.length; _i < _len; index = ++_i) {
-        element = a[index];
-        if (b[index] !== element) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    return LaunchPad;
-
-  })();
-
-}).call(this);
