@@ -1,0 +1,109 @@
+'CR1000 Series Datalogger
+'program author: MIT CECI - NHI
+
+'Dependencies: 
+'   experimentLength => Int for the total hours the experiment will run
+'   profile => String with the profile
+'   totalLoads => The total loads that we will control. Up to 16.
+
+
+Const ExperimentLength = ${experimentLength}$
+Const TotalLoads = ${totalLoads}$
+Const SampleEverySecs = 30
+Const InString = "${profile}$"
+
+' Convert the experiment length to hours. And then divide for the time we are waiting
+' between scans. This way we do not exceed the experiment time limit.
+' We are scanning every 30 seconds    
+Const MaxScanCount = (ExperimentLength * 60 * 60) INTDV SampleEverySecs
+
+
+Public Channels(${totalLoads}$)
+Public Source(16)
+Public InputLoads(ExperimentLength * (TotalLoads + 1))
+Public DateArray(9)
+Public InitTime As Long
+Public NextTime As Long
+Public CurrentTime As Long
+Public group
+Public StartGroupIndex
+
+Public i, channel ' For loops vars
+
+Sub setUpLoads
+  ' SerialOpen (ComRS232,115200,0,0,10000)
+  ' SerialIn (InString,ComRS232,0,66,1000)
+  ' SerialClose (ComRS232)
+
+  SplitStr (InputLoads(1),InString,",",5 * TotalLoads,0)
+EndSub
+
+'Subroutine turn all the loads off
+Sub turnLoadsOff (Source(16))
+  For i = 1 To 16
+    Source(i) = 0
+  Next
+EndSub
+
+' Map from index to channel number
+Sub setUpChannels
+  Channels(1) = 1
+  Channels(2) = 3
+  Channels(3) = 5
+  Channels(4) = 11
+EndSub
+
+'Main Program
+BeginProg
+  Call setUpChannels
+  Call turnLoadsOff(Source)
+  While 1=1
+    StartGroupIndex = 0
+    group = 0 ' The next index we will look for
+    Call setUpLoads  'We do not need RS232 connection anymore :D!
+
+    Call turnLoadsOff(Source)
+
+    '(1) year
+    '(2) month
+    '(3) day of month
+    '(4) hour of day
+    '(5) minutes
+    '(6) seconds
+    '(7) microseconds
+    '(8) day of week (1-7; Sunday = 1)
+    '(9) day of year.
+    RealTime(DateArray)
+
+    ' hour + minutes + seconds
+    InitTime = DateArray(4) * 60 * 60 + DateArray(5) * 60 + DateArray(6)
+    NextTime     = InitTime + InputLoads(1)
+    
+    For channel = 1 To TotalLoads
+      Source( Channels(channel) ) = InputLoads(StartGroupIndex + channel)
+    Next
+    ' SDMCD16AC (Source,1,0) ' Send loads for the first time
+   
+    Scan(SampleEverySecs, Sec, 1, MaxScanCount)
+      StartGroupIndex = group * (TotalLoads + 1) + 1 ' The last one if the offset for
+      ' each profile group
+      
+      ' For each channel that we are using, setup the source(channel) value to send it
+      ' to the switch and turn the channel on/off.
+      '
+      ' Remember that the profile has the DURATION on the first position.
+      For channel = 1 To TotalLoads
+        Source( Channels(channel) ) = InputLoads(StartGroupIndex + channel)
+      Next
+      ' SDMCD16AC (Source,1,0) ' Send loads
+
+      RealTime(DateArray)
+      CurrentTime  = DateArray(4) * 60 * 60 + DateArray(5) * 60 + DateArray(6)
+
+   	  If CurrentTime >= NextTime
+   	    group    = (group + 1) MOD ExperimentLength
+   	    NextTime = NextTime + InputLoads(StartGroupIndex)
+   	  EndIf
+    NextScan
+  Wend
+EndProg
