@@ -27,7 +27,7 @@ using iLabs.Web;
 
 
 
-namespace iLabs.LabServer.LabView
+namespace iLabs.LabServer
 {
 
 
