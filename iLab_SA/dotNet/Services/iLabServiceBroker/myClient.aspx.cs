@@ -685,7 +685,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         url.Append('?');
                     else
                         url.Append('&');
-                    url.Append("&sb_url=");
+                    url.Append("sb_url=");
                     url.Append(Utilities.ExportUrlPath(Request.Url));
                     string targetURL = iLabParser.Parse(url,properties,true);
                     // Now open the lab within the current Window/frame
