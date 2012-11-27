@@ -155,7 +155,7 @@ namespace iLabs.LabServer.Interactive
                    //Stop the application & close ESS sessions
 
                 }
-                Logger.WriteLine("TaskID = " + taskID + " has expired");
+                Logger.WriteLine("TaskID = " + taskID + " is being closed");
                 dbService.SetTaskStatus(taskID, (int)reason);
                 status = eStatus.Closed;
 

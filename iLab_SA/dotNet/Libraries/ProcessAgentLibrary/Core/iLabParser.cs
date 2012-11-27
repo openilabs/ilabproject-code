@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Text;
 
@@ -11,12 +12,25 @@ using iLabs.DataTypes.TicketingTypes;
 namespace iLabs.Core
 {
     // ${token}
-    public  class iLabParser{
-    
-        public iLabParser()
+    public  static class iLabParser
+    {
+        private static string endToken = "}$";
+
+        static iLabParser() 
         {
+            if(ConfigurationManager.AppSettings["iLabParserEndToken"] != null)
+                endToken = ConfigurationManager.AppSettings["iLabParserEndToken"];
         }
 
+        public static string GetEndToken()
+        {
+            return endToken;
+        }
+
+        public static void SetEndToken(string token)
+        {
+            endToken = token;
+        }
         public static string Parse(StringBuilder input, Hashtable properties)
         {
             return Parse(input.ToString(), properties, false);
@@ -62,17 +76,17 @@ namespace iLabs.Core
                 {
                     output.Append(input.Substring(offset, idx - offset));
                     offset = idx + 2;
-                    idx = input.IndexOf('}', offset);
+                    idx = input.IndexOf(endToken, offset);
                     if (idx == -1)
                     {
-                        throw new ParserException("Closing bracket not found");
+                        throw new ParserException("Closing token not found");
                     }
                     string key = input.Substring(offset, idx - offset);
                     object value = properties[key];
                     if (value != null)
                     {
                         output.Append(value);
-                        offset = idx + 1;
+                        offset = idx + endToken.Length;
                     }
                     else
                     {
@@ -98,7 +112,7 @@ namespace iLabs.Core
                     loader += "?";
                 else
                     loader += "&";
-                loader += "coupon_id=${op:couponId}";
+                loader += "coupon_id=${op:couponId" + endToken;
             }
             if (loader.IndexOf("passkey=") == -1)
             {
@@ -106,7 +120,7 @@ namespace iLabs.Core
                     loader += "?";
                 else
                     loader += "&";
-                loader += "passkey=${op:passkey}";
+                loader += "passkey=${op:passkey" + endToken;
             }
             if (loader.IndexOf("issuer_guid=") == -1)
             {
@@ -114,7 +128,7 @@ namespace iLabs.Core
                     loader += "?";
                 else
                     loader += "&";
-                loader += "issuer_guid=${op:issuer}";
+                loader += "issuer_guid=${op:issuer" + endToken;
             }
             return loader;
         }

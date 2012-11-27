@@ -100,7 +100,7 @@ namespace iLabs.LabServer.Interactive
                 tasks.Remove(task);
             }
         }
-        public LabTask GetTask(long experimentID)
+        public LabTask GetTask(long experimentID,string issuer)
         {
             LabTask task = null;
             lock (tasks)
@@ -109,8 +109,11 @@ namespace iLabs.LabServer.Interactive
                 {
                     if (t.experimentID == experimentID)
                     {
-                        task = t;
-                        break;
+                        if (t.issuerGUID == issuer)
+                        {
+                            task = t;
+                            break;
+                        }
                     }
                 }
             }

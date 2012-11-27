@@ -2,13 +2,13 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-
+using System.Xml;
 using System.Xml.XPath;
 
 namespace iLabs.UtilLib
 {
 	/// <summary>
-	/// A wrapped XPathDocument.
+	/// A wrapped XmlDocument.
 	/// </summary>
 	public class XmlQueryDoc
 	{
@@ -24,15 +24,13 @@ namespace iLabs.UtilLib
 		}
 
 		public XmlQueryDoc(String input)
-
 		{
 			UTF8Encoding utf8 = new UTF8Encoding();
  			MemoryStream mStream = new MemoryStream(utf8.GetBytes(input),false);
 
 			pathDocument = new XPathDocument(mStream);
+            //pathDocument.Load(mStream);
 			pathNavigator = pathDocument.CreateNavigator();
-
-			
 		}
 
 		// Get all the book prices
@@ -50,7 +48,6 @@ namespace iLabs.UtilLib
 			StringBuilder buf = new StringBuilder();
 			try
 			{
-
 				// Create a node interator to select nodes and move through them (read-only)
 				XPathNodeIterator pathNodeIterator =  pathNavigator.Select (xpathexpr);
 
@@ -58,7 +55,6 @@ namespace iLabs.UtilLib
 				{
 					buf.Append(pathNodeIterator.Current.Value);
 				}
-				
 			}
 			catch (Exception e)
 			{
@@ -77,9 +73,12 @@ namespace iLabs.UtilLib
             bool status = false;
             try
             {
-                // Create a node interator to select nodes and move through them (read-only)
+                // Create a node interator to select nodes, if found set true
                 XPathNodeIterator pathNodeIterator = pathNavigator.Select(xpathexpr);
-                status = true;
+                if (pathNodeIterator != null && pathNodeIterator.Count > 0)
+                {
+                    status = true;
+                }
             }
             catch (XPathException e)
             {
@@ -87,6 +86,52 @@ namespace iLabs.UtilLib
             }
             return status;
         }
+        //public bool Insert(string xpathexpr, string item, string value)
+        //{
+        //    bool status = false;
+        //    try
+        //    {
+        //        // Create a node interator to select nodes and move through them (read-only)
+        //        XPathNodeIterator pathNodeIterator = pathNavigator.Select(xpathexpr);
+        //        if (pathNodeIterator != null && pathNodeIterator.Count > 0)
+        //        {
+                     
+        //            pathNavigator.InsertAfter("<" + item + ">" + value + "</" + item + ">");
+        //             //pathNavigator.AppendChildElement(null,item,null,value);
+        //            //pathNodeIterator.Current.AppendChild( "<" +item + ">" + value + "</" +item + ">");
+        //            //pathNavigator.AppendChild( "<" +item + ">" + value + "</" +i tem + ">");
+                   
+        //            status = true;
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("Exception: {0}", e.ToString());
+        //    }
+        //    return status;
+        //}
+
+        //public bool Replace(string xpathexpr,  string value)
+        //{
+        //    bool status = false;
+        //    try
+        //    {
+        //        // Create a node interator to select nodes and move through them (read-only)
+        //        XPathNodeIterator pathNodeIterator = pathNavigator.Select(xpathexpr);
+        //        if (pathNodeIterator != null && pathNodeIterator.Count > 0)
+        //        {
+        //            pathNavigator.SetValue(value);
+        //            status = true;
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("Exception: {0}", e.ToString());
+        //    }
+        //    return status;
+        //}
+
+
         /// <summary>
         /// Create a node interator to select nodes and move through them (read-only)
         /// </summary>
@@ -161,6 +206,19 @@ namespace iLabs.UtilLib
             }
             return name;
 
+        }
+
+        public string ToXML()
+        {
+            if (pathDocument == null)
+                return null;
+            else{
+                 pathNavigator.MoveToRoot();
+            pathNavigator.MoveToFirstChild();
+            return pathNavigator.OuterXml;
+             
+                //return pathDocument.DocumentElement.OuterXml;
+            }
         }
         
         /// <summary>
