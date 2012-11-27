@@ -81,7 +81,6 @@ namespace iLabs.LabServer.BEE
 
                 }
 
-
                 ////Parse experiment payload, only get what is needed 	
                 string payload = expTicket.payload;
                 XmlQueryDoc expDoc = new XmlQueryDoc(payload);
@@ -118,6 +117,7 @@ namespace iLabs.LabServer.BEE
                 if (status == LabTask.eStatus.NotFound)
                 { 
                     // Check for existing tasks that may be using resources
+                    // For now only close other instances of the lab
                     List<LabTask> curTasks = TaskProcessor.Instance.GetTasks(appInfo.appID);
                     if (curTasks != null && curTasks.Count > 0)
                     {
@@ -126,6 +126,7 @@ namespace iLabs.LabServer.BEE
                             DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(t.taskID);
                             if (dsManager != null)
                             {
+                                // Need to close existing data Sources
                                 TaskProcessor.Instance.Remove(t);
                                 t.Close();
                             }
@@ -196,7 +197,7 @@ namespace iLabs.LabServer.BEE
                 }
                 else
                 { // An existing Experiment
-                    task =  TaskProcessor.Instance.GetTask(expID);
+                    task = TaskProcessor.Instance.GetTask(expID, sbStr);
                     if (task.data != null)
                     {
                         XmlQueryDoc taskDoc = new XmlQueryDoc(task.data);
@@ -208,8 +209,8 @@ namespace iLabs.LabServer.BEE
                     }
                 }
             }
-            if(pageURL != null){
-                StringBuilder buf = new StringBuilder(pageURL + "?taskid=" + task.taskID);
+            if(pageURL != null && pageURL.Length >0){
+                StringBuilder buf = new StringBuilder(pageURL + "?expid=" + expID);
                 buf.Append("&coupon_id=" + coupon_Id);
                 buf.Append("&passkey=" + passkey);
                 buf.Append("&issuer_guid=" + issuerGUID);

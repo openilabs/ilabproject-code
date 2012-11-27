@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Web;
 using System.Web.SessionState;
@@ -19,7 +20,6 @@ using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-
 
 using iLabs.Core;
 using iLabs.DataTypes;
@@ -32,13 +32,12 @@ using iLabs.Proxies.ESS;
 using iLabs.Proxies.ISB;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
-
+using iLabs.LabServer;
 
 namespace iLabs.LabServer.BEE
 {
 	/// <summary>
-    /// BEEanalysis is a page presenting the results from a completed BEE lab experiment
-    /// The user will have the option of querying for experiments and selecting one to display
+    /// BEEstart is a page for creating a load profile for the BEE lab
 	/// </summary>
 	public partial class BEEstart : System.Web.UI.Page
 	{
@@ -63,7 +62,7 @@ namespace iLabs.LabServer.BEE
             {
                 // Query values from the request
                 clearSessionInfo();
-                hdnTask.Value = Request.QueryString["taskid"];
+                //hdnExpId.Value = Request.QueryString["expid"];
                 hdnCoupon.Value = Request.QueryString["coupon_id"];
                 hdnPasscode.Value = Request.QueryString["passkey"];
                 hdnIssuer.Value = Request.QueryString["issuer_guid"];
@@ -78,56 +77,57 @@ namespace iLabs.LabServer.BEE
                 if (Session["returnURL"] != null)
                 {
                     String returnURL = (string)Session["returnURL"];
+                }
 
+                //// this should be the RedeemSession & Experiment Coupon data
+                if (!(hdnPasscode.Value != null && hdnPasscode.Value != ""
+                    && hdnCoupon.Value != null && hdnCoupon.Value != ""
+                    && hdnIssuer.Value != null && hdnIssuer.Value != ""))
+                {
+                    Logger.WriteLine("BEEstart: " + "AccessDenied missing credentials");
+                    Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
+                }
+                Session["opCouponID"] = hdnCoupon.Value;
+                Session["opIssuer"] = hdnIssuer.Value;
+                Session["opPasscode"] = hdnPasscode.Value;
+                Coupon expCoupon = new Coupon(hdnIssuer.Value, Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
 
-                    //// this should be the RedeemSession & Experiment Coupon data
-                    if (!(hdnPasscode.Value != null && hdnPasscode.Value != ""
-                        && hdnCoupon.Value != null && hdnCoupon.Value != ""
-                        && hdnIssuer.Value != null && hdnIssuer.Value != ""))
+                //Check the database for ticket and coupon, if not found Redeem Ticket from
+                // issuer and store in database.
+                //This ticket should include group, experiment id and be valid for this moment in time??
+                Ticket expTicket = dbManager.RetrieveAndVerify(expCoupon, TicketTypes.EXECUTE_EXPERIMENT);
+
+                if (expTicket != null)
+                {
+                    if (expTicket.IsExpired())
                     {
-                        Logger.WriteLine("BEEstart: " + "AccessDenied missing credentials");
-                        Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
+                        Response.Redirect("AccessDenied.aspx?text=The ExperimentExecution+ticket+has+expired.", true);
+
                     }
-                    Session["opCouponID"] = hdnCoupon.Value;
-                    Session["opIssuer"] = hdnIssuer.Value;
-                    Session["opPasscode"] = hdnPasscode.Value;
-                    Coupon expCoupon = new Coupon(hdnIssuer.Value, Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
+                    Session["exCoupon"] = expCoupon;
 
-                    //Check the database for ticket and coupon, if not found Redeem Ticket from
-                    // issuer and store in database.
-                    //This ticket should include group, experiment id and be valid for this moment in time??
-                    Ticket expTicket = dbManager.RetrieveAndVerify(expCoupon, TicketTypes.EXECUTE_EXPERIMENT);
+                    ////Parse experiment payload, only get what is needed 	
+                    string payload = expTicket.payload;
+                    XmlQueryDoc expDoc = new XmlQueryDoc(payload);
+                    string expIdStr = expDoc.Query("ExecuteExperimentPayload/experimentID");
+                    hdnExpID.Value = expIdStr;
+                    string tzStr = expDoc.Query("ExecuteExperimentPayload/userTZ");
+                    //string userIdStr = expDoc.Query("ExecuteExperimentPayload/userID");
+                    string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
+                    Session["groupName"] = groupName;
+                    string sbStr = expDoc.Query("ExecuteExperimentPayload/sbGuid");
+                    Session["brokerGUID"] = sbStr;
 
-                    if (expTicket != null)
+                    if ((tzStr != null) && (tzStr.Length > 0))
                     {
-                        if (expTicket.IsExpired())
-                        {
-                            Response.Redirect("AccessDenied.aspx?text=The ExperimentExecution+ticket+has+expired.", true);
-
-                        }
-                        Session["exCoupon"] = expCoupon;
-
-                        ////Parse experiment payload, only get what is needed 	
-                        string payload = expTicket.payload;
-                        XmlQueryDoc expDoc = new XmlQueryDoc(payload);
-                        string expIdStr = expDoc.Query("ExecuteExperimentPayload/experimentID");
-                        hdnExpID.Value = expIdStr;
-                        string tzStr = expDoc.Query("ExecuteExperimentPayload/userTZ");
-                        //string userIdStr = expDoc.Query("ExecuteExperimentPayload/userID");
-                        string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
-                        Session["groupName"] = groupName;
-                        string sbStr = expDoc.Query("ExecuteExperimentPayload/sbGuid");
-                        Session["brokerGUID"] = sbStr;
-
-                        if ((tzStr != null) && (tzStr.Length > 0))
-                        {
-                            Session["userTZ"] = tzStr;
-                        }
-                       
+                        Session["userTZ"] = tzStr;
                     }
+
                 }
             }
         }
+
+
 
         protected void clearSessionInfo()
         {
@@ -136,45 +136,76 @@ namespace iLabs.LabServer.BEE
             Session.Remove("opPasscode");
         }
 
-   
-	
-  
-       
+
+
+
+
         protected void goButton_Click(object sender, System.EventArgs e)
         {
             LabDB labDB = new LabDB();
-          
-            LabTask task = labDB.GetTask(Convert.ToInt64(hdnTask.Value));
-            
-                Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, hdnPasscode.Value);
-                XmlQueryDoc taskDoc = new XmlQueryDoc(task.data);
-                string test = taskDoc.ToXML();
-                //if (taskDoc.Found("task/application"))
-                //{
-                //    taskDoc.Replace("task/application", "BEEgraph.aspx");
-                //}
-                //else
-                //{
-                //    taskDoc.Insert("task", "application", "BEEgraph.aspx");
-                //}
-                string test2 = taskDoc.ToXML();
-                labDB.SetTaskData(task.taskID, taskDoc.ToXML());
-                 ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                        essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
-                        essProxy.OperationAuthHeaderValue.coupon = opCoupon;
-                        essProxy.Url = task.storage;
-                        essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
-            
-            StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
-            buf.Append(task.experimentID);
-            buf.Append("&coupon_id=" + task.couponID);
-            buf.Append("&passcode=" + hdnPasscode.Value);
-            buf.Append("&issuer_guid=" + task.issuerGUID);
-            if(hdnSbUrl.Value != null)
-                buf.Append("&sb_url=" + hdnSbUrl.Value);
-            Response.Redirect(buf.ToString(), false);
+
+            // Update Task data for graph page. Note XmlQueryDocs are read-only
+            LabTask task = labDB.GetTask(Convert.ToInt64(hdnExpID.Value),hdnIssuer.Value);
+            if (task != null)
+            {
+                if (task.data != null)
+                {
+                    XmlQueryDoc taskDoc = new XmlQueryDoc(task.data);
+                    string appId = taskDoc.Query("task/appId");
+                    string app = taskDoc.Query("task/application");
+                    string revision = taskDoc.Query("task/revision");
+                    string statusName = taskDoc.Query("task/status");
+                    string server = taskDoc.Query("task/server");
+                    string essUrl = taskDoc.Query("task/essUrl");
+                    string portStr = taskDoc.Query("task/serverPort");
+                    string data = LabTask.constructTaskXml(Convert.ToInt64(appId), "BEEgraph.aspx",
+                        revision, statusName, essUrl);
+                    labDB.SetTaskData(task.taskID, data);
+
+                    Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, hdnPasscode.Value);
+                    ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                    essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                    essProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                    essProxy.Url = task.storage;
+                    essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
+
+                    // send The program
+                    sendProfile("ceci_cr1000_test", hdnProfile.Value);
+                    
+                    StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
+                    buf.Append(task.experimentID);
+                    Response.Redirect(buf.ToString(), true);
+                }
+                else
+                {
+                    throw new Exception("No Task data!");
+                }
+            }
+            else
+            {
+                throw new Exception("Task was not found.");
+            }
         }
-        
+        private void sendProfile(string loggerName, string profile)
+        {
+            bool status = false;
+            string outputDirectory =  @"c:\logs\test";
+            string programPath = outputDirectory + @"\" + "program" + hdnExpID.Value + ".CR1";
+            // read the template
+            // parse it & render it & save it to tmp/file
+            // send that file
+
+            Hashtable hashtable = new Hashtable();
+            hashtable["experimentLength"] = "24";
+            hashtable["profile"] = profile;
+            hashtable["totalLoads"] = 4;
+            
+            string temp = File.ReadAllText(@"c:\logs\test\basicExperimentTemplate.txt");
+            File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
+            CR1000ConnectionAPI cr1000 = new CR1000ConnectionAPI();
+
+            cr1000.sendFile(loggerName,programPath,"");
+        }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

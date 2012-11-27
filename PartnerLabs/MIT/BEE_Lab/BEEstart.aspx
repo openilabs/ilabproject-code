@@ -30,7 +30,7 @@ Please see license.txt in top level directory for full license.
 
   <script type="text/javascript" src="scripts/bee_start.js"></script>
   <script type="text/javascript" src="scripts/chart.js"></script>
-  <script type="text/javascript" src="scripts/launching.js"></script>
+  <script type="text/javascript" src="scripts/launching.js?v=565757"></script>
 <style type="text/css">@import url(css/main.css );	</style>	
 	</head>
 	<body>
@@ -101,8 +101,7 @@ Please see license.txt in top level directory for full license.
 				<asp:HiddenField ID="hdnAppkey" runat="server" />
 				<asp:HiddenField ID="hdnSbUrl" runat="server" />
 				<asp:HiddenField ID="hdnExpID" runat="server" />
-				<asp:HiddenField ID="hdnProfile" runat="server" />
-				<asp:HiddenField ID="hdnTask" runat="server" />
+				<asp:HiddenField ID="hdnProfile" runat="server" value="120,0,2,3,6,6,6"/>
 			</div>
 		</form>
 	</body>
