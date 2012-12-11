@@ -26,7 +26,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
 
-namespace iLabs.LabServer.LabView
+namespace iLabs.LabServer
 {
 	/// <summary>
 	/// Summary description for administration.

@@ -89,6 +89,10 @@
       <Project>{9A2772DF-71D6-44E1-BAA9-87669A9FA942}</Project>
       <Name>TicketIssuerProxy</Name>
     </ProjectReference>
+    <ProjectReference Include="..\I_LabVew\I_LabView.csproj">
+      <Project>{30144572-B5C6-4EBD-9AF5-242F7C08D5DB}</Project>
+      <Name>I_LabView</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="ilab.snk" />

@@ -112,7 +112,7 @@ namespace iLabs.LabServer.LabView
             }
             else
             {
-                task =  TaskProcessor.Instance.GetTask(experimentID);
+                task =  TaskProcessor.Instance.GetTask(experimentID,expCoupon.issuerGuid);
             }
             return task;
         }

@@ -19,7 +19,7 @@ using iLabs.Ticketing;
 using iLabs.UtilLib;
 
 using iLabs.LabServer.Interactive;
-using iLabs.LabServer.LabView; 
+//using iLabs.LabServer.LabView; 
 
 namespace iLabs.LabServer.LabView 
 {

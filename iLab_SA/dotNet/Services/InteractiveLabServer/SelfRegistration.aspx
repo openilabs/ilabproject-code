@@ -1,11 +1,11 @@
-<%@ Page language="c#" Inherits="iLabs.LabServer.LabView.SelfRegistration" CodeFile="SelfRegistration.aspx.cs" EnableEventValidation="false" %>
+<%@ Page language="c#" Inherits="iLabs.LabServer.SelfRegistration" CodeFile="SelfRegistration.aspx.cs" EnableEventValidation="false" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register Assembly="iLabControls" Namespace="iLabs.Controls" TagPrefix="iLab" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>selfRegistration</title> 
 		<!-- 
