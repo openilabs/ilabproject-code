@@ -69,6 +69,7 @@ namespace iLabs.LabServer.BEE
                 hdnPasscode.Value = Request.QueryString["passkey"];
                 hdnIssuer.Value = Request.QueryString["issuer_guid"];
                 hdnSbUrl.Value = Request.QueryString["sb_url"];
+                
                 string userName = null;
                 string userIdStr = null;
 
@@ -89,9 +90,7 @@ namespace iLabs.LabServer.BEE
                     Logger.WriteLine("BEEstart: " + "AccessDenied missing credentials");
                     Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
                 }
-                Session["opCouponID"] = hdnCoupon.Value;
-                Session["opIssuer"] = hdnIssuer.Value;
-                Session["opPasscode"] = hdnPasscode.Value;
+               
                 Coupon expCoupon = new Coupon(hdnIssuer.Value, Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
 
                 //Check the database for ticket and coupon, if not found Redeem Ticket from
@@ -176,6 +175,10 @@ namespace iLabs.LabServer.BEE
                     
                     StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
                     buf.Append(task.experimentID);
+                    labDB.SetTaskStatus(task.taskID, (int) LabTask.eStatus.Running);
+                    Session["opCouponID"] = hdnCoupon.Value;
+                    Session["opIssuer"] = hdnIssuer.Value;
+                    Session["opPasscode"] = hdnPasscode.Value;
                     Response.Redirect(buf.ToString(), true);
                 }
                 else
@@ -202,12 +205,22 @@ namespace iLabs.LabServer.BEE
             hashtable["profile"] = profile;
             hashtable["totalLoads"] = 4;
             
-            string temp = File.ReadAllText(@"programs\basicExperimentTemplate.txt");
+            string temp = File.ReadAllText(@"c:\logs\programs\basicExperimentTemplate.txt");
+            //string temp = ReadUrl(@"programs\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
-            Server cr1000 = new Server();
+            Server cr1000 = new Server("hock.mit.edu");
 
-            cr1000.sendProgramFile(loggerName,programPath,"");
+            cr1000.sendProgramFile(loggerName,programPath);
         }
+
+    //    string ReadUrl(string urlStr){
+    //      HttpRequest request = new HttpRequest(null,urlStr,null);
+    //      HttpResponse response = request.GetResponse();
+    //      Stream stream = response.GetResponseStream();
+    //      StreamReader reader = new StreamReader(stream);
+    //      string text = reader.ReadToEnd();
+    //      return text;
+    //    }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

@@ -211,6 +211,9 @@ namespace iLabs.LabServer.BEE
             }
             if(pageURL != null && pageURL.Length >0){
                 StringBuilder buf = new StringBuilder(pageURL + "?expid=" + expID);
+                Session["opCouponID"] = coupon_Id;
+                Session["opPasscode"] = passkey;
+                Session["opIssuer"] = issuerGUID;
                 buf.Append("&coupon_id=" + coupon_Id);
                 buf.Append("&passkey=" + passkey);
                 buf.Append("&issuer_guid=" + issuerGUID);
