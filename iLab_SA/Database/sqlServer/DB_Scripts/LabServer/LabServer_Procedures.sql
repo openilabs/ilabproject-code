@@ -454,8 +454,7 @@ CREATE PROCEDURE GetTaskStatusByExperiment
 @guid varchar(50)
 
 AS
-  declare @status int
-  select @status=status from task where Experiment_ID = @id AND issuer_GUID = @guid
+  select status from task where Experiment_ID = @id AND issuer_GUID = @guid
 
 GO
 
