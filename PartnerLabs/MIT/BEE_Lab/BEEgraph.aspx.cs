@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.SessionState;
@@ -173,8 +174,49 @@ namespace iLabs.LabServer.BEE
             //Page.ClientScript.RegisterStartupScript(this.GetType(), "profileData", buf.ToString(), false);
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "profileData", buf.ToString(), false);
         }
-
         protected void processRecords(ExperimentRecord[] records)
+        {
+            bool hasRecords = false;
+            StringBuilder buf = new StringBuilder();
+            char[] delim = ",".ToCharArray();
+            buf.AppendLine("<script type=\"text/javascript\">");
+            buf.Append(" window.sampleData = [");
+            if (records.Length > 0)
+            {
+
+                //int i = 1;
+                DateTime epoc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                //for(int i =0; i < 100;i++){
+                //    ExperimentRecord rec = records[i];
+                DateTime tStamp = new DateTime();
+                foreach (ExperimentRecord rec in records)
+                {
+                    if (hasRecords)
+                    {
+                        buf.AppendLine(",");
+                    }
+                    else
+                    {
+                        buf.AppendLine();
+                        hasRecords = true;
+                    }
+                    string content = rec.contents;
+                    string[] values = content.Split(delim, 3);
+                    bool status = DateTime.TryParseExact(values[0], "yyyy-MM-dd HH:mm:ss", null, DateTimeStyles.None,out tStamp);
+                   if(status)
+                       buf.Append("[" + values[1] + ",'" + DateUtil.ToUtcString(tStamp) + "'," + values[2] + "]");
+                   else
+                       buf.Append("[" + values[1] + ",'" + values[0] + "'," + values[2] + "]");
+                }
+            }
+            buf.AppendLine();
+            buf.AppendLine("];");
+            buf.AppendLine("</script>");
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "graphData", buf.ToString(), false);
+
+        }
+
+        protected void processRecordsOrig(ExperimentRecord[] records)
         {
             bool hasRecords = false;
            StringBuilder buf = new StringBuilder();

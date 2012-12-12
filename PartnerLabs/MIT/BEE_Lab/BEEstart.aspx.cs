@@ -149,20 +149,6 @@ namespace iLabs.LabServer.BEE
             LabTask task = labDB.GetTask(Convert.ToInt64(hdnExpID.Value),hdnIssuer.Value);
             if (task != null)
             {
-                if (task.data != null)
-                {
-                    XmlQueryDoc taskDoc = new XmlQueryDoc(task.data);
-                    string appId = taskDoc.Query("task/appId");
-                    string app = taskDoc.Query("task/application");
-                    string revision = taskDoc.Query("task/revision");
-                    string statusName = taskDoc.Query("task/status");
-                    string server = taskDoc.Query("task/server");
-                    string essUrl = taskDoc.Query("task/essUrl");
-                    string portStr = taskDoc.Query("task/serverPort");
-                    string data = LabTask.constructTaskXml(Convert.ToInt64(appId), "BEEgraph.aspx",
-                        revision, statusName, essUrl);
-                    labDB.SetTaskData(task.taskID, data);
-
                     Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, hdnPasscode.Value);
                     ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
                     essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
@@ -171,8 +157,8 @@ namespace iLabs.LabServer.BEE
                     essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
 
                     // send The program
-                    sendProfile("ceci_cr1000_test", hdnProfile.Value);
-                    
+                    sendProfile("CR1000", hdnProfile.Value,"beelab2.mit.edu");
+                    sendFile("CR1000_Test_Chamber","c:\\logs\\programs\\test_chamber.CR1","beelab2.mit.edu");
                     StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
                     buf.Append(task.experimentID);
                     labDB.SetTaskStatus(task.taskID, (int) LabTask.eStatus.Running);
@@ -180,18 +166,20 @@ namespace iLabs.LabServer.BEE
                     Session["opIssuer"] = hdnIssuer.Value;
                     Session["opPasscode"] = hdnPasscode.Value;
                     Response.Redirect(buf.ToString(), true);
-                }
-                else
-                {
-                    throw new Exception("No Task data!");
-                }
+                
             }
             else
             {
                 throw new Exception("Task was not found.");
             }
         }
-        private void sendProfile(string loggerName, string profile)
+
+        private void sendFile(string loggerName, string filePath, string server){
+             Server cr1000 = new Server(server);
+            cr1000.sendProgramFile(loggerName,filePath);
+        }
+
+        private void sendProfile(string loggerName, string profile, string serverName)
         {
             bool status = false;
             string outputDirectory =  @"c:\logs\test";
@@ -208,9 +196,7 @@ namespace iLabs.LabServer.BEE
             string temp = File.ReadAllText(@"c:\logs\programs\basicExperimentTemplate.txt");
             //string temp = ReadUrl(@"programs\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
-            Server cr1000 = new Server("hock.mit.edu");
-
-            cr1000.sendProgramFile(loggerName,programPath);
+            sendFile(loggerName,programPath,serverName);
         }
 
     //    string ReadUrl(string urlStr){
