@@ -1,0 +1,112 @@
+'Program name: C:\Campbellsci\LoggerNet\50TC10XNTG-MAR10.CR1
+'Date written: 4/16/2009
+'Transform Version: 0.5
+'Transform file: C:\Program Files\Campbellsci\LoggerNet\CR10X.TRN Version: 1.1
+'
+'This program was converted from C:\Campbellsci\LoggerNet\50TC10XNTG-MAR10.CSI
+'using Campbell Scientific's Transformer application.
+'
+'CRBasic angle units are in Radians by default.
+'Switch to Degrees as CR10 used Degrees.
+ AngleDegrees
+'
+' Declare array of flags as the CR10 had.
+Public Flag(8) as boolean
+
+'{CR10X}
+'{CR10X}
+'20080105 50TC10X6 add 3rd AM25T (T_3_xx,Tref3)
+'20071211 50TC10X4 hi-res output; separate Tref1,Tref2;
+
+'\\\\\\\\\\\\\\\\\\\\\\\\\ DECLARATIONS /////////////////////////
+
+Public i1
+Public TC_1_1(25)
+Public TC_2_1(25)
+Public TC_3_1(25)
+Public RefTemp1C
+Public RefTemp2C
+Public RefTemp3C
+Public PumpPower
+Public LoadPower
+
+
+
+'\\\\\\\\\\\\\\\\\\\\\\\\ OUTPUT SECTION ////////////////////////
+
+DataTable(Table105,true,-1)
+  OpenInterval       
+  DataInterval(0,2,Sec,10)                   
+  Sample(1, RefTemp1C, FP2)
+  Sample(1, RefTemp2C, FP2)
+  Sample(1, RefTemp3C, FP2)
+  Sample(25, TC_1_1, FP2)
+  Sample(25, TC_2_1, FP2)
+  Sample(25, TC_3_1, FP2)
+  Average(1, PumpPower, FP2, 0)
+  Average(1, LoadPower, FP2, 0)
+EndTable
+
+'\\\\\\\\\\\\\\\\\\\\\\\\\ SUBROUTINES //////////////////////////
+
+
+'\\\\\\\\\\\\\\\\\\\\\\\\\\\ PROGRAM ////////////////////////////
+
+BeginProg
+
+  Scan(2,Sec, 3, 0)
+    'for the first AM25T, control port 1 and 2
+    PortSet(2, 1)              
+    PortSet(1, 0)              
+    PanelTemp(RefTemp1C, 250)
+    PortSet(2, 0)              
+    PortSet(2, 1)              
+     For i1 = 1 To 25              
+      PortSet(1, 1)              
+      PortSet(1, 0)              
+      PortSet(1, 1)              
+      PortSet(1, 0)              
+      TCDiff(TC_1_1(i1),1,mV2_5C,1,TypeT,RefTemp1C,true,0,_60Hz,1,0)
+    Next i1
+    PortSet(2, 0)
+                  
+    'for the second AM25T, control port 3 and 4
+    PortSet(4, 1)                            
+    PortSet(3, 0)              
+    PanelTemp(RefTemp2C, 250)
+    PortSet(4, 0)              
+    PortSet(4, 1)              
+     For i1 = 1 To 25              
+      PortSet(3, 1)              
+      PortSet(3, 0)              
+      PortSet(3, 1)              
+      PortSet(3, 0)              
+      TCDiff(TC_2_1(i1),1,mV2_5C,1,TypeT,RefTemp2C,true,0,_60Hz,1,0)
+    Next i1
+    PortSet(4, 0)              
+    
+    'for the third AM25T, control port 5 and 6
+    PortSet(6, 1)              
+    PortSet(5, 1)              
+    PortSet(5, 0)              
+    PanelTemp(RefTemp3C, 250)
+    PortSet(6, 0)              
+    PortSet(6, 1)              
+     For i1 = 1 To 25              
+      PortSet(5, 1)              
+      PortSet(5, 0)              
+      PortSet(5, 1)              
+      PortSet(5, 0)              
+      TCDiff(TC_3_1(i1),1,mV2_5C,1,TypeT,RefTemp3C,true,0,_60Hz,1,0)
+    Next i1
+    PortSet(6, 0)              
+    PulseCount(PumpPower, 1, 1, 0, 1, 78.03, 0)     
+' 0.867 CT AMPs, 338.2 ohms.  0.025 Wh/pulse/AMP
+    PulseCount(LoadPower, 1, 2, 0, 1, 6, 0)     
+' Load Watts, 0.6 W/Hz-CT-rated amps, 6 W/Hz, 0.0001667 Wh/pulse/Amp
+'WRITE TO FINAL STORAGE
+    CallTable Table105 
+'assign array ID to final storage ID
+'input locations written to final storage
+  NextScan
+EndProg
