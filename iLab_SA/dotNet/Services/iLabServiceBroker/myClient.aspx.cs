@@ -35,6 +35,7 @@ using iLabs.Ticketing;
 //using iLabs.Services;
 using iLabs.DataTypes.SchedulingTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.Proxies.USS;
 
@@ -529,6 +530,15 @@ namespace iLabs.ServiceBroker.iLabSB
                 ProcessAgentInfo labServer = getLabServer(client.clientID,effectiveGroupID);
                 if (labServer != null)
                 {
+                    if (client.IsReentrant)
+                    {
+                        long[] ids = InternalDataDB.RetrieveActiveExperimentIDs(Convert.ToInt32(Session["UserID"]),
+                                       effectiveGroupID, labServer.agentId, lc.clientID);
+                        foreach (long id in ids)
+                        {
+                            InternalDataDB.CloseExperiment(id, StorageStatus.CLOSED_USER);
+                        }
+                    }
                         TicketLoadFactory factory = TicketLoadFactory.Instance();
                         // 1. Create Coupon for ExperimentCollection
                         Coupon coupon = issuer.CreateCoupon();

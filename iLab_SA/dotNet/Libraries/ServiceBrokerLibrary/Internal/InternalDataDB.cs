@@ -615,7 +615,7 @@ namespace iLabs.ServiceBroker.Internal
         }
         /// <summary>
         /// retrieves all Active ExperimentIds for the user, group, client and server. 
-        /// Currently active uses scheduledStartTime and duration, status and closetime are ignored.
+        /// Currently active uses scheduledStartTime and duration, status less than 512, and closetime is null.
         /// </summary>
         /// <param name="userID"></param>
         /// <param name="groupID"

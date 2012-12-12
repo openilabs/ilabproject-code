@@ -888,8 +888,8 @@ namespace iLabs.Core
                     // read payload
                     ticket.payload = dataReader.GetString(8);
                     // read Cancelled
-                    bool cancelled = dataReader.GetBoolean(9);
-                    if (!cancelled)
+                    ticket.isCancelled = dataReader.GetBoolean(9);
+                    //if (! ticket.isCancelled)
                         result = ticket;
                 }
 
