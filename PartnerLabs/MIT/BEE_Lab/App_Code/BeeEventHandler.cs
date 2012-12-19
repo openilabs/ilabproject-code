@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Configuration;
+using System.Globalization;
 using System.IO;
 using System.Web;
 //using System.Web.Mvc;
@@ -39,6 +40,7 @@ namespace iLabs.LabServer.BEE
         protected string pusherID = "27877";
         protected string pusherKey = "b46f3ea8632aaeb34706";
         protected string pusherSS = "8eb0e8fb6087f48b1163";
+        protected char[] delim = ",".ToCharArray();
 
         //
         // TODO: Add constructor logic here
@@ -108,9 +110,13 @@ namespace iLabs.LabServer.BEE
 
                         string[] records = File.ReadAllLines(e.FullPath);
                         using (FileStream inFile = fInfo.Open(FileMode.Truncate)) { }
-
-                        foreach (string record in records)
+                        
+                        foreach (string rec in records)
                         {
+                            string []vals = rec.Split(delim, 2);
+                            DateTime timeStamp = new DateTime(0L, DateTimeKind.Local);
+                            bool status = DateTime.TryParseExact(vals[0].Replace("\"",""), "yyyy-MM-dd HH:mm:ss", null, DateTimeStyles.None,out timeStamp);
+                            string record = "\"" + timeStamp.ToString("o") + "\"," + vals[1];
                             try
                             {
                                 essProxy.AddRecord(experimentID, submitter, recordType, false, record, null);
@@ -123,7 +129,7 @@ namespace iLabs.LabServer.BEE
                             {
                                 string str = @"{'rawData': [" + record + "]}";
                                 ObjectPusherRequest request =
-                                    new ObjectPusherRequest(pusherChannel,pusherEvent,str);
+                                    new ObjectPusherRequest(pusherChannel,"meassurement-added",str);
                                 provider.Trigger(request);
                             }
                             catch (Exception dsEx)

@@ -56,7 +56,7 @@ namespace iLabs.LabServer.BEE
          
             if(Session["userTZ"] != null)
                 tz = Convert.ToInt32(Session["userTZ"]);
-            String returnURL = (string)Session["returnURL"];
+            String returnURL = (string)Session["sbUrl"];
             if ((returnURL != null) && (returnURL.Length > 0))
             {
                 lnkBackSB.NavigateUrl = returnURL;
@@ -78,9 +78,9 @@ namespace iLabs.LabServer.BEE
             {
                 // Query values from the request
                 hdnExperimentID.Value = Request.QueryString["expid"];
-                //if (hdnExperimentID.Value != null && hdnExperimentID.Value.Length > 0)
-                //    hdnChannelID.Value = ChecksumUtil.ToMD5Hash("BEElab" + hdnExperimentID.Value);
-                //else
+                if (hdnExperimentID.Value != null && hdnExperimentID.Value.Length > 0)
+                    hdnChannelID.Value = ChecksumUtil.ToMD5Hash("BEElab" + hdnExperimentID.Value);
+                else
                     hdnChannelID.Value = "experiment-channel";
 
                 InteractiveSBProxy sbProxy = new InteractiveSBProxy();
@@ -200,13 +200,10 @@ namespace iLabs.LabServer.BEE
                         buf.AppendLine();
                         hasRecords = true;
                     }
-                    string content = rec.contents;
-                    string[] values = content.Split(delim, 3);
-                    bool status = DateTime.TryParseExact(values[0], "yyyy-MM-dd HH:mm:ss", null, DateTimeStyles.None,out tStamp);
-                   if(status)
-                       buf.Append("[" + values[1] + ",'" + DateUtil.ToUtcString(tStamp) + "'," + values[2] + "]");
-                   else
-                       buf.Append("[" + values[1] + ",'" + values[0] + "'," + values[2] + "]");
+                    //string content = rec.contents;
+                    //string[] values = content.Split(delim, 3);
+                    //buf.Append("[" + values[0] + "," + values[1] + "," + values[2] + "]");
+                    buf.Append("[" + rec.contents + "]");
                 }
             }
             buf.AppendLine();

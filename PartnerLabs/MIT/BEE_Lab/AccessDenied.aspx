@@ -1,7 +1,7 @@
 <%@ Page language="c#" Inherits="iLabs.LabServer.LabView.AccessDenied" CodeFile="AccessDenied.aspx.cs" %>
 
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
-<%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
+<%@ Register TagPrefix="uc1" TagName="userNav" Src="labNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" > 
 
@@ -34,7 +34,7 @@ Please see license.txt in top level directory for full license.
 					</div>
 					<!-- end pageintro div -->
 					<div id="pagecontent">
-					<p>Too Bad</p>
+					<p>There is a problem with the credientials required to access the requested page.</p>
 					<asp:Label id="lblText" runat="server"></asp:Label>
 					</div>
 					<br clear="all">

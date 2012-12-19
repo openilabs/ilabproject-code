@@ -63,12 +63,12 @@ namespace iLabs.LabServer.BEE
             if (!IsPostBack)
             {
                 // Query values from the request
-                clearSessionInfo();
+                //clearSessionInfo();
                 //hdnExpId.Value = Request.QueryString["expid"];
-                hdnCoupon.Value = Request.QueryString["coupon_id"];
-                hdnPasscode.Value = Request.QueryString["passkey"];
-                hdnIssuer.Value = Request.QueryString["issuer_guid"];
-                hdnSbUrl.Value = Request.QueryString["sb_url"];
+                //hdnCoupon.Value = Request.QueryString["coupon_id"];
+                //hdnPasscode.Value = Request.QueryString["passkey"];
+                //hdnIssuer.Value = Request.QueryString["issuer_guid"];
+                //hdnSbUrl.Value = Request.QueryString["sb_url"];
                 
                 string userName = null;
                 string userIdStr = null;
@@ -77,21 +77,21 @@ namespace iLabs.LabServer.BEE
                 int tz = 0;
                 if (Session["userTZ"] != null)
                     tz = Convert.ToInt32(Session["userTZ"]);
-                if (Session["returnURL"] != null)
+                if (Session["sbUrl"] != null)
                 {
-                    String returnURL = (string)Session["returnURL"];
+                    String returnURL = (string)Session["sbUrl"];
                 }
 
                 //// this should be the RedeemSession & Experiment Coupon data
-                if (!(hdnPasscode.Value != null && hdnPasscode.Value != ""
-                    && hdnCoupon.Value != null && hdnCoupon.Value != ""
-                    && hdnIssuer.Value != null && hdnIssuer.Value != ""))
+                if (!(Session["opPasscode"] != null && Session["opPasscode"] != ""
+                    && Session["opCouponID"] != null && Session["opCouponID"] != ""
+                    && Session["opIssuer"] != null && Session["opIssuer"] != ""))
                 {
                     Logger.WriteLine("BEEstart: " + "AccessDenied missing credentials");
                     Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
                 }
-               
-                Coupon expCoupon = new Coupon(hdnIssuer.Value, Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
+
+                Coupon expCoupon = new Coupon(Session["opIssuer"].ToString(), Convert.ToInt64(Session["opCouponID"]), Session["opPasscode"].ToString());
 
                 //Check the database for ticket and coupon, if not found Redeem Ticket from
                 // issuer and store in database.
@@ -146,27 +146,28 @@ namespace iLabs.LabServer.BEE
             LabDB labDB = new LabDB();
 
             // Update Task data for graph page. Note XmlQueryDocs are read-only
-            LabTask task = labDB.GetTask(Convert.ToInt64(hdnExpID.Value),hdnIssuer.Value);
+            LabTask task = labDB.GetTask(Convert.ToInt64(hdnExpID.Value), Session["opIssuer"].ToString());
             if (task != null)
             {
-                    Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, hdnPasscode.Value);
-                    ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                    essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
-                    essProxy.OperationAuthHeaderValue.coupon = opCoupon;
-                    essProxy.Url = task.storage;
-                    essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
+                Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, Session["opPasscode"].ToString());
+               ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+               essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+               essProxy.OperationAuthHeaderValue.coupon = opCoupon;
+               essProxy.Url = task.storage;
+               essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
 
-                    // send The program
-                    sendProfile("CR1000", hdnProfile.Value,"beelab2.mit.edu");
-                    sendFile("CR1000_Test_Chamber","c:\\logs\\programs\\test_chamber.CR1","beelab2.mit.edu");
-                    StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
-                    buf.Append(task.experimentID);
-                    labDB.SetTaskStatus(task.taskID, (int) LabTask.eStatus.Running);
-                    Session["opCouponID"] = hdnCoupon.Value;
-                    Session["opIssuer"] = hdnIssuer.Value;
-                    Session["opPasscode"] = hdnPasscode.Value;
-                    Response.Redirect(buf.ToString(), true);
-                
+               // send The program
+               sendProfile("CR1000", hdnProfile.Value,"beelab2.mit.edu");
+               sendFile("CR1000_Test_Chamber","c:\\logs\\programs\\test_chamber.CR1","beelab2.mit.edu");
+                StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
+                buf.Append(task.experimentID);
+                task.Status = LabTask.eStatus.Running;
+                TaskProcessor.Instance.Modify(task);
+                labDB.SetTaskStatus(task.taskID, (int) LabTask.eStatus.Running);
+                //Session["opCouponID"] = hdnCoupon.Value;
+                //Session["opIssuer"] = hdnIssuer.Value;
+                //Session["opPasscode"] = hdnPasscode.Value;
+                Response.Redirect(buf.ToString(), true);
             }
             else
             {
@@ -198,15 +199,6 @@ namespace iLabs.LabServer.BEE
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
             sendFile(loggerName,programPath,serverName);
         }
-
-    //    string ReadUrl(string urlStr){
-    //      HttpRequest request = new HttpRequest(null,urlStr,null);
-    //      HttpResponse response = request.GetResponse();
-    //      Stream stream = response.GetResponseStream();
-    //      StreamReader reader = new StreamReader(stream);
-    //      string text = reader.ReadToEnd();
-    //      return text;
-    //    }
 
 		#region Web Form Designer generated code
 		override protected void OnInit(EventArgs e)

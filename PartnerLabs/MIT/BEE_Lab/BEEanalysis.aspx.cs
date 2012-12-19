@@ -67,6 +67,10 @@ namespace iLabs.LabServer.BEE
                 hdnPasscode.Value = Request.QueryString["passkey"];
                 hdnIssuer.Value = Request.QueryString["issuer_guid"];
                 hdnSbUrl.Value = Request.QueryString["sb_url"];
+                if (hdnSbUrl.Value != null && hdnSbUrl.Value.Length > 0)
+                    Session["sbUrl"] = hdnSbUrl.Value;
+                else
+                    Session.Remove("sbUrl");
                 string userName = null;
                 string userIdStr = null;
 
@@ -74,7 +78,6 @@ namespace iLabs.LabServer.BEE
                 int tz = 0;
                 if (Session["userTZ"] != null)
                     tz = Convert.ToInt32(Session["userTZ"]);
-                String returnURL = (string)Session["returnURL"];
                 
 
                 // this should be the RedeemSession & Experiment Coupon data
@@ -85,9 +88,7 @@ namespace iLabs.LabServer.BEE
                     Logger.WriteLine("BEEanaylsis: " + "AccessDenied missing credentials");
                     Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
                 }
-                Session["opCouponID"] = hdnCoupon.Value;
-                Session["opIssuer"] = hdnIssuer.Value;
-                Session["opPasscode"]= hdnPasscode.Value;
+            }
                 Coupon expCoupon = new Coupon(hdnIssuer.Value,  Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
 
                 //Check the database for ticket and coupon, if not found Redeem Ticket from
@@ -139,7 +140,6 @@ namespace iLabs.LabServer.BEE
                         listSummaries(expSum);
                     }
                 }
-            }
         }
 
         protected void clearSessionInfo()
@@ -196,7 +196,6 @@ namespace iLabs.LabServer.BEE
 		
 		protected void btnGo_Click(object sender, System.EventArgs e)
 		{
-            clearSessionInfo();
 			clearExperimentDisplay();
             List<Criterion> cList = new List<Criterion>();
             LabDB dbManager = new LabDB();

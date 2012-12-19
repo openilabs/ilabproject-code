@@ -2,7 +2,7 @@
   var Application, PusherListener, TestChamber, sensor;
 
   window.BEE = {
-    version: '3.0.0.alpha'
+    version: '3.0.2.alpha'
   };
 
   Application = (function() {
@@ -70,7 +70,7 @@
       high = window.sampleData.length - 1;
       while (high >= low) {
         mid = Math.floor((low + high) / 2);
-        time = Date.parse(window.sampleData[mid][1]);
+        time = Date.parse(window.sampleData[mid][0]);
         if (time > timestamp) {
           high = mid - 1;
         } else if (time < timestamp) {
@@ -109,7 +109,7 @@
         var checkbox, date, temp;
         if (serie.name !== "Navigator") {
           checkbox = $("#cb-" + serie.name);
-          date = Date.parse(data[1]);
+          date = Date.parse(data[0]);
           temp = data[parseInt(checkbox.val())];
           return serie.addPoint([date, temp], false);
         }
@@ -120,7 +120,7 @@
 
     TestChamber.prototype.prepareOneSerie = function(index) {
       return _.map(window.sampleData, function(data) {
-        return [Date.parse(data[1]), data[index]];
+        return [Date.parse(data[0]), data[index]];
       });
     };
 
