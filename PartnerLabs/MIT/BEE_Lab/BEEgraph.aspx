@@ -32,7 +32,7 @@ Please see license.txt in top level directory for full license.
   <script type="text/javascript" src="scripts/vendor/highstock.js"></script>
   <script type="text/javascript" src="scripts/vendor/exporting.src.js"></script>
   
-  <script type="text/javascript" src="scripts/reentrant.js?1234567890"></script>
+  <script type="text/javascript" src="scripts/reentrant.js?nocache"></script>
   <script type="text/javascript" src="scripts/chart.js"></script>
   <script type="text/javascript" src="scripts/launching.js"></script>
 
