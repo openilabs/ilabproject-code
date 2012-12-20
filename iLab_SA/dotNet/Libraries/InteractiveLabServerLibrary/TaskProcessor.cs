@@ -36,13 +36,13 @@ namespace iLabs.LabServer.Interactive
         private int waitTime = 10000;
         private int count = 0;
         private bool go = true;
-        private List<LabTask> tasks;
+        private Dictionary<long, LabTask> tasks;
         private Dictionary<long, DataSourceManager> dataManagers = null;
         
 		public TaskProcessor()
 		{
            Logger.WriteLine("TaskProcessor created");
-            tasks = new List<LabTask>();
+            tasks = new Dictionary<long, LabTask>();
             dataManagers = new Dictionary<long, DataSourceManager>();
            
 			//
@@ -90,22 +90,64 @@ namespace iLabs.LabServer.Interactive
         {
             lock (tasks)
             {
-                tasks.Add(task);
+                if (!tasks.ContainsKey(task.taskID))
+                {
+                    tasks.Add(task.taskID,task);
+                }
+                else
+                {
+                    throw new Exception("TaskID already being procesed");
+                }
+            }
+        }
+
+
+        public void Modify(LabTask task)
+        {
+            lock (tasks)
+            {
+                if (tasks.ContainsKey(task.taskID))
+                {
+                    tasks.Remove(task.taskID);
+                    tasks.Add(task.taskID, task);
+                }
+                else
+                {
+                    throw new Exception("Task not found");
+                }
             }
         }
         public void Remove(LabTask task)
         {
             lock (tasks)
             {
-                tasks.Remove(task);
+                if (tasks.ContainsKey(task.taskID))
+                {
+                    tasks.Remove(task.taskID);
+                }
+                else
+                {
+                    throw new Exception("Task not found");
+                }
             }
         }
+        public LabTask GetTask(long taskID)
+        {
+            LabTask task = new LabTask();
+            bool status = tasks.TryGetValue(taskID, out task);
+            if (status)
+                return task;
+            else
+                return null;
+
+        }
+
         public LabTask GetTask(long experimentID,string issuer)
         {
             LabTask task = null;
             lock (tasks)
             {
-                foreach (LabTask t in tasks)
+                foreach (LabTask t in tasks.Values)
                 {
                     if (t.experimentID == experimentID)
                     {
@@ -126,7 +168,7 @@ namespace iLabs.LabServer.Interactive
             List<LabTask> active = new List<LabTask>();
             lock (tasks)
             {
-                foreach (LabTask t in tasks)
+                foreach (LabTask t in tasks.Values)
                 {
                     if (t.labAppID == appID)
                     {
@@ -178,7 +220,7 @@ namespace iLabs.LabServer.Interactive
             long ticksNow = DateTime.UtcNow.Ticks;
             lock (tasks)
             {
-                foreach (LabTask task in tasks)
+                foreach (LabTask task in tasks.Values)
                 {
 
                     if (ticksNow > task.endTime.Ticks )
@@ -219,7 +261,7 @@ namespace iLabs.LabServer.Interactive
                     foreach (LabTask t in toBeRemoved)
                     {
                         t.Expire();
-                        tasks.Remove(t);
+                        tasks.Remove(t.taskID);
                     }
                 }
             }// End tasks lock
