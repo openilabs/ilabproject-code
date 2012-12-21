@@ -18,6 +18,7 @@ using System.Threading;
 
 using iLabs.DataTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
+using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.TicketingTypes;
 
 	/// <summary>
@@ -46,4 +47,16 @@ using iLabs.DataTypes.TicketingTypes;
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
         SoapDocumentMethod(Binding = "I_ILS")]
         public abstract void Alert(string payload);
+
+        /// <summary>
+        /// Used by the ServiceBroker to notify a LabServer that an experiment should be closed and that all data sources should be closed & released.
+        /// </summary>
+        /// <param name="experimentId"></param>
+        /// <param name="reason"></param>
+        /// 
+        /// <returns>an integer which is a StorageStatus value</returns>
+        [WebMethod(Description = "Used by the ServiceBroker to notify a LabServer that an experiment should be closed and that all data sources should be closed & released."),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
+        SoapDocumentMethod(Binding = "I_ILS")]
+        public abstract int CloseExperiment(long experimentId, int reason);
 	}

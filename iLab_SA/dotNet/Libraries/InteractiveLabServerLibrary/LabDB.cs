@@ -16,10 +16,6 @@ using iLabs.UtilLib;
 using iLabs.Proxies.ESS;
 using iLabs.Proxies.ISB;
 
-//using iLabs.LabServer.LabView;
-
-
-
 namespace iLabs.LabServer.Interactive
 {
 	/// <summary>

@@ -25,7 +25,7 @@ using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.Web;
 
-
+using iLabs.LabServer.Interactive;
 
 namespace iLabs.LabServer.LabView
 {
@@ -97,6 +97,61 @@ namespace iLabs.LabServer.LabView
             processAlert(payload);
 
         }
+
+        /// <summary>
+        /// Used by the ServiceBroker to notify a LabServer that an experiment should be closed and that all data sources should be closed & released.
+        /// </summary>
+        /// <param name="experimentId"></param>
+        /// <param name="reason"></param>
+        /// <returns>an integer which is a StorageStatus value</returns>
+        [WebMethod(Description = "Used by the ServiceBroker to notify a LabServer that an experiment should be closed and that all data sources should be closed & released."),
+        SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In),
+        SoapDocumentMethod(Binding = "I_ILS")]
+        public int CloseExperiment(long experimentId, int reason)
+        {
+            int sstatus = StorageStatus.UNKNOWN;
+            LabDB dbManager = new LabDB();
+            if (dbManager.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                LabTask.eStatus estatus = dbManager.ExperimentStatus(experimentId, agentAuthHeader.agentGuid);
+                if(estatus == LabTask.eStatus.Running
+                    || estatus == LabTask.eStatus.Scheduled
+                     || estatus == LabTask.eStatus.Pending
+                     || estatus == LabTask.eStatus.Waiting)
+                {
+                    LabTask task = TaskProcessor.Instance.GetTask(experimentId, agentAuthHeader.agentGuid);
+                    TaskProcessor.Instance.Remove(task);
+                    // close existing data Sources ln task.Close
+                    estatus = task.Close();
+                    switch (estatus)
+                    {
+                        case LabTask.eStatus.Aborted:
+                        case LabTask.eStatus.Closed:
+                        case LabTask.eStatus.Completed:
+                            sstatus = StorageStatus.CLOSED;
+                            break;
+                        case LabTask.eStatus.Expired:
+                            sstatus = StorageStatus.CLOSED_TIMEOUT;
+                            break;
+                        case LabTask.eStatus.Pending:
+                        case LabTask.eStatus.Running:
+                        case LabTask.eStatus.Scheduled:
+                        case LabTask.eStatus.Waiting:
+                            sstatus = StorageStatus.RUNNING;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                sstatus = StorageStatus.ERROR;
+            }
+            return sstatus;
+        }
+
+
         protected void processAlert(string payload)
         {
         }
