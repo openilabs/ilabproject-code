@@ -1488,116 +1488,130 @@ namespace iLabs.ServiceBroker.admin
                                     {
 
                                         ProcessAgentInfo lss = ticketing.GetProcessAgentInfo(lssId);
-                                        if (lss.retired)
+                                        if (lss != null)
                                         {
-                                            message.AppendLine("The LSS: " + lss.agentName + " is retired!<br/>");
+                                            if (lss.retired)
+                                            {
+                                                message.AppendLine("The LSS: " + lss.agentName + " is retired!<br/>");
+                                                return 0;
+                                            }
+                                            LabSchedulingProxy lssProxy = new LabSchedulingProxy();
+                                            lssProxy.Url = lss.webServiceUrl;
+                                            lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                            lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
+                                            lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                           
+                                            // Is this in the domain or cross-domain
+                                            //if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                                           // { 
+                                                lssProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName, labClient.clientGuid, labClient.clientName, labClient.version, labClient.contactEmail);
+                                            //}
+
+                                            // check for existing REVOKE_RESERVATION tickets
+                                            bool needUssRevoke = true;
+                                            bool needLssRevoke = true;
+                                            Coupon ussRevokeCoupon = null;
+                                            Coupon lssRevokeCoupon = null;
+                                            Ticket ussRevoke = null;
+                                            Ticket lssRevoke = null;
+                                            Ticket[] ussRevokeTickets = ticketing.RetrieveIssuedTickets(-1L,
+                                                    TicketTypes.REVOKE_RESERVATION, uss.agentGuid, lss.agentGuid);
+                                            if (ussRevokeTickets != null && ussRevokeTickets.Length > 0)
+                                            {
+                                                ussRevoke = ussRevokeTickets[0];
+                                                needUssRevoke = false;
+                                            }
+
+                                            Ticket[] lssRevokeTickets = ticketing.RetrieveIssuedTickets(-1L,
+                                                    TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid);
+                                            if (lssRevokeTickets != null && lssRevokeTickets.Length > 0)
+                                            {
+                                                lssRevoke = lssRevokeTickets[0];
+                                                needLssRevoke = false;
+                                            }
+
+                                            if (ussRevoke == null && lssRevoke == null)
+                                            {
+                                                ussRevokeCoupon = ticketing.CreateCoupon();
+                                                lssRevokeCoupon = ussRevokeCoupon;
+                                            }
+                                            if (needUssRevoke)
+                                            {
+                                                string ussRevokePayload = factory.createRevokeReservationPayload("LSS");
+                                                if (ussRevokeCoupon == null)
+                                                {
+                                                    ussRevokeCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION,
+                                                        uss.agentGuid, lss.agentGuid, -1L, ussRevokePayload);
+                                                }
+                                                else
+                                                {
+                                                    ticketing.AddTicket(ussRevokeCoupon, TicketTypes.REVOKE_RESERVATION,
+                                                        uss.agentGuid, lss.agentGuid, -1L, ussRevokePayload);
+                                                }
+
+                                                // Is this in the domain or cross-domain
+                                                if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
+                                                { // this domain
+                                                    //Add USS on LSS
+                                                    int ussAdded = lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, ussRevokeCoupon);
+                                                    status = 1;
+                                                }
+                                                else
+                                                {
+                                                    // cross-domain
+                                                    // send consumerInfo to remote SB
+                                                    int remoteSbId = ticketing.GetProcessAgentID(lss.domainGuid);
+                                                    message.AppendLine(RegistrationSupport.RegisterClientUSS(remoteSbId, null, lss.agentId, null, labServer.agentId,
+                                                        ussRevokeCoupon, uss.agentId, null, labClient.clientID));
+                                                }
+                                            }
+                                            UserSchedulingProxy ussProxy = new UserSchedulingProxy();
+                                            ussProxy.Url = uss.webServiceUrl;
+                                            ussProxy.AgentAuthHeaderValue = new AgentAuthHeader();
+                                            ussProxy.AgentAuthHeaderValue.coupon = uss.identOut;
+                                            ussProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
+                                            if (needLssRevoke)
+                                            {
+                                                //ADD LSS on USS
+                                                string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["UserTZ"]));
+                                                string lssRevokePayload = factory.createRevokeReservationPayload("USS");
+                                                if (lssRevokeCoupon == null)
+                                                {
+                                                    lssRevokeCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid, -1L, lssRevokePayload);
+                                                }
+                                                else
+                                                {
+                                                    ticketing.AddTicket(lssRevokeCoupon, TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid, -1L, lssRevokePayload);
+                                                }
+
+                                                int lssAdded = ussProxy.AddLSSInfo(lss.agentGuid, lss.agentName, lss.webServiceUrl, lssRevokeCoupon);
+                                            }
+                                            //Add Experiment Information on USS
+                                            int expInfoAdded = ussProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName,
+                                                labClient.clientGuid, labClient.clientName, labClient.version, labClient.contactEmail, lss.agentGuid);
+
+                                            //Ceate resource Map
+                                            ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.CLIENT, labClientID);
+                                            List<ResourceMappingValue> valuesList = new List<ResourceMappingValue>();
+                                            valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER));
+                                            valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussID));
+                                            valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
+                                                TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION)));
+                                            // Add the mapping to the database & cache
+                                            ResourceMapping newMapping = ticketing.AddResourceMapping(key, valuesList.ToArray());
+
+                                            // add mapping to qualifier list
+                                            int qualifierType = Qualifier.resourceMappingQualifierTypeID;
+                                            string name = ticketing.ResourceMappingToString(newMapping);
+                                            int qualifierID = AuthorizationAPI.AddQualifier(newMapping.MappingID, qualifierType, name, Qualifier.ROOT);
+
+                                            // Group Credentials MOVED TO THE MANAGE LAB GROUPS PAGE
+                                        }
+                                        else
+                                        {
+                                            message.AppendLine("The specified LSS was not found!<br/>");
                                             return 0;
                                         }
-                                        // The REVOKE_RESERVATION ticket
-                                        bool needUssRevoke = true;
-                                        bool needLssRevoke = true;
-                                        Coupon ussRevokeCoupon = null;
-                                        Coupon lssRevokeCoupon = null;
-                                        Ticket ussRevoke = null;
-                                        Ticket lssRevoke = null;
-                                        Ticket[] ussRevokeTickets = ticketing.RetrieveIssuedTickets(-1L,
-                                                TicketTypes.REVOKE_RESERVATION, uss.agentGuid, lss.agentGuid);
-                                        if (ussRevokeTickets != null && ussRevokeTickets.Length > 0){
-                                            ussRevoke = ussRevokeTickets[0];
-                                            needUssRevoke = false;
-                                        }
-
-                                        Ticket[] lssRevokeTickets = ticketing.RetrieveIssuedTickets(-1L,
-                                                TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid);
-                                        if (lssRevokeTickets != null && lssRevokeTickets.Length > 0){
-                                            lssRevoke = lssRevokeTickets[0];
-                                            needLssRevoke = false;
-                                        }
-
-                                        if (ussRevoke == null && lssRevoke == null)
-                                        {
-                                            ussRevokeCoupon = ticketing.CreateCoupon();
-                                            lssRevokeCoupon = ussRevokeCoupon;
-                                        }
-                                        if (needUssRevoke)
-                                        {
-                                            string ussRevokePayload = factory.createRevokeReservationPayload("LSS");
-                                            if (ussRevokeCoupon == null)
-                                            {
-                                                ussRevokeCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION,
-                                                    uss.agentGuid, lss.agentGuid, -1L, ussRevokePayload);
-                                            }
-                                            else
-                                            {
-                                                ticketing.AddTicket(ussRevokeCoupon, TicketTypes.REVOKE_RESERVATION,
-                                                    uss.agentGuid, lss.agentGuid, -1L, ussRevokePayload);
-                                            }
-
-                                            // Is this in the domain or cross-domain
-                                            if (lss.domainGuid.Equals(ProcessAgentDB.ServiceGuid))
-                                            {
-                                                // this domain
-                                                //Add USS on LSS
-
-                                                LabSchedulingProxy lssProxy = new LabSchedulingProxy();
-                                                lssProxy.Url = lss.webServiceUrl;
-                                                lssProxy.AgentAuthHeaderValue = new AgentAuthHeader();
-                                                lssProxy.AgentAuthHeaderValue.coupon = lss.identOut;
-                                                lssProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                                int ussAdded = lssProxy.AddUSSInfo(uss.agentGuid, uss.agentName, uss.webServiceUrl, ussRevokeCoupon);
-                                                lssProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName, labClient.clientGuid, labClient.clientName, labClient.version, labClient.contactEmail);
-                                                status = 1;
-                                            }
-                                            else
-                                            {
-                                                // cross-domain
-                                                // send consumerInfo to remote SB
-                                                int remoteSbId = ticketing.GetProcessAgentID(lss.domainGuid);
-                                                message.AppendLine(RegistrationSupport.RegisterClientUSS(remoteSbId, null, lss.agentId, null, labServer.agentId,
-                                                    ussRevokeCoupon, uss.agentId, null, labClient.clientID));
-                                            }
-                                        }
-                                        UserSchedulingProxy ussProxy = new UserSchedulingProxy();
-                                        ussProxy.Url = uss.webServiceUrl;
-                                        ussProxy.AgentAuthHeaderValue = new AgentAuthHeader();
-                                        ussProxy.AgentAuthHeaderValue.coupon = uss.identOut;
-                                        ussProxy.AgentAuthHeaderValue.agentGuid = ProcessAgentDB.ServiceGuid;
-                                        if (needLssRevoke)
-                                        {
-                                            //ADD LSS on USS
-                                            string ussPayload = factory.createAdministerUSSPayload(Convert.ToInt32(Session["UserTZ"]));
-                                            string lssRevokePayload = factory.createRevokeReservationPayload("USS");
-                                            if (lssRevokeCoupon == null)
-                                            {
-                                                lssRevokeCoupon = ticketing.CreateTicket(TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid, -1L, lssRevokePayload);
-                                            }
-                                            else
-                                            {
-                                                ticketing.AddTicket(lssRevokeCoupon, TicketTypes.REVOKE_RESERVATION, lss.agentGuid, uss.agentGuid, -1L, lssRevokePayload);
-                                            }
-                                           
-                                            int lssAdded = ussProxy.AddLSSInfo(lss.agentGuid, lss.agentName, lss.webServiceUrl, lssRevokeCoupon);
-                                        }
-                                        //Add Experiment Information on USS
-                                        int expInfoAdded = ussProxy.AddExperimentInfo(labServer.agentGuid, labServer.agentName,
-                                            labClient.clientGuid, labClient.clientName, labClient.version, labClient.contactEmail, lss.agentGuid);
-
-                                        //Ceate resource Map
-                                        ResourceMappingKey key = new ResourceMappingKey(ResourceMappingTypes.CLIENT, labClientID);
-                                        List<ResourceMappingValue> valuesList = new List<ResourceMappingValue>();
-                                        valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.RESOURCE_TYPE, ProcessAgentType.SCHEDULING_SERVER));
-                                        valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.PROCESS_AGENT, ussID));
-                                        valuesList.Add(new ResourceMappingValue(ResourceMappingTypes.TICKET_TYPE,
-                                            TicketTypes.GetTicketType(TicketTypes.SCHEDULE_SESSION)));
-                                        // Add the mapping to the database & cache
-                                        ResourceMapping newMapping = ticketing.AddResourceMapping(key, valuesList.ToArray());
-
-                                        // add mapping to qualifier list
-                                        int qualifierType = Qualifier.resourceMappingQualifierTypeID;
-                                        string name = ticketing.ResourceMappingToString(newMapping);
-                                        int qualifierID = AuthorizationAPI.AddQualifier(newMapping.MappingID, qualifierType, name, Qualifier.ROOT);
-
-                                        // Group Credentials MOVED TO THE MANAGE LAB GROUPS PAGE
                                     }
                                     else
                                     {

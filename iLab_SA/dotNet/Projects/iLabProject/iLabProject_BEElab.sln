@@ -287,6 +287,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InteractiveLSProxy", "..\..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLab_WSDL/", "http://localhost/iLab_WSDL", "{74153503-B389-4A78-AE2D-2AE4F3904E3F}"
+	ProjectSection(WebsiteProperties) = preProject
+		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;"
+		Debug.AspNetCompiler.VirtualPath = "/iLab_WSDL"
+		Debug.AspNetCompiler.PhysicalPath = "..\..\..\iLab_WSDL\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\iLab_WSDL\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/iLab_WSDL"
+		Release.AspNetCompiler.PhysicalPath = "..\..\..\iLab_WSDL\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\iLab_WSDL\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "..\..\..\iLab_WSDL\"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|.NET = Debug|.NET
@@ -611,6 +631,18 @@ Global
 		{4EEA84C9-137C-4D50-B0A2-8C7B1A900716}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{4EEA84C9-137C-4D50-B0A2-8C7B1A900716}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4EEA84C9-137C-4D50-B0A2-8C7B1A900716}.Release|x86.ActiveCfg = Release|Any CPU
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Debug|.NET.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Debug|.NET.Build.0 = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Debug|Any CPU.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Debug|Mixed Platforms.Build.0 = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Debug|x86.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Release|.NET.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Release|.NET.Build.0 = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Release|Any CPU.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Release|Mixed Platforms.Build.0 = Debug|.NET
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F}.Release|x86.ActiveCfg = Debug|.NET
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -642,5 +674,6 @@ Global
 		{B73D2A93-DEFD-425B-AF36-F5C232A43C70} = {FE996D5D-71F9-4FF6-96CA-11AAB91FE1C5}
 		{8C1C390E-1DE1-48CE-8DBC-4CB81D480A2B} = {FE996D5D-71F9-4FF6-96CA-11AAB91FE1C5}
 		{5674F985-C5F4-4608-B979-59AE616052E9} = {FE996D5D-71F9-4FF6-96CA-11AAB91FE1C5}
+		{74153503-B389-4A78-AE2D-2AE4F3904E3F} = {FE996D5D-71F9-4FF6-96CA-11AAB91FE1C5}
 	EndGlobalSection
 EndGlobal

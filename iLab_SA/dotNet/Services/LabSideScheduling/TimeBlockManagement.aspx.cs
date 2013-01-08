@@ -173,20 +173,30 @@ namespace iLabs.Scheduling.LabSide
             lbxPermittedExperiments.Items.Clear();
             lbxSelectExperiment.Items.Clear();
             LSResource[] resources = dbManager.GetLSResources(Session["labServerGuid"].ToString());
-            int[] recurrenceIDs = dbManager.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resources[0].resourceID);
-            Recurrence[] recurs = dbManager.GetRecurrences(recurrenceIDs);
-			//if related recurrence have been found
-			if (recurs.Length > 0)
-			{
-				BuildRecurrenceListBox(recurs);
-			}
-			else //no related recurrence exist
-			{
+            if (resources != null && resources.Length > 0)
+            {
+                int[] recurrenceIDs = dbManager.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resources[0].resourceID);
+                Recurrence[] recurs = dbManager.GetRecurrences(recurrenceIDs);
+                //if related recurrence have been found
+                if (recurs.Length > 0)
+                {
+                    BuildRecurrenceListBox(recurs);
+                }
+                else //no related recurrence exist
+                {
 
-                string msg = "no recurring time blocks assigned to the Lab server " + Session["labServerName"].ToString() + ".";
-				lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
-				lblErrorMessage.Visible=true;
-			}
+                    string msg = "no recurring time blocks assigned to the Lab server " + Session["labServerName"].ToString() + ".";
+                    lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
+                    lblErrorMessage.Visible = true;
+                }
+            }
+            else //no resources exist
+            {
+
+                string msg = "no resources are assigned to LabServer: " + Session["labServerName"].ToString() + ".";
+                lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
+                lblErrorMessage.Visible = true;
+            }
 			
 		}
 		
