@@ -44,7 +44,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Libraries\InteractiveLabServerLibrary\InteractiveLabServerLibrary.csproj">
       <Project>{482C3D3E-9596-4AB0-BD61-E3E427995AC4}</Project>
-      <Name>LabServerLibrary</Name>
+      <Name>InteractiveLabServerLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
