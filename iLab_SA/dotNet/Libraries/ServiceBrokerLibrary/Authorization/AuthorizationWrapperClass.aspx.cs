@@ -529,13 +529,13 @@ namespace iLabs.ServiceBroker.Authorization
 			else
 			{
 				// can only add user to group that you have permission for
-				int associatedGroupID = AdministrativeAPI.GetAssociatedGroupID(Convert.ToInt32(Session["GroupID"]));
-				if (associatedGroupID > 0)
+                int adminGroupID = InternalAdminDB.SelectGroupAdminGroupID(Convert.ToInt32(Session["GroupID"]));
+                if (adminGroupID > 0)
 				{
-					int qID = AuthorizationAPI .GetQualifierID (associatedGroupID, Qualifier .groupQualifierTypeID );
+                    int qID = AuthorizationAPI.GetQualifierID(adminGroupID, Qualifier.groupQualifierTypeID);
 					if ((AuthorizationAPI .CheckAuthorization (loginUserID, Function .administerGroupFunctionType , qID))||(Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function .addMemberFunctionType , qID)))
 					{
-						return AdministrativeAPI .AddUser ( userName,  authID, authenticationTypeID, firstName,  lastName, email,  affiliation, reason,xmlExtension,  associatedGroupID,  lockAccount);
+                        return AdministrativeAPI.AddUser(userName, authID, authenticationTypeID, firstName, lastName, email, affiliation, reason, xmlExtension, adminGroupID, lockAccount);
 					}
 					else
 						throw new AccessDeniedException ("Access denied adding users.");
@@ -649,7 +649,7 @@ namespace iLabs.ServiceBroker.Authorization
 					// get users of the course that you have adminster group privileges for
 
 					//get associated group
-					int mainGroupID = Administration.AdministrativeAPI.GetAssociatedGroupID(groupID);
+					int mainGroupID = InternalAdminDB.SelectGroupAdminGroupID(groupID);
 					
 					if (mainGroupID>0)
 					{
@@ -792,8 +792,8 @@ namespace iLabs.ServiceBroker.Authorization
 			else
 			{
                 int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-				ArrayList removeGroups = new ArrayList();
-				ArrayList notRemoved = new ArrayList();
+				List<int> removeGroups = new List<int>();
+				List<int> notRemoved = new List<int>();
 				// remove groups to one you have permission to administer
 				foreach (int groupID in groupIDs)
 				{
@@ -807,10 +807,10 @@ namespace iLabs.ServiceBroker.Authorization
 				}
 				if (removeGroups.Count>0)
 				{
-					int[] unremovedGroups = Administration.AdministrativeAPI.RemoveGroups(Utilities.ArrayListToIntArray(removeGroups));
+					int[] unremovedGroups = Administration.AdministrativeAPI.RemoveGroups(removeGroups.ToArray());
 					foreach (int g in unremovedGroups)
 						notRemoved.Add(g);
-					return Utilities.ArrayListToIntArray(notRemoved);
+					return notRemoved.ToArray();
 				}
 				else
 					throw new AccessDeniedException ("Access denied removing groups.");
@@ -1451,7 +1451,7 @@ namespace iLabs.ServiceBroker.Authorization
 			{
 				bool haveAccess = false;
 				// special case. give administrator group privilege to add request group grants
-				int mainGroupID = AdministrativeAPI.GetAssociatedGroupID(sessionGroupID);
+                int mainGroupID = InternalAdminDB.SelectGroupAdminGroupID(sessionGroupID);
 				if (mainGroupID >0)
 				{
 					int reqQualID = AuthorizationAPI.GetQualifierID(AdministrativeUtilities.GetGroupRequestGroup(mainGroupID),Qualifier.groupQualifierTypeID);

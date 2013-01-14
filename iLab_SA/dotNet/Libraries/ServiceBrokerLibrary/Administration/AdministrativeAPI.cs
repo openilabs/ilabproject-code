@@ -1672,18 +1672,28 @@ namespace iLabs.ServiceBroker.Administration
         {
             return InternalAdminDB.SelectGroupName(groupID);
         }
+
 		/// <summary>
-		/// Obtains the associated GroupID, given the group ID. A TA Group or Request 
-		/// group is associated with another group which it administers / is the request group of.
+		/// Obtains the associated base GroupID, given the TA Group or Request 
+		/// group ID.
 		/// </summary>
-		/// <param name="groupID">The ID of the group whose associated group ID is to be obtained.</param>
-		/// <returns>The integer ID of the associated group.</returns>
+		/// <param name="groupID">The ID of the group whose associated base group ID is to be obtained.</param>
+		/// <returns>The integer ID of the associated base group.</returns>
 		public static int GetAssociatedGroupID (int groupID)
 		{
 			return InternalAdminDB.SelectAssociatedGroupID(groupID);
 		}
 
-
+        /// <summary>
+        /// Obtains the associated Group IDs, given the base group ID. A TA Group and/or Request 
+        /// group ID is retured for the base group.
+        /// </summary>
+        /// <param name="groupID">The ID of the base group whose associated group TA & Request goup IDs are to be obtained.</param>
+        /// <returns>The integer IDs of the associated TA and/or Request groups.</returns>
+        public static int[] GetAssociatedGroupIDs(int groupID)
+        {
+            return InternalAdminDB.SelectAssociatedGroupIDs(groupID);
+        }
 		///*********************** GROUP MEMBERSHIP **************************///
 
 

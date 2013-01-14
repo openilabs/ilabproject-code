@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="Interop.CsiCoraScriptLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\Interop.CsiCoraScriptLib.dll</HintPath>
+      <HintPath>C:\Campbellsci\LoggerNetSDK\examples\C#.NET\CoraScriptConsole\bin\Release\Interop.CsiCoraScriptLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

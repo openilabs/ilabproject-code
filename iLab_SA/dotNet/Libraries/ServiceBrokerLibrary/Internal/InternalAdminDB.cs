@@ -3127,15 +3127,47 @@ public static int CountScheduledClients(int labServerID){
                 myConnection.Close();
             }
         }
+        /// <summary>
+        /// to get a group's associated ID given groupID
+        /// </summary>
+        public static int SelectAssociatedGroupID(int groupID)
+        {
+            int id = -1;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAssociatedGroupID", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID, DbType.Int32));
+
+            try
+            {
+                myConnection.Open();
+                Object obj = myCommand.ExecuteScalar();
+                if (obj != null)
+                {
+                    id = Convert.ToInt32(obj);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in retrieving associated group id", ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return id;
+        }
 
 
 		/// <summary>
 		/// to get a group's associated ID given groupID
 		/// </summary>
-		public static int SelectAssociatedGroupID(int groupID)
+		public static int[] SelectAssociatedGroupIDs(int groupID)
 		{
+            List<int> ids = new List<int>();
 			DbConnection myConnection = FactoryDB.GetConnection();
-			DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAssociatedGroupID", myConnection);
+			DbCommand myCommand = FactoryDB.CreateCommand("Group_RetrieveAssociatedGroupIDs", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 
 			myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupID,DbType.Int32));
@@ -3143,14 +3175,13 @@ public static int CountScheduledClients(int labServerID){
 			try
 			{
 				myConnection.Open();
-
-				int associatedGroupID = Convert.ToInt32(myCommand.ExecuteScalar());
-
-				//If group record doesn't exist return -1
-				if (associatedGroupID == 0)
-					associatedGroupID=-1;
-
-				return associatedGroupID;
+                DbDataReader myReader = myCommand.ExecuteReader();
+                while (myReader.Read())
+                {
+                    if (!myReader.IsDBNull(0))
+                        ids.Add(myReader.GetInt32(0));
+                }
+				return ids.ToArray();
 			}
 			catch (Exception ex)
 			{

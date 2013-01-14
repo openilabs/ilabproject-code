@@ -34,7 +34,7 @@ namespace iLabs.ServiceBroker.admin
 		protected string actionCmd = "Edit";
 		protected string target;
 		protected List<Group> groupList;
-		protected int associatedGroup = 0;
+		protected int baseGroup = -1;
 
 		AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass ();
 
@@ -53,14 +53,14 @@ namespace iLabs.ServiceBroker.admin
 			// on the popup.
 			hiddenPopupOnSave.Attributes.Add("onpropertychange", Page.GetPostBackEventReference(btnRefresh));
 
-			associatedGroup = wrapper.GetAssociatedGroupIDWrapper(Convert.ToInt32(Session["GroupID"]));
+			baseGroup = wrapper.GetAssociatedGroupIDWrapper(Convert.ToInt32(Session["GroupID"]));
 
 			if(!Page.IsPostBack )			// populate with all the group IDs
 			{
-				refreshGroupRepeater();
 				btnAddGroup.Attributes.Add("onClick","javascript:window.open('addEditGroupPopup.aspx?action=Add','addeditgroup','scrollbars=yes,resizable=yes,width=700,height=600')");
                 btnAddServAdminGroup.Attributes.Add("onClick", "javascript:window.open('addEditServAdminGroupPopup.aspx?action=Add','addeditgroup','scrollbars=yes,resizable=yes,width=700,height=600')");
 			}
+            refreshGroupRepeater();
 		}
 
 		private void refreshGroupRepeater()
@@ -162,7 +162,7 @@ namespace iLabs.ServiceBroker.admin
 				script = "return confirmDelete()";
 				curBtn.Attributes.Add("onClick", script);
 				curBtn.CommandArgument = curGroup.GroupID.ToString();
-				if ((curGroup.groupID == Convert.ToInt32(Session["GroupID"]))||(curGroup.groupID == associatedGroup))
+				if ((curGroup.groupID == Convert.ToInt32(Session["GroupID"]))||(curGroup.groupID == baseGroup))
 				{
 					curBtn.Enabled = false;
 					curBtn.BackColor = Color.Silver;
@@ -174,9 +174,19 @@ namespace iLabs.ServiceBroker.admin
 		{
 				if(e.CommandName.Equals("Remove"))
 				{
-				
+				    List<int> ids = new List<int>();
 					int groupID = Convert.ToInt32(e.CommandArgument);
-					string gname = wrapper.GetGroupsWrapper(new int[] {groupID})[0].groupName;
+                    string gname = AdministrativeAPI.GetGroupName(groupID);
+                    int[] assocIDs = AdministrativeAPI.GetAssociatedGroupIDs(groupID);
+                    if (assocIDs != null)
+                    {
+                        foreach (int id in assocIDs)
+                        {
+                            ids.Add(id);
+                        }
+                    }
+                    ids.Add(groupID);
+                    wrapper.RemoveGroupsWrapper(ids.ToArray());
 					//first remove request group
 					int requestGroupID = AdministrativeUtilities.GetGroupRequestGroup(groupID);
 					if (requestGroupID >0)
