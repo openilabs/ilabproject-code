@@ -1,4 +1,4 @@
-<%@ Page language="c#" Inherits="iLabs.ServiceBroker.admin.administerGroups" CodeFile="administerGroups.aspx.cs" %>
+<%@ Page language="c#" Inherits="iLabs.ServiceBroker.admin.administerGroups" CodeFile="administerGroups.aspx.cs" enableEventValidation="false" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="../banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>

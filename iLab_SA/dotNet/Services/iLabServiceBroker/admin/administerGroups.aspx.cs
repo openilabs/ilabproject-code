@@ -57,10 +57,11 @@ namespace iLabs.ServiceBroker.admin
 
 			if(!Page.IsPostBack )			// populate with all the group IDs
 			{
+                refreshGroupRepeater();
 				btnAddGroup.Attributes.Add("onClick","javascript:window.open('addEditGroupPopup.aspx?action=Add','addeditgroup','scrollbars=yes,resizable=yes,width=700,height=600')");
                 btnAddServAdminGroup.Attributes.Add("onClick", "javascript:window.open('addEditServAdminGroupPopup.aspx?action=Add','addeditgroup','scrollbars=yes,resizable=yes,width=700,height=600')");
 			}
-            refreshGroupRepeater();
+            
 		}
 
 		private void refreshGroupRepeater()
@@ -87,7 +88,7 @@ namespace iLabs.ServiceBroker.admin
 		}
 		/// <summary>
 		/// This is a hidden HTML button that is "clicked" by an event raised 
-		/// by the closing of the associatedLabServers popup.
+		/// by the closing of the addEditGroup popup.
 		/// It causes the Lab Servers repeater to be refreshed.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -178,34 +179,42 @@ namespace iLabs.ServiceBroker.admin
 					int groupID = Convert.ToInt32(e.CommandArgument);
                     string gname = AdministrativeAPI.GetGroupName(groupID);
                     int[] assocIDs = AdministrativeAPI.GetAssociatedGroupIDs(groupID);
-                    if (assocIDs != null)
+                    if (assocIDs != null && assocIDs.Length > 0)
                     {
                         foreach (int id in assocIDs)
                         {
                             ids.Add(id);
                         }
+                        wrapper.RemoveGroupsWrapper(ids.ToArray());
                     }
-                    ids.Add(groupID);
-                    wrapper.RemoveGroupsWrapper(ids.ToArray());
-					//first remove request group
-					int requestGroupID = AdministrativeUtilities.GetGroupRequestGroup(groupID);
-					if (requestGroupID >0)
-					{
-						int[] groups = new int[2];
-						groups[0] = requestGroupID;
-						groups[1] =groupID;
-						wrapper.RemoveGroupsWrapper(groups);
-					}
-					else
-					{
+                    //ids.Add(groupID);
+                    
+                    ////first remove request group
+                    //int requestGroupID = AdministrativeUtilities.GetGroupRequestGroup(groupID);
+                    //if (requestGroupID >0)
+                    //{
+                    //    int[] groups = new int[2];
+                    //    groups[0] = requestGroupID;
+                    //    groups[1] =groupID;
+                    //    wrapper.RemoveGroupsWrapper(groups);
+                    //}
+                    //else
+                    //{
 						int [] groups = new int[1];
 						groups[0] = groupID;
-						wrapper.RemoveGroupsWrapper(groups);
-					}
+					int[] notRemoved =	wrapper.RemoveGroupsWrapper(groups);
+					//}
 
 					refreshGroupRepeater();
-					lblResponse.Text = Utilities.FormatConfirmationMessage("Group '"+gname+"' has successfully been removed.");
-					lblResponse.Visible = true;
+                    if (notRemoved != null && notRemoved.Length > 0)
+                    {
+                        lblResponse.Text = Utilities.FormatWarningMessage("Group '" + gname + "' has not been been removed.");
+                    }
+                    else
+                    {
+                        lblResponse.Text = Utilities.FormatConfirmationMessage("Group '" + gname + "' has successfully been removed.");
+                    }
+                    lblResponse.Visible = true;
 				}
 			}
 }

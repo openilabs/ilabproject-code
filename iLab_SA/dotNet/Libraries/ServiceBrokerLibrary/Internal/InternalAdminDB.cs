@@ -2762,7 +2762,7 @@ public static int CountScheduledClients(int labServerID){
 			 * extremely inefficient and hence this method was chosen
 			 */
 			 
-			ArrayList arrayList = new ArrayList ();
+			List<int> arrayList = new List<int> ();
 
 			try 
 			{
@@ -2785,7 +2785,8 @@ public static int CountScheduledClients(int labServerID){
 					 * 6. The Experiment_Collection qualifier of the group is also deleted from the Qualifiers Table
 					 */
 					myCommand.Parameters["@groupID"].Value = groupID;
-					if(myCommand.ExecuteNonQuery () == 0)
+                    int status = myCommand.ExecuteNonQuery();
+					if(status == 0)
 					{
 						arrayList.Add(groupID);
 					}
@@ -2808,10 +2809,7 @@ public static int CountScheduledClients(int labServerID){
 			AuthCache.QualifierSet  = InternalAuthorizationDB.RetrieveQualifiers ();
 			AuthCache.QualifierHierarchySet = InternalAuthorizationDB.RetrieveQualifierHierarchy ();
 
-			//Converting to int array
-			int[] gIDs = Utilities.ArrayListToIntArray(arrayList);
-				
-			return gIDs;
+            return arrayList.ToArray();
 		}
 
 		/// <summary>
@@ -3448,13 +3446,8 @@ public static int CountScheduledClients(int labServerID){
 				/*	
 				* IMPORTANT ! 
 				* The stored procedure implements the following functionality:
-				* 1. When a user is to be removed from a group, he/she is either
-					- Moved into orphaned users group (if they are part of only 1 group,
-						 from which they're being removed) OR,
-					- Just removed from the group (relationship severed in agent hierarchy table)
-						if they're part of multiple groups
-						
-				* 2. When a subgroup is to be removed from a group it is either,
+					
+				* When a subgroup is to be removed from a group it is either,
 					- Moved to ROOT (if it is part of only one group from which it's being removed).
 						Consequently, the corresponding group qualifier is also moved under the 
 						Qualifier root & the corresponding experiment collection qualifier 

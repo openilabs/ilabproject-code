@@ -45,11 +45,22 @@ namespace iLabs.ServiceBroker.iLabSB
 
 				foreach(Group g in gps)
 				{
-					if (g.groupName.EndsWith("request"))
+					if (g.groupName.EndsWith("request")){
 						requestGroups.Add(g);
-					else 
-						if(!g.groupName.Equals(Group.NEWUSERGROUP))
-						nonRequestGroups.Add(g);	
+                    }
+					else{
+                        if (!g.groupName.Equals(Group.NEWUSERGROUP))
+                        {
+                            if (g.groupName.Equals(Group.SUPERUSER))
+                            {
+                                nonRequestGroups.Insert(0,g);
+                            }
+                            else
+                            {
+                                nonRequestGroups.Add(g);
+                            }
+                        }
+                    }
 				}
 			}
 
