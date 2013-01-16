@@ -143,12 +143,11 @@ namespace iLabs.LabServer.BEE
 
                         if (task != null)
                         {
-                            string filePath = "c:\\Campbellsci\\LoggerNet";
-                            string fileName = "CR1000_TEST_CHAMBER_Table105.dat";
+                            string filePath = ConfigurationManager.AppSettings["chamberOutputFile"];
                             // Stop the controller and flush the data file
 
                             //Flush the File
-                            FileInfo fInfo = new FileInfo(filePath + "\\" + fileName);
+                            FileInfo fInfo = new FileInfo(filePath);
                             using (FileStream inFile = fInfo.Open(FileMode.Truncate)) { }
 
                             string pushChannel = ChecksumUtil.ToMD5Hash("BEElab" + expID);

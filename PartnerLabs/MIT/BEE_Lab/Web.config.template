@@ -42,7 +42,17 @@
     
     <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
     <add key="logPath" value=""/>
-  
+
+    <!-- BEE LAb specific Keys START -->
+    <add key="climateServer" value="beelab2.mit.edu"/>
+    <add key="climateController" value="CR1000"/>
+    <add key="climateTemplate" value="c:\beelab\programs\basicExperimentTemplate.txt"/>
+    <add key="climateProgramDir" value="c:\beelab\programs\temp"/>
+    <add key="chamberServer" value="beelab2.mit.edu"/>
+    <add key="chamberControler" value="CR1000_Test_Chamber"/>
+    <add key="chamberFile" value="c:\beelab\programs\test_chamber.CR1"/>
+    <add key="chamberOutputFile" value="c:\\Campbellsci\\LoggerNet\CR1000_TEST_CHAMBER_Table105.dat"/>
+    <!-- BEE LAb specific Keys END -->
 
   </appSettings>
   <system.diagnostics>

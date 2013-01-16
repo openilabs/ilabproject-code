@@ -8,6 +8,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -157,8 +158,11 @@ namespace iLabs.LabServer.BEE
                essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
 
                // send The program
-               sendProfile("CR1000", hdnProfile.Value,"beelab2.mit.edu");
-               sendFile("CR1000_Test_Chamber","c:\\logs\\programs\\test_chamber.CR1","beelab2.mit.edu");
+               sendProfile(ConfigurationManager.AppSettings["climateController"],
+                   hdnProfile.Value, ConfigurationManager.AppSettings["climateServer"]);
+               sendFile(ConfigurationManager.AppSettings["chamberController"],
+                  ConfigurationManager.AppSettings["chamberFile"], 
+                  ConfigurationManager.AppSettings["chamberServer"]);
                 StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
                 buf.Append(task.experimentID);
                 task.Status = LabTask.eStatus.Running;
@@ -175,16 +179,16 @@ namespace iLabs.LabServer.BEE
             }
         }
 
-        private void sendFile(string loggerName, string filePath, string server){
-             Server cr1000 = new Server(server);
+        private void sendFile(string loggerName, string filePath, string serverName){
+             Server cr1000 = new Server(serverName);
             cr1000.sendProgramFile(loggerName,filePath);
         }
 
         private void sendProfile(string loggerName, string profile, string serverName)
         {
             bool status = false;
-            string outputDirectory =  @"c:\logs\test";
-            string programPath = outputDirectory + @"\" + "program" + hdnExpID.Value + ".CR1";
+            
+            string programPath = ConfigurationManager.AppSettings["climateProgramDir"] + @"\" + "program" + hdnExpID.Value + ".CR1";
             // read the template
             // parse it & render it & save it to tmp/file
             // send that file
@@ -194,7 +198,7 @@ namespace iLabs.LabServer.BEE
             hashtable["profile"] = profile;
             hashtable["totalLoads"] = 4;
             
-            string temp = File.ReadAllText(@"c:\logs\programs\basicExperimentTemplate.txt");
+            string temp = File.ReadAllText(@"");
             //string temp = ReadUrl(@"programs\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
             sendFile(loggerName,programPath,serverName);
