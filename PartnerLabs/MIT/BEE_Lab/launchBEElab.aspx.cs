@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.IO;
@@ -143,7 +144,9 @@ namespace iLabs.LabServer.BEE
 
                         if (task != null)
                         {
-                            string filePath = ConfigurationManager.AppSettings["chamberOutputFile"];
+                            string outputDir = ConfigurationManager.AppSettings["chamberOutputDir"];
+                            string outputFile = ConfigurationManager.AppSettings["chamberOutputFile"];
+                            string filePath = outputDir + @"\" + outputFile;
                             // Stop the controller and flush the data file
 
                             //Flush the File
@@ -157,8 +160,8 @@ namespace iLabs.LabServer.BEE
                             bEvt.PusherChannel = pushChannel;
                             DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(task.taskID);
                             FileDataSource fds = new FileDataSource();
-                            fds.Path = filePath;
-                            fds.Filter = fileName;
+                            fds.Path = outputDir;
+                            fds.Filter = outputFile;
                             fds.AddFileSystemEventHandler(bEvt.OnChanged);
                             dsManager.AddDataSource(fds);
                             fds.Start();

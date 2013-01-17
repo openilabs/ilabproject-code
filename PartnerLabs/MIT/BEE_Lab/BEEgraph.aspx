@@ -51,7 +51,6 @@ Please see license.txt in top level directory for full license.
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1><asp:label id="lblExperimentTitle" Runat="server"><% =title %></asp:label></h1>
-						<h1>Welcome back! Here's your data</h1>
 						<asp:label id="lblDescription" Runat="server"></asp:label>
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
@@ -103,7 +102,7 @@ Please see license.txt in top level directory for full license.
     <a href='#' rel='#bee-modal'>Select Graphed Sensors</a>
   </div>
   <asp:Button ID="btnDownload" runat="server" OnClick="downloadClick"  Text="Download"/>
-  <div id="container">Please wait while we load it. This may take a while.</div>
+  <div id="container"><h3>Please wait while we gather the first data. This may take a while.</h3></div>
 
   <div class="modal" id="bee-modal">
     <div id="bee-room-modal">

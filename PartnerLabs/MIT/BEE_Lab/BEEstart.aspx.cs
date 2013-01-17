@@ -197,8 +197,8 @@ namespace iLabs.LabServer.BEE
             hashtable["experimentLength"] = "24";
             hashtable["profile"] = profile;
             hashtable["totalLoads"] = 4;
-            
-            string temp = File.ReadAllText(@"");
+
+            string temp = File.ReadAllText(ConfigurationManager.AppSettings["climateTemplate"]);
             //string temp = ReadUrl(@"programs\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
             sendFile(loggerName,programPath,serverName);

@@ -51,7 +51,8 @@
     <add key="chamberServer" value="beelab2.mit.edu"/>
     <add key="chamberControler" value="CR1000_Test_Chamber"/>
     <add key="chamberFile" value="c:\beelab\programs\test_chamber.CR1"/>
-    <add key="chamberOutputFile" value="c:\\Campbellsci\\LoggerNet\CR1000_TEST_CHAMBER_Table105.dat"/>
+    <add key="chamberOutputDir" value="c:\\Campbellsci\\LoggerNet"/>
+    <add key="chamberOutputFile" value="CR1000_TEST_CHAMBER_Table105.dat"/>
     <!-- BEE LAb specific Keys END -->
 
   </appSettings>
