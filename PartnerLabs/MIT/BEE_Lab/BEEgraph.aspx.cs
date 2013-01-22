@@ -90,12 +90,13 @@ namespace iLabs.LabServer.BEE
                     sbProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                     sbProxy.OperationAuthHeaderValue.coupon = opCoupon;
                     sbProxy.Url = sbInfo.webServiceUrl;
-                    Criterion[] search = new Criterion[] { new Criterion("experiment_ID", "=", hdnExperimentID.Value) };
-                    ExperimentSummary[] expInfo = sbProxy.RetrieveExperimentSummary(search);
-                    if (expInfo.Length > 0)
-                    {
-                        theExperiment = expInfo[0];
-                    }
+                    
+                    //Criterion[] search = new Criterion[] { new Criterion("experiment_ID", "=", hdnExperimentID.Value) };
+                    //ExperimentSummary[] expInfo = sbProxy.RetrieveExperimentSummary(search);
+                    //if (expInfo.Length > 0)
+                    //{
+                    //    theExperiment = expInfo[0];
+                    //}
                     ExperimentRecord[] profileRecords = getRecords(sbProxy, Convert.ToInt64(hdnExperimentID.Value),
                       new Criterion[] { new Criterion("Record_Type", "=", "profile") });
                     ExperimentRecord[] records = getRecords(sbProxy,Convert.ToInt64(hdnExperimentID.Value),

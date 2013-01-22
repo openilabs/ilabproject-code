@@ -12,38 +12,39 @@ using iLabs.DataTypes.TicketingTypes;
 namespace iLabs.Core
 {
     // ${token}
-    public  static class iLabParser
+    public  class iLabParser
     {
-        private static string endToken = "}$";
+        private string startToken = "${";
+        private string endToken = "}";
 
-        static iLabParser() 
+        public iLabParser() 
         {
             if(ConfigurationManager.AppSettings["iLabParserEndToken"] != null)
                 endToken = ConfigurationManager.AppSettings["iLabParserEndToken"];
         }
 
-        public static string GetEndToken()
+        public string GetEndToken()
         {
             return endToken;
         }
 
-        public static void SetEndToken(string token)
+        public void SetEndToken(string token)
         {
             endToken = token;
         }
-        public static string Parse(StringBuilder input, Hashtable properties)
+        public string Parse(StringBuilder input, Hashtable properties)
         {
             return Parse(input.ToString(), properties, false);
         }
-        public static string Parse(StringBuilder input, Hashtable properties, bool appendDefaults)
+        public string Parse(StringBuilder input, Hashtable properties, bool appendDefaults)
         {
             return Parse(input.ToString(), properties, appendDefaults);
         }
-        public static string Parse(string input, Hashtable properties)
+        public string Parse(string input, Hashtable properties)
         {
             return Parse(input, properties, false);
         }
-        public static string Parse(string inputStr, Hashtable properties, bool appendDefaults)
+        public string Parse(string inputStr, Hashtable properties, bool appendDefaults)
         {
             string input = null;
             if (appendDefaults)
@@ -59,14 +60,14 @@ namespace iLabs.Core
             }
             StringBuilder output = new StringBuilder();
             // test for token
-            idx = input.IndexOf("${");
+            idx = input.IndexOf(startToken);
             if (idx == -1)
             {
                 return input;
             }
             while (offset < input.Length)
             {
-                idx = input.IndexOf("${",offset);
+                idx = input.IndexOf(startToken,offset);
                 if (idx == -1)
                 {
                     output.Append(input.Substring(offset));
@@ -75,7 +76,7 @@ namespace iLabs.Core
                 else
                 {
                     output.Append(input.Substring(offset, idx - offset));
-                    offset = idx + 2;
+                    offset = idx + startToken.Length;
                     idx = input.IndexOf(endToken, offset);
                     if (idx == -1)
                     {
@@ -102,7 +103,7 @@ namespace iLabs.Core
         /// </summary>
         /// <param name="str"></param>
         /// <returns></returns>
-        private static string addDefaultParameters(string str)
+        private string addDefaultParameters(string str)
         {
             // check that the default auth tokens are added
             string loader = str;

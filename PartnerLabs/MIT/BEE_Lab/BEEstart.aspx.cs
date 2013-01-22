@@ -168,9 +168,9 @@ namespace iLabs.LabServer.BEE
                 task.Status = LabTask.eStatus.Running;
                 TaskProcessor.Instance.Modify(task);
                 labDB.SetTaskStatus(task.taskID, (int) LabTask.eStatus.Running);
-                //Session["opCouponID"] = hdnCoupon.Value;
-                //Session["opIssuer"] = hdnIssuer.Value;
-                //Session["opPasscode"] = hdnPasscode.Value;
+                Session["opCouponID"] = hdnCoupon.Value;
+                Session["opIssuer"] = hdnIssuer.Value;
+                Session["opPasscode"] = hdnPasscode.Value;
                 Response.Redirect(buf.ToString(), true);
             }
             else
@@ -197,10 +197,11 @@ namespace iLabs.LabServer.BEE
             hashtable["experimentLength"] = "24";
             hashtable["profile"] = profile;
             hashtable["totalLoads"] = 4;
-
+            iLabParser parser = new iLabParser();
+            parser.SetEndToken("}$");
             string temp = File.ReadAllText(ConfigurationManager.AppSettings["climateTemplate"]);
             //string temp = ReadUrl(@"programs\basicExperimentTemplate.txt");
-            File.WriteAllText(programPath, iLabParser.Parse(temp, hashtable));
+            File.WriteAllText(programPath, parser.Parse(temp, hashtable));
             sendFile(loggerName,programPath,serverName);
         }
 

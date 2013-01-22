@@ -318,7 +318,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebSites", "WebSites", "{80
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/BEElab/", "http://localhost/BEElab", "{7D5CE010-A1F7-4A1A-A263-05C159A1C45E}"
 	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{3D7D2F78-75EB-495B-A75D-0216D2F49384}|CR1000Connection.dll;"
+		ProjectReferences = "{3D7D2F78-75EB-495B-A75D-0216D2F49384}|CR1000Connection.dll;{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}|ExperimentStorageProxy.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;{482C3D3E-9596-4AB0-BD61-E3E427995AC4}|LabServerLibrary.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/BEElab"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\..\..\PartnerLabs\MIT\BEE_Lab\"
 		Debug.AspNetCompiler.TargetPath = "..\..\Builds\BEElab\"

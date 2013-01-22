@@ -524,6 +524,7 @@ namespace iLabs.ServiceBroker.iLabSB
             StringBuilder message = new StringBuilder("Message: clientID = ");
             message.Append(btnLaunchLab.CommandArgument + " ");
             LabClient client = AdministrativeAPI.GetLabClient(c_id);
+            iLabParser parser = new iLabParser();
             if (client!= null)
             {
                 // [GeneralTicketing] get lab servers metadata from lab server ids
@@ -588,7 +589,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 redirectURL += "&";
                             redirectURL += "sb_url=" + Utilities.ExportUrlPath(Request.Url);
                             // Parse & check that the default auth tokens are added
-                            string tmpUrl = iLabParser.Parse(redirectURL, properties, true);
+                            string tmpUrl = parser.Parse(redirectURL, properties, true);
 
                             // Now open the lab within the current Window/frame
                             Response.Redirect(tmpUrl, true);
@@ -601,7 +602,8 @@ namespace iLabs.ServiceBroker.iLabSB
                             // Note: Currently Interactive applets
                             // use the Loader script for Batch experiments
                             // Applets do not use default query string parameters, parametes must be in the loader script
-                            Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
+                           
+                            Session["LoaderScript"] = parser.Parse(client.loaderScript, properties);
                             Session.Remove("RedirectURL");
 
                             string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
@@ -628,7 +630,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
                                 /* This is the original batch-redirect using a pop-up */
                                 // check that the default auth tokens are added
-                                string jScript = @"<script language='javascript'> window.open ('" + iLabParser.Parse(client.loaderScript, properties, true) + "')</script>";
+                                string jScript = @"<script language='javascript'> window.open ('" + parser.Parse(client.loaderScript, properties, true) + "')</script>";
                                 Page.RegisterStartupScript("HTML Client", jScript);
 
                                 /* This is the batch-redirect with a simple redirect, this may not work as we need to preserve session-state */
@@ -640,7 +642,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         else if (client.clientType == LabClient.BATCH_APPLET)
                         {
                             // Do not append defaults
-                            Session["LoaderScript"] = iLabParser.Parse(client.loaderScript, properties);
+                            Session["LoaderScript"] = parser.Parse(client.loaderScript, properties);
                             Session.Remove("RedirectURL");
 
                             string jScript = @"<script language='javascript'>parent.theapplet.location.href = '"
@@ -672,6 +674,7 @@ namespace iLabs.ServiceBroker.iLabSB
             StringBuilder message = new StringBuilder("Message: clientID = ");
             int[] labIds = new int[1];
             message.Append(btnReenter.CommandArgument + " ");
+            iLabParser parser = new iLabParser();
             long expid = Convert.ToInt64(btnReenter.CommandArgument);
             LabClient client = AdministrativeAPI.GetLabClient(Convert.ToInt32(Session["ClientID"]));
             if (client.clientID > 0)
@@ -697,7 +700,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         url.Append('&');
                     url.Append("sb_url=");
                     url.Append(Utilities.ExportUrlPath(Request.Url));
-                    string targetURL = iLabParser.Parse(url,properties,true);
+                    string targetURL = parser.Parse(url,properties,true);
                     // Now open the lab within the current Window/frame
                     Response.Redirect(targetURL, true);
                 }
