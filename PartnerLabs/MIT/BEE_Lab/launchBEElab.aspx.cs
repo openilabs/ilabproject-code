@@ -82,7 +82,9 @@ namespace iLabs.LabServer.BEE
                         Response.Redirect("AccessDenied.aspx?text=The ExperimentExecution+ticket+has+expired.", true);
 
                     }
-
+                    Session[""] = issuerGUID;
+                    Session[""] = expCoupId;
+                    Session[""] = passkey;
                     ////Parse experiment payload, only get what is needed 	
                     string payload = expTicket.payload;
                     XmlQueryDoc expDoc = new XmlQueryDoc(payload);
@@ -217,10 +219,10 @@ namespace iLabs.LabServer.BEE
                     Session["opCouponID"] = coupon_Id;
                     Session["opPasscode"] = passkey;
                     Session["opIssuer"] = issuerGUID;
-                    //buf.Append("&coupon_id=" + coupon_Id);
-                    //buf.Append("&passkey=" + passkey);
-                    //buf.Append("&issuer_guid=" + issuerGUID);
-                    //buf.Append("&sb_url=" + returnTarget);
+                    buf.Append("&coupon_id=" + coupon_Id);
+                    buf.Append("&passkey=" + passkey);
+                    buf.Append("&issuer_guid=" + issuerGUID);
+                    buf.Append("&sb_url=" + returnTarget);
                     Response.Redirect(buf.ToString(), true);
                 }
                 else

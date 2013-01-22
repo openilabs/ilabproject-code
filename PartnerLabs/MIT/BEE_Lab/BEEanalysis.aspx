@@ -15,15 +15,15 @@ Please see license.txt in top level directory for full license.
 		<meta content="C#" name="CODE_LANGUAGE" />
 		<meta content="JavaScript" name="vs_defaultClientScript" />
 		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />
-		<style type="text/css">@import url( ../css/main.css );
+		<style type="text/css">@import url( css/main.css );
 		</style>
 	</head>
 	<body>
 		<form method="post" runat="server">
 			<a name="top"></a>
-			<div id="outerwrapper">
-			<uc1:banner id="Banner1" runat="server" BannerText="Building Energy Lab"></uc1:banner><br clear="all"/>
+			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server" BannerText="Building Energy Lab"></uc1:banner><br clear="all"/>
 			<uc1:userNav ID="UserNav1" runat="server" ></uc1:userNav>
+			<br clear="all"/>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1><asp:label id="lblExperimentTitle" Runat="server"><% =title %></asp:label></h1>

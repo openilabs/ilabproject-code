@@ -61,7 +61,7 @@ namespace iLabs.LabServer.BEE
             if (!IsPostBack)
             {
                 // Query values from the request
-                clearSessionInfo();
+                //clearSessionInfo();
                 hdnAppkey.Value = Request.QueryString["app"];
                 hdnCoupon.Value = Request.QueryString["coupon_id"];
                 hdnPasscode.Value = Request.QueryString["passkey"];
@@ -74,22 +74,22 @@ namespace iLabs.LabServer.BEE
                 string userName = null;
                 string userIdStr = null;
 
-              
+
                 int tz = 0;
                 if (Session["userTZ"] != null)
                     tz = Convert.ToInt32(Session["userTZ"]);
-                
+
 
                 // this should be the RedeemSession & Experiment Coupon data
                 if (!(hdnPasscode.Value != null && hdnPasscode.Value != ""
-                    && hdnCoupon.Value != null && hdnCoupon.Value != "" 
+                    && hdnCoupon.Value != null && hdnCoupon.Value != ""
                     && hdnIssuer.Value != null && hdnIssuer.Value != ""))
                 {
                     Logger.WriteLine("BEEanaylsis: " + "AccessDenied missing credentials");
                     Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
                 }
-            }
-                Coupon expCoupon = new Coupon(hdnIssuer.Value,  Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
+
+                Coupon expCoupon = new Coupon(hdnIssuer.Value, Convert.ToInt64(hdnCoupon.Value), hdnPasscode.Value);
 
                 //Check the database for ticket and coupon, if not found Redeem Ticket from
                 // issuer and store in database.
@@ -121,7 +121,8 @@ namespace iLabs.LabServer.BEE
                         Session["userTZ"] = tzStr;
                     }
                     LabAppInfo clientInfo = dbManager.GetLabApp(hdnAppkey.Value);
-                    if(clientInfo == null){
+                    if (clientInfo == null)
+                    {
                         throw new Exception("Client does not exist!");
                     }
                     long experimentID = Convert.ToInt64(expIdStr);
@@ -132,14 +133,15 @@ namespace iLabs.LabServer.BEE
                         sbProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                         sbProxy.OperationAuthHeaderValue.coupon = expCoupon;
                         sbProxy.Url = sbInfo.webServiceUrl;
-                        
+
                         List<Criterion> cri = new List<Criterion>();
                         if (clientInfo.extraInfo != null && clientInfo.extraInfo.Length > 0)
-                            cri.Add(new Criterion("clientguid","=", clientInfo.extraInfo));
+                            cri.Add(new Criterion("clientguid", "=", clientInfo.extraInfo));
                         ExperimentSummary[] expSum = sbProxy.RetrieveExperimentSummary(cri.ToArray());
                         listSummaries(expSum);
                     }
                 }
+            }
         }
 
         protected void clearSessionInfo()
@@ -196,7 +198,7 @@ namespace iLabs.LabServer.BEE
 		
 		protected void btnGo_Click(object sender, System.EventArgs e)
 		{
-			clearExperimentDisplay();
+			//clearExperimentDisplay();
             List<Criterion> cList = new List<Criterion>();
             LabDB dbManager = new LabDB();
             LabAppInfo clientInfo = dbManager.GetLabApp(hdnAppkey.Value);
@@ -319,8 +321,8 @@ namespace iLabs.LabServer.BEE
 		protected void lbxSelectExperiment_SelectedIndexChanged(object sender, System.EventArgs e)
 		{
             LabDB dbManager = new LabDB();
-            clearSessionInfo();
-            clearExperimentDisplay();
+            //clearSessionInfo();
+            //clearExperimentDisplay();
 			long experimentID = Int64.Parse (lbxSelectExperiment.Items [lbxSelectExperiment.SelectedIndex ].Value);
             InteractiveSBProxy sbProxy = new InteractiveSBProxy();
             ProcessAgentInfo sbInfo = dbManager.GetProcessAgentInfo(hdnIssuer.Value);

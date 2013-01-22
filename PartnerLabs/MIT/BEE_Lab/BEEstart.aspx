@@ -100,7 +100,7 @@ Please see license.txt in top level directory for full license.
 				<asp:HiddenField ID="hdnIssuer" runat="server" />
 				<asp:HiddenField ID="hdnAppkey" runat="server" />
 				<asp:HiddenField ID="hdnSbUrl" runat="server" />
-				<asp:HiddenField ID="hdnExpID" runat="server" />
+				<asp:HiddenField ID="hdnExpId" runat="server" />
 				<asp:HiddenField ID="hdnProfile" runat="server" value="120,0,2,3,6,6,6"/>
 			</div>
 		</form>

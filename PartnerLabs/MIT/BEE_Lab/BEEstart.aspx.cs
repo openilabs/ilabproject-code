@@ -65,11 +65,11 @@ namespace iLabs.LabServer.BEE
             {
                 // Query values from the request
                 //clearSessionInfo();
-                //hdnExpId.Value = Request.QueryString["expid"];
-                //hdnCoupon.Value = Request.QueryString["coupon_id"];
-                //hdnPasscode.Value = Request.QueryString["passkey"];
-                //hdnIssuer.Value = Request.QueryString["issuer_guid"];
-                //hdnSbUrl.Value = Request.QueryString["sb_url"];
+                hdnExpId.Value = Request.QueryString["expid"];
+                hdnCoupon.Value = Request.QueryString["coupon_id"];
+                hdnPasscode.Value = Request.QueryString["passkey"];
+                hdnIssuer.Value = Request.QueryString["issuer_guid"];
+                hdnSbUrl.Value = Request.QueryString["sb_url"];
                 
                 string userName = null;
                 string userIdStr = null;
@@ -112,7 +112,7 @@ namespace iLabs.LabServer.BEE
                     string payload = expTicket.payload;
                     XmlQueryDoc expDoc = new XmlQueryDoc(payload);
                     string expIdStr = expDoc.Query("ExecuteExperimentPayload/experimentID");
-                    hdnExpID.Value = expIdStr;
+                    hdnExpId.Value = expIdStr;
                     string tzStr = expDoc.Query("ExecuteExperimentPayload/userTZ");
                     //string userIdStr = expDoc.Query("ExecuteExperimentPayload/userID");
                     string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
@@ -130,14 +130,14 @@ namespace iLabs.LabServer.BEE
         }
 
 
-
+        /*
         protected void clearSessionInfo()
         {
             Session.Remove("opCouponID");
             Session.Remove("opIssuer");
             Session.Remove("opPasscode");
         }
-
+        */
 
 
 
@@ -147,7 +147,7 @@ namespace iLabs.LabServer.BEE
             LabDB labDB = new LabDB();
 
             // Update Task data for graph page. Note XmlQueryDocs are read-only
-            LabTask task = labDB.GetTask(Convert.ToInt64(hdnExpID.Value), Session["opIssuer"].ToString());
+            LabTask task = labDB.GetTask(Convert.ToInt64(hdnExpId.Value), Session["opIssuer"].ToString());
             if (task != null)
             {
                 Coupon opCoupon = new Coupon(task.issuerGUID, task.couponID, Session["opPasscode"].ToString());
@@ -188,7 +188,7 @@ namespace iLabs.LabServer.BEE
         {
             bool status = false;
             
-            string programPath = ConfigurationManager.AppSettings["climateProgramDir"] + @"\" + "program" + hdnExpID.Value + ".CR1";
+            string programPath = ConfigurationManager.AppSettings["climateProgramDir"] + @"\" + "program" + hdnExpId.Value + ".CR1";
             // read the template
             // parse it & render it & save it to tmp/file
             // send that file
