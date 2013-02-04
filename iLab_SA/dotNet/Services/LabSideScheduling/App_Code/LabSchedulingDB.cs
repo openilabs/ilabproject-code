@@ -4713,7 +4713,7 @@ namespace iLabs.Scheduling.LabSide
 
                 TimeBlock[] reservationTbs = ListReservationTimeBlocks(resourceID, startTime.AddMinutes(-exInfo.prepareTime),
                         endTime.AddMinutes(exInfo.recoverTime));
-                if (reservationTbs != null)
+                if (reservationTbs != null && reservationTbs.Length > 0)
                 {
                     returnBlocks = TimeBlock.Remaining(recurBlocks.ToArray(), reservationTbs);
                     returnBlocks = TimeBlock.Concatenate(returnBlocks);

@@ -225,6 +225,7 @@ namespace iLabs.Scheduling.UserSide
                 cntrScheduling.Visible = true;
                 cntrScheduling.StartTime = startTime;
                 cntrScheduling.EndTime = endTime;
+                cntrScheduling.MaxDuration = Convert.ToInt32(maxAllowTime.TotalSeconds);
                 cntrScheduling.UserTZ = userTZ;
                 cntrScheduling.Culture = culture;
                
@@ -288,12 +289,16 @@ namespace iLabs.Scheduling.UserSide
                     span = minRequiredTime.Add(TimeSpan.FromMinutes(offset));
                 }
             }
-            ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), Convert.ToInt32(span.TotalSeconds).ToString()));
+           double durSecs = span < maxAllowTime ? span.TotalSeconds : maxAllowTime.TotalSeconds;
+            ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), 
+                Convert.ToInt32(durSecs).ToString()));
             span = span.Add(quantTS);
             span = span.Subtract(TimeSpan.FromMinutes((double)(span.Minutes % quantum)));
             while ((span <= maxAllowTime) && (span <duration))
             {
-                ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), Convert.ToInt32(span.TotalSeconds).ToString()));
+                 durSecs = span < maxAllowTime ? span.TotalSeconds : maxAllowTime.TotalSeconds;
+                ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span),
+                    Convert.ToInt32(durSecs).ToString()));
                 span = span.Add(quantTS);
             }
             //if( (span < maxAllowTime) && (endTime >= args.Start.Add(span)))

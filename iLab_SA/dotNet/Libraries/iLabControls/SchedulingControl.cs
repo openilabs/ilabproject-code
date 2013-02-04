@@ -48,6 +48,7 @@ namespace iLabs.Controls.Scheduling
         CultureInfo culture;
         List<TimePeriod> periods = new List<TimePeriod>();
         List<Reservation> reservations = null;
+        DateTime endOfDay;
 
         string scheduleTableClass = "scheduling";
         string hourTableClass = "hours";
@@ -346,8 +347,9 @@ namespace iLabs.Controls.Scheduling
             return h.ToString();
         }
 
-        private int calcHeight(int height)
+        private int adjustHeight(int height)
         {
+            int height
             if(browserMode == 0){
                 return height - 1;
             }
@@ -540,7 +542,7 @@ namespace iLabs.Controls.Scheduling
             output.Write("<tr>");
 
             //output.AddStyleAttribute("top", top + "px");
-            output.AddStyleAttribute("height", calcHeight(HourHeight) + "px");
+            output.AddStyleAttribute("height", adjustHeight(HourHeight) + "px");
             if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
@@ -586,6 +588,7 @@ namespace iLabs.Controls.Scheduling
         /// <param name="offset"></param>
         private void renderDay(HtmlTextWriter output, DateTime day, int offset)
         {
+            endOfDay = day.Add(oneDay);
             output.WriteLine();
             //output.AddStyleAttribute("position", "absolute");
             //output.AddStyleAttribute("top", "0px");
@@ -645,10 +648,11 @@ namespace iLabs.Controls.Scheduling
         private void renderTimePeriods(HtmlTextWriter output, DateTime date, IEnumerable periods)
         {
           
-            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.Add(maxTOD));
+            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), endTime);
             TimeBlock valid;
             DateTime cur = DateTime.MinValue;
             DateTime end = DateTime.MinValue;
+            
             if (periods != null)
             {
                 IEnumerator enumTP = null;
@@ -659,7 +663,8 @@ namespace iLabs.Controls.Scheduling
                     TimePeriod first = (TimePeriod)enumTP.Current;
                     if (first.Start > validTime.Start)
                     {
-                        renderVoidTime(output, Convert.ToInt32((first.Start - validTime.Start).TotalSeconds));
+                        first.End = validTime.Start;
+                        renderVoidTime(output,first);
                     }
                 }
                 catch (Exception ex) {
@@ -687,18 +692,38 @@ namespace iLabs.Controls.Scheduling
                             int tDur = valid.Duration;
                             
 
-                            while (cur < end)
+                            //while (cur < endOfDay)
+                            //{
+                            //    cellDur = defaultCellDuration -( cur.TimeOfDay.Minutes % defaultCellDuration);
+                            //    if(cellDur < defaultCellDuration) 
+                            //        cellDur += defaultCellDuration;
+                            //    if ((end - cur.AddMinutes(cellDur)).TotalMinutes < (defaultCellDuration/2))
+                            //    {
+                            //        cellDur += Convert.ToInt32((end - cur.AddMinutes(cellDur)).TotalMinutes );
+                            //    }
+                            //    cellDur = (cur.AddMinutes(cellDur) <= end) ? cellDur : (int)(end - cur).TotalMinutes;
+                            //    renderAvailableTime(output, cur, tDur, tp.quantum, cellDur * 60, false);
+                            //    cur = cur.AddMinutes(cellDur);
+                            //    tDur = tDur - (cellDur * 60);
+
+                            //    //cellDur = (cur.TimeOfDay.Minutes % defaultCellDuration) + defaultCellDuration;
+                            //    //cellDur = (cur.AddMinutes(cellDur) <= end) ? cellDur : (int)(end - cur).TotalMinutes;
+                            //    //renderAvailableTime(output, cur, tDur, tp.quantum, cellDur * 60, false);
+                            //    //cur = cur.AddMinutes(cellDur);
+                            //    //tDur = tDur - (cellDur * 60);
+                            //}
+                            while (valid.Start < endOfDay)
                             {
-                                cellDur = defaultCellDuration -( cur.TimeOfDay.Minutes % defaultCellDuration);
-                                if(cellDur < defaultCellDuration) 
+                                cellDur = defaultCellDuration - (valid.Start.TimeOfDay.Minutes % defaultCellDuration);
+                                if (cellDur < defaultCellDuration)
                                     cellDur += defaultCellDuration;
-                                if ((end - cur.AddMinutes(cellDur)).TotalMinutes < (defaultCellDuration/2))
+                                if ((end - cur.AddMinutes(cellDur)).TotalMinutes < (defaultCellDuration / 2))
                                 {
-                                    cellDur += Convert.ToInt32((end - cur.AddMinutes(cellDur)).TotalMinutes );
+                                    cellDur += Convert.ToInt32((end - cur.AddMinutes(cellDur)).TotalMinutes);
                                 }
                                 cellDur = (cur.AddMinutes(cellDur) <= end) ? cellDur : (int)(end - cur).TotalMinutes;
                                 renderAvailableTime(output, cur, tDur, tp.quantum, cellDur * 60, false);
-                                cur = cur.AddMinutes(cellDur);
+                                vaild.Start.AddMinutes(cellDur);
                                 tDur = tDur - (cellDur * 60);
 
                                 //cellDur = (cur.TimeOfDay.Minutes % defaultCellDuration) + defaultCellDuration;
@@ -717,14 +742,14 @@ namespace iLabs.Controls.Scheduling
             }
         }
        
-        private int renderVoidTime(HtmlTextWriter output, int duration)
+        private int renderVoidTime(HtmlTextWriter output, ITimeBlock tb)
         {
             output.Write("<tr>");
            int height = Convert.ToInt32((hourHeight* duration)/3600.0);
            output.AddAttribute("class", voidClass);
            //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
            output.AddAttribute("title", (duration / 60.0).ToString());
-           output.AddStyleAttribute("height", calcHeight(height) + "px");
+           output.AddStyleAttribute("height", adjustHeight(height) + "px");
             if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
@@ -746,6 +771,7 @@ namespace iLabs.Controls.Scheduling
         private int renderScheduledTime(HtmlTextWriter output,  ITimeBlock tb)
         {
             output.Write("<tr>");
+           
            int height = Convert.ToInt32((((hourHeight * tb.Duration)/3600.0)));
            //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
 #if useStyle
@@ -756,7 +782,7 @@ namespace iLabs.Controls.Scheduling
             //output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
 #endif
            output.AddAttribute("class", reservedClass);
-            output.AddStyleAttribute("height", calcHeight(height) + "px");
+            output.AddStyleAttribute("height", adjustHeight(height) + "px");
            if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
@@ -774,15 +800,15 @@ namespace iLabs.Controls.Scheduling
              
         }
 
-        private int renderAvailableTime(HtmlTextWriter output, DateTime startTime, int duration,int quantum, int cellDuration,bool lastCell)
+        private int renderAvailableTime(HtmlTextWriter output, DateTime startTime, int availableDuration, int quantum, int cellDuration, bool last)
         {
-            string str = startTime.ToString("o") + ", " + duration + ", " + quantum;
+            string str = startTime.ToString("o") + ", " + availableDuration + ", " + quantum;
             output.Write("<tr>");
             int height = Convert.ToInt32((((hourHeight* cellDuration)/3600.0)));
             output.AddAttribute("class", availableClass);
             output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, str));
             output.AddAttribute("title", startTime.AddMinutes(userTZ).TimeOfDay.ToString());
-            output.AddStyleAttribute("height", calcHeight(height) + "px");
+            output.AddStyleAttribute("height", adjustHeight(height) + "px");
             if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
