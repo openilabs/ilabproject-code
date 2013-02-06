@@ -30,7 +30,7 @@ using iLabs.UtilLib;
 namespace iLabs.Scheduling.UserSide
 {
 	/// <summary>
-	/// Summary description for ConfirmReservation.
+	/// Summary description for SelectTimePeriods.
 	/// </summary>
 	public partial class SelectTimePeriods: System.Web.UI.Page
 	{
@@ -55,7 +55,7 @@ namespace iLabs.Scheduling.UserSide
         CultureInfo culture;
         UserSchedulingDB dbManager = new UserSchedulingDB();
         List<TimePeriod> periods = null;
-        int defaultRange = 30;
+        //int defaultRange = 30;
         int quantum;
         DateTime endTimePeriod;
         TimeSpan maxAllowTime;
@@ -213,7 +213,6 @@ namespace iLabs.Scheduling.UserSide
                 lblErrorMessage.Text = Utilities.FormatWarningMessage(msg);
                 lblErrorMessage.Visible = true;
                 btnMakeReservation.Visible = false;
-               // btnMakeReservation1.Visible = false;
                 cntrScheduling.Visible=false;
             }
             else{
@@ -225,7 +224,6 @@ namespace iLabs.Scheduling.UserSide
                 cntrScheduling.Visible = true;
                 cntrScheduling.StartTime = startTime;
                 cntrScheduling.EndTime = endTime;
-                cntrScheduling.MaxDuration = Convert.ToInt32(maxAllowTime.TotalSeconds);
                 cntrScheduling.UserTZ = userTZ;
                 cntrScheduling.Culture = culture;
                
@@ -242,6 +240,9 @@ namespace iLabs.Scheduling.UserSide
             TimeSpan duration = TimeSpan.FromSeconds(args.Duration);
             endTimePeriod = args.Start.Add(duration);
             DateTime endTime = args.Start.Add(duration).Subtract(minRequiredTime);
+            DateTime endMaxTime = args.Start.Add(maxAllowTime);
+
+
             TimeSpan span;
             StringBuilder buf = new StringBuilder();
             //buf.Append("StartTime: " + args.Start.ToString("o") + "<br />&nbsp;&nbsp;Duration: " + duration.ToString() + " Quant: " + quantum + "<br />");
@@ -260,12 +261,13 @@ namespace iLabs.Scheduling.UserSide
                 quantOffset = quantum - qOff;
                 ddlSelectTime.Items.Add(new ListItem(DateUtil.ToUserTime(wrkTime, culture, userTZ)));
                 wrkTime = wrkTime.AddMinutes(quantOffset);
-                //count += quantOffset;
             }
-            while ((count <= defaultRange) && (wrkTime <= endTime))
+            int sampleCount = 0;
+            while (sampleCount < 4 &&(wrkTime <= endMaxTime) && (wrkTime <= endTime))
             {
                 ddlSelectTime.Items.Add(new ListItem(DateUtil.ToUserTime(wrkTime, culture, userTZ)));
                 wrkTime = wrkTime.AddMinutes(quantum);
+                sampleCount++;
                 count += quantum;
             }
             if(quantOffset != 0){
@@ -289,20 +291,14 @@ namespace iLabs.Scheduling.UserSide
                     span = minRequiredTime.Add(TimeSpan.FromMinutes(offset));
                 }
             }
-           double durSecs = span < maxAllowTime ? span.TotalSeconds : maxAllowTime.TotalSeconds;
-            ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), 
-                Convert.ToInt32(durSecs).ToString()));
+            ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), Convert.ToInt32(span.TotalSeconds).ToString()));
             span = span.Add(quantTS);
             span = span.Subtract(TimeSpan.FromMinutes((double)(span.Minutes % quantum)));
             while ((span <= maxAllowTime) && (span <duration))
             {
-                 durSecs = span < maxAllowTime ? span.TotalSeconds : maxAllowTime.TotalSeconds;
-                ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span),
-                    Convert.ToInt32(durSecs).ToString()));
+                ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(span), Convert.ToInt32(span.TotalSeconds).ToString()));
                 span = span.Add(quantTS);
             }
-            //if( (span < maxAllowTime) && (endTime >= args.Start.Add(span)))
-                //ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(maxAllowTime), Convert.ToInt32(maxAllowTime.TotalSeconds).ToString()));
             if( (span < maxAllowTime) && (maxAllowTime >= duration))
                 ddlDuration.Items.Add(new ListItem(DateUtil.TimeSpanTrunc(duration), Convert.ToInt32(duration.TotalSeconds).ToString()));
         }
