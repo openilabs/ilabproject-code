@@ -10,7 +10,8 @@ namespace iLabs.ExpStorage
 {
     public class BlobHandler : IHttpHandler
     {
-
+        bool authorized = true;
+        
         public void ProcessRequest(HttpContext context)
         {
             string mime = "text/plain";
@@ -19,7 +20,7 @@ namespace iLabs.ExpStorage
             string passStr = context.Request.QueryString["pid"];
 
             // check auth
-            if (true)
+            if (authorized)
             {
                 //retrieve BLOB
                 long blobId = -1;
