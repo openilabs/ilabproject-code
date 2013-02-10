@@ -40,6 +40,7 @@ namespace iLabs.Controls.Scheduling
         TimeSpan minTOD;
         TimeSpan minDuration;
         TimeSpan tzSpan;
+        TimeBlock curDay;
 
         TimeSpan oneDay = TimeSpan.FromDays(1);
         int minHour = 0;
@@ -946,6 +947,7 @@ namespace iLabs.Controls.Scheduling
             
             MinTOD = TimeSpan.Zero;
             MaxTOD = oneDay;
+            curDay = new TimeBlock(StartDate, StartDate.Add(oneDay));
             // Verify data exists.
             if (schedulingData != null)
             {
