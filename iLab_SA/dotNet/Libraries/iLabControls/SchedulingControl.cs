@@ -39,7 +39,7 @@ namespace iLabs.Controls.Scheduling
         TimeSpan maxTOD;
         TimeSpan minTOD;
         TimeSpan minDuration;
-        TimeSpan tzSpan;
+        TimeSpan tzSpan;  
 
         TimeSpan oneDay = TimeSpan.FromDays(1);
         int minHour = 0;
@@ -48,6 +48,7 @@ namespace iLabs.Controls.Scheduling
         CultureInfo culture;
         List<TimePeriod> periods = new List<TimePeriod>();
         List<Reservation> reservations = null;
+        DateTime endOfDay;
 
         string scheduleTableClass = "scheduling";
         string hourTableClass = "hours";
@@ -345,8 +346,12 @@ namespace iLabs.Controls.Scheduling
             }
             return h.ToString();
         }
-
-        private int calcHeight(int height)
+        /// <summary>
+        /// Based on the browser modify the height for box mode.
+        /// </summary>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        private int adjustHeight(int height)
         {
             if(browserMode == 0){
                 return height - 1;
@@ -540,7 +545,7 @@ namespace iLabs.Controls.Scheduling
             output.Write("<tr>");
 
             //output.AddStyleAttribute("top", top + "px");
-            output.AddStyleAttribute("height", calcHeight(HourHeight) + "px");
+            output.AddStyleAttribute("height", adjustHeight(HourHeight) + "px");
             if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
@@ -586,6 +591,7 @@ namespace iLabs.Controls.Scheduling
         /// <param name="offset"></param>
         private void renderDay(HtmlTextWriter output, DateTime day, int offset)
         {
+            endOfDay = day.Add(oneDay);
             output.WriteLine();
             //output.AddStyleAttribute("position", "absolute");
             //output.AddStyleAttribute("top", "0px");
@@ -642,21 +648,19 @@ namespace iLabs.Controls.Scheduling
             output.RenderEndTag();
         }
 
-        private void renderTimePeriods(HtmlTextWriter output, DateTime date, IEnumerable periods)
+        private void renderTimePeriods(HtmlTextWriter output, DateTime date, List<TimePeriod> periods)
         {
           
-            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.Add(maxTOD));
+            //TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.Add(maxTOD));
+            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), EndDate);
             TimeBlock valid;
             DateTime cur = DateTime.MinValue;
             DateTime end = DateTime.MinValue;
-            if (periods != null)
+            if (periods != null && periods.Count >0)
             {
-                IEnumerator enumTP = null;
                 try
                 {
-                    enumTP = periods.GetEnumerator();
-                    enumTP.MoveNext();
-                    TimePeriod first = (TimePeriod)enumTP.Current;
+                    TimePeriod first = periods[0];
                     if (first.Start > validTime.Start)
                     {
                         renderVoidTime(output, Convert.ToInt32((first.Start - validTime.Start).TotalSeconds));
@@ -665,11 +669,6 @@ namespace iLabs.Controls.Scheduling
                 catch (Exception ex) {
                     throw ex;
                 }
-                finally
-                {
-                    enumTP.Reset();
-                }
-
                 foreach (TimePeriod tp in periods)
                 {
                     if (validTime.Intersects(tp))
@@ -686,8 +685,7 @@ namespace iLabs.Controls.Scheduling
                             int cellDur = 0;
                             int tDur = valid.Duration;
                             
-
-                            while (cur < end)
+                            while (cur < end && cur < endOfDay)
                             {
                                 cellDur = defaultCellDuration -( cur.TimeOfDay.Minutes % defaultCellDuration);
                                 if(cellDur < defaultCellDuration) 
@@ -696,7 +694,7 @@ namespace iLabs.Controls.Scheduling
                                 {
                                     cellDur += Convert.ToInt32((end - cur.AddMinutes(cellDur)).TotalMinutes );
                                 }
-                                cellDur = (cur.AddMinutes(cellDur) <= end) ? cellDur : (int)(end - cur).TotalMinutes;
+                                cellDur = (cur.AddMinutes(cellDur) <= endOfDay) ? cellDur : (int)(endOfDay - cur).TotalMinutes;
                                 renderAvailableTime(output, cur, tDur, tp.quantum, cellDur * 60, false);
                                 cur = cur.AddMinutes(cellDur);
                                 tDur = tDur - (cellDur * 60);
@@ -710,9 +708,9 @@ namespace iLabs.Controls.Scheduling
                         }
                     }
                 } // End of foreach period
-                if (end < validTime.End)
+                if (end < endOfDay)
                 {
-                    renderScheduledTime(output, new TimePeriod(end,validTime.End));
+                    renderScheduledTime(output, new TimeBlock(end,validTime.End));
                 }
             }
         }
@@ -724,7 +722,7 @@ namespace iLabs.Controls.Scheduling
            output.AddAttribute("class", voidClass);
            //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
            output.AddAttribute("title", (duration / 60.0).ToString());
-           output.AddStyleAttribute("height", calcHeight(height) + "px");
+           output.AddStyleAttribute("height", adjustHeight(height) + "px");
             if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
@@ -745,9 +743,16 @@ namespace iLabs.Controls.Scheduling
 
         private int renderScheduledTime(HtmlTextWriter output,  ITimeBlock tb)
         {
-            output.Write("<tr>");
-           int height = Convert.ToInt32((((hourHeight * tb.Duration)/3600.0)));
-           //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
+            int duration = 0;
+            if (tb.End < endOfDay)
+                duration = tb.Duration;
+            else
+                duration = new TimeBlock(tb.Start, endOfDay).Duration;
+            if (duration > 0)
+            {
+                output.Write("<tr>");
+                int height = Convert.ToInt32((((hourHeight * duration) / 3600.0)));
+                //output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, startTime.ToString("s")));
 #if useStyle
              output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -755,34 +760,35 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("cursor", "hand");
             //output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
 #endif
-           output.AddAttribute("class", reservedClass);
-            output.AddStyleAttribute("height", calcHeight(height) + "px");
-           if (browserMode > 0)
-            {
-                output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
-                output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(scheduledColor));
+                output.AddAttribute("class", reservedClass);
+                output.AddStyleAttribute("height", adjustHeight(height) + "px");
+                if (browserMode > 0)
+                {
+                    output.AddStyleAttribute("border-bottom", "1px solid " + ColorTranslator.ToHtml(BorderColor));
+                    output.AddStyleAttribute("background-color", ColorTranslator.ToHtml(scheduledColor));
+                }
+                output.AddAttribute("title", tb.Start.AddMinutes(userTZ).TimeOfDay.ToString() + " - " + tb.End.AddMinutes(userTZ).ToString());
+                output.RenderBeginTag("td");
+                //if(height > 24)
+                //    output.Write(tb.Start.AddMinutes(userTZ).TimeOfDay );
+                //if(height > 48)
+                //    output.Write(" - " + tb.End.AddMinutes(userTZ).TimeOfDay);
+                output.RenderEndTag();
+                output.WriteLine("</tr>");
             }
-            output.AddAttribute("title", tb.Start.AddMinutes(userTZ).TimeOfDay.ToString() + " - " + tb.End.AddMinutes(userTZ).TimeOfDay.ToString());
-            output.RenderBeginTag("td");
-            //if(height > 24)
-            //    output.Write(tb.Start.AddMinutes(userTZ).TimeOfDay );
-            //if(height > 48)
-            //    output.Write(" - " + tb.End.AddMinutes(userTZ).TimeOfDay);
-            output.RenderEndTag();
-            output.WriteLine("</tr>");
-            return height;
+            return duration;
              
         }
 
-        private int renderAvailableTime(HtmlTextWriter output, DateTime startTime, int duration,int quantum, int cellDuration,bool lastCell)
+        private int renderAvailableTime(HtmlTextWriter output, DateTime startTime, int totalDuration,int quantum, int cellDuration,bool lastCell)
         {
-            string str = startTime.ToString("o") + ", " + duration + ", " + quantum;
+            string str = startTime.ToString("o") + ", " + totalDuration + ", " + quantum;
             output.Write("<tr>");
             int height = Convert.ToInt32((((hourHeight* cellDuration)/3600.0)));
             output.AddAttribute("class", availableClass);
             output.AddAttribute("onclick", "javascript:" + Page.ClientScript.GetPostBackEventReference(this, str));
             output.AddAttribute("title", startTime.AddMinutes(userTZ).TimeOfDay.ToString());
-            output.AddStyleAttribute("height", calcHeight(height) + "px");
+            output.AddStyleAttribute("height", adjustHeight(height) + "px");
             if (browserMode > 0)
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
@@ -802,8 +808,7 @@ namespace iLabs.Controls.Scheduling
 #endif
             output.RenderBeginTag("td");
             output.Write("&nbsp;");
-            //DateTime end = startTime.AddSeconds(duration);
-            //output.Write(startTime.AddMinutes(userTZ).TimeOfDay + " - " + end.AddMinutes(userTZ).TimeOfDay);
+           
            
             output.RenderEndTag();
             output.WriteLine("</tr>");
@@ -811,8 +816,9 @@ namespace iLabs.Controls.Scheduling
         }
 
         private void renderReservations(HtmlTextWriter output, DateTime day, IEnumerable reservations)
-        { 
-            int a = 0;
+        {
+            if (bindReservations)
+                output.WriteLine("<!-- renderReservations not supported! -->");
         }
  
         #endregion
