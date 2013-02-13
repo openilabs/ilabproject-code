@@ -437,7 +437,6 @@ namespace iLabs.Controls.Scheduling
             output.AddStyleAttribute("border-bottom", "1px");     
 #endif
             
-            //output.AddStyleAttribute("position", "relative");
             output.RenderBeginTag("table");
             
             // <tr> Table contents
@@ -470,7 +469,7 @@ namespace iLabs.Controls.Scheduling
         private void renderHoursTable(HtmlTextWriter output, int offset)
         {
             output.AddAttribute("id", "tdHourCell");
-            //output.AddStyleAttribute("background-color", "blue");
+          
 #if useStyle
             //output.AddStyleAttribute("width", hourWidth + "px");
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
@@ -531,7 +530,6 @@ namespace iLabs.Controls.Scheduling
                 renderHourCell(output, i);
             }
 
-            //output.WriteLine();
             output.RenderEndTag(); // end of table
             output.RenderEndTag(); // </td> End of hours cell
             output.WriteLine();
@@ -550,7 +548,7 @@ namespace iLabs.Controls.Scheduling
             {
                 output.AddStyleAttribute("border-bottom","1px solid " + ColorTranslator.ToHtml(BorderColor));
             }
-            //output.AddStyleAttribute("background-color", "Yellow");
+            
 #if useStyle
             output.AddStyleAttribute(HtmlTextWriterStyle.Padding, zero.ToString());
             output.AddStyleAttribute(HtmlTextWriterStyle.Margin, zero.ToString());
@@ -593,9 +591,6 @@ namespace iLabs.Controls.Scheduling
         {
             endOfDay = day.Add(oneDay);
             output.WriteLine();
-            //output.AddStyleAttribute("position", "absolute");
-            //output.AddStyleAttribute("top", "0px");
-            //output.AddStyleAttribute("left", offset.ToString() + "px");
             output.RenderBeginTag("td");
             // <table>
             output.AddAttribute("class", dayTableClass);
@@ -650,8 +645,6 @@ namespace iLabs.Controls.Scheduling
 
         private void renderTimePeriods(HtmlTextWriter output, DateTime date, List<TimePeriod> periods)
         {
-          
-            //TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), date.Add(maxTOD));
             TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), EndDate);
             TimeBlock valid;
             DateTime cur = DateTime.MinValue;
@@ -698,19 +691,13 @@ namespace iLabs.Controls.Scheduling
                                 renderAvailableTime(output, cur, tDur, tp.quantum, cellDur * 60, false);
                                 cur = cur.AddMinutes(cellDur);
                                 tDur = tDur - (cellDur * 60);
-
-                                //cellDur = (cur.TimeOfDay.Minutes % defaultCellDuration) + defaultCellDuration;
-                                //cellDur = (cur.AddMinutes(cellDur) <= end) ? cellDur : (int)(end - cur).TotalMinutes;
-                                //renderAvailableTime(output, cur, tDur, tp.quantum, cellDur * 60, false);
-                                //cur = cur.AddMinutes(cellDur);
-                                //tDur = tDur - (cellDur * 60);
                             }
                         }
                     }
                 } // End of foreach period
                 if (end < endOfDay)
                 {
-                    renderScheduledTime(output, new TimeBlock(end,validTime.End));
+                    renderScheduledTime(output, new TimeBlock(end,endOfDay));
                 }
             }
         }
@@ -769,15 +756,10 @@ namespace iLabs.Controls.Scheduling
                 }
                 output.AddAttribute("title", tb.Start.AddMinutes(userTZ).TimeOfDay.ToString() + " - " + tb.End.AddMinutes(userTZ).ToString());
                 output.RenderBeginTag("td");
-                //if(height > 24)
-                //    output.Write(tb.Start.AddMinutes(userTZ).TimeOfDay );
-                //if(height > 48)
-                //    output.Write(" - " + tb.End.AddMinutes(userTZ).TimeOfDay);
                 output.RenderEndTag();
                 output.WriteLine("</tr>");
             }
             return duration;
-             
         }
 
         private int renderAvailableTime(HtmlTextWriter output, DateTime startTime, int totalDuration,int quantum, int cellDuration,bool lastCell)
@@ -808,8 +790,6 @@ namespace iLabs.Controls.Scheduling
 #endif
             output.RenderBeginTag("td");
             output.Write("&nbsp;");
-           
-           
             output.RenderEndTag();
             output.WriteLine("</tr>");
             return height;
@@ -934,25 +914,6 @@ namespace iLabs.Controls.Scheduling
                 {
                     TimeSpan tmpTS;
                     TimeSpan tmpMinTOD = oneDay;
-                    //TimeSpan tmpMaxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
-                    //tmpMinTOD = startTime.Add(TimeSpan.FromMinutes(userTZ)).TimeOfDay;
-                    // tmpMaxTOD = endTime.Add(TimeSpan.FromMinutes(userTZ)).TimeOfDay;
-                    //if (tmpMaxTOD.Hours < 24)
-                    //{
-                    //    if (tmpMaxTOD.TotalHours > maxTOD.Hours)
-                    //    {
-                    //        tmpMaxTOD = TimeSpan.FromHours(maxTOD.Hours + 1.0);
-                    //    }
-                    //}
-
-
-
-                    //DateTime localEnd = endTime.Subtract(TimeSpan.FromMinutes(userTZ));
-                    //localStart.
-                    //TimeSpan tmpTS;
-                    //TimeSpan oneDay = TimeSpan.FromDays(1);
-                    //maxTOD = TimeSpan.Zero.Subtract(TimeSpan.FromMinutes(userTZ));
-                    //minTOD = oneDay;
 
                     //Check the first timeBlock
                     IEnumerator eTB = schedulingData.GetEnumerator();
@@ -966,35 +927,7 @@ namespace iLabs.Controls.Scheduling
                         }
 
                     }
-                //    //Check all TimeBlocks
-                //    foreach (ITimeBlock tb in schedulingData)
-                //    {
-                //        tmpTS = tb.Start.AddMinutes(userTZ).TimeOfDay;
-                //        if (tmpMinTOD > tmpTS)
-                //            tmpMinTOD = tmpTS;
-                //        //tmpTS = tmpTS.Add(TimeSpan.FromSeconds(tb.Duration));
-                //        //if (tmpTS.TotalHours < 24)
-                //        //{
-                //        //    if (tmpMaxTOD < tmpTS)
-                //        //    {
-                //        //        tmpMaxTOD = tmpTS;
-                //        //    }
-                //        //}
-                //        //else if (tmpTS.TotalHours == 24)
-                //        //{
-                //        //    tmpMaxTOD = tmpTS;
-                //        //}
-                //        //else
-                //        //{
-                //        //    tmpMinTOD = TimeSpan.Zero;
-                //        //    tmpMaxTOD = TimeSpan.FromHours(24);
-                //        //    break;
-                //        //}
-                //    }
-                //    if (tmpMinTOD != oneDay)
-                //    {
-                //        MinTOD = tmpMinTOD;
-                //    }
+                
                 }
                 if (bindReservations)
                 { // should be Reservations
@@ -1098,7 +1031,6 @@ namespace iLabs.Controls.Scheduling
         {
             string[] data = values.Split(new char[] { ',' });
             start = DateUtil.ParseUtc(data[0]);
-           // start.Kind = DateTimeKind.Utc;
             duration = Int32.Parse(data[1]);
             quantum = Int32.Parse(data[2]);
         }
