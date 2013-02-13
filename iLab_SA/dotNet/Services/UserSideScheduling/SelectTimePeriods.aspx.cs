@@ -222,11 +222,10 @@ namespace iLabs.Scheduling.UserSide
                         ? TimeSpan.FromMinutes(availablePeriods[0].quantum) : minRequiredTime;
                 }
                 cntrScheduling.Visible = true;
-                cntrScheduling.StartTime = startTime;
-                cntrScheduling.EndTime = endTime;
                 cntrScheduling.UserTZ = userTZ;
                 cntrScheduling.Culture = culture;
-               
+                cntrScheduling.StartTime = startTime;
+                cntrScheduling.EndTime = endTime;
                 cntrScheduling.DataSource = availablePeriods;
                 cntrScheduling.DataBind();
             }
