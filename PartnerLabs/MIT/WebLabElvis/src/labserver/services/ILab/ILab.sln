@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ILab", "ILab.vbproj", "{2BF9060F-C312-4508-A64C-92018E46A9AD}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Debug.ActiveCfg = Debug|.NET
+		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Debug.Build.0 = Debug|.NET
+		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Release.ActiveCfg = Release|.NET
+		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

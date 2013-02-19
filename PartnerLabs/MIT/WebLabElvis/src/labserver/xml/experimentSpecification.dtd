@@ -1,0 +1,24 @@
+﻿<!ELEMENT experimentSpecification (setupID, terminal+, userDefinedFunction*)>
+<!ATTLIST experimentSpecification	lab			CDATA	#REQUIRED
+									specversion	CDATA	#REQUIRED>
+	<!ELEMENT setupID (#PCDATA)>
+	<!ELEMENT terminal (vname, function)>
+	<!ATTLIST terminal	instrumentType	(FGEN | SCOPE)	   #REQUIRED
+						instrumentNumber	CDATA  #REQUIRED>
+		<!ELEMENT vname (#PCDATA)>
+		<!ATTLIST vname	download (true | false) #REQUIRED>
+		<!ELEMENT function ((waveformType, frequency, amplitude, offset)|
+							(samplingRate, samplingTime))>
+		<!ATTLIST function	type (WAVEFORM | SAMPLING)	#REQUIRED>
+			<!ELEMENT waveformType (#PCDATA)>
+			<!ELEMENT frequency (#PCDATA)>
+			<!ELEMENT amplitude (#PCDATA)>
+			<!ELEMENT offset (#PCDATA)>
+			<!ELEMENT samplingRate (#PCDATA)>
+			<!ELEMENT samplingTime (#PCDATA)>
+	<!ELEMENT userDefinedFunction (name, units, body)>
+		<!ELEMENT name (#PCDATA)>
+		<!ATTLIST name download (true | false) #REQUIRED>
+		<!ELEMENT units (#PCDATA)>
+		<!ELEMENT body (#PCDATA)>
+		

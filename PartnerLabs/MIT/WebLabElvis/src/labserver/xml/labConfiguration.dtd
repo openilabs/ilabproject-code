@@ -1,0 +1,16 @@
+<!ELEMENT labConfiguration (setup*)>
+<!ATTLIST labConfiguration	lab			CDATA	#REQUIRED
+							specversion	CDATA	#REQUIRED>
+	<!ELEMENT setup (name, description, imageURL, terminal+, maxDataPoints)>
+	<!ATTLIST setup id		CDATA		#REQUIRED>
+		<!ELEMENT name (#PCDATA)>
+		<!ELEMENT description (#PCDATA)>
+		<!ELEMENT imageURL (#PCDATA)>
+		<!ELEMENT terminal (label, pixelLocation>
+		<!ATTLIST terminal	instrumentType	(FGEN | SCOPE)	#REQUIRED
+							instrumentNumber	CDATA	#REQUIRED>
+			<!ELEMENT label (#PCDATA)>
+			<!ELEMENT pixelLocation (x, y)>
+				<!ELEMENT x (#PCDATA)>
+				<!ELEMENT y (#PCDATA)>
+		

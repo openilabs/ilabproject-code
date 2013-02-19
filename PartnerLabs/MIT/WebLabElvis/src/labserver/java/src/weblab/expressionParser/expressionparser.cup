@@ -1,0 +1,137 @@
+package weblab.expressionParser;
+
+import java_cup.runtime.Symbol;
+import java.io.StringReader;
+
+// This code will be added to the generated Parser class
+parser code {:
+
+  public void report_fatal_error(String message, Object info)
+    throws InvalidExpressionSyntaxException
+    {
+      String m = message;
+
+      if (info instanceof Symbol)
+	if (((Symbol)info).left != -1)
+	  if (((Symbol)info).value instanceof String)
+	    m = "unexpected token \'" + ((Symbol)info).value +
+	      "\' at character " + ((Symbol)info).left + " of input";
+      
+      throw new InvalidExpressionSyntaxException(m);
+    }
+
+  public void report_error(String message, Object info)
+    {
+      // all errors will eventually be fatal errors
+    }
+
+  /**
+   * @return the expression parsed from text
+   * @throws InvalidExpressionSyntaxException if text is not a syntactically valid expression (or if an unexpected error condition occurs while parsing)
+   */
+  public static Expression parseExpression(String text)
+    throws InvalidExpressionSyntaxException
+    {
+      try {
+	StringReader reader = new StringReader(text);
+	Parser parser = new Parser(new Yylex(reader));
+	return (Expression)parser.parse().value;
+      }
+      catch (InvalidExpressionSyntaxException e) {
+	throw e;
+      }
+      catch (Exception e) {
+	InvalidExpressionSyntaxException e2 = new
+	  InvalidExpressionSyntaxException("Unknown error: " + e.getMessage());
+	e2.initCause(e);
+	throw e2;
+      }
+    }
+:}
+
+/* Terminals (tokens returned by the scanner) */
+terminal String COMMA, LPAREN, RPAREN, PLUS, MINUS, TIMES, DIVIDE, POW;
+terminal String	NUMBER, SCIENTIFIC_CONST, BUILTIN_FUNCTION, VARIABLE;
+// used for precedence only
+terminal UNARY;
+
+/* Non terminals */
+non terminal ExpressionList	expr_list;
+non terminal Expression    	expr;
+
+/* Precedences (lowest to highest) */
+precedence left PLUS, MINUS;
+precedence left TIMES, DIVIDE;
+precedence left POW;
+precedence nonassoc UNARY;
+
+// whole thing should reduce to an expr
+start with expr;
+
+
+/* Reduction rules for expr */
+// monadic (unary) operation
+expr ::= PLUS expr:e
+ {: RESULT = new UnaryOpExpression(UnaryOpExpression.PLUS, e); :}
+ %prec UNARY // high precedence
+
+| MINUS expr:e
+ {: RESULT = new UnaryOpExpression(UnaryOpExpression.MINUS, e); :}
+ %prec UNARY // high precedence
+
+// dyadic (binary) operation
+| expr:e1 PLUS expr:e2
+ {: RESULT = new BinaryOpExpression(BinaryOpExpression.PLUS, e1, e2); :}
+
+| expr:e1 MINUS expr:e2
+ {: RESULT = new BinaryOpExpression(BinaryOpExpression.MINUS, e1, e2); :}
+
+| expr:e1 TIMES expr:e2
+ {: RESULT = new BinaryOpExpression(BinaryOpExpression.TIMES, e1, e2); :}
+
+| expr:e1 DIVIDE expr:e2
+ {: RESULT = new BinaryOpExpression(BinaryOpExpression.DIVIDE, e1, e2); :}
+
+| expr:e1 POW expr:e2
+ {: RESULT = new BinaryOpExpression(BinaryOpExpression.POW, e1, e2); :} 
+
+// numeric constant
+| NUMBER:x
+ {: RESULT = new NumericConstantExpression(x); :}
+
+// scientific constant
+| SCIENTIFIC_CONST:x
+ {: RESULT = new ScientificConstantExpression(x); :}
+
+// data variable name
+| VARIABLE:x
+ {: RESULT = new VariableExpression(x); :} 
+
+// built-in function application
+| BUILTIN_FUNCTION:fxnname LPAREN expr_list:arglist RPAREN
+ {: RESULT = new BuiltinFunctionExpression(fxnname, arglist); :} 
+
+// readout function keywords are not currently supported by this parser
+
+// parentheses
+| LPAREN expr:e RPAREN
+ {: RESULT = e;	:}
+; // end rule
+
+
+/* Reduction rules for expr_list */
+expr_list ::= expr:e {:
+{
+  ExpressionList list = new ExpressionList();
+  list.add(e);
+  RESULT = list;
+}
+:} 
+
+| expr:e COMMA expr_list:list {:
+{
+  list.add(0,e);
+  RESULT = list;
+}
+:} 
+; // end rule

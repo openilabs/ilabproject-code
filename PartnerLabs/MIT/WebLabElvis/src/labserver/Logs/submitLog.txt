@@ -1,0 +1,12 @@
+Submit method called
+The experiment specification passed in is <?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE experimentSpecification SYSTEM "http://ilab-labview.mit.edu/LabServer/xml/experimentSpecification.dtd"><experimentSpecification lab="MIT NI-ELVIS Weblab" specversion="0.1"><setupID>7</setupID><terminal instrumentType="FGEN" instrumentNumber="1"><vname download="true">Vin</vname><function type="WAVEFORM"><waveformType>SINE</waveformType><frequency>10</frequency><amplitude>0.5</amplitude><offset>0</offset></function></terminal></experimentSpecification>
+The caller has sufficient permission
+The interface is enabled
+Entering validation with broker ID 1
+The valication report is SUCCESS
+The experiment has been Accepted
+Estimated runtime is 71
+Done getting the report
+validation step complete, begin submission
+Submit the job

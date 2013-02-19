@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE labConfiguration SYSTEM "http://ilab-labview.mit.edu/LabServer/xml/labConfiguration.dtd">
+<labConfiguration lab="MIT ELVIS Weblab" specversion="0.1">
+	<setup id="5">
+		<name>OpAmp Differentiator Circuit</name>
+		<description>Aren't opAmpss just swell?</description>
+		<imageURL>http://localhost/labServer/setupImages/opAmpDifferentiator.gif</imageURL>
+		<terminal instrumentType="FGEN" instrumentNumber="1">
+			<label>Input Waveform</label>
+			<pixelLocation>
+				<x>121</x>
+				<y>94</y>
+			</pixelLocation>
+		</terminal>
+		<terminal instrumentType="SCOPE" instrumentNumber="2">
+			<label>Oscilloscope</label>
+			<pixelLocation>
+				<x>195</x>
+				<y>156</y>
+			</pixelLocation>
+		</terminal>
+	</setup>
+</labConfiguration>

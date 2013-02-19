@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE experimentSpecification SYSTEM "http://ilab-labview.mit.edu/labServer/xml/experimentSpecification.dtd">
+<experimentSpecification lab="MIT NI-ELVIS Weblab" specversion="0.1">
+	<setupID>1</setupID>
+		<vname download="true">VIN</vname>
+		<iname download="true">IIN</iname>
+		<mode>V</mode>
+		<function type="WAVEFORM">
+			<waveformType>SINE</waveformType>
+			<frequency>100</frequency>
+			<amplitude>0.5</amplitude>
+			<offset>0.1</offset>
+		</function>
+	</terminal>
+	<terminal instrumentType="SCOPE" instrumentNumber="2">
+		<vname download="true">VOUT</vname>
+		<iname download="true">IOUT</iname>
+		<mode>V</mode>
+		<function type="SAMPLING">
+			<samplingRate>100</samplingRate>
+			<samplingTime>0.01</samplingTime>
+		</function>
+	</terminal>
+	<userDefinedFunction>
+		<name download="true">SQRTID</name>
+		<units>A</units>
+		<body>SQRT(VIN)</body>
+	</userDefinedFunction>
+</experimentSpecification>
+
+
+
+			
+			

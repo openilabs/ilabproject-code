@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE experimentResult SYSTEM "http://ilab-labview.mit.edu/labServer/xml/experimentResult.dtd">
+<experimentResult lab="MIT NI-ELVIS Weblab" specversion="0.1">
+	<datavector name="VIN" units="V">1,2,3,4,5</datavector>
+	<datavector name="VOUT" units="I">6,7,8,9,0</datavector>
+</experimentResult>

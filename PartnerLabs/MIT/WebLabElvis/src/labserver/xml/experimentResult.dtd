@@ -1,0 +1,7 @@
+﻿
+<!ELEMENT experimentResult (datavector+)>
+<!ELEMENT datavector (#PCDATA)>
+<!ATTLIST experimentResult	lab			CDATA	#REQUIRED
+							specversion	CDATA	#REQUIRED>
+<!ATTLIST datavector		name		CDATA	#REQUIRED
+							units		CDATA	#REQUIRED>

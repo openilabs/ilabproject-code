@@ -1,0 +1,60 @@
+<html>
+<body background="button_bg.gif" bgcolor=white text=black marginheight=0 marginwidth=0 topmargin=0 leftmargin=0>
+
+<script language="JavaScript">
+<!--
+   /* Due to size differences in Netscape and Internet Explorer when specifying widths
+    * this javascript catches the different widths and spits out the one compatible with
+    * the detected browser
+    */
+
+    function QueryString(key) {
+            var value = null;
+            for (var i=0;i<QueryString.keys.length;i++) {
+                    if (QueryString.keys[i]==key) {
+                            value = QueryString.values[i];
+                            break;
+                    }
+            }
+            return value;
+    }
+
+    QueryString.keys = new Array();
+    QueryString.values = new Array();
+
+    function parseQueryString() {
+            var query = window.location.search.substring(1);
+            var pairs = query.split("&");
+
+            for (var i=0;i<pairs.length;i++) {
+                    var pos = pairs[i].indexOf('=');
+                    if (pos >= 0) {
+                            var argname = pairs[i].substring(0,pos);
+                            var value = pairs[i].substring(pos+1);
+                            QueryString.keys[QueryString.keys.length] = argname;
+                            QueryString.values[QueryString.values.length] = value;
+                    }
+            }
+    }
+
+    //execute
+    parseQueryString();
+
+    var offset = parseInt(QueryString("offset"));
+    var agt = navigator.userAgent.toLowerCase();
+    if((agt.indexOf('mozilla')!=-1) && (agt.indexOf('compatible') == -1) && (agt.indexOf('hotjava')==-1)) {
+      //this is a netscape browser...width offset is +8
+      offset +=3;
+    }
+
+    //write out results
+    document.write("<table border=0 cellpadding=0 cellspacing=0>\n");
+    document.write("<tr><td width='"+offset+"' align=right><img src='darkgray.gif' width=1 height=1650></td></tr>\n");
+    document.write("</table>\n");
+//-->
+</script>
+<noscript>
+test
+</noscript>
+</body>
+</html>
