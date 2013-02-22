@@ -7,12 +7,12 @@
 '   totalLoads => The total loads that we will control. Up to 16.
 
 
-Const ExperimentLength = ${ExperimentLength}$
-Const TotalLoads = ${TotalLoads}$
-Const SampleEverySecs = 30
+Const ExperimentLength = ${experimentLength}$
+Const TotalLoads = ${totalLoads}$
+Const SampleEverySecs = ${sampleRate}$
 Const InString = "${profile}$"
 
-Const TimeMeasurement = 60 ' Change to 1 to use minutes. Change to 60 to use hours.
+Const TimeMeasurement = ${timeUnit}$ ' Change to 1 to use minutes. Change to 60 to use hours.
 
 
 ' Convert the experiment length to hours. And then divide for the time we are waiting

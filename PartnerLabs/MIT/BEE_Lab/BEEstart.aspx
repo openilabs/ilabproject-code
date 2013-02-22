@@ -80,8 +80,13 @@ Please see license.txt in top level directory for full license.
     </li>
   </ul>
 </nav>
-
-<div id="chart-container"></div>
+<div class='main'>
+  <h1 class='chart-title'>Load Profiles</h1>
+  <div id='holder'>
+    <div id="chart-container"></div>
+  </div>
+  <div class='legend'></div>
+</div>
 <a class="button" id="js-launch-experiment" href="#">
   Start Experiment
 </a>
@@ -102,6 +107,9 @@ Please see license.txt in top level directory for full license.
 				<asp:HiddenField ID="hdnSbUrl" runat="server" />
 				<asp:HiddenField ID="hdnExpId" runat="server" />
 				<asp:HiddenField ID="hdnProfile" runat="server" value="120,0,2,3,6,6,6"/>
+				<asp:HiddenField ID="hdnExpLength" runat="server" value="24"/>
+				<asp:HiddenField ID="hdnTimeUnit" runat="server" value="60"/>
+				<asp:HiddenField ID="hdnSampleRate" runat="server" value="30"/>
 			</div>
 		</form>
 	</body>

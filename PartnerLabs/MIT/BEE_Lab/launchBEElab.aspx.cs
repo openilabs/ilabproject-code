@@ -45,7 +45,9 @@ namespace iLabs.LabServer.BEE
             int appID = 0;
             long expID = 0;
             LabTask task = null;
+            string expLen = null;
             string pageURL = null;
+            bool useTaskDuration = true;
             // Query values from the request
             if (!IsPostBack)
             {
@@ -54,7 +56,7 @@ namespace iLabs.LabServer.BEE
                 string passkey = Request.QueryString["passkey"];
                 string issuerGUID = Request.QueryString["issuer_guid"];
                 string returnTarget = Request.QueryString["sb_url"];
-
+                expLen = Request.QueryString["explen"];
                 if ((returnTarget != null) && (returnTarget.Length > 0))
                     Session["sbUrl"] = returnTarget;
 
@@ -223,6 +225,14 @@ namespace iLabs.LabServer.BEE
                     buf.Append("&passkey=" + passkey);
                     buf.Append("&issuer_guid=" + issuerGUID);
                     buf.Append("&sb_url=" + returnTarget);
+                    if(expLen != null && expLen.Length > 0)
+                        buf.Append("&explen=" + expLen);
+                    //if (useTaskDuration)
+                    //{
+                    //    TimeSpan taskDur = task.endTime.Subtract(DateTime.UtcNow);
+                    //    int hours = Convert.ToInt32(taskDur.TotalHours);
+                    //    buf.Append("&explen=" + hours);
+                    //}
                     Response.Redirect(buf.ToString(), true);
                 }
                 else

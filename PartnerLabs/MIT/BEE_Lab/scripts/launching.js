@@ -1,4 +1,4 @@
-(function() {
+﻿(function() {
   var LaunchPad;
 
   window.LaunchPad = LaunchPad = (function() {

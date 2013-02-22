@@ -29,11 +29,20 @@ nav {
     color: white;
     background: #c6a77d; }
 
-input[type=radio],#btnGo {
+input[type=radio], #btnGo {
   display: none; }
 
-#chart-container {
+#holder {
   width: 90%;
+  margin: 0 auto 10px;
+  overflow-x: scroll;
+  position: relative; }
+
+.chart-title {
+  margin: 0 auto 15px;
+  text-align: center; }
+
+#chart-container {
   margin: 0 auto; }
 
 .load-table {

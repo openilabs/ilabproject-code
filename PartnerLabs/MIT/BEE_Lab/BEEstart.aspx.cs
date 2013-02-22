@@ -70,6 +70,15 @@ namespace iLabs.LabServer.BEE
                 hdnPasscode.Value = Request.QueryString["passkey"];
                 hdnIssuer.Value = Request.QueryString["issuer_guid"];
                 hdnSbUrl.Value = Request.QueryString["sb_url"];
+               string expLen  = Request.QueryString["explen"];
+               if (expLen != null && expLen.Length > 0)
+               {
+                   hdnExpLength.Value = expLen;
+               }
+               writeExpLength();
+               string timeUnit = Request.QueryString["tu"];
+               if (timeUnit != null && timeUnit.Length > 0)
+                   hdnTimeUnit.Value = timeUnit;
                 
                 string userName = null;
                 string userIdStr = null;
@@ -129,6 +138,13 @@ namespace iLabs.LabServer.BEE
             }
         }
 
+        protected void writeExpLength()
+        {
+            StringBuilder buf = new StringBuilder("<script type=\"text/javascript\">");
+            buf.Append(" window.labLength = '" + hdnExpLength.Value + "';");
+            buf.AppendLine("</script>");
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "labLength", buf.ToString(), false);
+        }
 
         /*
         protected void clearSessionInfo()
@@ -179,6 +195,7 @@ namespace iLabs.LabServer.BEE
             }
         }
 
+
         private void sendFile(string loggerName, string filePath, string serverName){
              Server cr1000 = new Server(serverName);
             cr1000.sendProgramFile(loggerName,filePath);
@@ -194,9 +211,11 @@ namespace iLabs.LabServer.BEE
             // send that file
 
             Hashtable hashtable = new Hashtable();
-            hashtable["experimentLength"] = "24";
+            hashtable["experimentLength"] = hdnExpLength.Value;
             hashtable["profile"] = profile;
             hashtable["totalLoads"] = 4;
+            hashtable["timeUnit"] = hdnTimeUnit.Value;
+            hashtable["sampleRate"] = hdnSampleRate.Value;
             iLabParser parser = new iLabParser();
             parser.SetEndToken("}$");
             string temp = File.ReadAllText(ConfigurationManager.AppSettings["climateTemplate"]);
