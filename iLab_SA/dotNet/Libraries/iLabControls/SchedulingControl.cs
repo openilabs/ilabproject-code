@@ -39,7 +39,7 @@ namespace iLabs.Controls.Scheduling
         TimeSpan maxTOD;
         TimeSpan minTOD;
         TimeSpan minDuration;
-        TimeSpan tzSpan;  
+        //TimeSpan tzSpan;  
 
         TimeSpan oneDay = TimeSpan.FromDays(1);
         int minHour = 0;
@@ -124,7 +124,7 @@ namespace iLabs.Controls.Scheduling
             set
             {
                 userTZ = value;
-                tzSpan = TimeSpan.FromMinutes(userTZ);
+                //tzSpan = TimeSpan.FromMinutes(userTZ);
             }
         }
         public CultureInfo Culture
@@ -645,7 +645,7 @@ namespace iLabs.Controls.Scheduling
 
         private void renderTimePeriods(HtmlTextWriter output, DateTime date, List<TimePeriod> periods)
         {
-            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), EndDate);
+            TimeBlock validTime = new TimeBlock(date.AddHours((int)minTOD.Hours), endTime);
             TimeBlock valid;
             DateTime cur = DateTime.MinValue;
             DateTime end = DateTime.MinValue;

@@ -50,6 +50,11 @@
                 <asp:ListItem Value="5"> 5 </asp:ListItem>
                 <asp:ListItem Value="6"> 6 </asp:ListItem>
                 <asp:ListItem Value="7"> 7 </asp:ListItem>
+                <asp:ListItem Value="8"> 8 </asp:ListItem>
+                <asp:ListItem Value="9"> 9 </asp:ListItem>
+                <asp:ListItem Value="10"> 10 </asp:ListItem>
+                <asp:ListItem Value="11"> 11 </asp:ListItem>
+                <asp:ListItem Value="12"> 12 </asp:ListItem>
 		        </asp:DropDownList>
 		    </td>
 		    <td align="center" valign="top">
