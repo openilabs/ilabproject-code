@@ -71,11 +71,6 @@ namespace iLabs.LabServer.BEE
                 hdnIssuer.Value = Request.QueryString["issuer_guid"];
                 hdnSbUrl.Value = Request.QueryString["sb_url"];
                string expLen  = Request.QueryString["explen"];
-               if (expLen != null && expLen.Length > 0)
-               {
-                   hdnExpLength.Value = expLen;
-               }
-               writeExpLength();
                string timeUnit = Request.QueryString["tu"];
                if (timeUnit != null && timeUnit.Length > 0)
                    hdnTimeUnit.Value = timeUnit;
@@ -128,7 +123,9 @@ namespace iLabs.LabServer.BEE
                     Session["groupName"] = groupName;
                     string sbStr = expDoc.Query("ExecuteExperimentPayload/sbGuid");
                     Session["brokerGUID"] = sbStr;
-
+                    string startStr = expDoc.Query("ExecuteExperimentPayload/startExecution");
+                    string durStr = expDoc.Query("ExecuteExperimentPayload/duration");
+                    writeExpLength(startStr,durStr);
                     if ((tzStr != null) && (tzStr.Length > 0))
                     {
                         Session["userTZ"] = tzStr;
@@ -138,8 +135,29 @@ namespace iLabs.LabServer.BEE
             }
         }
 
-        protected void writeExpLength()
+        protected void writeExpLength(string startStr, string durStr)
         {
+            if (startStr != null && durStr != null && startStr.Length > 0 && durStr.Length > 0)
+            {
+                DateTime start = DateUtil.ParseUtc(startStr);
+                int duration = Convert.ToInt32(durStr);
+                DateTime end = start.AddSeconds(duration);
+                double hours = end.Subtract(DateTime.UtcNow).TotalHours;
+                int runTime = (int) Math.Truncate(hours);
+                if (runTime < 0)
+                {
+                    throw new Exception("Remaining time to run experiment is negative!");
+                }
+                if (runTime < 1)
+                {
+                    runTime = 1; ;
+                }
+                hdnExpLength.Value = runTime.ToString();
+            }
+            else
+            {
+                hdnExpLength.Value = "24";
+            }
             StringBuilder buf = new StringBuilder("<script type=\"text/javascript\">");
             buf.Append(" window.labLength = '" + hdnExpLength.Value + "';");
             buf.AppendLine("</script>");

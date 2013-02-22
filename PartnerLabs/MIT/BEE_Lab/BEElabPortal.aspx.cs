@@ -136,8 +136,6 @@ namespace iLabs.LabServer.BEE
                     // Create a new Experiment task
                     // Use taskFactory to create a new task
                     LabTaskFactory factory = new LabTaskFactory();
-
-        
                     task = factory.CreateLabTask(appInfo, expCoupon, expTicket);
 
                     if (task != null)
@@ -168,23 +166,23 @@ namespace iLabs.LabServer.BEE
 
                         //Utilities.WriteLog("TaskXML: " + task.taskID + " \t" + task.data);
 
-                        //Construct the information to be passed to the target page
-                        TimeSpan taskDur = task.endTime - task.startTime;
-                        string vipayload = LabTask.constructSessionPayload(appInfo,
-                            task.startTime, taskDur.Ticks / TimeSpan.TicksPerSecond, task.taskID,
-                            returnTarget, null, null);
+                        ////Construct the information to be passed to the target page
+                        //TimeSpan taskDur = task.endTime - task.startTime;
+                        //string vipayload = LabTask.constructSessionPayload(appInfo,
+                        //    task.startTime, taskDur.Ticks / TimeSpan.TicksPerSecond, task.taskID,
+                        //    returnTarget, null, null);
 
-                        //Utilities.WriteLog("sessionPayload: " + payload);
-                        //Store Session information
-                        Session["payload"] = vipayload;
-                        if (appInfo.rev != null && appInfo.rev.Length > 0)
-                        {
-                            Session["lvversion"] = appInfo.rev;
-                        }
-                        else
-                        {
-                            Session.Remove("lvversion");
-                        }
+                        ////Utilities.WriteLog("sessionPayload: " + payload);
+                        ////Store Session information
+                        //Session["payload"] = vipayload;
+                        //if (appInfo.rev != null && appInfo.rev.Length > 0)
+                        //{
+                        //    Session["lvversion"] = appInfo.rev;
+                        //}
+                        //else
+                        //{
+                        //    Session.Remove("lvversion");
+                        //}
 
                         //set Presentation page tp appPage
                         pageURL = appInfo.page;
