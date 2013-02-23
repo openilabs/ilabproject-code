@@ -21,7 +21,7 @@ Const TimeMeasurement = ${timeUnit}$ ' Change to 1 to use minutes. Change to 60 
 Const MaxScanCount = ((ExperimentLength * TimeMeasurement * 60) INTDV SampleEverySecs) + 1
 
 
-Public Channels(${TotalLoads}$)
+Public Channels(${totalLoads}$)
 Public Source(16)
 Public InputLoads(ExperimentLength * (TotalLoads + 1))
 Public DateArray(9)
