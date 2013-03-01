@@ -30,8 +30,56 @@ namespace iLabs.LabServer.Interactive
             // TODO: Add constructor logic here
             //
         }
-        //This should be in the factory as a method
+        
+        /// <summary>
+        /// Parses the appInfo and experiment ticket, inserts the task into the database and
+        /// creates a dataManager and dataSources defined in the appInfo.
+        /// </summary>
+        /// <param name="appInfo"></param>
+        /// <param name="expCoupon"></param>
+        /// <param name="expTicket"></param>
+        /// <returns></returns>
         public virtual LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket)
+        {
+            LabTask labTask = CreateLabTask(appInfo, expTicket);
+
+            if (((labTask.storage != null) && (labTask.storage.Length > 0)))
+            {
+                // Create DataSourceManager to manage dataSources
+                DataSourceManager dsManager = new DataSourceManager();
+
+                // set up an experiment storage handler
+                ExperimentStorageProxy ess = new ExperimentStorageProxy();
+                ess.OperationAuthHeaderValue = new OperationAuthHeader();
+                ess.OperationAuthHeaderValue.coupon = expCoupon;
+                ess.Url = labTask.storage;
+                dsManager.essProxy = ess;
+                dsManager.ExperimentID = labTask.experimentID;
+                dsManager.AppKey = appInfo.appKey;
+                // Note these dataSources are written to by the application and sent to the ESS
+                if ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0))
+                {
+                    string[] sources = appInfo.dataSources.Split(',');
+                    // Use the experimentID as the storage parameter
+                    foreach (string s in sources)
+                    {
+                       // dsManager.AddDataSource(createDataSource(s));
+                    }
+                }
+                TaskProcessor.Instance.AddDataManager(labTask.taskID, dsManager);
+            }
+            TaskProcessor.Instance.Add(labTask);
+            return labTask;
+        }
+
+        /// <summary>
+        /// Parses the appInfo and experiment ticket, inserts the task into the database, 
+        /// but does not create the DataManager.
+        /// </summary>
+        /// <param name="appInfo"></param>
+        /// <param name="expTicket"></param>
+        /// <returns></returns>
+        public virtual LabTask CreateLabTask(LabAppInfo appInfo, Ticket expTicket)
         {
             // set defaults
             DateTime startTime = DateTime.UtcNow;
@@ -97,40 +145,12 @@ namespace iLabs.LabServer.Interactive
             string taskData = null;
             taskData = LabTask.constructTaskXml(appInfo.appID, fullName, appInfo.rev, statusName, essService);
 
-            // Create  & store the labTask in database and return an LabTAsk object;
+            // Create  & store the labTask in database and return an LabTask object;
             labTask = dbManager.InsertTask(appInfo.appID, experimentID,
                         groupName, startTime, duration, LabTask.eStatus.Scheduled,
                         expTicket.couponId, expTicket.issuerGuid, essService, taskData);
-
-            if (((essService != null) && (essService.Length > 0)))
-            {
-                // Create DataSourceManager to manage dataSources
-                DataSourceManager dsManager = new DataSourceManager();
-
-                // set up an experiment storage handler
-                ExperimentStorageProxy ess = new ExperimentStorageProxy();
-                ess.OperationAuthHeaderValue = new OperationAuthHeader();
-                ess.OperationAuthHeaderValue.coupon = expCoupon;
-                ess.Url = essService;
-                dsManager.essProxy = ess;
-                dsManager.ExperimentID = experimentID;
-                dsManager.AppKey = qualName;
-                // Note these dataSources are written to by the application and sent to the ESS
-                if ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0))
-                {
-                    string[] sources = appInfo.dataSources.Split(',');
-                    // Use the experimentID as the storage parameter
-                    foreach (string s in sources)
-                    {
-                       // dsManager.AddDataSource(createDataSource(s));
-                    }
-                }
-                TaskProcessor.Instance.AddDataManager(labTask.taskID, dsManager);
-            }
-            TaskProcessor.Instance.Add(labTask);
             return labTask;
         }
-       
      
 
     }

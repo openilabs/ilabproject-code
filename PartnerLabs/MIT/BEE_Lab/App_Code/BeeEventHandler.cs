@@ -1,9 +1,11 @@
 using System;
 using System.Data;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Globalization;
 using System.Net;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Web;
 //using System.Web.Mvc;
 
@@ -43,6 +45,8 @@ namespace iLabs.LabServer.BEE
         protected string pusherSS = "8eb0e8fb6087f48b1163";
         protected char[] delim = ",".ToCharArray();
         protected int count = 0;
+        protected int status =0;
+        protected int waitTime = 1000;
         //
         // TODO: Add constructor logic here
         //
@@ -84,7 +88,39 @@ namespace iLabs.LabServer.BEE
                 pusherChannel = value;
             }
         }
+        /*
+         ++numTries;
+            try
+            {
+                // Attempt to open the file exclusively.
+                using (FileStream fs = new FileStream(fullPath,
+                    FileMode.Open, FileAccess.ReadWrite, 
+                    FileShare.None, 100))
+                {
+                    fs.ReadByte();
 
+                    // If we got this far the file is ready
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.LogWarning(
+                   "WaitForFile {0} failed to get an exclusive lock: {1}", 
+                    fullPath, ex.ToString());
+
+                if (numTries > 10)
+                {
+                    Log.LogWarning(
+                        "WaitForFile {0} giving up after 10 tries", 
+                        fullPath);
+                    return false;
+                }
+
+                // Wait for the lock to be released
+                System.Threading.Thread.Sleep(500);
+            }
+        */
         // Define the event handlers.
         public void OnChanged(object source, FileSystemEventArgs e)
         {
@@ -98,64 +134,45 @@ namespace iLabs.LabServer.BEE
                         Logger.WriteLine("BeeEventHabdler File Created: " + e.FullPath + " " + e.ChangeType);
                         break;
                     case WatcherChangeTypes.Changed:
-
-                        // DateTime lastWrite = File.GetLastWriteTimeUtc(e.FullPath);
-                        FileInfo fInfo = new FileInfo(e.FullPath);
-                        
-                        long len = fInfo.Length;
-                        if (len > 0)
-                        {
-                            ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                            essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
-                            essProxy.OperationAuthHeaderValue.coupon = opCoupon;
-                            essProxy.Url = essUrl;
-
-                            //replace DataSocket code with 'Pusher' interface
-                            IPusherProvider provider = new PusherProvider(pusherID, pusherKey, pusherSS, null);
-
-                            string[] records = File.ReadAllLines(e.FullPath);
-                            using (FileStream inFile = fInfo.Open(FileMode.Truncate)) { }
-
-                            foreach (string rec in records)
-                            {
-                                string[] vals = rec.Split(delim, 2);
-                                DateTime timeStamp = new DateTime(0L, DateTimeKind.Local);
-                                bool status = DateTime.TryParseExact(vals[0].Replace("\"", ""), "yyyy-MM-dd HH:mm:ss", null, DateTimeStyles.None, out timeStamp);
-                                string record = "\"" + timeStamp.ToString("o") + "\"," + vals[1];
-                                try
+                        try{
+                            status = 0;
+                            status = ProcessRecords(  e.FullPath);
+                        }
+                        catch(IOException ioe){
+                            if(IsFileLocked(ioe)){
+                                Logger.WriteLine("BeeEventHandle waiting for unlock");
+                                status = 0;
+                                int loopCOunt = 0;
+                                while (status == 0 && loopCOunt < 10)
                                 {
-                                    essProxy.AddRecord(experimentID, submitter, recordType, false, record, null);
-                                }
-                                catch (Exception essEx)
-                                {
-                                    Logger.WriteLine("BeeEventHandler: OnChange ESS: " + essEx.Message);
-                                }
-                                try
-                                {
-                                    string str = @"{'rawData': [" + record + "]}";
-                                    ObjectPusherRequest request =
-                                        new ObjectPusherRequest(pusherChannel, "meassurement-added", str);
-                                    provider.Trigger(request);
-                                }
-                                catch (Exception dsEx)
-                                {
-                                    Logger.WriteLine("BeeEventHandler: OnChange DS: " + dsEx.Message);
+                                    // Wait for the lock to be released
+                                    System.Threading.Thread.Sleep(waitTime);
+                                    loopCOunt++;
+                                    try
+                                    {
+                                        status = ProcessRecords(e.FullPath);
+                                    }
+                                    catch (IOException ioe2)
+                                    {
+                                        if (!IsFileLocked(ioe2))
+                                        {
+                                            throw ioe2;
+                                        }
+                                    }
+                                    if (loopCOunt >= 10)
+                                    {
+                                        Logger.WriteLine("BeeEventHandle waiting for unlock timed out");
+                                    }
                                 }
                             }
-                            //Pusher interface Close not needed
                         }
-                        if (count > 10)
-                        {
-                            Global.PingServer();
-                            count = 0;
-                        }
-                        else
-                        {
-                            count++;
+                        catch(Exception ex){
+                             throw ex;
                         }
                         break;
+ 
                     case WatcherChangeTypes.Deleted:
-                        Console.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
+                        Logger.WriteLine("File: " + e.FullPath + " " + e.ChangeType);
                         break;
                 }
             }
@@ -163,9 +180,117 @@ namespace iLabs.LabServer.BEE
             {
                 Logger.WriteLine("BeeEventHandler: " + ex.Message);
             }
-
         }
 
+        private int ProcessRecords(string fullPath)
+        {
+            List<string> records = new List<string>();
+            int count = 0;
+            try
+            {
+                try
+                {
+                    // Attempt to open the file exclusively.
+                   
+                    using (FileStream fs = File.Open(fullPath, FileMode.Open, FileAccess.ReadWrite,
+                             FileShare.None))
+                    {
+                        string line;
+                        StreamReader sr = new StreamReader(fs);
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            records.Add(line);
+                        }
+                        
+                        fs.SetLength(0L);
+                        sr.Close();
+                    }
+                }
+                catch (IOException ioe)
+                {
+                    throw ioe;
+                }
+
+                // If we got this far send the data
+                if (records.Count > 0)
+                {
+                    ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
+                    essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                    essProxy.OperationAuthHeaderValue.coupon = opCoupon;
+                    essProxy.Url = essUrl;
+
+                    //replace DataSocket code with 'Pusher' interface
+                    IPusherProvider provider = new PusherProvider(pusherID, pusherKey, pusherSS, null);
+
+
+                    foreach (string rec in records)
+                    {
+                        string[] vals = rec.Split(delim, 2);
+                        DateTime timeStamp = new DateTime(0L, DateTimeKind.Local);
+                        bool status = DateTime.TryParseExact(vals[0].Replace("\"", ""), "yyyy-MM-dd HH:mm:ss", null, DateTimeStyles.None, out timeStamp);
+                        string record = "\"" + timeStamp.ToString("o") + "\"," + vals[1];
+                        try
+                        {
+                            essProxy.AddRecord(experimentID, submitter, recordType, false, record, null);
+                        }
+                        catch (Exception essEx)
+                        {
+                            Logger.WriteLine("BeeEventHandler: OnChange ESS: " + essEx.Message);
+                        }
+                        try
+                        {
+                            string str = @"{'rawData': [" + record + "]}";
+                            ObjectPusherRequest request =
+                                new ObjectPusherRequest(pusherChannel, "meassurement-added", str);
+                            provider.Trigger(request);
+                        }
+                        catch (Exception dsEx)
+                        {
+                            Logger.WriteLine("BeeEventHandler: OnChange DS: " + dsEx.Message);
+                        }
+                        count++;
+                    }
+                    //Pusher interface Close not needed
+                }
+            }
+            catch (Exception e)
+            {
+            }
+            return count;
+        }
+ 
+
+    private bool IsFileLocked(IOException exception)
+    {
+        int errorCode = Marshal.GetHRForException(exception) & ((1 << 16) - 1);
+        return errorCode == 32 || errorCode == 33;
+    }
+
+    /*                  
+           }
+       }
+       catch (Exception ex)
+       {
+           Log.LogWarning(
+              "WaitForFile {0} failed to get an exclusive lock: {1}", 
+               fullPath, ex.ToString());
+
+           if (numTries > 10)
+           {
+               Log.LogWarning(
+                   "WaitForFile {0} giving up after 10 tries", 
+                   fullPath);
+               return false;
+           }
+
+           // Wait for the lock to be released
+           System.Threading.Thread.Sleep(500);
+       }
+                   // DateTime lastWrite = File.GetLastWriteTimeUtc(e.FullPath);
+                   FileInfo fInfo = new FileInfo(e.FullPath);
+                   fInfo.
+                   long len = fInfo.Length;
+                 */  
      
     }
     

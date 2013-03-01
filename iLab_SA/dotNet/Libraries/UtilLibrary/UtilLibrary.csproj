@@ -50,6 +50,7 @@
     <Compile Include="DateUtil.cs" />
     <Compile Include="iLabGlobal.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="ThreadedProcess.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="XmlQueryDoc.cs" />
   </ItemGroup>

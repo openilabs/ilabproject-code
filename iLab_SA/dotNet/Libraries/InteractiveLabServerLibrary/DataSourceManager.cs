@@ -13,7 +13,11 @@ using System.Configuration;
 using System.Web;
 using System.Web.Services;
 
+using iLabs.DataTypes;
+
+using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.DataTypes.StorageTypes;
+using iLabs.DataTypes.TicketingTypes;
 using iLabs.Proxies.ESS;
 using iLabs.Proxies.ISB;
 
@@ -36,6 +40,29 @@ namespace iLabs.LabServer.Interactive
         public DataSourceManager()
         {
             dataSources = new ArrayList();
+        }
+
+        public DataSourceManager(LabTask task)
+            : this()
+        {
+            taskID = task.taskID;
+            experimentID = task.experimentID;
+            if (task.storage != null && task.storage.Length > 0)
+            {
+                LabDB labDB = new LabDB();
+                Coupon expCoupon = labDB.GetCoupon(task.couponID, task.issuerGUID);
+                if (expCoupon != null)
+                {
+                    essProxy = new ExperimentStorageProxy();
+                    essProxy.Url = task.storage;
+                    essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
+                    essProxy.OperationAuthHeaderValue.coupon = expCoupon;
+                }
+                else
+                    throw new Exception("ExpCoupon not found");
+            }
+            else
+             throw new Exception("ESS is not specified");
         }
 
         public long ExperimentID

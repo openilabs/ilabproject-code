@@ -34,17 +34,17 @@ namespace iLabs.ServiceBroker
 	public class SBTicketRemover
 	{
         private Thread theThread;
-        // waitTime in milliseconds
-        //private int waitTime = 3600000; // once an hour
+        // waitMilliseconds in milliseconds
+        //private int waitMilliseconds = 3600000; // once an hour
         private int waitTime = 600000; // 10 minutes - current default
-        //private int waitTime = 60000; // 1 minute for debugging
+        //private int waitMilliseconds = 60000; // 1 minute for debugging
         //private int count = 0;  // Was used to output a log message every N times
         private bool go = true;
  
         
 		public SBTicketRemover()
 		{
-            Logger.WriteLine("SBTicketRemover created waitTime = " + waitTime);
+            Logger.WriteLine("SBTicketRemover created waitMilliseconds = " + waitTime);
 			
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
@@ -54,7 +54,7 @@ namespace iLabs.ServiceBroker
 
         public SBTicketRemover(int delay){
             waitTime = delay;
-            Logger.WriteLine("SBTicketRemover created waitTime = " + waitTime);
+            Logger.WriteLine("SBTicketRemover created waitMilliseconds = " + waitTime);
             theThread = new Thread(new ThreadStart(Run));
             theThread.IsBackground = true;
             theThread.Start();

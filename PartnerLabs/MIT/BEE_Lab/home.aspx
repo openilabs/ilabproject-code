@@ -1,4 +1,4 @@
-<%@ Page language="c#" Inherits="iLabs.LabServer.LabView.home" CodeFile="home.aspx.cs" %>
+<%@ Page language="c#" Inherits="iLabs.LabServer.BEE.home" CodeFile="home.aspx.cs" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="userNav" Src="userNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>

@@ -232,9 +232,14 @@ namespace iLabs.LabServer.Interactive
         public virtual void DisplayStatus(string statusName, string message, string time)
         {
         }
+
+         /// <summary>
+         /// This is called by the TaskProcessor during every interation of the process loop, 
+         /// for task with one of these LabTask.eStatus: Pending, Scheduled, Running, Waiting.
+         /// </summary>
+         /// <returns>the task status after the heartb eet.</returns>
         public virtual eStatus HeartBeat()
         {
-
             try
             {
                 if (status == eStatus.Running)
@@ -247,23 +252,18 @@ namespace iLabs.LabServer.Interactive
 
                         if ((statusName != null) && (statusName.Length > 0))
                         {
-                           
                                 long ticks = endTime.Ticks - DateTime.UtcNow.Ticks;
                                 TimeSpan val = new TimeSpan(ticks);
                                 DisplayStatus(statusName, "TaskID: " + taskID, val.Minutes + ":" + val.Seconds);
-                           
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Logger.WriteLine("ProcessTasks Status: " + e.Message);
+                Logger.WriteLine("HeartBeat: " + e.Message);
             }
             return status;
         }
-
-
-
 	}
 }

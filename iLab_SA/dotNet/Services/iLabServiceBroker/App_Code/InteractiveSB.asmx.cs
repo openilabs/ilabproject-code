@@ -1063,7 +1063,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 Coupon coupon = brokerDB.CreateCoupon();
                                 TicketLoadFactory tlc = TicketLoadFactory.Instance();
                                 string payload = tlc.createAuthenticateAgentPayload(authority.authGuid, clientGuid, userName, groupName);
-                                brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, authority.authGuid, 600L, payload);
+                                brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, 600L, payload);
                                 buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
                                 buf.Append("/default.aspx?sso=t");
                                 buf.Append("&usr=" + userName + "&cid=" + clientGuid);
@@ -1150,7 +1150,7 @@ namespace iLabs.ServiceBroker.iLabSB
 
             if (agentAuthHeader.coupon == null && opHeader.coupon == null)
             {
-                throw new AccessDeniedException("Missing Header Information, access denied!");
+                throw new AccessDeniedException("Missing ProcessName Information, access denied!");
             }
             if (opHeader.coupon != null)
             {

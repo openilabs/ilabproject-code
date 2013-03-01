@@ -18,7 +18,7 @@ using System.Web.Security;
 using System.Configuration;
 using iLabs.UtilLib;
 
-namespace iLabs.LabServer.LabView
+namespace iLabs.LabServer.BEE
 {
 	/// <summary>
 	/// iLabs Home Page

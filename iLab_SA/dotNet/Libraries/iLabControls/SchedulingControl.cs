@@ -613,7 +613,7 @@ namespace iLabs.Controls.Scheduling
 #endif
             output.RenderBeginTag("table");
 
-            //Day Header 
+            //Day ProcessName 
             output.Write("<tr>");
             output.AddStyleAttribute("height", headerHeight*2 + "px");
             output.AddStyleAttribute("width", columnWidth + "px");

@@ -107,10 +107,11 @@ namespace iLabs.LabServer.BEE
                     {
                         appInfo = dbManager.GetLabApp(appKey);
                     }
-                    else // Have to use groupName & Servicebroker THIS REQUIRES groups & permissions are set in database
-                    {    // This is no longer the case as the USS handles groups and permissions
-                        appInfo = dbManager.GetLabAppForGroup(groupName, sbStr);
-                    }
+                    // This is no longer the case as the USS handles groups and permissions
+                    //else // Have to use groupName & Servicebroker THIS REQUIRES groups & permissions are set in database
+                    //{   
+                    //    appInfo = dbManager.GetLabAppForGroup(groupName, sbStr);
+                    //}
                     if (appInfo == null)
                     {
                         Response.Redirect("AccessDenied.aspx?text=Unable+to+find+application+information,+please+notify+your+administrator.", true);
@@ -129,6 +130,7 @@ namespace iLabs.LabServer.BEE
                         {
                             foreach (LabTask t in curTasks)
                             {
+                                //ToDo: check if the tasks should all be closed
                                 DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(t.taskID);
                                 if (dsManager != null)
                                 {
@@ -141,49 +143,21 @@ namespace iLabs.LabServer.BEE
 
                         // Create a new Experiment task
                         // Use taskFactory to create a new task
-                        LabTaskFactory factory = new LabTaskFactory();
-
-
-                        task = factory.CreateLabTask(appInfo, expCoupon, expTicket);
+                        BeeAPI factory = new BeeAPI();
+                        task = factory.CreateLabTask(appInfo, expTicket);
 
                         if (task != null)
                         {
-                            string outputDir = ConfigurationManager.AppSettings["chamberOutputDir"];
-                            string outputFile = ConfigurationManager.AppSettings["chamberOutputFile"];
-                            string filePath = outputDir + @"\" + outputFile;
-                            // Stop the controller and flush the data file
+                            if (task.storage != null && task.storage.Length > 0)
+                            {
+                                DataSourceManager dsManager = new DataSourceManager(task);
+                                FileDataSource fds = factory.CreateBeeDataSource(expCoupon, task, "data", true);
+                                dsManager.AddDataSource(fds);
+                                fds.Start();
+                                TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
+                            }
+                            TaskProcessor.Instance.Add(new BeeTask(task));
 
-                            //Flush the File
-                            FileInfo fInfo = new FileInfo(filePath);
-                            using (FileStream inFile = fInfo.Open(FileMode.Truncate)) { }
-
-                            string pushChannel = ChecksumUtil.ToMD5Hash("BEElab" + expID);
-                            //Add BEElab specific attributes
-                            BeeEventHandler bEvt = new BeeEventHandler(expCoupon, expID, essUrl,
-                                "data", ProcessAgentDB.ServiceGuid);
-                            bEvt.PusherChannel = pushChannel;
-                            DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(task.taskID);
-                            FileDataSource fds = new FileDataSource();
-                            fds.Path = outputDir;
-                            fds.Filter = outputFile;
-                            fds.AddFileSystemEventHandler(bEvt.OnChanged);
-                            dsManager.AddDataSource(fds);
-                            fds.Start();
-
-                            //Useful for debugging overloads the use of a field in the banner
-                            //Session["GroupName"] = "TaskID: " + task.taskID.ToString();
-
-                            //Utilities.WriteLog("TaskXML: " + task.taskID + " \t" + task.data);
-
-                            //Construct the information to be passed to the target page
-                            TimeSpan taskDur = task.endTime - task.startTime;
-                            string vipayload = LabTask.constructSessionPayload(appInfo,
-                                task.startTime, taskDur.Ticks / TimeSpan.TicksPerSecond, task.taskID,
-                                returnTarget, null, null);
-
-                            //Utilities.WriteLog("sessionPayload: " + payload);
-                            //Store Session information
-                            Session["payload"] = vipayload;
 
                             //set Presentation page tp appPage
                             pageURL = appInfo.page;

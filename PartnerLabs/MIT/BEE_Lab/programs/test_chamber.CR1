@@ -54,7 +54,7 @@ EndTable
 
 BeginProg
 
-  Scan(2,Sec, 3, 0)
+  Scan(30,Sec, 3, 0)
     'for the first AM25T, control port 1 and 2
     PortSet(2, 1)              
     PortSet(1, 0)              

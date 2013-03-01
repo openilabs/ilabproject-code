@@ -210,8 +210,10 @@ namespace iLabs.LabServer.Interactive
         public void ProcessTasks()
         {
             List<LabTask> toBeRemoved = null;
+            //Logger.WriteLine("ProcessTasks");
             count++;
-            if (count >= 10000)
+            //ToDo: Change to 10000 after debugging
+            if (count >= 100)  
             {
                Logger.WriteLine("ProcessTasks");
                 count = 0;
@@ -245,9 +247,15 @@ namespace iLabs.LabServer.Interactive
                     {
                         try
                         {
-                            if (task.Status == LabTask.eStatus.Running)
-                            {
-                                task.HeartBeat();
+                            switch(task.Status){
+                                case LabTask.eStatus.Pending:
+                                case LabTask.eStatus.Scheduled:
+                                case LabTask.eStatus.Running:
+                                case LabTask.eStatus.Waiting:
+                                    task.HeartBeat();
+                                    break;
+                                default:
+                                    break;
                             }
                         }
                         catch (Exception e2)
@@ -272,7 +280,7 @@ namespace iLabs.LabServer.Interactive
     {
         TaskProcessor taskProc;
         bool go = true;
-
+        int waitTime = 10000;
         public TaskHandler(TaskProcessor task)
         {
             taskProc = task;
@@ -285,8 +293,13 @@ namespace iLabs.LabServer.Interactive
             while (go)
             {
                 taskProc.ProcessTasks();
-                Thread.Sleep(10000);
+                Thread.Sleep(waitTime);
             }
+        }
+
+        public void Stop()
+        {
+            go = false;
         }
     }
 }
