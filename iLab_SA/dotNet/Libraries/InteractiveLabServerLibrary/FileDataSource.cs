@@ -134,7 +134,7 @@ namespace iLabs.LabServer.Interactive
         //    while (go)
         //    {
         //        int i = 0;
-        //        Thread.Sleep(waitTime);
+        //        Thread.Sleep(waitMilliseconds);
         //        i++;
         //    }
         //    theWatcher.EnableRaisingEvents = false;

@@ -141,29 +141,29 @@ namespace iLabs.LabServer.BEE
                         catch(IOException ioe){
                             if(IsFileLocked(ioe)){
                                 Logger.WriteLine("BeeEventHandle waiting for unlock");
-                                status = 0;
-                                int loopCOunt = 0;
-                                while (status == 0 && loopCOunt < 10)
-                                {
-                                    // Wait for the lock to be released
-                                    System.Threading.Thread.Sleep(waitTime);
-                                    loopCOunt++;
-                                    try
-                                    {
-                                        status = ProcessRecords(e.FullPath);
-                                    }
-                                    catch (IOException ioe2)
-                                    {
-                                        if (!IsFileLocked(ioe2))
-                                        {
-                                            throw ioe2;
-                                        }
-                                    }
-                                    if (loopCOunt >= 10)
-                                    {
-                                        Logger.WriteLine("BeeEventHandle waiting for unlock timed out");
-                                    }
-                                }
+                                //status = 0;
+                                //int loopCOunt = 0;
+                                //while (status == 0 && loopCOunt < 10)
+                                //{
+                                //    // Wait for the lock to be released
+                                //    System.Threading.Thread.Sleep(waitTime);
+                                //    loopCOunt++;
+                                //    try
+                                //    {
+                                //        status = ProcessRecords(e.FullPath);
+                                //    }
+                                //    catch (IOException ioe2)
+                                //    {
+                                //        if (!IsFileLocked(ioe2))
+                                //        {
+                                //            throw ioe2;
+                                //        }
+                                //    }
+                                //    if (loopCOunt >= 10)
+                                //    {
+                                //        Logger.WriteLine("BeeEventHandle waiting for unlock timed out");
+                                //    }
+                                //}
                             }
                         }
                         catch(Exception ex){
@@ -221,7 +221,6 @@ namespace iLabs.LabServer.BEE
 
                     //replace DataSocket code with 'Pusher' interface
                     IPusherProvider provider = new PusherProvider(pusherID, pusherKey, pusherSS, null);
-
 
                     foreach (string rec in records)
                     {

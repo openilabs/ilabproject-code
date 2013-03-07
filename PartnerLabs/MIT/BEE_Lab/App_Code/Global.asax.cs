@@ -41,6 +41,7 @@ namespace iLabs.LabServer.BEE
         /// </summary>
         private System.ComponentModel.IContainer components = null;
         private TicketRemover ticketRemover;
+        private ThreadedProcess pinger;
 		
         
 
@@ -94,6 +95,11 @@ namespace iLabs.LabServer.BEE
                 ProcessAgentDB.RefreshServiceAgent();
                 //Should load any active tasks and update any expired tasks
                 LabDB dbService = new LabDB();
+                pinger = new ThreadedProcess();
+                pinger.ProcessName("PingServer");
+                pinger.WaitTime = 360; //6 minutes
+                pinger.Process = PingServer;
+                pinger.Start();
 
                 TaskProcessor.Instance.WaitTime = 60000;
                 LabTask[] activeTasks = dbService.GetActiveTasks();
@@ -107,7 +113,7 @@ namespace iLabs.LabServer.BEE
                             Coupon expCoupon = dbService.GetCoupon(task.couponID, task.issuerGUID);
                             DataSourceManager dsManager = new DataSourceManager(task);
                             BeeAPI api = new BeeAPI();
-                            FileDataSource fds = api.CreateBeeDataSource(expCoupon, task, "data", false);
+                            FileWatcherDataSource fds = api.CreateBeeDataSource(expCoupon, task, "data", false);
                             dsManager.AddDataSource(fds);
                             fds.Start();
                             TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
@@ -178,8 +184,12 @@ namespace iLabs.LabServer.BEE
 		{
             if (ticketRemover != null)
                 ticketRemover.Stop();
+            TaskProcessor.Instance.Stop();
+            if (pinger != null)
+                pinger.Stop();
 			Logger.WriteLine("Application_End Called:");
            Logger.WriteLine("Application_End: closing");
+            //try to restart a new Application
            Global.PingServer();
 			
 		}
