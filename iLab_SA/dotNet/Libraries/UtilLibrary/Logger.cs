@@ -37,9 +37,15 @@ namespace iLabs.UtilLib
             {
                 if (IsLogging)
                 {
-                    System.IO.StreamWriter writer = new System.IO.StreamWriter(logPath, true);
-                    writer.WriteLine(DateTime.Now.ToString() + ": \t" + str);
-                    writer.Close();
+                    try
+                    {
+                        System.IO.StreamWriter writer = new System.IO.StreamWriter(logPath, true);
+                        writer.WriteLine(DateTime.Now.ToString() + ": \t" + str);
+                        writer.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                 }
                 Trace.WriteLine(DateTime.Now.ToString() + ": \t" + str);
             }
@@ -48,9 +54,15 @@ namespace iLabs.UtilLib
         {
             if (IsLogging)
             {
-                System.IO.StreamWriter writer = new System.IO.StreamWriter(logPath, true);
-                writer.WriteLine(str);
-                writer.Close();
+                try
+                {
+                    System.IO.StreamWriter writer = new System.IO.StreamWriter(logPath, true);
+                    writer.WriteLine(str);
+                    writer.Close();
+                }
+                catch (Exception ex)
+                {
+                }
             }
             Trace.Write(str);
         }

@@ -151,7 +151,7 @@ namespace iLabs.LabServer.BEE
                             if (task.storage != null && task.storage.Length > 0)
                             {
                                 DataSourceManager dsManager = new DataSourceManager(task);
-                                FileDataSource fds = factory.CreateBeeDataSource(expCoupon, task, "data", true);
+                                FileWatcherDataSource fds = factory.CreateBeeDataSource(expCoupon, task, "data", true);
                                 dsManager.AddDataSource(fds);
                                 fds.Start();
                                 TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
