@@ -41,9 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileDataSource.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="FileWatcherDataSource.cs" />
     <Compile Include="LabDataSource.cs" />
     <Compile Include="DataSourceManager.cs" />

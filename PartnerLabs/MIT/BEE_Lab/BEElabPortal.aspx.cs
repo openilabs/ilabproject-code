@@ -154,7 +154,7 @@ namespace iLabs.LabServer.BEE
                             "data",ProcessAgentDB.ServiceGuid);
                         bEvt.PusherChannel = pushChannel;
                         DataSourceManager dsManager = TaskProcessor.Instance.GetDataManager(task.taskID);
-                        FileDataSource fds = new FileDataSource();
+                        FileWatcherDataSource fds = new FileWatcherDataSource();
                         fds.Path = filePath;
                         fds.Filter = fileName;
                         fds.AddFileSystemEventHandler(bEvt.OnChanged);
