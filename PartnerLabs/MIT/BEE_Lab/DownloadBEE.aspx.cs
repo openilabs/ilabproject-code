@@ -56,7 +56,7 @@ namespace iLabs.LabServer.BEE
             if (Request.QueryString["min"] != null && Request.QueryString["min"].Length > 0)
                 minRecord = Convert.ToInt32(Request.QueryString["min"]);
             if (Request.QueryString["max"] != null && Request.QueryString["max"].Length > 0)
-                maxRecord = Convert.ToInt32(Request.QueryString["max"]);
+                maxRecord = Convert.ToInt32(Request.QueryString["max"]) +1;
             if (Request.QueryString["index"] != null && Request.QueryString["index"].Length > 0)
                 indices = Request.QueryString["index"];
 
@@ -136,26 +136,12 @@ namespace iLabs.LabServer.BEE
             {
                 foreach (ExperimentRecord rec in records)
                 {
-                    string[] values = null;
-                    string content = rec.contents;
+                    buf.Append(rec.sequenceNum.ToString());
                     if (useIndex)
                     {
-                        values = content.Split(delim);
-                    }
-                    else
-                    {
-                        values = content.Split(delim, 5);
-                    }
-                    DateTime tStamp = new DateTime(0L, DateTimeKind.Utc);
-                    tStamp = tStamp.AddYears(Convert.ToInt32(values[1]) - 1);
-                    tStamp = tStamp.AddDays(Convert.ToDouble(values[2]) - 1.0);
-                    string hhmm = values[3].PadLeft(4, '0');
-                    tStamp = tStamp.AddHours(Convert.ToDouble(hhmm.Substring(0, 2)));
-                    tStamp = tStamp.AddMinutes(Convert.ToDouble(hhmm.Substring(2, 2)));
-
-                    buf.Append(rec.sequenceNum.ToString() + ",'" + DateUtil.ToUtcString(tStamp) + "'");
-                    if (useIndex)
-                    {
+                        string[] values = null;
+                        values = rec.contents.Split(delim);
+                        buf.Append("," + values[0]);
                         for (int i = 0; i < indexes.Length; i++)
                         {
                             // May need an offset
@@ -165,7 +151,7 @@ namespace iLabs.LabServer.BEE
                     }
                     else
                     {
-                        buf.AppendLine("," + values[4]);
+                        buf.AppendLine("," + rec.contents);
                     }
                 }
             }

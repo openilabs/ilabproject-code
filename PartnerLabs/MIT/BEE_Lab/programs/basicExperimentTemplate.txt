@@ -5,6 +5,8 @@
 '   experimentLength => Int for the total hours the experiment will run
 '   profile => String with the profile
 '   totalLoads => The total loads that we will control. Up to 16.
+'   timeUnit => The time unit we'll use. 60 for seconds (change every minute). 1 for minutes (change every hour).
+'   sampleRate => The number of SECONDS of between each scan.
 
 
 Const ExperimentLength = ${experimentLength}$
@@ -12,7 +14,7 @@ Const TotalLoads = ${totalLoads}$
 Const SampleEverySecs = ${sampleRate}$
 Const InString = "${profile}$"
 
-Const TimeMeasurement = ${timeUnit}$ ' Change to 1 to use minutes. Change to 60 to use hours.
+Const TimeMeasurement = ${timeUnit}$ ' Change to 60 to use seconds. Change to 1 to use minutes.
 
 
 ' Convert the experiment length to hours. And then divide for the time we are waiting
@@ -20,18 +22,13 @@ Const TimeMeasurement = ${timeUnit}$ ' Change to 1 to use minutes. Change to 60 
 ' We are scanning every 30 seconds
 Const MaxScanCount = ((ExperimentLength * TimeMeasurement * 60) INTDV SampleEverySecs) + 1
 
-
+Public scansSinceLastChange as Float
 Public Channels(${totalLoads}$)
 Public Source(16)
 Public InputLoads(ExperimentLength * (TotalLoads + 1))
-Public DateArray(9)
-Public InitTime As Long
-Public EndTime As Long
-Public NextTime As Long
-Public CurrentTime As Long
 Public group
 Public StartGroupIndex
-
+Public intervalTime As Long
 Public i, channel ' For loops vars
 
 Sub setUpLoads
@@ -64,68 +61,49 @@ Sub setUpChannels
   Channels(4) = 11
 EndSub
 
-'Main Program
-BeginProg
-  Call setUpChannels
-  Call turnLoadsOff(Source)
-  StartGroupIndex = 0
-  group = 0 ' The next index we will look for
-  Call setUpLoads  'We do not need RS232 connection anymore :D!
-
-  Call turnLoadsOff(Source)
-
-  '(1) year
-  '(2) month
-  '(3) day of month
-  '(4) hour of day
-  '(5) minutes
-  '(6) seconds
-  '(7) microseconds
-  '(8) day of week (1-7; Sunday = 1)
-  '(9) day of year.
-  RealTime(DateArray)
-
-  ' hour + minutes + seconds
-  InitTime = DateArray(4) * 60 * 60 + DateArray(5) * 60 + DateArray(6)
-  EndTime = InitTime + (ExperimentLength * TimeMeasurement * 60)
-  NextTime = InitTime + (InputLoads(1) * TimeMeasurement)
-    
+' For each channel that we are using, setup the `source(channel)` value to send it
+' to the switch and turn the channel on/off.
+'
+' Remember that the profile has the DURATION on the first position. So a profile like
+' 120 1 0 0 0 means that for 120 minutes (or seconds - se below *) the first load will
+' be on.
+'
+' * The minutes or seconds will depend on the TimeMeasurement constant. If it's 1
+' it's seconds, if it's 60 it's minutes.
+Sub sendLoads
   For channel = 1 To TotalLoads
     Source( Channels(channel) ) = InputLoads(StartGroupIndex + channel)
   Next
-  SDMCD16AC (Source,1,0) ' Send loads for the first time
-   
+  SDMCD16AC (Source,1,0) ' Send loads
+EndSub
+
+'Main Program
+BeginProg
+  Call setUpChannels
+  Call setUpLoads  'We do not need RS232 connection anymore :D!
+  Call turnLoadsOff(Source)
+
+  StartGroupIndex = 1
+  scansSinceLastChange = -0.5 * TimeMeasurement
+  group = 0 ' The next index we will look for
+  Call sendLoads
+
+  intervalTime = InputLoads(1)
+
   Scan(SampleEverySecs, Sec, 1, MaxScanCount)
-    ' The first index of the group. Remember that each group will have totalLoads + 1
-    ' elements in it  (the time that group is active). This "time" value is the first
-    ' value of the group.
-    StartGroupIndex = group * (TotalLoads + 1) + 1
+    scansSinceLastChange = scansSinceLastChange + (0.5 * TimeMeasurement)
+    If scansSinceLastChange >= intervalTime
+      group    = (group + 1) MOD ExperimentLength
+
+      ' The first index of the group. Remember that each group will have totalLoads + 1
+      ' elements in it  (the time that group is active). This "time" value is the first
+      ' value of the group.
+      StartGroupIndex = group * (TotalLoads + 1) + 1
+      intervalTime = InputLoads(StartGroupIndex)
     
-    ' For each channel that we are using, setup the `source(channel)` value to send it
-    ' to the switch and turn the channel on/off.
-    '
-    ' Remember that the profile has the DURATION on the first position. So a profile like
-    ' 120 1 0 0 0 means that for 120 minutes (or seconds - se below *) the first load will
-    ' be on.
-    '
-    ' * The minutes or seconds will depend on the TimeMeasurement constant. If it's 60
-    ' it's minutes, if it's 1 it's seconds.
-    For channel = 1 To TotalLoads
-      Source( Channels(channel) ) = InputLoads(StartGroupIndex + channel)
-    Next
-    SDMCD16AC (Source,1,0) ' Send loads
-
-    RealTime(DateArray)
-    CurrentTime  = DateArray(4) * 60 * 60 + DateArray(5) * 60 + DateArray(6)
-
-    If CurrentTime > EndTime
-      ExitScan ' Experiment should be over now
-    EndIf
-
-    If CurrentTime >= NextTime
-       group    = (group + 1) MOD ExperimentLength
-   	  NextTime = NextTime + (InputLoads(StartGroupIndex) * TimeMeasurement)
-   	EndIf
+      Call sendLoads
+      scansSinceLastChange = 0
+     EndIf
   NextScan
   Call turnLoadsOff(Source)
 EndProg

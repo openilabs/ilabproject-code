@@ -53,7 +53,7 @@ namespace iLabs.LabServer.BEE
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
-         
+        
             if(Session["userTZ"] != null)
                 tz = Convert.ToInt32(Session["userTZ"]);
             String returnURL = (string)Session["sbUrl"];
@@ -68,6 +68,7 @@ namespace iLabs.LabServer.BEE
             if (Session["opCouponID"] != null && Session["opIssuer"] != null && Session["opPasscode"] != null)
             {
                 opCoupon = new Coupon(Session["opIssuer"].ToString(), Convert.ToInt64(Session["opCouponID"].ToString()), Session["opPasscode"].ToString());
+              
             }
             else
             {
@@ -82,6 +83,14 @@ namespace iLabs.LabServer.BEE
                     hdnChannelID.Value = ChecksumUtil.ToMD5Hash("BEElab" + hdnExperimentID.Value);
                 else
                     hdnChannelID.Value = "experiment-channel";
+
+                if (Session["opCouponID"] != null && Session["opIssuer"] != null && Session["opPasscode"] != null)
+                {
+                    // Save the coupon data for when the session times out
+                    ViewState["opCouponID"] = Session["opCouponID"].ToString();
+                    ViewState["opIssuer"] = Session["opIssuer"].ToString();
+                    ViewState["opPasscode"] = Session["opPasscode"].ToString();
+                }
 
                 InteractiveSBProxy sbProxy = new InteractiveSBProxy();
                 ProcessAgentInfo sbInfo = dbManager.GetProcessAgentInfo(Session["opIssuer"].ToString());
@@ -257,6 +266,10 @@ namespace iLabs.LabServer.BEE
         }
         protected void downloadClick(object sender, System.EventArgs e)
         {
+            // Restore the coupon data to prevent session time out
+            Session["opCouponID"] = ViewState["opCouponID"];
+            Session["opIssuer"] = ViewState["opIssuer"];
+            Session["opPasscode"] = ViewState["opPasscode"];
             StringBuilder buf = new StringBuilder("downloadBEE.aspx?expid=");
             buf.Append(hdnExperimentID.Value);
             buf.Append("&min=" + hdnMin.Value);

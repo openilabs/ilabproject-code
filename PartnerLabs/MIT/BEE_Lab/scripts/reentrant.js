@@ -35,8 +35,8 @@
       baseSerie = chart.xAxis[0];
       extremes = baseSerie.getExtremes();
       indexes = this.getIndexes(extremes);
-      $('input#hdnMin').val(window.sampleData[indexes[0]][0]);
-      $('input#hdnMax').val(window.sampleData[indexes[1]][0]);
+      $('input#hdnMin').val(indexes[0]);
+      $('input#hdnMax').val(indexes[1]);
       if (select_all) {
         $('input#hdnSensors').val("");
       } else {
