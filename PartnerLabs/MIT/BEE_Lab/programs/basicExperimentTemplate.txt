@@ -8,27 +8,25 @@
 '   timeUnit => The time unit we'll use. 60 for seconds (change every minute). 1 for minutes (change every hour).
 '   sampleRate => The number of SECONDS of between each scan.
 
-
 Const ExperimentLength = ${experimentLength}$
 Const TotalLoads = ${totalLoads}$
 Const SampleEverySecs = ${sampleRate}$
 Const InString = "${profile}$"
 
-Const TimeMeasurement = ${timeUnit}$ ' Change to 60 to use seconds. Change to 1 to use minutes.
+' If each block on the profile graph represents an HOUR, use 60
+' If each block on the profile grap represents a MINUTE, use 1
+'
+' This is the number of seconds that each unit block represents. So, if I get 60 on the
+' profile and I need that to represent an hour. I need to multiply it by 60.
+Const TimeUnitRate = ${timeUnit}$
 
-
-' Convert the experiment length to hours. And then divide for the time we are waiting
-' between scans. This way we do not exceed the experiment time limit.
-' We are scanning every 30 seconds
-Const MaxScanCount = ((ExperimentLength * TimeMeasurement * 60) INTDV SampleEverySecs) + 1
-
-Public scansSinceLastChange as Float
+Public timeInBlockInSeconds as Float
 Public Channels(${totalLoads}$)
 Public Source(16)
 Public InputLoads(ExperimentLength * (TotalLoads + 1))
-Public group
-Public StartGroupIndex
-Public intervalTime As Long
+Public group ' The block I'm currently processing
+Public StartGroupIndex ' Where does this block start in the InputLoads array
+Public intervalTimeInSeconds As Long ' How long should I stay on this block
 Public i, channel ' For loops vars
 
 Sub setUpLoads
@@ -65,11 +63,9 @@ EndSub
 ' to the switch and turn the channel on/off.
 '
 ' Remember that the profile has the DURATION on the first position. So a profile like
-' 120 1 0 0 0 means that for 120 minutes (or seconds - se below *) the first load will
-' be on.
+' 120 1 0 0 0 means that for 120 units of time the first load will be on.
 '
-' * The minutes or seconds will depend on the TimeMeasurement constant. If it's 1
-' it's seconds, if it's 60 it's minutes.
+' To change the units of time, change the `TimeMeasurement` constant.
 Sub sendLoads
   For channel = 1 To TotalLoads
     Source( Channels(channel) ) = InputLoads(StartGroupIndex + channel)
@@ -84,25 +80,31 @@ BeginProg
   Call turnLoadsOff(Source)
 
   StartGroupIndex = 1
-  scansSinceLastChange = -0.5 * TimeMeasurement
+  timeInBlockInSeconds = -SampleEverySecs ' Start on negative so the first time on the loop will get to 0
   group = 0 ' The next index we will look for
   Call sendLoads
 
-  intervalTime = InputLoads(1)
+  intervalTimeInSeconds = InputLoads(1) * TimeUnitRate
 
-  Scan(SampleEverySecs, Sec, 1, MaxScanCount)
-    scansSinceLastChange = scansSinceLastChange + (0.5 * TimeMeasurement)
-    If scansSinceLastChange >= intervalTime
-      group    = (group + 1) MOD ExperimentLength
+  Scan(SampleEverySecs, Sec, 1, 0)
+    timeInBlockInSeconds  = timeInBlockInSeconds + SampleEverySecs
+    intervalTimeInSeconds = InputLoads(StartGroupIndex) * TimeUnitRate
+
+    If timeInBlockInSeconds >= intervalTimeInSeconds
+      group = group + 1
+
+      If group >= ExperimentLength
+        ExitScan
+      EndIf
 
       ' The first index of the group. Remember that each group will have totalLoads + 1
       ' elements in it  (the time that group is active). This "time" value is the first
       ' value of the group.
       StartGroupIndex = group * (TotalLoads + 1) + 1
-      intervalTime = InputLoads(StartGroupIndex)
-    
+      intervalTimeInSeconds = InputLoads(StartGroupIndex) * TimeUnitRate
+
       Call sendLoads
-      scansSinceLastChange = 0
+      timeInBlockInSeconds = 0 'I just changed the lights. New block comming up.
      EndIf
   NextScan
   Call turnLoadsOff(Source)
