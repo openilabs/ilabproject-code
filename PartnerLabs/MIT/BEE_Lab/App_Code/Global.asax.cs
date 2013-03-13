@@ -9,8 +9,10 @@ using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Configuration;
+using System.Diagnostics;
 using System.Net;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.SessionState;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -150,6 +152,7 @@ namespace iLabs.LabServer.BEE
 
 		protected void Application_EndRequest(Object sender, EventArgs e)
 		{
+            Logger.WriteLine("Application_EndRequest: " + sender.ToString() + " \t EventType: " + e.GetType());
 
 		}
 
@@ -182,12 +185,13 @@ namespace iLabs.LabServer.BEE
 
 		protected void Application_End(Object sender, EventArgs e)
 		{
+           
             if (ticketRemover != null)
                 ticketRemover.Stop();
             TaskProcessor.Instance.Stop();
             //if (pinger != null)
             //    pinger.Stop();
-			Logger.WriteLine("Application_End Called:");
+			Logger.WriteLine("Application_End Called: " + HostingEnvironment.ShutdownReason.ToString());
            Logger.WriteLine("Application_End: closing");
             //try to restart a new Application
            Global.PingServer();
@@ -199,7 +203,7 @@ namespace iLabs.LabServer.BEE
 			Application_End(this, null);
 			base.Dispose();
 		}
-
+     
         public static void PingServer()
         {
             try
