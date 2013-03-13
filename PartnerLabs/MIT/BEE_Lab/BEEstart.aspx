@@ -108,7 +108,7 @@ Please see license.txt in top level directory for full license.
 				<asp:HiddenField ID="hdnExpId" runat="server" />
 				<asp:HiddenField ID="hdnProfile" runat="server" value="120,0,2,3,6,6,6"/>
 				<asp:HiddenField ID="hdnExpLength" runat="server" value="24"/>
-				<asp:HiddenField ID="hdnTimeUnit" runat="server" value="1"/>
+				<asp:HiddenField ID="hdnTimeUnit" runat="server" value="60"/>
 				<asp:HiddenField ID="hdnSampleRate" runat="server" value="30"/>
 			</div>
 		</form>
