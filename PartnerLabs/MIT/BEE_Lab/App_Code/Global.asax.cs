@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
 using System.Net;
+using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.SessionState;
@@ -32,31 +33,17 @@ namespace iLabs.LabServer.BEE
 	/// </summary>
 	public class Global : System.Web.HttpApplication
 	{
-		
-		static protected Thread threadLV;
-        //static public Hashtable taskTable;
-        public static TaskHandler taskThread;
-        //public static TaskProcessor tasks;
-
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+
+        public static TaskHandler taskThread;
         private TicketRemover ticketRemover;
-        private ThreadedProcess pinger;
-		
-        
-
-	
-
-		public static void ThreadProc() 
-		{
-			//LVDLLStatus(IntPtr.Zero, 0, IntPtr.Zero);
-			//PumpMessages();
-		}
 
 		static Global()
 		{
+           
             if (ConfigurationManager.AppSettings["logPath"] != null
                 && ConfigurationManager.AppSettings["logPath"].Length > 0)
             {
@@ -66,13 +53,9 @@ namespace iLabs.LabServer.BEE
                Logger.WriteLine("");
                Logger.WriteLine("Global Static started: " + iLabGlobal.Release + " -- " + iLabGlobal.BuildDate);
             }
+
             ProcessAgentDB.RefreshServiceAgent();
-			//threadLV = new Thread(new ThreadStart(ThreadProc));
-			//threadLV.Start();
-          
-			
-            //taskTable = new Hashtable();
-            //tasks = new TaskProcessor();
+		
            Logger.WriteLine("Global Static ended");
 		}
 
@@ -97,12 +80,7 @@ namespace iLabs.LabServer.BEE
                 ProcessAgentDB.RefreshServiceAgent();
                 //Should load any active tasks and update any expired tasks
                 LabDB dbService = new LabDB();
-                //pinger = new ThreadedProcess();
-                //pinger.ProcessName = "PingServer";
-                //pinger.WaitTime = 360; //6 minutes
-                //pinger.Process = PingServer;
-                //pinger.Start();
-
+        
                 TaskProcessor.Instance.WaitTime = 60000;
                 LabTask[] activeTasks = dbService.GetActiveTasks();
                 int count = 0;
@@ -124,35 +102,37 @@ namespace iLabs.LabServer.BEE
                         count++;
                     }
                 }
-                Logger.WriteLine("Added " + count + " active Tasks");
                 taskThread = new TaskHandler(TaskProcessor.Instance);
                 ticketRemover = new TicketRemover();
+                if (Logger.IsLogging)
+                    Logger.WriteLine("Added " + count + " active Tasks\r\n");
+
             }
             catch (Exception err)
             {
+                if (Logger.IsLogging)
                 Logger.WriteLine(Utilities.DumpException(err));
             }
 		}
  
 		protected void Session_Start(Object sender, EventArgs e)
 		{
+            if (Logger.IsLogging)
             Logger.WriteLine("Session_Start: " + sender.ToString() + " \t EventType: " + e.GetType());
-           // Exception ex = new Exception("Session_Start:");
-           // string tmp = Utilities.DumpException(ex);
-           //Logger.WriteLine(Utilities.DumpException(ex));
-
 		}
 
 		protected void Application_BeginRequest(Object sender, EventArgs e)
 		{
 			// In InteractiveLabView
+            if (Logger.IsLogging)
             Logger.WriteLine("Request: " + sender.ToString() + " \t EventType: " + e.GetType());
 
 		}
 
 		protected void Application_EndRequest(Object sender, EventArgs e)
 		{
-            Logger.WriteLine("Application_EndRequest: " + sender.ToString() + " \t EventType: " + e.GetType());
+            //if (Logger.IsLogging)
+            //Logger.WriteLine("Application_EndRequest: " + sender.ToString() + " \t EventType: " + e.GetType());
 
 		}
 
@@ -163,23 +143,23 @@ namespace iLabs.LabServer.BEE
 
 		protected void Application_Error(Object sender, EventArgs e)
 		{
-            
-           Logger.WriteLine("Application_Error: " + sender.ToString() + " \t EventType: " + e.GetType());
-           Exception ex = null;
+            Exception ex = null;
             Exception err = Server.GetLastError();
-            if(e != null)
-                ex = new Exception("Application_Error: ",err);
+            if (e != null)
+                ex = new Exception("Application_Error: ", err);
             else
                 ex = new Exception("Application_Error: No Exception returned");
-           Logger.WriteLine(Utilities.DumpException(ex));
+            if (Logger.IsLogging)
+            {
+                Logger.WriteLine("Application_Error: " + sender.ToString() + " \t EventType: " + e.GetType());
+                Logger.WriteLine(Utilities.DumpException(ex));
+            }
 		}
 
 		protected void Session_End(Object sender, EventArgs e)
 		{
+            if (Logger.IsLogging)
            Logger.WriteLine("Session_End: " + sender.ToString() + " \t EventType: " + e.GetType());
-           // string tmp = Utilities.DumpException(ex);
-           //Logger.WriteLine(Utilities.DumpException(ex));
-
 		}
 		
 
@@ -189,10 +169,13 @@ namespace iLabs.LabServer.BEE
             if (ticketRemover != null)
                 ticketRemover.Stop();
             TaskProcessor.Instance.Stop();
-            //if (pinger != null)
-            //    pinger.Stop();
-			Logger.WriteLine("Application_End Called: " + HostingEnvironment.ShutdownReason.ToString());
-           Logger.WriteLine("Application_End: closing");
+            if (Logger.IsLogging)
+            {
+                Logger.WriteLine("Application_End Called: " + HostingEnvironment.ShutdownReason.ToString());
+                //if (HostingEnvironment.ShutdownReason == ApplicationShutdownReason.HostingEnvironment)
+                    logApplicationEnd();
+                Logger.WriteLine("Application_End: closing");
+            }
             //try to restart a new Application
            Global.PingServer();
 			
@@ -217,6 +200,30 @@ namespace iLabs.LabServer.BEE
             {
                 Logger.WriteLine("PingServer: " + ex.Message);
             }
+        }
+
+        public void logApplicationEnd()
+        {
+
+            HttpRuntime runtime = (HttpRuntime)typeof(System.Web.HttpRuntime).InvokeMember("_theRuntime",
+                BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField,
+                 null, null, null);
+
+            if (runtime == null)
+                return;
+
+            string shutDownMessage = (string)runtime.GetType().InvokeMember("_shutDownMessage",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
+                null, runtime, null);
+
+            string shutDownStack = (string)runtime.GetType().InvokeMember("_shutDownStack",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
+                 null,runtime, null);
+
+            
+            Logger.WriteLine(String.Format("ShutDownMessage={0}\r\n\r\n_shutDownStack={1}",
+                                         shutDownMessage,
+                                         shutDownStack));
         }
 
         public static string FormatRegularURL(HttpRequest r, string relativePath)

@@ -14,6 +14,7 @@ namespace iLabs.UtilLib
         // Make this a property
         private static string logPath = null;
         private static System.IO.StreamWriter writer;
+        private static bool isLogging = false;
 
         public static string LogPath
         {
@@ -24,18 +25,19 @@ namespace iLabs.UtilLib
             set
             {
                 logPath = value;
+                isLogging = (logPath != null && logPath.Length > 0) ? true : false;
             }
         }
 
         public static bool IsLogging
         {
             get{
-                return (logPath != null && logPath.Length >0 ) ? true : false;
+                return isLogging;
             }
         }
             public static void WriteLine(string str)
             {
-                if (IsLogging)
+                if (isLogging)
                 {
                     try
                     {
@@ -52,7 +54,7 @@ namespace iLabs.UtilLib
 
         public static void Write(string str)
         {
-            if (IsLogging)
+            if (isLogging)
             {
                 try
                 {
