@@ -36,7 +36,7 @@ Public LoadPower
 
 DataTable(Table105,true,-1)
   OpenInterval       
-  DataInterval(0,2,Sec,10)                   
+  DataInterval(0,30,Sec,10)                   
   Sample(1, RefTemp1C, FP2)
   Sample(1, RefTemp2C, FP2)
   Sample(1, RefTemp3C, FP2)
