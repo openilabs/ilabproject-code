@@ -7,11 +7,14 @@ label,
 .hidden {
   display: none; }
 
+#container {
+  width: 90%; }
+
 #bee-room-modal {
   width: 600px;
   height: 600px;
   position: relative;
-  background: transparent url(../images/bee-room.png) top left no-repeat;
+  background: transparent url("../images/bee-room.png") top left no-repeat;
   margin: 0 auto; }
   #bee-room-modal .sensor {
     font-family: 'Helvetica', sans-serif;
@@ -26,6 +29,9 @@ label,
     background: white; }
     #bee-room-modal .sensor.on {
       background: #ffffd1; }
+  #bee-room-modal .sensor.total-wattz {
+    width: 120px;
+    top: 20px; }
   #bee-room-modal .sensor.ceil {
     top: 120px; }
     #bee-room-modal .sensor.ceil.interior {

@@ -2,7 +2,7 @@
   var Application, PusherListener, TestChamber, sensor;
 
   window.BEE = {
-    version: '3.0.2.alpha'
+    version: '3.1.0'
   };
 
   Application = (function() {
@@ -125,10 +125,12 @@
     };
 
     TestChamber.prototype.prepareData = function() {
-      var _this = this;
-      return _.map($(this.seriesSelector), function(checkbox) {
+      var results,
+        _this = this;
+      results = _.map($(this.seriesSelector), function(checkbox) {
         return _this.prepareOneSerie(checkbox.value);
       });
+      return results;
     };
 
     TestChamber.prototype.chart = function() {
@@ -173,7 +175,8 @@
         this.memoSerie(name);
         return this.chart.addSeries({
           name: name,
-          data: this.prepareOneSerie(index)
+          data: this.prepareOneSerie(index),
+          yAxis: (!!name.match(/wattz/i) ? 1 : 0)
         });
       }
     };
@@ -184,15 +187,9 @@
 
     TestChamber.prototype.pusherEventReceived = function() {
       if (window.sampleData.size !== 0 && !this.chartInitialized) {
-        if (typeof console !== "undefined" && console !== null) {
-          console.log("First data received");
-        }
         this.initializeChart();
         return this.memoSeries();
       } else {
-        if (typeof console !== "undefined" && console !== null) {
-          console.log("Adding a new meassurement");
-        }
         return this.addNewMeassurement();
       }
     };
@@ -271,15 +268,25 @@
             margin: 80
           }
         },
-        yAxis: {
-          title: {
-            text: "Temperature (C)"
+        yAxis: [
+          {
+            title: {
+              text: "Temperature (C)"
+            }
+          }, {
+            title: {
+              text: "Total Wattage"
+            },
+            opposite: true,
+            min: 0,
+            max: 450
           }
-        },
+        ],
         series: _.map(seriesNames, function(name, index) {
           return {
             name: name,
-            data: preparedData[index]
+            data: preparedData[index],
+            yAxis: 0
           };
         })
       });

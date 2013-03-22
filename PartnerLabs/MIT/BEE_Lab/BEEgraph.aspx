@@ -98,6 +98,11 @@ Please see license.txt in top level directory for full license.
 
     <input type="checkbox" class="series-box air-south" id="cb-air-south" value="42" name="air-south"/>
     <label for="cb-air-south">air-south</label>
+    
+    <input type="checkbox" class="series-box total-wattz" id="cb-total-wattz" value="81" name="total-wattz"/>
+    <label for="cb-total-wattz">total-wattz</label>
+
+
   <div class="select-series">
     <a href='#' rel='#bee-modal'>Select Graphed Sensors</a>
   </div>
@@ -162,6 +167,10 @@ Please see license.txt in top level directory for full license.
       <div class="sensor air south" data-checkbox="cb-air-south" title="air sensor near south wall">
         aS
       </div>
+      
+      <div class="sensor total-wattz" data-checkbox="cb-total-wattz" title="total wattage on the room">
+        Total Watts
+     </div>
     </div> <!-- End of sensors -->
     <div class="legend"></div>
   </div>

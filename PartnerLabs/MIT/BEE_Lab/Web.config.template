@@ -44,11 +44,11 @@
     <add key="logPath" value=""/>
 
     <!-- BEE LAb specific Keys START -->
-    <add key="climateServer" value="beelab2.mit.edu"/>
+    <add key="climateServer" value="localhost"/>
     <add key="climateController" value="CR1000"/>
     <add key="climateTemplate" value="c:\beelab\programs\basicExperimentTemplate.txt"/>
     <add key="climateProgramDir" value="c:\beelab\programs\temp"/>
-    <add key="chamberServer" value="beelab2.mit.edu"/>
+    <add key="chamberServer" value="localhost"/>
     <add key="chamberControler" value="CR1000_Test_Chamber"/>
     <add key="chamberFile" value="c:\beelab\programs\test_chamber.CR1"/>
     <add key="chamberOutputDir" value="c:\\Campbellsci\\LoggerNet"/>
