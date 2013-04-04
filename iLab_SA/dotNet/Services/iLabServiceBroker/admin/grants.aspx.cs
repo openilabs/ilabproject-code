@@ -238,6 +238,7 @@ namespace iLabs.ServiceBroker.admin
                     childNode.Text = qualifierText;
                     childNode.ImageUrl = "../img/GrantImages/" + imageFile;
                     childNode.Value = childID.ToString();
+                    childNode.PopulateOnDemand = true;
                     if (recurse)
                         AddQualifiers(childNode, true);
                     n.ChildNodes.Add(childNode);

@@ -541,11 +541,12 @@ GO
 
 /****** Object:  Table [dbo].[Grants]    Script Date: 8/30/2005 4:07:57 PM ******/
 CREATE TABLE [dbo].[Grants] (
+	[Grant_ID] [int] IDENTITY (1, 1) NOT NULL,
 	[Agent_ID] [int] NOT NULL ,
 	[Function_ID] [int] NOT NULL ,
 	[Qualifier_ID] [int] NOT NULL ,
-	[Date_Created] [datetime] NOT NULL ,
-	[Grant_ID] [int] IDENTITY (1, 1) NOT NULL 
+	[Date_Created] [datetime] NOT NULL 
+	
 ) ON [PRIMARY]
 GO
 

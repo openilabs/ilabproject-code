@@ -810,10 +810,7 @@ namespace iLabs.ServiceBroker.Internal
         /// <returns></returns>
         public static DataSet RetrieveExperimentIDsCriteria(int userID, int groupID, Criterion[] carray)
         {
-            //if (carray == null || carray.Length == 0)
-            //{
-            //    throw new Exception("Method requires Criteria");
-            //}
+           
             StringBuilder whereClause = null;
             DataSet results = new DataSet();
 
@@ -839,6 +836,8 @@ namespace iLabs.ServiceBroker.Internal
                         case "record_count":
                         case "scheduledstart":
                         case "status":
+                            whereClause.Append(carray[i].ToSQL());
+                            break;
                         case "user_id":
                             whereClause.Append(carray[i].ToSQL());
                             break;

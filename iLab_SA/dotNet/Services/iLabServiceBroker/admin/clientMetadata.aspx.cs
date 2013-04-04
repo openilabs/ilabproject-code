@@ -157,7 +157,7 @@ namespace iLabs.ServiceBroker.admin
                 TicketLoadFactory tlf = TicketLoadFactory.Instance();
                 if (ddlGroups.SelectedItem != null)
                 {
-                    string payload = tlf.createAuthorizeClientPayload(clientGuid, ddlGroups.SelectedItem.Text);
+                    string payload = tlf.createAuthorizeClientPayload(clientGuid, null,ddlGroups.SelectedItem.Text, null);
                     brokerDB.AddTicket(authCoupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid,
                         ProcessAgentDB.ServiceGuid, -1L, payload);
                     txtCouponID.Text = authCoupon.couponId.ToString();

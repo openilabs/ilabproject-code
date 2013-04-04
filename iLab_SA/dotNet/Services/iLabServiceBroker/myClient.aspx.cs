@@ -75,6 +75,7 @@ namespace iLabs.ServiceBroker.iLabSB
         protected void Page_Load(object sender, System.EventArgs e)
         {
             int groupID = 0;
+            int authID = -1;
             Coupon opCoupon = null;
             string groupName = null;
             lblResponse.Visible = false;
@@ -82,6 +83,65 @@ namespace iLabs.ServiceBroker.iLabSB
             userTZ = Convert.ToInt32(Session["UserTZ"]);
             culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
             lc = null;
+            if (!IsPostBack)
+            {
+                // retrieve parameters from URL
+                couponId = Request.QueryString["coupon_id"];
+                passkey = Request.QueryString["passkey"];
+                issuerGuid = Request.QueryString["issuer_guid"];
+                if (couponId != null && passkey != null && issuerGuid != null)
+                {
+                    opCoupon = new Coupon(issuerGuid, Int64.Parse(couponId), passkey);
+                    Ticket authExperimentTicket = issuer.RetrieveTicket(opCoupon, 
+                        TicketTypes.CREATE_EXPERIMENT, ProcessAgentDB.ServiceGuid);
+                    if (authExperimentTicket != null)
+                    {
+                        XmlQueryDoc authDoc = new XmlQueryDoc(authExperimentTicket.payload);
+                        string auth = authDoc.Query("CreateExperimentPayload/authID");
+                        if (auth != null && auth.Length > 0)
+                        {
+                            authID = Int32.Parse(auth);
+                            
+                        }
+                        string grpName = authDoc.Query("CreateExperimentPayload/groupName");
+                        if (grpName != null && groupName.Length > 0)
+                        {
+                            Session["GroupName"] = grpName;
+                            int grpID = AdministrativeAPI.GetGroupID(grpName);
+                            if (grpID > 0)
+                                Session["GroupID"] = groupID;
+                        }
+                        string userName = authDoc.Query("CreateExperimentPayload/userName");
+                        if (userName != null && userName.Length > 0)
+                        {
+                            Session["UserName"] = userName;
+                            int userID = AdministrativeAPI.GetUserID(userName,authID);
+                            if (userID > 0)
+                                Session["UserID"] = userID;
+                        }
+                        string clientGuid = authDoc.Query("CreateExperimentPayload/clientGuid");
+                        if (clientGuid != null && clientGuid.Length > 0)
+                        {
+                            Session["ClientGuid"] = clientGuid;
+                            int clientID = AdministrativeAPI.GetLabClientID(clientGuid);
+                            if (clientID > 0)
+                                Session["ClientID"] = clientID;
+                        }
+                    }
+                }
+                pReenter.Visible = false;
+                btnReenter.Visible = false;
+                auto = Request.QueryString["auto"];
+                if (auto != null && auto.Length > 0)
+                {
+                    if (auto.ToLower().Contains("t"))
+                    {
+                        autoLaunch = true;
+                    }
+                }
+
+
+            }
             if (Session["ClientID"] != null && Session["ClientID"].ToString().Length > 0)
             {
                 lc = wrapper.GetLabClientsWrapper(new int[] { Convert.ToInt32(Session["ClientID"]) })[0];
@@ -102,31 +162,8 @@ namespace iLabs.ServiceBroker.iLabSB
                 groupName = Session["GroupName"].ToString();
 
                 lblGroupNameTitle.Text = groupName;
-                //lblBackToLabs.Text = groupName;
             }
-            if (!IsPostBack)
-            {
-                // retrieve parameters from URL
-                couponId = Request.QueryString["coupon_id"];
-                passkey = Request.QueryString["passkey"];
-                issuerGuid = Request.QueryString["issuer_guid"];
-                if (couponId != null && passkey != null && issuerGuid != null)
-                {
-                    opCoupon = new Coupon(issuerGuid, Int64.Parse(couponId), passkey);
-                }
-                pReenter.Visible = false;
-                btnReenter.Visible = false;
-                auto = Request.QueryString["auto"];
-                if (auto != null && auto.Length > 0)
-                {
-                    if (auto.ToLower().Contains("t"))
-                    {
-                        autoLaunch = true;
-                    }
-                }
-
-               
-            }
+          
             if (lc != null)
             {
                 labServer = getLabServer(lc.clientID, effectiveGroupID);
@@ -209,6 +246,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                 if (ids.Length > 0)
                                 {
                                     btnLaunchLab.Text = "Launch New Experiment";
+                                    btnLaunchLab.OnClientClick ="<script lang=javascript>confirm('Are you sure you want to end the running expeiment?'); </script>";
                                     btnLaunchLab.Visible = true;
                                     pLaunch.Visible = true;
                                     pReenter.Visible = true;
@@ -221,6 +259,7 @@ namespace iLabs.ServiceBroker.iLabSB
                                     //pReenter.Visible = false;
                                     //btnReenter.Visible = false;
                                     btnLaunchLab.Text = "Launch Lab";
+                                    btnLaunchLab.OnClientClick="";
                                     if (autoLaunch)
                                     {
                                         launchLabClient(lc.clientID);
@@ -730,7 +769,7 @@ namespace iLabs.ServiceBroker.iLabSB
                 ProcessAgent lss = issuer.GetProcessAgent(lssId);
 
                 //Default duration ????
-                long duration = 36000;
+                long duration = 36000L;
 
                 RecipeExecutor recipeExec = RecipeExecutor.Instance();
                 string schedulingUrl = recipeExec.ExecuteExerimentSchedulingRecipe(uss, lss, username, Convert.ToInt32(Session["UserID"]),effectiveGroupName,

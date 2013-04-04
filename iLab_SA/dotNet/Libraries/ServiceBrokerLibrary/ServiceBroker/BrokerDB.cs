@@ -150,6 +150,13 @@ namespace iLabs.ServiceBroker
             return records;
         }
 
+        /// <summary>
+        /// Retrive records from the experiment. It is assummed that read permissons have been checked and passed.
+        /// A new coupon is created for this request.
+        /// </summary>
+        /// <param name="experimentID"></param>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
         public ExperimentRecord[] RetrieveExperimentRecords(long experimentID, Criterion[] criteria)
         {
             ExperimentRecord[] records = null;
@@ -157,13 +164,12 @@ namespace iLabs.ServiceBroker
             if (ess != null)
             {
                 ExperimentStorageProxy essProxy = new ExperimentStorageProxy();
-                Coupon opCoupon = GetEssOpCoupon(experimentID, TicketTypes.RETRIEVE_RECORDS, 60, ess.agentGuid);
-                if (opCoupon == null)
-                {
-                    string payload = TicketLoadFactory.Instance().RetrieveRecordsPayload(experimentID, ess.webServiceUrl);
-                    opCoupon = CreateTicket(TicketTypes.RETRIEVE_RECORDS, ess.agentGuid, ProcessAgentDB.ServiceGuid,
-                        60, payload);
-                }
+                Coupon opCoupon = CreateCoupon();
+                
+                string payload = TicketLoadFactory.Instance().RetrieveRecordsPayload(experimentID, ess.webServiceUrl);
+                opCoupon = CreateTicket(TicketTypes.RETRIEVE_RECORDS, ess.agentGuid, ProcessAgentDB.ServiceGuid,
+                     60, payload);
+                
                 essProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                 essProxy.OperationAuthHeaderValue.coupon = opCoupon;
                 essProxy.Url = ess.webServiceUrl;

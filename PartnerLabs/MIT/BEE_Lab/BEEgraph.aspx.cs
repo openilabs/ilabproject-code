@@ -77,6 +77,8 @@ namespace iLabs.LabServer.BEE
             LabDB dbManager = new LabDB();
             if (!IsPostBack)
             {
+                lblResponse.Text = "";
+                lblResponse.Visible = false;
                 // Query values from the request
                 hdnExperimentID.Value = Request.QueryString["expid"];
                 if (hdnExperimentID.Value != null && hdnExperimentID.Value.Length > 0)
@@ -126,7 +128,16 @@ namespace iLabs.LabServer.BEE
         protected ExperimentRecord[] getRecords(InteractiveSBProxy sbProxy, long expID, Criterion[] cList)
         {
             ExperimentRecord[] records = null;
-            records = sbProxy.RetrieveExperimentRecords(expID,cList);
+            try
+            {
+                records = sbProxy.RetrieveExperimentRecords(expID, cList);
+            }
+            catch (Exception e)
+            {
+                lblResponse.Text = Utilities.FormatWarningMessage("You do not have access to this experiment!");
+                lblResponse.Visible = true;
+                return null;
+            }
             return records;
         }
         protected void writeChannelID(string channelID)
@@ -187,12 +198,14 @@ namespace iLabs.LabServer.BEE
         protected void processRecords(ExperimentRecord[] records)
         {
             bool hasRecords = false;
-            StringBuilder buf = new StringBuilder();
-            char[] delim = ",".ToCharArray();
-            buf.AppendLine("<script type=\"text/javascript\">");
-            buf.Append(" window.sampleData = [");
-            if (records.Length > 0)
+            if (records != null && records.Length > 0)
             {
+                StringBuilder buf = new StringBuilder();
+                char[] delim = ",".ToCharArray();
+                buf.AppendLine("<script type=\"text/javascript\">");
+                buf.Append(" window.sampleData = [");
+                //if (records.Length > 0)
+                //{
 
                 //int i = 1;
                 DateTime epoc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -215,11 +228,12 @@ namespace iLabs.LabServer.BEE
                     //buf.Append("[" + values[0] + "," + values[1] + "," + values[2] + "]");
                     buf.Append("[" + rec.contents + "]");
                 }
+
+                buf.AppendLine();
+                buf.AppendLine("];");
+                buf.AppendLine("</script>");
+                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "graphData", buf.ToString(), false);
             }
-            buf.AppendLine();
-            buf.AppendLine("];");
-            buf.AppendLine("</script>");
-            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "graphData", buf.ToString(), false);
 
         }
 

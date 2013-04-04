@@ -85,11 +85,11 @@ namespace iLabs.ServiceBroker.iLabSB
                 culture = DateUtil.ParseCulture(Request.Headers["Accept-Language"]);
                 //txtTime2.Enabled = false;
 				List<Criterion> cList = new List<Criterion> ();
-                if (Session["UserID"] != null)
-                {
-                    cList.Add(new Criterion("User_ID", "=", Session["UserID"].ToString()));
+                //if (Session["UserID"] != null)
+                //{
+                //    cList.Add(new Criterion("User_ID", "=", Session["UserID"].ToString()));
 
-                }
+                //}
                 //if (Session["GroupID"] != null)
                 //{
                 //    cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));

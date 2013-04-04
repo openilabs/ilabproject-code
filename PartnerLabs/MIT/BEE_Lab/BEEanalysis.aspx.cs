@@ -133,10 +133,11 @@ namespace iLabs.LabServer.BEE
                         sbProxy.OperationAuthHeaderValue = new OperationAuthHeader();
                         sbProxy.OperationAuthHeaderValue.coupon = expCoupon;
                         sbProxy.Url = sbInfo.webServiceUrl;
-
+                        // Use the extraInfo field to provide the target ClientGUID
                         List<Criterion> cri = new List<Criterion>();
                         if (clientInfo.extraInfo != null && clientInfo.extraInfo.Length > 0)
                             cri.Add(new Criterion("clientguid", "=", clientInfo.extraInfo));
+
                         ExperimentSummary[] expSum = sbProxy.RetrieveExperimentSummary(cri.ToArray());
                         listSummaries(expSum);
                     }

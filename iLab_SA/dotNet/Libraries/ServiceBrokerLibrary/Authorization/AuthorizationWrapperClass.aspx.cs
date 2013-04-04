@@ -2020,7 +2020,6 @@ namespace iLabs.ServiceBroker.Authorization
             else
             {
                 //readExperiment check
-
                 // get qualifier ID of experimentID
                 int qualifierID = Authorization.AuthorizationAPI.GetQualifierID((int)experimentID, Qualifier.experimentQualifierTypeID);
                 if (Authorization.AuthorizationAPI.CheckAuthorization(loginUserID, Function.readExperimentFunctionType, qualifierID))
@@ -2035,6 +2034,8 @@ namespace iLabs.ServiceBroker.Authorization
                 {
                     haveAccess |= ExperimentAccess.ADMINISTER;
                 }
+
+                int grpQualID = Authorization.AuthorizationAPI.GetQualifierID(groupID, Qualifier.experimentCollectionQualifierTypeID);
             }
 
             return haveAccess;

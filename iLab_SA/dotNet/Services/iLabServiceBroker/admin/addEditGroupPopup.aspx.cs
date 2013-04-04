@@ -222,7 +222,7 @@ namespace iLabs.ServiceBroker.admin
 			}
 		}
 		/// <summary>
-		/// Finds all eperiment collection grants derived from the specified qualID,
+		/// Finds all experiment collection grants derived from the specified qualID,
 		/// and loads the values into the GrantInfo.
 		/// </summary>
 		/// <param name="qualID"></param>

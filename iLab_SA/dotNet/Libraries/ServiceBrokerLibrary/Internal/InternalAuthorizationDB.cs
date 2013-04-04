@@ -36,6 +36,46 @@ namespace iLabs.ServiceBroker.Internal
 			//
 		}
 
+        public static bool CanReadExperiment(int userId, int groupId, long expId)
+        {
+            bool status = false;
+            DbConnection myConnection = FactoryDB.GetConnection();
+            DbCommand myCommand = FactoryDB.CreateCommand("Authorization_CanReadExp", myConnection);
+            myCommand.CommandType = CommandType.StoredProcedure;
+
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", userId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", groupId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@expID", expId, DbType.Int64));
+
+            DbDataReader reader = null;
+            try
+            {
+                myConnection.Open();
+                reader = myCommand.ExecuteReader();
+                if (reader != null && reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        if (!reader.IsDBNull(0))
+                        {
+                            long id = reader.GetInt64(0);
+                            if (id == expId)
+                                status = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in CanReadExpID. " + ex.Message, ex);
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return status;
+        }
+
 		/* !------------------------------------------------------------------------------!
 		 *							CALLS FOR GRANTS
 		 * !------------------------------------------------------------------------------!
@@ -242,9 +282,10 @@ namespace iLabs.ServiceBroker.Internal
 		}
 
 		/// <summary>
-		/// enumerates the IDs of all explicit grants matching the specification of the arguments; any or all of the arguments may be null, in which case, 
-		/// the method does a wildcard match on the null argument(s). 
-		/// (A FindGrants() with all the arguments null is equivalent to a ListGrantIDs().
+		/// enumerates the IDs of all explicit grants matching the specification of the arguments; 
+        /// agentID and qualifierID may be -1, function may be null, in which case, 
+		/// the method does a wildcard match on the 'not a value' argument(s). 
+        /// (A FindGrants() with all the arguments 'not a value' is equivalent to a ListGrantIDs().
 		/// This uses the cached GrantSet, without updating it first.
 		/// Current implementation assumes that all wildcard searches do not yield implicit grants
 		/// </summary>

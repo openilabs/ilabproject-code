@@ -1105,21 +1105,30 @@ namespace iLabs.ServiceBroker.iLabSB
 
         
         /// <summary>
-        /// Request authorization for the specified types of access, for the specified group and optional user. At this time remote SB's are not supported.
-        /// This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header, at least one must be used.
-        /// If an AgentAuthHeader is used & the agent is a known service it is assummed that the user name is authenticated,
+        /// Request authorization for the specified types of access, for the specified group and 
+        /// optional user. At this time remote SB's are not supported.
+        /// This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header, 
+        /// at least one must be used.
+        /// If an AgentAuthHeader is used & the agent is a known service it is assummed that 
+        /// the user name is authenticated,
         /// the additional parameters refine the options the user has, and a REDEEM_SESSION ticket is created.
-        /// If an OperationHeader is used a REDEEM_SESSION ticket has already been created, supplied arguments are tested against the session's user 
+        /// If an OperationHeader is used a REDEEM_SESSION ticket has already been created, supplied 
+        /// arguments are tested against the session's user 
         /// and if the requested resources are available to the user.
         /// Depending on the header, session information and supplied arguments the requested tickets will be created.
-        /// Currently you must specify the user and client and only scheduling tickets are supported.
+        /// Currently you must specify the user and client and only scheduling tickets are supported. 
+        /// Support for AUTHORIZE CLIENT will be added for requesting all the permissions needed to launch a client.
         /// This method may change in the next release.
         /// </summary>
         /// <param name="types">An array of requested ticket types</param>
-        /// <param name="duration">minimum duration of the created tickets in seconds, durations less than 2 minutes will be converted to two minutes.</param>
-        /// <param name="userName">User name on this ServiceBroker, may allow utomatic creation of a local account in future, may in the future support validation from the service making the request, may be null</param>
-        /// <param name="groupName">group name on this ServiceBroker, may in the future support validation from the service making the request, may be null/param>
-        /// <param name="authtority">The authority string that validates the specified user. This assumes that the requesting service has authenticated the user. May be null</param>
+        /// <param name="duration">minimum duration of the created tickets in seconds, durations less 
+        /// than 2 minutes will be converted to two minutes.</param>
+        /// <param name="userName">User name on this ServiceBroker, may allow utomatic creation of a 
+        /// local account in future, may in the future support validation from the service making the request, may be null</param>
+        /// <param name="groupName">group name on this ServiceBroker, may in the future support validation 
+        /// from the service making the request, may be null/param>
+        /// <param name="authtority">The authority string that validates the specified user. 
+        /// This assumes that the requesting service has authenticated the user. May be null</param>
         /// <param name="clientGuid">May be null</param>
         /// <returns>An operationCoupon or null</returns>
         [WebMethod(Description = "Request authorization for the specified types of access, for the specified user, group, authority and  client.")]
@@ -1212,7 +1221,8 @@ namespace iLabs.ServiceBroker.iLabSB
                                 authID = auth.authorityID;
                             }
                         }
-                        //Determine resources available based on supplied fields, note requestGuid is not used to authenticate users at this time
+                        //Determine resources available based on supplied fields, note requestGuid 
+                        // is not used to authenticate users at this time
                         // Only return groups that match the inputs, have clients & are not administrative
                         status = brokerDB.ResolveResources(Context, authID, userName, groupName, serviceGuid, clientGuid, false,
                             ref message, out userID, out groupClientsMap);
@@ -1359,11 +1369,15 @@ namespace iLabs.ServiceBroker.iLabSB
                                     brokerDB.AddTicket(coupon, TicketTypes.REDEEM_SESSION, ProcessAgentDB.ServiceGuid, agentAuthHeader.agentGuid, duration, payload);
                                     break;
                                 //case TicketTypes.ALLOW_EXPERIMENT_EXECUTION:
-                                //    payload = tlf.createAllowExperimentExecutionPayload(start,duration,groupName,theClient.clientGuid);
+                                //    payload = tlf.createAllowExperimentExecutionPayload(start,duration,groupName,
+                                //      theClient.clientGuid);
                                 //    break;
-                                //case TicketTypes.CREATE_EXPERIMENT:
-                                //    payload = tlf.createCreateExperimentPayload(start,duration,userName,groupName,ProcessAgentDB.ServiceGuid,theClient.clientGuid);
-                                //    break;
+                                case TicketTypes.AUTHORIZE_CLIENT:
+                                case TicketTypes.CREATE_EXPERIMENT:
+                                    payload = tlf.createCreateExperimentPayload(start, duration, userName, authID, groupName, 
+                                        ls.agentGuid, theClient.clientGuid);
+                                    brokerDB.AddTicket(coupon, TicketTypes.CREATE_EXPERIMENT, ProcessAgentDB.ServiceGuid,                                                      ProcessAgentDB.ServiceGuid, duration, payload);
+                                    break;
                                 //case TicketTypes.EXECUTE_EXPERIMENT:
                                 //    payload = tlf.createExecuteExperimentPayload(ess.webServiceUrl,start,duration,0,groupName,ProcessAgentDB.ServiceGuid,expID);
                                 //    break;
@@ -1762,23 +1776,19 @@ EnableSession = true)]
             long[] expIDs = null;
             if (brokerDB.RedeemSessionInfo(opHeader.coupon, out userID, out groupID, out clientID))
             {
-
                 if (userID > 0)
                 {
-
-                    AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
-                    roles = wrapper.GetExperimentAuthorizationWrapper(experimentID, userID, groupID);
-                }
-                if ((roles & ExperimentAccess.READ) == ExperimentAccess.READ)
-                {
-                    records = brokerDB.RetrieveExperimentRecords(experimentID, carray);
-                }
-                else
-                {
-                    throw new AccessDeniedException("You do not have the required permission to access the experiment");
+                    if (InternalAuthorizationDB.CanReadExperiment(userID, groupID, experimentID))
+                    {
+                        records = brokerDB.RetrieveExperimentRecords(experimentID, carray);
+                    }
+                    else
+                    {
+                        throw new AccessDeniedException("You do not have the required permission to access the experiment");
+                    }
                 }
             }
-                return records;
+            return records;
         }
 
         [WebMethod(Description = "Uses the cridentials granted the experiment specified by the opHeader to check "

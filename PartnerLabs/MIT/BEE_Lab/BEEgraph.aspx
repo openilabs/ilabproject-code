@@ -51,6 +51,7 @@ Please see license.txt in top level directory for full license.
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1><asp:label id="lblExperimentTitle" Runat="server"><% =title %></asp:label></h1>
+						<asp:label id="lblResponse" Runat="server" Visible="False"></asp:label>
 						<asp:label id="lblDescription" Runat="server"></asp:label>
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">

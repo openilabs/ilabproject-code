@@ -75,7 +75,7 @@ namespace iLabs.Ticketing
          * service broker tickets
          * */
 
-        public string createAuthorizeClientPayload(string clientGuid, string groupName)
+        public string createAuthorizeClientPayload(string clientGuid, string lsGuid, string groupName, string userName)
         {
             string rootElemt = "AuthorizeClientPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
@@ -83,9 +83,17 @@ namespace iLabs.Ticketing
             {
                 keyValueDictionary.Add("clientGuid", clientGuid);
             }
+            if (lsGuid != null && lsGuid.Length > 0)
+            {
+                keyValueDictionary.Add("serverGuid", clientGuid);
+            }
             if (groupName != null && groupName.Length > 0)
             {
                 keyValueDictionary.Add("groupName", groupName);
+            }
+            if (userName != null && userName.Length > 0)
+            {
+                keyValueDictionary.Add("userName", groupName);
             }
             return writeTicketLoad(rootElemt, TicketTypes.AUTHORIZE_CLIENT, keyValueDictionary);
         }
@@ -308,14 +316,14 @@ namespace iLabs.Ticketing
         }
 
         public string createCreateExperimentPayload(DateTime startExecution, long duration,
-            string userName, int userID, string groupName, string lsGuid, string clientGuid)
+            string userName, int authID, string groupName, string lsGuid, string clientGuid)
         {
             string rootElemt = "CreateExperimentPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
             keyValueDictionary.Add("startExecution", DateUtil.ToUtcString(startExecution));
             keyValueDictionary.Add("duration", duration);
             keyValueDictionary.Add("userName", userName);
-            keyValueDictionary.Add("userID", userID.ToString());
+            keyValueDictionary.Add("authID", authID.ToString());
             keyValueDictionary.Add("groupName", groupName);
             keyValueDictionary.Add("labGuid", lsGuid);
             keyValueDictionary.Add("clientGuid", clientGuid);

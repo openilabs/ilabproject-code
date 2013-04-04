@@ -304,7 +304,7 @@ namespace iLabs.ServiceBroker.DataStorage
             long[] expIDs = null;
             List<Criterion> sbList = new List<Criterion>();
             List<Criterion> essList = new List<Criterion>();
-           
+            int usrId = userID;
 
             if (carray != null && carray.Length > 0)
             {
@@ -352,7 +352,7 @@ namespace iLabs.ServiceBroker.DataStorage
             if (sbList.Count == 0 && essList.Count == 0)
             {
                 // No search items - Get all experiments allowed
-                expIDs = InternalDataDB.RetrieveAuthorizedExperimentIDs(userID, groupID);
+                expIDs = InternalDataDB.RetrieveAuthorizedExperimentIDs(usrId, groupID);
             }
             else
             { // Query SB database to find all possible Experiments and related ESS's
@@ -363,7 +363,7 @@ namespace iLabs.ServiceBroker.DataStorage
 
                 // DataSet contains all experimentID and ess ids that pass SB criteria,
                 // and a set of all ess_ids for the authorized experiments
-                DataSet results = InternalDataDB.RetrieveExperimentIDsCriteria(userID, groupID, sbList.ToArray());
+                DataSet results = InternalDataDB.RetrieveExperimentIDsCriteria(usrId, groupID, sbList.ToArray());
                 if (results != null)
                 {
                     if (hasEssCriteria)
