@@ -67,33 +67,23 @@ Please see license.txt in top level directory for full license.
 							<div class="unit">
 								<table border="0" cellspacing="0" cellpadding="0" cols="3" >
 										<tr>
-											<th width="40">
-												Group
-											</th>
-											<td width="400"><%# Convert.ToString(DataBinder.Eval(Container,"DataItem.groupName"))%>
-											</td>
+											<th width="40">Group</th>
+											<td width="400"><b><%# Convert.ToString(DataBinder.Eval(Container,"DataItem.groupName"))%></b></td>
 											<td rowspan="2" width="110">
 												<asp:Button ID="btnEdit" Runat="server" Text="Edit" CommandName="Edit" CssClass="button"></asp:Button>
 												<asp:Button ID="btnRemove" Runat="server" Text="Remove" CommandName="Remove" CssClass="button"></asp:Button>
 											</td>
 										</tr>
 										<tr>
-											<th>
-												Description</th>
-											<td>
-												<asp:Label ID="lblDescription" Runat="server"></asp:Label>
-											</td>
+											<th>Description</th>
+											<td><asp:Label ID="lblDescription" Runat="server"></asp:Label></td>
 										</tr>
 										<tr>
-											<th>
-												Type
-											</th>
-											<td>
-												<%# Convert.ToString(DataBinder.Eval(Container,"DataItem.GroupType"))%>
-											</td>
+											<th>Type</th>
+											<td><%# Convert.ToString(DataBinder.Eval(Container,"DataItem.GroupType"))%></td>
 										</tr>
 								</table>
-								</div>
+							</div>
 							</ItemTemplate>
 						</asp:repeater>
 					</div>

@@ -312,6 +312,7 @@ namespace iLabs.Controls
 
         HtmlGenericControl pageintro;      
         HtmlGenericControl pagecontent;
+        HtmlGenericControl divUnit;
         HtmlGenericControl simpleform;
 
         //HtmlForm frmRegister;
@@ -1078,6 +1079,9 @@ namespace iLabs.Controls
             pagecontent = new HtmlGenericControl("div");
             pagecontent.ID = "pagecontent";
 
+            divUnit = new HtmlGenericControl("div");
+            divUnit.Attributes["class"] = "unit";
+            pagecontent.Controls.Add(divUnit);
             //frmRegister = new HtmlForm();
             //frmRegister.Method = "post";
             //frmRegister.Target = "";
@@ -1085,7 +1089,6 @@ namespace iLabs.Controls
             //frmRegister.ID = "frmRegister";
             
             tblMain = new Table();
-            tblMain.CssClass = "simpleform";
             tblMain.Width = width;
             
             Literal spacer = new Literal();
@@ -1231,7 +1234,7 @@ namespace iLabs.Controls
             th = new TableHeaderCell();
             lblDomainServer = new Label();
             lblDomainServer.ID = "lblDomainServer";
-            lblDomainServer.Text = "Domain ServiceBroker";
+            lblDomainServer.Text = "Domain&nbsp;ServiceBroker";
             th.Controls.Add(lblDomainServer);
            
             td = new TableCell();
@@ -1245,7 +1248,8 @@ namespace iLabs.Controls
             trDomainSB.Cells.Add(td);
             tblMain.Rows.Add(trDomainSB);
 
-            trDomainSB.Visible = (AgentType == ProcessAgentType.SERVICE_BROKER || AgentType == ProcessAgentType.BATCH_SERVICE_BROKER) ? false :true;
+            trDomainSB.Visible = (AgentType == ProcessAgentType.SERVICE_BROKER 
+                || AgentType == ProcessAgentType.BATCH_SERVICE_BROKER) ? false :true;
 
             trDomainGuid = new TableRow();
             trDomainGuid.ID = "trDomainGuid";
@@ -1266,14 +1270,15 @@ namespace iLabs.Controls
             trDomainGuid.Cells.Add(td);
             tblMain.Rows.Add(trDomainGuid);
 
-            trDomainGuid.Visible = (AgentType == ProcessAgentType.SERVICE_BROKER || AgentType == ProcessAgentType.BATCH_SERVICE_BROKER) ? false : true;
+            trDomainGuid.Visible = (AgentType == ProcessAgentType.SERVICE_BROKER 
+                || AgentType == ProcessAgentType.BATCH_SERVICE_BROKER) ? false : true;
 
 
             trRowPasskey = new TableRow();
             th = new TableHeaderCell();
             lblOutPassKey = new Label();
             lblOutPassKey.ID = "lblOutPassKey";
-            lblOutPassKey.Text = "Install Credential Passkey";
+            lblOutPassKey.Text = "Install&nbsp;Credential&nbsp;Passkey";
             th.Controls.Add(lblOutPassKey);
            
             td = new TableCell();
@@ -1443,7 +1448,7 @@ namespace iLabs.Controls
             row.Cells.Add(td);
             tblMain.Rows.Add(row);
 
-            pagecontent.Controls.Add(tblMain);
+            divUnit.Controls.Add(tblMain);
             hdnServiceGuid = new HiddenField();
             hdnServiceGuid.ID = "bakServiceGuid";
             pagecontent.Controls.Add(hdnServiceGuid);

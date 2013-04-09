@@ -36,6 +36,7 @@ Please see license.txt in top level directory for full license.
 					<div id="pagecontent">
 							<div class="simpleform">
 							    <form id="modifylab" action="" method="post" name="modifylab">
+							    <div class="unit">
 									<table style="WIDTH: 680px; HEIGHT: 460px" cols="3" cellspacing="0" cellpadding="5" border="0">
 										<TBODY>
 										    <tr style="height: 1px">
@@ -174,6 +175,7 @@ Please see license.txt in top level directory for full license.
 											</tr>
        									</TBODY>
 									</table>
+								</div>
 								</form>
 							</div>
 						</div><!-- end pagecontent div -->

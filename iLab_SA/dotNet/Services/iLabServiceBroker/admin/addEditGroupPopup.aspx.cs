@@ -221,6 +221,7 @@ namespace iLabs.ServiceBroker.admin
 				}
 			}
 		}
+
 		/// <summary>
 		/// Finds all experiment collection grants derived from the specified qualID,
 		/// and loads the values into the GrantInfo.
@@ -422,17 +423,16 @@ namespace iLabs.ServiceBroker.admin
 					saveModified();
 				}
 				//Session.Remove("GroupInfo");
-				string jScript;
-				jScript = "<script language=javascript> window.opener.Form1.hiddenPopupOnSave.value='1';";
-				jScript += "window.close();</script>";
-				Page.RegisterClientScriptBlock("postbackScript", jScript);
+                 Page.ClientScript.RegisterStartupScript(this.GetType(), "Success", "ReloadParent();", true);
+            
+				
 			}
 			catch (Exception ex)
 			{
 				lblResponse.Text = Utilities.FormatErrorMessage(ex.GetBaseException().ToString());
 			}
 		}
-
+       
 		protected void saveNew()
 		{
 			StringBuilder sb = new StringBuilder();
@@ -449,12 +449,6 @@ namespace iLabs.ServiceBroker.admin
 				{
 					throw new Exception("Group: " + txtName.Text + " exists, choose another name.");
 				}
-
-                //if (AdministrativeAPI.GetUserID(txtName.Text) > 0) // user record exists, choose another name
-                //{
-                //    throw new Exception("The name '" + txtName.Text + "' is not available, choose another name.");
-                //}
-									
 			
 				int groupRootID = AdministrativeAPI.GetGroupID(Group.ROOT); //Group.ROOT;
 				int tmpParent = groupRootID;
@@ -462,8 +456,16 @@ namespace iLabs.ServiceBroker.admin
 				// If a parent is specified, then add group under that parent group; otherwise add it under ROOT
 				if(lbxParentGroups.Items.Count >0)
 					tmpParent = Convert.ToInt32(lbxParentGroups.Items[0].Value); // find tmpParent
-				groupInfo.id = wrapper.AddGroupWrapper(txtName.Text, tmpParent, txtDescription.Text,txtEmail.Text, GroupType.REGULAR, 0); //AddGroup
-
+                //AddGroup
+				groupInfo.id = wrapper.AddGroupWrapper(txtName.Text, tmpParent, txtDescription.Text,txtEmail.Text, 
+                    GroupType.REGULAR, 0); 
+                // Set Default Grant 'CreateExperiment'
+                int expQualId = 0;
+                if (groupInfo.id > 0)
+                {
+                    expQualId = AuthorizationAPI.GetQualifierID(groupInfo.id, Qualifier.experimentCollectionQualifierTypeID);
+                    AuthorizationAPI.AddGrant(groupInfo.id, Function.createExperimentFunctionType, expQualId);
+                }
 				// If more than 1 parent is specified, then add group to all other parent groups (except the one under which it was created in the previous step)
 				// AddMemberToGroup automatically handles all qualifier transfers
 				if(lbxParentGroups.Items.Count >1)
@@ -478,9 +480,7 @@ namespace iLabs.ServiceBroker.admin
 				int loginGroupID = Convert.ToInt32(Session["GroupID"]);
 				int groupQID = AuthorizationAPI.GetQualifierID(groupInfo.id, Qualifier.groupQualifierTypeID);
 				AuthorizationAPI.AddGrant(loginGroupID, Function.administerGroupFunctionType,groupQID);
-				//wrapper.AddGrantWrapper(loginGroupID, Function.administerGroupFunctionType,groupQID);
 
-			
 				int requestID =0;
 				// Create a Request group if the box has been checked
 				if(cbxRequestgroup.Checked == true)
@@ -514,11 +514,10 @@ namespace iLabs.ServiceBroker.admin
 					{
 						/* Add permissions for TA groups */
 						int groupQualID = AuthorizationAPI.GetQualifierID(groupInfo.id,Qualifier.groupQualifierTypeID);
-						int expCollQualID = AuthorizationAPI.GetQualifierID(groupInfo.id,Qualifier.experimentCollectionQualifierTypeID);
 						
-						/* administer group & read experiment privileges over main group */
+                        /* administer group & read experiment privileges over main group */
 						wrapper.AddGrantWrapper(TAGrpID,Function.administerGroupFunctionType,groupQualID);
-						wrapper.AddGrantWrapper(TAGrpID,Function.readExperimentFunctionType,expCollQualID);
+                        wrapper.AddGrantWrapper(TAGrpID, Function.readExperimentFunctionType, expQualId);
 						
 						requestID = AdministrativeUtilities.GetGroupRequestGroup(groupInfo.id);
 						if (requestID>0)

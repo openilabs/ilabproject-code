@@ -34,7 +34,7 @@ Please see license.txt in top level directory for full license.
 						<p><asp:label id="lblErrorMessage" Runat="server" Visible="False"></asp:label></p>
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
-							<div class="simpleform">
+							<div class="unit">
 							    <form id="authorities" action="" method="post" name="authorities">
 									<table style="WIDTH: 680px; HEIGHT: 460px" cols="3" cellspacing="0" cellpadding="5" border="0">
 										<TBODY>

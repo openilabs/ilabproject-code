@@ -19,6 +19,18 @@ Please see license.txt in top level directory for full license.
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<link href="../css/main.css" type="text/css" rel="stylesheet" />
 		<link href="../css/popup.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript">
+		<!--
+		function ReloadParent() 
+        {          
+            if (window.opener){            
+                window.opener.location.href = 'administerGroups.aspx?refresh=t';
+                window.opener.focus();
+            } 
+            window.close();  
+        }
+        -->
+        </script>
 	</head>
 	<body>
 		<form id="Form1" method="post" runat="server">
@@ -59,10 +71,10 @@ Please see license.txt in top level directory for full license.
 						</table>
 						<h4>Experiment&nbsp;Grants</h4>
 						<%if (showExpGrants) {%>
-						<p>(Specify "Read Experiment" (R), "Write Experiment" (W) or "Conduct Experiments" (C) grants for the group 
-							and its subgroups)</p>
+						<p>Specify 'Create(C)', 'Read Group'(R), or 'Write Group'(W) experiment grants for the group 
+							and its subgroups</p>
 						<%} else {%>
-						<p>Set "Read", "Write" or Create Experiment grants for this group or subgroups . To add these 
+						<p>Set 'Create(C)', 'Read Group'(R), or 'Write Group'(W) experiment grants for this group or subgroups . To achange the default 
 							grants, save all changes on this page and return to it by clicking on the Edit 
 							Button for the group.</p>
 						<%}%>
@@ -73,9 +85,10 @@ Please see license.txt in top level directory for full license.
 										<th style="WIDTH: 146px">
 											<asp:Label ID="lblExp" Runat="server" Font-Size="12px"></asp:Label>&nbsp;</th>
 										<td><div class="checkset">
+										        <asp:CheckBox ID="cbxCreate" Enabled="False" Runat="server"></asp:CheckBox><label for="cbxCreate">C</label>
 												<asp:CheckBox ID="cbxRead" Enabled="false" Runat="server"></asp:CheckBox><label for="cbxRead">R</label>
 												<asp:CheckBox ID="cbxWrite" Enabled="False" Runat="server"></asp:CheckBox><label for="cbxWrite">W</label>
-												<asp:CheckBox ID="cbxCreate" Enabled="False" Runat="server"></asp:CheckBox><label for="cbxCreate">C</label></div>
+											</div>
 										</td>
 									</tr>
 								</ItemTemplate>

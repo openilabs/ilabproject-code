@@ -45,7 +45,7 @@ Please see license.txt in top level directory for full license.
 					</div><!-- end pageintro div -->
 					<div id="pagecontent">
 					<!--    <button id="btnRefresh" style="VISIBILITY: hidden" type="button" runat="server" ></button> -->
-						<div class="simpleform">
+						<div class="unit">
 							<table cellspacing="5" cellpadding="0" border="0">
 							    <tr style="height: 0px">
 							     <td style="width: 100px"></td>

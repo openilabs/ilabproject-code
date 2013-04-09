@@ -1790,7 +1790,6 @@ FETCH domainC INTO @domain
 		delete from Coupon where issuer_guid = @domain AND Coupon_ID in ( select cid from #remove)
 		if (@@error <> 0)
 		BEGIN
-			ROLLBACK
 			CLOSE domainC
 			DEALLOCATE domainC
 			goto on_error

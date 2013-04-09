@@ -133,7 +133,7 @@ begin
 update IssuedCoupon set Cancelled = 1 where Coupon_ID=@couponID
 if (@@rowcount = 0)
 goto on_error
-if (@@error>0)
+if (@@error<>0)
 goto on_error
 update IssuedTicket set Cancelled =1 where Coupon_ID = @couponID
 if (@@error>0)
@@ -164,7 +164,7 @@ begin
 delete from IssuedCoupon  where Coupon_ID=@couponID
 if (@@rowcount = 0)
 goto on_error
-if (@@error>0)
+if (@@error<>0)
 goto on_error
 end
 COMMIT TRANSACTION

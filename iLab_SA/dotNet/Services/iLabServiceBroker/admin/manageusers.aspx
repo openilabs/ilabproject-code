@@ -37,37 +37,30 @@ Please see license.txt in top level directory for full license.
 								<p><asp:label id="lblGroups" Runat="server"></asp:label></p>
 								<p><asp:label id="lblRequestGroups" Runat="server"></asp:label></p>
 							</div>
-							<div class="simpleform">
+							<div class="unit">
 								<table>
 									<tr>
-										<th>
-											<label for="username">Username</label></th>
+										<th><label for="username">Username</label></th>
 										<td><asp:textbox id="txtUsername" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="firstname">First Name </label>
-										</th>
+										<th><label for="firstname">First Name </label></th>
 										<td><asp:textbox id="txtFirstName" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="lastname">Last Name</label></th>
+										<th><label for="lastname">Last Name</label></th>
 										<td><asp:textbox id="txtLastName" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="email">Email</label></th>
+										<th><label for="email">Email</label></th>
 										<td><asp:textbox id="txtEmail" Runat="server" Width="310px"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="authority">Authority</label></th>
-										<td>
-                                            &nbsp;<asp:dropdownlist CssClass="i18n" id="ddlAuthority" Runat="server" Width="315px"></asp:dropdownlist></td>
-									</tr><tr>
-										<th>
-											<label for="affiliation">Affiliation</label></th>
+										<th><label for="authority">Authority</label></th>
+										<td>&nbsp;<asp:dropdownlist CssClass="i18n" id="ddlAuthority" Runat="server" Width="315px"></asp:dropdownlist></td>
+									</tr>
+									<tr>
+										<th><label for="affiliation">Affiliation</label></th>
 										<td>
 											<% if(ConfigurationManager.AppSettings["useAffiliationDDL"].Equals("true")){ %>
 											<asp:dropdownlist CssClass="i18n" id="ddlAffiliation" Runat="server" Width="171px"></asp:dropdownlist>
@@ -77,24 +70,20 @@ Please see license.txt in top level directory for full license.
 										</td>
 									</tr>
 									<tr>
-										<th>
-											<label for="pword">Password</label></th>
+										<th><label for="pword">Password</label></th>
 										<td><asp:textbox id="txtPassword" Runat="server" Width="152px" TextMode="Password"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											<label for="confirmpword">Confirm Password </label>
-										</th>
+										<th><label for="confirmpword">Confirm Password </label></th>
 										<td><asp:textbox id="txtConfirmPassword" Runat="server" Width="152px" TextMode="Password"></asp:textbox></td>
 									</tr>
 									<tr>
-										<th>
-											&nbsp;</th>
-										<td><asp:checkbox id="cbxLockAccount" Runat="server"></asp:checkbox><label for="lock">Lock Account</label></td>
+										<th><label for="lockaccount">Lock Account</label></th>
+										<td><asp:checkbox id="cbxLockAccount" Runat="server"></asp:checkbox></td>
 									</tr>
 									<tr>
-										<th colspan="2">
-											<asp:button id="btnSaveChanges" Runat="server" OnClick="btnSaveChanges_Click" Text="Save Changes"></asp:button><asp:button id="btnRemove" Runat="server" OnClick="btnRemove_Click" Text="Remove" CssClass="button"></asp:button><asp:button id="btnNew" Runat="server" OnClick="btnNew_Click" Text="New" CssClass="button"></asp:button></th></tr>
+										<th colspan="2"><asp:button id="btnSaveChanges" Runat="server" OnClick="btnSaveChanges_Click" Text="Save Changes"></asp:button><asp:button id="btnRemove" Runat="server" OnClick="btnRemove_Click" Text="Remove" CssClass="button"></asp:button><asp:button id="btnNew" Runat="server" OnClick="btnNew_Click" Text="New" CssClass="button"></asp:button></th>
+									</tr>
 								</table>
 							</div>
 						</div>

@@ -19,6 +19,18 @@ Please see license.txt in top level directory for full license.
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<LINK href="../css/main.css" type="text/css" rel="stylesheet">
 		<LINK href="../css/popup.css" type="text/css" rel="stylesheet">
+		<script type="text/javascript">
+		<!--
+		function ReloadParent() 
+        {          
+            if (window.opener){            
+                window.opener.location.href = 'administerGroups.aspx?refresh=t';
+                window.opener.focus();
+            } 
+            window.close();  
+        }
+        -->
+        </script>
 	</HEAD>
 	<body>
 		<form id="Form1" method="post" runat="server">
@@ -69,7 +81,7 @@ Please see license.txt in top level directory for full license.
 										Height="22"></asp:imagebutton><br>
 									<asp:imagebutton id="ibtnRemoveParent" Runat="server" Width="74" ImageUrl="../img/remove-btn.gif"
 										CssClass="buttonstyle" Height="22"></asp:imagebutton></td>
-								<td style="WIDTH: 306px"><asp:listbox cssClass="i18n" id="lbxParentGroups" Runat="server" Width="288px" Rows="6" Columns="30" TextMode="MultiLine"></asp:listbox>
+								<td style="WIDTH: 306px"><asp:listbox cssClass="i18n" id="lbxParentGroups" Runat="server" Width="288px" Rows="6" Columns="30" TextMode="MultiLine"></asp:listbox></td>
 								<td style="WIDTH: 1px"></td>
 							</tr>
 						</table>

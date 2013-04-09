@@ -425,10 +425,7 @@ namespace iLabs.ServiceBroker.admin
                     saveModified();
                 }
                 //Session.Remove("GroupInfo");
-                string jScript;
-                jScript = "<script language=javascript> window.opener.Form1.hiddenPopupOnSave.value='1';";
-                jScript += "window.close();</script>";
-                Page.RegisterClientScriptBlock("postbackScript", jScript);
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "Success", "ReloadParent();", true);
             }
             catch (Exception ex)
             {
@@ -553,6 +550,7 @@ namespace iLabs.ServiceBroker.admin
                 lblResponse.Visible = true;
                 //throw new Exception();
             }
+           
 
         }
 
@@ -692,6 +690,7 @@ namespace iLabs.ServiceBroker.admin
                 lblResponse.Visible = true;
                 //throw new Exception();
             }
+           
         }
 
         //private void saveExperimentStatus()
