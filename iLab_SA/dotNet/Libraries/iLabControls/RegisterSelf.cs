@@ -999,40 +999,7 @@ namespace iLabs.Controls
 
         #region render
 
-        //protected override void Render(HtmlTextWriter output)
-        //{
-        //    StringBuilder code = new StringBuilder();
-        //    code.AppendLine("<script>");
-        //    code.AppendLine("function EnableServiceName() {");
-        //    code.AppendLine("var msg= 'Are you sure you want to modify the Web Service Name?" + "';");
-        //    code.AppendLine("if (confirm(msg)) document.getElementById('btnModifyService').disabled = false;");
-        //    code.AppendLine("else{ document.getElementById('txtServiceName').value = document.getElementById('bakServiceName').value;}}");
-        //    code.AppendLine();
-        //    code.AppendLine("function EnableCodeBase() {");
-        //    code.AppendLine("var msg= 'Are you sure you want to modify the CodeBase for this service?" + "';");
-        //    code.AppendLine("if (confirm(msg))document.getElementById('btnModifyService').disabled = false;");
-        //    code.AppendLine("else{document.getElementById('txtCodebaseUrl').value = document.getElementById('bakCodebase').value;}}");
-        //    code.AppendLine();
-        //    code.AppendLine("function EnableServiceUrl() {");
-        //    code.AppendLine("var msg= 'Are you sure you want to modify the Web Service URL?" + "';");
-        //    code.AppendLine("if (confirm(msg))document.getElementById('btnModifyService').disabled = false;");
-        //    code.AppendLine("else{document.getElementById('txtWebServiceUrl').value = document.getElementById('bakServiceUrl').value;}}");
-        //    code.AppendLine();
-        //    code.AppendLine("function ConfirmRetire() {");
-        //    code.AppendLine("var msg= 'Are you sure you want to retire this WebService.\\nIf you proceed all references to this site will be retired';");
-        //    code.AppendLine("var state = confirm(msg);return state;}");
-        //    code.AppendLine("</script>");
-        //    output.Write(code.ToString());
-        //    base.Render(output);
-        //}
-
-
-        //protected override void Render(HtmlTextWriter output)
-        //{
-        //    EnsureChildControls();
-        //    DisplayForm();
-        //    RenderContents(output);
-        //}
+      
         protected override void CreateChildControls()
         {
             Controls.Clear();
@@ -1278,7 +1245,7 @@ namespace iLabs.Controls
             th = new TableHeaderCell();
             lblOutPassKey = new Label();
             lblOutPassKey.ID = "lblOutPassKey";
-            lblOutPassKey.Text = "Install&nbsp;Credential&nbsp;Passkey";
+            lblOutPassKey.Text = "Credentials&nbsp;Passkey";
             th.Controls.Add(lblOutPassKey);
            
             td = new TableCell();
@@ -1288,7 +1255,7 @@ namespace iLabs.Controls
             txtOutPasskey.Text = ConfigurationManager.AppSettings["defaultPasskey"];
             txtOutPasskey.Enabled = false;
             txtOutPasskey.ReadOnly = true;
-            txtOutPasskey.ToolTip = "Default passkey may only be modified by editing the web.config file.";
+            txtOutPasskey.ToolTip = "Install Credentials passkey may only be modified by editing the web.config file.";
             
             td.Controls.Add(txtOutPasskey);
             td2 = new TableCell();
