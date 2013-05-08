@@ -13,7 +13,7 @@
  * 
  * NOTE: This example is intended to be compiled with Visual Studio .NET Beta 2
  */
-/* $Id: NTPClient.cs,v 1.1 2005/02/22 22:28:49 felknor Exp $ */
+/* $Id$ */
 
 using System;
 using System.Net;

@@ -1,4 +1,4 @@
--- $Id: TIssuerProcedures.sql,v 1.22 2007/06/02 09:51:30 pbailey Exp $
+-- $Id$
 
 --
 -- Stored Procedures specfic to a TicketIssuer Service ( Service Broker ).

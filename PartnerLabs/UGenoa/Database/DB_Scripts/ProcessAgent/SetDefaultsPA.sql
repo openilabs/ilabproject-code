@@ -1,4 +1,4 @@
-/* $Id: SetDefaultsTicketing.sql,v 1.17 2007/03/09 00:19:45 pbailey Exp $ */
+/* $Id$ */
 
 /* created by Tingting. */
 

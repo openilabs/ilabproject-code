@@ -1,4 +1,4 @@
--- $Id: TIssuerTables.sql,v 1.6 2007/04/02 12:09:36 pbailey Exp $
+-- $Id$
 
 --
 -- TicketIssuer additional tables. These tables should be added to the ProcessAgentTables for a ServiceBroker's Database.
