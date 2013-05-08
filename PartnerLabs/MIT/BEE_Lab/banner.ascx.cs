@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: banner.ascx.cs 547 2012-04-17 20:20:00Z phbailey $
+ * $Id$
  */
 
 namespace iLabs.LabServer.LabView

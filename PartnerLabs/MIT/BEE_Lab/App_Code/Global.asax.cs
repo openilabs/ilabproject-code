@@ -2,7 +2,7 @@
  * Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
  * Please see license.txt in top level directory for full license.
  * 
- * $Id: Global.asax.cs 469 2011-10-26 21:13:05Z phbailey $
+ * $Id$
  */
 
 using System;
