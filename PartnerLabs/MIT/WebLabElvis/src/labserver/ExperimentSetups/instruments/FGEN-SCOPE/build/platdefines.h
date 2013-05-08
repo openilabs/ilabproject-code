@@ -18,7 +18,7 @@
 */
 
 #ifdef DefineHeaderRCSId
-#define rcsid_platdefines "$Id: //lvdist/branches/Europa/dev/plat/win/cintools/platdefines.h#3 $"
+#define rcsid_platdefines "$Id$"
 #endif
 
 /*

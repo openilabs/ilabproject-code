@@ -4,7 +4,7 @@
 	© Copyright 1997-2001 by National Instruments Corp.
 	All rights reserved.
 
-	$Id: //lvdist/branches/Europa/dev/plat/win/cintools/cvilvsb.h#1 $
+	$Id$
 */
 
 extern void __stdcall GetLVSBHeader (void);

@@ -13,7 +13,7 @@
 */
 
 #ifdef DefineHeaderRCSId
-#define rcsid_fundtypes "$Id: //lvdist/branches/Europa/dev/plat/win/cintools/fundtypes.h#3 $"
+#define rcsid_fundtypes "$Id$"
 #endif
 
 #include "platdefines.h"

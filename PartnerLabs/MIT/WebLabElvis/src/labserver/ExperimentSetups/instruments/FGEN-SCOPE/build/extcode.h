@@ -10,7 +10,7 @@
 		DO NOT CHANGE
 */
 
-#define rcsid_extcode "$Id: //lvdist/branches/Europa/dev/plat/win/cintools/extcode.h#3 $"
+#define rcsid_extcode "$Id$"
 
 /* define this to keep C++ isms from littering the code */
 #ifdef __cplusplus

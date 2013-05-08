@@ -10,7 +10,7 @@
 	@brief	Host specific definitions, etc.
 */
 
-#define rcsid_hosttype "$Id: //lvdist/branches/Europa/dev/plat/win/cintools/hosttype.h#2 $"
+#define rcsid_hosttype "$Id$"
 
 #if Mac // use forward includes to define types needed for managerp.h
 struct EventRecord;
