@@ -178,10 +178,10 @@ namespace iLabs.ServiceBroker.iLabSB
                 cList.Add(new Criterion("User_ID", "=", Session["UserID"].ToString()));
             }
 
-            //if (Session["GroupID"] != null)
-            //{
-            //    cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
-            //}
+            if (Session["GroupID"] != null)
+            {
+                cList.Add(new Criterion("Group_ID", "=", Session["GroupID"].ToString()));
+            }
 			
 			if((ddlTimeAttribute.SelectedIndex >0))
 			{

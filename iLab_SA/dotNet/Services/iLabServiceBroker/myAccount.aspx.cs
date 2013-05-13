@@ -48,7 +48,6 @@ namespace iLabs.ServiceBroker.iLabSB
 				sessionUser = wrapper.GetUsersWrapper(new int[]{Convert.ToInt32(Session["UserID"])})[0];
 				
 				txtUsername.Text = sessionUser.userName;
-                txtUsername.Enabled = false;
 				txtFirstName.Text = sessionUser.firstName;
 				txtLastName.Text = sessionUser.lastName;
 				txtEmail.Text = sessionUser.email;
@@ -190,7 +189,9 @@ namespace iLabs.ServiceBroker.iLabSB
 					if (userInfo.xmlExtension==null)
 						userInfo.xmlExtension="";
 
-					wrapper.ModifyUserWrapper (userInfo.userID,txtUsername.Text,auth.authorityID,auth.authTypeID, txtFirstName.Text , txtLastName.Text , txtEmail.Text ,userInfo.affiliation, userInfo.reason, userInfo.xmlExtension,userInfo.lockAccount );
+					wrapper.ModifyUserWrapper (userInfo.userID,txtUsername.Text,auth.authorityID,auth.authTypeID, 
+                        txtFirstName.Text , txtLastName.Text , txtEmail.Text ,userInfo.affiliation, userInfo.reason,
+                        userInfo.xmlExtension,userInfo.lockAccount );
 					lblResponse.Text = Utilities.FormatConfirmationMessage("User \"" + txtUsername.Text  + "\" information has been updated.");
 					lblResponse.Visible = true;
                     if (auth.authTypeID == (int) AuthenticationType.AuthTypeID.Native)

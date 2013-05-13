@@ -30,10 +30,7 @@ Please see license.txt in top level directory for full license.
 						<h1>My Account
 						</h1>
 						<p>You can edit your account information below.</p>
-						<!-- Errormessage should appear here:-->
-						<!--div class="errormessage"-->
 						<asp:Label Runat="server" id="lblResponse" Visible="False"></asp:Label>
-						<!--/div--> <!--End error message -->
 					</div> <!-- end pageintro div -->
 					<div id="pagecontent">
 						<div id="actionbox-right">
@@ -51,13 +48,11 @@ Please see license.txt in top level directory for full license.
 						<p>Complete all fields below to change your account information. You will be be 
 							emailed a confirmation.</p>
 						<div class="simpleform">
-							<!--form name="register" id="editaccount" method="post" action=""-->
 							<table>
 								<tr>
 									<th>
 										<label for="username">Username</label></th>
-									<td><asp:TextBox ID="txtUsername" Runat="server"></asp:TextBox>
-										<!--input name="username" type="text" class="noneditable" id="username"--></td>
+									<td><asp:TextBox ID="txtUsername" Runat="server"></asp:TextBox></td>
 								</tr>
 								<tr>
 									<th>
@@ -68,34 +63,29 @@ Please see license.txt in top level directory for full license.
 									<th>
 										<label for="firstname">First Name </label>
 									</th>
-									<td><asp:TextBox ID="txtFirstName" Runat="server"></asp:TextBox>
-										<!--input type="text" name="firstname" id="firstname"--></td>
+									<td><asp:TextBox ID="txtFirstName" Runat="server"></asp:TextBox></td>
 								</tr>
 								<tr>
 									<th>
 										<label for="lastname">Last Name </label>
 									</th>
-									<td><asp:TextBox ID="txtLastName" Runat="server"></asp:TextBox>
-										<!--input type="text" name="lastname" id="lastname"--></td>
+									<td><asp:TextBox ID="txtLastName" Runat="server"></asp:TextBox></td>
 								</tr>
 								<tr>
 									<th>
 										<label for="email">Email</label></th>
-									<td><asp:TextBox ID="txtEmail" Runat="server"></asp:TextBox>
-										<!--input type="text" name="email" id="email"--></td>
+									<td><asp:TextBox ID="txtEmail" Runat="server"></asp:TextBox></td>
 								</tr>
 								<tr>
 									<th>
 										<label for="password">New Password</label></th>
-									<td><asp:TextBox ID="txtNewPassword" Runat="server" TextMode="Password"></asp:TextBox>
-										<!--input type="password" name="password" id="password"--></td>
+									<td><asp:TextBox ID="txtNewPassword" Runat="server" TextMode="Password"></asp:TextBox></td>
 								</tr>
 								<tr>
 									<th>
 										<label for="passwordconfirm">Confirm New Password </label>
 									</th>
-									<td><asp:TextBox ID="txtConfirmPassword" Runat="server" TextMode="Password"></asp:TextBox>
-										<!--input type="password" name="passwordconfirm" id="passwordconfirm"--></td>
+									<td><asp:TextBox ID="txtConfirmPassword" Runat="server" TextMode="Password"></asp:TextBox></td>
 								</tr>
 								<tr>
 									<td colspan="2">
@@ -103,7 +93,6 @@ Please see license.txt in top level directory for full license.
 										type="submit" name="Submit" value="Save Changes" class="buttonright"----></td>
 								</tr>
 							</table>
-							<!--/form-->
 						</div>
 					</div>
 					<br clear="all" /> <!-- end pagecontent div -->
