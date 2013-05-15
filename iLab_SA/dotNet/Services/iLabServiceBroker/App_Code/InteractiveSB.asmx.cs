@@ -1471,11 +1471,14 @@ namespace iLabs.ServiceBroker.iLabSB
 
                     long sbExperimentId = Int64.Parse(payload.GetElementsByTagName("experimentID")[0].InnerText);
                     //
-                    ExperimentSummary summary = InternalDataDB.SelectExperimentSummary(experimentId);
-                    if (summary.HasEss)
+                  
+                    ExperimentAdminInfo expInfo = InternalDataDB.SelectExperimentAdminInfo(experimentId);
+                
+                    if ( expInfo.essID > 0)
                     {
+               
                         // Retrieve the ESS Status info and update as needed
-                        ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo(summary.essGuid);
+                        ProcessAgentInfo ess = brokerDB.GetProcessAgentInfo( expInfo.essID);
                         if (ess.retired)
                         {
                             throw new Exception("The ESS is retired");

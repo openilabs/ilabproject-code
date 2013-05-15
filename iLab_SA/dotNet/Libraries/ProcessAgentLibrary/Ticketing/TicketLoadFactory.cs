@@ -331,7 +331,7 @@ namespace iLabs.Ticketing
         }
 
         public string createExecuteExperimentPayload(string essWebAddress, DateTime startExecution, long duration, 
-            int userTZ, int userID, string groupName, string sbGuid, long experimentID)
+            int userTZ, int userID, int groupID, string groupName, string sbGuid, long experimentID)
         {
             string rootElemt = "ExecuteExperimentPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
@@ -343,6 +343,7 @@ namespace iLabs.Ticketing
             // Use ID to hide username and deal with authority
            
             keyValueDictionary.Add("userID", userID);
+            keyValueDictionary.Add("groupID", groupID);
             keyValueDictionary.Add("groupName", groupName);
             // changed to "sbGuid"
             keyValueDictionary.Add("sbGuid", sbGuid);

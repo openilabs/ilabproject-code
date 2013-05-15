@@ -39,7 +39,6 @@ namespace iLabs.ExpStorage
         /// <remarks>a duration of value -1 indicates a indefinite duration</remarks>
         public int OpenExperiment(long duration, long sbExperimentId, string sbGuid)
         {
-            long experimentId = -1;
             int code = -1;
 
             DbConnection myConnection = FactoryDB.GetConnection();
@@ -49,8 +48,9 @@ namespace iLabs.ExpStorage
                 StorageStatus status = GetExperimentStatus(myConnection, sbExperimentId, sbGuid);
                 if (status == null)
                 {
-                    experimentId = CreateExperiment(myConnection, duration, sbExperimentId, sbGuid, StorageStatus.OPEN);
-                    code = StorageStatus.OPEN;
+                    throw new Exception(" Trying to open an experiment that has not been created yet!");
+                    //experimentId = CreateExperiment(myConnection, duration, sbExperimentId, sbGuid, StorageStatus.OPEN,0,0,0);
+                    //code = StorageStatus.OPEN;
                 }
                 else
                 {
@@ -74,7 +74,42 @@ namespace iLabs.ExpStorage
             return code;
         }
 
-        public long CreateExperiment(DbConnection myConnection, long duration, long sbExperimentId, string sbGuid, int status)
+        public long CreateExperiment(long duration, long sbExperimentId, string sbGuid,
+           int statusCode, int userId, int groupId, int clientId)
+        {
+              long experimentId = -1;
+            int code = -1;
+
+            DbConnection myConnection = FactoryDB.GetConnection();
+            try
+            {
+                myConnection.Open();
+                StorageStatus status = GetExperimentStatus(myConnection, sbExperimentId, sbGuid);
+                if (status != null)
+                {
+                    throw new Exception(" Trying to create an experiment that has already been created!");
+                }
+                else
+                {
+                   experimentId =  CreateExperiment(myConnection, duration, sbExperimentId, sbGuid,
+                        statusCode, userId, groupId, clientId);
+                }
+            }
+
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+
+            return experimentId;
+        }
+
+        public long CreateExperiment(DbConnection myConnection, long duration, long sbExperimentId, string sbGuid,
+            int status, int userId, int groupId, int clientId)
         {
             long experimentId = -1;
 
@@ -94,6 +129,9 @@ namespace iLabs.ExpStorage
                 myCommand.Parameters.Add(FactoryDB.CreateParameter("@scheduledClose", null, DbType.DateTime));
             }
             myCommand.Parameters.Add(FactoryDB.CreateParameter( "@status", status, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@userId", userId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupId", groupId, DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@clientId", clientId, DbType.Int32));
             try
             {
                 experimentId = Convert.ToInt64(myCommand.ExecuteScalar());

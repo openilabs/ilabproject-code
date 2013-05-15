@@ -376,7 +376,7 @@ namespace iLabs.ServiceBroker.iLabSB
                     ess.Url = essAgent.webServiceUrl;
 
                     // Call the ESS to create the ESS Records and open the experiment
-                    StorageStatus status = ess.OpenExperiment(experimentID, duration);
+                    StorageStatus status = ess.CreateExperiment(experimentID, duration,userID,effectiveGroupID,clientID);
                     if (status != null)
                         DataStorageAPI.UpdateExperimentStatus(status);
 

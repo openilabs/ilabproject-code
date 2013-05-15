@@ -39,6 +39,15 @@ public abstract class I_ESS  : System.Web.Services.WebService {
     ///       IESS Methods - Experiment methods      ///
     ////////////////////////////////////////////////////
 
+    [WebMethod(Description = "Creates and Opens an Experiment on the ESS so that ExperimentRecords "
+            + "and BLOBs can be written to it. Duration specifies the amount of time ( in seconds )"
+            + " before the experiment may be automaticly closed. Should be called via the ServiceBroker."
+            + "Added in release 4.2.0, to support user and group data in the experiment table.",
+            EnableSession = true)]
+    [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+    [SoapDocumentMethod(Binding = "IESS")]
+    public abstract StorageStatus CreateExperiment(long experimentId, long duration, int userId, int groupId, int clientId);
+    
 /// <summary>
 /// Notifies the ESS that it may close the experiment.
 /// </summary>
@@ -59,9 +68,11 @@ public abstract class I_ESS  : System.Web.Services.WebService {
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
     public abstract bool DeleteExperiment(long experimentId);
     
-    [WebMethod(Description = "Opens an Experiment on the ESS so that ExperimentRecords "
-            + "and BLOBs can be written to it. Duration specifies the amount of time ( in seconds )"
-           + " before the experiment may be automaticly closed. Should be called via the ServiceBroker.",
+    [WebMethod(Description = "Opens an Experiment on the ESS so that ExperimentRecords"
+            + " and BLOBs can be written to it. Duration specifies the amount of time ( in seconds )"
+           + " before the experiment may be automaticly closed. Should be called via the ServiceBroker."
+        + " This will normally be called on an experiment that has already been created but for backward" 
+        + " compatibility it will create the administrative experiment record if it does not  esist.",
             EnableSession = true)]
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         [SoapDocumentMethod(Binding = "IESS")]

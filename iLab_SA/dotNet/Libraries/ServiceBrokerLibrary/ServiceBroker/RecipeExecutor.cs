@@ -140,7 +140,7 @@ namespace iLabs.ServiceBroker
                          essWebAddress = essAgent.webServiceUrl;
 
                          // Call the ESS to create the ESS Records and open the experiment
-                         StorageStatus status = ess.OpenExperiment(experimentID, ticketDuration);
+                         StorageStatus status = ess.CreateExperiment(experimentID, ticketDuration, userID,groupID,client.clientID);
                          if (status != null)
                              DataStorageAPI.UpdateExperimentStatus(status);
                      }
@@ -152,7 +152,7 @@ namespace iLabs.ServiceBroker
  
             // 4.A create payload 
             string payload = factory.createExecuteExperimentPayload(essWebAddress, startExecution, duration,
-                userTZ, userID, groupName, brokerDB.GetIssuerGuid(), experimentID);
+                userTZ, userID, groupID, groupName, brokerDB.GetIssuerGuid(), experimentID);
 
             
             // 4.B create experiment execution ticket.

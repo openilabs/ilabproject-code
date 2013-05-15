@@ -51,6 +51,8 @@ namespace iLabs.ExpStorage.ESS
         ///       IESS Methods - Experiment methods      ///
         ////////////////////////////////////////////////////
 
+      
+    
     
         /// <summary>
         /// Closes an Experiment on the ESS so that no further ExperimentRecords
@@ -78,14 +80,54 @@ namespace iLabs.ExpStorage.ESS
                 experimentClosed = experimentsAPI.CloseExperiment(experimentId, agentAuthHeader.coupon.issuerGuid);
                 return experimentsAPI.GetExperimentStatus(experimentId, agentAuthHeader.coupon.issuerGuid); ;
             }
-            catch
+            catch(Exception e)
             {
-                throw;
+                throw new Exception("ESS:CloseExperiment: ",e);
             }
            }
            else{
                return null;
            }
+        }
+
+        /// <summary>
+        /// Creates and Opens an Experiment on the ESS so that ExperimentRecords
+        /// and BLOBs can be written to it. Duration specifies the amount of time ( in seconds )
+        /// before the experiment may be automaticly closed. Should be called via the ServiceBroker.
+        /// Added in release 4.2.0, to support user and group data in the experiment table.
+        /// </summary>
+        /// <param name="experimentId"></param>
+        /// <param name="duration"></param>
+        /// <param name="userId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="clientId"></param>
+        /// <returns></returns>
+        [WebMethod(Description = "Creates and Opens an Experiment on the ESS so that ExperimentRecords "
+            + "and BLOBs can be written to it. Duration specifies the amount of time ( in seconds )"
+            + " before the experiment may be automaticly closed. Should be called via the ServiceBroker."
+            + "Added in release 4.2.0, to support user and group data in the experiment table.",
+            EnableSession = true)]
+        [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
+        [SoapDocumentMethod(Binding = "IESS")]
+        public StorageStatus CreateExperiment(long experimentId, long duration, int userId, int groupId, int clientId)
+        {
+            long essExpId = -1L;
+            StorageStatus expStatus = null;
+
+            if (dbTicketing.AuthenticateAgentHeader(agentAuthHeader))
+            {
+                try
+                {
+                    essExpId = experimentsAPI.CreateExperiment(duration, experimentId, agentAuthHeader.coupon.issuerGuid,
+                        StorageStatus.OPEN, userId, groupId, clientId);
+                    expStatus = experimentsAPI.GetExperimentStatus(experimentId, agentAuthHeader.coupon.issuerGuid);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("ESS:CreateExperiment: ", e);
+                }
+            }
+            return expStatus;
         }
 
         [WebMethod(Description = "Deletes an experiment object and all its associated ExperimentRecords "
@@ -106,7 +148,7 @@ namespace iLabs.ExpStorage.ESS
             catch (Exception ex)
             {
                Logger.WriteLine("DeleteExperiment: " + ex.Message);
-                throw;
+                throw ex;
             }
             return experimentDeleted;
         }
@@ -130,9 +172,9 @@ namespace iLabs.ExpStorage.ESS
                         agentAuthHeader.coupon.issuerGuid);  // , retrievedTicket.sponsorGuid
                     expStatus = experimentsAPI.GetExperimentStatus(experimentId, agentAuthHeader.coupon.issuerGuid);
                 }
-                catch
+                catch(Exception e)
                 {
-                    throw;
+                    throw new Exception("ESS:OpenExperiment: ", e);
                 }
             }
             return expStatus ;
