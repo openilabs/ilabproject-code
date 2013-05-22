@@ -1,0 +1,31 @@
+To support a new version of LabVIEW:
+
+Note: It does not seem possible for one lab server to support more 
+than one release of LabVIEW.
+
+Use TLBIMP to create a DLL from the labview.tlb file located in the 
+...\National Instruments\LabVIEW version\resource directory.
+
+tlbimp labview.tlb /out:Interop.LabVIEW_verrsion /namespace:LabVIEW.lvVersion
+
+Copy an existing LabViewInterface project file and rename to the target version 
+remove the reference to the old Interop dll & replace with the target version.
+Change the properties build option defined value to match the target version.
+
+open the project, in the properties directory make a copy of the AssemblyInfoxxx.cs file. 
+Using the project properties folder rename the original AssemblyInfoxxx.cs file to 
+reflect the new version file. In the directory rename the copy to the original file name.
+Edit the new AssemblyInfo file to reflect the new assembly and a new GUID.
+
+Add #ifDef statements to the Following files LabViewInterface.cs, LabViewRemote.cs 
+and LabViewTask.cs to support the build option and new namespace.
+
+Add an else if clause to LabViewTaskFactory so the correct version task is created.
+
+Use the web publishing tool to wrap any VI, save the HTML file. Create a new switch case condition 
+in LVRemotePanel.ascx.cs with the values from the generated html file. 
+
+Set the Web.config file to use the version tag that you created.
+
+
+

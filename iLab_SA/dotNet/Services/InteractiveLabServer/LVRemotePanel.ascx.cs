@@ -101,6 +101,13 @@ namespace iLabs.LabServer.LabView
                     fpProtocol = ".LV_FrontPanelProtocol.rpvi110";
                     pluginspace = @"http://digital.ni.com/express.nsf/bycode/exck2m";
                     break;
+                case "2012":
+                    appMimeType = "application/x-labviewrpvi120";
+                    classId = "CLSID:A40B0AD4-B50E-4E58-8A1D-8544233807B4";
+                    codebase = @"ftp://ftp.ni.com/support/labview/runtime/windows/2012/LVRTE2012min.exe";
+                    fpProtocol = ".LV_FrontPanelProtocol.rpvi120";
+                    pluginspace = @"http://digital.ni.com/express.nsf/bycode/exck2m";
+                    break;
                 case "2009":
                 default:
                     appMimeType = "application/x-labviewrpvi90";

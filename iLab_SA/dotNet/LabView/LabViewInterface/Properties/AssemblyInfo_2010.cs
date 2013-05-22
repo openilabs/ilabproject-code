@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LabViewInterface82")]
+[assembly: AssemblyTitle("LabViewInterface2010")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("MIT")]
-[assembly: AssemblyProduct("LabViewInterface86")]
-[assembly: AssemblyCopyright("Copyright © MIT 2006")]
+[assembly: AssemblyProduct("LabViewInterface2010")]
+[assembly: AssemblyCopyright("Copyright © MIT 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6D294417-C52B-48ef-9603-53A10590C334")]
+[assembly: Guid("52A9B149-30B4-4c9d-8ACC-68948D212A73")]
 
 // Version information for an assembly consists of the following four values:
 //

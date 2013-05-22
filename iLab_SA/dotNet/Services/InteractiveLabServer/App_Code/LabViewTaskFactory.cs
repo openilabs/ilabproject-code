@@ -103,6 +103,10 @@ namespace iLabs.LabServer.LabView
                     {
                         task = iLabs.LabView.LV2011.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
                     }
+                    else if (revision.Contains("2012"))
+                    {
+                        task = iLabs.LabView.LV2012.LabViewTask.CreateLabTask(appInfo, expCoupon, expTicket);
+                    }
                 }
                 else // Default to LV 2009
                 {

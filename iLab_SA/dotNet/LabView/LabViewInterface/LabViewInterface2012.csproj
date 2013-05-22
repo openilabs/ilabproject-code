@@ -4,32 +4,34 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{FFFC2C73-33E5-4D53-914A-76D369E3295F}</ProjectGuid>
+    <ProjectGuid>{0B57F561-A7ED-47AF-B346-EE4AB9435B37}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LabViewInterface82</RootNamespace>
-    <AssemblyName>LabViewInterface82</AssemblyName>
+    <RootNamespace>iLabs.LabView.LV2012</RootNamespace>
+    <AssemblyName>LabViewInterface2012</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>ilab.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;LabVIEW_82</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LabVIEW_2012</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\LabViewInterface82.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\LabViewInterface2012.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;LabVIEW_82</DefineConstants>
+    <DefineConstants>TRACE;LabVIEW_86</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -42,9 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Interop.CWDSLib.dll</HintPath>
     </Reference>
-    <Reference Include="Interop.LabVIEW_82, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Interop.LabVIEW_2012, Version=5.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Interop.LabVIEW_82.dll</HintPath>
+      <HintPath>bin\Interop.LabVIEW_2012.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -56,16 +58,12 @@
     <Compile Include="LabViewRemote.cs" />
     <Compile Include="LabViewTask.cs" />
     <Compile Include="LVDataSocket.cs" />
-    <Compile Include="Properties\AssemblyInfo_82.cs" />
+    <Compile Include="Properties\AssemblyInfo_2012.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\ProcessAgentLibrary\ProcessAgentLibrary.csproj">
       <Project>{1138C760-3D21-4592-BCF0-00C38449F4CC}</Project>
       <Name>ProcessAgentLibrary</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libraries\TicketIssuerLibrary\TicketIssuerLibrary.csproj">
-      <Project>{2FED805D-4A8C-4D9B-8339-266CF16394C8}</Project>
-      <Name>TicketIssuerLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Libraries\UtilLibrary\UtilLibrary.csproj">
       <Project>{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}</Project>
@@ -95,6 +93,12 @@
       <Project>{30144572-B5C6-4EBD-9AF5-242F7C08D5DB}</Project>
       <Name>I_LabView</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ilab.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Add a LabVIEW Version.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

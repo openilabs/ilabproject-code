@@ -27,57 +27,59 @@ using CWDataServer;
 using CWDSLib;
 using iLabs.LabView;
 
+#if LabVIEW_2012
+using LabVIEW.lv2012;
+namespace iLabs.LabView.LV2012
+#endif
 #if LabVIEW_2011
 using LabVIEW.lv2011;
 namespace iLabs.LabView.LV2011
-{
 #endif
 #if LabVIEW_2010
 using LabVIEW.lv2010;
 namespace iLabs.LabView.LV2010
-{
 #endif
 #if LabVIEW_2009
 using LabVIEW.lv2009;
 namespace iLabs.LabView.LV2009
-{
 #endif
 #if LabVIEW_86
 using LabVIEW.lv86;
 namespace iLabs.LabView.LV86
-{
 #endif
 #if LabVIEW_82
 using LabVIEW.lv821;
 namespace iLabs.LabView.LV82
-{
 #endif
+{
 
-
-/// <summary>
-	/// Summary description for LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
-	/// As the Application will require the automatic loading of several VI's this implementation should be 
-	/// somewhat faster and simpler than using the standard LabVIEW exe. Also hope to make the Interface 
-	/// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
+    /// <summary>
+    /// Summary description for LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
+    /// As the Application will require the automatic loading of several VI's this implementation should be 
+    /// somewhat faster and simpler than using the standard LabVIEW exe. Also hope to make the Interface 
+    /// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
     /// <br />Note: many changes have been required to support the addition of Libary Name to the GetVIReference calling parameter.
-	/// </summary>
-	public class LabViewInterface : I_LabViewInterface
-	{
+    /// </summary>
+    public class LabViewInterface : I_LabViewInterface
+    {
         protected string lvVersion = null;
-		protected _Application viServer;
+        protected _Application viServer;
 
         protected string appDir = null;
         protected string viPath = @"\user.lib\iLabs";
 
- 	
-		/// <summary>
-		/// Connect to the local VI application,  the 'LabView' reference will detremine 
-		/// what version and LabView application will be the target
-		/// </summary>
-		public LabViewInterface()
+
+        /// <summary>
+        /// Connect to the local VI application,  the 'LabView' reference will detremine 
+        /// what version and LabView application will be the target
+        /// </summary>
+        public LabViewInterface()
         {
             try
             {
+#if LabVIEW_2012
+                lvVersion = "LabVIEW 2012";
+#endif
 #if LabVIEW_2011
                 lvVersion = "LabVIEW 2011";
 #endif
@@ -100,47 +102,48 @@ namespace iLabs.LabView.LV82
             catch (Exception e)
             {
 
-                Exception ex = new Exception("ERROR: Creating ApplicationClass " + lvVersion +": ", e);
+                Exception ex = new Exception("ERROR: Creating ApplicationClass " + lvVersion + ": ", e);
                 throw ex;
             }
-		}
+        }
 
-	public string GetLabViewVersion(){
-	return viServer.Version.ToString();
-}
+        public string GetLabViewVersion()
+        {
+            return viServer.Version.ToString();
+        }
         public virtual string GetViServerStatus()
         {
             return GetViServerStatus(viServer);
         }
 
-		protected internal string GetViServerStatus(_Application app)
-		{
-			StringBuilder message = new StringBuilder("AppStatus: ");
-			try
-			{				
-				if(app != null)
-				{
-					//viServer.CheckConnection();				
-					//message.Append(app.ToString());
+        protected internal string GetViServerStatus(_Application app)
+        {
+            StringBuilder message = new StringBuilder("AppStatus: ");
+            try
+            {
+                if (app != null)
+                {
+                    //viServer.CheckConnection();				
+                    //message.Append(app.ToString());
                     message.Append("\tAppName: " + app.AppName);
                     message.Append("\tDirectory: " + app.ApplicationDirectory);
-					message.Append("\tVersion: " + app.Version);
-					message.Append("\tUserName: " +app.UserName);
-					message.Append("\tProcessID: " + app._ProcessID);
-				}
-				else
-				{
-					message.Append("labViewApp = null");
-				}
-			}
-			catch(Exception ex)
-			{
-				message.Append("Error: " + ex.Message + ex.StackTrace);
-				throw(ex);
-			}
-			message.ToString();
-			return message.ToString();
-		}
+                    message.Append("\tVersion: " + app.Version);
+                    message.Append("\tUserName: " + app.UserName);
+                    message.Append("\tProcessID: " + app._ProcessID);
+                }
+                else
+                {
+                    message.Append("labViewApp = null");
+                }
+            }
+            catch (Exception ex)
+            {
+                message.Append("Error: " + ex.Message + ex.StackTrace);
+                throw (ex);
+            }
+            message.ToString();
+            return message.ToString();
+        }
 
         protected string stripName(string name)
         {
@@ -190,11 +193,11 @@ namespace iLabs.LabView.LV82
                 }
                 catch (InvalidCastException ivcEx)
                 {
-                   Logger.WriteLine("Library error: " + ivcEx.Message);
+                    Logger.WriteLine("Library error: " + ivcEx.Message);
                 }
                 buf.Append(vi.Name);
-                qName = buf.ToString(); 
-   
+                qName = buf.ToString();
+
             }
             return qName;
         }
@@ -228,7 +231,7 @@ namespace iLabs.LabView.LV82
         }
 
         public int GetFPState(VirtualInstrument vi)
-        { 
+        {
             int status = -1;
             if (vi != null)
             {
@@ -237,7 +240,7 @@ namespace iLabs.LabView.LV82
             }
             return status;
         }
-       
+
 
         public virtual int GetLockState(string viName)
         {
@@ -251,13 +254,13 @@ namespace iLabs.LabView.LV82
             return status;
         }
 
-        public  int GetLockState(VirtualInstrument vi)
+        public int GetLockState(VirtualInstrument vi)
         {
             bool cached = false;
             int status = -1;
             if (vi != null)
             {
-                status = ( int) vi.GetLockState(out cached);   
+                status = (int)vi.GetLockState(out cached);
             }
             return status;
         }
@@ -295,7 +298,7 @@ namespace iLabs.LabView.LV82
             int status = -1;
             VirtualInstrument vi = null;
             vi = GetVI(viName);
-            status = SetBounds(vi,left,top,right,bottom);
+            status = SetBounds(vi, left, top, right, bottom);
             vi = null;
             return status;
         }
@@ -313,8 +316,8 @@ namespace iLabs.LabView.LV82
                 bounds[3] = (object)bottom;
                 vi.FPWinBounds = (object)bounds;
                 status = 1;
-             }
-             return status;
+            }
+            return status;
         }
         public bool HasControl(VirtualInstrument vi, string name)
         {
@@ -327,7 +330,7 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
-               Logger.WriteLine(name + " control not found: " + e.Message);
+                Logger.WriteLine(name + " control not found: " + e.Message);
             }
             return status;
         }
@@ -337,21 +340,21 @@ namespace iLabs.LabView.LV82
             object value = null;
             if (vi != null)
             {
-          
+
                 try
                 {
                     value = vi.GetControlValue(name);
-                    
+
                 }
                 catch (Exception e)
                 {
-                   Logger.WriteLine(name + " control not found: " + e.Message);
+                    Logger.WriteLine(name + " control not found: " + e.Message);
                     throw new Exception(name + " control not found:", e);
                 }
             }
             return value;
         }
-        public int SetControlValue(VirtualInstrument vi,string name, object value)
+        public int SetControlValue(VirtualInstrument vi, string name, object value)
         {
             int status = -1;
             if (vi != null)
@@ -369,7 +372,7 @@ namespace iLabs.LabView.LV82
                 }
                 catch (Exception e)
                 {
-                   Logger.WriteLine(name + " control not found: " + e.Message);
+                    Logger.WriteLine(name + " control not found: " + e.Message);
                 }
                 if (found)
                 {
@@ -436,8 +439,8 @@ namespace iLabs.LabView.LV82
             {
                 vi.ReinitializeAllToDefault();
                 status = (int)GetVIStatus(vi);
-             }
-             return status;
+            }
+            return status;
         }
 
         public int RunVI(string viName)
@@ -495,12 +498,12 @@ namespace iLabs.LabView.LV82
                     }
                     else
                     {
-                       Logger.WriteLine(controlName + " control not found: null returned");
+                        Logger.WriteLine(controlName + " control not found: null returned");
                     }
                 }
                 catch (Exception e)
                 {
-                   Logger.WriteLine(controlName + " control not found: Exception: " + e.Message);
+                    Logger.WriteLine(controlName + " control not found: Exception: " + e.Message);
                 }
                 if (found)
                 {
@@ -522,13 +525,13 @@ namespace iLabs.LabView.LV82
                         vi.SetControlValue(controlName, false);
                         if ((vi.ExecState != ExecStateEnum.eRunning) && (vi.ExecState != ExecStateEnum.eRunTopLevel))
                         {
-                           Logger.WriteLine("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
+                            Logger.WriteLine("stopping VI: " + vi.Name + " status=" + (int)GetVIStatus(vi));
                             status = 0;
                         }
                     }
                     catch (Exception ex)
                     {
-                       Logger.WriteLine("Error: setControl " +controlName +": " + ex.Message);
+                        Logger.WriteLine("Error: setControl " + controlName + ": " + ex.Message);
                     }
                 }
             }
@@ -553,7 +556,7 @@ namespace iLabs.LabView.LV82
             if (vi != null)
             {
                 StopVI(vi);
-                
+
                 vi.Abort();
                 vi.CloseFrontPanel();
                 status = (int)GetVIStatus(vi);
@@ -562,45 +565,47 @@ namespace iLabs.LabView.LV82
         }
 
 
-		public virtual string QuitLabView()
-		{
-			StringBuilder message = new StringBuilder("QuitLabview: ");
-			
+        public virtual string QuitLabView()
+        {
+            StringBuilder message = new StringBuilder("QuitLabview: ");
 
-			if(viServer != null)
-			{
-				message.Append(" Process=" +viServer._ProcessID);
-			
-				try
-				{
-					viServer.Quit();
-				}
-				catch(Exception e)
-				{
-					message.Append(" ERROR on Quit(): " + e.Message);
-				}
-				
-				viServer = null;
-			}
-			return message.ToString();
-		}
 
-		public virtual bool IsLoaded(string name)
-		{
-			bool status = false;
+            if (viServer != null)
+            {
+                message.Append(" Process=" + viServer._ProcessID);
+
+                try
+                {
+                    viServer.Quit();
+                }
+                catch (Exception e)
+                {
+                    message.Append(" ERROR on Quit(): " + e.Message);
+                }
+
+                viServer = null;
+            }
+            return message.ToString();
+        }
+
+        public virtual bool IsLoaded(string name)
+        {
+            bool status = false;
             string viname = stripName(name);
-         
+
             object obj = viServer.ExportedVIs;
-            string [] vis = (string[]) obj;
-            for(int i = 0;i< vis.Length;i++){
-                if(vis[i] == viname){
+            string[] vis = (string[])obj;
+            for (int i = 0; i < vis.Length; i++)
+            {
+                if (vis[i] == viname)
+                {
                     status = true;
                     break;
                 }
             }
-           
-			return status;
-		}
+
+            return status;
+        }
 
         //public virtual bool IsLoaded(string viname)
         //{
@@ -639,7 +644,7 @@ namespace iLabs.LabView.LV82
             catch (Exception e)
             {
                 Exception notFound = new Exception("VI NotFound: " + path + @"\" + name, e);
-               Logger.WriteLine("VI not Found: " + " Path: " + path + " Name: " + name + " Exception: " + e.Message);
+                Logger.WriteLine("VI not Found: " + " Path: " + path + " Name: " + name + " Exception: " + e.Message);
                 throw notFound;
             }
             return vi;
@@ -668,8 +673,8 @@ namespace iLabs.LabView.LV82
             }
             catch (Exception e)
             {
-                Exception notFound = new Exception("VI Not Found GetVI: " + viName,e);
-               Logger.WriteLine("VI Not Found GetVI: " + viName + " Exception: " + e.Message);
+                Exception notFound = new Exception("VI Not Found GetVI: " + viName, e);
+                Logger.WriteLine("VI Not Found GetVI: " + viName + " Exception: " + e.Message);
                 throw notFound;
             }
             return vi;
@@ -680,8 +685,9 @@ namespace iLabs.LabView.LV82
             bool subvi = false;
 
             // This call does not work it returns an array of strings
-            string[] subs = (string[]) parent.Callees;
-            foreach( string viName in subs){
+            string[] subs = (string[])parent.Callees;
+            foreach (string viName in subs)
+            {
                 if (viName.CompareTo(name) == 0)
                 {
                     subvi = true;
@@ -713,7 +719,7 @@ namespace iLabs.LabView.LV82
 
         public string LoadVI(string path, string name)
         {
-            VirtualInstrument vi = loadVI(path,name);
+            VirtualInstrument vi = loadVI(path, name);
             return qualifiedName(vi);
         }
 
@@ -722,7 +728,7 @@ namespace iLabs.LabView.LV82
             return loadVI(path, name, false, 0);
         }
 
-        public VirtualInstrument loadVI(string path, string name, bool resvForCall,int options)
+        public VirtualInstrument loadVI(string path, string name, bool resvForCall, int options)
         {
             VirtualInstrument vi = null;
             try
@@ -777,36 +783,38 @@ namespace iLabs.LabView.LV82
             return status;
         }
 
-		public int RemoveVI(string viName)
-		{
-			int status = -1;
-			if(IsLoaded(viName)){
-				VirtualInstrument vi =  GetVI(viName);
-				status = RemoveVI(vi);
-			}
-			return status;
-		}
+        public int RemoveVI(string viName)
+        {
+            int status = -1;
+            if (IsLoaded(viName))
+            {
+                VirtualInstrument vi = GetVI(viName);
+                status = RemoveVI(vi);
+            }
+            return status;
+        }
         public int RemoveVI(VirtualInstrument vi)
-		{
-			int status = -1;
-			if(vi != null)
-			{
-				string message = "Trying to remove " + vi.Name;
-				
-				//vi.SetLockState(LabVIEW.VILockStateEnum.eLockedNoPwdState,false,"",false);
-				vi.Abort();
-				vi.CloseFrontPanel();
-				vi = null;
-			}
-			return status;
-		}
+        {
+            int status = -1;
+            if (vi != null)
+            {
+                string message = "Trying to remove " + vi.Name;
 
-		public bool IsLabViewOpen(){
-			return( viServer != null);
-		}
+                //vi.SetLockState(LabVIEW.VILockStateEnum.eLockedNoPwdState,false,"",false);
+                vi.Abort();
+                vi.CloseFrontPanel();
+                vi = null;
+            }
+            return status;
+        }
+
+        public bool IsLabViewOpen()
+        {
+            return (viServer != null);
+        }
 
 
-       
+
         public string CreateFromTemplate(string templatePath)
         {
             string buf = null;
@@ -822,66 +830,66 @@ namespace iLabs.LabView.LV82
             return buf;
         }
 
-        
+
         protected internal VirtualInstrument createFromTemplate(string path)
         {
             VirtualInstrument vi = null;
             vi = GetVI(path);
-            
+
             //if (vi != null)
             //{
             //    string newName = templateName + suffix + ".vi";
             //    vi.Name = newName;
             //}
-            
+
             return vi;
         }
 
 
-		public  virtual string CreateFromTemplate(string path, string templateBase, string index)
-		{
+        public virtual string CreateFromTemplate(string path, string templateBase, string index)
+        {
             string buf = null;
-			
-			//Try & get the vi
-			//VirtualInstrument templateVI = (VirtualInstrument) viServer.GetVIReference(@"c:Program Files\National Intruments\LabVIEW 8.2\user.lib\iLabs\ILAB_CreateFromTemplate.vi","",true,0);
+
+            //Try & get the vi
+            //VirtualInstrument templateVI = (VirtualInstrument) viServer.GetVIReference(@"c:Program Files\National Intruments\LabVIEW 8.2\user.lib\iLabs\ILAB_CreateFromTemplate.vi","",true,0);
             VirtualInstrument templateVI = getFromTemplate();
-			if(templateVI != null)
-			{
-                
-				string[] connectors = new String[4];
-				connectors[0]="templateName";
-				connectors[1]="index";
-				connectors[2]="name";
-				connectors[3]="path";
+            if (templateVI != null)
+            {
 
-				object[] data = new object[4];
-				data[0]= (object) templateBase;
-				data[1]= (object) index;
+                string[] connectors = new String[4];
+                connectors[0] = "templateName";
+                connectors[1] = "index";
+                connectors[2] = "name";
+                connectors[3] = "path";
 
-				object param1 = (object) connectors;
-				object param2= (object) data;
+                object[] data = new object[4];
+                data[0] = (object)templateBase;
+                data[1] = (object)index;
 
-				//Call the VI
-				templateVI.Call(ref param1,ref param2);
-                
-			}
+                object param1 = (object)connectors;
+                object param2 = (object)data;
+
+                //Call the VI
+                templateVI.Call(ref param1, ref param2);
+
+            }
             return buf;
-		}
+        }
         public virtual string testNames()
         {
             StringBuilder buf = new StringBuilder();
 
             //Try & get the vi
-            VirtualInstrument VI = (VirtualInstrument) viServer.GetVIReference(@"C:\Program Files\National Instruments\LabVIEW 8.2\vi.lib\Utility\allVIsInMemory.llb\VIMemory Get VIs in Memory.vi","",true,0);
-           
+            VirtualInstrument VI = (VirtualInstrument)viServer.GetVIReference(@"C:\Program Files\National Instruments\LabVIEW 8.2\vi.lib\Utility\allVIsInMemory.llb\VIMemory Get VIs in Memory.vi", "", true, 0);
+
             if (VI != null)
             {
 
                 string[] connectors = new String[2];
-          
+
                 connectors[0] = "VIs in memory";
                 connectors[1] = "error out";
-                
+
 
                 object[] data = new object[2];
                 //data[0] = (object)templateBase;
@@ -892,14 +900,16 @@ namespace iLabs.LabView.LV82
 
                 //Call the VI
                 VI.Call(ref param1, ref param2);
-                if ( ((object[])param2)[0] != null){
-                    object [] results = (object[]) ((object[])param2)[0];
-                    for(int i=0; i< results.Length; i++){
-                        object[] item = (object[]) results[i];
+                if (((object[])param2)[0] != null)
+                {
+                    object[] results = (object[])((object[])param2)[0];
+                    for (int i = 0; i < results.Length; i++)
+                    {
+                        object[] item = (object[])results[i];
                         buf.Append("Project: " + item[0].ToString());
                         buf.Append("CompNode: " + item[1].ToString());
                         buf.Append("viName: " + item[2].ToString());
-                        _Application app = (_Application) item[3];
+                        _Application app = (_Application)item[3];
                         buf.AppendLine(this.GetViServerStatus(app));
                     }
                 }
@@ -908,36 +918,36 @@ namespace iLabs.LabView.LV82
         }
 
 
-		
 
-		public void DisplayStatus(string statusVIName, string message,string time)
-		{
-			
-			//Try & get the vi
-			VirtualInstrument statusVI = (VirtualInstrument) viServer.GetVIReference(statusVIName,"",true,0);
-		
-			if(statusVI != null)
-			{
-				
-				statusVI.SetControlValue("Status",message);
-				statusVI.SetControlValue("Time Remaining",time);
-				/*
-				string[] connectors = new String[2];
-				connectors[0]="Status";
-				connectors[1]="Time Remaining";
 
-				object[] data = new object[2];
-				data[0]= (object) message;
-				data[1]= (object) time;
+        public void DisplayStatus(string statusVIName, string message, string time)
+        {
 
-				object param1 = (object) connectors;
-				object param2= (object) data;
+            //Try & get the vi
+            VirtualInstrument statusVI = (VirtualInstrument)viServer.GetVIReference(statusVIName, "", true, 0);
 
-				//Call the VI
-				statusVI.Call(ref param1,ref param2);
-				*/
-			}
-		}
+            if (statusVI != null)
+            {
+
+                statusVI.SetControlValue("Status", message);
+                statusVI.SetControlValue("Time Remaining", time);
+                /*
+                string[] connectors = new String[2];
+                connectors[0]="Status";
+                connectors[1]="Time Remaining";
+
+                object[] data = new object[2];
+                data[0]= (object) message;
+                data[1]= (object) time;
+
+                object param1 = (object) connectors;
+                object param2= (object) data;
+
+                //Call the VI
+                statusVI.Call(ref param1,ref param2);
+                */
+            }
+        }
 
 
         /// <summary>
@@ -950,67 +960,68 @@ namespace iLabs.LabView.LV82
         /// <param name="actionStr"></param>
         /// <param name="valueStr">if a vi, use the full path</param>
         /// <returns>verbose message</returns>
-		public string SubmitAction(string actionStr, string valueStr){
-			return submitAction(actionStr,valueStr);
-		}
+        public string SubmitAction(string actionStr, string valueStr)
+        {
+            return submitAction(actionStr, valueStr);
+        }
 
-		public virtual string submitAction(string actionStr, string valueStr)
-		{	
-			/*
-			 * Initialize the variables and define the strings corresponding to
-			 * the VI connector labels. Note the strings are case sensitive
-			 **/
-			StringBuilder message = new StringBuilder(actionStr + ": ");
-            if(valueStr != null)
+        public virtual string submitAction(string actionStr, string valueStr)
+        {
+            /*
+             * Initialize the variables and define the strings corresponding to
+             * the VI connector labels. Note the strings are case sensitive
+             **/
+            StringBuilder message = new StringBuilder(actionStr + ": ");
+            if (valueStr != null)
                 message.Append(" Data=" + valueStr);
-			string dataStr = valueStr;
+            string dataStr = valueStr;
             VirtualInstrument actionVI = getCaseHandler();
-			if(actionVI != null)
-			{
-               
-               string[] connectors = new String[4];
-               object[] data = new object[4];
-               
-			connectors[0]="action";
-			connectors[1]="data";
-			connectors[2]="response";
-			connectors[3]="errorOut";
+            if (actionVI != null)
+            {
 
-			//The wrapper function expects to be passed a object type by reference.
-			//We pass the string array to the object type here
-			object param1 = (object) connectors;
+                string[] connectors = new String[4];
+                object[] data = new object[4];
 
-			//Define the variable that will pass the expression to be evaluated to 
-			//LabVIEW and typecast it to type object
+                connectors[0] = "action";
+                connectors[1] = "data";
+                connectors[2] = "response";
+                connectors[3] = "errorOut";
 
-			
-			data[0]= (object) actionStr;
-            if (dataStr == null)
-                data[1] = (object) "";
+                //The wrapper function expects to be passed a object type by reference.
+                //We pass the string array to the object type here
+                object param1 = (object)connectors;
+
+                //Define the variable that will pass the expression to be evaluated to 
+                //LabVIEW and typecast it to type object
+
+
+                data[0] = (object)actionStr;
+                if (dataStr == null)
+                    data[1] = (object)"";
+                else
+                    data[1] = (object)dataStr;
+                object param2 = (object)data;
+
+
+                //Call the VI
+                actionVI.Call(ref param1, ref param2);
+                //Display the result
+                //Data returned
+                if (((object[])param2)[2] != null)
+                    message.Append(" response: " + ((object[])param2)[2].ToString());
+                //Error returned
+                if (((object[])param2)[3] != null)
+                    message.Append(" Error: " + ((object[])param2)[3].ToString());
+
+            }
             else
-			    data[1]= (object) dataStr;
-			object param2= (object) data;
-			
-			
-				//Call the VI
-				actionVI.Call(ref param1,ref param2);
-				//Display the result
-				//Data returned
-				if(((object[])param2)[2] != null)
-					message.Append(" response: " + ((object[])param2)[2].ToString());
-				//Error returned
-				if(((object[])param2)[3] != null)
-					message.Append(" Error: " + ((object[])param2)[3].ToString());
-				
-			}
-			else
-			{
-				message.Append(" ERROR: actionVI not found");
-			}
-           Logger.WriteLine(message.ToString());
-			return message.ToString();
-		
-		}
+            {
+                message.Append(" ERROR: actionVI not found");
+            }
+            Logger.WriteLine(message.ToString());
+            return message.ToString();
+
+        }
 
         public virtual string submitRemoteCommand(string actionStr, string valueStr,
             VirtualInstrument viRef)
@@ -1029,7 +1040,7 @@ namespace iLabs.LabView.LV82
             if (valueStr != null)
                 message.Append(" Data=" + valueStr);
             string dataStr = valueStr;
-            VirtualInstrument actionVI =  this.getRemoteCommandVI();
+            VirtualInstrument actionVI = this.getRemoteCommandVI();
             if (actionVI != null)
             {
 
@@ -1042,7 +1053,7 @@ namespace iLabs.LabView.LV82
                 connectors[3] = "errorOut";
                 connectors[4] = "appRef";
                 connectors[5] = "viRef";
-                
+
 
                 //The wrapper function expects to be passed a object type by reference.
                 //We pass the string array to the object type here
@@ -1057,7 +1068,7 @@ namespace iLabs.LabView.LV82
                     data[1] = (object)"";
                 else
                     data[1] = (object)dataStr;
-                
+
                 if (appRef != null)
                 {
                     data[4] = appRef;
@@ -1083,63 +1094,63 @@ namespace iLabs.LabView.LV82
             {
                 message.Append(" ERROR: RemoteCommandMgr not found");
             }
-           Logger.WriteLine(message.ToString());
+            Logger.WriteLine(message.ToString());
             return message.ToString();
 
         }
 
-		public virtual string GetLabConfiguration(string group)
-		{
-			StringBuilder message = new StringBuilder("getConfiguration: ");
-			try
-			{
-				if(viServer != null)
-				{
-					message.Append(submitAction("listvis",""));
-				}
-			}
-			catch(Exception ex)
-			{
-				message.Append("<pre>Error: " + ex.Message + ex.StackTrace + "</pre>");
-			}
-			return message.ToString();
-		}
+        public virtual string GetLabConfiguration(string group)
+        {
+            StringBuilder message = new StringBuilder("getConfiguration: ");
+            try
+            {
+                if (viServer != null)
+                {
+                    message.Append(submitAction("listvis", ""));
+                }
+            }
+            catch (Exception ex)
+            {
+                message.Append("<pre>Error: " + ex.Message + ex.StackTrace + "</pre>");
+            }
+            return message.ToString();
+        }
 
 
         VirtualInstrument getCGI()
         {
             return (VirtualInstrument)viServer.GetVIReference(appDir + @"\www\cgi-bin\ILAB_FrameContentCGI.vi", "", true, 0);
-            
+
         }
 
         VirtualInstrument getCaseHandler()
         {
             return getILabVI("ILAB_CaseHandlerNoPath.vi");
-           
+
         }
 
-                VirtualInstrument getVIStatus()
+        VirtualInstrument getVIStatus()
         {
             return getILabVI("ILAB_VIStatus.vi");
-           
+
         }
 
-                VirtualInstrument getIsLoaded()
+        VirtualInstrument getIsLoaded()
         {
             return getILabVI("ILAB_IsLoaded.vi");
-            
+
         }
 
         VirtualInstrument getFromTemplate()
         {
             return getILabVI("ILAB_CreateFromTemplate.vi");
-           
+
         }
 
-                VirtualInstrument getSetBounds()
+        VirtualInstrument getSetBounds()
         {
             return getILabVI("ILAB_SetBounds.vi");
-           
+
         }
 
         VirtualInstrument getGetVI()
@@ -1162,22 +1173,22 @@ namespace iLabs.LabView.LV82
             //catch( Exception e1)
             //{
             //   Logger.WriteLine("Error: " + viName + " \t" + e1.Message);
-                try
-                {
-                    vi = (VirtualInstrument)viServer.GetVIReference(appDir + viPath + @"\" + viName, "", true, 0);
-                    string path = vi.Path;
-                    Library library = vi.Library;
-                   Logger.WriteLine("getILabVI Found VI: " + appDir + viPath + @"\" + viName + " Path = " + path + " Library: '" + library.LocalName + "'");
-                }
-                catch(Exception e2)
-                {
-                   Logger.WriteLine("Error: " +  viName + " \t" + e2.Message);
-                }
-           // }
-            return vi; 
+            try
+            {
+                vi = (VirtualInstrument)viServer.GetVIReference(appDir + viPath + @"\" + viName, "", true, 0);
+                string path = vi.Path;
+                Library library = vi.Library;
+                Logger.WriteLine("getILabVI Found VI: " + appDir + viPath + @"\" + viName + " Path = " + path + " Library: '" + library.LocalName + "'");
+            }
+            catch (Exception e2)
+            {
+                Logger.WriteLine("Error: " + viName + " \t" + e2.Message);
+            }
+            // }
+            return vi;
         }
 
-   
+
 
 
         /****************************************************************
@@ -1424,18 +1435,4 @@ namespace iLabs.LabView.LV82
  */
 
     }
-#if LabVIEW_2011
 }
-#endif
-#if LabVIEW_2010
-}
-#endif
-#if LabVIEW_2009
-}
-#endif
-#if LabVIEW_86
-}
-#endif
-#if LabVIEW_82
-}
-#endif
