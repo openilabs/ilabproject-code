@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>RTE 1.2</title>
+
+<script type="text/javascript" src="SCORM_API_wrapper.js"></script>
+
+<script type="text/javascript">
+
+//creating shortcut for less verbose code
+var scorm = pipwerks.SCORM;
+
+
+function init(){
+	
+	//Specify SCORM 1.2:
+	scorm.version = "1.2";
+	
+	show("Initializing course.");
+	
+	var callSucceeded = scorm.init();
+	
+	show("Call succeeded? " +callSucceeded);
+
+}
+
+
+function send(){
+
+	var field = document.getElementById("userText"),
+		value = "Placeholder text";
+	
+	if(field.value !== null && field.value !== ""){
+		value = field.value;
+	}
+	
+	set('cmi.suspend_data', value);
+
+}
+
+
+
+function set(param, value){
+
+	show("Sending: '" +value +"'");
+
+	var callSucceeded = scorm.set(param, value);
+
+	show("Call succeeded? " +callSucceeded);
+
+}
+
+
+function get(param){
+
+	var value = scorm.get(param);
+
+	show("Received: '" +value +"'");
+
+}
+
+
+function complete(){
+
+	show("Setting course status to 'completed'.");
+
+	var callSucceeded = scorm.set("cmi.core.lesson_status", "completed");
+
+	show("Call succeeded? " +callSucceeded);
+
+}
+
+
+function end(){
+
+	show("Terminating connection.");
+
+	var callSucceeded = scorm.quit();
+
+	show("Call succeeded? " +callSucceeded);
+
+}
+
+
+function show(msg){
+
+	var debugText = document.getElementById("debugText");
+	if(debugText){
+		debugText.innerHTML += msg +"<br/>";
+	}
+
+	//Can also show data using pipwerks.UTILS.trace
+	pipwerks.UTILS.trace(msg);
+
+
+}
+
+
+window.onload = function (){
+	init();
+}
+
+window.onunload = function (){
+	end();
+}
+
+</script>
+
+</head>
+
+<body>
+
+<h1>This is a simple SCORM 1.2 test page using SCORM_API_wrapper.js.</h1>
+
+<div id="debugConsole">
+  <h1>DEBUG CONSOLE</h1>
+    <p id="debugText"></p>
+</div>
+
+<div id="content">
+  <p>Click the following links to perform tasks:</p>
+  <ol>
+    <li><input name="userText" id="userText" type="text" value="Type some text here!"><button onClick="send();">Send data to LMS (Supend data))</button></li>
+    <li><a href="#" onClick="get('cmi.suspend_data'); return false;">Retrieve the data you just sent to the LMS</a>.</li>
+    <li><a href="#" onClick="get('cmi.core.student_id'); return false;">Retrieve the student id</a>.</li>
+    <li><a href="#" onClick="get('cmi.core.student_name'); return false;">Retrieve the student name</a>.</li>   
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+    <li><a href="#" onClick="complete(); return false;">Set course status to 'complete'</a>.</li>
+    <li><a href="#" onClick="end(); return false;">Exit the course</a>.</li>
+  </ol>
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    
+<script type="text/javascript" src="SCORM_API_wrapper.js"></script>
+<script type="text/javascript" src="iLab_SCORM.js"></script>      <!-- to be written  -->
+<script type="text/javascript">
+
+var webServiceURL ='http://ludi.mit.edu/ISB/iLabServiceBroker.asmx'
+var authCouponID = '124'
+var issuerGuid = 'ISB-247A4591CA1443485D85657CF357'
+var authPasscode = 'D0CE85E6F56E4686BAF9E4EFABA8737A'
+var userGroup = 'Experiment_Group'
+var clientGuid = 'TOD-123456'
+
+    //JavaScript methods to wrap access for the 4 iLab Authority methods should be in iLab_SCORM.js
+    // Each of the methods could check for specific progress CMI data, if the iLab SCO file was structured
+    // as a sequence of activities on initial launch:
+    <!---
+        CallService(arguments,...)
+            getAPI();
+            get user cmi information
+            
+            get CMI data userStatusProgress if NOT exist
+                Call GetUserStatus(arguments);
+                if(!complete)
+                    Display Form and call ModifyUser
+                    set userStatusProgress complete
+                    
+           if userStatusProgress complete
+           
+           if(needs scheduling)
+               getReservation
+               
+           launchCLient(arguments)
+                    
+                
+                
+
+   <!-- This method should be in iLab_SCORM.js  and is only an example and outline of what needs to be done -->
+   function launchClient(couponID, issuerGuid, passkey, clientGuid, userGroup, webServiceURL)
+   {
+      init();
+      //Depending on the API-Wrapper query for LMS supplied Vslues, API and CMI may be handled in the CallService function
+      var api = getAPI();
+
+      var cookies=document.cookie; 
+      var userID=doLMSGetValue("cmi.core.student_id");	
+      var userName=doLMSGetValue("cmi.core.student_name");	
+	  
+      // Get any other general cmi ot other LMS infor you might be interested in  
+      var hostName = window.location.host;
+      if( window.location.port.length >0){
+        hostName += ":" + window.location.port;
+      } 
+      if( window.location.pathname.length > 2){
+        if(window.location.pathname.indexOf("/",1) > 0){
+            hostName += window.location.pathname.substr(0,window.location.pathname.indexOf("/",1));
+        }
+      }
+     
+	if (window.XMLHttpRequest)
+  	{// code for IE7+, Firefox, Chrome, Opera, Safari
+  		xmlhttp=new XMLHttpRequest();
+ 	 }
+	else
+  	{// code for IE6, IE5
+  		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+     }
+     
+     
+      
+  		var soapXml = '<?xml version="1.0" encoding="utf-8"?>'+
+				'<soap12:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' +
+				'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '+
+				'xmlns:soap12="http://www.w3.org/2003/05/soap-envelope">'+
+  				'<soap12:Header>' +
+    				  '<OperationAuthHeader xmlns="http://ilab.mit.edu/iLabs/type">' +
+                        '<coupon  xmlns="http://ilab.mit.edu/iLabs/type">' +
+                          '<couponId>' + couponID + '</couponId>' +
+                          '<issuerGuid>' + issuerGuid + '</issuerGuid>' +
+                          '<passkey>' + passkey +'</passkey>' +
+                        '</coupon>'+
+                     '</OperationAuthHeader>' +
+  				'</soap12:Header>' +
+  				'<soap12:Body>' +
+    				'<LaunchLabClient xmlns="http://ilab.mit.edu/iLabs/Services">' +
+      			        '<clientGuid>' + clientGuid +'</clientGuid>' +
+      			        '<groupName>' + groupname + '</groupName>'+
+      			        '<userName>' + userID +'</userName>' +
+      			        '<authorityUrl>' + hostName + '</authorityUrl>' + 
+      			        '<duration>' + duration + '</duration>' +
+      			        '<autoStart>1</autoStart>'+
+    				'</LaunchLabClient>' +
+  				'</soap12:Body>'+
+				'</soap12:Envelope>';
+      	alert(soapXml);
+      	xmlhttp.open("POST", webServiceURL, false);
+      	xmlhttp.setRequestHeader("Content-Type", "application/soap+xml; charset=utf-8");
+      	xmlhttp.setRequestHeader("Content-Length", soapXml.length);
+      	xmlhttp.send(soapXml); 
+
+//      if (xmlhttp.readyState == 4) {
+//	      //alert(xmlhttp.responseText);
+		var objxml = xmlhttp.responseText; 
+		alert(objxml);
+		//alert(xmlhttp.getAllResponseHeaders());
+	
+		//var value =objxml.getElementsByTagName("VALUE")[0].firstChild.nodeValue;
+		 
+//	} else {
+//	  alert("no");
+//      }
+      
+      //var iframe=document.getElementById("frame1");
+	//iframe.src = value;
+	//iframe.location=value;
+	//var zonea= document.getElementById("lau");
+	//zonea.style.display='none';
+	//var zone= document.getElementById("visir");
+	//zone.style.display='';
+    end();
+	}
+</script>	
+    <title>Example iLab SCO</title>
+</head>
+<body>
+<h1> Launch ilab</h1>
+
+<div name="lau" id="lau">      
+
+<input type="button" name="submitButton" value="Launch" onClick="javascript:launchClient()" width=100% height="100%">
+
+</div>
+ 
+<div name="visir" id="visir" style="display: none">      
+
+<iframe  src="" id="frame1" name="frame1" width="100%" height="100%" scrolling="auto" frameborder="0" transparency>  </iframe> 
+
+</div>
+</body>
+</html>
