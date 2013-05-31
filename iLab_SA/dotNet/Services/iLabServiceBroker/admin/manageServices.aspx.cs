@@ -218,6 +218,7 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="readOnlySwitch">true if displaying a service, false if not</param>
         private void SetInputMode(bool isDisplay)
         {
+            cbxDoBatch.Checked = false;
             txtBatchHelp.Visible = false;
             btnRegister.Text = "Install Domain Credentitials";
             txtWebServiceURL.ReadOnly = isDisplay;
@@ -244,6 +245,7 @@ namespace iLabs.ServiceBroker.admin
             //lblAdminGroup.Visible = isDisplay;
             //ddlAdminGroup.Visible = isDisplay;
             btnRegister.Visible = !isDisplay;
+            btnPass.Visible = !isDisplay;
             btnSaveChanges.Visible = isDisplay;
             trAdminGroup.Visible = false;
             trAssociate.Visible = false;
@@ -260,6 +262,7 @@ namespace iLabs.ServiceBroker.admin
         /// <param name="isDisplay">true if displaying a service, false if not</param>
         private void SetBatchInputMode(bool isDisplay)
         {
+            cbxDoBatch.Checked = true;
             txtBatchHelp.Visible = true;
             btnRegister.Text = "Register LabServer";
             txtWebServiceURL.ReadOnly = false;
@@ -267,8 +270,10 @@ namespace iLabs.ServiceBroker.admin
             txtServiceGUID.ReadOnly = isDisplay;
             txtServiceGUID.BackColor = isDisplay ? disabled : enabled;
             trPasskey.Visible = false;
-            //txtOutPassKey.ReadOnly = isDisplay;
-            //txtOutPassKey.BackColor = isDisplay ? disabled : enabled;
+            txtBatchPassIn.ReadOnly = isDisplay;
+            txtBatchPassIn.BackColor = isDisplay ? disabled : enabled;
+            txtOutPassKey.ReadOnly = isDisplay;
+            txtOutPassKey.BackColor = isDisplay ? disabled : enabled;
             txtApplicationURL.ReadOnly = false;
             txtApplicationURL.BackColor = enabled;
             txtServiceName.ReadOnly = isDisplay;
@@ -396,7 +401,7 @@ namespace iLabs.ServiceBroker.admin
                     
                     if (agent.agentType.Equals(ProcessAgentType.AgentType.BATCH_LAB_SERVER))
                     {
-                        cbxDoBatch.Checked = true;
+                        //cbxDoBatch.Checked = true;
                         SetBatchInputMode(true);
                         if (agent.identIn != null)
                         {
@@ -616,6 +621,10 @@ namespace iLabs.ServiceBroker.admin
             return lssId;
         }
 
+        protected void btnPass_Click(object sender, System.EventArgs e)
+        {
+            txtBatchPassIn.Text = Utilities.MakeGuid("N");
+        }
 
         protected void btnNew_Click(object sender, System.EventArgs e)
         {
