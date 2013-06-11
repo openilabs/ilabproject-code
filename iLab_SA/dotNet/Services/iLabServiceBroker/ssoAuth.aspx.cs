@@ -515,7 +515,7 @@ namespace iLabs.ServiceBroker.iLabSB
             bool status = false;
             if (userName == null || userName.Length == 0 || passwd == null || passwd.Length == 0)
             {
-                lblLoginErrorMessage.Text = Utilities.FormatErrorMessage("Missing user ID and/or password field.");
+                lblLoginErrorMessage.Text = Utilities.FormatErrorMessage("Missing user ID and/or passkey field.");
                 lblLoginErrorMessage.Visible = true;
                 return status;
             }
@@ -550,29 +550,37 @@ namespace iLabs.ServiceBroker.iLabSB
                 }
                 bool authOK = false;
                 //Test for an authorized request for a third party agent
-                if(authority != null && authority.Length >0 && authority.CompareTo(ProcessAgentDB.ServiceGuid) !=0){
+                if (authority != null && authority.Length > 0 && authority.CompareTo(ProcessAgentDB.ServiceGuid) != 0)
+                {
                     Coupon[] authCoupon = brokerDB.GetIssuedCoupons(passwd);
-                    if (authCoupon != null && authCoupon.Length >0)
+                    if (authCoupon != null && authCoupon.Length > 0)
                     {
                         Ticket authTicket = brokerDB.RetrieveTicket(authCoupon[0], TicketTypes.AUTHENTICATE_AGENT);
                         if (authTicket != null && authTicket.sponsorGuid.CompareTo(authority) == 0)
                         {
-                            XmlQueryDoc authDoc =  new XmlQueryDoc(authTicket.payload);
-                            string authAgent = authDoc.Query("AuthenticateAgentPayload/authGuid");
-                            string authGuid = authDoc.Query("AuthenticateAgentPayload/clientGuid");
+                            XmlQueryDoc authDoc = new XmlQueryDoc(authTicket.payload);
+                            string authGuid = authDoc.Query("AuthenticateAgentPayload/authGuid");
+                            string clientGuid = authDoc.Query("AuthenticateAgentPayload/clientGuid");
                             string authUser = authDoc.Query("AuthenticateAgentPayload/userName");
                             string authGroup = authDoc.Query("AuthenticateAgentPayload/groupName");
+                            //string userName, string passwd, string authority
+                            if (authGuid.CompareTo(authority) == 0
+                                && clientGuid.CompareTo(hdnClient) == 0
+                                && authGroup.CompareTo(hdnGroup) == 0
+                                && authUser.CompareTo(hdnUser) == 0)
+                            {
+                                authOK = true;
 
-
-
+                            }
+                        }
+                        else
+                        {
+                            throw new AccessDeniedException("AccessDenied!");
                         }
                     }
-                    else
-                    {
-                        throw new AccessDeniedException("AccessDenied!");
-                    }
                 }
-                else{
+                else // this is a request for a user from the serviceBroker
+                {
                     authOK = AuthenticationAPI.Authenticate(userID, passwd);
                 }
                 if (authOK)

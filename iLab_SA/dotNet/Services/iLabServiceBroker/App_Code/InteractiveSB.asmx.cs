@@ -974,7 +974,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
         /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
         /// id that the authority will always use to identify this user</param>
-        /// <param name="authorityUrl">The codebase of the authority site this does need to match the information in the database</param>
+        /// <param name="authorityKey">A key thay uniquely identifies the authority this does need to match the information in the database</param>
         /// <param name="duration"></param>
         /// <param name="autoStart">If the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
         /// <returns>an IntTag with a status code in the interger depending on the code there is an error or an action to be performed within the 
@@ -985,8 +985,8 @@ namespace iLabs.ServiceBroker.iLabSB
         public IntTag LaunchLabClient(string clientGuid, string groupName,
                string userName, string authorityKey, DateTime start, long duration, int autoStart)
         {
-            IntTag result = new IntTag(-1, "Access Denied");
-            StringBuilder buf = new StringBuilder();
+            IntTag result = new IntTag(-1, "");
+            StringBuilder buf = new StringBuilder("LaunchClient Called: ");
             int userID = -1;
             int clientID = -1;
             int groupID = -1;
@@ -998,11 +998,15 @@ namespace iLabs.ServiceBroker.iLabSB
                 // Need to check opHeader
                 if (opHeader != null && opHeader.coupon != null)
                 {
+                    buf.AppendLine("found opHeader");
                     authority = brokerDB.AuthorityRetrieve(authorityKey);
+                    if (authority != null)
+                        buf.AppendLine("authority: " + authority.authName);
                     // Coupon is from the client SCORM
                     clientAuthTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
                     if (authority == null || clientAuthTicket == null)
                     {
+                         result.tag = buf.ToString();
                         return result;
                     }
                     if (!clientAuthTicket.IsExpired() && !clientAuthTicket.isCancelled)
@@ -1010,11 +1014,13 @@ namespace iLabs.ServiceBroker.iLabSB
                         XmlQueryDoc xDoc = new XmlQueryDoc(clientAuthTicket.payload);
                         string cGuid = xDoc.Query("AuthorizeClientPayload/clientGuid");
                         string gName = xDoc.Query("AuthorizeClientPayload/groupName");
+                        buf.AppendLine("AuthGroup: " + gName);
                         if ((cGuid.CompareTo(clientGuid) == 0) && (gName.CompareTo(groupName) == 0))
                         {
                             userID = AdministrativeAPI.GetUserID(userName, authority.authorityID);
                             if (userID <= 0)
                             { //User does not exist
+                                buf.AppendLine("user: " + userName + " doesnot exist");
                                 //Check if Authority has a default group
                                 if (authority.defaultGroupID > 0)
                                 {
@@ -1029,25 +1035,30 @@ namespace iLabs.ServiceBroker.iLabSB
                             }
                             if (userID > 0)
                             {
+                                buf.AppendLine("found userID: " + userID);
                                 if (cGuid != null && clientGuid != null && cGuid.Length > 0 && (cGuid.CompareTo(clientGuid) == 0))
                                 {
                                     clientID = AdministrativeAPI.GetLabClientID(clientGuid);
+                                    buf.AppendLine("ClientID: " +clientID);
                                 }
                                 else
                                 {
+                                    result.tag = buf.ToString();
                                     return result;
                                 }
                                 if (gName != null && groupName != null && gName.Length > 0 && (gName.CompareTo(groupName) == 0))
                                 {
                                     groupID = AdministrativeAPI.GetGroupID(groupName);
+                                     buf.AppendLine("GroupID "+ groupID);
                                 }
                                 else
                                 {
+                                     result.tag = buf.ToString();
                                     return result;
                                 }
                             }
                             else
-                            {
+                            { result.tag = buf.ToString();
                                 return result;
                             }
 
@@ -1064,17 +1075,18 @@ namespace iLabs.ServiceBroker.iLabSB
                                 TicketLoadFactory tlc = TicketLoadFactory.Instance();
                                 string payload = tlc.createAuthenticateAgentPayload(authority.authGuid, clientGuid, userName, groupName);
                                 brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, 600L, payload);
-                                buf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
-                                buf.Append("/default.aspx?sso=t");
-                                buf.Append("&usr=" + userName + "&cid=" + clientGuid);
-                                buf.Append("&grp=" + groupName);
-                                buf.Append("&auth=" + authority.authGuid);
-                                buf.Append("&key=" + coupon.passkey);
+                                StringBuilder urlbuf = new StringBuilder();
+                                urlbuf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
+                                urlbuf.Append("/default.aspx?sso=t");
+                                urlbuf.Append("&usr=" + userName + "&cid=" + clientGuid);
+                                urlbuf.Append("&grp=" + groupName);
+                                urlbuf.Append("&auth=" + authority.authGuid);
+                                urlbuf.Append("&key=" + coupon.passkey);
                                 if (autoStart > 0)
-                                    buf.Append("&auto=t");
+                                    urlbuf.Append("&auto=t");
 
                                 result.id = 1;
-                                result.tag = buf.ToString();
+                                result.tag = urlbuf.ToString();
                                 //
                                 //
                                 //if (test.id > 0)
@@ -1096,7 +1108,7 @@ namespace iLabs.ServiceBroker.iLabSB
             catch (Exception e)
             {
                 result.id = -1;
-                result.tag = e.Message;
+                result.tag = buf.ToString() + e.Message;
             }
             Context.Response.AddHeader("Access-Control-Allow-Origin", authority.Origin);
             return result;
