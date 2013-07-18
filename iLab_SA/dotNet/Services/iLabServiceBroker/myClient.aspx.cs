@@ -473,7 +473,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="clientID"></param>
         void setEffectiveGroup(int currentGroup, int clientID)
         {
-            // Find efective group
+            // Find effective group
             effectiveGroupName = null;
             effectiveGroupID = AuthorizationAPI.GetEffectiveGroupID(currentGroup, clientID,
                 Qualifier.labClientQualifierTypeID, Function.useLabClientFunctionType);
