@@ -34,7 +34,7 @@
                     <asp:Repeater ID="repAdminGrants" runat="server" OnItemCommand="repAdminGrants_ItemCommand">
                         <ItemTemplate>
                             <div class="unit">
-                                <table border="0" cellpadding="0" cellspacing="0" cols="2">
+                                <table border="0" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td width="400">
                                             <asp:Label ID="lblAdmin" Runat="server"></asp:Label>
