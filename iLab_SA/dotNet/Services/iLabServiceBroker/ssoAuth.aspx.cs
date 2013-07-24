@@ -565,9 +565,9 @@ namespace iLabs.ServiceBroker.iLabSB
                             string authGroup = authDoc.Query("AuthenticateAgentPayload/groupName");
                             //string userName, string passwd, string authority
                             if (authGuid.CompareTo(authority) == 0
-                                && clientGuid.CompareTo(hdnClient) == 0
-                                && authGroup.CompareTo(hdnGroup) == 0
-                                && authUser.CompareTo(hdnUser) == 0)
+                                && clientGuid.CompareTo(hdnClient.Value) == 0
+                                && authGroup.CompareTo(hdnGroup.Value) == 0
+                                && authUser.CompareTo(hdnUser.Value) == 0)
                             {
                                 authOK = true;
 
