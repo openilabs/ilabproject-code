@@ -127,14 +127,16 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
     /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
     /// id that the authority will always use to identify this user</param>
     /// <param name="authorityKey">May be a URL or GUID, not sure what it will actually be</param>
+    /// <param name="start"> An optional suggested start time in UTC</param>
     /// <param name="duration"></param>
-    /// <param name="autoStart">If the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
+   
     /// <returns>an IntTag with a status code in the interger and a URLto be used by the authority to redirect the request.</returns>
-    [WebMethod(Description = "An authority requests the launching of a specific client for a user.", EnableSession = true)]
+    [WebMethod(Description = "An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM."
+            + " The operationHeader coupon will be defined within the SCO and refer to a TicketCollection that includes an Authenticate_Client ticket.", EnableSession = true)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract IntTag LaunchLabClient(string clientGuid, string groupName,
-           string userName, string authorityKey, DateTime start, long duration, int autoStart);
+           string userName, string authorityKey, DateTime start, long duration);
 
 
     /// <summary>
@@ -154,7 +156,7 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
     [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, service and  client. Currently support for Scheduling tickets only.")]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
-    [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]
+    [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]
     public abstract Coupon RequestAuthorization(string[] types, long duration, string userName, string groupName, string serviceGuid, string clientGuid);
 
     ///////////////////////////////////

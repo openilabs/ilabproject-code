@@ -13,7 +13,17 @@ namespace iLabs.UtilLib
 {
     public class Utilities
     {
+        static private Random randGen = new Random();
 
+        public static int RandomInt(int lessThan)
+        {
+            return randGen.Next(lessThan);
+        }
+
+        public static string RandomStr(int lessThan)
+        {
+            return randGen.Next(lessThan).ToString();
+        }
     
         /// <summary>
         /// Utility to convert an ArrayList of strings to an array.

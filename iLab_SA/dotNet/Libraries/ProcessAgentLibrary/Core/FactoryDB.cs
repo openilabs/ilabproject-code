@@ -161,7 +161,6 @@ namespace iLabs.Core
 	 /// <summary>
         ///  Convenience method to create a parameter, minimal value checking is done
         /// </summary>
-        /// <param name="cmd"></param>
         /// <param name="name"></param>
         /// <param name="value">If null or DBNull.Value, param.Value set to DBNull.Value, zero length strings are not converted to DBNull, 
         /// DateTime values are checked and adjusted to Database min or max if needed.</param>

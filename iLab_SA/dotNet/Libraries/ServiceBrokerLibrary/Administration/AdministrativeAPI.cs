@@ -13,10 +13,8 @@ using System.Text;
 
 using iLabs.Core;
 using iLabs.ServiceBroker;
-//using iLabs.ServiceBroker.DataStorage;
 using iLabs.ServiceBroker.Authorization;
 using iLabs.ServiceBroker.Internal;
-//using iLabs.Services;
 
 using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
@@ -189,6 +187,7 @@ namespace iLabs.ServiceBroker.Administration
         ///// An array of ClientInfo structures containing (potentially) multiple 
         ///// instances of information associated with this clientID. Information 
         ///// such as the client name and the URL of an information page are maintained.
+        ///// This has been moved out of the LabClient class
         ///// </summary>
         ///// <seealso cref="ClientInfo">ClientInfo Structure</seealso>
         //public ClientInfo[] clientInfos;
@@ -307,6 +306,15 @@ namespace iLabs.ServiceBroker.Administration
         /// Named constant for the Client type.
         /// </summary>
         public const string WEB_SERVICE_REDIRECT = "Web Service Redirect";
+
+        public const int BATCH_BIT = 1;
+        public const int INTERACTIVE_BIT = 2;
+        public const int APPLET_BIT = 4;
+        public const int REDIRECT_BIT = 8;
+        public const int APPLICATION_BIT = 0x10;
+        public const int WEB_SERVICE_BIT = 0x20;
+        public const int NEEDS_SCHEDULING_BIT = 0x40;
+
 
         #region IComparable Members
 
@@ -2008,12 +2016,12 @@ namespace iLabs.ServiceBroker.Administration
         }
 
         /// <summary>
-        /// Checks whether the specified agent is a member of the specified group. 
+        /// Checks whether the specified user is an explict member of the specified group. 
         /// </summary>
         /// <param name="groupID">The ID of the Group in which the agent's membership is being checked.</param>
         /// <param name="userID">The ID of the user whose membership in the enclosing group is to be checked; note that the agent may be a single user (represented by a userID) or a subgroup of the target group to satisfy the query.</param>
        
-        /// <returns>true if and only if the specified agent is a member or subgroup or the target group.</returns>
+        /// <returns>true if and only if the specified user is a direct member of the target group.</returns>
         public static bool IsUserMember(int groupID, int userID)
         {
             return InternalAdminDB.IsUserMember(groupID, userID);
@@ -2033,7 +2041,7 @@ namespace iLabs.ServiceBroker.Administration
 
 		
 		/// <summary>
-		/// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
+		/// Lists the IDs of all Groups of which the specified user is an explicit member. 
 		/// An explicit member is one directly added to the specified group by the adduser() or addmemberToGroup() methods.
 		/// </summary>
 		/// <param name="userID">The ID of the agent whose group membership is being enumerated.</param>
@@ -2045,7 +2053,7 @@ namespace iLabs.ServiceBroker.Administration
 		}
 
         /// <summary>
-        /// Lists the IDs of all Groups of which the specified agent (group or user) is an explicit member. 
+        /// Lists the IDs of all explicit Group memberships and all of the parent groups of which the specified user is a member. 
         /// An explicit member is one directly added to the specified group by the adduser() or addmemberToGroup() methods.
         /// </summary>
         /// <param name="userID">The ID of the agent whose group membership is being enumerated.</param>
@@ -2244,13 +2252,14 @@ namespace iLabs.ServiceBroker.Administration
 		/// <param name="effectiveGroupID">The User's current Effective Group.</param>
 		/// <param name="sessionKey">The User's current Session Key.</param>
 		/// <returns>A database generated session ID.</returns>
-		public static long InsertUserSession(int userID, int effectiveGroupID, int tzOffset,string sessionKey)
+		public static long InsertUserSession(int userID, int effectiveGroupID, int clientID, int tzOffset,string sessionKey)
 		{			
 			UserSession us = new UserSession();
 			us.userID = userID;
 			us.groupID = effectiveGroupID;
 			us.sessionKey = sessionKey;
             us.tzOffset = tzOffset;
+            us.clientID = clientID;
 
 			return InternalAdminDB.InsertUserSession (us);
 		}

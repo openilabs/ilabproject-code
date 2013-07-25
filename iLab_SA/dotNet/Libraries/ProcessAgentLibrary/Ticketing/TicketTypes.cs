@@ -23,7 +23,10 @@ namespace iLabs.Ticketing
         public const string AUTHENTICATE_SERVICE_BROKER = "AUTHENTICATE SERVICE BROKER";
         public const string AUTHENTICATE_AGENT = "AUTHENTICATE AGENT";
 
-        // session redemption tickets
+        // SB Tickets
+        public const string AUTHORIZE_ACCESS = "AUTHORIZE ACCESS";
+        public const string AUTHORIZE_CLIENT = "AUTHORIZE CLIENT";
+        public const string LAUNCH_CLIENT = "LAUNCH CLIENT";
         public const string REDEEM_SESSION = "REDEEM SESSION";
 
         // ESS tickets
@@ -51,8 +54,6 @@ namespace iLabs.Ticketing
         public const string EXECUTE_EXPERIMENT = "EXECUTE EXPERIMENT";
         public const string CREATE_EXPERIMENT = "CREATE EXPERIMENT";
 
-        public const string AUTHORIZE_ACCESS = "AUTHORIZE ACCESS";
-        public const string AUTHORIZE_CLIENT = "AUTHORIZE CLIENT";
 
         /// <summary>
         /// static array of ticket types that exist in the DB

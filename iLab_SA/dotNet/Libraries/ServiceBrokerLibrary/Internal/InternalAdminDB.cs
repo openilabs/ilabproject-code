@@ -2127,18 +2127,8 @@ public static int CountScheduledClients(int labServerID){
 			DbCommand myCommand = FactoryDB.CreateCommand("UserSession_insert", myConnection);
 			myCommand.CommandType = CommandType.StoredProcedure;
 			myCommand.Parameters.Add(FactoryDB.CreateParameter("@userID", us.userID,DbType.Int32));
-            DbParameter paramGroup = FactoryDB.CreateParameter("@groupID",DbType.Int32);
-            //if(us.groupID >0)
-                paramGroup.Value = us.groupID;
-            //else
-            //    paramGroup.Value =DBNull.Value;
-			myCommand.Parameters.Add( paramGroup);
-             DbParameter paramClient = FactoryDB.CreateParameter("@clientID", DbType.Int32);
-            //if(us.clientID >0)
-                paramClient.Value = us.clientID;
-            //else
-            //    paramClient.Value =DBNull.Value;
-            myCommand.Parameters.Add(paramClient);
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@groupID", us.groupID,DbType.Int32));
+            myCommand.Parameters.Add(FactoryDB.CreateParameter("@clientID",us.clientID, DbType.Int32));
             myCommand.Parameters.Add(FactoryDB.CreateParameter("@tzOffset", us.tzOffset,DbType.Int32));
 			myCommand.Parameters.Add(FactoryDB.CreateParameter("@sessionKey", us.sessionKey,DbType.AnsiString,512));
 			
@@ -3374,7 +3364,12 @@ public static int CountScheduledClients(int labServerID){
                 myConnection.Close();
             }
         }
-
+/// <summary>
+/// Cheks if user is an explict member of the group
+/// </summary>
+/// <param name="groupID"></param>
+/// <param name="memberID"></param>
+/// <returns></returns>
         public static bool IsGroupMember(int groupID, int memberID)
         {
             bool status = false;

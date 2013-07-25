@@ -1,4 +1,4 @@
-<%@ Page language="c#" Codebehind="AuthorizationWrapperClass.aspx.cs" AutoEventWireup="false" Inherits="iLabs.Architecture.Authorization.AuthorizationWrapperClass" %>
+<%@ Page language="c#" CodeFile="AuthorizationWrapperClass.aspx.cs" AutoEventWireup="false" Inherits="iLabs.Architecture.Authorization.AuthorizationWrapperClass" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
 <html>
 <!-- 

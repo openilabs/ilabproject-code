@@ -75,7 +75,7 @@ namespace iLabs.Ticketing
          * service broker tickets
          * */
 
-        public string createAuthorizeClientPayload(string clientGuid, string lsGuid, string groupName, string userName)
+        public string createAuthorizeClientPayload(string clientGuid, string lsGuid, string groupName, string authorityKey, int userId)
         {
             string rootElemt = "AuthorizeClientPayload";
             Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
@@ -91,11 +91,64 @@ namespace iLabs.Ticketing
             {
                 keyValueDictionary.Add("groupName", groupName);
             }
-            if (userName != null && userName.Length > 0)
+            if (authorityKey != null && authorityKey.Length > 0)
             {
-                keyValueDictionary.Add("userName", groupName);
+                keyValueDictionary.Add("authorityKey", authorityKey);
+            }
+            if (userId > 0)
+            {
+                keyValueDictionary.Add("userId", userId);
             }
             return writeTicketLoad(rootElemt, TicketTypes.AUTHORIZE_CLIENT, keyValueDictionary);
+        }
+
+         public string createLaunchClientPayload(string clientGuid, string lsGuid, string groupName, string authorityKey, int userId,
+            string userName, string passcode, string ss)
+        {
+            return createLaunchClientPayload(clientGuid, lsGuid, groupName, authorityKey, userId, userName, passcode, ss, DateTime.MinValue, -1);
+        }
+
+        public string createLaunchClientPayload(string clientGuid, string lsGuid, string groupName, string authorityKey, int userId,
+            string userName, string passcode, string ss, DateTime start, long duration)
+        {
+            string rootElemt = "LaunchClient";
+            Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+            if (passcode != null && passcode.Length > 0)
+            {
+                keyValueDictionary.Add("passcode", passcode);
+            } 
+            if (clientGuid != null && clientGuid.Length > 0)
+            {
+                keyValueDictionary.Add("clientGuid", clientGuid);
+            }
+            if (lsGuid != null && lsGuid.Length > 0)
+            {
+                keyValueDictionary.Add("serverGuid", clientGuid);
+            }
+            if (groupName != null && groupName.Length > 0)
+            {
+                keyValueDictionary.Add("groupName", groupName);
+            }
+            if (authorityKey != null && authorityKey.Length > 0)
+            {
+                keyValueDictionary.Add("authorityKey", authorityKey);
+            }
+            if (userId > 0)
+            {
+                keyValueDictionary.Add("userId", userId);
+            }
+            if (userName != null && userName.Length > 0)
+            {
+                keyValueDictionary.Add("userName", userName);
+            } if (start > DateTime.MinValue)
+            {
+                keyValueDictionary.Add("start ", start);
+            }
+            if (duration > 0)
+            {
+                keyValueDictionary.Add("duration", duration);
+            }
+            return writeTicketLoad(rootElemt, TicketTypes.LAUNCH_CLIENT, keyValueDictionary);
         }
 
         public string createRedeemSessionPayload(int userID, int groupID, int clientID)

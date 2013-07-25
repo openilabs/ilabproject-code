@@ -49,7 +49,7 @@ namespace iLabs.LabServer.TimeOfDay
                 passkey = Request.QueryString["passkey"];
                 issuerGuid = Request.QueryString["issuer_guid"];
                 sbUrl = Request.QueryString["sb_url"];
-
+             
 
                 if (passkey != null && couponId != null && issuerGuid != null)
                 {
@@ -67,8 +67,16 @@ namespace iLabs.LabServer.TimeOfDay
                         essUrl = payload.GetElementsByTagName("essWebAddress")[0].InnerText;
 
                         essInterface.Url = essUrl;
-
-                        HyperLinkSB.NavigateUrl = sbUrl;
+                        if (!String.IsNullOrEmpty(sbUrl))
+                        {
+                            HyperLinkSB.Visible = true;
+                            HyperLinkSB.NavigateUrl = sbUrl;
+                        }
+                        else
+                        {
+                            HyperLinkSB.Visible = false;
+                            HyperLinkSB.NavigateUrl = null;
+                        }
                     }
 
                     catch

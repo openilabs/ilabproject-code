@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head runat="server">
-    <title>Untitled Page</title>
+    <title>Time of Day</title>
 </head>
 <body>
     <form id="form1" runat="server">
@@ -14,7 +14,7 @@
         <br />
         <strong><span style="font-size: 24pt">Interactive Time Of Day Client</span></strong><br />
         <br />
-        <asp:HyperLink ID="HyperLinkSB" runat="server" Font-Bold="True"><< Back To SB</asp:HyperLink><br />
+        <asp:HyperLink ID="HyperLinkSB"  runat="server" Font-Bold="True"><< Back To SB</asp:HyperLink><br />
         <asp:Label ID="lblGetTimeOfDay" runat="server" Style="z-index: 101; left: 50px;
             position: absolute; top: 169px" Width="358px"></asp:Label>
         <asp:Label ID="Label1" runat="server" Font-Size="Smaller" Style="z-index: 105; left: 190px;

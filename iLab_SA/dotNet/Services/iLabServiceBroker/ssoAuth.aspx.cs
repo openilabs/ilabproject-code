@@ -595,7 +595,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         uTZ = Convert.ToInt32(Request.Params["userTZ"]);
                     }
                 
-                    Session["SessionID"] = AdministrativeAPI.InsertUserSession(userID, 0, uTZ, Session.SessionID.ToString()).ToString();
+                    Session["SessionID"] = AdministrativeAPI.InsertUserSession(userID, 0, 0, uTZ, Session.SessionID.ToString()).ToString();
                     Object tst = Session["SessionID"];
                     HttpCookie cookie = new HttpCookie(ConfigurationManager.AppSettings["isbAuthCookieName"], Session["SessionID"].ToString());
                     Response.AppendCookie(cookie);

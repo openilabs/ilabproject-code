@@ -135,7 +135,6 @@
     <Compile Include="ServiceBroker\ResourceDescriptorFactory.cs" />
     <Compile Include="ServiceBroker\SBTicketRemover.cs" />
     <Content Include="Authorization\AuthorizationWrapperClass.aspx">
-      <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="obj\Debug\iLabsArchitecture.dll" />
     <Content Include="obj\Debug\iLabsArchitecture.pdb" />
@@ -152,6 +151,10 @@
     <ProjectReference Include="..\..\Proxies\ProcessAgentProxy\ProcessAgentProxy.csproj">
       <Project>{34C8F4C5-900D-4221-B833-94D01F7E93B7}</Project>
       <Name>ProcessAgentProxy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\UserSchedulingProxy\UserSchedulingProxy.csproj">
+      <Project>{06EF99E2-DB59-4139-AF0C-EC9B339DD460}</Project>
+      <Name>UserSchedulingProxy</Name>
     </ProjectReference>
     <ProjectReference Include="..\DataTypes\iLabsDataTypes.csproj">
       <Project>{ADDE40F3-E299-400B-A842-15ACD58BBF19}</Project>

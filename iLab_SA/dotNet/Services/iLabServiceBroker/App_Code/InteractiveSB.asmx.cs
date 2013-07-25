@@ -967,23 +967,27 @@ namespace iLabs.ServiceBroker.iLabSB
 
        
         /// <summary>
-        /// An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM.
-        /// The operationHeader coupon will be defined within the SCO and refer to a TicketCollection that includes an Authenticate_Client ticket.
+        /// An authority requests the launching of a specific client for a user. This will most likely only be 
+        /// supported for requests from a SCORM or other LMS environment.
+        /// The operationHeader coupon will be defined within the SCO and refer to a TicketCollection that 
+        /// includes an Authenticate_Client ticket.
         /// </summary>
         /// <param name="clientGuid">The GUID of the client, this client must be registered on the serviceBroker.</param>
         /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
         /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
         /// id that the authority will always use to identify this user</param>
-        /// <param name="authorityKey">A key thay uniquely identifies the authority this does need to match the information in the database</param>
-        /// <param name="duration"></param>
-        /// <param name="autoStart">If the client is resolved for the user and may be executed now, the myClient page is not displayed. Default is true(1).</param>
-        /// <returns>an IntTag with a status code in the interger depending on the code there is an error or an action to be performed within the 
+        /// <param name="authorityKey">A key that uniquely identifies the authority this does need to match the information in the database</param>
+        /// <param name="start"> An optional suggested start time in UTC</param>
+        /// <param name="duration">An optional duration in seconds</param>
+        /// <returns>an IntTag with a status code in the interger depending on the code there is an error 
+        /// or an action to be performed within the 
         /// SCO which may be a URL to be used by the authority to redirect the request.</returns>
-        [WebMethod(Description = "An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+        [WebMethod(Description = "An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM."
+            + " The operationHeader coupon will be defined within the SCO and refer to a TicketCollection that includes an Authenticate_Client ticket.", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LaunchLabClient", Binding = "IServiceBroker")]
         public IntTag LaunchLabClient(string clientGuid, string groupName,
-               string userName, string authorityKey, DateTime start, long duration, int autoStart)
+               string userName, string authorityKey, DateTime start, long duration)
         {
             IntTag result = new IntTag(-1, "");
             StringBuilder buf = new StringBuilder("LaunchClient Called: ");
@@ -1003,7 +1007,8 @@ namespace iLabs.ServiceBroker.iLabSB
                     if (authority != null)
                         buf.AppendLine("authority: " + authority.authName);
                     // Coupon is from the client SCORM
-                    clientAuthTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
+                    clientAuthTicket = brokerDB.RetrieveIssuedTicket(opHeader.coupon, 
+                        TicketTypes.AUTHORIZE_CLIENT, ProcessAgentDB.ServiceGuid);
                     if (authority == null || clientAuthTicket == null)
                     {
                          result.tag = buf.ToString();
@@ -1069,22 +1074,26 @@ namespace iLabs.ServiceBroker.iLabSB
                                 //THis is the planned future need to deal with Session varables before it works
                                 //result = brokerDB.ResolveAction(Context, clientID, userID, groupID, DateTime.UtcNow, duration, autoStart > 0);
 
-                                // Currently use the ssoAuth page
-                                //http://your.machine.com/iLabServiceBroker/default.aspx?sso=t&amp;usr=USER_NAME&amp;key=USER_PASSWD&amp;cid=CLIENT_GUID&amp;grp=GROUP_NAME"
+                                
                                 Coupon coupon = brokerDB.CreateCoupon();
+                                string ss = Utilities.RandomStr(10000);
                                 TicketLoadFactory tlc = TicketLoadFactory.Instance();
-                                string payload = tlc.createAuthenticateAgentPayload(authority.authGuid, clientGuid, userName, groupName);
-                                brokerDB.AddTicket(coupon, TicketTypes.AUTHENTICATE_AGENT, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, 600L, payload);
+                                string payload = tlc.createLaunchClientPayload(clientGuid, null, groupName, authority.authGuid, userID, userName, coupon.passkey, ss);
+                                Ticket tt = brokerDB.AddTicket(coupon, TicketTypes.LAUNCH_CLIENT, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, 600L, payload);
                                 StringBuilder urlbuf = new StringBuilder();
                                 urlbuf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
-                                urlbuf.Append("/default.aspx?sso=t");
-                                urlbuf.Append("&usr=" + userName + "&cid=" + clientGuid);
-                                urlbuf.Append("&grp=" + groupName);
-                                urlbuf.Append("&auth=" + authority.authGuid);
-                                urlbuf.Append("&key=" + coupon.passkey);
-                                if (autoStart > 0)
-                                    urlbuf.Append("&auto=t");
+                                //urlbuf.Append("/default.aspx?sso=t");
+                                //urlbuf.Append("&usr=" + userName + "&cid=" + clientGuid);
+                                //urlbuf.Append("&grp=" + groupName);
+                                //urlbuf.Append("&auth=" + authority.authGuid);
+                                //urlbuf.Append("&key=" + coupon.passkey);
+                                //if (autoStart > 0)
+                                //    urlbuf.Append("&auto=t");
+                                //urlbuf.Append("/ClientLauncher.ashx?cid=" + coupon.couponId);
+                                //urlbuf.Append("&key=" + coupon.passkey);
 
+                                urlbuf.Append("/LaunchClient.aspx?cid=" + coupon.couponId);
+                                urlbuf.Append("&ss=" + ss);
                                 result.id = 1;
                                 result.tag = urlbuf.ToString();
                                 //
@@ -1236,7 +1245,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         //Determine resources available based on supplied fields, note requestGuid 
                         // is not used to authenticate users at this time
                         // Only return groups that match the inputs, have clients & are not administrative
-                        status = brokerDB.ResolveResources(Context, authID, userName, groupName, serviceGuid, clientGuid, false,
+                        status = brokerDB.ResolveResources(authID, userName, groupName, serviceGuid, clientGuid, false,
                             ref message, out userID, out groupClientsMap);
                         if (userID <= 0 || groupClientsMap.Count == 0)
                         {

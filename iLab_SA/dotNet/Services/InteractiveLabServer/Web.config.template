@@ -37,7 +37,7 @@
     <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
     <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
 
-    <!-- Specify the default LabVIEW version legal values: 8.2, 8.6, 2009. If nothing is specified the default is 2009 -->
+    <!-- Specify the default LabVIEW version legal values: 8.2, 8.6, 2009, 2010, 2011, 2012. If nothing is specified the default is 2009 -->
     <add key="LabViewVersion" value="2009"/>
     
     <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
