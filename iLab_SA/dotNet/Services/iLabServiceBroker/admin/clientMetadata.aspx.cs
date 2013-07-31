@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using System.Text;
 using System.Web;
 using System.Web.Security;
@@ -43,6 +44,12 @@ namespace iLabs.ServiceBroker.admin
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["UserID"] == null)
+                Response.Redirect("../login.aspx");
+            //only superusers can view this page
+            if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
+                Response.Redirect("../home.aspx");
+
             if (!Page.IsPostBack)
             {
                 hdnMetaId.Value = "";
@@ -164,7 +171,17 @@ namespace iLabs.ServiceBroker.admin
                     txtIssuer.Text = authCoupon.issuerGuid;
                     txtPasscode.Text = authCoupon.passkey;
                 }
-
+                Dictionary<string, object> keyValueDictionary = new Dictionary<string, object>();
+                keyValueDictionary.Add("authCouponId", authCoupon.couponId);
+                keyValueDictionary.Add("authIssuer", authCoupon.issuerGuid);
+                keyValueDictionary.Add("authPasskey", authCoupon.passkey);
+                keyValueDictionary.Add("webService", ProcessAgentDB.ServiceAgent.webServiceUrl);
+                keyValueDictionary.Add("webMethod", "LanuchLabClient");
+                keyValueDictionary.Add("clientName",ddlClient.SelectedItem.Text);
+                keyValueDictionary.Add("clientGuid",clientGuid);
+                keyValueDictionary.Add("groupName", ddlGroups.SelectedItem.Text);
+               
+                txtMetadata.Text = writeXML("iLabClientMetadata", keyValueDictionary);
             
             }
             DbConnection connection = FactoryDB.GetConnection();
@@ -187,7 +204,7 @@ namespace iLabs.ServiceBroker.admin
             cmd.Parameters.Add(FactoryDB.CreateParameter("@authCouponID", Convert.ToInt64(txtCouponID.Text), DbType.Int64));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@scoGuid", txtPasscode.Text, DbType.AnsiString,50));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@metadata", txtMetadata.Text, DbType.String));
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@sco",txtScorm.Text, DbType.String));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@sco", txtScorm.Text, DbType.String));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@metadataFormat", txtFormat.Text, DbType.String,256));
             try
             {
@@ -234,7 +251,7 @@ namespace iLabs.ServiceBroker.admin
         protected void btnGuid_Click(object sender, System.EventArgs e)
         {
             Guid guid = System.Guid.NewGuid();
-            txtPasscode.Text = Utilities.MakeGuid();
+            txtPasscode.Text = Utilities.MakeGuid("N");
         }
 
         protected void checkGuid(object sender, ServerValidateEventArgs args)
@@ -243,6 +260,41 @@ namespace iLabs.ServiceBroker.admin
                 args.IsValid = true;
             else
                 args.IsValid = false;
+        }
+
+        public string writeXML(string rootElement, Dictionary<string, object> keyValueDictionary)
+        {
+            try
+            {
+                StringWriter stringWriter = new StringWriter();
+                XmlTextWriter xmlWriter = new XmlTextWriter(stringWriter);
+                //xmlWriter.Formatting = Formatting.Indented;
+                //xmlWriter.Indentation = indentation;
+
+                // write root element
+                xmlWriter.WriteStartElement(rootElement);
+                xmlWriter.WriteAttributeString("xmlns", "ns", null, "http://ilab.mit.edu/iLab");
+
+               
+                foreach (string s in keyValueDictionary.Keys)
+                {
+                    xmlWriter.WriteStartElement(s);
+                    object value = new object();
+                    keyValueDictionary.TryGetValue(s, out value);
+                    xmlWriter.WriteString(value.ToString());
+                    xmlWriter.WriteEndElement();
+                }
+
+                xmlWriter.WriteEndElement();
+                return stringWriter.ToString();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            return null;
         }
 
     }

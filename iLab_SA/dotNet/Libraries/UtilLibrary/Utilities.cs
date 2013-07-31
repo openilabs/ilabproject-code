@@ -270,7 +270,7 @@ namespace iLabs.UtilLib
             return MakeGuid("D");
         }
         /// <summary>
-        /// Simple Guid generator, wraps Microsoft GUID and formats the string as all uppercase.
+        /// Simple Guid generator, wraps Microsoft GUID and formats the string based on the format.
         /// </summary>
         /// <param name="format">"N", "D", "B", or "P", null or empty defaults to D</param>
         /// <returns></returns>
@@ -453,6 +453,26 @@ namespace iLabs.UtilLib
         //    }
 
         //}
+
+        public static string ToBase64(string inputStr)
+        {
+            // Convert the string to a byte array.
+            UnicodeEncoding encoder = new UnicodeEncoding();
+            byte[] data = encoder.GetBytes(inputStr);
+
+            // Convert the byte array to a base 64 encoded string.
+            return(Convert.ToBase64String(data));
+        }
+
+        public static string FromBase64(string input64)
+        {
+            // Convert UUEncoded string to a byte array.
+            byte[] data = Convert.FromBase64String(input64);
+
+            // Convert byte array back to the original string.
+            UnicodeEncoding encoder = new UnicodeEncoding();
+            return(encoder.GetString(data, 0, data.Length)); 
+        }
 
     }
 

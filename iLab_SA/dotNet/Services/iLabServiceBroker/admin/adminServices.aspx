@@ -1,5 +1,5 @@
 <%@ Register TagPrefix="uc1" TagName="footer" Src="../footer.ascx" %>
-<%@ Register TagPrefix="uc1" TagName="userNav" Src="../userNav.ascx" %>
+<%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="../banner.ascx" %>
 <%@ Page language="c#" Inherits="iLabs.ServiceBroker.admin.adminServices" CodeFile="adminServices.aspx.cs" %>
 
@@ -15,7 +15,7 @@
         <a name="top"></a>
 			<div id="outerwrapper">
 				<uc1:banner id="Banner1" runat="server"></uc1:banner>
-				<uc1:userNav id="UserNav1" runat="server"></uc1:userNav>
+				<uc1:adminNav id="adminNav1" runat="server"></uc1:adminNav>
 				<br clear="all" />
 				<div id="innerwrapper">
 					<div id="pageintro">

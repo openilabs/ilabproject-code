@@ -262,7 +262,7 @@ namespace iLabs.ServiceBroker.admin
             txtAssociatedUSS.Visible = false;
             txtAssociatedUSS.Text = "";
             btnRegisterUSS.Visible = false;
-
+            btnMetadata.Visible = false;
             trOptions.Visible = false;
             Session.Remove("ESSmapID");
             Session.Remove("USSmapID");
@@ -350,7 +350,8 @@ namespace iLabs.ServiceBroker.admin
                     //metadataPopupScript.Append("','editMetadataPopup','scrollbars=yes,resizable=yes,width=800').focus()");
                     //btnMetadata.Attributes.Remove("onClick");
                     //btnMetadata.Attributes.Add("onClick", metadataPopupScript.ToString());
-
+                    if (!Session["GroupName"].ToString().Equals(Group.SUPERUSER))
+                    btnMetadata.Visible = true;
                     trOptions.Visible = true;
                 }
             }

@@ -1,4 +1,4 @@
-<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ClientMetadata.aspx.cs" Inherits="iLabs.ServiceBroker.admin.ClientMetadata" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="ClientMetadata.aspx.cs" Inherits="iLabs.ServiceBroker.admin.ClientMetadata" validateRequest="false" %>
 
 <%@ Register TagPrefix="uc1" TagName="banner" Src="../banner.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="adminNav" Src="adminNav.ascx" %>
@@ -25,6 +25,7 @@ Please see license.txt in top level directory for full license.
         <asp:HiddenField ID="hdnMetaId" runat="server" />
         <div id="outerwrapper">
             <uc1:banner ID="Banner1" runat="server"></uc1:banner>
+            <uc1:adminNav ID="nav1" runat="server"></uc1:adminNav>
             <br clear="all">
             <div id="innerwrapper">
                 <div id="pageintro">
@@ -32,8 +33,11 @@ Please see license.txt in top level directory for full license.
                         Client Metadata
                     </h1>
                     <p>
-                        Create, modify and publish client metadata. Note: This page is not integrated into the ServiceBroker and currently may only be used to create a ClientAuthorization Ticket.
-                    </p>
+                        Create, modify and publish client metadata. Note: This page is not integrated into the
+                        ServiceBroker it currently is used to create a ClientAuthorization Ticket and
+                        a simple XML document of the Metadata required to call the WebService method 'LaunchLabClient'.
+                        The Ticket &amp; metadata are stored in the database. To generate a new set of Metadata
+                        for the selected client, clear the CouponID &amp; Passkey fields before registering.</p>
                     <p>
                         <asp:Label ID="lblResponse" runat="server" Visible="False"></asp:Label></p>
                 </div>
@@ -51,12 +55,13 @@ Please see license.txt in top level directory for full license.
                                         Width="672px"></asp:DropDownList></td>
                             </tr>
                             <tr>
-                                <th rowspan="2"><label for="client">Client Authorization </label></th>
-                                <td style="width: 336px"><asp:Textbox CssClass="i18n" ID="txtCouponID" runat="server" Width="200px"></asp:Textbox></td>
-                                <td style="width: 180px"><asp:Textbox CssClass="i18n" ID="txtIssuer" runat="server" Columns="50"></asp:Textbox></td>
+                                <th rowspan="2"><label for="client">Client Authorization Coupon
+                                </label></th>
+                                <td style="width: 336px"> Issuer: <asp:Textbox CssClass="i18n" ID="txtIssuer" runat="server" Columns="50"></asp:Textbox></td>
+                                <td style="width: 180px"> CouponID: <asp:Textbox CssClass="i18n" ID="txtCouponID" runat="server" Width="200px"></asp:Textbox></td>
                             </tr>
                             <tr>
-                                <td style="width: 336px"><asp:Textbox CssClass="i18n" ID="txtPasscode" runat="server" Columns="50"></asp:Textbox>&nbsp;&nbsp;&nbsp;</td><td><asp:Button ID="btnGuid" runat="server" CssClass="button" Text="Make Guid" OnClick="btnGuid_Click" /></td>
+                                <td style="width: 336px"> Passkey: <asp:Textbox CssClass="i18n" ID="txtPasscode" runat="server" Columns="50"></asp:Textbox>&nbsp;&nbsp;&nbsp;</td><td><asp:Button ID="btnGuid" runat="server" CssClass="button" Text="Generate Passkey" OnClick="btnGuid_Click" /></td>
                             </tr>
                             <tr>
                                 <th><label for="client">Metadata </label></th>
