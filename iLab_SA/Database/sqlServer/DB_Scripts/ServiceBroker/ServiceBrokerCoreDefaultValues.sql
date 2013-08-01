@@ -140,7 +140,7 @@ Select @defaultGroupID =(Select Group_ID From Groups Where Group_Name ='NewUserG
 Select @defaultType = (Select Auth_Type_ID from Authentication_Types where Auth_Name = 'Native');
 SET IDENTITY_INSERT Authority ON
 INSERT INTO Authority (Authority_ID, Auth_Type_ID, Default_Group_ID,Authority_Guid, Authority_Name, Authority_URL)
-	VALUES(0,@defaultType,@defaultGroupID,'','','localhost');
+	VALUES(0,@defaultType,@defaultGroupID,'','Local Authority','localhost');
 SET IDENTITY_INSERT Authority OFF
 DBCC CHECKIDENT (Authority, RESEED);
 END
