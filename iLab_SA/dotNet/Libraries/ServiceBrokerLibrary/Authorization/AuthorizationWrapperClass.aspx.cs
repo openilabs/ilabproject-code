@@ -507,7 +507,7 @@ namespace iLabs.ServiceBroker.Authorization
 		/// addMember, adminsterGroup and superUser privilege
 		/// </summary>
 		/// <param name="userName"></param>
-		/// <param name="principalString"></param>
+		/// <param name="authID"></param>
 		/// <param name="authenticationType"></param>
 		/// <param name="firstName"></param>
 		/// <param name="lastName"></param>
@@ -603,7 +603,7 @@ namespace iLabs.ServiceBroker.Authorization
 		/// </summary>
 		/// <param name="userID"></param>
 		/// <param name="userName"></param>
-		/// <param name="principalString"></param>
+		/// <param name="AuthorityID"></param>
 		/// <param name="authenticationType"></param>
 		/// <param name="firstName"></param>
 		/// <param name="lastName"></param>
