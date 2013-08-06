@@ -117,7 +117,7 @@ namespace iLabs.ServiceBroker.admin
                 {
                     Group startGroup = AdministrativeAPI.GetGroup(i);
                     string startImage = null;
-                    if (startGroup.groupName.CompareTo(Group.ROOT) == 0)
+                    if (startGroup.groupID == 1) // Predefined Root
                         startImage = rootImage;
                     else
                         startImage = groupImage;
@@ -128,6 +128,7 @@ namespace iLabs.ServiceBroker.admin
 
                     TreeNode rootNodeGroups = new TreeNode(startGroup.groupName, startGroup.groupID.ToString(), startImage);
                     rootNodeGroups.Expanded = true;
+                    rootNodeGroups.ShowCheckBox = isRegular(startGroup);
                     rootNodeGroups.SelectAction = TreeNodeSelectAction.None;
                     AddAgentsRecursively(rootNodeAgents, rootNodeGroups);
 
@@ -227,9 +228,11 @@ namespace iLabs.ServiceBroker.admin
 				{
 					n.Expanded=true;
 					TreeNode parent = (TreeNode)n.Parent;
-					//parent.Expanded = true;
-					if (!parent.Text.Equals("ROOT"))
-						ExpandParent(parent);
+                    if (parent != null && parent.Text != null)
+                    {
+                        if (!parent.Text.Equals("ROOT"))
+                            ExpandParent(parent);
+                    }
 				}
 				ExpandNode(n.ChildNodes, nodeID);
 			}
@@ -265,7 +268,7 @@ namespace iLabs.ServiceBroker.admin
 
         private bool isRegular(Group g)
         {
-            return (GroupType.REGULAR.CompareTo(g.GroupType) == 0);
+            return (g.groupTypeID == 1);
         }
 
         private void ibtnRemoveCB_Click(object sender, System.Web.UI.ImageClickEventArgs e)
@@ -565,21 +568,4 @@ namespace iLabs.ServiceBroker.admin
 
 	}
 
-    //public class TreeNodeStatus : TreeNode
-    //{
-    //    protected int status = 0;
-    //    public TreeNodeStatus(string text, string value, string imageUrl) : base(text,value,imageUrl){}
-       
-    //    public int Status
-    //    {
-    //        get
-    //        {
-    //            return status;
-    //        }
-    //        set
-    //        {
-    //            status = value;
-    //        }
-    //    }
-    //}
 }

@@ -167,7 +167,9 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		protected void Session_End(Object sender, EventArgs e)
 		{
-			AdministrativeAPI.SaveUserSessionEndTime (Convert.ToInt64 (Session["SessionID"]));
+           
+            if(Session["SessionID"] != null)
+			    AdministrativeAPI.SaveUserSessionEndTime (Convert.ToInt64 (Session["SessionID"]));
 			Session.RemoveAll();
 			FormsAuthentication.SignOut ();
 		}
