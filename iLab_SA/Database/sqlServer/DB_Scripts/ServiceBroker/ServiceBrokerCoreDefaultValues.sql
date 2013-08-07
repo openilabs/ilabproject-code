@@ -1,7 +1,7 @@
 -- Copyright (c) 2004 The Massachusetts Institute of Technology. All rights reserved.
 -- $Id$
 
-/* created by Charu. Last Modified 12/16/2004 */
+/* created by Charu */
 
 /* ENTERING DEFAULT VALUES IN TABLES */
 
@@ -175,17 +175,4 @@ INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (8,'AUT
 
 SET IDENTITY_INSERT ResourceMappingTypes OFF
 DBCC CHECKIDENT (ResourceMappingTypes, RESEED);
-GO
-
-/*ReSourceMapTypes*/
---SET IDENTITY_INSERT ResourceMappingTypes ON
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (1,'GROUP','Group');
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (2,'PROCESS_AGENT','Process Agent');
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (3,'CLIENT','Client');
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (4,'RESOURCE_MAPPING','Resource Mapping');
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (5,'TICKET_TYPE','Ticket Type');
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (6,'RESOURCE_TYPE', 'Resource Type');
---INSERT INTO ResourceMappingTypes(Type_ID, Type_Name, Description) VALUES (7,'STRING','String');
-
---SET IDENTITY_INSERT ResourceMappingTypes OFF
 GO
