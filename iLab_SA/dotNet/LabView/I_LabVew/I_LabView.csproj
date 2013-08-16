@@ -34,7 +34,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="I_LabViewInterface.cs" />
+    <Compile Include="LabViewInterface_W.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\UtilLibrary\UtilLibrary.csproj">
+      <Project>{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}</Project>
+      <Name>UtilLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
