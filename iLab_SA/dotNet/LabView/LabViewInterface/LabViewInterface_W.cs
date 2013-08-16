@@ -45,8 +45,6 @@ namespace iLabs.LabView
             {
                 try
                 {
-                    //Need to implement method to escape the three fields used from using any reserved URL characters. 
-                    //Same applies to all other uses of HTTP Web Requests
                     string response = CallHTTPWebRequest(url_base + "ILABW_DisplayStatus.vi?viName=" + viName + "&message=" + message + "&time=" + time);
                 }
                 catch (Exception e)

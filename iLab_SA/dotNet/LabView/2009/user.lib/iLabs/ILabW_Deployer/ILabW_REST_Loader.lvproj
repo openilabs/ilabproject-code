@@ -86,7 +86,7 @@
 				<Property Name="INST_buildSpecName" Type="Str">My Installer</Property>
 				<Property Name="INST_defaultDir" Type="Str">{A761572A-746D-49DF-95D4-2B9BF8EC7A5B}</Property>
 				<Property Name="INST_productName" Type="Str">ILabW_REST_Loader</Property>
-				<Property Name="INST_productVersion" Type="Str">1.0.4</Property>
+				<Property Name="INST_productVersion" Type="Str">1.0.5</Property>
 				<Property Name="InstSpecBitness" Type="Str">32-bit</Property>
 				<Property Name="InstSpecVersion" Type="Str">12008029</Property>
 				<Property Name="MSI_arpCompany" Type="Str">MIT iLab Project</Property>
@@ -150,7 +150,7 @@
 				<Property Name="RESTfulWebSrvc_routingTemplate[9].template" Type="Str">/ILABW_AppStatus</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[9].VIName" Type="Str">ILABW_AppStatus.vi</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplateCount" Type="Int">11</Property>
-				<Property Name="Source[0].itemID" Type="Str">{1C96EAFD-77BF-4899-B0C5-2ABF74347D7C}</Property>
+				<Property Name="Source[0].itemID" Type="Str">{2558FC7B-A2FC-47CF-AB9B-D9737E2C0C63}</Property>
 				<Property Name="Source[0].type" Type="Str">Container</Property>
 				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
 				<Property Name="Source[1].itemID" Type="Ref">/My Computer/ILABW_CaseHandler.vi</Property>
