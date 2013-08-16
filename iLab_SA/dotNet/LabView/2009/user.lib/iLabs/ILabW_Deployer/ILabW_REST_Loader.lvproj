@@ -18,10 +18,13 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
+		<Item Name="ILABW_AppStatus.vi" Type="VI" URL="../../ILABW_AppStatus.vi"/>
 		<Item Name="ILABW_CaseHandler.vi" Type="VI" URL="../../ILABW_CaseHandler.vi"/>
 		<Item Name="ILABW_CaseHandlerNoPath.vi" Type="VI" URL="../../ILABW_CaseHandlerNoPath.vi"/>
 		<Item Name="ILABW_CreateFromTemplate.vi" Type="VI" URL="../../ILABW_CreateFromTemplate.vi"/>
+		<Item Name="ILABW_DisplayStatus.vi" Type="VI" URL="../../ILABW_DisplayStatus.vi"/>
 		<Item Name="ILABW_ErrorToString.vi" Type="VI" URL="../../ILABW_ErrorToString.vi"/>
+		<Item Name="ILABW_GetPath.vi" Type="VI" URL="../../ILABW_GetPath.vi"/>
 		<Item Name="ILABW_GetVI.vi" Type="VI" URL="../../ILABW_GetVI.vi"/>
 		<Item Name="ILABW_IsLoaded.vi" Type="VI" URL="../../ILABW_IsLoaded.vi"/>
 		<Item Name="ILABW_RemoteCommandMgr.vi" Type="VI" URL="../../ILABW_RemoteCommandMgr.vi"/>
@@ -83,7 +86,7 @@
 				<Property Name="INST_buildSpecName" Type="Str">My Installer</Property>
 				<Property Name="INST_defaultDir" Type="Str">{A761572A-746D-49DF-95D4-2B9BF8EC7A5B}</Property>
 				<Property Name="INST_productName" Type="Str">ILabW_REST_Loader</Property>
-				<Property Name="INST_productVersion" Type="Str">1.0.3</Property>
+				<Property Name="INST_productVersion" Type="Str">1.0.4</Property>
 				<Property Name="InstSpecBitness" Type="Str">32-bit</Property>
 				<Property Name="InstSpecVersion" Type="Str">12008029</Property>
 				<Property Name="MSI_arpCompany" Type="Str">MIT iLab Project</Property>
@@ -128,6 +131,8 @@
 				<Property Name="RESTfulWebSrvc_routingTemplate[0].VIName" Type="Str">ILABW_CaseHandler.vi</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[1].template" Type="Str">/ILABW_CaseHandlerNoPath/:data/:action</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[1].VIName" Type="Str">ILABW_CaseHandlerNoPath.vi</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplate[10].template" Type="Str">/ILABW_DisplayStatus</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplate[10].VIName" Type="Str">ILABW_DisplayStatus.vi</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[2].template" Type="Str">/ILABW_CreateFromTemplate/:path/:suffix/:templateName</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[2].VIName" Type="Str">ILABW_CreateFromTemplate.vi</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[3].template" Type="Str">/ILABW_GetVI/:path</Property>
@@ -140,13 +145,25 @@
 				<Property Name="RESTfulWebSrvc_routingTemplate[6].VIName" Type="Str">ILABW_SetBounds.vi</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[7].template" Type="Str">/ILABW_ViStatus/:name</Property>
 				<Property Name="RESTfulWebSrvc_routingTemplate[7].VIName" Type="Str">ILABW_ViStatus.vi</Property>
-				<Property Name="RESTfulWebSrvc_routingTemplateCount" Type="Int">8</Property>
-				<Property Name="Source[0].itemID" Type="Str">{022FD8D1-1136-4674-A258-40E33F1E8B71}</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplate[8].template" Type="Str">/ILABW_GetPath/:name</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplate[8].VIName" Type="Str">ILABW_GetPath.vi</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplate[9].template" Type="Str">/ILABW_AppStatus</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplate[9].VIName" Type="Str">ILABW_AppStatus.vi</Property>
+				<Property Name="RESTfulWebSrvc_routingTemplateCount" Type="Int">11</Property>
+				<Property Name="Source[0].itemID" Type="Str">{1C96EAFD-77BF-4899-B0C5-2ABF74347D7C}</Property>
 				<Property Name="Source[0].type" Type="Str">Container</Property>
 				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
 				<Property Name="Source[1].itemID" Type="Ref">/My Computer/ILABW_CaseHandler.vi</Property>
 				<Property Name="Source[1].sourceInclusion" Type="Str">TopLevel</Property>
 				<Property Name="Source[1].type" Type="Str">RESTfulVI</Property>
+				<Property Name="Source[10].destinationIndex" Type="Int">0</Property>
+				<Property Name="Source[10].itemID" Type="Ref">/My Computer/ILABW_AppStatus.vi</Property>
+				<Property Name="Source[10].sourceInclusion" Type="Str">TopLevel</Property>
+				<Property Name="Source[10].type" Type="Str">RESTfulVI</Property>
+				<Property Name="Source[11].destinationIndex" Type="Int">0</Property>
+				<Property Name="Source[11].itemID" Type="Ref">/My Computer/ILABW_DisplayStatus.vi</Property>
+				<Property Name="Source[11].sourceInclusion" Type="Str">TopLevel</Property>
+				<Property Name="Source[11].type" Type="Str">RESTfulVI</Property>
 				<Property Name="Source[2].destinationIndex" Type="Int">0</Property>
 				<Property Name="Source[2].itemID" Type="Ref">/My Computer/ILABW_CaseHandlerNoPath.vi</Property>
 				<Property Name="Source[2].sourceInclusion" Type="Str">TopLevel</Property>
@@ -175,7 +192,11 @@
 				<Property Name="Source[8].itemID" Type="Ref">/My Computer/ILABW_ViStatus.vi</Property>
 				<Property Name="Source[8].sourceInclusion" Type="Str">TopLevel</Property>
 				<Property Name="Source[8].type" Type="Str">RESTfulVI</Property>
-				<Property Name="SourceCount" Type="Int">9</Property>
+				<Property Name="Source[9].destinationIndex" Type="Int">0</Property>
+				<Property Name="Source[9].itemID" Type="Ref">/My Computer/ILABW_GetPath.vi</Property>
+				<Property Name="Source[9].sourceInclusion" Type="Str">TopLevel</Property>
+				<Property Name="Source[9].type" Type="Str">RESTfulVI</Property>
+				<Property Name="SourceCount" Type="Int">12</Property>
 				<Property Name="TgtF_companyName" Type="Str">MIT</Property>
 				<Property Name="TgtF_fileDescription" Type="Str">My Web Service</Property>
 				<Property Name="TgtF_internalName" Type="Str">My Web Service</Property>
