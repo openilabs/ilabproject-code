@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace iLabs.LabView
     {
         protected string url_base = "http://localhost:8080/Ilab_WebService/";
         protected string lvVersion = null;
-        protected _Application viServer;
+        //protected _Application viServer;
 
         protected string appDir = null;
         protected string viPath = @"\user.lib\iLabs";
@@ -127,7 +128,7 @@ namespace iLabs.LabView
             }
             message.Append(response);
             message.Append("<error>" + error + "</error>");
-            
+            return message.ToString();
         }
 
         public bool IsLoaded(string viName)
@@ -138,7 +139,7 @@ namespace iLabs.LabView
             return response.Contains("true");
         }
 
-		public int GetViStatus(string viName)
+		public int GetVIStatus(string viName)
         {
             viName = StripName(viName);
             if (IsLoaded(viName))
@@ -146,7 +147,7 @@ namespace iLabs.LabView
                 string response = GetSubmitAction("statusvi", viName, "status");
                 try
                 {
-                    return System.Convert.ToDecimal(response);
+                    return System.Convert.ToInt32(response);
                 }
                 catch (Exception e)
                 {
@@ -180,7 +181,7 @@ namespace iLabs.LabView
             {
                 try
                 {
-                    return System.Convert.ToDecimal(response);
+                    return System.Convert.ToInt32(response);
                 }
                 catch (Exception e)
                 {
@@ -217,12 +218,12 @@ namespace iLabs.LabView
             return output;
         }
 
-        public string ResetVI(string viName)
+        public int ResetVI(string viName)
         {
             string output = GetSubmitAction("resetvi", viName, "status");
             try
             {
-                return System.Convert.ToDecimal(output);
+                return System.Convert.ToInt32(output);
             }
             catch (Exception e)
             {
@@ -230,11 +231,11 @@ namespace iLabs.LabView
             }
         }
 
-        public string RunVI(string viName)
+        public int RunVI(string viName)
         {
             try
             {
-                return System.Convert.ToDecimal(GetSubmitAction("runvi", viName, "status"));
+                return System.Convert.ToInt32(GetSubmitAction("runvi", viName, "status"));
             }
             catch (Exception e)
             {
@@ -251,7 +252,7 @@ namespace iLabs.LabView
         {
             try
             {
-                return System.Convert.ToDecimal(GetSubmitAction("stopvi", viName, "status"));
+                return Convert.ToInt32(GetSubmitAction("stopvi", viName, "status"));
             }
             catch (Exception e)
             {
@@ -264,7 +265,7 @@ namespace iLabs.LabView
             string output = CallHttpWebRequest(url_base + "ILabW_SetBounds/?viName=" + viName + "&left=" + left.ToString() + "&top=" + top.ToString() + "&right=" + right.ToString() + "&bottom=" + bottom.ToString());
             try
             {
-                return System.Convert.ToDecimal(GetXML(output, "status"));
+                return System.Convert.ToInt32(GetXML(output, "status"));
             }
             catch
             {
@@ -274,18 +275,22 @@ namespace iLabs.LabView
 
         public int GetLockState(string viName)
         {
+            int status = 0;
             try
             {
-                return System.Convert.ToDecimal(GetSubmitAction("getlockstate", viName, "status"));
+                status = Convert.ToInt32(GetSubmitAction("getlockstate", viName, "status"));
             }
             catch (Exception e)
             {
-                return -1;
+                status = -1;
             }
+            return status;
         }
 
         public int SetLockState(string viName, Boolean state)
         {
+            //TODO: getStatus
+           int  status = 1;
             string viPath = GetPath(viName);
             if (state)
             {
@@ -295,6 +300,7 @@ namespace iLabs.LabView
             {
                 SubmitAction("unlockvi", viPath);
             }
+            return status;
         }
 
         //Convert any ASCII representations of < and > to be literals of "<" and ">"
@@ -329,7 +335,7 @@ namespace iLabs.LabView
         }
 
         //Version of ParseXML to get all data within multiple tags. Mapped as a dictionary with each tag corresponding to an array of returned data.
-        private Dictionary ParseXMLMultiTag(string input, string[] tag_names)
+        private Dictionary<string,string[]> ParseXMLMultiTag(string input, string[] tag_names)
         {
             Dictionary<string, string[]> outputs = new Dictionary<string, string[]>();
             for (int i = 0; i < tag_names.Length; i++)
