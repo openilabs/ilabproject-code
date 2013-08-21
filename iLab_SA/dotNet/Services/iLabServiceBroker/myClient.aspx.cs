@@ -378,7 +378,7 @@ namespace iLabs.ServiceBroker.iLabSB
             if ((groupMessages == null || groupMessages.Length == 0) && (serverMessages == null || serverMessages.Length == 0))
             {
 
-                lblGroupNameSystemMessage.Text += "No Messages at this time!";
+                lblGroupNameSystemMessage.Text = "No Messages at this time!";
                 lblGroupNameSystemMessage.Visible = true;
                 lblServerSystemMessage.Visible = false;
             }

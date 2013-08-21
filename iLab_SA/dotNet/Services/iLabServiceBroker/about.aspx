@@ -42,7 +42,7 @@ students at MIT and around the world.</P>
 <P>Based on the experiences of the different iLab development teams, <i>The iLabs 
 Project</i> is developing a suite of software tools that makes it efficient to bring 
 online complex laboratory experiments, and provides the infrastructure for user management. The <A 
-href="http://icampus.mit.edu/ilabs/architecture">iLabs Shared Architecture</A> has the following 
+href="http://ilab.mit.edu/wiki">iLabs Shared Architecture</A> has the following 
 design goals:</P>
 <ul style="MARGIN-TOP: 0in; MARGIN-BOTTOM: 0in" type=disc>
 <li>Minimize development and management effort for users and providers of remote 

@@ -5,6 +5,18 @@
 <html xmlns="http://www.w3.org/1999/xhtml" >
 <head runat="server">
     <title>Create Recurring Time Blocks</title>
+    <script type="text/javascript">
+		<!--
+		function ReloadParent() 
+        {          
+            if (window.opener){            
+                window.opener.location.href = 'TimeBlockManagement.aspx?refresh=t';
+                window.opener.focus();
+            } 
+            window.close();  
+        }
+        -->
+        </script>
 <script language="javascript" type="text/javascript">
 <!--
 

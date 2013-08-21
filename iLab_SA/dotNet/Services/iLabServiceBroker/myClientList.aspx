@@ -62,10 +62,6 @@ Please see license.txt in top level directory for full license.
 									<p></p>
 								</ItemTemplate>
 							</asp:repeater>
-							<!--<p class="lab"><strong><a href="samplelab.html">Lab 1</a></strong> - description</p>
-							<p class="lab"><strong><a href="samplelab.html">Lab 2</a></strong> - description</p>
-							<p class="lab"><strong><a href="samplelab.html">Lab 3 </a></strong>- description</p>
-							<p class="lab"><strong><a href="samplelab.html">Lab 4 </a></strong>- description</p>-->
 						</div>
 					</div>
 					<br clear="all"/> <!-- end pagecontent div -->

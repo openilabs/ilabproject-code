@@ -71,7 +71,7 @@ namespace iLabs.ServiceBroker.iLabSB
 			repSystemMessage.DataBind();
 
 			if (messagesList==null)
-				lblSystemMessage.Text +="<p>No Messages at this time</p>";
+				lblSystemMessage.Text ="<p>No Messages at this time</p>";
 		}
 
 		#region Web Form Designer generated code

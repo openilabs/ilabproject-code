@@ -345,11 +345,7 @@ namespace iLabs.Scheduling.LabSide
                 Session["newOccurrenceID"] = recurID;
 
                 //No longer creating TimeBlocks
-             
-                string jScript;
-                jScript = "<script language=javascript> window.opener.Form1.hiddenPopupOnNewTB.value='1';";
-                jScript += "window.close();</script>";
-                Page.RegisterClientScriptBlock("postbackScript", jScript);
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "Success", "ReloadParent();", true);
                 return;
             }
             catch (Exception ex)

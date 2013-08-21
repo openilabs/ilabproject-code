@@ -1,5 +1,6 @@
 <%@ Page language="c#" Inherits="iLabs.LabServer.LabView.RunExperiment" CodeFile="RunExperiment.aspx.cs"  EnableSessionState="true"%>
 <%@ Register TagPrefix="uc1" TagName="banner" Src="banner.ascx" %>
+<%@ Register TagPrefix="uc1" TagName="labNav" Src="labNav.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="lvpanel" Src="LVRemotePanel.ascx" %>
 <%@ Register TagPrefix="uc1" TagName="footer" Src="footer.ascx" %>
 
@@ -22,6 +23,7 @@ Please see license.txt in top level directory for full license.
 		<form method="post" runat="server">
 			<a name="top"></a>
 			<div id="outerwrapper"><uc1:banner id="Banner1" runat="server"></uc1:banner><br clear="all">
+			    <uc1:labNav ID="labNav1" runat="server" ></uc1:labNav>
 				<div id="innerwrapper">
 					<div id="pageintro">
 						<h1><asp:label id="lblExperimentTitle" Runat="server"><% =title %></asp:label></h1>

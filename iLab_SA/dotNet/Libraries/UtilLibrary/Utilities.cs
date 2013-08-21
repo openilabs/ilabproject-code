@@ -5,9 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace iLabs.UtilLib
 {
@@ -24,6 +27,49 @@ namespace iLabs.UtilLib
         {
             return randGen.Next(lessThan).ToString();
         }
+
+        public static object LoadXml(string filePath, object dummy)
+        {
+            Stream inFile = null;
+            object data = null;
+            try
+            {
+                XmlSerializer xs = new XmlSerializer(dummy.GetType());
+                inFile = File.Open(filePath, FileMode.Open, FileAccess.Read);
+                data = xs.Deserialize(inFile);
+            }
+            catch(Exception e){
+                throw new Exception("Utilities.LoadXml Error: ",e);
+            }
+            finally{
+                if(inFile != null)
+                    inFile.Close();
+            }
+            return data;
+        }
+
+        public static bool SaveXml(string filePath,object obj)
+        {
+            bool status = false;
+            Stream outFile = null;
+            try
+            {
+                outFile = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write);
+                XmlSerializer xs = new XmlSerializer(obj.GetType());
+                xs.Serialize(outFile, obj);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Utilities.SaveXml Error: ", e);
+            }
+            finally
+            {
+                if (outFile != null)
+                    outFile.Close();
+            }
+            return status;
+        }
+
     
         /// <summary>
         /// Utility to convert an ArrayList of strings to an array.
@@ -504,6 +550,32 @@ namespace iLabs.UtilLib
             return null;
         }
     }
+/*
+    public class iLabProperties : Dictionary<string, string>
+    {
+        protected string rootType;
 
+        public string Root
+        {
+            get
+            {
+                return rootType;
+            }
+            set
+            {
+                rootType = value;
+            }
+        }
+        public iLabProperties()
+        {
+        }
+
+        public iLabProperties(string root)
+        {
+            rootType = root;
+        }
+
+    }
+    */
   
 }

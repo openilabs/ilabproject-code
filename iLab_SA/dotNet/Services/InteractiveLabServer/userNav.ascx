@@ -30,7 +30,7 @@ The last item in the nav bar should always have <a href="abc" class="last"> ****
 	</div>
 	<!-- end nav div -->
 	<div id="nav2">
-		<!-- This is where the help and logout buttons go. Log out only appears if the user is logged in. -->
+		<!-- This is where the help and backToSB buttons go. -->
 		<ul class="navlist2">
 		    <li id="liBackToSB" runat="server"><a id="aBackToSB" runat="server">To ServiceBroker</a> </li>
 			<li><a id="aHelp" runat="server">Help</a></li>	
