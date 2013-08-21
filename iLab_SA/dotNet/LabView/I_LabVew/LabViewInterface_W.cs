@@ -15,10 +15,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Collections.Generic;
+using System.Net;
+using System.IO;
 
 using System.Runtime.InteropServices;
-
-using iLabs.UtilLib;
 
 /// <summary>
 /// Rewriting of the LabViewInterface class to implement the functions specified in I_LabViewInterface using RESTful Web Services. 
@@ -42,11 +42,11 @@ namespace iLabs.LabView
         public void DisplayStatus(string viName, string message, string time)
         {
             viName = StripName(viName);
-			if (IsLoaded(viName))
+            if (IsLoaded(viName))
             {
                 try
                 {
-                    string response = CallHTTPWebRequest(url_base + "ILABW_DisplayStatus.vi?viName=" + viName + "&message=" + message + "&time=" + time);
+                    string response = CallHttpWebRequest(url_base + "ILABW_DisplayStatus.vi?viName=" + viName + "&message=" + message + "&time=" + time);
                 }
                 catch (Exception e)
                 {
@@ -87,7 +87,7 @@ namespace iLabs.LabView
         public bool IsLabViewOpen()
         {
             string output = SubmitAction("listvis", "");
-            string[] response = GetXML(output, "vi_name");
+            string response = GetXML(output, "vi_name");
             return (response.Length > 0);
         }
 
@@ -98,7 +98,7 @@ namespace iLabs.LabView
             {
                 try
                 {
-                    temp = SubmitAction("exit", "");
+                    string temp = SubmitAction("exit", "");
                     message.Append(" Success");
                 }
                 catch (Exception e)
@@ -114,7 +114,7 @@ namespace iLabs.LabView
         }
 
 
-		public string SubmitAction(string action, string data)
+        public string SubmitAction(string action, string data)
         {
             action = StripName(action);
             data = StripName(data);
@@ -139,7 +139,7 @@ namespace iLabs.LabView
             return response.Contains("true");
         }
 
-		public int GetVIStatus(string viName)
+        public int GetVIStatus(string viName)
         {
             viName = StripName(viName);
             if (IsLoaded(viName))
@@ -200,7 +200,7 @@ namespace iLabs.LabView
             {
                 try
                 {
-                    return System.Convert.ToDecimal(response);
+                    return System.Convert.ToInt32(response);
                 }
                 catch (Exception e)
                 {
@@ -290,7 +290,7 @@ namespace iLabs.LabView
         public int SetLockState(string viName, Boolean state)
         {
             //TODO: getStatus
-           int  status = 1;
+            int status = 1;
             string viPath = GetPath(viName);
             if (state)
             {
@@ -335,7 +335,7 @@ namespace iLabs.LabView
         }
 
         //Version of ParseXML to get all data within multiple tags. Mapped as a dictionary with each tag corresponding to an array of returned data.
-        private Dictionary<string,string[]> ParseXMLMultiTag(string input, string[] tag_names)
+        private Dictionary<string, string[]> ParseXMLMultiTag(string input, string[] tag_names)
         {
             Dictionary<string, string[]> outputs = new Dictionary<string, string[]>();
             for (int i = 0; i < tag_names.Length; i++)
@@ -350,7 +350,7 @@ namespace iLabs.LabView
         //Gets the data (as a string) within the first instance of a tag. Useful when it is known that only one thing is returned per tag.
         public string GetXML(string input, string tag_name)
         {
-            string[] response = parseXML(input, tag_name);
+            string[] response = ParseXML(input, tag_name);
             if (response.Length > 0)
                 return response[0];
             return "";
@@ -360,7 +360,7 @@ namespace iLabs.LabView
         private string GetPath(string viName)
         {
             viName = StripName(viName);
-            string path = queryXML(CallHttpWebRequest(url_base + "ILabW_GetPath/?name=" + viName), "vi_path");
+            string path = GetXML(CallHttpWebRequest(url_base + "ILabW_GetPath/?name=" + viName), "vi_path");
             return path;
         }
 
@@ -385,6 +385,5 @@ namespace iLabs.LabView
             string respHTML = reader.ReadToEnd();
             return respHTML;
         }
-
     }
 }
