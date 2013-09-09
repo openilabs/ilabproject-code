@@ -1,32 +1,44 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "validation_engine", "controls\validation_engine\validation_engine.vbproj", "{E7211769-E7BE-4EAC-AB2E-C4EA52D402BE}"
 	ProjectSection(ProjectDependencies) = postProject
+		{2BF9060F-C312-4508-A64C-92018E46A9AD} = {2BF9060F-C312-4508-A64C-92018E46A9AD}
+		{B95DAD56-BC54-4E3A-BACD-2471B3832C44} = {B95DAD56-BC54-4E3A-BACD-2471B3832C44}
 		{FA6D28AA-9C14-4F7A-B3E7-03F592C54B84} = {FA6D28AA-9C14-4F7A-B3E7-03F592C54B84}
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WebLabCustomDataTypes", "controls\WebLabCustomDataTypes\WebLabCustomDataTypes.vbproj", "{B95DAD56-BC54-4E3A-BACD-2471B3832C44}"
 	ProjectSection(ProjectDependencies) = postProject
+		{2BF9060F-C312-4508-A64C-92018E46A9AD} = {2BF9060F-C312-4508-A64C-92018E46A9AD}
 	EndProjectSection
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WebLabDataManagers", "controls\WebLabDataManagers\WebLabDataManagers.vbproj", "{FA6D28AA-9C14-4F7A-B3E7-03F592C54B84}"
 	ProjectSection(ProjectDependencies) = postProject
+		{2BF9060F-C312-4508-A64C-92018E46A9AD} = {2BF9060F-C312-4508-A64C-92018E46A9AD}
 		{B95DAD56-BC54-4E3A-BACD-2471B3832C44} = {B95DAD56-BC54-4E3A-BACD-2471B3832C44}
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "experiment_engine", "experiment_engine\experiment_engine.vbproj", "{27791CD5-EE10-446B-9646-52658F7394A2}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "experiment_engine", "experiment_engine\experiment_engine.vbproj", "{E2DF63C1-0387-4781-BF7F-DA1AF2C857DC}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ILab", "services\ILab\ILab.vbproj", "{2BF9060F-C312-4508-A64C-92018E46A9AD}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "OpAmpInverter", "ExperimentSetups\wrappers\OpAmpInverter\OpAmpInverter.vbproj", "{10C66228-D5CB-40CD-9C0E-93A5BEFFFBDA}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "OpAmpInverter", "ExperimentSetups\wrappers\OpAmpInverter\OpAmpInverter.vbproj", "{2D1D12FD-51A3-4751-B628-8D5260C138BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iLabUtil", "iLabUtil\iLabUtil.csproj", "{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LabServer", "http://localhost/LabServer/LabServer.vbproj", "{CDBC9FBE-2B02-42C3-9ABA-4C7BBB58B62C}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ILab", "ILab\ILab.vbproj", "{2BF9060F-C312-4508-A64C-92018E46A9AD}"
 	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "labserver", "http://localhost/labserver/labserver.vbproj", "{CDBC9FBE-2B02-42C3-9ABA-4C7BBB58B62C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2BF9060F-C312-4508-A64C-92018E46A9AD} = {2BF9060F-C312-4508-A64C-92018E46A9AD}
+		{B95DAD56-BC54-4E3A-BACD-2471B3832C44} = {B95DAD56-BC54-4E3A-BACD-2471B3832C44}
+		{E7211769-E7BE-4EAC-AB2E-C4EA52D402BE} = {E7211769-E7BE-4EAC-AB2E-C4EA52D402BE}
+		{FA6D28AA-9C14-4F7A-B3E7-03F592C54B84} = {FA6D28AA-9C14-4F7A-B3E7-03F592C54B84}
 	EndProjectSection
 EndProject
 Global
@@ -44,19 +56,24 @@ Global
 		{FA6D28AA-9C14-4F7A-B3E7-03F592C54B84}.Debug.ActiveCfg = Debug|.NET
 		{FA6D28AA-9C14-4F7A-B3E7-03F592C54B84}.Debug.Build.0 = Debug|.NET
 		{FA6D28AA-9C14-4F7A-B3E7-03F592C54B84}.Release.ActiveCfg = Release|.NET
-		{27791CD5-EE10-446B-9646-52658F7394A2}.Debug.ActiveCfg = Debug|.NET
-		{27791CD5-EE10-446B-9646-52658F7394A2}.Release.ActiveCfg = Release|.NET
+		{E2DF63C1-0387-4781-BF7F-DA1AF2C857DC}.Debug.ActiveCfg = Debug|.NET
+		{E2DF63C1-0387-4781-BF7F-DA1AF2C857DC}.Debug.Build.0 = Debug|.NET
+		{E2DF63C1-0387-4781-BF7F-DA1AF2C857DC}.Release.ActiveCfg = Release|.NET
+		{E2DF63C1-0387-4781-BF7F-DA1AF2C857DC}.Release.Build.0 = Release|.NET
+		{10C66228-D5CB-40CD-9C0E-93A5BEFFFBDA}.Debug.ActiveCfg = Debug|.NET
+		{10C66228-D5CB-40CD-9C0E-93A5BEFFFBDA}.Debug.Build.0 = Debug|.NET
+		{10C66228-D5CB-40CD-9C0E-93A5BEFFFBDA}.Release.ActiveCfg = Release|.NET
+		{10C66228-D5CB-40CD-9C0E-93A5BEFFFBDA}.Release.Build.0 = Release|.NET
+		{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}.Debug.ActiveCfg = Debug|.NET
+		{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}.Debug.Build.0 = Debug|.NET
+		{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}.Release.ActiveCfg = Release|.NET
+		{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}.Release.Build.0 = Release|.NET
 		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Debug.ActiveCfg = Debug|.NET
 		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Debug.Build.0 = Debug|.NET
 		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Release.ActiveCfg = Release|.NET
-		{2D1D12FD-51A3-4751-B628-8D5260C138BB}.Debug.ActiveCfg = Debug|.NET
-		{2D1D12FD-51A3-4751-B628-8D5260C138BB}.Debug.Build.0 = Debug|.NET
-		{2D1D12FD-51A3-4751-B628-8D5260C138BB}.Release.ActiveCfg = Release|.NET
-		{2D1D12FD-51A3-4751-B628-8D5260C138BB}.Release.Build.0 = Release|.NET
+		{2BF9060F-C312-4508-A64C-92018E46A9AD}.Release.Build.0 = Release|.NET
 		{CDBC9FBE-2B02-42C3-9ABA-4C7BBB58B62C}.Debug.ActiveCfg = Debug|.NET
-		{CDBC9FBE-2B02-42C3-9ABA-4C7BBB58B62C}.Debug.Build.0 = Debug|.NET
 		{CDBC9FBE-2B02-42C3-9ABA-4C7BBB58B62C}.Release.ActiveCfg = Release|.NET
-		{CDBC9FBE-2B02-42C3-9ABA-4C7BBB58B62C}.Release.Build.0 = Release|.NET
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
