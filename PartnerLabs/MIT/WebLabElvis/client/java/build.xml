@@ -1,0 +1,123 @@
+<project name="ELVIS Client" default="usage">
+
+  <property name="clientname" value="MIT NI-ELVIS Weblab Client" />
+  <property name="clientversion" value="1.0" />
+
+  <!-- BUILDING -->
+
+  <property name="srcdir" location="src" />
+  <property name="classdir" location="bin" />
+  <property name="libdir" location="lib" /> <!-- for entries on the classpath -->
+
+  <!-- DEPLOYMENT AND DISTRIBUTION -->
+  <property name="dist.dir" location="jar" />
+  <property name="unsigned.jar.name" value="${dist.dir}/ELVIS-client.jar" />
+  <property name="signed.jar.name" value="${dist.dir}/signed_ELVIS-client.jar" />
+
+  <!-- SIGNING JAR -->
+  <property name="keystore.loc" location=".keystore" />
+  <property name="keystore.pwd" value="changeme" />
+  <property name="alias" value="weblab" />
+
+  <!-- debug mode defaults to false -->
+  <property name="weblab-debug" value="false" />
+
+
+  <target name="elvis" depends="jar" />
+
+  <target name="elvis-debug">
+    <antcall target="elvis">
+      <param name="weblab-debug" value="true"/>
+    </antcall>
+  </target>
+
+  <target name="usage">
+<echo>Build options for ELVIS client:
+
+"ant elvis": for production (minimal debugging, smaller JAR size)
+"and sign": for production, signed JAR (enables client data download)
+"ant elvis-debug": for development and debugging (larger JAR size)
+"ant clean": remove all files created by ant
+
+Note: always run "ant clean" before rebuilding with a different set of options (e.g. when switching from "ant elvis-debug" to "ant elvis").
+</echo>
+    <fail>You must specify one of the above options to build the ELVIS client.</fail>
+  </target>
+
+
+  <target name="init">
+    <!-- create build timestamp -->
+    <tstamp>
+      <format property="BUILD_STAMP" pattern="E MMM d yyyy HH:mm:ss z" />
+    </tstamp>
+    <echo>${BUILD_STAMP}</echo>
+
+    <!-- if not building in debug mode, exclude some files -->
+    <!-- (using ".*" to refer to both the .java and .class) -->
+    <condition property="build-excludes"
+        value="weblab/client/serverInterface/StubServer.* weblab/client/graphicalUI/GraphicalAppletDEBUG.*"
+        else="">
+      <isfalse value="${weblab-debug}"/>
+    </condition>
+  </target>
+
+
+  <target name="compile" depends="init" description="compile java source into class files">
+    <mkdir dir="${classdir}" />
+    <javac srcdir="${srcdir}"
+        includes="**/*.java"
+        excludes="${build-excludes}"
+        destdir="${classdir}"
+        includeAntRuntime="no"
+        debug="${weblab-debug}"
+        source="1.4" target="1.4">
+     <!-- not currently needed -->
+     <!--
+      <classpath>
+        <fileset dir="${libdir}">
+          <include name="**/*.jar" />
+        </fileset>
+        <pathelement location="." />
+      </classpath>
+     -->
+    </javac>
+  </target>
+
+
+  <target name="jar" depends="compile" description="assembles a JAR file from compiled output">
+    <mkdir dir="${dist.dir}" />
+    <!-- create file with build information for inclusion in JAR -->
+    <echo file="build-version.txt">${clientname}
+version: ${clientversion}
+build: ${BUILD_STAMP}
+</echo>
+    <!-- assemble the JAR -->
+    <jar destfile="${unsigned.jar.name}"
+         basedir="${classdir}" includes="**/*.class"
+         excludes="${build-excludes}"
+         duplicate="fail">
+      <fileset dir="." includes="img/*.gif" />
+      <fileset dir="." includes="build-version.txt" />
+    </jar>
+  </target>
+
+
+  <target name="clean" description="deletes all existing output and output directories">
+    <delete dir="${classdir}" />
+    <delete file="${unsigned.jar.name}" />
+    <delete file="${signed.jar.name}" />
+  </target>
+
+
+  <!-- this is not currently used, and may not be correct anyway -->
+
+  <target name="sign" depends="jar" description="signs the jar with a pre-built keystore">
+    <signjar jar="${unsigned.jar.name}"
+      alias="${alias}"
+      storepass="${keystore.pwd}"
+      keystore="${keystore.loc}"
+      signedjar="${signed.jar.name}" />
+  </target>
+
+
+</project>

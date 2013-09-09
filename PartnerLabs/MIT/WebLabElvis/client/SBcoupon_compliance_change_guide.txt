@@ -1,0 +1,71 @@
+The purpose of this document is to record the steps necessary for modifying a non-coupon compliant batched iLab client to accept and relay Service Broker coupon information.  Modification of the v7 beta 6 Microelectronics iLab Client is the test case detailed here (and the original source location of this file).  Speficific modifications required by other clients may be different but the main concept is to recieve the "couponID" and "couponPasskey" values from the Service Broker via parameters in the applet loader script and return them when a request is made back to the the Service Broker.  In this case, and in the case of all java-based, batched iLab clients at the time of this writing, this is done by adding them a SOAPHeader object appended to the main SOAP object for each Web Method request.  It should be noted that this method is based on code originally written by Olayemi Oyabode for his ELVIS v5.0 client.  I used his code as a reference in making the changes described below.  If he did the work, my contribution is to highlight it.  
+
+For the Microelectronics iLab Client, three class files had to be modified in order to make them coupon-compatible: GraphicalApplet.java (weblab.client.GraphicalUI), SBServer.java (weblab.toolkit.serverInterface) and SOAPRequest.java (weblab.toolkit.xml).  GraphicalApplet.java functions as a primary launch point for the applet and, as such, handles applet initialization and importing loader script parameters.  SBServer.java and SOAPRequest.java handle the calling of individual Service Broker methods and the underlying mechanics of forming a SOAP request, respectively.  These two classes handle the usage of SB coupon info by the applet.
+
+Specifically, the GraphicalApplet.java classfile requires a small modification to read the appropriate loader script parameters that will contain the couponID and couponPasskey values needed.  In the case of the Microelectronics iLab client the following lines of code are added in the initHelper() method just above where other loader script parameters are being read:
+
+
+	//look for coupon information passed from Service Broker
+	String strCouponID = getParameter("couponID");
+	long couponID = -1L;
+	if (strCouponID != null && !strCouponID.equals("") && !strCouponID.equals("${op:couponId}")) couponID = Long.parseLong(strCouponID);
+
+	String couponPassKey = getParameter("couponPassKey");
+	if (couponID > 0) ((SBServer) theServer).addCouponInformation(couponID, couponPassKey);
+
+It's worth noting that the specific method this should be placed in may differ depending on the client codebase you are starting with.  The client for the ELVIS v5.0 lab had this code in an init() method.  It seems that the helper method was placed into the Microelectronics Client to organize the class source and to let the init() method return immediately while further applet processes run in the background.  The main thing is to place this where other loader script parameters are being read so that scoping is consistent.  The last line of the above code calls the addCouponInformation() method, which adds the coupon information to the class instance governing web method calls to the Service Broker.  Next, we need to add this method.
+
+In the SBServer.java classfile we are only interested in creating this addCouponInformation() method.  The code for this method, including commented description, are below.  This was placed in the SBServer class immediately after the class constructors are declared and before the methods which invoke specific Service Broker Web Methods are defined.\
+
+
+	/**
+	 * This method relays the SB coupon info read from the loader script parameter
+	 * list to the SOAPRequest object
+	 * 
+	 * @param couponID The ID value of the current lab session coupon as provided
+	 * by the Service Broker.
+	 * @param couponPassKey The passkey value of the current lab session coupon
+	 * as provided by the Service Broker.
+	 */
+  
+	public void addCouponInformation(long couponID, String couponPassKey) {
+	      SOAPRequest.addSBHeader(couponID, couponPassKey);
+	  }
+
+As can be seen, the addCouponInformation() method adds the coupon information to an instance of a SOAPRequest object using an addSBHeader() method.  Supporting this call and ensuring that the header information is written into the Web Method call will be our final modification.  In the SOAPRequest.java classfile we will need to make three modifications.  First, we need to create class property variables to contain the coupon information we want to add to the class.  For this we add the following declarations to the class definition:
+
+	//SB coupon info 
+	private static long couponID = -1L;
+	private static String couponPassKey;
+
+Next, we need to define the addSBHeader() method.  This is just a method that will take the coupon information and write it to the class property values we just declared.  We add the following method to the class:
+
+
+	//Provides SB coupon info to be placed in teh request's SOAP Header
+	public static void addSBHeader(long id, String passcode) {
+	      SOAPRequest.couponID = id;
+	      SOAPRequest.couponPassKey = passcode;
+	  }
+
+Finally, we need to do something with the coupon information.  The existing SOAPRequest.toString() method is responsible for taking a given Web Method call and translating it into the XML-encoded string that will be sent as the payload of our SOAP request.  We add the following code immediately after the SOAP envelope object (soap:Envelope) is opened and immediately before the Body of the SOAP object ("soap:Body") is opened:
+
+
+	//also write SB coupon info into SOAP Header
+	if (couponID > 0) {
+	        sb.append("<soap:Header><sbAuthHeader xmlns=\"http://ilab.mit.edu\"><couponID>"
+	                + couponID + "</couponID><couponPassKey>" + couponPassKey
+	                + "</couponPassKey></sbAuthHeader></soap:Header>");
+
+       		}
+
+Provided the SOAP objects are being output to the Java Console, this last step will also result in the coupon information being displayed in the console output whenever a web method is called.  This should be all that is required to make a non-coupon-compatible batched iLab client coupon compatible.  At this writing, the Service Broker (v.3.5.2) automatically tries to supply coupon information for a launching client and looks for the client header info in incoming SOAP requests.  
+	
+-James Hardison
+ hardison@alum.mit.edu
+ February 22, 2012
+
+
+
+
+
+
