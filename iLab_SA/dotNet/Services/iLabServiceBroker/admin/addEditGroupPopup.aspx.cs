@@ -297,6 +297,7 @@ namespace iLabs.ServiceBroker.admin
 			base.OnInit(e);
 			this.ibtnAddParent.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnAddParent_Click);
 			this.ibtnRemoveParent.Click += new System.Web.UI.ImageClickEventHandler(this.ibtnRemoveParent_Click);
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
 			this.btnSaveChanges.Click += new System.EventHandler(this.btnSaveChanges_Click);
 			this.repExperiments.ItemDataBound += new RepeaterItemEventHandler(this.repExperiments_ItemBound);
 		}
@@ -402,6 +403,18 @@ namespace iLabs.ServiceBroker.admin
 				lbxAllParents.Items.Add(li);
 			}
 		}
+
+        protected void btnClose_Click(object sender, System.EventArgs e)
+        {
+            try
+            {
+                Page.ClientScript.RegisterStartupScript(this.GetType(), "Success", "ReloadParent();", true);
+            }
+            catch (Exception ex)
+            {
+                lblResponse.Text = Utilities.FormatErrorMessage(ex.GetBaseException().ToString());
+            }
+        }
 		
 		protected void btnSaveChanges_Click(object sender, System.EventArgs  e)
 		{

@@ -38,8 +38,9 @@
     
     <add key="serviceURL" value="~/iLabGeneric.asmx"/>
     <add key="defaultPasskey" value="GPA"/>
+
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu" />
-    <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
+    <add key="supportMailAddress" value="ilab_support@mit.edu"/>
 
     <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
     <add key="logPath" value=""/>

@@ -31,20 +31,22 @@
     <add key="defaultPasskey" value="USS"/>
   
   <!-- email address where various reports are sent -->
-  <add key="genericFromMailAddress" value="ilab-bug@mit.edu"/>
+
   <!--this for the centralized bug tracking system at MIT. 
 	      Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
   <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
 
+ <!-- CHANGE THIS TO LOCAL ADDRESS: -->
+ <add key="genericFromMailAddress" value="noreply@mit.edu"/>
+
   <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
-  <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
+  <add key="supportMailAddress" value="ilab_support@mit.edu"/>
 
   <!-- Optional path and filename for application log. The directory must exisit & be writeable to the IIS worker process -->
   <add key="logPath" value=""/>
 
-     <!-- USS Specific Keys  ussGuid & ussName should be replaced with standard keys -->
+     <!-- USS Specific Keys  -->
     <add key="allowExecutionTicketDefaultDuration" value="7200"/>
-    <add key ="ussName" value="User Side Scheduling Server"/>
 
   
   </appSettings>

@@ -33,13 +33,16 @@
     <add key="defaultPasskey" value="Let me in!"/>
 
     <!-- email address where various reports are sent -->
-    <add key="genericFromMailAddress" value="ilab-bug@mit.edu"/>
+
     <!--this for the centralized bug tracking system at MIT. 
-	      Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
+	Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
+
+    <!-- CHANGE THIS TO LOCAL ADDRESS: Normally noreply@yourdomain -->
+    <add key="genericFromMailAddress" value="noreply@mit.edu"/>
    
     <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
-    <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
+    <add key="supportMailAddress" value="ilab_support@mit.edu"/>
     
     <!-- CHANGE THIS TO LOCAL ADDRESS: default email address where requests for membership in a group are sent.
 	  If the group has a contact address mail will be sent to that address -->

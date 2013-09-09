@@ -143,7 +143,9 @@ Please see license.txt in top level directory for full license.
 							
 							<tr>
 								<th style="WIDTH: 635px" colspan="3">
-									<asp:button id="btnSaveChanges" Runat="server" Width="133px" CssClass="buttonright" Text="Save Changes"></asp:button></th></tr>
+									<asp:button id="btnSaveChanges" Runat="server" Width="133px" Text="Save Changes"></asp:button>
+									<asp:button id="btnClose" Runat="server" Width="133px" Text="Cancel"></asp:button>
+									</th></tr>
 							</table>
 					</div>
 				</div>

@@ -29,13 +29,15 @@
     <add key="defaultPasskey" value="ILS"/>
     
     <!-- email address where various reports are sent -->
-    <add key="genericFromMailAddress" value="ilab-bug@mit.edu"/>
+
+    <add key="genericFromMailAddress" value="noreply@mit.edu"/>
+
     <!--this for the centralized bug tracking system at MIT. 
 	      Append a local mail address if you want to also recieve bug reports ( comma delimited ) -->
     <add key="bugReportMailAddress" value="ilab-bug@mit.edu"/>
 
     <!-- CHANGE THIS TO LOCAL ADDRESS: email address where help requests are sent -->
-    <add key="supportMailAddress" value="ilab-bug@mit.edu"/>
+    <add key="supportMailAddress" value="ilab_support@mit.edu"/>
 
     <!-- Specify the default LabVIEW version legal values: 8.2, 8.6, 2009, 2010, 2011, 2012. If nothing is specified the default is 2009 -->
     <add key="LabViewVersion" value="2009"/>
