@@ -98,9 +98,13 @@ namespace iLabs.LabServer.LabView
             //Should load any active tasks and update any expired tasks
             LabDB dbService = new LabDB();
             LabTask[] activeTasks = dbService.GetActiveTasks();
-            foreach (LabTask task in activeTasks)
+            if (activeTasks != null && activeTasks.Length > 0)
             {
-                TaskProcessor.Instance.Add(task);
+                foreach (LabTask task in activeTasks)
+                {
+                    if(task != null)
+                        TaskProcessor.Instance.Add(task);
+                }
             }
             taskThread = new TaskHandler(TaskProcessor.Instance);
             ticketRemover = new TicketRemover();
