@@ -234,9 +234,13 @@ namespace iLabs.ServiceBroker.iLabSB
                         {
                             SmtpMail.Send(mail);
                         }
-                        catch
+                        catch(Exception e2)
                         {
                             // if the confirmation message fails, c'est la vie...
+                            string msg = "Error sending email notification: (" + e2.Message + ". " + e2.GetBaseException() + "). Contact " + supportMailAddress + ".";
+                            lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                            lblResponse.Visible = true;
+
                         }
                     }
 				}

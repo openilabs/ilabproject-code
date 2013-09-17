@@ -7,9 +7,11 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Drawing;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
@@ -17,7 +19,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.Mail;
 using System.Web.Security;
-using System.Configuration;
+
 
 using iLabs.Core;
 using iLabs.DataTypes.ProcessAgentTypes;
@@ -37,7 +39,7 @@ namespace iLabs.ServiceBroker.iLabSB
 	public partial class lostPassword : System.Web.UI.Page
 	{
 
-		string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
+		
 
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
@@ -65,17 +67,24 @@ namespace iLabs.ServiceBroker.iLabSB
 
 		protected void btnSubmit_Click(object sender, System.EventArgs e)
 		{
+            string registrationMailAddress = ConfigurationManager.AppSettings["registrationMailAddress"];
 			AuthorizationWrapperClass wrapper = new AuthorizationWrapperClass();
 			if(txtUsername.Text == "")
 			{
-				lblResponse.Text = Utilities.FormatErrorMessage("Missing user ID field.");
+				lblResponse.Text = Utilities.FormatErrorMessage("Missing user name.");
 				lblResponse.Visible = true;
 				return;
 			}
 			else
 			{
 				string userName = txtUsername.Text;
-				int userID = wrapper.GetUserIDWrapper(userName, 0) ;
+				int userID = AdministrativeAPI.GetUserID(userName, 0);
+                if(userID <= 0)
+                {
+                    lblResponse.Text = Utilities.FormatErrorMessage("User name was not found.");
+                    lblResponse.Visible = true;
+                    return;
+                }
 				if (txtEmail.Text == null || txtEmail.Text == "")
 				{
 					lblResponse.Text = Utilities.FormatErrorMessage("Missing email field.");
@@ -85,31 +94,34 @@ namespace iLabs.ServiceBroker.iLabSB
 				else
 				{
 					string email = txtEmail.Text ;
-					User[] lostPassUsers = wrapper.GetUsersWrapper (new int[]{userID});
+					User lostPassUser = AdministrativeAPI.GetUser(userID);
 
-					if (lostPassUsers[0].userID == 0)
+                    if (lostPassUser == null || lostPassUser.userID == 0)
 					{
 						// userID does not exist in the database
-						lblResponse.Text = Utilities.FormatErrorMessage("This user does not exist.");
+						lblResponse.Text = Utilities.FormatErrorMessage("The user does not exist.");
 						lblResponse.Visible = true;
 
 					}
-					else if( email.ToLower () != wrapper.GetUsersWrapper (new int[] {userID})[0].email.ToLower ())
+                    else if (email.ToLower() != lostPassUser.email.ToLower())
 					{
 						// email does not match email record in our database
-						lblResponse.Text = Utilities.FormatErrorMessage("Please use the user ID AND email you were registered with.");
+						lblResponse.Text = Utilities.FormatErrorMessage("Please use the user name AND email you were registered with.");
 						lblResponse.Visible = true;
 					}
                     else // send password to requestor's email address
 					{
 						MailMessage mail = new MailMessage();
 						mail.From = registrationMailAddress;
-						mail.To = email;
+                        mail.To = lostPassUser.email;
+                       
 						mail.Subject = "[iLabs] Service Broker Password Reminder" ;
-						mail.Body = "Username: " + userName + "\n\r";
-						mail.Body += "Email:  " + email + "\n\r\n\r";
-						mail.Body +="Your old password has been reset to the following password. For security reasons, please login and use the 'My Account' page to reset your password.\n\r\n\r";
-						mail.Body += "Password: " + resetPassword(userID);//InternalAuthenticationDB.ReturnNativePassword (userID);
+                        StringBuilder buf = new StringBuilder();
+                        buf.AppendLine("Username: " + userName);
+						buf.AppendLine("Email:  " + email);
+						buf.AppendLine("Your old password has been reset to the following password. For security reasons, please login and use the 'My Account' page to reset your password.");
+						buf.AppendLine("Password: " + resetPassword(userID));//InternalAuthenticationDB.ReturnNativePassword (userID);
+                        mail.Body = buf.ToString();
 
 						SmtpMail.SmtpServer = "127.0.0.1";
 						try
@@ -117,7 +129,7 @@ namespace iLabs.ServiceBroker.iLabSB
 							SmtpMail.Send(mail);
 
 							// email sent message
-                            lblResponse.Text = Utilities.FormatConfirmationMessage("Your request has been submitted. A new password will be created and emailed to the email address you entered below.");
+                            lblResponse.Text = Utilities.FormatConfirmationMessage("Your request has been submitted. A new password has been created and emailed to the email address you entered below.");
 							lblResponse.Visible = true;
 						}
 						catch (Exception ex)
