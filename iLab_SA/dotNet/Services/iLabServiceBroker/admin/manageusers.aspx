@@ -92,6 +92,7 @@ Please see license.txt in top level directory for full license.
 								<asp:ListItem Value="Username">Username</asp:ListItem>
 								<asp:ListItem Value="Last Name">Last Name</asp:ListItem>
 								<asp:ListItem Value="First Name">First Name</asp:ListItem>
+								<asp:ListItem Value="Email">Email</asp:ListItem>
 								<asp:ListItem Value="Group">Group</asp:ListItem>
 							</asp:dropdownlist>
 							<br/><br/>

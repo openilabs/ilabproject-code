@@ -379,8 +379,11 @@ namespace iLabs.ServiceBroker.admin
                                 users = wrapper.GetUsersWrapper(userIDs);
                                 foreach (User u in users)
                                 {
-                                    if (Utilities.WildCardMatch(txtSearchBy.Text, u.firstName))
-                                        foundUsers.Add(u);
+                                    if (u.firstName != null)
+                                    {
+                                        if (Utilities.WildCardMatch(txtSearchBy.Text, u.firstName))
+                                            foundUsers.Add(u);
+                                    }
                                 }
                                 if (foundUsers.Count <= 0)
                                 {
@@ -396,8 +399,31 @@ namespace iLabs.ServiceBroker.admin
                                 users = wrapper.GetUsersWrapper(userIDs);
                                 foreach (User u in users)
                                 {
-                                    if (Utilities.WildCardMatch(txtSearchBy.Text, u.lastName))
-                                        foundUsers.Add(u);
+                                    if (u.lastName != null)
+                                    {
+                                        if (Utilities.WildCardMatch(txtSearchBy.Text, u.lastName))
+                                            foundUsers.Add(u);
+                                    }
+                                }
+                                if (foundUsers.Count <= 0)
+                                {
+                                    string msg = "There are no last names that match " + txtSearchBy.Text + ".";
+                                    lblResponse.Text = Utilities.FormatErrorMessage(msg);
+                                    lblResponse.Visible = true;
+                                }
+                            }
+                            break;
+                        case "Email":
+                            {
+                                userIDs = wrapper.ListUserIDsWrapper();
+                                users = wrapper.GetUsersWrapper(userIDs);
+                                foreach (User u in users)
+                                {
+                                    if (u.email != null)
+                                    {
+                                        if (Utilities.WildCardMatch(txtSearchBy.Text, u.email))
+                                            foundUsers.Add(u);
+                                    }
                                 }
                                 if (foundUsers.Count <= 0)
                                 {
