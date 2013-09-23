@@ -348,7 +348,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/BEElab/", 
 		SlnRelativePath = "..\BEE_Lab\"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CR1000Connection", "..\CR1000Connection\CR1000Connection.csproj", "{3D7D2F78-75EB-495B-A75D-0216D2F49384}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CR1000Connection", "CR1000Connection\CR1000Connection.csproj", "{3D7D2F78-75EB-495B-A75D-0216D2F49384}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
