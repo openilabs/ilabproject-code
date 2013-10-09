@@ -1,0 +1,227 @@
+<!--
+Copyright (c) 2005 The Massachusetts Institute of Technology. All rights reserved.
+Please see license.txt in top level directory for full license. 
+-->
+
+<HTML>
+	<HEAD>
+		<TITLE></TITLE>
+		<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+	</HEAD>
+	<BODY>
+		<P>
+			Click the following to run an ASP test, with no actual command executed on the 
+			4155:
+			<form method="get" action="engine.asp" name="testform">
+				<input type="hidden" name="mode" value="SWEEP"> <input type="submit" name="test" value="Test"><p>
+				<p>
+				<!-- SMU setup -->
+				<!-- Information about SMU1 -->
+				To disable any SMU for the current run, leave the corresponding VName blank.<p>
+					<b>SMU1 Information</b><br>
+					Vname : <input type="text" name="SMU1VName">
+					<br>
+					Iname : <input type="text" name="SMU1IName">
+					<br>
+					Mode :
+					<select name="SMU1Mode">
+						<option label="V source, I monitor" value="V" selected>V source, I monitor</option>
+						<option label="I source, V monitor" value="I">I source, V monitor</option>
+						<option label="ground terminal" value="COMM">ground terminal</option>
+					</select>
+					<br>
+					Function :
+					<select name="SMU1Function">
+						<option selected>CONS</option>
+						<option>VAR1</option>
+						<option>VAR2</option>
+						<option>VARD</option>
+					</select>
+					<br>
+					Constant Value (only if CONS function selected): <input type="text" name="SMU1Source">
+				<P>
+					<b>SMU2 Information</b><br>
+					Vname : <input type="text" name="SMU2VName" value="VB">
+					<br>
+					Iname : <input type="text" name="SMU2IName" value="IB">
+					<br>
+					Mode :
+					<select name="SMU2Mode">
+						<option value="V">V source, I Monitor</option>
+						<option selected value="I">I source, V Monitor</option>
+						<option value="COMM">ground terminal</option>
+					</select>
+					<br>
+					Function :
+					<select name="SMU2Function">
+						<option>CONS</option>
+						<option>VAR1</option>
+						<option selected>VAR2</option>
+						<option>VARD</option>
+					</select><br>
+					Constant Value (only if CONS function selected): <input type="text" name="SMU2Source">
+				<p>
+					<!-- Information about SMU3 -->
+					<b>SMU3 Information</b><br>
+					Vname : <input type="text" name="SMU3VName">
+					<br>
+					Iname : <input type="text" name="SMU3IName">
+					<br>
+					Mode :
+					<select name="SMU3Mode">
+						<option label="V source, I monitor" value="V" selected>V source, I monitor</option>
+						<option label="I source, V monitor" value="I">I source, V monitor</option>
+						<option label="ground terminal" value="COMM">ground terminal</option>
+					</select>
+					<br>
+					Function :
+					<select name="SMU3Function">
+						<option selected>CONS</option>
+						<option>VAR1</option>
+						<option>VAR2</option>
+						<option>VARD</option>
+					</select><br>
+					Constant Value (only if CONS function selected): <input type="text" name="SMU3Source">
+				<p>
+					<!-- Information about SMU4 -->
+					<b>SMU4 Information</b><br>
+					Vname : <input type="text" name="SMU4VName">
+					<br>
+					Iname : <input type="text" name="SMU4IName">
+					<br>
+					Mode :
+					<select name="SMU4Mode">
+						<option label="V source, I monitor" value="V" selected>V source, I monitor</option>
+						<option label="I source, V monitor" value="I">I source, V monitor</option>
+						<option label="ground terminal" value="COMM">ground terminal</option>
+					</select>
+					<br>
+					Function :
+					<select name="SMU4Function">
+						<option selected>CONS</option>
+						<option>VAR1</option>
+						<option>VAR2</option>
+						<option>VARD</option>
+					</select><br>
+					Constant Value (only if CONS function selected): <input type="text" name="SMU4Source">
+				<p>
+					<!-- Information about SMU5-->
+					<b>SMU5 Information</b><br>
+					Vname : <input type="text" name="SMU5VName" value="VCE">
+					<br>
+					Iname : <input type="text" name="SMU5IName" value="ICE">
+					<br>
+					Mode :
+					<select name="SMU5Mode">
+						<option selected value="V">V source, I monitor</option>
+						<option value="I">I source, V monitor</option>
+						<option value="COMM">ground terminal</option>
+					</select>
+					<br>
+					Function :
+					<select name="SMU5Function">
+						<option>CONS</option>
+						<option selected>VAR1</option>
+						<option>VAR2</option>
+						<option>VARD</option>
+					</select>
+					<br>
+					Constant Value (only if CONS function selected): <input type="text" name="SMU5Source">
+				<p>
+					<b><i>Only for the (SINGLE) Var1 SMU in V or I mode: </i></b>
+					<br>
+					<!--SMU to apply VAR1 Sweep : <select name="VAR1Name">
+							<option value="1">SMU1</option>
+							<option value="2">SMU2</option>
+							<option value="3">SMU3</option>
+							<option value="4">SMU4</option>
+							<option value="5">SMU5</option> 
+						 </select> <br> -->
+					<input type="hidden" name="VAR1Scale" value="LIN"> Var1 Start : <input type="text" name="VAR1Start" value="0">
+					<br>
+					Var1 Stop : <input type="text" name="VAR1Stop" value="1">
+					<br>
+					Var1 Step : <input type="text" name="VAR1Step" value=".01"><br>
+					Var1 Compliance (for quantity being monitored): <input type="text" name="VAR1Compliance" value="1"><br>
+				<p>
+					<b><i>Only for the (SINGLE) Var2 SMU in V or I mode: </i></b>
+					<br>
+					<input type="hidden" name="VAR2Scale" value="LIN"> Var2 Start : <input type="text" name="VAR2Start" value="0">
+					<br>
+					Var2 Data Points : <input type="text" name="VAR2Points" value="10">
+					<br>
+					Var2 Step : <input type="text" name="VAR2Step" value=".01"><br>
+					Var2 Compliance (for quantity being monitored): <input type="text" name="VAR2Compliance" value="2"><br>
+				<p>
+					<!-- VSU unit setup
+
+			<b>VSU1 (constant voltage source - no current monitoring)</b> <br>
+			Compliance Value: 100 mA <br>
+			VSU1 VName : <input type="text" name="VSU1VName" value=""> <br>
+			VSU1 Function : 
+					<select name="VSU1Function">
+						<option>CONS</option>
+						<option>VAR1</option>
+						<option>VAR2</option>
+						<option>VAR1P</option>
+					</select> <br>
+			Voltage to supply: (V) <input type="text" name="VSU1Source" value=""> <br>
+			<p>
+
+			<b>VSU2 (constant voltage source - no current monitoring)</b> <br>
+			Compliance Value: 100 mA <br>
+			VSU2 VName : <input type="text" name="VSU2VName" value=""> <br>
+			VSU2 Function : 
+					<select name="VSU2Function">
+						<option>CONS</option>
+						<option>VAR1</option>
+						<option>VAR2</option>
+						<option>VAR1P</option>
+					</select> <br>
+			
+			Voltage to supply (V): <input type="text" name="VSU2Source" value=""> <br>
+			<p>
+
+			-->
+					<!-- VMU unit setup 
+
+			<b>VMU1 (voltage monitor only - no current supplied) </b>
+			VMU1 Name : <input type="text" name="VMU1VName" value="V3"><br>
+			VMU1 Mode : <input type="text" name="VMU1Mode" value="V"><br>
+			<p>
+
+			-->
+					Test Fixture :
+					<select name="deviceNumber">
+						<option selected>0</option>
+						<option>1</option>
+						<option>2</option>
+						<option>3</option>
+						<option>4</option>
+						<option>5</option>
+						<option>6</option>
+						<option>7</option>
+					</select>
+				<P>
+					<i><b>Please enter the variables (in the form of Vnames or Inames above) to download: </b>
+					</i>
+					<br>
+					List Item # 1: <input type="text" name="listItem0" value="VCE"><br>
+					List Item # 2: <input type="text" name="listItem1" value="ICE"><br>
+					List Item # 3: <input type="text" name="listItem2" value="VB"><br>
+					List Item # 4: <input type="text" name="listItem3" value="IB"></P>
+				<P><STRONG><EM>Select a wait time multiplier (0 to 10 w/ step .1):</EM></STRONG>
+				<BR><STRONG><EM> <INPUT id="Text1" type="text" value="0" name="waittime"></EM></STRONG>
+				<P><STRONG>Enter an integration time between 8 and 80: </STRONG><BR>
+				<INPUT type="text" name="integtime" value="64">
+
+				<P> <B>Enter functions for the hp4155 to compute: </B>
+				<BR> 1. <input type="text" name="userfunc1">
+				<BR> 2. <input type="text" name="userfunc2">
+				<BR> 3. <input type="text" name="userfunc3">
+				<BR> 4. <input type="text" name="userfunc4">
+				<P>
+					<input type="submit" name="submit" value="Run Experiment"><input type="reset" value="Reset"></P>
+			</form>
+	</BODY>
+</HTML>

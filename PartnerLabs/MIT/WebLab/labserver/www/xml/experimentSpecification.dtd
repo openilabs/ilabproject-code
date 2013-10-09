@@ -1,0 +1,43 @@
+﻿<!-- 
+Copyright (c) 2005 The Massachusetts Institute of Technology. All rightsreserved.
+Please see license.txt in top level directory for full license. 
+-->
+
+<!ELEMENT experimentSpecification (deviceID, terminal+, userDefinedFunction*)>
+<!ATTLIST experimentSpecification	lab			CDATA	#REQUIRED
+									specversion	CDATA	#REQUIRED>
+	<!ELEMENT deviceID (#PCDATA)>
+	<!ELEMENT terminal (vname, ((iname, mode, function, compliance?) |
+								(function, compliance?) |
+								(mode))?)>
+	<!ATTLIST terminal	portType	(SMU | VSU | VMU)	#REQUIRED
+						portNumber	CDATA				#REQUIRED>
+		<!ELEMENT vname (#PCDATA)>
+		<!ATTLIST vname	download (true | false) #REQUIRED>
+		<!ELEMENT iname (#PCDATA)>
+		<!ATTLIST iname download (true | false) #REQUIRED>
+		<!ELEMENT mode (#PCDATA)>
+		<!ELEMENT function ((scale?, start, stop, step) |
+							(offset, ratio) |
+							(value))>
+		<!ATTLIST function	type	(VAR1 | VAR2 | VAR1P | CONS)	#REQUIRED>
+			<!ELEMENT scale (#PCDATA)>
+			<!ELEMENT start (#PCDATA)>
+			<!ELEMENT stop (#PCDATA)>
+			<!ELEMENT step (#PCDATA)>
+			<!ELEMENT offset (#PCDATA)>
+			<!ELEMENT ratio (#PCDATA)>
+			<!ELEMENT value (#PCDATA)>
+		<!ELEMENT compliance (#PCDATA)>
+	<!ELEMENT userDefinedFunction (name, units, body)>
+		<!ELEMENT name (#PCDATA)>
+		<!ATTLIST name download (true | false) #REQUIRED>
+		<!ELEMENT units (#PCDATA)>
+		<!ELEMENT body (#PCDATA)>
+
+
+
+
+
+
+

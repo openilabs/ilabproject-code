@@ -1,0 +1,663 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Untitled Document</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<style type="text/css">
+			<!--
+.style2 {font-size: medium}
+.style4 {font-size: x-large}
+.style6 {color: #CC0000}
+.style7 {font-size: large}
+.style8 {font-size: xx-large}
+--></style>
+	</head>
+	<body>
+		<div id="content">
+			<h2 class="style8">User Manual</h2>
+			<p class="style4"></p>
+			<h1><span class="style7"><span class="style4"><a name="overview">Chapter 1</a></span>
+				</span></h1>
+			<h1 class="style4">Overview</h1>
+			<p>
+				Weblab is a remote microelectronics laboratory. It allows users to measure the 
+				current-voltage characteristics of transistors and other devices at any time, 
+				from any physical location, using a Java-enabled web browser.
+			</p>
+			<h2>
+				<a name="behind">1.1 Behind the Scenes</a></h2>
+			<p>
+				At the heart of the Weblab system is the Agilent 4155B Semiconductor Parameter 
+				Analyzer, a state-of-theart instrument for measuring the current-voltage 
+				characteristics of microelectronics devices with up to eight terminals. The 
+				analyzer is connected to an Agilent E5250A Switching Matrix, a multiplexer 
+				which allows eight different microelectronics devices to be connected to the 
+				system at any given time. Both the analyzer and the switching matrix are 
+				controlled through a GPIB interface card on the Weblab server computer. The 
+				devices under test are mounted in a packaged form onto standard test fixtures 
+				that are connected to the switching matrix.
+			</p>
+			<p>The user interface forWeblab is a Java applet which duplicates the essential 
+				functionality of the analyzer console, allowing the user to set up a 
+				measurement for one of the devices that is currently connected to the system 
+				(the necessary information about these devices is provided by the server when 
+				the applet loads). When the user is ready to execute a measurement, the applet 
+				sends the measurement specifications to the server. The server then sets the 
+				switching matrix to the appropriate device, instructs the analyzer to run the 
+				measurement, obtains the results from the analyzer, and finally transmits the 
+				data back to the applet, where they can be graphed and otherwise analyzed by 
+				the user.</p>
+			<h2><br>
+				<a name="measure">1.2 Measurement Units</a></h2>
+			<p>
+				The analyzer has a total of eight measurement units (four SMUs, two VSUs, and 
+				two VMUs) that can be connected to the terminals of a device. Note that these 
+				connections are made using physical wires in the lab; it is impossible to 
+				change them remotely. Each type of measurement unit has different capabilities.</p>
+			<ul>
+				<li>
+					A Source/Monitor Unit (SMU) is a highly versatile measurement unit which can 
+					operate in three different modes:<br>
+					V : the SMU functions as a voltage source and a current monitor. It also 
+					enforces a compliance value for current (a maximum value that the current is 
+					allowed to attain, useful for protecting fragile devices); if the actual 
+					current ever reaches the compliance value, then the SMU becomes a constant 
+					voltage source for the remainder of the measurement.<br>
+					I : the SMU functions as a current source and a voltage monitor. It also 
+					enforces a compliance value for voltage; if the actual voltage ever reaches the 
+					compliance value, then the SMU becomes a constant current source for the 
+					remainder of the measurement.<br>
+					COMM : the SMU functions as a common terminal (ground). COMM mode is 
+					essentially the same as V mode with the voltage set to zero.<br>
+				</li>
+				<li>
+					A Voltage Source Unit (VSU) functions as a voltage source only. It allows the 
+					voltage to be specified more precisely than an SMU in V mode, but it cannot 
+					simultaneously function as a current monitor. The compliance value for a VSU is 
+					automatically set to approximately 100 mA and cannot be changed.<br>
+				</li>
+				<li>
+					A Voltage Monitor Unit (VMU) functions as a voltage monitor only. It measures 
+					voltage more precisely than an SMU in I mode, but it cannot simultaneously 
+					function as a current source.</li>
+			</ul>
+			<h2><br>
+				<a name="functions">1.3 Functions</a></h2>
+			<p><br>
+				Each source unit (this includes VSUs, SMUs in V mode, and SMUs in I mode) has a 
+				function that defines the behavior of its output. There are four different 
+				functions:<br>
+				<strong>CONS :</strong> a constant source, defined by a single value (either a 
+				voltage value or a current value, depending on the source type). The source 
+				unit maintains this value throughout the measurement.<br>
+				<strong>VAR1 :</strong> the primary sweep source. Behavior depends on the scale 
+				selected: Linear : defined by a start value, a stop value, and a step value. 
+				VAR1 is set to the start value and then repeatedly incremented by the step 
+				value until it reaches (or exceeds) the stop value. Generates<img src="images/expr1.jpg" width="141" height="45">data 
+				points, evenly spaced in a linear fashion.<br>
+				Log10 : defined by a start value and a stop value (no step value). Generates 10 
+				data points per decade, evenly spaced in a logarithmic fashion.<br>
+				Log25 : defined by a start value and a stop value (no step value). Generates 25 
+				data points per decade, evenly spaced in a logarithmic fashion.<br>
+				Log50 : defined by a start value and a stop value (no step value). Generates 50 
+				data points per decade, evenly spaced in a logarithmic fashion. Only one source 
+				unit per measurement may be set to VAR1.<br>
+				<strong>VAR2 </strong>: the secondary sweep source, defined just like VAR1 
+				except that the scale of VAR2 is always Linear. However, the value of VAR2 is 
+				incremented only after every complete sweep of VAR1. Only one source unit per 
+				measurement may be set to VAR2.<br>
+				<strong>VAR1P :</strong> the synchronous sweep source, defined by a ratio and 
+				an o set. The value of VAR1P for each data point is calculated from the value 
+				of VAR1 using the following equation:<br>
+				VAR1P = VAR1 * ratio + o set<br>
+				Only one source unit per measurement may be set to VAR1P.</p>
+			<h2><br>
+				<a name="sweep">1.4 Sweep Measurements</a></h2>
+			<p><br>
+				The analyzer uses sweep source functions to perform di erent kinds of sweep 
+				measurements. The following sweep measurements are supported by Weblab.<br>
+				&bull; A basic sweep measurement uses only one sweep source (VAR1).</p>
+			<img src="images/table_sweep.jpg" width="599" height="460"><br>
+			Table 1.1: Sweep Measurements
+			<ul>
+				<li>
+					<strong>A subordinate sweep measurement</strong> uses a primary sweep source 
+					(VAR1) and a secondary sweep source (VAR2). The primary sweep loop is nested 
+					inside the secondary sweep loop; thus VAR2 will be swept only one time, but 
+					VAR1 will be swept many times (once for each value of VAR2). The total number 
+					of data points generated by a subordinate sweep measurement is the product of 
+					the number of points in each VAR1 sweep and the number of points in each VAR2 
+					sweep.</li>
+				<li>
+					<strong>A synchronous sweep measurement</strong> uses a primary sweep source 
+					(VAR1) and a synchronous sweep<br>
+					source (VAR1P). Because VAR1P sweeps along with VAR1, the number of data points 
+					generated by a synchronous sweep measurement is the same as for the 
+					corresponding basic sweep measurement.
+				</li>
+			</ul>
+			<p>It is possible to set up a VAR1 source, a VAR2 source, and a VAR1P source all in 
+				the same measurement; this has the e ect of performing a synchronous sweep and 
+				a subordinate sweep at the same time. Table 1.1 illustrates an example of a 
+				measurement that uses all three sweep sources.</p>
+			<h2><br>
+				<a name="data">1.5 Data Variables</a></h2>
+			<p><br>
+				Weblab stores data in data variables. A data variable is an array of numerical 
+				values containing one element for each data point that was measured by the 
+				analyzer. Each data variable is identified by a name (alphanumeric, 6 
+				characters maximum). When a measurement is executed, the analyzer generates 
+				data for all of the variables that have been de- fined. However, to save 
+				bandwidth and time (especially on slower network connections), only those 
+				variables that have been selected by the user for download will be included in 
+				the results that are transferred from the lab server back to the client (for 
+				graphing and further analysis).</p>
+			<h2><br>
+				<a name="user-defined">1.6 User-Defined Functions</a></h2>
+			<p>
+				Another helpful feature of the analyzer allows the user to create new data 
+				variables which represent real-time functions of the data collected during a 
+				measurement (the square root of another data variable, for example). A 
+				user-defined function has three components:<br>
+				<strong>Name</strong> : the name of the new variable to be created<br>
+				<strong>Units </strong>: the units for the results of the function<br>
+				<strong>Body</strong> : the body of the function. This is an algebraic 
+				expression which may include other variables, builtin analyzer functions, and 
+				scientific constants (see section 3.1.2 for details on the syntax of 
+				user-defined functions). Once defined, a user-defined function can be treated 
+				like any other data variable, and even referred to within the body of another 
+				user-defined function. However, recursive definitions (A depends on A) and 
+				mutually recursive definitions (A depends on B, and B depends on A) are not 
+				allowed.</p>
+			<br>
+			<p><span class="style2"><a href="#top" class="style6"></a></span></p>
+			<h1><span class="style4"><a name="classical">Chapter 2 </a>
+				</span></h1>
+			<h1 class="style4">The Classical Applet</h1>
+			<p><br>
+				The Classical Applet (shown in figure 2.1) for the MIT Microelectronics Weblab 
+				is designed for maximum portability and performance in low-bandwidth 
+				environments. It is written entirely in Java 1.1 and should run in any 
+				Java-enabled web browser (even without a recent Java Plugin from Sun).</p>
+			<h2>
+				<a name="using-setup-c">2.1 Using the Setup Panel</a></h2>
+			<p>
+				The left half of the main window contains the Setup Panel, which is used to 
+				configure an experiment specification to be run on the lab server. The Setup 
+				Panel displays a simple table whose contents are edited inorder to configure 
+				the measurement units. Each measurement unit is represented by an column in the 
+				table. The title of the column is the measurement unit's name and the 
+				parameters which can be changed are located on the left hand side of the table.
+			</p>
+			<h3><br>
+				<a name="config-c">2.1.1 Configuring Measurement Units</a></h3>
+			<p>
+				Click on the &quot;Edit&quot; button at the bottom of a column in the Setup 
+				Panel to open a configuration dialog box for that unit. Depending on the type 
+				of measurement unit you click on, the configuration dialog box will contain 
+				some or all of the following fields.</p>
+			<p>
+				<strong>VName</strong> (all units): enter the name of a data variable which 
+				will represent the voltage measured at this<br>
+				unit. Check the Download box below if you want to download this variable. Refer 
+				to section 1.5 for more information on data variables and downloading.</p>
+			<p>
+				<strong>IName</strong> (SMU only): enter the name of a data variable which will 
+				represent the current measured at this unit. Check the Download box below if 
+				you want to download this variable. Refer to section 1.5 for more information 
+				on data variables and downloading.</p>
+			<p>
+				<strong>Mode</strong> (SMU only): select a mode for this unit. Refer to section 
+				1.2 for more information on measurement units and modes.</p>
+			<p>
+				<strong>Function </strong>(SMU in V mode or I mode, or VSU): select a function 
+				for this unit. Depending on which function you select, additional fields will 
+				appear in the dialog box to allow you to further specify the source 
+				unit&rsquo;s behavior. Refer to section 1.3 for more information on functions 
+				and their parameters.<br>
+				&bull; <em>Constant Setup</em> (when Function is set to CONS): enter a Value.<br>
+				&bull; <em>VAR1 Variable Setup</em> (when Function is set to VAR1): select a 
+				Scale. Enter Start and Stop values. If you selected the Linear scale, also 
+				enter a Step value. Points will be calculated automatically based on the values 
+				you enter.<br>
+				&bull; <em>VAR2 Variable Setup</em> (when Function is set to VAR2): enter 
+				Start, Stop, and Step values. Points will be calculated automatically based on 
+				the values you enter.<br>
+				&bull; <em>VAR1P Variable Setup</em> (when Function is set to VAR1P): enter a 
+				Ratio and an O set. Compliance (SMU only): enter a compliance value. Refer to 
+				section 1.2 for more information on compliance. When you are finished making 
+				changes, click OK to apply your changes and close the dialog box, Cancel to 
+				discard your changes and close the dialog box, or Apply to apply your changes 
+				but keep the dialog box open.</p>
+			<p><img src="images/classic_applet.JPG" width="808" height="605"> Figure 2.1: 
+				Classical Applet
+			</p>
+			<h3>
+				<a name="config-user-c">2.1.2 Configuring User-Defined Functions</a></h3>
+			<p>
+				Click the &quot;Edit&quot; button at the bottom of the Setup Panel to open the 
+				User-Defined Functions dialog box. Each function has Name, Units, and Body as 
+				described in section 1.6. Each function also has a Download checkbox which 
+				functions just like that of a data variable (see section 1.5). You can edit the 
+				parameters of existing User-Defined Functions, or click the &ldquo;Add new 
+				function&rdquo; button to create a new User-Defined Function. You can delete 
+				existing User-Defined Functions using the Delete buttons on the right. When you 
+				are finished making changes, click OK to apply your changes and close the 
+				dialog box, Cancel to discard your changes and close the dialog box, or Apply 
+				to apply your changes but keep the dialog box open.</p>
+			<h2><br>
+				<a name="using-results-c">2.2 Using the Results Panel</a></h2>
+			<p>
+				After a measurement is executed on the analyzer, the results are returned to 
+				the client and graphed on the graph canvas in the Results Panel, which is 
+				located in the bottom half of the main window. Three axes can be specified for 
+				the graph canvas, each representing one of the downloaded data variables: the <strong>
+					X Axis</strong>, the <strong>Y1 Axis</strong> (the primary y axis, located 
+				on the left), and the <strong>Y2 Axis</strong> (the secondary y axis, located 
+				on the right). This allows two 2-dimensional variable relationships to be 
+				plotted simultaneously: Y1 vs. X (in blue) and Y2 vs. X (in red). The actual 
+				data points are displayed as small circles, and each data point is connected to 
+				the next by a line segment (exception: in a subordinate sweep measurement, no 
+				line segment is drawn between data points which correspond to di erent values 
+				of the VAR2 variable). Each axis has controls which allow you to choose which 
+				of the downloaded variables should be plotted on this axis, whether the axis 
+				should be displayed in Linear or Logarithmic scale, and the minimum and maximum 
+				values to show for this axis on the graph canvas. Most settings take e ect as 
+				soon as you enter them; for numeric values, press the Enter key when you are 
+				done typing. Note: when you run a measurement, the applet will automatically 
+				select variables to graph for you. If you check the autoscale box, the minimum 
+				and maximum values will be automatically determined for you based on the data 
+				(note: in order to change these values manually again, you must uncheck the 
+				autoscale box).<br>
+				<br>
+				The<strong> Tracking </strong>button at the bottle left corner of the Results 
+				Panel causes a new window to be displayed when it is clicked. As you move the 
+				mouse pointer over the graph canvas, this<br>
+				window will display the approximate data value that corresponds to the current 
+				position. A check box at the top of the window allows the user to choose 
+				whether to force teh mouse ponter to snap to data points or not.
+				<br>
+				The Results Panel also contains a Temperature display, located just above the 
+				graph canvas. When the<br>
+				results are received, this field will automatically display the temperature 
+				measured in the lab at the time<br>
+				when the experiment was performed. Note that not all lab servers support this 
+				feature.<br>
+			</p>
+			<h2><img src="images/results_panel.jpg" width="608" height="426"></h2>
+			Figure 2.2: Results Panel
+			<h2>
+				<br>
+				<a name="using-menus-c">2.3 Using the Menus</a></h2>
+			<p>
+				The menubar at the top of the main window provides access to a variety of 
+				Weblab features.</p>
+			<ul>
+				<li>
+					<em>Setup menu:</em><br>
+					<strong>New(reset</strong>) : resets the current setup (this includes 
+					configuration settings for all measurement units, as well as user-defined 
+					functions). Reset does not change the currently selected device.<br>
+					<strong>Load</strong> : allows you to load a previously saved measurement 
+					setup. Select a setup from the list that appears, and click OK to load that 
+					setup. If you decide not to load a setup, click Cancel to close the dialog box 
+					without doing anything.<br>
+					<strong>Delete</strong> : allows you to delete a previously saved setup. Select 
+					a setup from the list that appears, and click OK to permanently delete that 
+					setup. If you decide not to delete a setup, click Cancel to close the dialog 
+					box without doing anything.<br>
+					<strong>Save</strong> : allows you to save the current measurement setup for 
+					later retrieval. A list of previously saved setups appears for your reference 
+					when you save the setup for the first time. Subsequent saving operations are 
+					done automatically without bringing up this list of previously saved setups. 
+					Enter a name for the new setup, and click OK to save it under that name (if you 
+					select the name of an existing setup, the existing setup will be overwritten 
+					with the new one). If you decide not to save the setup, click Cancel to close 
+					the dialog box without doing anything.<br>
+					<strong>Save As</strong>: identical to &quot;Save&quot; above but always opens 
+					up the &quot;available setups&quot; dialag box which contains a list of 
+					previously saved setups.
+					<br>
+					<strong>Exit</strong> : closes the applet.<br>
+					<strong>Run Measurement</strong> : submits the measurement setup to the lab 
+					server for execution, receives the results, when they are ready, and plots the 
+					results on the Results Panel.
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<em>Devices menu:</em><br>
+					This menu allows you to choose a new active device from the list of available 
+					devices connected to the analyzer. The active device is the device which is 
+					displayed in the schematic diagram, and the device on which a submitted 
+					experiment will be run.</li>
+			</ul>
+			<ul>
+				<li>
+					<em>Results menu:</em><br>
+					<strong>View Data</strong> : displays a window containing the raw data from the 
+					most recent measurement. Each data point is a comma-separated list of values 
+					(one for each downloaded variable). The names and units of the downloaded 
+					variables are displayed in the first few lines.<br>
+					<strong>Clear Data</strong> : Clears the result panel and delete the data that 
+					has just been taken.<br>
+					<strong>Grid Setup </strong>: determines which vertical axis will be used to 
+					plot the data. &quot;follow Y1 axis&quot; selects the Y1 axis on the left of 
+					the results pane while &quot;follow Y2 axis&quot; selects teh Y2 axis on the 
+					right of the results pane.
+				</li>
+			</ul>
+			<ul>
+				<li>
+					<em>Help menu:</em><br>
+					<strong>Help</strong> : Opens a new window which displays the Microelectronics 
+					Weblab Documentation webpage.<br>
+					<strong>About the Weblab Client</strong> : displays information about the 
+					specific version of the Weblab Client you are using.<br>
+				</li>
+			</ul>
+			<h2>
+				<a name="printing-c">2.4 Printing Your Results</a></h2>
+			<p>
+				Refer to section 3.5.</p>
+			<h1><br>
+				<span class="style4">
+					<a name="graphical">Chapter 3</a></span></h1>
+			<h1 class="style4">The Graphical Applet</h1>
+			<p>
+				The Graphical Applet (shown in figure 3.1) is the primary (and recommended) 
+				user interface for Weblab.</p>
+			<h2>
+				<a name="using-setup">3.1 Using the Setup Panel</a></h2>
+			<p>
+				The top half of the main window contains the Setup Panel, which is used to 
+				configure an experiment specification to be run on the lab server. The Setup 
+				Panel displays an interactive schematic diagram of the active device, including 
+				its connections to the measurement units on the analyzer. Each measurement unit 
+				is represented by an icon which changes based on the unit&rsquo;s mode and 
+				function. If voltage and current variable names have been defined for a 
+				measurement unit, these are also labelled on the schematic. If you move the 
+				mouse over one of the measurement units in the schematic, the configuration 
+				settings of that unit will be displayed concisely in a small tooltip window. If 
+				you click on a measurement unit, a dialog box will open to allow you to change 
+				the configuration settings of the unit.</p>
+			<h3><br>
+				<a name="config">3.1.1 Configuring Measurement Units</a></h3>
+			<p>
+				Click on a measurement unit in the schematic diagram to open a configuration 
+				dialog box for that unit. Depending on the type of measurement unit you click 
+				on, the configuration dialog box will contain some or all of the following 
+				fields.</p>
+			<p>
+				<strong>VName</strong> (all units): enter the name of a data variable which 
+				will represent the voltage measured at this<br>
+				unit. Check the Download box below if you want to download this variable. Refer 
+				to section 1.5 for more information on data variables and downloading.</p>
+			<p>
+				<strong>IName</strong> (SMU only): enter the name of a data variable which will 
+				represent the current measured at this unit. Check the Download box below if 
+				you want to download this variable. Refer to section 1.5 for more information 
+				on data variables and downloading.</p>
+			<p>
+				<strong>Mode</strong> (SMU only): select a mode for this unit. Refer to section 
+				1.2 for more information on measurement units and modes.</p>
+			<p>
+				<strong>Function </strong>(SMU in V mode or I mode, or VSU): select a function 
+				for this unit. Depending on which function you select, additional fields will 
+				appear in the dialog box to allow you to further specify the source 
+				unit&rsquo;s behavior. Refer to section 1.3 for more information on functions 
+				and their parameters.<br>
+				&bull; <em>Constant Setup</em> (when Function is set to CONS): enter a Value.<br>
+				&bull; <em>VAR1 Variable Setup</em> (when Function is set to VAR1): select a 
+				Scale. Enter Start and Stop values. If you selected the Linear scale, also 
+				enter a Step value. Points will be calculated automatically based on the values 
+				you enter.<br>
+				&bull; <em>VAR2 Variable Setup</em> (when Function is set to VAR2): enter 
+				Start, Stop, and Step values. Points will be calculated automatically based on 
+				the values you enter.<br>
+				&bull; <em>VAR1P Variable Setup</em> (when Function is set to VAR1P): enter a 
+				Ratio and an O set. Compliance (SMU only): enter a compliance value. Refer to 
+				section 1.2 for more information on compliance. When you are finished making 
+				changes, click OK to apply your changes and close the dialog box, Cancel to 
+				discard your changes and close the dialog box, or Apply to apply your changes 
+				but keep the dialog box open.</p>
+			<p><img src="images/applet_setup.jpg" width="558" height="719"><br>
+				Figure 3.1: Graphical Applet<br>
+			</p>
+			<h3>
+				<a name="config-user">3.1.2 Configuring User-Defined Functions</a></h3>
+			<p>
+				Choose Show User-Defined Functions to open the User-Defined Functions dialog 
+				box. Each function has Name, Units, and Body as described in section 1.6. Each 
+				function also has a Download checkbox which functions just like that of a data 
+				variable (see section 1.5). You can edit the parameters of existing 
+				User-Defined Functions, or click the &ldquo;Add new function&rdquo; button to 
+				create a new User-Defined Function. You can delete existing User-Defined 
+				Functions using the Delete buttons on the right. When you are finished making 
+				changes, click OK to apply your changes and close the dialog box, Cancel to 
+				discard your changes and close the dialog box, or Apply to apply your changes 
+				but keep the dialog box open.</p>
+			<h2><br>
+				<a name="using-results">3.2 Using the Results Panel</a></h2>
+			<p>
+				After a measurement is executed on the analyzer, the results are returned to 
+				the client and graphed on the graph canvas in the Results Panel, which is 
+				located in the bottom half of the main window. Three axes can be specified for 
+				the graph canvas, each representing one of the downloaded data variables: the <strong>
+					X Axis</strong>, the <strong>Y1 Axis</strong> (the primary y axis, located 
+				on the left), and the <strong>Y2 Axis</strong> (the secondary y axis, located 
+				on the right). This allows two 2-dimensional variable relationships to be 
+				plotted simultaneously: Y1 vs. X (in blue) and Y2 vs. X (in red). The actual 
+				data points are displayed as small circles, and each data point is connected to 
+				the next by a line segment (exception: in a subordinate sweep measurement, no 
+				line segment is drawn between data points which correspond to di erent values 
+				of the VAR2 variable). Each axis has controls which allow you to choose which 
+				of the downloaded variables should be plotted on this axis, whether the axis 
+				should be displayed in Linear or Logarithmic scale, and the minimum and maximum 
+				values to show for this axis on the graph canvas. Most settings take e ect as 
+				soon as you enter them; for numeric values, press the Enter key when you are 
+				done typing. Note: when you run a measurement, the applet will automatically 
+				select variables to graph for you. If you check the autoscale box, the minimum 
+				and maximum values will be automatically determined for you based on the data 
+				(note: in order to change these values manually again, you must uncheck the 
+				autoscale box).<br>
+				<br>
+				The<strong> Tracking </strong>button at the bottle left corner of the Results 
+				Panel causes a new window to be displayed when it is clicked. As you move the 
+				mouse pointer over the graph canvas, this window will display the approximate 
+				data value that corresponds to the current position. A check box at the top of 
+				the window allows the user to choose whether to force teh mouse ponter to snap 
+				to data points or not. The Results Panel also contains a Temperature display, 
+				located just above the graph canvas. When the results are received, this field 
+				will automatically display the temperature measured in the lab at the time when 
+				the experiment was performed. Note that not all lab servers support this 
+				feature.
+			</p>
+			<h2><img src="images/results_panel.jpg" width="608" height="426"></h2>
+			Figure 3.2: Results Panel
+			<h2>
+				<br>
+				<a name="using-menus">3.3 Using the Menus</a></h2>
+			<p>
+				The menubar at the top of the main window provides access to a variety of 
+				Weblab features.</p>
+			<ul>
+				<li>
+					<em>File menu:</em><br>
+					<strong>Reset</strong> : resets the current setup (this includes configuration 
+					settings for all measurement units, as well as user-defined functions). Reset 
+					does not change the currently selected device.<br>
+					<strong>Load Setup</strong> : allows you to load a previously saved measurement 
+					setup. Select a setup from the list that appears, and click OK to load that 
+					setup. If you decide not to load a setup, click Cancel to close the dialog box 
+					without doing anything.<br>
+					<strong>Delete Setup</strong> : allows you to delete a previously saved setup. 
+					Select a setup from the list that appears, and click OK to permanently delete 
+					that setup. If you decide not to delete a setup, click Cancel to close the 
+					dialog box without doing anything.<br>
+					<strong>Save Setup</strong> : allows you to save the current measurement setup 
+					for later retrieval. A list of previously saved setups appears for your 
+					reference. Enter a name for the new setup, and click OK to save it under that 
+					name (if you select the name of an existing setup, the existing setup will be 
+					overwritten with the new one). If you decide not to save the setup, click 
+					Cancel to close the dialog box without doing anything.<br>
+					<strong>Exit</strong> : closes the applet.<br>
+					<br>
+				</li>
+				<li>
+					<em>Measurement menu:</em><br>
+					<strong>Run Measurement</strong> : submits the measurement setup to the lab 
+					server for execution, receives the results, when they are ready, and plots the 
+					results on the Results Panel.</li><br>
+				<br>
+				<li>
+					<em>Devices menu:</em><br>
+					This menu allows you to choose a new active device from the list of available 
+					devices connected to the analyzer. The active device is the device which is 
+					displayed in the schematic diagram, and the device on which a submitted 
+					experiment will be run.</li><br>
+				<br>
+				<li>
+					<em>User Defined Functions menu:</em><br>
+					<strong>Show User-Defined Functions </strong>: opens the User Defined Functions 
+					dialog box (see section 3.1.2).</li><br>
+				<br>
+				<li>
+					<em>Results menu:</em><br>
+					<strong>View Data</strong> : displays a window containing the raw data from the 
+					most recent measurement. Each data point is a comma-separated list of values 
+					(one for each downloaded variable). The names and units of the downloaded 
+					variables are displayed in the first few lines.<br>
+					<strong>Download Data</strong> : saves a copy of the raw data from the most 
+					recent measurement to a Comma- Separated Value (.csv) file on your local 
+					computer. You can import this file into another application (e.g. a spreadsheet 
+					program) for further processing.</li><br>
+				<br>
+				<li>
+					<em>Help menu:</em><br>
+					<strong>Help</strong> : Opens a new window which displays the Microelectronics 
+					Weblab Documentation webpage.<br>
+					<strong>About the Weblab Client</strong> : displays information about the 
+					specific version of the Weblab Client you are using.<br>
+					<br>
+				</li>
+			</ul>
+			<h2><br>
+				<a name="using-toolbar">3.4 Using the Toolbar</a></h2>
+			<p><br>
+				The toolbar, which floats above the Setup Panel, provides a convenient way to 
+				access a few of the most commonly used features ofWeblab with a single click. 
+				The toolbar buttons exactly duplicate the functionality of the corresponding 
+				menu items described in section 3.3.<br>
+				<img src="images/run_measurment.jpg" width="29" height="27"> Run Measurement<br>
+				<img src="images/open.jpg" width="28" height="30"> Load Setup<br>
+				<img src="images/save.jpg" width="31" height="32"> Save Setup<br>
+				<img src="images/show_user_def.jpg" width="29" height="31"> Show User-Defined 
+				Functions<br>
+				<img src="images/help.jpg" width="30" height="31"> Help
+			</p>
+			<h2><br>
+				<a name="printing">3.5 Printing Your Results</a></h2>
+			<p><br>
+				The Weblab 6.1 Client does not yet have a built-in print feature. In order to 
+				print the results, you must capture a screen dump and then use another program 
+				to actually print the resulting image.<br>
+				<strong>If you are using Windows:</strong><br>
+				1. Select the window you want to print.<br>
+				2. Press &lt;Alt&gt; + &lt;PrintScreen&gt; to copy an image of the currently 
+				selected window to the clipboard. (note: on most Windows keyboards, the 
+				PrintScreen key is located next to the Scroll Lock key, to the right of the 
+				function keys F1 through F12)<br>
+				3. Open up your favorite image editor (or word processor) and paste the 
+				contents of the clipboard into a new document.<br>
+				4. Print the image from your image editor or word processor.<br>
+				<br>
+				<strong>If you are using Athena:</strong><br>
+				1. Run the xv program (type &ldquo;add graphics&rdquo;, then &ldquo;xv 
+				&amp;&rdquo;).<br>
+				2. When the xv window comes up, right-click on it to get your menu choices.<br>
+				3. Click the &ldquo;grab&rdquo; button, and then use the right mouse button to 
+				grab the window that you want to print.<br>
+				4. Print the image from xv (note: you may need to scale it down in size in 
+				order to fit the whole image on one sheet of paper).</p>
+			<p><span class="style2"><a href="#top" class="style6"></a></span></p>
+			<h1>
+				<span class="style4"><a name="expression">Appendix A</a><br>
+    Expression Syntax for User-Defined Functions</span></h1>
+			<h2><br>
+				<img src="images/built_in_func1.jpg" width="641" height="562"></h2>
+			<p><img src="images/built_in_func2.jpg" width="642" height="553"></p>
+			<p><img src="images/built_in_func3.jpg" width="648" height="821"></p>
+			<h1><span class="style2"><a href="#top" class="style6"></a></span></h1>
+			<h1><br>
+				<a name="description" class="style4">Appendix B<br>
+					Description of Parameter Analyser </a>
+			</h1>
+			<p>An Agilent 4155B semiconductor parameter analyzer is a state-of-the-art, 
+				industrial-strength instrument of broad use in the microelectronics world. It 
+				sends test currents and voltages through its connections to the DUT and 
+				measures the response of the connected device.</p>
+			<p>The Agilent 4155B semiconductor parameter analyzer has eight bi-directional 
+				channels: four SMUs (Semiconductor Measuring Units), two VMUs (Voltage 
+				Measuring Units), and two VSUs (Voltage Source Units). The SMUs are the most 
+				versatile and commonly used channels. Each SMU can serve as a constant or 
+				variable current source or voltage source. When serving as a current source, 
+				the SMU monitors the voltage of the channel. When serving as a voltage source, 
+				it monitors the current running through the channel. VMUs are high-quality 
+				voltage monitors, and VSU channels are dedicated voltage sources.</p>
+			<p>Figure 1 displays the multiple-device architecture. In this system, the 
+				switching matrix routes signals between the Agilent 4155B parameter analyzer 
+				and the eight DUTs. Like the parameter analyzer, the switching matrix can be 
+				controlled remotely through its GPIB connection to the WebLab server. In this 
+				system, the user can remotely select one of the eight connected DUTs as the 
+				device to be measured.
+			</p>
+			<p>
+				<img width="613" height="456" src="images/weblab_6_1_manual_clip_image002.jpg">
+			</p>
+			<p><strong>Figure B.1 - The architecture of the multiple-device WebLab system (versions 
+					4.0-4.2). </strong><strong>Note that there are only 6 connections between each 
+					DUT and the switching matrix because the switching matrix only offers 48 ports. </strong>
+			<p>Before each transmission, the applet checks the test vector for common errors 
+				that would render it not executable by the Agilent 4155B and refuses to submit 
+				it until all such errors have been corrected by the user. When the test vector 
+				passes all the rules in the applet's error checking procedure, the applet 
+				submits it to the WebLab server using a HTTP connection. On the WebLab server, 
+				one of a set of Active Server Pages (ASP) receives the uploaded vector through 
+				Microsoft Internet Information Services (IIS). IIS includes a request queue 
+				which the WebLab architecture fully utilizes. If another user is executing a 
+				measurement when the request is received, the request is queued on IIS until 
+				the instruments become available.</p>
+			<p>When the request gets off the queue, the ASP wraps the data into method calls to 
+				the third software component, the WebLab driver. This Visual-Basic-based driver 
+				places the user's request into method calls to the fourth software component, a 
+				commercially produced driver called VISA. The VISA driver then translates the 
+				Visual Basic commands into GPIB commands. GPIB is the instrument control 
+				language used by the Agilent 4155B. Through a commercially-available GPIB 
+				interface card, the WebLab server transmits the GPIB method calls to the 
+				parameter analyzer. The user's measurement request is thus relayed to the lab 
+				equipment through this chain. In the background of this information flow, a 
+				fifth component, a SQL database, records and supplies user information and 
+				transaction data by communicating with the ASP.</p>
+			<p>The user's selection request reaches the switching matrix in the form of GPIB 
+				commands. The switching matrix then connects the parameter analyzer with the 
+				selected device. When the parameter analyzer performs measurements, the 
+				switching matrix ensures that all input/output signals run between the 
+				parameter analyzer and the selected device. This multi-device WebLab system 
+				offers much more flexibility and reliability than the single-device system.
+			</p>
+			<p>Upon receiving the request, the parameter analyzer performs the specified 
+				measurements and responds to the GPIB interface card with the results. Through 
+				the same path on which the request traveled to the lab equipment, the measured 
+				data travel back to the client applet, which then graphs them for the user. 
+				Since HTTP connections only persist through one request-response cycle, the 
+				connection is closed by the server as soon as it returns the measurement data.</p>
+			<p>A thermometer was added to the system architecture. This enables the WebLab user 
+				to obtain the ambient temperature surrounding the DUTs. This is a useful 
+				addition with significant educational impact because the behavior of 
+				microelectronics devices is often influenced in a large way by their 
+				surrounding temperature.</p>
+		</div>
+	</body>
+</html>

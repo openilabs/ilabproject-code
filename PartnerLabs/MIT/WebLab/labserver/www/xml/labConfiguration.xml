@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE labConfiguration SYSTEM "http://weblab2.mit.edu/xml/labConfiguration.dtd">
+<labConfiguration lab="MIT Microelectronics Weblab" specversion="0.1">
+	<device id="5" type="nMOSFET">
+		<name>6.012 nMOSFET</name>
+		<description>Aren't nMOSFETs just swell?</description>
+		<imageURL>http://weblab.mit.edu/Version5.0/icons/NMOS.gif</imageURL>
+		<terminal portType="SMU" portNumber="2">
+			<label>Gate</label>
+			<pixelLocation>
+				<x>121</x>
+				<y>94</y>
+			</pixelLocation>
+			<maxVoltage>2.0</maxVoltage>
+			<maxCurrent>0.1</maxCurrent>
+		</terminal>
+		<terminal portType="SMU" portNumber="3">
+			<label>Source</label>
+			<pixelLocation>
+				<x>195</x>
+				<y>156</y>
+			</pixelLocation>
+			<maxVoltage>5.0</maxVoltage>
+			<maxCurrent>0.1</maxCurrent>
+		</terminal>
+		<terminal portType="SMU" portNumber="4">
+			<label>Bulk</label>
+			<pixelLocation>
+				<x>235</x>
+				<y>94</y>
+			</pixelLocation>
+			<maxVoltage>5.0</maxVoltage>
+			<maxCurrent>0.1</maxCurrent>
+		</terminal>
+		<terminal portType="SMU" portNumber="1">
+			<label>Drain</label>
+			<pixelLocation>
+				<x>195</x>
+				<y>23</y>
+			</pixelLocation>
+			<maxVoltage>5.0</maxVoltage>
+			<maxCurrent>0.1</maxCurrent>
+		</terminal>
+		<maxDataPoints>500</maxDataPoints>
+	</device>
+</labConfiguration>

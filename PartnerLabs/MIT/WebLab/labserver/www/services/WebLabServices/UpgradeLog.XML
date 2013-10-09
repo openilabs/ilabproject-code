@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="WebLabServices">
+</Property><Property Name="Solution File" Value="C:\dev\weblab\labserver\labserver\services\WebLabServices\WebLabServices.sln">
+</Property><Property Name="User Options File" Value="C:\dev\weblab\labserver\labserver\services\WebLabServices\WebLabServices.suo">
+</Property><Property Name="Date" Value="Tuesday, December 27, 2011">
+</Property><Property Name="Time" Value="14:51 PM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="WebLabServices.sln" Description="File successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\WebLabServices.sln">
+</Event><Event ErrorLevel="0" Project="" Source="WebLabServices.suo" Description="File successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\WebLabServices.suo">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="WebLabServices.vbproj" Description="Project file successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\WebLabServices.vbproj">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="WebLabServices.vbproj.user" Description="Project user file successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\WebLabServices.vbproj.user">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="AssemblyInfo.vb" Description="File successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\AssemblyInfo.vb">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="LabServerAPI.vb" Description="File successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\LabServerAPI.vb">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="LabServerAPI.resx" Description="File successfully backed up as C:\dev\weblab\labserver\labserver\services\WebLabServices\Backup\LabServerAPI.resx">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="WebLabServices.vbproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="WebLabServices" Source="WebLabServices.vbproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="WebLabServices.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="WebLabServices.sln" Description="Converted">
+</Event><Event ErrorLevel="0" Project="WebLabServices" Source="WebLabServices.vbproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>

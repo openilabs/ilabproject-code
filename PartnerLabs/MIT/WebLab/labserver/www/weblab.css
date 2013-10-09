@@ -1,0 +1,40 @@
+
+/* 
+Copyright (c) 2005 The Massachusetts Institute of Technology. All rights reserved.
+Please see license.txt in top level directory for full license. 
+*/
+
+
+.regular {
+   font-family: Arial,Helvetica,Sans-Serif;
+   font-size: 13px;
+}
+
+.small {
+   font-family: Arial,Helvetica,Sans-Serif;
+   font-size: 12px;
+}
+
+.extra-small {
+   font-family: Arial,Helvetica,Sans-Serif;
+   font-size: 11px;
+}
+
+.title {
+   font-family: Arial,Helvetica,Sans-Serif;
+   font-size: 13px;
+   font-weight: bold;
+   color: #1C388A;
+}
+
+.darkblue {
+   color: #27225C;
+}
+
+.offblue {
+   color: #243588;
+}
+
+.menu {
+   color: black;
+}

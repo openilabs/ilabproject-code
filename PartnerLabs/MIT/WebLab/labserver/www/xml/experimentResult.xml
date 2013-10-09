@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE experimentResult SYSTEM "http://weblab2.mit.edu/xml/experimentResult.dtd">
+<experimentResult lab="MIT Microelectronics Weblab" specversion="0.1">
+	<temp units="K">300</temp>
+	<datavector name="VS" units="V">1,2,3,4,5</datavector>
+	<datavector name="IS" units="I">6,7,8,9,0</datavector>
+</experimentResult>

@@ -1,0 +1,15 @@
+<APPLET
+  height=1 width=1
+  archive="[APPLET JAR FILE LOCATION - URL]"
+  code="weblab.client.graphicalUI.GraphicalApplet">
+<PARAM NAME="helpURL" VALUE="[LAB DOCUMENTATION URL - http://weblab2.mit.edu/docs/weblab/v6.1/manual/]">
+<PARAM NAME="expSpecDTD" VALUE="[MICROELECTRONICS ILAB EXPERIMENT SPECIFICATION XML DTD URL - http://weblab2.mit.edu/xml/experimentSpecification.dtd]">
+<PARAM NAME="couponID" VALUE="${op:couponId}">
+<PARAM NAME="couponPassKey" VALUE="${op:passkey}">
+<PARAM NAME="serviceURL" VALUE="[HOST SERVICE BROKER WEB SERVICE INTERFACE URL]">
+<PARAM NAME="labServerID" VALUE="[LAB SERVER ID GUID VALUE]">
+<PARAM NAME="initial_focus" VALUE="false"></APPLET> 
+
+
+
+NOTE - Older Service Brokers that do not support the iLab Interactive Architecture should ommit the "couponID" and couponPassKey" parameters.

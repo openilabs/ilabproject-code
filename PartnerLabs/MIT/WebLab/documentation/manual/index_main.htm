@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Untitled Document</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<style type="text/css">
+			<!--
+.style1 {font-family: Verdana, Arial, Helvetica, sans-serif}
+.style2 {font-size: medium}
+.style3 {font-size: large}
+.style4 {font-size: x-large}
+.style6 {color: #CC0000}
+--></style>
+	</head>
+	<body>
+		<h2 class="style4" id="pageName">Overview
+		</h2>
+		<div class="story">
+			<h1><strong><a name="goals" class="style3"> Goals </a></strong>
+			</h1>
+			<p class="style2">The M.I.T. Microelectronics WebLab or "WebLab" is a remote 
+				microelectronics device characterization laboratory. It enables users to 
+				measure the current-voltage characteristics various microelectronics devices at 
+				any time, from any physical location, using a Java-enabled web browser.&nbsp;
+			</p>
+			<p class="style2">WebLab is one of the laboratories available under the iLabs 
+				project which is dedicated to the proposition that online laboratories - real 
+				laboratories accessed through the Internet - can enrich science and engineering 
+				education by greatly expanding the range of experiments that students are 
+				exposed to in the course of their education. Unlike conventional laboratories, 
+				iLabs can be shared across a university or across the world. The iLabs vision 
+				is to share expensive equipment and educational materials associated with lab 
+				experiments as broadly as possible within higher education and beyond.
+			</p>
+			<p class="style2">The major goal of the WebLab project is to deliver the 
+				educational benefits of hands-on experimentation to students anywhere, at any 
+				time. This project provides the technology to make microelectronics test 
+				equipment available over the Internet. Students are able to enjoy the complete 
+				laboratory experience which can be delivered to any conventional Java-enabled 
+				web browser. Today, web browsers are ubiquitous; therefore, through WebLab, 
+				students can take current-voltage measurements on transistors and other devices 
+				in real time from anywhere and at anytime. In addition, expensive equipment and 
+				educational materials associated with lab experiments are shared as broadly as 
+				possible within higher education and beyond.
+			</p>
+			<p class="style2">Some of the devices available for I-V characterization include pn 
+				diodes, nmos/pmos field effect transistors, and npn/pnp bipolar junction 
+				transistors. The user is able to change the operating conditions of the 
+				experiment such as bias voltages and currents, compliance values, voltage and 
+				current sweep ranges, etc using a simple graphical interface. The results of 
+				the experiments are immediately displayed as graphs in the Weblab applet 
+				console, and can be downloaded as a comma separated file for post processing 
+				using matlab or any spread sheet application.
+			</p>
+			<p class="style1"><a href="#top" class="style6"><strong>back to top ^</strong></a></p>
+			<h1><strong><a name="arch" class="style3">Architecture</a></strong></h1>
+			<p class="style2">The Microelectronics WebLab is based on the iLabs Shared 
+				Architecture. iLabs' design separates online labs into three distinct modules 
+				connected by a Web service architecture.
+			</p>
+			<p class="style2">&#149;&nbsp; The Lab Server is operated by the lab's owner and 
+				deals with the actual operation of the lab hardware. While the semiconductor 
+				test equipment performs the testing, the Lab Server component is what enables 
+				this testing to be initiated remotely. The Lab Server itself is a PC running 
+				Windows 2000 that houses all of the software components of the system. In 
+				addition, this machine is configured with an Agilent 82350A PC/GPIB Interface 
+				card. This allows the Lab Server to control and receive data from all hardware 
+				components that are connected to the GPIB network.
+			</p>
+			<p class="style2">&#149;&nbsp; The Lab Client runs on the end user's computer, and 
+				provides the interface to the operation of the lab. Specifically, is a Java 
+				applet which serves as the client's interface to the instrumentation hardware. 
+				It provides the user with an interface similar to that of the front panel of 
+				the 4155B while also incorporating the multiple device access and temperature 
+				measurement ability of the E5250A and the 34970A respectively. This is where 
+				the end-user decides what device to test, what signals to send to the device as 
+				input and what ports to listen for data on.
+			</p>
+			<p class="style2">&#149;&nbsp; The Service Broker mediates exchanges between the 
+				Lab Client and the Lab Server and provides storage and administrative services 
+				that are generic and can be shared by multiple labs within a single university.
+			</p>
+			<p><img width="500" height="333" src="image1.gif"></p>
+			<p class="style2">Figure 1: Overview of iLabs Shared Architecture</p>
+			<p class="style2">The Semiconductor Test Component of the WebLab System provides 
+				the core functionality of the system. Testing and characterization of 
+				microelectronic devices is performed by the handful of devices. First, an 
+				Agilent 4155B Semiconductor Parameter Analyzer is used to carry out the actual 
+				measurements. This device is what provides the test signals and 
+				receives/processes returned signals from a given microelectronic device under 
+				test. Specifically, the device under test is placed in an Agilent 16442A Test 
+				Fixture, which is connected to the signal outputs of the 4155B. The 4155B is 
+				directly controlled by the Web Server through the system's GPIB network. This 
+				enables the Web Server to configure the 4155B and initiate the test process.</p>
+			<p class="style2">In order to make eight microelectronic devices available for test 
+				to the WebLab System, a multiplexing device must be integrated into this 
+				component. The system makes use of the Agilent E5250A Low Leakage Switch 
+				Mainframe to perform this function. The E5250A is ideal for this application, 
+				primarily, because it is an exceptionally low-loss switch. As such, there is 
+				little signal degradation across the switch. Additionally, the E5250A can be 
+				controlled via GBIP. Thus, the signal output of the 4155B is connected to the 
+				input of the E5250A, which routes it to one of eight sets of output ports. Each 
+				of these output ports connects one of the above mentioned 16442A Test Fixtures. 
+				As was the case with the 4155B, the E5250A is connected to the system's GPIB 
+				network. This allows the Web Server to control which of the eight test devices 
+				the 4155B's signals are routed to.
+			</p>
+			<p><img width="490" height="359" src="image2.jpg"></p>
+			<p>Figure 2: Architecture of Semiconductor Test System
+			</p>
+			<h2><a href="#top" class="style6">back to top ^</a></h2>
+			<p></p>
+			<h1>
+				<strong><a name="experiment" class="style3">Typical Experiment </a></strong>
+			</h1>
+			<p class="style2">A relatively simple experiment which can be run using the M.I.T. 
+				Microelectronics WebLab is obtaining the output characteristics of a pn diode. 
+				The diagram in Figure 3 shows the layout of the experimental set up. The diode 
+				symbol has a triangle pointing into a vertical line. In a diode, current can 
+				flow in the direction indicated by this pointy triangle, but not in the other 
+				direction; stated simply, a diode is a one way electronic valve. In the diagram 
+				of Figure 1, the diode is connected to an instrument that is going to perform 
+				the actual measurements. In WebLab, this is an Agilent 4155B Semiconductor 
+				Parameter Analyzer. The boxes labeled SMU1 and SMU2 represent the signal 
+				measurement units of this instrument to which the diode is connected. 
+				Characterizing the electrical behavior of the pn diode requires that these two 
+				SMU's be programmed appropriately.
+			</p>
+			<p><img width="370" height="489" src="image3.jpg"></p>
+			<p class="style2">Figure 3: The WebLab 6.1 Client
+			</p>
+			<p class="style2">This experimental setup grounds SMU2 and successively applies a 
+				voltage to SMU1 from -1.5 to +1.5 volts in 10 milliVolt increments, and will 
+				measure the current flowing through SMU 1 .&nbsp; The voltages and currents on 
+				each of the leads of the pn diode are controlled by SMU1 and SMU2. Clicking 
+				your mouse on the SMU's would bring up dialog boxes which are used to configure 
+				the voltages or currents on each of these leads. The Webab user's manual 
+				explains to you how to program the SMU's . The tutorial examples on this web 
+				site illustrates how to do this.
+			</p>
+			<p class="style2">Once the configuration of the experiment is completed, you can 
+				click on the &quot;Measurement&quot; item on the menu bar. Do this and select 
+				the &quot;Run Measurement&quot; option (the only option available on this menu 
+				item). This will submit the experiment over the Internet to the WebLab server 
+				for execution. You can also click on the &quot;Running Man&quot; icon in the 
+				upper right of the WebLab client program to submit an experiment. Once the 
+				experiment is complete the results are downloaded to the client. The resulting 
+				window should look like Figure 4 below.
+			</p>
+			<p>&nbsp; <img width="379" height="493" src="image4.jpg"></p>
+			<p class="style2">Figure 4: Plot of Output from Diode Experiment
+			</p>
+			<p class="style2">The graph shows the voltage across the diode on the <em>x </em>axis 
+				and the current through the diode on the <em>y </em>axis. For this simple 
+				experiment, the graph is the diode characteristic that is familiar to 
+				electrical engineers. Namely, the current remains negligible until the voltage 
+				reaches about 0.6 Volts, at which point the current increases rapidly in an 
+				exponential way. In our experiment, we limit the current to 100 milliAmps. This 
+				limit is imposed by the experimental setup.
+			</p>
+			<p class="style2">This characteristic behavior allows the pn diode to act as a 
+				valve for current; if the voltage between the leads is less than about 0.6 
+				Volts (the voltage needed in the diode to allow it to conduct current), no 
+				current flows; if it it a bit higher than 0.6 Volts, the current rises quickly 
+				to the maximum allowed value.
+			</p>
+			<p class="style2">You can change the way the experimental data is plotted by 
+				altering the scale of the axes. For example, try resetting the scale on the <em>y </em>
+				axis from linear to logarithmic. The data should be redisplayed with the new 
+				axes.
+			</p>
+			<p class="style2"><a href="#top" class="style6"><strong>back to top ^</strong></a></p>
+			<h1>
+				<strong><a name="policy" class="style3">Policies and constraints </a></strong>
+			</h1>
+			<p class="style2">In order to provide a seamless experience, the WebLab team 
+				introduced a number of policies and constraints:
+			</p>
+			<p class="style2">&#149;&nbsp; Number of data points in the results generated is 
+				limited to a particular value. The Weblab applet checks for this constraint at 
+				run time and informs the user if this value is exceeded.
+			</p>
+			<p class="style2">&#149;&nbsp; There is a maximum voltage or current that can be 
+				applied to the leads of a device. This is called the default compliance value 
+				is automatically set to protect the measuring equipment from damage. Thus, 
+				whenever the voltage or current in an experiment exceeds the compliance value, 
+				the results obtained saturates to that value.
+			</p>
+			<p><span class="style2">&#149;&nbsp; Only one applet instance can be opened per internet browser. </span></p>
+			<p><span class="style2"><a href="#top" class="style6"><strong>back to top ^</strong></a></span>
+			</p>
+			<h1>
+				<strong><a name="resources" class="style3">Resources </a></strong>
+			</h1>
+			<p><img width="330" height="233" src="image5.jpg"></p>
+			<p class="style2">Figure 5: Agilent 4155B - Semiconductor Parameter Analyzer
+			</p>
+			<p class="style2">Agilent 4155B - Semiconductor Parameter Analyzer: Characterizes a 
+				given microelectronic device. It performs the required current and voltage 
+				measurements on any connected device such as a transistor or diode.</p>
+			<p class="style2">Agilent E5250A - Low Leakage Switching Matrix: Multiplexes the 
+				I/O signals from the Agilent 4155B to one of the eight test fixtures connected 
+				to the output ports of the matrix. This increases the system's capacity (in 
+				terms of devices connected at a given time) from 1 to 8.</p>
+			<p class="style2">Agilent 16442A - Test Fixture: Houses a device or circuit that is 
+				connected to the system. Provides a means for the I/O signals from the Agilent 
+				4155B to be broken out of their triaxial lines and connected to individual 
+				device terminals.</p>
+			<p class="style2">Agilent 34970A - Data Logger: Used with a digital multimeter 
+				module to record the ambient temperature of the lab for the student. This 
+				information is useful as input to device models/simulations.</p>
+			<p class="style2">All of this equipment is connected via a common GPIB 
+				communication interface to a computer that controls all three of the Agilent 
+				devices.</p>
+			<p class="style2"><a href="#top" class="style6"><strong>back to top ^</strong></a></p>
+			<h1><br>
+				<strong><a name="ref" class="style3">References </a></strong>
+			</h1>
+			<p class="style2"><strong>&quot;MIT Microelectronics WebLab&quot;</strong>, J.A. 
+				del Alamo, V. Chang, L. Brooks, C. McLean, J.L. Hardison, G. Mishuris, and L. 
+				Hui</p>
+			<p class="style2"><strong>&quot;An Open-Source Export Package for the MIT 
+					Microelectronics WebLab&quot;</strong>, J.L. Hardison
+			</p>
+			<p class="style2"><strong>http://icampus.mit.edu/iLabs/Architecture/default.aspx </strong>
+			</p>
+			<p class="style2"><strong>http://ilab.mit.edu/ServiceBroker5_1/about.aspx</strong></p>
+			<p class="style2"><a href="#top" class="style6"><strong>back to top ^</strong></a></p>
+		</div>
+	</body>
+</html>

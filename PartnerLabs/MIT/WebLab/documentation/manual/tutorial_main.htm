@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>MIT WebLab Tutorials</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<style type="text/css">
+			<!--
+.style3 {font-size: medium}
+.style7 {font-size: xx-large}
+.style8 {font-size: x-large}
+--></style></head>
+	<body>
+		<h2 class="style7">Tutorials</h2>
+		<p class="style3">The MIT Microelectronics WebLab is a remote microelectronics 
+			device characterization laboratory. It allows users to measure the 
+			current-voltage characteristics of diodes and other microelectronics devices 
+			remotely, using a Java-enabled web browser.&nbsp; To run the Microelectronics 
+			WebLab, you must have a Java 1.4.2 plug-in installed, available from <a href="http://java.sun.com/products/plugin/">
+				Sun's web site</a>. You must also enable pop-ups.</p>
+		<h1><a name="simple" class="style8">Basic Diode Experiment</a></h1>
+		<p class="style3">First, you will need to create an account at <a href="http://ilab.mit.edu/">
+				the WebLab web site</a>. Account group permissions are manually approved; 
+			as a result, there may be up to a 24 hour delay between when you create the 
+			account, and when you can run the WebLab experiments. Once your account has 
+			been enabled, log in, and select the group appropriate for your class. Select 
+			the <b>graphical client</b>, and from there, select <b>Launch Client</b>. You 
+			may be asked whether you authorize the downloading of the WebLab client 
+			software to your computer; approve this. After a short download and startup 
+			time, the client should appear in a new window:
+		</p>
+		<center>
+			<p><img src="images/pn_diode_setup_u.jpg" height="701" width="599"></p>
+			<p class="style3">Figure 1: The WebLab 6.1 Client
+			</p>
+		</center>
+		<p class="style3">We will now walk you through the simplest WebLab experiment -- 
+			testing the properties of a PN diode. When the client is launched, it 
+			automatically makes the diode experiment available to you. The diode symbol has 
+			a triangle pointing into a vertical line. The diode is connected to an 
+			instrument that is going to perform the actual measurements -- an Agilent 4155B 
+			Semiconductor Parameter Analyzer. The boxes labeled SMU1 and SMU2 correspond to 
+			the signal measurement ports of this 4155B. Characterizing the electrical 
+			behavior of the PN diode requires that these two SMU's be programmed 
+			appropriately.
+		</p>
+		<p class="style3">Click on the box labeled SMU1. This will open a dialog box that 
+			allows you to configure SMU1. Since this is the anode, label the voltage Va and 
+			the current Ia. Check the <b>download</b> checkbox for both (WebLab will only 
+			allow you to plot the voltages and currents that you download). Set SMU1 to 
+			voltage mode, with the function set as Variable 1. Configure the voltage to 
+			sweep the voltage from -1.5V through 1.5V in 10mV increments. Do not adjust the 
+			compliance setting -- this sets the maximum current that the 4155B will allow 
+			on any terminals, so as not to damage the device (this setting will be 
+			correctly preconfigured, and will depend on the type of diode currently in the 
+			system):
+		</p>
+		<center>
+			<p><img src="images/diode-tutorial-smu1.gif" height="353" width="240"></p>
+			<p class="style3">Figure 2: SMU1 Configuration
+			</p>
+		</center>
+		<p>You will now want to configure SMU2. Instead of sweeping the voltage, you will 
+			want SMU2 connected to ground. As a result, set it to common mode. Since this 
+			is the cathode, label the voltage Vc and the current Ic. You do not need to 
+			download the voltage, since it is fixed. Also, the diode is a two-terminal 
+			device, so Ia=Ic. Therefore, there is no reason to download both Ia and Ic 
+			(downloading more variables will increase execution time of the experiment):
+		</p>
+		<center>
+			<p><img src="images/tutorial_main_data/diode-tutorial-smu2.gif" height="353" width="240"></p>
+			<p class="style3">Figure 3: SMU2 Configuration
+			</p>
+		</center>
+		<p>From the <b>Measurement</b> menu, select <b>Run Measurement</b>. Depending on 
+			the number of users, you may need to wait a short amount of time for the 
+			experiment to run. Once the experiment is run, you should see a plot of the IV 
+			characteristic of the diode:
+		</p>
+		<center>
+			<p><img src="images/diode-tutorial-results.gif" height="701" width="599"></p>
+			<p class="style3">Figure 4: Diode Characterization Results</p>
+		</center>
+		<p>In order to prevent damage to the diode, we have limited the maximum current 
+			(see the section on the compliance setting above). As a result, depending on 
+			the diode currently in the test setup, you may see the results saturate.
+		</p>
+		<p>You can modify the axes from the dropdowns to the sides of the plot. Try 
+			switching the Y axis into logarithmic mode for a better idea of how the diode 
+			behaves.
+		</p>
+		<p class="style3">After an experiment is run it is possible to download the 
+			experimental data to your machine. From the <b>Results</b> menu, you have the 
+			option of viewing the data in a pop-up window, or downloading it into a comma 
+			separated values (CSV) file suitable for Matlab, spreadsheets, or other 
+			applications.
+		</p>
+		<p>Congratulations! You have successfully completed your first WebLab measurement.
+		</p>
+		<h1 class="style3"><a name="complex" class="style8">Transistor Experiment </a>
+		</h1>
+		<p class="style3">This tutorial walks you through a slightly more complicated 
+			experiment -- analyzing a transistor.
+		</p>
+		<p class="style3">First, if you have not already done so, you will need to create 
+			an account at <a href="http://ilab.mit.edu/">the WebLab web site</a>. Account 
+			group permissions are manually approved, and as a result, there may be up to a 
+			24 hour delay between when you create the account, and when you can run the 
+			WebLab experiments. Once your account has been enabled, log in, and select the 
+			group appropriate for your class. Select the graphical client, and from there, 
+			select <b>Launch Client</b>. You may be asked whether you authorize the 
+			downloading of the WebLab client software to your computer; approve this. After 
+			a short download and startup time, the client should appear in a new window:
+		</p>
+		<center>
+			<p><img src="images/pn_diode_setup_u.jpg" height="701" width="599"></p>
+			<p class="style3">Figure 1: The WebLab 6.1 Client
+			</p>
+		</center>
+		<p class="style3">Once loaded the client will be set to the default device, the 
+			diode. From the <b>Devices</b> menu, select 2n7000 MOSFET transistor:
+		</p>
+		<center>
+			<p><img src="images/trans-tutorial-main.gif" height="701" width="599"></p>
+			<p class="style3">Figure 2: WebLab with Transistor Selected
+			</p>
+		</center>
+		Now, we will configure the ports connected to the transistor. Click on SMU1, 
+		connected to the drain of the transistor. Name the voltage Vd, and the current 
+		Id. Download both, so that you can later plot them. Now, configure this port in 
+		voltage mode and as variable one, sweeping the voltage from 0V through 4V in 
+		200mV increments:
+		<center>
+			<p><img src="images/trans-tutorial-smu1.gif" height="353" width="240"></p>
+			<p class="style3">Figure 3: SMU1 Configuration
+			</p>
+		</center>
+		<p class="style3">Configure the gate terminal, SMU2, to use names Vg and Ig, 
+			voltage mode, function VAR2, a data range of 0.0V to 3.0V, and step size of 
+			200mV. The compliance (maximum gate current) should be limited to 1.0 mA. 
+			Download the gate voltage. Unless you are particularly interested in gate 
+			leakage, there is no reason to download gate current:
+		</p>
+		<center>
+			<p><img src="images/trans-tutorial-smu2.gif" height="353" width="240"></p>
+			<p class="style3">Figure 4: SMU2 Configuration
+			</p>
+		</center>
+		<p class="style3">The source terminal should be held at ground. You do this by 
+			configuring SMU3 using names Vs and Is, and setting the mode to COMM:
+		</p>
+		<center>
+			<p><img src="images/trans-tutorial-smu3.gif" height="353" width="240"></p>
+			<p class="style3">Figure 5: SMU3 Configuration
+			</p>
+		</center>
+		<p class="style3">The experiment is ready to be submitted to the lab server. First, 
+			in case something goes wrong, you should save the current setup. From the <b>setup</b>
+			menu, select <b>Save setup</b>. Setups are permanently saved to your account 
+			and may be loaded, edited, deleted or submitted whenever you login to the lab 
+			sever using this account.
+		</p>
+		<p class="style3">Submit your experiment by selecting <b>Run Measurement</b> from 
+			the <b>Measurement</b> menu. Once the experiment is submitted to the lab 
+			server, the system will verify whether the experiment is properly configured. 
+			If not, it will display an error message telling you what the problem is. If 
+			the experiment passes the validation checks, it is placed on a queue. The 
+			"please wait" message is displayed. Depending on the number of experiments in 
+			the queue, the wait time for your experiment may vary. Once the experiment is 
+			complete, the results are downloaded to the client, and assuming the axes are 
+			reasonably configured, shown in the client window:
+		</p>
+		<center>
+			<p><img src="images/trans-tutorial-postrun1.gif" height="701" width="599"></p>
+			<p class="style3">Figure 6: Output Result Plots
+			</p>
+		</center>
+		<p class="style3">If your window does not show a similar plot, set the <b>X1</b> axis 
+			to display <b>Vd</b>, the <b>Y1</b> axis to display <b>Id</b>, <b>Y2</b> axis 
+			to <b>none</b>, and all axes to Linear/autoscale. From here, try changing the 
+			variables and scales, and see how the plots change.
+		</p>
+		<p class="style3">The Weblab client also allows you do define custom functions. In 
+			the next part of this tutorial, we will show how this can be used to plot 
+			small-signal conductance of the transistor. Select <b>Show User-Defined Functions</b>
+			from the <b>User Defined Functions</b> menu. The <b>User-Defined Functions</b> window 
+			should open. Click the <b>Add new function</b> button in this window. Entering 
+			the the following information to create a named variable GD which is the 
+			derivative of drain current divided by drain voltage:
+		</p>
+		<center>
+			<p><img src="images/trans-tutorial-udf1.gif" height="250" width="562"></p>
+			<p class="style3">Figure 7: User Defined Functions Dialog
+			</p>
+		</center>
+		<p class="style3">Resubmit your experiment to the server. Plot <b>Id</b> on the <b>Y1</b>
+			axis, and <b>GD</b> on the <b>Y2</b> axis.
+		</p>
+		<center>
+			<p><img src="images/trans-tutorial-udfplot.gif" height="701" width="599"></p>
+			<p class="style3">Figure 8: Plot with Custom Function
+			</p>
+		</center>
+		<p class="style3">After an experiment is run it is possible to download the 
+			experiment data to your machine. From the <b>Results</b> menu item you have the 
+			option of viewing the data in a pop-up window, or downloading it into a comma 
+			separated values (CSV) file suitable for import into Matlab, a spreadsheet, or 
+			many other applications.
+		</p>
+	</body>
+</html>

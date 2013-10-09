@@ -1,0 +1,166 @@
+<!--
+Copyright (c) 2007 The Massachusetts Institute of Technology.  All
+rights reserved.  Please see license.txt in top level directory for
+full license.
+-->
+<project name="Weblab Client" default="usage">
+
+  <!-- PROPERTIES -->
+
+  <property name="clientname" value="MIT Microelectronics Device Characterization Lab Client" />
+  <property name="clientversion" value="7.0 beta 5" />
+
+  <!-- source files to be included in the build (relative to srcdir) -->
+  <property name="build-includes" value="weblab/toolkit/**/*.java weblab/client/serverInterface/*.java weblab/client/*.java weblab/client/graphicalUI/*.java" />
+
+  <!-- building -->
+  <property name="srcdir" location="src" />
+  <property name="classdir" location="bin" />
+  <property name="libdir" location="lib" />  <!-- for classpath -->
+
+  <!-- deployment and distribution -->
+  <property name="javadocdir" location="doc/api" />
+  <property name="jardir" location="jar" />
+  <property name="unsignedjar.loc" value="${jardir}/Weblab-client.jar" />
+  <property name="signedjar.loc" value="${jardir}/signed_Weblab-client.jar" />
+
+  <!-- jar signing -->
+  <property name="keystore.location" location=".keystore" />
+  <property name="keystore.alias" value="weblab" />
+  <property name="keystore.password" value="changeme" />
+
+  <!-- debug mode defaults to false (enable using client-debug target) -->
+  <property name="debug-mode" value="false" />
+
+
+  <!-- TARGETS -->
+
+  <target name="client" depends="signedjar" />
+
+  <target name="client-debug">
+    <antcall target="client">
+      <param name="debug-mode" value="true"/>
+    </antcall>
+  </target>
+
+  <target name="usage">
+<echo>Build options for ${clientname}:
+
+"ant client": for production (minimal debugging, smaller JAR size)
+"ant client-debug": for development and debugging (larger JAR size)
+"ant javadoc": generate Javadoc API documentation for the client
+"ant clean": remove all files created by build process
+
+Note: always run "ant clean" before rebuilding with a different set of options (e.g. when switching from "ant client-debug" to "ant client").
+</echo>
+    <fail>You must specify one of the above options to build the client.</fail>
+  </target>
+
+
+  <target name="init">
+    <!-- create build timestamp -->
+    <tstamp>
+      <format property="BUILD_STAMP" pattern="E MMM d yyyy HH:mm:ss z" />
+    </tstamp>
+    <echo>${BUILD_STAMP}</echo>
+
+    <!-- if not building in debug mode, exclude some files -->
+    <!-- (using ".*" to refer to both the .java and .class) -->
+    <condition property="build-excludes"
+               value="weblab/toolkit/serverInterface/StubServer.* weblab/client/WeblabStubServer.* weblab/client/graphicalUI/GraphicalAppletDEBUG.*"
+               else="">
+      <isfalse value="${debug-mode}"/>
+    </condition>
+  </target>
+
+
+  <target name="compile" depends="init" description="compile java source into class files">
+    <mkdir dir="${classdir}" />
+    <javac srcdir="${srcdir}"
+           includes="${build-includes}"
+           excludes="${build-excludes}"
+           destdir="${classdir}"
+           includeAntRuntime="no"
+           debug="${debug-mode}"
+           source="1.4"
+           target="1.4">
+     <!-- not currently needed -->
+     <!--
+      <classpath>
+        <fileset dir="${libdir}">
+          <include name="**/*.jar" />
+        </fileset>
+        <pathelement location="." />
+      </classpath>
+     -->
+    </javac>
+  </target>
+
+
+  <target name="jar" depends="compile" description="assembles a JAR file from compiled output">
+    <mkdir dir="${jardir}" />
+    <!-- create file with build information for inclusion in JAR -->
+    <echo file="version.txt">${clientname}
+version: ${clientversion}
+build: ${BUILD_STAMP}
+</echo>
+    <!-- assemble the JAR -->
+    <jar destfile="${unsignedjar.loc}"
+         basedir="${classdir}"
+         includes="**/*.class"
+         excludes="${build-excludes}"
+         duplicate="fail">
+      <fileset dir="." includes="img/*.gif img/*.png" />
+      <fileset dir="." includes="version.txt" />
+    </jar>
+  </target>
+
+
+  <target name="signedjar" depends="jar" description="signs the jar with the key from a previously generated keystore">
+    <signjar jar="${unsignedjar.loc}"
+             signedjar="${signedjar.loc}"
+             keystore="${keystore.location}"
+             alias="${keystore.alias}"
+             storepass="${keystore.password}" />
+  </target>
+
+
+  <target name="keystore" description="generates the keystore and key needed for signing jars">
+    <genkey keystore="${keystore.location}"
+            alias="${keystore.alias}"
+            storepass="${keystore.password}"
+            validity="3650"
+            keyalg="RSA">
+      <dname>
+        <param name="CN" value="MIT Microelectronics Weblab Team" />
+        <param name="O" value="Massachusetts Institute of Technology" />
+        <param name="L" value="Cambridge" />
+        <param name="ST" value="MA" />
+        <param name="C" value="US" />
+      </dname>
+    </genkey>
+  </target>
+
+
+  <target name="javadoc" description="generates javadoc documentation">
+    <mkdir dir="${javadocdir}" />
+    <javadoc sourcepath="${srcdir}"
+             destdir="${javadocdir}"
+             source="1.4"
+             breakiterator="yes">
+      <fileset dir="${srcdir}"><!--XXX doesn't work -->
+        <include name="${build-includes}" />
+        <exclude name="${build-excludes}" />
+      </fileset>
+    </javadoc>
+  </target>
+
+
+  <target name="clean" description="deletes all existing output and output directories">
+    <delete dir="${classdir}" />
+    <delete dir="${javadocdir}" />
+    <delete file="${unsignedjar.loc}" />
+    <delete file="${signedjar.loc}" />
+  </target>
+
+</project>

@@ -1,0 +1,24 @@
+<!-- 
+Copyright (c) 2005 The Massachusetts Institute of Technology. All rightsreserved.
+Please see license.txt in top level directory for full license. 
+-->
+
+<!ELEMENT labConfiguration (device*)>
+<!ATTLIST labConfiguration	lab			CDATA	#REQUIRED
+							specversion	CDATA	#REQUIRED>
+	<!ELEMENT device (name, description, imageURL, terminal+, maxDataPoints)>
+	<!ATTLIST device id		CDATA		#REQUIRED
+					 type	CDATA		#REQUIRED>
+		<!ELEMENT name (#PCDATA)>
+		<!ELEMENT description (#PCDATA)>
+		<!ELEMENT imageURL (#PCDATA)>
+		<!ELEMENT terminal (label, pixelLocation, maxVoltage, maxCurrent)>
+		<!ATTLIST terminal	portType	(SMU | VSU | VMU)	#REQUIRED
+							portNumber	CDATA	#REQUIRED>
+			<!ELEMENT label (#PCDATA)>
+			<!ELEMENT pixelLocation (x, y)>
+				<!ELEMENT x (#PCDATA)>
+				<!ELEMENT y (#PCDATA)>
+			<!ELEMENT maxVoltage (#PCDATA)>
+			<!ELEMENT maxCurrent (#PCDATA)>
+		<!ELEMENT maxDataPoints (#PCDATA)>

@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008 Tools for Applications
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ExperimentExecEngine", "ExperimentExecEngine.vbproj", "{EE161E3E-1D24-4B18-B2E8-06B39C839D1A}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ExperimentExecEngineSetup", "ExperimentExecEngineSetup\ExperimentExecEngineSetup.vdproj", "{1AB6883F-9329-404B-A3CF-5C22D333D857}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE161E3E-1D24-4B18-B2E8-06B39C839D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE161E3E-1D24-4B18-B2E8-06B39C839D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE161E3E-1D24-4B18-B2E8-06B39C839D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE161E3E-1D24-4B18-B2E8-06B39C839D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB6883F-9329-404B-A3CF-5C22D333D857}.Debug|Any CPU.ActiveCfg = Debug
+		{1AB6883F-9329-404B-A3CF-5C22D333D857}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!DOCTYPE experimentSpecification SYSTEM "http://weblab2.mit.edu/xml/experimentSpecification.dtd">
+<experimentSpecification lab="MIT Microelectronics Weblab" specversion="0.1">
+	<deviceID>1</deviceID>
+	<terminal portType="SMU" portNumber="1">
+		<vname download="true">VDS</vname>
+		<iname download="true">IDS</iname>
+		<mode>V</mode>
+		<function type="VAR2">
+			<scale>LIN</scale>
+			<start>0.05</start>
+			<stop>0.5</stop>
+			<step>0.1</step>
+		</function>
+		<compliance>0.1</compliance>
+	</terminal>
+	<terminal portType="SMU" portNumber="2">
+		<vname download="true">VG</vname>
+		<iname download="true">IG</iname>
+		<mode>V</mode>
+		<function type="VAR1">
+			<scale>LIN</scale>
+			<start>0.0</start>
+			<stop>4.5</stop>
+			<step>0.05</step>
+		</function>
+		<compliance>0.1</compliance>
+	</terminal>
+	<terminal portType="SMU" portNumber="3">
+		<vname download="true">VGRD</vname>
+		<iname download="true">IGRD</iname>
+		<mode>V</mode>
+		<function type="CONS">
+			<value>0.0</value>
+		</function>
+		<compliance>0.1</compliance>
+	</terminal>
+	<userDefinedFunction>
+		<name download="true">SQRTID</name>
+		<units>A</units>
+		<body>SQRT(IDS)</body>
+	</userDefinedFunction>
+</experimentSpecification>
+
+
+
+			
