@@ -5,7 +5,7 @@ Please see license.txt in top level directory for full license.
 
 
 /****** Object:  Database WebLabServicesLS    Script Date: 8/31/2004 1:34:26 PM ******/
-CREATE DATABASE WebLabServicesLS  ON (NAME = N'WebLabServicesLS_dat', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL\data\WebLabServicesLS.mdf' , SIZE = 314, FILEGROWTH = 10%) LOG ON (NAME = N'WebLabServicesLS_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL\data\WebLabServicesLS.ldf' , SIZE = 10, FILEGROWTH = 10%)
+CREATE DATABASE WebLabServicesLS  ON (NAME = N'WebLabServicesLS_dat', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL\DATA\WebLabServicesLS.mdf' , SIZE = 314, FILEGROWTH = 10%) LOG ON (NAME = N'WebLabServicesLS_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL\data\WebLabServicesLS.ldf' , SIZE = 10, FILEGROWTH = 10%)
  COLLATE SQL_Latin1_General_CP1_CI_AS
 GO
 
@@ -1395,7 +1395,7 @@ CREATE TABLE [dbo].[LSSystemConfig] (
 	[Admin_ID] [int] NOT NULL ,
 	[ws_int_is_active] [bit] NOT NULL ,
 	[exp_eng_is_active] [bit] NOT NULL ,
-	[lab_server_id] [varchar] (35) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[lab_server_id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[lab_status_msg] [varchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL 
 ) ON [PRIMARY]
 GO
@@ -1405,7 +1405,7 @@ CREATE TABLE [dbo].[LoginRecord] (
 	[record_id] [int] IDENTITY (1, 1) NOT NULL ,
 	[login_type] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[user_id] [int] NOT NULL ,
-	[remote_ip] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[remote_ip] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[user_agent] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[login_time] [datetime] NOT NULL 
 ) ON [PRIMARY]
@@ -1468,14 +1468,14 @@ CREATE TABLE [dbo].[Brokers] (
 	[broker_id] [numeric](18, 0) IDENTITY (1, 1) NOT NULL ,
 	[class_id] [numeric](18, 0) NOT NULL ,
 	[name] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[broker_server_id] [varchar] (35) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
+	[broker_server_id] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[broker_passkey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[server_passkey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[description] [varchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[comments] [varchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[contact_first_name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[contact_last_name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
-	[contact_email] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
+	[contact_email] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL ,
 	[is_active] [bit] NOT NULL ,
 	[notify_location] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL ,
 	[date_created] [datetime] NOT NULL ,
