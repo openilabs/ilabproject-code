@@ -1,7 +1,8 @@
 <%@ Page %>
 <%@ Import Namespace="System" %>
+<%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 <!--
 Author(s): James Hardison (hardison@alum.mit.edu)
 Date: 5/9/2003

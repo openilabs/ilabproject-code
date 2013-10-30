@@ -247,7 +247,7 @@
 			
 			Dim loopIdx, intCtrlNum As Integer
 			Dim strResult As String
-			Dim lblMappingIDRef, lblClassIDRef As Label
+			Dim lblMappingIDRef, lblClassIDRef As HiddenField
 			Dim chkCanReadRef, chkCanEditRef, chkCanDeleteRef, chkCanGrantRef As CheckBox
 			Dim txtPriorityRef As TextBox
 			
@@ -255,43 +255,48 @@
 				'only need to handle mapping updates/removals
 				
 				If e.CommandName = "SETUP" Then
+					Dim strCtrlNum As String
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMappingIDRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":lblMappingID")
-						chkCanReadRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanRead")
-						chkCanEditRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanEdit")
-						chkCanDeleteRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanDelete")
-						chkCanGrantRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanGrant")
-						txtPriorityRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":txtPriority")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMappingIDRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
+						chkCanReadRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
+						chkCanEditRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
+						chkCanDeleteRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
+						chkCanGrantRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
+						txtPriorityRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$txtPriority")
 						
 						If lblMappingIDRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource:SetUpPerms MappingID.  Aborting."
 							Exit Sub
 						End If	
 						
 						If chkCanReadRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanRead.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanEditRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanEdit.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanDeleteRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanDelete.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanGrantRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanGrant.  Aborting."
 							Exit Sub
 						End If
 						
 						If txtPriorityRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: Priority.  Aborting."
 							Exit Sub
 						Else
 							If Not IsNumeric(txtPriorityRef.Text) Then
@@ -305,7 +310,7 @@
 						
 						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) Then
 							'case where permissions have been removed.
-							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Text))
+							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Value))
 							
 							If strResult <> "Mapping successfully deleted." Then
 								lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -313,7 +318,7 @@
 							End If
 						Else
 							'case where permissions are updated
-							strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
+							strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
 							
 							If strResult <> "Mapping successfully updated." Then
 								lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -323,43 +328,48 @@
 						
 					Next
 				Else
+					Dim strCtrlNum As String
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMappingIDRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":lblMappingID")
-						chkCanReadRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanRead")
-						chkCanEditRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanEdit")
-						chkCanDeleteRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanDelete")
-						chkCanGrantRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanGrant")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMappingIDRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
+						chkCanReadRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
+						chkCanEditRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
+						chkCanDeleteRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
+						chkCanGrantRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
 						
 						If lblMappingIDRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource:NonSetup MappingID.  Aborting."
 							Exit Sub
 						End If	
 						
 						If chkCanReadRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanRead.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanEditRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanEdit.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanDeleteRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanDelete.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanGrantRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanGrant.  Aborting."
 							Exit Sub
 						End If
 						
 						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) Then
 							'case where permissions have been removed.
-							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Text))
+							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Value))
 							
 							If strResult <> "Mapping successfully deleted." Then
 								lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -367,7 +377,7 @@
 							End If
 						Else
 							'case where permissions are updated
-							strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
+							strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
 							
 							If strResult <> "Mapping successfully updated." Then
 								lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -383,49 +393,55 @@
 				'need to handle add cases as well
 				
 				If e.CommandName = "SETUP" Then
+					Dim strCtrlNum As String
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
 						
-						lblMappingIDRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":lblMappingID")
-						lblClassIDRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":lblClassID")
-						chkCanReadRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanRead")
-						chkCanEditRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanEdit")
-						chkCanDeleteRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanDelete")
-						chkCanGrantRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":chkCanGrant")
-						txtPriorityRef = FindControl("rptSetupPerms:_ctl" & intCtrlNum & ":txtPriority")
+						lblMappingIDRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
+						lblClassIDRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$lblClassID")
+						chkCanReadRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
+						chkCanEditRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
+						chkCanDeleteRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
+						chkCanGrantRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
+						txtPriorityRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$txtPriority")
 						
 						If lblMappingIDRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource:SetUp MappingID.  Aborting."
 							Exit Sub
 						End If	
 						
 						If lblClassIDRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: ClassID.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanReadRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanRead.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanEditRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanEdit.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanDeleteRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanDelete.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanGrantRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanGrant.  Aborting."
 							Exit Sub
 						End If
 						
 						If txtPriorityRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: Priority.  Aborting."
 							Exit Sub
 						Else
 							If Not IsNumeric(txtPriorityRef.Text) Then
@@ -438,9 +454,9 @@
 						End If
 						
 						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) Then
-							If lblMappingIDRef.Text <> "0" Then
+							If lblMappingIDRef.Value <> "0" Then
 								'case where mapping has should be removed (permissions removed)
-								strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Text))
+								strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Value))
 								
 								If strResult <> "Mapping successfully deleted." Then
 									lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -449,9 +465,9 @@
 							End If
 								'else case is where non-mapped class has not been given permissions, do nothing.
 						Else
-							If lblMappingIDRef.Text <> "0" Then
+							If lblMappingIDRef.Value <> "0" Then
 								'case where non-removal edits have been made to pre-existing mapping, update.					
-								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
+								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
 								
 								If strResult <> "Mapping successfully updated." Then
 									lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -459,7 +475,7 @@
 								End If
 							Else 
 								'case where non-mapped class has been given permissions, add
-								strResult = rpmObject.MapClassToResource(CInt(e.CommandArgument), CInt(lblClassIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
+								strResult = rpmObject.MapClassToResource(CInt(e.CommandArgument), CInt(lblClassIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
 								
 								If strResult <> "Mapping successfully added." Then
 									lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -471,50 +487,55 @@
 					Next
 				Else
 				'non-setup case
+					Dim strCtrlNum As String
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMappingIDRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":lblMappingID")
-						lblClassIDRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":lblClassID")
-						chkCanReadRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanRead")
-						chkCanEditRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanEdit")
-						chkCanDeleteRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanDelete")
-						chkCanGrantRef = FindControl("rptNonSetupPerms:_ctl" & intCtrlNum & ":chkCanGrant")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMappingIDRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
+						lblClassIDRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$lblClassID")
+						chkCanReadRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
+						chkCanEditRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
+						chkCanDeleteRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
+						chkCanGrantRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
 						
 						If lblMappingIDRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: MAppingID.  Aborting."
 							Exit Sub
 						End If	
 						
 						If lblClassIDRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: ClassID.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanReadRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CAnRead.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanEditRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CanEdit.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanDeleteRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: AnDelete.  Aborting."
 							Exit Sub
 						End If
 						
 						If chkCanGrantRef Is Nothing Then
-							lblErrorMsg.Text = "Page Error While Updating Resource.  Aborting."
+							lblErrorMsg.Text = "Page Error While Updating Resource: CAnGrant.  Aborting."
 							Exit Sub
 						End If
 						
 						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) Then
-							If lblMappingIDRef.Text <> "0" Then
+							If lblMappingIDRef.Value <> "0" Then
 								'case where mapping has should be removed (permissions removed)
-								strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Text))
+								strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Value))
 								
 								If strResult <> "Mapping successfully deleted." Then
 									lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -523,9 +544,9 @@
 							End If
 								'else case is where non-mapped class has not been given permissions, do nothing.
 						Else
-							If lblMappingIDRef.Text <> "0" Then
+							If lblMappingIDRef.Value <> "0" Then
 								'case where non-removal edits have been made to pre-existing mapping, update.					
-								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
+								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
 								
 								If strResult <> "Mapping successfully updated." Then
 									lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -533,7 +554,7 @@
 								End If
 							Else 
 								'case where non-mapped class has been given permissions, add
-								strResult = rpmObject.MapClassToResource(CInt(e.CommandArgument), CInt(lblClassIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
+								strResult = rpmObject.MapClassToResource(CInt(e.CommandArgument), CInt(lblClassIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
 								
 								If strResult <> "Mapping successfully added." Then
 									lblErrorMsg.Text = "Error Updating Resource: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -603,49 +624,53 @@
 			If blnACGrant Then
 				Dim loopIdx, intCtrlNum As Integer
 				Dim chkAddCanReadRef, chkAddCanEditRef, chkAddCanDeleteRef, chkAddCanGrantRef As CheckBox
-				Dim lblAddClassIDRef As Label
-				
+				Dim lblAddClassIDRef As HiddenField
+				Dim strCtrlNum As String
 				For loopIdx = 0 To CInt(Request.Form("Gct")) - 1
 					intCtrlNum = (loopIdx * 2) + 1
-					
-					lblAddClassIDRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":lblAddClassID")
-					chkAddCanReadRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanRead")
-					chkAddCanEditRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanEdit")
-					chkAddCanDeleteRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanDelete")
-					chkAddCanGrantRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanGrant")
+					If intCtrlNum < 10 Then
+						strCtrlNum = "0" & IntCtrlNum
+					Else
+						strCtrlNum = IntCtrlNum
+					End If
+					lblAddClassIDRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$lblAddClassID")
+					chkAddCanReadRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanRead")
+					chkAddCanEditRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanEdit")
+					chkAddCanDeleteRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanDelete")
+					chkAddCanGrantRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanGrant")
 					
 					If lblAddClassIDRef Is Nothing Then
-						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions.  Aborting."
+						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions: ClassID.  Aborting."
 						strPageState = "ADD"
 						Exit Sub
 					End If
 					
 					If chkAddCanReadRef Is Nothing Then
-						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions.  Aborting."
+						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions: CanRead.  Aborting."
 						strPageState = "ADD"
 						Exit Sub
 					End If
 				
 					If chkAddCanEditRef Is Nothing Then
-						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions.  Aborting."
+						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions: EditEdit.  Aborting."
 						strPageState = "ADD"
 						Exit Sub
 					End If
 					
 					If chkAddCanDeleteRef Is Nothing Then
-						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions.  Aborting."
+						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions: CanDelete.  Aborting."
 						strPageState = "ADD"
 						Exit Sub
 					End If
 					
 					If chkAddCanGrantRef Is Nothing Then
-						lblErrorMsg.Text = "Page Error While Assigning Permissions.  Aborting."
+						lblErrorMsg.Text = "Page Error While Assigning Permissions: CanGrant.  Aborting."
 						Exit Sub
 					End If
 					
 					'use RPM method MapClassToResource to assign resource permissions.
 					
-					strResult = rpmObject.MapClassToResource(CInt(strResourceID), CInt(lblAddClassIDRef.Text), chkAddCanReadRef.Checked, chkAddCanEditRef.Checked, chkAddCanGrantRef.Checked, chkAddCanDeleteRef.Checked)
+					strResult = rpmObject.MapClassToResource(CInt(strResourceID), CInt(lblAddClassIDRef.Value), chkAddCanReadRef.Checked, chkAddCanEditRef.Checked, chkAddCanGrantRef.Checked, chkAddCanDeleteRef.Checked)
 					
 					If strResult <> "Mapping successfully added." Then
 						lblErrorMsg.Text = "Error Assigning Permissions: " & strResult
@@ -737,9 +762,9 @@
 								|
 							<%End If%>
 							<%If blnSRRead Then%>
-								<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/labserver/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>
 						</div>
 						<p>
@@ -830,9 +855,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -843,7 +868,7 @@
 								<td align=left>
 									<font class="regular"><b>General Information</b></font>
 									<%If blnIsSetup And blnDMRead Then%>
-									<font class="extra-small">(<a href="/labserver/admin/experiment-setups.aspx?sid=<%=strSetupID%>" target=main>View Experiment Setup</a>)</font>
+									<font class="extra-small">(<a href="experiment-setups.aspx?sid=<%=strSetupID%>" target=main>View Experiment Setup</a>)</font>
 									<%End If%>
 								</td>
 							</tr>
@@ -988,16 +1013,14 @@
 											 						<tr>
 											 							<td>
 											 								<font class="regular">
-											 									&nbsp;<a href="/labserver/admin/usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target=main><%#Container.DataItem("name")%></a>
-											 									<asp:Label
+											 									&nbsp;<a href="usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target=main><%#Container.DataItem("name")%></a>
+											 									<asp:HiddenField
 											 										ID="lblMappingID"
-											 										Visible="False"
-											 										Text='<%#DBNullFilter(Container.DataItem("mapping_id"), "0")%>'
+											 										Value='<%#DBNullFilter(Container.DataItem("mapping_id"), "0")%>'
 											 										Runat="Server" />
-											 									<asp:Label
+											 									<asp:HiddenField
 											 										ID="lblClassID"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("class_id")%>'
+											 										Value='<%#Container.DataItem("class_id")%>'
 											 										Runat="Server" />
 											 								</font>
 											 							</td>
@@ -1096,16 +1119,14 @@
 											 						<tr>
 											 							<td>
 											 								<font class="regular">
-											 									&nbsp;<a href="/labserver/admin/usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target=main><%#Container.DataItem("name")%></a>
-											 									<asp:Label
+											 									&nbsp;<a href="usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target=main><%#Container.DataItem("name")%></a>
+											 									<asp:HiddenField
 											 										ID="lblMappingID"
-											 										Visible="False"
-											 										Text='<%#DBNullFilter(Container.DataItem("mapping_id"), "0")%>'
+											 										Value='<%#DBNullFilter(Container.DataItem("mapping_id"), "0")%>'
 											 										Runat="Server" />
-											 									<asp:Label
+											 									<asp:HiddenField
 											 										ID="lblClassID"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("class_id")%>'
+											 										Value='<%#Container.DataItem("class_id")%>'
 											 										Runat="Server" />
 											 								</font>
 											 							</td>
@@ -1226,9 +1247,9 @@
 										Runat="Server" />
 									|
 									<%If blnSRRead Then%>
-										<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+										<a href="main.aspx" target="main">Return to Main</a>
 									<%Else%>
-										<a href="/labserver/main.aspx" target="main">Return to Main</a>
+										<a href="/main.aspx" target="main">Return to Main</a>
 									<%End If%>
 								</div>
 							<p>
@@ -1263,7 +1284,7 @@
 													<font class="regular">
 														Note: This form is to be used for creating software resources only.  
 														<%If blnDMEdit Then%>
-															Experiment Setup resources can be added via the <a href="/labserver/admin/experiment-setups.aspx?mode=add" target=main>Create Experiment Setup form</a>.
+															Experiment Setup resources can be added via the <a href="experiment-setups.aspx?mode=add" target=main>Create Experiment Setup form</a>.
 														<%End If%>
 														<br>&nbsp;
 													</font>
@@ -1344,11 +1365,10 @@
 											 						<tr>
 											 							<td>
 											 								<font class="regular">
-											 									&nbsp;<a href="/labserver/admin/usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target=main><%#Container.DataItem("name")%></a>
-											 									<asp:Label
+											 									&nbsp;<a href="usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target=main><%#Container.DataItem("name")%></a>
+											 									<asp:HiddenField
 											 										ID="lblAddClassID"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("class_id")%>'
+											 										Value='<%#Container.DataItem("class_id")%>'
 											 										Runat="Server" />
 											 								</font>
 											 							</td>
@@ -1433,7 +1453,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

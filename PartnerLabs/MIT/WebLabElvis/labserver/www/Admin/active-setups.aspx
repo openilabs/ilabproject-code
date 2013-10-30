@@ -146,15 +146,21 @@
 			Dim loopIdx, intCtrlNum As Integer
 			Dim ddlProfilesRef As DropDownList
 			Dim chkStatusRef As CheckBox
-			Dim lblIDContainerRef As Label
+			Dim lblIDContainerRef As HiddenField
 
-			
+			Dim strCtrlNum As String
 			For loopIdx = 0 To e.CommandArgument - 1
 				intCtrlNum = (loopIdx * 2) + 1
 				
-				ddlProfilesRef = FindControl("rptActives:_ctl" & intCtrlNum & ":ddlProfiles")
-				chkStatusRef = FindControl("rptActives:_ctl" & intCtrlNum & ":chkStatus")
-				lblIDContainerRef = FindControl("rptActives:_ctl" & intCtrlNum & ":lblIDContainer")
+				If intCtrlNum < 10 Then
+				    strCtrlNum = "0" &IntCtrlNum
+				Else
+				     strCtrlNum = IntCtrlNum
+				End If
+				
+				ddlProfilesRef = FindControl("rptActives$ctl" & strCtrlNum & "$ddlProfiles")
+				chkStatusRef = FindControl("rptActives$ctl" & strCtrlNum & "$chkStatus")
+				lblIDContainerRef = FindControl("rptActives$ctl" & strCtrlNum & "$lblIDContainer")
 				
 				If ddlProfilesRef Is Nothing Then
 					lblErrorMsg.Text = "Page Error While Changing Assignments.  Aborting. (ddlProfiles, " & loopIdx & ")"
@@ -172,13 +178,13 @@
 				End If
 				
 				If ddlProfilesRef.SelectedItem.Value = "0" Then
-					'strResult = rpmObject.SetActiveDevice(CInt(lblIDContainerRef.Text), CBool(chkStatusRef.Checked))
+					'strResult = rpmObject.SetActiveDevice(CInt(lblIDContainerRef.Value), CBool(chkStatusRef.Checked))
 					
 					'If strResult <> "Device position successfully set." Then
 					'	lblErrorMsg.Text = "Error Assigning Profile: " & strResult
 					'End If
 				Else
-					strResult = rpmObject.SetActiveSetup(CInt(lblIDContainerRef.Text), CInt(ddlProfilesRef.SelectedItem.Value), CBool(chkStatusRef.Checked))
+					strResult = rpmObject.SetActiveSetup(CInt(lblIDContainerRef.Value), CInt(ddlProfilesRef.SelectedItem.Value), CBool(chkStatusRef.Checked))
 					
 					If strResult <> "Device position successfully set." Then
 						lblErrorMsg.Text = "Error Assigning Profile: " & strResult
@@ -250,9 +256,9 @@
 						<hr size=1>
 						<div align="right" class="extra-small">
 							<%If blnSRRead Then%>
-								<a href="/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>
 						</div>
 						<p>
@@ -279,10 +285,9 @@
 											
 											<td>
 												<font class="regular">
-												<asp:Label
+												<asp:HiddenField
 														ID="lblIDContainer"
-														Visible="False"
-														Text='<%#Container.DataItem("active_id")%>'
+														Value='<%#Container.DataItem("active_id")%>'
 														Runat="Server" />
 													<asp:DropDownList
 														ID="ddlProfiles"
@@ -355,7 +360,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

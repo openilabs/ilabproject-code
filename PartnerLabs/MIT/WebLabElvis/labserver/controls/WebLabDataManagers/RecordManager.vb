@@ -1,7 +1,9 @@
 Imports System
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports Microsoft.VisualBasic
-Imports WebLabCustomDataTypes.WebLabCustomDataTypes
+
+Imports WebLabCustomDataTypes
 
 
 'Author(s): James Hardison (hardison@alum.mit.edu)

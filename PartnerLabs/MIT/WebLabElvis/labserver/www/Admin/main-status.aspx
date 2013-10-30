@@ -389,7 +389,7 @@
 					<table cellspacing=0 cellpadding=0 border=0 width=100%>
 						<tr>
 							<td><font class="regular"><b>Queuing & Execution System:</b></font></td>
-							<td align=center><font class="small">Most Recent Jobs:&nbsp;&nbsp; <font class="extra-small">(<a href="/labserver/admin/exec-log.aspx" target="main">View All</a>)</font></font></td>
+							<td align=center><font class="small">Most Recent Jobs:&nbsp;&nbsp; <font class="extra-small">(<a href="exec-log.aspx" target="main">View All</a>)</font></font></td>
 						</tr>
 						<tr>
 							<td width=37%>
@@ -465,7 +465,7 @@
 					<table cellspacing=0 cellpadding=0 border=0 width=100%>
 						<tr>
 							<td><font class="regular"><b>Web Service Interface Traffic:</b></font></td>
-							<td align=center><font class="small">Most Recent Requests:&nbsp;&nbsp; <font class="extra-small">(<a href="/labserver/admin/wsint-log.aspx" target="main">View All</a>)</font></font></td>
+							<td align=center><font class="small">Most Recent Requests:&nbsp;&nbsp; <font class="extra-small">(<a href="wsint-log.aspx" target="main">View All</a>)</font></font></td>
 						</tr>
 						<tr>
 							<td width=37%>

@@ -6,7 +6,7 @@
 <script Runat="Server">
 
 	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
-	Dim strDBQuery, strLabStatusMsg, strLabServerID, strWebServIntEnabled, strExpEngEnabled, strSysManID, strHomepage As String
+	Dim strDBQuery, strLabStatusMsg, strLabServerID, strWebServIntEnabled, strExpEngEnabled, strSysManID, strHomepage, strDevName As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
 	Dim rpmObject As New ResourcePermissionManager()
@@ -23,7 +23,7 @@
 			
 			If blnSCRead Then
 			
-				strDBQuery = "SELECT homepage, Admin_ID, ws_int_is_active, exp_eng_is_active, lab_server_id, lab_status_msg FROM LSSystemConfig WHERE SetupID = '1';"
+				strDBQuery = "SELECT homepage, Admin_ID, ws_int_is_active, exp_eng_is_active, lab_server_id, lab_status_msg, elvis_dev_name FROM LSSystemConfig WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
 				dtrDBQuery = cmdDBQuery.ExecuteReader()
 				
@@ -48,6 +48,12 @@
 					Else
 						strHomepage = dtrDBQuery("homepage")
 					End If
+					
+					If dtrDBQuery("elvis_dev_name") Is DBNull.Value Then
+						strDevName = ""
+					Else
+						strDevName = dtrDBQuery("elvis_dev_name")
+					End If
 				End If
 				
 				dtrDBQuery.Close()		
@@ -62,6 +68,7 @@
 			txtHomepage.Text = strHomepage
 			txtStatusMessage.Text = strLabStatusMsg
 			txtServerID.Text = strLabServerID
+			txtDevName.Text = strDevName
 			
 			'resets drop down list item collection (purges data from previous page state)
 			dropWebServIntEnabled.Items.Clear()
@@ -114,6 +121,25 @@
 		conWebLabLS.Close()
 	End Sub
 	
+	
+	Sub DevNameUpdate_Click(s As Object, e As EventArgs)
+		If blnSCEdit Then
+			Dim strNewValue As String
+			
+			strNewValue = txtDevName.Text
+			
+			If Not Trim(strNewValue) = "" Then
+				strDevName = strNewValue
+				application("device_name") = strNewValue
+				
+				strDBQuery = "UPDATE LSSystemConfig SET elvis_dev_name = @newValue WHERE SetupID = '1';"
+				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
+				cmdDBQuery.Parameters.Add("@newValue", strNewValue)
+				
+				cmdDBQuery.ExecuteNonQuery()
+			End If
+		End If
+	End Sub
 	
 	Sub HomepageUpdate_Click(s As Object, e As EventArgs)
 		If blnSCEdit Then
@@ -289,15 +315,19 @@
 	Sub	ConfigUpdateAll_Click(s As Object, e As EventArgs)
 		If blnSCEdit Then
 			'load all new settings
-			Dim strNewSysManVal, strNewHomepage As String
+			Dim strNewSysManVal, strNewHomepage, strNewDevName As String
 			
 			strNewHomepage = txtHomepage.Text
 			strNewSysManVal = dropSysMan.SelectedItem.Value
+			strNewDevName = txtDevName.Text
 			
-			If  Not (Trim(strNewHomepage) = "" Or Trim(strNewSysManVal) = "") Then
+			If  Not (Trim(strNewHomepage) = "" Or Trim(strNewSysManVal) = "" Or Trim(strNewDevName) = "") Then
 				'edit page/site setting variables
 				strHomepage = strNewHomepage
 				application("homepage") = strNewHomepage
+				
+				strDevName = strNewDevName
+				application("device_name") = strNewDevName
 				
 				strDBQuery = "SELECT first_name, last_name, email FROM SiteUsers WHERE user_id = @adminID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
@@ -317,10 +347,11 @@
 				strSysManID = strNewSysManVal
 				
 				'update setup record in database
-				strDBQuery = "UPDATE LSSystemConfig SET homepage = @newHomepageValue, Admin_ID = @newSysManValue WHERE SetupID = '1';"
+				strDBQuery = "UPDATE LSSystemConfig SET homepage = @newHomepageValue, Admin_ID = @newSysManValue, elvis_dev_name = @newDevName WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
 				cmdDBQuery.Parameters.Add("@newHomepageValue", strNewHomepage)
 				cmdDBQuery.Parameters.Add("@newSysManValue", strNewSysManVal)
+				cmdDBQuery.Parameters.Add("@newDevName", strNewDevName)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 		End If
@@ -508,6 +539,28 @@
 				</tr>
 				
 				<tr>
+					<td><font class="regular">NI-ELVIS Device Name:</font></td>
+					<td><font class="regular">
+							<asp:TextBox
+								ID="txtDevName"
+								Columns="20"
+								MaxLength="100"
+								TextMode="SingleLine"
+								Runat="Server" />
+						</font></td>
+					<td><font class="regular">
+						<%If blnSCEdit Then%>
+							<asp:LinkButton
+								Text="Update"
+								OnClick="DevNameUpdate_Click"
+								Runat="Server" />
+						<%Else%>
+							&nbsp;
+						<%End If%>
+						</font></td>
+				</tr>
+				
+				<tr>
 					<td colspan=3 align=center>
 						<font class="regular">
 						<p>
@@ -562,9 +615,8 @@
 				<center>
 					<font class="small">
 						<%If blnSRRead Then%>
-							<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
-						<%Else%>
-							<a href="/labserver/main.aspx" target="main">Return to Main</a>
+							<a href="main.aspx" target="main">Return to Main</a>						<%Else%>
+							<a href="../main.aspx" target="main">Return to Main</a>
 						<%End If%>
 					</font>
 				</center>

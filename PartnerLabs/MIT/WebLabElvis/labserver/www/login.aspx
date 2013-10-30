@@ -204,7 +204,7 @@
 								/>	
 			<p>
 			<center><asp:ImageButton
-						ImageURL="/menu_login_off.gif"
+						ImageURL="menu_login_off.gif"
 						AlternativeText="Login"
 						CausesValidation="True"
 						OnClick="LoginButton_Click"

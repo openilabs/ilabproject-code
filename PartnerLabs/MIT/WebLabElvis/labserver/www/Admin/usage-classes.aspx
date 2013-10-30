@@ -455,23 +455,27 @@
 				'prepare to update permission mapping records.
 				Dim loopIdx, intCtrlNum As Integer
 				Dim strResult As String
-				Dim lblMappingIDRef, lblResourceIDRef, lblResourceTypeRef As Label
+				Dim lblMappingIDRef, lblResourceIDRef, lblResourceTypeRef As HiddenField
 				Dim chkCanReadRef, chkCanEditRef, chkCanDeleteRef, chkCanGrantRef As CheckBox
 				Dim txtPriorityRef As TextBox
 				
 				If Session("PermListViewPref") = "limit" Then
 					'only need to handle mapping update/removals
-				
+					Dim strCtrlNum As String
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMappingIDRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":lblMappingID")
-						lblResourceTypeRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":lblResourceType")
-						chkCanReadRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanRead")
-						chkCanEditRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanEdit")
-						chkCanDeleteRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanDelete")
-						chkCanGrantRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanGrant")
-						txtPriorityRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":txtPriority")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMappingIDRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$lblMappingID")
+						lblResourceTypeRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$lblResourceType")
+						chkCanReadRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanRead")
+						chkCanEditRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanEdit")
+						chkCanDeleteRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanDelete")
+						chkCanGrantRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanGrant")
+						txtPriorityRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$txtPriority")
 						
 						If lblMappingIDRef Is Nothing Then
 							lblErrorOnEditPermMsg.Text = "Page Error While Updating Class.  Aborting."
@@ -518,7 +522,7 @@
 					
 						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) Then
 							'case where permissions have been removed.
-							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Text))
+							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Value))
 							
 							If strResult <> "Mapping successfully deleted." Then
 								lblErrorOnEditPermMsg.Text = "Error Updating Class: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -526,10 +530,10 @@
 							End If
 						Else
 							'case where permissions are updated
-							If lblResourceTypeRef.Text = "SETUP" Then
-								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
+							If lblResourceTypeRef.Value = "SETUP" Then
+								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
 							Else
-								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
+								strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
 							End If
 							
 							If strResult <> "Mapping successfully updated." Then
@@ -539,17 +543,22 @@
 						End If 
 					Next
 				Else
+					Dim strCtrlNum As String
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMappingIDRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":lblMappingID")
-						lblResourceIDRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":lblResourceID")
-						lblResourceTypeRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":lblResourceType")
-						chkCanReadRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanRead")
-						chkCanEditRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanEdit")
-						chkCanDeleteRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanDelete")
-						chkCanGrantRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":chkCanGrant")
-						txtPriorityRef = FindControl("rptClassPerms:_ctl" & intCtrlNum & ":txtPriority")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMappingIDRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$lblMappingID")
+						lblResourceIDRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$lblResourceID")
+						lblResourceTypeRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$lblResourceType")
+						chkCanReadRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanRead")
+						chkCanEditRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanEdit")
+						chkCanDeleteRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanDelete")
+						chkCanGrantRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$chkCanGrant")
+						txtPriorityRef = FindControl("rptClassPerms$ctl" & strCtrlNum & "$txtPriority")
 						
 						If lblMappingIDRef Is Nothing Then
 							lblErrorOnEditPermMsg.Text = "Page Error While Updating Class.  Aborting."
@@ -599,9 +608,9 @@
 							End If
 						End If
 					
-						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) And lblMappingIDRef.Text <> "0" Then
+						If Not (chkCanReadRef.Checked Or chkCanEditRef.Checked Or chkCanDeleteRef.Checked Or chkCanGrantRef.Checked) And lblMappingIDRef.Value <> "0" Then
 							'case where permissions have been removed. (else case is non-mapped resource has not been given permissions, do nothing)
-							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Text))
+							strResult = rpmObject.RemoveResourceMapping(CInt(lblMappingIDRef.Value))
 							
 							If strResult <> "Mapping successfully deleted." Then
 								lblErrorOnEditPermMsg.Text = "Error Updating Class: " & strResult & " (Item " & (loopIdx + 1) & ")"
@@ -609,12 +618,12 @@
 							End If
 						
 						Else
-							If lblMappingIDRef.Text <> "0" Then
+							If lblMappingIDRef.Value <> "0" Then
 							'case where non-removal edits have been made to pre-existing permissions, do nothing.
-								If lblResourceTypeRef.Text = "SETUP" Then
-									strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
+								If lblResourceTypeRef.Value = "SETUP" Then
+									strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
 								Else
-									strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Text), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
+									strResult = rpmObject.EditResourceMapping(CInt(lblMappingIDRef.Value), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
 								End If
 								
 								If strResult <> "Mapping successfully updated." Then
@@ -623,10 +632,10 @@
 								End If
 							Else
 								'case where non-mapped resource has been given permissions, add.
-								If lblResourceTypeRef.Text = "SETUP" Then
-									strResult = rpmObject.MapClassToResource(CInt(lblResourceIDRef.Text), CInt(strClassID), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
+								If lblResourceTypeRef.Value = "SETUP" Then
+									strResult = rpmObject.MapClassToResource(CInt(lblResourceIDRef.Value), CInt(strClassID), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked, CInt(txtPriorityRef.Text))
 								Else
-									strResult = rpmObject.MapClassToResource(CInt(lblResourceIDRef.Text), CInt(strClassID), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
+									strResult = rpmObject.MapClassToResource(CInt(lblResourceIDRef.Value), CInt(strClassID), chkCanReadRef.Checked, chkCanEditRef.Checked, chkCanGrantRef.Checked, chkCanDeleteRef.Checked)
 								End If
 								
 								If strResult <> "Mapping successfully added." Then
@@ -653,16 +662,22 @@
 			
 			Dim strResult As String
 			Dim loopIdx, intCtrlNum As Integer
-			Dim lblMemberIDRef As Label
+			Dim lblMemberIDRef As HiddenField
 			Dim ddlNewClassRef As DropDownList
+			Dim strCtrlNum As String
 			
 			Select strPageState
 				Case "EDITMEMB"
+					
 					For loopIdx = 0 To CInt(Request.Form("Gct")) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMemberIDRef = FindControl("rptBMembers:_ctl" & intCtrlNum & ":lblBrokerID")
-						ddlNewClassRef = FindControl("rptBMembers:_ctl" & intCtrlNum & ":ddlBMemOC")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMemberIDRef = FindControl("rptBMembers$ctl" & strCtrlNum & "$lblBrokerID")
+						ddlNewClassRef = FindControl("rptBMembers$ctl" & strCtrlNum & "$ddlBMemOC")
 						
 						If lblMemberIDRef Is Nothing Then
 							lblErrorOnEditBMemMsg.Text = "Page Error While Updating Class Membership.  Aborting."
@@ -677,7 +692,7 @@
 						If ddlNewClassRef.SelectedItem.Value <> "0" Then
 							'case where other group has been selected, else do nothing.
 							'member reassignment is handled by a resource permission manager method.
-							strResult = rpmObject.MapBrokerToClass(CInt(lblMemberIDRef.Text), CInt(ddlNewClassRef.SelectedItem.Value))
+							strResult = rpmObject.MapBrokerToClass(CInt(lblMemberIDRef.Value), CInt(ddlNewClassRef.SelectedItem.Value))
 						
 							If strResult <> "Mapping successfully updated." Then
 								lblErrorOnEditBMemMsg.Text = "Error Updating Class Membership: " & strResult
@@ -688,9 +703,13 @@
 				Case "EDITMEMG"
 					For loopIdx = 0 To CInt(Request.Form("Gct")) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMemberIDRef = FindControl("rptGMembers:_ctl" & intCtrlNum & ":lblGroupID")
-						ddlNewClassRef = FindControl("rptGMembers:_ctl" & intCtrlNum & ":ddlGMemOC")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMemberIDRef = FindControl("rptGMembers$ctl" & strCtrlNum & "$lblGroupID")
+						ddlNewClassRef = FindControl("rptGMembers$ctl" & strCtrlNum & "$ddlGMemOC")
 						
 						If lblMemberIDRef Is Nothing Then
 							lblErrorOnEditGMemMsg.Text = "Page Error While Updating Class Membership.  Aborting."
@@ -705,7 +724,7 @@
 						If ddlNewClassRef.SelectedItem.Value <> "0" Then
 							'case where other group has been selected, else do nothing.
 							'member reassignment is handled by a resource permission manager method.
-							strResult = rpmObject.MapGroupToClass(CInt(lblMemberIDRef.Text), CInt(ddlNewClassRef.SelectedItem.Value))
+							strResult = rpmObject.MapGroupToClass(CInt(lblMemberIDRef.Value), CInt(ddlNewClassRef.SelectedItem.Value))
 						
 							If strResult <> "Mapping successfully updated." Then
 								lblErrorOnEditGMemMsg.Text = "Error Updating Class Membership: " & strResult
@@ -716,9 +735,13 @@
 				Case "EDITMEMU"
 					For loopIdx = 0 To CInt(Request.Form("Gct")) - 1
 						intCtrlNum = (loopIdx * 2) + 1
-						
-						lblMemberIDRef = FindControl("rptUMembers:_ctl" & intCtrlNum & ":lblUserID")
-						ddlNewClassRef = FindControl("rptUMembers:_ctl" & intCtrlNum & ":ddlUMemOC")
+						If intCtrlNum < 10 Then
+							strCtrlNum = "0" & IntCtrlNum
+						Else
+							strCtrlNum = IntCtrlNum
+						End If
+						lblMemberIDRef = FindControl("rptUMembers$ctl" & strCtrlNum & "$lblUserID")
+						ddlNewClassRef = FindControl("rptUMembers$ctl" & strCtrlNum & "$ddlUMemOC")
 						
 						If lblMemberIDRef Is Nothing Then
 							lblErrorOnEditUMemMsg.Text = "Page Error While Updating Class Membership.  Aborting."
@@ -733,7 +756,7 @@
 						If ddlNewClassRef.SelectedItem.Value <> "0" Then
 							'case where other group has been selected, else do nothing.
 							'member reassignment is handled by a resource permission manager method.
-							strResult = rpmObject.MapSiteUserToClass(CInt(lblMemberIDRef.Text), CInt(ddlNewClassRef.SelectedItem.Value))
+							strResult = rpmObject.MapSiteUserToClass(CInt(lblMemberIDRef.Value), CInt(ddlNewClassRef.SelectedItem.Value))
 						
 							If strResult <> "Mapping successfully updated." Then
 								lblErrorOnEditUMemMsg.Text = "Error Updating Class Membership: " & strResult
@@ -837,20 +860,25 @@
 			
 			If blnACGrant Then
 				Dim loopIdx, intCtrlNum As Integer
-				Dim lblAddResourceIDRef, lblAddResourceTypeRef As Label
+				Dim lblAddResourceIDRef, lblAddResourceTypeRef As HiddenField
 				Dim chkAddCanReadRef, chkAddCanEditRef, chkAddCanDeleteRef, chkAddCanGrantRef As Checkbox
 				Dim txtAddPriorityRef As TextBox
+				Dim strCtrlNum As String
 				
 				For loopIdx = 0 To CInt(Request.Form("Gct")) - 1
 					intCtrlNum = (loopIdx * 2) + 1
-				
-					lblAddResourceIDRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":lblAddResourceID")
-					lblAddResourceTypeRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":lblAddResourceType")
-					chkAddCanReadRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanRead")
-					chkAddCanEditRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanEdit")
-					chkAddCanDeleteRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanDelete")
-					chkAddCanGrantRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":chkAddCanGrant")
-					txtAddPriorityRef = FindControl("rptAddPerms:_ctl" & intCtrlNum & ":txtAddPriority")
+					If intCtrlNum < 10 Then
+						strCtrlNum = "0" & IntCtrlNum
+					Else
+						strCtrlNum = IntCtrlNum
+					End If
+					lblAddResourceIDRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$lblAddResourceID")
+					lblAddResourceTypeRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$lblAddResourceType")
+					chkAddCanReadRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanRead")
+					chkAddCanEditRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanEdit")
+					chkAddCanDeleteRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanDelete")
+					chkAddCanGrantRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanGrant")
+					txtAddPriorityRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$txtAddPriority")
 					
 					If lblAddResourceIDRef Is Nothing Then
 						lblErrorOnEditPermMsg.Text = "Page Error While Creating Class Permissions.  Aborting. [1]"
@@ -899,11 +927,11 @@
 						'case where some permissions have been set (create mapping), else do nothing
 						'mapping creation is handled by Resource Permission Manager method
 						
-						If lblAddResourceTypeRef.Text = "SETUP" Then
+						If lblAddResourceTypeRef.Value = "SETUP" Then
 							'case where resource is an experiment (include priority)
-							strResult = rpmObject.MapClassToResource(CInt(lblAddResourceIDRef.Text), CInt(strClassID), chkAddCanReadRef.Checked, chkAddCanEditRef.Checked, chkAddCanGrantRef.Checked, chkAddCanDeleteRef.Checked, CInt(txtAddPriorityRef.Text))
+							strResult = rpmObject.MapClassToResource(CInt(lblAddResourceIDRef.Value), CInt(strClassID), chkAddCanReadRef.Checked, chkAddCanEditRef.Checked, chkAddCanGrantRef.Checked, chkAddCanDeleteRef.Checked, CInt(txtAddPriorityRef.Text))
 						Else
-							strResult = rpmObject.MapClassToResource(CInt(lblAddResourceIDRef.Text), CInt(strClassID), chkAddCanReadRef.Checked, chkAddCanEditRef.Checked, chkAddCanGrantRef.Checked, chkAddCanDeleteRef.Checked)
+							strResult = rpmObject.MapClassToResource(CInt(lblAddResourceIDRef.Value), CInt(strClassID), chkAddCanReadRef.Checked, chkAddCanEditRef.Checked, chkAddCanGrantRef.Checked, chkAddCanDeleteRef.Checked)
 						End If
 						
 						If strResult <> "Mapping successfully added." Then
@@ -1014,9 +1042,9 @@
 								|
 							<%End If%>
 							<%If blnSRRead Then%>
-								<a href="/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>	
 						</div>
 						<p>
@@ -1110,9 +1138,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1240,21 +1268,18 @@
 											 						<tr>
 											 							<td>
 											 								<font class="regular">
-											 									&nbsp;<a href="/admin/system-resources.aspx?rid=<%#Container.DataItem("resource_id")%>" target=main><%#Container.DataItem("name")%></a>
-											 									<asp:Label
+											 									&nbsp;<a href="system-resources.aspx?rid=<%#Container.DataItem("resource_id")%>" target=main><%#Container.DataItem("name")%></a>
+											 									<asp:HiddenField
 											 										ID="lblMappingID"
-											 										Visible="False"
-											 										Text='<%#DBNullFilter(Container.DataItem("mapping_id"), "0")%>'
+											 										Value='<%#DBNullFilter(Container.DataItem("mapping_id"), "0")%>'
 											 										Runat="Server" />
-											 									<asp:Label
+											 									<asp:HiddenField
 											 										ID="lblResourceType"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("type")%>'
+											 										Value='<%#Container.DataItem("type")%>'
 											 										Runat="Server" />
-											 									<asp:Label
+											 									<asp:HiddenField
 											 										ID="lblResourceID"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("resource_id")%>'
+											 										Value='<%#Container.DataItem("resource_id")%>'
 											 										Runat="Server" />
 											 								</font>
 											 							</td>
@@ -1404,9 +1429,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1495,11 +1520,10 @@
 											 					<tr>
 											 						<td>
 											 							<font class="regular">
-											 								<a href="/admin/service-brokers.aspx?bid=<%#Container.DataItem("broker_id")%>" target="main"><%#Container.DataItem("name")%></a>
-											 								<asp:Label
+											 								<a href="service-brokers.aspx?bid=<%#Container.DataItem("broker_id")%>" target="main"><%#Container.DataItem("name")%></a>
+											 								<asp:HiddenField
 											 									ID="lblBrokerID"
-											 									Text='<%#Container.DataItem("broker_id")%>'
-											 									Visible="False"
+											 									Value='<%#Container.DataItem("broker_id")%>'
 											 									Runat="Server" />
 											 							</font>
 											 						</td>
@@ -1634,9 +1658,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1725,17 +1749,16 @@
 											 					<tr>
 											 						<td>
 											 							<font class="regular">
-											 								<a href="/admin/service-brokers.aspx?gid=<%#Container.DataItem("group_id")%>" target="main"><%#Container.DataItem("group_name")%></a>
-											 								<asp:Label
+											 								<a href="service-brokers.aspx?gid=<%#Container.DataItem("group_id")%>" target="main"><%#Container.DataItem("group_name")%></a>
+											 								<asp:HiddenField
 											 									ID="lblGroupID"
-											 									Text='<%#Container.DataItem("group_id")%>'
-											 									Visible="False"
+											 									Value='<%#Container.DataItem("group_id")%>'
 											 									Runat="Server" />
 											 							</font>
 											 						</td>
 											 						<td>
 											 							<font class="regular">
-											 								<a href="/admin/service-brokers.aspx?bid=<%#Container.DataItem("broker_id")%>" target="main"><%#Container.DataItem("broker_name")%></a>
+											 								<a href="service-brokers.aspx?bid=<%#Container.DataItem("broker_id")%>" target="main"><%#Container.DataItem("broker_name")%></a>
 											 							</font>
 											 						</td>
 																	<td>
@@ -1863,9 +1886,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1954,11 +1977,10 @@
 											 					<tr>
 											 						<td>
 											 							<font class="regular">
-											 								<a href="/admin/site-users.aspx?uid=<%#Container.DataItem("user_id")%>" target="main"><%#Container.DataItem("first_name")%>&nbsp;<%#Container.DataItem("last_name")%></a>
-											 								<asp:Label
+											 								<a href="site-users.aspx?uid=<%#Container.DataItem("user_id")%>" target="main"><%#Container.DataItem("first_name")%>&nbsp;<%#Container.DataItem("last_name")%></a>
+											 								<asp:HiddenField
 											 									ID="lblUserID"
-											 									Text='<%#Container.DataItem("user_id")%>'
-											 									Visible="False"
+											 									Value='<%#Container.DataItem("user_id")%>'
 											 									Runat="Server" />
 											 							</font>
 											 						</td>
@@ -2078,9 +2100,9 @@
 										Runat="Server" />
 									|
 									<%If blnSRRead Then%>
-										<a href="/admin/main.aspx" target="main">Return to Main</a>
+										<a href="main.aspx" target="main">Return to Main</a>
 									<%Else%>
-										<a href="/main.aspx" target="main">Return to Main</a>
+										<a href="../main.aspx" target="main">Return to Main</a>
 									<%End If%>
 								</div>
 							<p>
@@ -2184,16 +2206,14 @@
 											 						<tr>
 											 							<td>
 											 								<font class="regular">
-											 									&nbsp;<a href="/admin/system-resources.aspx?rid=<%#Container.DataItem("resource_id")%>" target=main><%#Container.DataItem("name")%></a>
-											 									<asp:Label
+											 									&nbsp;<a href="system-resources.aspx?rid=<%#Container.DataItem("resource_id")%>" target=main><%#Container.DataItem("name")%></a>
+											 									<asp:HiddenField
 											 										ID="lblAddResourceID"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("resource_id")%>'
+											 										Value='<%#Container.DataItem("resource_id")%>'
 											 										Runat="Server" />
-											 									<asp:Label
+											 									<asp:HiddenField
 											 										ID="lblAddResourceType"
-											 										Visible="False"
-											 										Text='<%#Container.DataItem("type")%>'
+											 										Value='<%#Container.DataItem("type")%>'
 											 										Runat="Server" />
 											 								</font>
 											 							</td>
@@ -2294,7 +2314,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

@@ -465,9 +465,9 @@
 								|
 							<%End If%>
 							<%If blnSRRead Then%>
-								<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/labserver/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>
 						</div>
 						<p>
@@ -558,9 +558,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -642,7 +642,7 @@
 												<font class="regular">
 													<b>Class Membership:</b>
 													<%If blnACRead Then%>
-														<a href="/labserver/admin/usage-classes.aspx?cid=<%=strClassID%>" target="main"><%=strClassName%></a>
+														<a href="usage-classes.aspx?cid=<%=strClassID%>" target="main"><%=strClassName%></a>
 													<%Else
 														Response.Write(strClassName)
 													End If%>
@@ -756,9 +756,9 @@
 									Runat="Server" />
 								|
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -897,7 +897,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

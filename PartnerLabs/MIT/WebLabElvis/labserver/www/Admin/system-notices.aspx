@@ -359,9 +359,9 @@
 								|
 							<%End If%>
 							<%If blnSRread Then%>
-								<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/labserver/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>					
 							
 						</div>
@@ -485,9 +485,9 @@
 											|
 										<%End If%>
 										<%If blnSRRead Then%>
-											<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+											<a href="main.aspx" target="main">Return to Main</a>
 										<%Else%>
-											<a href="/labserver/main.aspx" target="main">Return to Main</a>
+											<a href="../main.aspx" target="main">Return to Main</a>
 										<%End If%>
 										
 									</div>
@@ -614,9 +614,9 @@
 										|
 										<%End If%>
 										<%If blnSRRead Then%>
-											<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+											<a href="main.aspx" target="main">Return to Main</a>
 										<%Else%>
-											<a href="/labserver/main.aspx" target="main">Return to Main</a>
+											<a href="../main.aspx" target="main">Return to Main</a>
 										<%End If%>
 									</div>
 								<p>
@@ -715,7 +715,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

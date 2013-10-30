@@ -406,17 +406,23 @@
 			End If
 			
 			'group information update.
-			Dim lblEBGroupIDRef, lblEBGroupStatusRef, lblEBGClassIDRef As Label
+			Dim  lblEBGroupStatusRef As HiddenField
+			Dim lblEBGroupIDRef, lblEBGClassIDRef As HiddenField
 			Dim ddlEBOCListRef, ddlEBGStatusRef As DropDownList
 			
+			Dim strCtrlNum As String
 			For loopIdx = 0 To cInt(Request.Form("Gct")) - 1
 				intCtrlNum = (loopIdx * 2) + 1
-				
-				lblEBGroupIDRef = FindControl("rptGroups:_ctl" & intCtrlNum & ":lblEditBrokerGroupID")
-				lblEBGroupStatusRef = FindControl("rptGroups:_ctl" & intCtrlNum & ":lblEditBrokerGroupStatus")
-				lblEBGClassIDRef = FindControl("rptGroups:_ctl" & intCtrlNum & ":lblEditBrokerGClassID")
-				ddlEBOCListRef = FindControl("rptGroups:_ctl" & intCtrlNum & ":ddlEditBrokerOCList")
-				ddlEBGStatusRef = FindControl("rptGroups:_ctl" & intCtrlNum & ":ddlEditBrokerGStatus")
+				If intCtrlNum < 10 Then
+				    strCtrlNum = "0" & IntCtrlNum
+				Else
+				     strCtrlNum = IntCtrlNum
+				End If
+				lblEBGroupIDRef = FindControl("rptGroups$ctl" & strCtrlNum & "$lblEditBrokerGroupID")
+				lblEBGroupStatusRef = FindControl("rptGroups$ctl" & strCtrlNum & "$lblEditBrokerGroupStatus")
+				lblEBGClassIDRef = FindControl("rptGroups$ctl" & strCtrlNum & "$lblEditBrokerGClassID")
+				ddlEBOCListRef = FindControl("rptGroups$ctl" & strCtrlNum & "$ddlEditBrokerOCList")
+				ddlEBGStatusRef = FindControl("rptGroups$ctl" & strCtrlNum & "$ddlEditBrokerGStatus")
 				
 				If lblEBGroupIDRef Is Nothing Then
 					lblErrorOnEditBrokerMsg.Text = "Page Error While Updating Broker.  Aborting."
@@ -444,8 +450,8 @@
 				End If
 				
 				'check and update class membership, if allowed.
-				If ddlEBOCListRef.SelectedItem.Value <> lblEBGClassIDRef.Text And blnACGrant Then
-					strResult = rpmObject.MapGroupToClass(CInt(lblEBGroupIDRef.Text), CInt(ddlEBOCListRef.SelectedItem.Value))
+				If ddlEBOCListRef.SelectedItem.Value <> lblEBGClassIDRef.Value And blnACGrant Then
+					strResult = rpmObject.MapGroupToClass(CInt(lblEBGroupIDRef.Value), CInt(ddlEBOCListRef.SelectedItem.Value))
 					
 					If strResult <> "Mapping successfully updated." Then
 						lblErrorOnEditBrokerMsg.Text = "Error Updating Broker Group: " & strResult
@@ -454,16 +460,16 @@
 				End If
 				
 				'check and update status
-				If lblEBGroupStatusRef.Text = "True" And ddlEBGStatusRef.SelectedItem.Value = "0" Then
-					strResult = rpmObject.DeactivateGroup(CInt(lblEBGroupIDRef.Text))
+				If lblEBGroupStatusRef.Value = "True" And ddlEBGStatusRef.SelectedItem.Value = "0" Then
+					strResult = rpmObject.DeactivateGroup(CInt(lblEBGroupIDRef.Value))
 					
 					If strResult <> "SUCCESS" Then
 						lblErrorOnEditBrokerMsg.Text = "Error Updating Broker Group Status.  Aborting."
 						Exit Sub
 					End If
 					
-				ElseIf lblEBGroupStatusRef.Text = "False" And ddlEBGStatusRef.SelectedItem.Value = "1" Then
-					strResult = rpmObject.ActivateGroup(CInt(lblEBGroupIDRef.Text))
+				ElseIf lblEBGroupStatusRef.Value = "False" And ddlEBGStatusRef.SelectedItem.Value = "1" Then
+					strResult = rpmObject.ActivateGroup(CInt(lblEBGroupIDRef.Value))
 					
 					If strResult <> "SUCCESS" Then
 						lblErrorOnEditBrokerMsg.Text = "Error Updating Broker Group Status.  Aborting."
@@ -803,9 +809,9 @@
 								|
 							<%End If%>
 							<%If blnSRRead Then%>
-								<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/labserver/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>
 						</div>
 						<p>
@@ -845,7 +851,7 @@
 											<td>
 												<font class="regular"> 
 													<%If blnACRead Then%>
-														<a href="/labserver/admin/usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target="main"><%#Container.DataItem("class_name")%></a>
+														<a href="usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target="main"><%#Container.DataItem("class_name")%></a>
 													<%Else%>
 														<%#Container.DataItem("class_name")%>
 													<%End If%>
@@ -900,9 +906,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -964,7 +970,7 @@
 												<font class="regular">
 													<b>Class Membership:</b>
 													<%If blnACRead Then%>
-														<a href="/labserver/admin/usage-classes.aspx?cid=<%=strClassID%>" target="main"><%=strClassName%></a>
+														<a href="usage-classes.aspx?cid=<%=strClassID%>" target="main"><%=strClassName%></a>
 													<%Else
 														Response.Write(strClassName)
 													End If%>
@@ -1136,20 +1142,17 @@
 											 										onCommand="ShowEditGroup_Command"
 											 										CommandArgument='<%#Container.DataItem("group_id")%>'
 											 										Runat="Server" />
-											 								<asp:Label
+											 								<asp:HiddenField
 											 									ID="lblEditBrokerGroupID"
-											 									Visible="False"
-											 									Text='<%#Container.DataItem("group_id")%>'
+											 									Value='<%#Container.DataItem("group_id")%>'
 											 									Runat="Server" />
-											 								<asp:Label
+											 								<asp:HiddenField
 											 									ID="lblEditBrokerGroupStatus"
-											 									Visible="False"
-											 									Text='<%#Container.DataItem("is_active")%>'
+											 									Value='<%#Container.DataItem("is_active")%>'
 											 									Runat="Server" />
-											 								<asp:Label
+											 								<asp:HiddenField
 											 									ID="lblEditBrokerGClassID"
-											 									Visible="False"
-											 									Text='<%#Container.DataItem("class_id")%>'
+											 									Value='<%#Container.DataItem("class_id")%>'
 											 									Runat="Server" />
 											 							</font>
 											 						</td>
@@ -1164,7 +1167,7 @@
 											 										SelectedIndex='<%#htClassIDOrder.Item(Container.DataItem("class_id"))%>'
 											 										Runat="Server" />
 											 								<%ElseIf blnACRead Then%>
-											 									&nbsp;<a href="/labserver/admin/usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target="main"><%#Container.DataItem("class_name")%></a>
+											 									&nbsp;<a href="usage-classes.aspx?cid=<%#Container.DataItem("class_id")%>" target="main"><%#Container.DataItem("class_name")%></a>
 											 								<%Else%>
 											 									&nbsp;<%#Container.DataItem("class_name")%>
 											 								<%End If%>
@@ -1288,9 +1291,9 @@
 								|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1356,7 +1359,7 @@
 												<font class="regular">
 													<b>Class Membership:</b>
 													<%If blnACRead Then%>
-														<a href="/labserver/admin/usage-classes.aspx?cid=<%=strClassID%>" target="main"><%=strClassName%></a>
+														<a href="usage-classes.aspx?cid=<%=strClassID%>" target="main"><%=strClassName%></a>
 													<%Else
 														Response.Write(strClassName)
 													End If%>
@@ -1487,9 +1490,9 @@
 									|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1611,9 +1614,9 @@
 									Runat="Server" />
 								|
 								<%If blnSRRead Then%>
-									<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/labserver/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1783,7 +1786,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/labserver/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

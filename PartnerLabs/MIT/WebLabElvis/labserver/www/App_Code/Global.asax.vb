@@ -3,7 +3,11 @@ Imports System.Web.SessionState
 Imports System.Data
 Imports System.Data.SqlClient
 
-Public Class Global
+
+Namespace LabServer
+
+
+Public Class [Global]
     Inherits System.Web.HttpApplication
 
 #Region " Component Designer Generated Code "
@@ -39,7 +43,7 @@ Public Class Global
         Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
         conWebLabLS.Open()
 
-        strDBQuery = "SELECT s.homepage, s.ws_int_is_active, s.exp_eng_is_active, s.lab_server_id, u.first_name, u.last_name, u.email FROM LSSystemConfig s JOIN SiteUsers u ON s.Admin_ID = u.user_id;"
+        strDBQuery = "SELECT s.homepage, s.ws_int_is_active, s.exp_eng_is_active, s.lab_server_id, s.elvis_dev_name, u.first_name, u.last_name, u.email FROM LSSystemConfig s JOIN SiteUsers u ON s.Admin_ID = u.user_id;"
         cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
         dtrDBQuery = cmdDBQuery.ExecuteReader()
 
@@ -50,6 +54,7 @@ Public Class Global
             Application("ws_int_is_active") = dtrDBQuery("ws_int_is_active")
             Application("exp_eng_is_active") = dtrDBQuery("exp_eng_is_active")
             Application("lab_server_id") = dtrDBQuery("lab_server_id")
+            Application("device_name") = dtrDBQuery("elvis_dev_name")
         End If
 
         dtrDBQuery.Close()
@@ -84,3 +89,5 @@ Public Class Global
     End Sub
 
 End Class
+
+End Namespace

@@ -267,8 +267,9 @@
 						
 						strImageName = Right(strImageName, (Len(strImageName) - InStrRev(strImageName, "\")))
 						
-						inpSetupImg.PostedFile.SaveAs(MapPath("/images/setups/" & e.CommandArgument & strImageName))
-						
+					'	response.write(MapPath("../images/setups"))						
+						inpSetupImg.PostedFile.SaveAs(MapPath("../images/setups/" & e.CommandArgument & strImageName))
+					
 						If Right(application("homepage"), 1) = "/" Then
 							strWebPath = Left(application("homepage"), Len(application("homepage")) - 1) & "/images/setups/" & e.CommandArgument & strImageName
 						Else
@@ -396,21 +397,25 @@
 			End If
 			
 			dtrDBQuery.Close()
-			
+			Dim strCtrlNum As String
 			intCtrlNum = (CInt(e.CommandName) * 2) - 1
+			If intCtrlNum < 10 Then
+				strCtrlNum = "0" & IntCtrlNum
+			Else
+				strCtrlNum = IntCtrlNum
+			End If
+			txtEditTermNameRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermName")
+			txtEditTermXLocRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermXLoc")
+			txtEditTermYLocRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermYLoc")
+			txtEditTermMaxAmpRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxAmp")
+			txtEditTermMaxOffsetRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxOffset")
+			txtEditTermMaxARef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxA")
+			txtEditTermMaxFRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxF")
+			txtEditTermMaxSamplingRateRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxSamplingRate")
+			txtEditTermMaxSamplingTimeRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxSamplingTime")
+			txtEditTermMaxPointsRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$txtEditTermMaxPoints")
 			
-			txtEditTermNameRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermName")
-			txtEditTermXLocRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermXLoc")
-			txtEditTermYLocRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermYLoc")
-			txtEditTermMaxAmpRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxAmp")
-			txtEditTermMaxOffsetRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxOffset")
-			txtEditTermMaxARef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxA")
-			txtEditTermMaxFRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxF")
-			txtEditTermMaxSamplingRateRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxSamplingRate")
-			txtEditTermMaxSamplingTimeRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxSamplingTime")
-			txtEditTermMaxPointsRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":txtEditTermMaxPoints")
-			
-			ddlEditTermInstrumentRef = FindControl("rptSetupTerm:_ctl" & intCtrlNum & ":ddlEditTermInstrument")
+			ddlEditTermInstrumentRef = FindControl("rptSetupTerm$ctl" & strCtrlNum & "$ddlEditTermInstrument")
 			
 			If Not txtEditTermNameRef Is Nothing Then
 				If Trim(txtEditTermNameRef.Text) = "" Then
@@ -711,7 +716,7 @@
 					
 					strImageName = Right(strImageName, (Len(strImageName) - InStrRev(strImageName, "\")))
 					
-					inpAddSetupImg.PostedFile.SaveAs(MapPath("/images/setups/" & strSetupID & strImageName))
+					inpAddSetupImg.PostedFile.SaveAs(MapPath("../images/setups/" & strSetupID & strImageName))
 					
 					If Right(application("homepage"), 1) = "/" Then
 						strWebPath = Left(application("homepage"), Len(application("homepage")) - 1) & "/images/setups/" & strSetupID & strImageName
@@ -802,9 +807,9 @@
 							|
 							<%End If%>
 							<%If blnSRRead Then%>
-								<a href="/admin/main.aspx" target="main">Return to Main</a>
+								<a href="main.aspx" target="main">Return to Main</a>
 							<%Else%>
-								<a href="/main.aspx" target="main">Return to Main</a>
+								<a href="../main.aspx" target="main">Return to Main</a>
 							<%End If%>
 						</div>
 						<p>
@@ -905,9 +910,9 @@
 								|
 								<%End If%>
 								<%If blnSRRead Then%>
-									<a href="/admin/main.aspx" target="main">Return to Main</a>
+									<a href="main.aspx" target="main">Return to Main</a>
 								<%Else%>
-									<a href="/main.aspx" target="main">Return to Main</a>
+									<a href="../main.aspx" target="main">Return to Main</a>
 								<%End If%>
 							</div>
 						<p>
@@ -1447,9 +1452,9 @@
 										|
 									<%End If%>
 									<%If blnSRRead Then%>
-										<a href="/admin/main.aspx" target="main">Return to Main</a>
+										<a href="main.aspx" target="main">Return to Main</a>
 									<%Else%>
-										<a href="/main.aspx" target="main">Return to Main</a>
+										<a href="../main.aspx" target="main">Return to Main</a>
 									<%End If%>
 								</div>
 							<p>
@@ -1549,7 +1554,7 @@
 				<td>
 				<center>
 				<!--	<font class="small">
-						<a href="/admin/main.aspx" target="main">Return to Main</a>
+						<a href="main.aspx" target="main">Return to Main</a>
 					</font>-->
 				</center>
 				</td>

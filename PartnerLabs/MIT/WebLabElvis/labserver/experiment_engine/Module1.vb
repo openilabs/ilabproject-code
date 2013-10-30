@@ -3,6 +3,7 @@ Imports System.Xml
 Imports System.Net
 Imports System.IO
 Imports System.Threading
+
 Imports OpAmpInverter.InstrumentDriverInterop.Ivi
 
 'Author(s): James Hardison (hardison@alum.mit.edu)
@@ -22,9 +23,9 @@ Imports OpAmpInverter.InstrumentDriverInterop.Ivi
 'work properly.
 '    2.the local database must have a properly permissioned user account with the 
 'information set in line 82 of this file.
-
 Module Module1
     Dim conWebLabLS As SqlConnection
+    Dim strConnectionString As String
     Dim strExpID, strExpSpec, strWarningMsg, listItem, listUnits As String
     Dim intSetupID As Integer
     Dim termInfoTable(,), udfInfoTable(,), functInfoTable(,) As String
@@ -59,11 +60,21 @@ Module Module1
     Const UDF_NAME As Integer = 0
     Const UDF_UNITS As Integer = 1
     Const UDF_BODY As Integer = 2
-    Sub Main()
+
+    Sub Main(ByVal cmdArgs() As String)
         Dim strDBQuery As String
         Dim cmdDBQuery As SqlCommand
         Dim dtrOutput As SqlDataReader
-        conWebLabLS = New SqlConnection("DataBase=ELVIS_LS;Server=localhost;Integrated Security=true")
+        strConnectionString = "DataBase=ELVIS_LS;Server=localhost;Integrated Security=true"
+        If cmdArgs.Length > 0 Then
+            For argNum As Integer = 0 To UBound(cmdArgs, 1)
+                ' Insert code to examine cmdArgs(argNum) and take
+                ' appropriate action based on its value.
+                'Currently only ConnectionString is supported
+                strConnectionString = cmdArgs(argNum)
+            Next argNum
+        End If
+        conWebLabLS = New SqlConnection(strConnectionString)
         conWebLabLS.Open()
 
         Debug.WriteLine("MAIN SUB STARTED")
@@ -96,7 +107,7 @@ Module Module1
                     'if experiment engine is set to active
                     'dequeue, load and parse an experiment
                     LoadJob(strExpID, strExpSpec)
-                    
+
                     Debug.WriteLine("job Loaded: ID=" & strExpID)
 
                     ParseExperimentSpec(strExpSpec)
@@ -104,7 +115,7 @@ Module Module1
                     'configure lab hardware and execute experiment
 
                     'if present sets the switching matrix to proper channel
-                    
+
                     'clear old warning messages
                     strWarningMsg = ""
 
@@ -165,7 +176,7 @@ Module Module1
         Dim ELVIS_Session As Inverter
         ' Restart the inverter
         Debug.WriteLine("Restarting the ELVIS session")
-        
+
         ELVIS_Session = New Inverter
         ' get the parameters that were read on from the xml specs
 

@@ -3,7 +3,7 @@ Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Net
 Imports Microsoft.VisualBasic
-Imports WebLabCustomDataTypes.WebLabCustomDataTypes
+Imports WebLabCustomDataTypes
 
 
 'Author(s): James Hardison (hardison@alum.mit.edu)

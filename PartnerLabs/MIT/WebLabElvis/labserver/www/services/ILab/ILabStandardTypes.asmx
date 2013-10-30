@@ -13,9 +13,9 @@ Public Class ILabStandardTypes
         Public labStatusMessage As String
     End Structure
 
-    <WebMethod()> Public Function EatLabStatus(ByVal labStatusObject As LabStatus)
+    '<WebMethod()> Public Function EatLabStatus(ByVal labStatusObject As LabStatus)
 
-    End Function
+    'End Function
 
 
     Public Structure WaitEstimate
@@ -23,9 +23,9 @@ Public Class ILabStandardTypes
         Public estWait As Double
     End Structure
 
-    <WebMethod()> Public Function EatWaitEstimate(ByVal waitEstimateObject As WaitEstimate)
+    '<WebMethod()> Public Function EatWaitEstimate(ByVal waitEstimateObject As WaitEstimate)
 
-    End Function
+    'End Function
 
 
 
@@ -37,9 +37,9 @@ Public Class ILabStandardTypes
         Public estRuntime As Double
     End Structure
 
-    <WebMethod()> Public Function EatValidationReport(ByVal validationReportObject As ValidationReport)
+    '<WebMethod()> Public Function EatValidationReport(ByVal validationReportObject As ValidationReport)
 
-    End Function
+    'End Function
 
     Public Structure SubmissionReport
         Public vReport As ValidationReport
@@ -48,9 +48,9 @@ Public Class ILabStandardTypes
         Public wait As WaitEstimate
     End Structure
 
-    <WebMethod()> Public Function EatSubmissionReport(ByVal submissionReportObject As SubmissionReport)
+    '<WebMethod()> Public Function EatSubmissionReport(ByVal submissionReportObject As SubmissionReport)
 
-    End Function
+    'End Function
 
     Public Structure ExperimentStatus
         Public statusCode As Integer
@@ -59,18 +59,18 @@ Public Class ILabStandardTypes
         Public estRemainingRuntime As Double
     End Structure
 
-    <WebMethod()> Public Function EatExperimentStatus(ByVal experimentStatusObject As ExperimentStatus)
+    '<WebMethod()> Public Function EatExperimentStatus(ByVal experimentStatusObject As ExperimentStatus)
 
-    End Function
+    'End Function
 
     Public Structure LabExperimentStatus
         Public statusReport As ExperimentStatus
         Public minTimetoLive As Double
     End Structure
 
-    <WebMethod()> Public Function EatLabExperimentStatus(ByVal labExperimentStatusObject As LabExperimentStatus)
+    '<WebMethod()> Public Function EatLabExperimentStatus(ByVal labExperimentStatusObject As LabExperimentStatus)
 
-    End Function
+    'End Function
 
     Public Structure ResultReport
         Public statusCode As Integer
@@ -81,9 +81,9 @@ Public Class ILabStandardTypes
         Public errorMessage As String
     End Structure
 
-    <WebMethod()> Public Function EatResultReport(ByVal resultReportObject As ResultReport)
+    '<WebMethod()> Public Function EatResultReport(ByVal resultReportObject As ResultReport)
 
-    End Function
+    'End Function
 
 
 

@@ -633,9 +633,9 @@
 				<center>
 					<font class="small">
 						<%If blnSRRead Then%>
-							<a href="/LabServer/admin/main.aspx" target="main">Return to Main</a>
+							<a href="main.aspx" target="main">Return to Main</a>
 						<%Else%>
-							<a href="/LabServer/main.aspx" target="main">Return to Main</a>
+							<a href="../main.aspx" target="main">Return to Main</a>
 						<%End If%>
 					</font>
 				</center>

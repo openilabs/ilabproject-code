@@ -5,10 +5,15 @@ Imports System.Diagnostics
 Imports System.Web.Services.Protocols
 Imports System.Xml.Serialization
 Imports Microsoft.VisualBasic
-Imports WebLabDataManagers.WebLabDataManagers
-Imports WebLabCustomDataTypes.WebLabCustomDataTypes
+
+Imports WebLabDataManagers
+Imports WebLabCustomDataTypes
 Imports validation_engine.WebLabSystemComponents
 Imports ILab.ILabStandardTypes
+
+
+Namespace LabServer
+
 
 
 'Date Created: 6/20/2003
@@ -29,14 +34,6 @@ Imports ILab.ILabStandardTypes
 '   Lab Server Record Manager Library (/bin/RecordManager.dll, /controls/WebLabDataManagers/RecordManager.vb)
 '   Lab Server Queue Manager Library (/bin/QueueManager.dll, /controls/WebLabDataManagers/QueueManager.vb)
 
-Public Class AuthHeader
-    Inherits SoapHeader
-    'This class defines the Authentication Header object.  For each Web Method call, an instance of this class, containing the caller's 
-    'server ID and passKey will be passed in the header of the SOAP Request.  
-    Public identifier As String '= "440D9C2E-2588-411f-A40F-D7A49225907" ' = "A964948D-D7C1-406d-BAE1-DEDC336681A"
-    Public passKey As String '= "725214958714880" ' = "958180024647680"
-End Class
-
 <XmlType(Namespace:="http://ilab.mit.edu"), WebService(Description:="WebLab Lab Server/Service Broker Interface", Namespace:="http://ilab.mit.edu")> _
 Public Class LabServerAPI : Inherits WebService
     'This class defines the body of the WebLab LAb Server API.
@@ -49,7 +46,7 @@ Public Class LabServerAPI : Inherits WebService
         'This method returns the current status of the lab to the caller.  In the future, labStatusMessage should incorporate data 
         'from system notices.
         Dim lsOutput As LabStatus = New LabStatus
-        Dim rmObject As RecordManager = New RecordManager
+            Dim rmObject As RecordManager = New RecordManager
         Dim rpmObject As ResourcePermissionManager = New ResourcePermissionManager
         Dim intBrokerID As Integer
         Dim blnHasPermission As Boolean = False
@@ -842,3 +839,14 @@ Public Class LabServerAPI : Inherits WebService
     End Function
 
 End Class
+
+
+Public Class AuthHeader
+    Inherits SoapHeader
+    'This class defines the Authentication Header object.  For each Web Method call, an instance of this class, containing the caller's 
+    'server ID and passKey will be passed in the header of the SOAP Request.  
+    Public identifier As String '= "440D9C2E-2588-411f-A40F-D7A49225907" ' = "A964948D-D7C1-406d-BAE1-DEDC336681A"
+    Public passKey As String '= "725214958714880" ' = "958180024647680"
+End Class
+
+End Namespace

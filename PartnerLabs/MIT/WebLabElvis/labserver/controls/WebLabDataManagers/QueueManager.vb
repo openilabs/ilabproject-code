@@ -1,6 +1,6 @@
 Imports System
 Imports System.Data.SqlClient
-Imports WebLabCustomDataTypes.WebLabCustomDataTypes
+Imports WebLabCustomDataTypes
 
 
 'Author(s): James Hardison (hardison@alum.mit.edu)
