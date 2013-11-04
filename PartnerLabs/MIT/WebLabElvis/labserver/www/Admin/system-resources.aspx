@@ -1,10 +1,10 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -12,7 +12,9 @@
 	Dim blnIsSetup As Boolean
 	Dim rpmObject As New ResourcePermissionManager()
 	Dim blnSRRead, blnACRead, blnACEdit, blnACDelete, blnACGrant, blnDMRead, blnDMEdit As Boolean
-	
+	Dim sepChar As Char = Me.IdSeparator
+
+
 	
 	Sub Page_Load
 		conWebLabLS.Open()
@@ -38,7 +40,7 @@
 				If Not Request.QueryString("rid") Is Nothing And IsNumeric(Request.QueryString("rid")) Then
 					strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT resource_id FROM Resources WHERE resource_id = @ResourceID);"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ResourceID", Request.QueryString("rid"))
+					cmdDBQuery.Parameters.AddWithValue("@ResourceID", Request.QueryString("rid"))
 					
 					If cmdDBQuery.ExecuteScalar() = "true" THen
 						strPageState = "EDIT"
@@ -68,7 +70,7 @@
 				Case "EDIT"
 					strDBQuery = "SELECT r.resource_id, r.name, r.type, r.category, r.description, r.date_created, r.date_modified, p.setup_id FROM Resources r LEFT JOIN Setups p ON r.resource_id = p.resource_id WHERE r.resource_id = @ResourceID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+					cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 					
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
@@ -115,7 +117,7 @@
 					End If
 									
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+					cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 					
 					If blnIsSetup Then
 						rptSetupPerms.DataSource = cmdDBQuery.ExecuteReader()
@@ -215,8 +217,8 @@
 			Else
 				strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT resource_id FROM Resources WHERE name = @Name AND NOT resource_id = @ResourceID);"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Name", txtEditName.Text)
-				cmdDBQuery.Parameters.Add("@ResourceID", e.CommandArgument)
+				cmdDBQuery.Parameters.AddWithValue("@Name", txtEditName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@ResourceID", e.CommandArgument)
 				
 				If cmdDBQuery.ExecuteScalar() = "true" Then
 					lblErrorMsg.Text = "Error Updating Resource: The specified Resource name is in use, please select another."
@@ -237,10 +239,10 @@
 			'inputs verified, updating
 			strDBQuery = "UPDATE Resources SET name = @Name, category = @Category, description = @Desc, date_modified = GETDATE() WHERE resource_id = @ResourceID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtEditName.Text)
-			cmdDBQuery.Parameters.Add("@Category", txtEditCat.Text)
-			cmdDBQuery.Parameters.Add("@Desc", txtEditDesc.Text)
-			cmdDBQuery.Parameters.Add("@ResourceID", e.CommandArgument)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtEditName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Category", txtEditCat.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Desc", txtEditDesc.Text)
+			cmdDBQuery.Parameters.AddWithValue("@ResourceID", e.CommandArgument)
 			
 			cmdDBQuery.ExecuteNonQuery()
 			
@@ -616,7 +618,7 @@
 			'creation successfull, get new resource id, set page state and assign permission settings.
 			strDBQuery = "SELECT resource_id FROM Resources WHERE name = @NewName;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@NewName", txtAddName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@NewName", txtAddName.Text)
 			
 			strResourceID = cmdDBQuery.ExecuteScalar()
 			strPageState = "EDIT"
@@ -1329,7 +1331,7 @@
 														%>
 														<asp:Repeater
 															ID="rptAddPerms"
-															Runat="Server">
+															Runat="Server" >
 															<HeaderTemplate>
 																<table border=1 cellspacing=0 cellpadding=0 width=100%>
 																	<tr>
