@@ -1,10 +1,10 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -84,8 +84,8 @@
 		
 		strDBQuery = "EXEC rm_ReturnWSIntLogSubset @StartIdx, @Interval;"
 		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-		cmdDBQuery.Parameters.Add("@StartIdx", intStartIdx)
-		cmdDBQuery.Parameters.Add("@Interval", intInterval)
+		cmdDBQuery.Parameters.AddWithValue("@StartIdx", intStartIdx)
+		cmdDBQuery.Parameters.AddWithValue("@Interval", intInterval)
 		
 		Return cmdDBQuery.ExecuteReader()	
 	End Function
@@ -152,7 +152,7 @@
 			
 			strDBQuery = "SELECT type, source_name, dest_name, method_name, out_dest_URL, in_has_permission, completion_status, transaction_time FROM WebMethodRequestLog WHERE request_id = @ReqID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@ReqID", strDetailID)
+			cmdDBQuery.Parameters.AddWithValue("@ReqID", strDetailID)
 			
 			dtrDBQuery = cmdDBQuery.ExecuteReader()
 			

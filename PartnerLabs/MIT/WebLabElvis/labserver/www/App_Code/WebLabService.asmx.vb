@@ -39,14 +39,14 @@ Public Class LabServerAPI : Inherits WebService
     'This class defines the body of the WebLab LAb Server API.
 
     'member variable from SoapHeader, instantiated so as to accept and interpret sbAuthHeader objects in incoming SOAP Requests. 
-    Public BrokerCred As AuthHeader '= New sbAuthHeader
+        Public BrokerCred As AuthHeader = New AuthHeader
 
     <WebMethod(Description:="WebLab Lab Server Method: Returns the current status of the lab.  Members of struct LabStatus are 'online' (boolean) and 'labStatusMessage' (string)."), SoapHeader("BrokerCred", Direction:=SoapHeaderDirection.In), SoapDocumentMethod(RequestNamespace:="http://ilab.mit.edu")> _
     Public Function GetLabStatus() As LabStatus
         'This method returns the current status of the lab to the caller.  In the future, labStatusMessage should incorporate data 
         'from system notices.
         Dim lsOutput As LabStatus = New LabStatus
-            Dim rmObject As RecordManager = New RecordManager
+            Dim rmObject As WebLabDataManagers.RecordManager = New WebLabDataManagers.RecordManager
         Dim rpmObject As ResourcePermissionManager = New ResourcePermissionManager
         Dim intBrokerID As Integer
         Dim blnHasPermission As Boolean = False
@@ -108,7 +108,7 @@ Public Class LabServerAPI : Inherits WebService
         Dim weOutput As WaitEstimate = New WaitEstimate
         Dim qmObject As QueueManager = New QueueManager
         Dim rpmObject As ResourcePermissionManager = New ResourcePermissionManager
-        Dim rmObject As RecordManager = New RecordManager
+            Dim rmObject As WebLabDataManagers.RecordManager = New RecordManager
         Dim queueLength As QueueLengthObject
         Dim intBrokerID, intPriority, intGroupID As Integer
         Dim blnHasPermission As Boolean = False

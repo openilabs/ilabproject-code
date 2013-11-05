@@ -10,7 +10,7 @@ Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Dim cmdDBQuery As SqlCommand
         Dim dtrDBQuery As SqlDataReader
 
-        Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+        Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
         conWebLabLS.Open()
 
         strDBQuery = "SELECT s.homepage, s.ws_int_is_active, s.exp_eng_is_active, s.lab_server_id, s.elvis_dev_name, u.first_name, u.last_name, u.email FROM LSSystemConfig s JOIN SiteUsers u ON s.Admin_ID = u.user_id;"

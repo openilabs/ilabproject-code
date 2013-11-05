@@ -1,10 +1,10 @@
 <%@ Page Language="VBScript" ValidateRequest="False" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -155,12 +155,12 @@
 			If e.CommandName = "HIDE" Then
 				strDBQuery = "UPDATE SystemNotices SET is_displayed = '0' WHERE notice_id = @NoticeID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@NoticeID", e.CommandArgument)
+				cmdDBQuery.Parameters.AddWithValue("@NoticeID", e.CommandArgument)
 				cmdDBQuery.ExecuteNonQuery()
 			ElseIf e.CommandName = "SHOW" Then
 				strDBQuery = "UPDATE SystemNotices SET is_displayed = '1' WHERE notice_id = @NoticeID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@NoticeID", e.CommandArgument)
+				cmdDBQuery.Parameters.AddWithValue("@NoticeID", e.CommandArgument)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 		End If
@@ -173,7 +173,7 @@
 			
 			strDBQuery = "DELETE FROM SystemNotices WHERE notice_id = @NoticeID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@NoticeID", e.CommandArgument)
+			cmdDBQuery.Parameters.AddWithValue("@NoticeID", e.CommandArgument)
 			cmdDBQuery.ExecuteNonQuery()
 		End If
 	End Sub
@@ -190,10 +190,10 @@
 			Else
 				strDBQuery = "UPDATE SystemNotices SET title = @Title, is_displayed = @Displayed, body = @Body WHERE notice_id = @NoticeID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Title", txtTitle.Text)
-				cmdDBQuery.Parameters.Add("@Displayed", ddlDisplayed.SelectedItem.Value)
-				cmdDBQuery.Parameters.Add("@Body", txtBody.Text)
-				cmdDBQuery.Parameters.Add("@NoticeID", strEditID)
+				cmdDBQuery.Parameters.AddWithValue("@Title", txtTitle.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Displayed", ddlDisplayed.SelectedItem.Value)
+				cmdDBQuery.Parameters.AddWithValue("@Body", txtBody.Text)
+				cmdDBQuery.Parameters.AddWithValue("@NoticeID", strEditID)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 			
@@ -201,7 +201,7 @@
 			
 			strDBQuery = "SELECT n.notice_id, n.title, n.body, n.date_entered, n.is_displayed, n.author_id, s.username FROM SystemNotices n JOIN SiteUsers s ON n.author_id = s.user_id WHERE n.notice_id = @NoticeID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@NoticeID", strEditID)
+			cmdDBQuery.Parameters.AddWithValue("@NoticeID", strEditID)
 			
 			dtrDBQuery = cmdDBQuery.ExecuteReader()
 			
@@ -244,10 +244,10 @@
 			Else
 				strDBQuery = "INSERT INTO SystemNotices (title, body, is_displayed, author_id, date_entered) VALUES (@Title, @Body, @IsDisplayed, @AuthorID, GETDATE());"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Title", txtTitleInput.Text)
-				cmdDBQuery.Parameters.Add("@Body", txtBodyInput.Text)
-				cmdDBQuery.Parameters.Add("@IsDisplayed", ddlDisplayedInput.SelectedItem.Value)
-				cmdDBQuery.Parameters.Add("@AuthorID", Session("LoggedInUserID"))
+				cmdDBQuery.Parameters.AddWithValue("@Title", txtTitleInput.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Body", txtBodyInput.Text)
+				cmdDBQuery.Parameters.AddWithValue("@IsDisplayed", ddlDisplayedInput.SelectedItem.Value)
+				cmdDBQuery.Parameters.AddWithValue("@AuthorID", Session("LoggedInUserID"))
 				
 				cmdDBQuery.ExecuteNonQuery()
 				strPageState = "LIST"
@@ -263,7 +263,7 @@
 			
 			strDBQuery = "SELECT n.notice_id, n.title, n.body, n.date_entered, n.is_displayed, n.author_id, s.username FROM SystemNotices n JOIN SiteUsers s ON n.author_id = s.user_id WHERE n.notice_id = @NoticeID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@NoticeID", strEditID)
+			cmdDBQuery.Parameters.AddWithValue("@NoticeID", strEditID)
 			
 			dtrDBQuery = cmdDBQuery.ExecuteReader()
 			

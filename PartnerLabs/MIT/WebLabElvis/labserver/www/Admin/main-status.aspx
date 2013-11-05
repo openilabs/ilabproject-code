@@ -4,7 +4,7 @@
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery, strSetupNameList, strSetupStatList As String
 	Dim dcmInSuccess, dcmOutSuccess As Decimal
 	Dim cmdDBQuery As SqlCommand

@@ -1,11 +1,11 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.Math" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery, strLabStatusMsg, strLabServerID, strWebServIntEnabled, strExpEngEnabled, strSysManID, strHomepage, strDevName As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -134,7 +134,7 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET elvis_dev_name = @newValue WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newValue", strNewValue)
+				cmdDBQuery.Parameters.AddWithValue("@newValue", strNewValue)
 				
 				cmdDBQuery.ExecuteNonQuery()
 			End If
@@ -153,7 +153,7 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET homepage = @newValue WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newValue", strNewValue)
+				cmdDBQuery.Parameters.AddWithValue("@newValue", strNewValue)
 				
 				cmdDBQuery.ExecuteNonQuery()
 			End If
@@ -172,7 +172,7 @@
 							
 				strDBQuery = "SELECT first_name, last_name, email FROM SiteUsers WHERE user_id = @adminID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@adminID", strNewValue)
+				cmdDBQuery.Parameters.AddWithValue("@adminID", strNewValue)
 				dtrDBQuery = cmdDBQuery.ExecuteReader()
 				
 				If dtrDBQuery.Read() Then
@@ -189,7 +189,7 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET Admin_ID = @newValue WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newValue", strNewValue)
+				cmdDBQuery.Parameters.AddWithValue("@newValue", strNewValue)
 				cmdDBQuery.ExecuteNonQuery()
 				
 			End If
@@ -216,7 +216,7 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET exp_eng_is_active = @newValue WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newValue", strNewValue)
+				cmdDBQuery.Parameters.AddWithValue("@newValue", strNewValue)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 		End If
@@ -240,7 +240,7 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET ws_int_is_active = @newValue WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newValue", strNewValue)
+				cmdDBQuery.Parameters.AddWithValue("@newValue", strNewValue)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 		End If
@@ -257,7 +257,7 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET lab_status_msg = @newStatusMsg WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newStatusMsg", strNewStatusMsg)
+				cmdDBQuery.Parameters.AddWithValue("@newStatusMsg", strNewStatusMsg)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 		End If
@@ -292,9 +292,9 @@
 				
 				strDBQuery = "UPDATE LSSystemConfig SET exp_eng_is_active = @newEngValue, ws_int_is_active = @newIntValue, lab_status_msg = @newStatusMsg WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newEngValue", strNewEngValue)
-				cmdDBQuery.Parameters.Add("@newIntValue", strNewIntValue)
-				cmdDBQuery.Parameters.Add("@newStatusMsg", strNewStatusMsg)
+				cmdDBQuery.Parameters.AddWithValue("@newEngValue", strNewEngValue)
+				cmdDBQuery.Parameters.AddWithValue("@newIntValue", strNewIntValue)
+				cmdDBQuery.Parameters.AddWithValue("@newStatusMsg", strNewStatusMsg)
 				cmdDBQuery.ExecuteNonQuery()
 				
 			End If
@@ -331,7 +331,7 @@
 				
 				strDBQuery = "SELECT first_name, last_name, email FROM SiteUsers WHERE user_id = @adminID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@adminID", strNewSysManVal)
+				cmdDBQuery.Parameters.AddWithValue("@adminID", strNewSysManVal)
 				dtrDBQuery = cmdDBQuery.ExecuteReader()
 				
 				If dtrDBQuery.Read() Then
@@ -349,9 +349,9 @@
 				'update setup record in database
 				strDBQuery = "UPDATE LSSystemConfig SET homepage = @newHomepageValue, Admin_ID = @newSysManValue, elvis_dev_name = @newDevName WHERE SetupID = '1';"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@newHomepageValue", strNewHomepage)
-				cmdDBQuery.Parameters.Add("@newSysManValue", strNewSysManVal)
-				cmdDBQuery.Parameters.Add("@newDevName", strNewDevName)
+				cmdDBQuery.Parameters.AddWithValue("@newHomepageValue", strNewHomepage)
+				cmdDBQuery.Parameters.AddWithValue("@newSysManValue", strNewSysManVal)
+				cmdDBQuery.Parameters.AddWithValue("@newDevName", strNewDevName)
 				cmdDBQuery.ExecuteNonQuery()
 			End If
 		End If

@@ -4,7 +4,7 @@
 <%@ Import Namespace="System.Xml" %>
 <%@ Import Namespace="System.Diagnostics" %>
 <%@ Import Namespace="validation_engine.WebLabSystemComponents" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="server">
 Dim strPageState, strValidateResponse as String

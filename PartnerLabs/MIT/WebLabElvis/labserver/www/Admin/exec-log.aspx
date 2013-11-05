@@ -1,10 +1,10 @@
 <%@ Page Language="VBScript" ValidateRequest="False" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -84,8 +84,8 @@
 		
 		strDBQuery = "EXEC rm_ReturnJobLogSubset @StartIdx, @Interval;"
 		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-		cmdDBQuery.Parameters.Add("@StartIdx", intStartIdx)
-		cmdDBQuery.Parameters.Add("@Interval", intInterval)
+		cmdDBQuery.Parameters.AddWithValue("@StartIdx", intStartIdx)
+		cmdDBQuery.Parameters.AddWithValue("@Interval", intInterval)
 		
 		Return cmdDBQuery.ExecuteReader()	
 	End Function
@@ -205,7 +205,7 @@
 			
 			strDBQuery = "SELECT j.exp_id, j.provider_id, b.name As broker_name, j.broker_assigned_id, j.groups, j.priority, j.job_status, j.submit_time, j.exec_time, j.end_time, j.exec_elapsed, j.job_elapsed, j.est_exec_time, j.queue_at_insert, j.datapoints, j.setup_used, r.name As setup_name, j.lab_config_at_exec, j.experiment_vector, j.experiment_results, j.error_report, j.error_occurred, j.downloaded FROM JobRecord j LEFT JOIN Brokers b ON j.provider_id = b.broker_id LEFT JOIN Setups s ON j.setup_used = s.setup_id LEFT JOIN Resources r ON s.resource_id = r.resource_id WHERE j.exp_id = @ExpID;"		
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@ExpID", strDetailID)
+			cmdDBQuery.Parameters.AddWithValue("@ExpID", strDetailID)
 			
 			dtrDBQuery = cmdDBQuery.ExecuteReader()
 			

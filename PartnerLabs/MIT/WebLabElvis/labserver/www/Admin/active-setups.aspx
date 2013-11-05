@@ -1,11 +1,11 @@
 <%@ Page Language="VBScript"%>
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -202,13 +202,13 @@
 	'	If e.CommandName = "Activate" Then
 	'		strDBQuery = "UPDATE ActiveDevices SET is_active = 1 WHERE active_id = @LocID;"
 	'		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-	'		cmdDBQuery.Parameters.Add("@LocID", e.CommandArgument)
+	'		cmdDBQuery.Parameters.AddWithValue("@LocID", e.CommandArgument)
 	'		cmdDBQuery.ExecuteNonQuery()
 	'		
 	'	ElseIf e.CommandName = "Deactivate" Then
 	'		strDBQuery = "UPDATE ActiveDevices SET is_active = 0 WHERE active_id = @LocID;"
 	'		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-	'		cmdDBQuery.Parameters.Add("@LocID", e.CommandArgument)
+	'		cmdDBQuery.Parameters.AddWithValue("@LocID", e.CommandArgument)
 	'		cmdDBQuery.ExecuteNonQuery()
 	'	
 	'	Else

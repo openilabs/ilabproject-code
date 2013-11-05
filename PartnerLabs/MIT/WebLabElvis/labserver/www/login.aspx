@@ -1,10 +1,10 @@
 <%@ Page language="VBscript" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Web.Security" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <Script Runat="Server">
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strPageState, strErrorTrigger as String
 	Dim RecMan As New RecordManager()
 	Dim RPMan As New ResourcePermissionManager()
@@ -61,8 +61,8 @@
 				
 		strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT user_id FROM SiteUsers WHERE username = @username AND password = @password);"
 		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-		cmdDBQuery.Parameters.Add("@username", strUserName)
-		cmdDBQuery.Parameters.Add("@password", strPassword)
+		cmdDBQuery.Parameters.AddWithValue("@username", strUserName)
+		cmdDBQuery.Parameters.AddWithValue("@password", strPassword)
 		
 		If cmdDBQuery.ExecuteScalar() = "true" Then
 			blnResult = True
@@ -81,7 +81,7 @@
 		
 		strDBQuery = "SELECT user_id, username, class_id FROM SiteUsers WHERE username = @username;"
 		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-		cmdDBQuery.Parameters.Add("@username", strUserName)
+		cmdDBQuery.Parameters.AddWithValue("@username", strUserName)
 		
 		dtrDBQuery = cmdDBQuery.ExecuteReader()
 		

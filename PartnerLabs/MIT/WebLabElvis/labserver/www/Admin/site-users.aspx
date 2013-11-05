@@ -1,11 +1,11 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim loopIdx As Integer
 	Dim cmdDBQuery As SqlCommand
@@ -61,7 +61,7 @@
 					
 					strDBQuery = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.username, u.password, u.class_id, c.name AS class_name, u.is_active, u.date_created, u.date_modified FROM SiteUsers u JOIN UsageClasses c ON u.class_id = c.class_id WHERE u.user_id = @UserID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@UserID", strUserID)
+					cmdDBQuery.Parameters.AddWithValue("@UserID", strUserID)
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
 					If dtrDBQuery.Read() Then
@@ -88,7 +88,7 @@
 					
 					strDBQuery = "SELECT 0 As class_id, 'Select New Class' As name UNION SELECT 0 As class_id, '-----' As name UNION SELECT class_id, name FROM UsageClasses WHERE NOT class_id = @ClassID ORDER BY class_id, name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 				
 					Do While dtrDBQuery.Read()
@@ -238,8 +238,8 @@
 			Else
 				strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT user_id FROM SiteUsers WHERE username = @UName AND NOT useR_id = @UserID);"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@UName", txtEditUName.Text)
-				cmdDBQuery.Parameters.Add("@UserID", strUserID)
+				cmdDBQuery.Parameters.AddWithValue("@UName", txtEditUName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@UserID", strUserID)
 				
 				If cmdDBQuery.ExecuteScalar() = "true" Then
 					lblErrorOnEditMsg.Text = "Error Updating Site User Account: The specified username is already in use.  Please select another."
@@ -251,12 +251,12 @@
 				'process update without pwd change
 				strDBQuery = "UPDATE SiteUsers SET first_name = @FName, last_name = @LName, email = @Email, username = @UName, is_active = @Status, date_modified = GETDATE() WHERE user_id = @UserID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@FName", txtEditFName.Text)
-				cmdDBQuery.Parameters.Add("@LName", txtEditLName.Text)
-				cmdDBQuery.Parameters.Add("@Email", txtEditEmail.Text)
-				cmdDBQuery.Parameters.Add("@UName", txtEditUName.Text)
-				cmdDBQuery.Parameters.Add("@Status", ddlEditStatus.SelectedItem.Value)
-				cmdDBQuery.Parameters.Add("@UserID", strUserID)
+				cmdDBQuery.Parameters.AddWithValue("@FName", txtEditFName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@LName", txtEditLName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Email", txtEditEmail.Text)
+				cmdDBQuery.Parameters.AddWithValue("@UName", txtEditUName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Status", ddlEditStatus.SelectedItem.Value)
+				cmdDBQuery.Parameters.AddWithValue("@UserID", strUserID)
 				
 				Try
 					cmdDBQuery.ExecuteNonQuery()
@@ -269,13 +269,13 @@
 				'process update with pwd change
 				strDBQuery = "UPDATE SiteUsers SET first_name = @FName, last_name = @LName, email = @Email, username = @UName, password = @Pass, is_active = @Status, date_modified = GETDATE() WHERE user_id = @UserID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@FName", txtEditFName.Text)
-				cmdDBQuery.Parameters.Add("@LName", txtEditLName.Text)
-				cmdDBQuery.Parameters.Add("@Email", txtEditEmail.Text)
-				cmdDBQuery.Parameters.Add("@UName", txtEditUName.Text)
-				cmdDBQuery.Parameters.Add("@Pass", txtEditNewPass.Text)
-				cmdDBQuery.Parameters.Add("@Status", ddlEditStatus.SelectedItem.Value)
-				cmdDBQuery.Parameters.Add("@UserID", strUserID)
+				cmdDBQuery.Parameters.AddWithValue("@FName", txtEditFName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@LName", txtEditLName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Email", txtEditEmail.Text)
+				cmdDBQuery.Parameters.AddWithValue("@UName", txtEditUName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Pass", txtEditNewPass.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Status", ddlEditStatus.SelectedItem.Value)
+				cmdDBQuery.Parameters.AddWithValue("@UserID", strUserID)
 				
 				Try
 					cmdDBQuery.ExecuteNonQuery()

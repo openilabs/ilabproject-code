@@ -261,16 +261,16 @@
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
 						If intCtrlNum < 10 Then
-							strCtrlNum = "0" & IntCtrlNum
+							strCtrlNum = "ctl" & "0" & IntCtrlNum
 						Else
-							strCtrlNum = IntCtrlNum
+							strCtrlNum = "ctl" & IntCtrlNum
 						End If
-						lblMappingIDRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
-						chkCanReadRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
-						chkCanEditRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
-						chkCanDeleteRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
-						chkCanGrantRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
-						txtPriorityRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$txtPriority")
+						lblMappingIDRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "lblMappingID")
+						chkCanReadRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanRead")
+						chkCanEditRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanEdit")
+						chkCanDeleteRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanDelete")
+						chkCanGrantRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanGrant")
+						txtPriorityRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "txtPriority")
 						
 						If lblMappingIDRef Is Nothing Then
 							lblErrorMsg.Text = "Page Error While Updating Resource:SetUpPerms MappingID.  Aborting."
@@ -334,15 +334,15 @@
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
 						If intCtrlNum < 10 Then
-							strCtrlNum = "0" & IntCtrlNum
+							strCtrlNum = "ctl" & "0" & IntCtrlNum
 						Else
-							strCtrlNum = IntCtrlNum
+							strCtrlNum = "ctl" & IntCtrlNum
 						End If
-						lblMappingIDRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
-						chkCanReadRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
-						chkCanEditRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
-						chkCanDeleteRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
-						chkCanGrantRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
+						lblMappingIDRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "lblMappingID")
+						chkCanReadRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanRead")
+						chkCanEditRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanEdit")
+						chkCanDeleteRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanDelete")
+						chkCanGrantRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanGrant")
 						
 						If lblMappingIDRef Is Nothing Then
 							lblErrorMsg.Text = "Page Error While Updating Resource:NonSetup MappingID.  Aborting."
@@ -399,18 +399,18 @@
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
 						If intCtrlNum < 10 Then
-							strCtrlNum = "0" & IntCtrlNum
+							strCtrlNum = "ctl" & "0" & IntCtrlNum
 						Else
-							strCtrlNum = IntCtrlNum
+							strCtrlNum = "ctl" & IntCtrlNum
 						End If
 						
-						lblMappingIDRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
-						lblClassIDRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$lblClassID")
-						chkCanReadRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
-						chkCanEditRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
-						chkCanDeleteRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
-						chkCanGrantRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
-						txtPriorityRef = FindControl("rptSetupPerms$ctl" & strCtrlNum & "$txtPriority")
+						lblMappingIDRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "lblMappingID")
+						lblClassIDRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "lblClassID")
+						chkCanReadRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanRead")
+						chkCanEditRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanEdit")
+						chkCanDeleteRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanDelete")
+						chkCanGrantRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanGrant")
+						txtPriorityRef = FindControl("rptSetupPerms" & sepChar & strCtrlNum & sepChar & "txtPriority")
 						
 						If lblMappingIDRef Is Nothing Then
 							lblErrorMsg.Text = "Page Error While Updating Resource:SetUp MappingID.  Aborting."
@@ -493,16 +493,16 @@
 					For loopIdx = 0 To Cint(Request.Form("Gct")) - 1 'CInt(lblGroupCT.Text) - 1
 						intCtrlNum = (loopIdx * 2) + 1
 						If intCtrlNum < 10 Then
-							strCtrlNum = "0" & IntCtrlNum
+							strCtrlNum = "ctl" & "0" & IntCtrlNum
 						Else
-							strCtrlNum = IntCtrlNum
+							strCtrlNum = "ctl" & IntCtrlNum
 						End If
-						lblMappingIDRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$lblMappingID")
-						lblClassIDRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$lblClassID")
-						chkCanReadRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanRead")
-						chkCanEditRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanEdit")
-						chkCanDeleteRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanDelete")
-						chkCanGrantRef = FindControl("rptNonSetupPerms$ctl" & strCtrlNum & "$chkCanGrant")
+						lblMappingIDRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "lblMappingID")
+						lblClassIDRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "lblClassID")
+						chkCanReadRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanRead")
+						chkCanEditRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanEdit")
+						chkCanDeleteRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanDelete")
+						chkCanGrantRef = FindControl("rptNonSetupPerms" & sepChar & strCtrlNum & sepChar & "chkCanGrant")
 						
 						If lblMappingIDRef Is Nothing Then
 							lblErrorMsg.Text = "Page Error While Updating Resource: MAppingID.  Aborting."
@@ -631,15 +631,15 @@
 				For loopIdx = 0 To CInt(Request.Form("Gct")) - 1
 					intCtrlNum = (loopIdx * 2) + 1
 					If intCtrlNum < 10 Then
-						strCtrlNum = "0" & IntCtrlNum
-					Else
-						strCtrlNum = IntCtrlNum
+						strCtrlNum = "ctl" & "0" & IntCtrlNum
+						Else
+							strCtrlNum = "ctl" & IntCtrlNum
 					End If
-					lblAddClassIDRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$lblAddClassID")
-					chkAddCanReadRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanRead")
-					chkAddCanEditRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanEdit")
-					chkAddCanDeleteRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanDelete")
-					chkAddCanGrantRef = FindControl("rptAddPerms$ctl" & strCtrlNum & "$chkAddCanGrant")
+					lblAddClassIDRef = FindControl("rptAddPerms" & sepChar & strCtrlNum & sepChar & "lblAddClassID")
+					chkAddCanReadRef = FindControl("rptAddPerms" & sepChar & strCtrlNum & sepChar & "chkAddCanRead")
+					chkAddCanEditRef = FindControl("rptAddPerms" & sepChar & strCtrlNum & sepChar & "chkAddCanEdit")
+					chkAddCanDeleteRef = FindControl("rptAddPerms" & sepChar & strCtrlNum & sepChar & "chkAddCanDelete")
+					chkAddCanGrantRef = FindControl("rptAddPerms" & sepChar & strCtrlNum & sepChar & "chkAddCanGrant")
 					
 					If lblAddClassIDRef Is Nothing Then
 						lblErrorOnAddMsg.Text = "Page Error While Assigning Permissions: ClassID.  Aborting."

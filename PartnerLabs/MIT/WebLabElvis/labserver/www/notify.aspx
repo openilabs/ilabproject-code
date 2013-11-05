@@ -3,6 +3,8 @@
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="iLabs.Proxies.BatchSB" %>
+
 <!--
 Author(s): James Hardison (hardison@alum.mit.edu)
 Date: 5/9/2003
@@ -27,14 +29,14 @@ Sub Page_Load
 		Exit Sub
 	End If
 	
-	strConString = ConfigurationSettings.AppSettings("conString")
+        strConString = ConfigurationManager.AppSettings("conString")
 	conWebLabLS = New SqlConnection(strConString)
 	
 	conWebLabLS.Open()
 	'checks if the submitted id is valid and the associated broker has a service broker service interface location on file	
 	strDBQuery = "SELECT b.notify_location, b.broker_id, r.broker_assigned_id FROM JobRecord r JOIN Brokers b ON b.broker_id = r.provider_id WHERE r.job_status = 'COMPLETE' AND r.exp_id = @ExpID;"
 	cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-	cmdDBQuery.Parameters.Add("@ExpID", strExpID)
+        cmdDBQuery.Parameters.AddWithValue("@ExpID", strExpID)
 	
 	dtrDBQuery = cmdDBQuery.ExecuteReader()
 	
@@ -54,10 +56,14 @@ Sub Page_Load
 		
 		'strReturn = "Entered Exec block"
 		'instantiate the service broker service class
-		Dim SBObj as New ServiceBrokerService()
+            Dim SBObj As New BatchSBProxy()
+            
+            'The Service broker does not check the header currently Oct 31,2013
+            'Method signature expects a sbAuthHeader but should use a AuthHeader
+            'Since the WebLab server does not have access to the couponID
 		
 		'set the appropriate URL for this job
-		SBObj.URL = strMethodUrl
+            SBObj.Url = strMethodUrl
 		
 		'call notify
 		Try

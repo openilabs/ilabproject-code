@@ -1,7 +1,7 @@
 <%@ Page language="VBscript" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <script Runat="Server">
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 
 	Sub Page_Load
 		Dim strDBQuery As String

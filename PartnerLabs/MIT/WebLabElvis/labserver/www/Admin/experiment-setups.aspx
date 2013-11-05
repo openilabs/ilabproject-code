@@ -1,11 +1,11 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -31,7 +31,7 @@
 				If Not Request.QueryString("sid") Is Nothing And IsNumeric(Request.QueryString("sid")) Then
 					strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT setup_id FROM Setups WHERE setup_id = @SetupID);"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@SetupID", Request.QueryString("sid"))
+					cmdDBQuery.Parameters.AddWithValue("@SetupID", Request.QueryString("sid"))
 					
 					If cmdDBQuery.ExecuteScalar() = "true" Then
 						strPageState = "EDIT"
@@ -63,7 +63,7 @@
 					'strSetupID = Request.QueryString("sid")
 					strDBQuery = "SELECT r.name, r.resource_id, r.description, s.icon_path, s.terminals_used, s.date_created, s.date_modified FROM Setups s JOIN Resources r ON s.resource_id = r.resource_id WHERE s.setup_id = @SetupID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@SetupID", strSetupID)
+					cmdDBQuery.Parameters.AddWithValue("@SetupID", strSetupID)
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
 					If dtrDBQuery.Read() Then
@@ -119,7 +119,7 @@
 					
 					strDBQuery = "SELECT setupterm_id, setup_id, number, name, x_pixel_loc, y_pixel_loc, max_amplitude, max_offset, max_current, max_frequency, max_sampling_rate, max_sampling_time, max_points, instrument, date_created, date_modified FROM SetupTerminalConfig WHERE setup_id = @SetupID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@SetupID", strSetupID)
+					cmdDBQuery.Parameters.AddWithValue("@SetupID", strSetupID)
 					rptSetupTerm.DataSource = cmdDBQuery.ExecuteReader()
 					rptSetupTerm.DataBind()
 				
@@ -217,7 +217,7 @@
 			
 			strDBQuery = "SELECT setup_id FROM Setups WHERE resource_id = @ResourceId;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+			cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 			strSetupID = cmdDBQuery.ExecuteScalar()
 			
 			'check if the setup name is an appropriate value
@@ -232,8 +232,8 @@
 			
 			strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT resource_id FROM Resources WHERE name = @NewName AND NOT resource_id = @ResourceID);"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@NewName", txtEditName.Text)
-			cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+			cmdDBQuery.Parameters.AddWithValue("@NewName", txtEditName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 			
 			If cmdDBQuery.ExecuteScalar() = "true" Then
 				lblErrorMsg.Text = "Error Updating Experiment Setup: The Name """ & txtEditName.Text & """ is already in use."
@@ -243,16 +243,16 @@
 			'update resource listing
 			strDBQuery = "UPDATE Resources SET name = @Name, description = @Desc, date_modified = GETDATE() WHERE resource_id = @ResourceID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtEditName.Text)
-			cmdDBQuery.Parameters.Add("@Desc", txtEditDesc.Text)
-			cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtEditName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Desc", txtEditDesc.Text)
+			cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 			cmdDBQuery.ExecuteNonQuery()
 			
 			'update setup listing
 			'strDBQuery = "UPDATE Setups SET max_points = @MaxPoints, date_modified = GETDATE() WHERE resource_id = @ResourceID;"
 			'cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			'cmdDBQuery.Parameters.Add("@MaxPoints", txtMaxPoints.Text)
-			'cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+			'cmdDBQuery.Parameters.AddWithValue("@MaxPoints", txtMaxPoints.Text)
+			'cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 			'cmdDBQuery.ExecuteNonQuery()
 			
 			If Not blnHasImage Then
@@ -277,8 +277,8 @@
 						End If
 						strDBQuery = "UPDATE Setups SET icon_path = @NewIP, date_modified = GETDATE() WHERE resource_id = @ResourceID;"
 						cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-						cmdDBQuery.Parameters.Add("@NewIP", strWebPath)
-						cmdDBQuery.Parameters.Add("@ResourceID", strResourceID)
+						cmdDBQuery.Parameters.AddWithValue("@NewIP", strWebPath)
+						cmdDBQuery.Parameters.AddWithValue("@ResourceID", strResourceID)
 						cmdDBQuery.ExecuteNonQuery()
 					Else
 						lblErrorMsg.Text = "Error Updating Setup: The specified file must be an image."
@@ -302,7 +302,7 @@
 			If blnHasImage Then
 				strDBQuery = "SELECT icon_path FROM Setups WHERE setup_id = @SetupID;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@SetupID", e.CommandArgument)
+				cmdDBQuery.Parameters.AddWithValue("@SetupID", e.CommandArgument)
 				
 				strImageLoc = cmdDBQuery.ExecuteScalar()
 			End If
@@ -320,7 +320,7 @@
 					
 				strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT setup_id FROM Setups WHERE icon_path = @ImgLoc);"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@ImgLoc", strImageLoc)
+				cmdDBQuery.Parameters.AddWithValue("@ImgLoc", strImageLoc)
 				
 				'if there are no other references, proceed with file removal
 				If cmdDBQuery.ExecuteScalar() <> "true" Then
@@ -357,7 +357,7 @@
 			Else
 				strDBQuery = "SELECT setup_id FROM Setups WHERE name = @CopyName;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@CopyName", "Copy of " & Left(e.CommandName, 92))
+				cmdDBQuery.Parameters.AddWithValue("@CopyName", "Copy of " & Left(e.CommandName, 92))
 				
 				strSetupID = cmdDBQuery.ExecuteScalar()
 			End If
@@ -376,13 +376,13 @@
 			
 			strDBQuery = "SELECT setup_id FROM SetupTerminalConfig WHERE setupterm_id = @TermID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@TermID", e.commandArgument)
+			cmdDBQuery.Parameters.AddWithValue("@TermID", e.commandArgument)
 			strSetupID = cmdDBQuery.ExecuteScalar()
 			
 			strDBQuery = "SELECT name, instrument FROM SetupTerminalConfig WHERE setup_id = @SetupID AND setupterm_id <> @TermID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@SetupID", strSetupID)
-			cmdDBQuery.Parameters.Add("@TermID", e.CommandArgument)
+			cmdDBQuery.Parameters.AddWithValue("@SetupID", strSetupID)
+			cmdDBQuery.Parameters.AddWithValue("@TermID", e.CommandArgument)
 			
 			dtrDBQuery = cmdDBQuery.ExecuteReader()
 			
@@ -563,18 +563,18 @@
 			
 			strDBQuery = "UPDATE SetupTerminalConfig SET name = @Name, x_pixel_loc = @XLoc, y_pixel_loc = @YLoc, instrument = @Instrument, max_amplitude = @MaxAmplitude, max_offset = @MaxOffset, max_current = @MaxCurrent,  max_frequency = @MaxFrequency, max_sampling_rate = @MaxSamplingRate, max_sampling_time = @MaxSamplingTime, max_points = @MaxPoints,date_modified = GETDATE() WHERE setupterm_id = @TermID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtEditTermNameRef.Text)
-			cmdDBQuery.Parameters.Add("@XLoc", txtEditTermXLocRef.Text)
-			cmdDBQuery.Parameters.Add("@YLoc", txtEditTermYLocRef.Text)
-			cmdDBQuery.Parameters.Add("@MaxAmplitude", txtEditTermMaxAmpRef.Text)
-			cmdDBQuery.Parameters.Add("@MaxOffset", txtEditTermMaxOffsetRef.Text)
-			cmdDBQuery.Parameters.Add("@MaxCurrent", txtEditTermMaxARef.Text)
-			cmdDBQuery.Parameters.Add("@MaxFrequency", txtEditTermMaxFRef.Text)
-			cmdDBQuery.Parameters.Add("@MaxSamplingRate", txtEditTermMaxSamplingRateRef.Text)
-			cmdDBQuery.Parameters.Add("@MaxSamplingTime", txtEditTermMaxSamplingTimeRef.Text)
-			cmdDBQuery.Parameters.Add("@MaxPoints", txtEditTermMaxPointsRef.Text)
-			cmdDBQuery.Parameters.Add("@Instrument", ddlEditTermInstrumentRef.SelectedItem.Text)
-			cmdDBQuery.Parameters.Add("@TermID", e.CommandArgument)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtEditTermNameRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@XLoc", txtEditTermXLocRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@YLoc", txtEditTermYLocRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxAmplitude", txtEditTermMaxAmpRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxOffset", txtEditTermMaxOffsetRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxCurrent", txtEditTermMaxARef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxFrequency", txtEditTermMaxFRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxSamplingRate", txtEditTermMaxSamplingRateRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxSamplingTime", txtEditTermMaxSamplingTimeRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@MaxPoints", txtEditTermMaxPointsRef.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Instrument", ddlEditTermInstrumentRef.SelectedItem.Text)
+			cmdDBQuery.Parameters.AddWithValue("@TermID", e.CommandArgument)
 
 			cmdDBQuery.ExecuteNonQuery()
 			
@@ -638,13 +638,13 @@
 			'remove the reference from the specified setup
 			strDBQuery = "UPDATE Setups SET icon_path = NULL WHERE setup_id = @SetupID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@SetupID", e.CommandArgument)
+			cmdDBQuery.Parameters.AddWithValue("@SetupID", e.CommandArgument)
 			cmdDBQuery.ExecuteNonQuery()
 			
 			'are there other setups that use this image?
 			strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT setup_id FROM Setups WHERE icon_path = @ImgLoc);"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@ImgLoc", e.CommandName)
+			cmdDBQuery.Parameters.AddWithValue("@ImgLoc", e.CommandName)
 			
 			'if there are no other references, proceed with file removal
 			If cmdDBQuery.ExecuteScalar() <> "true" Then
@@ -703,7 +703,7 @@
 				'get id of new setup
 				strDBQuery = "SELECT s.setup_id FROM Setups s JOIN Resources r ON r.resource_id = s.resource_id WHERE r.name = @Name;"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Name", txtAddName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@Name", txtAddName.Text)
 				
 				strSetupID = cmdDBQuery.ExecuteScalar()
 				
@@ -728,8 +728,8 @@
 					
 					strDBQuery = "UPDATE Setups SET icon_path = @NewIP WHERE setup_id = @SetupID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@NewIP", strWebPath)
-					cmdDBQuery.Parameters.Add("@SetupID", strSetupID)
+					cmdDBQuery.Parameters.AddWithValue("@NewIP", strWebPath)
+					cmdDBQuery.Parameters.AddWithValue("@SetupID", strSetupID)
 					cmdDBQuery.ExecuteNonQuery()
 					
 				End If

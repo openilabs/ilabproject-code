@@ -2,12 +2,12 @@
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Collections" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
-<%@ Import Namespace="WebLabCustomDataTypes.WebLabCustomDataTypes" %>
+<%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="WebLabCustomDataTypes" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim loopIdx As Integer
 	DIm htClassIDOrder As New HashTable()
@@ -68,7 +68,7 @@
 				
 					strDBQuery = "SELECT b.broker_id, b.class_id, b.name, b.broker_server_id, b.broker_passkey, b.server_passkey, b.description, b.contact_first_name, b.contact_last_name, b.contact_email, b.is_active, b.notify_location, b.date_created, b.date_modified, c.name AS class_name FROM Brokers b JOIN UsageClasses c ON b.class_id = c.class_id WHERE b.broker_id = @BrokerID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
+					cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
 					If dtrDBQuery.Read() Then
@@ -126,7 +126,7 @@
 					
 					strDBQuery = "SELECT COUNT(*) FROM Groups WHERE owner_id = @BrokerID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
+					cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
 					
 					If CInt(cmdDBQuery.ExecuteScalar()) = 0 Then
 						rptGroups.Visible = False
@@ -134,7 +134,7 @@
 						rptGroups.Visible = True
 						strDBQuery = "SELECT g.group_id, g.name, g.class_id, c.name AS class_name, g.is_active, g.date_modified FROM Groups g JOIN UsageClasses c ON g.class_id = c.class_id WHERE owner_id = @BrokerID;"
 						cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-						cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
+						cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
 						rptGroups.DataSource = cmdDBQuery.ExecuteReader()
 						rptGroups.DataBind()
 					End If
@@ -144,7 +144,7 @@
 				
 					strDBQuery = "SELECT g.group_id, g.name, g.owner_id, b.name AS broker_name, g.class_id, c.name AS class_name, g.description, g.is_active, g.date_created, g.date_modified FROM Groups g JOIN Brokers b ON g.owner_id = b.broker_id JOIN UsageClasses c ON g.class_id = c.class_id WHERE g.group_id = @GroupID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@GroupID", strGroupID)
+					cmdDBQuery.Parameters.AddWithValue("@GroupID", strGroupID)
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
 					If dtrDBQuery.Read() Then
@@ -176,7 +176,7 @@
 					
 					strDBQuery = "SELECT 0 As class_id, 'Select New Class' As name UNION SELECT 0 As class_id, '-----' As name UNION SELECT class_id, name FROM UsageClasses WHERE NOT class_id = @ClassID ORDER BY class_id, name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
 					Do While dtrDBQuery.Read()
@@ -190,7 +190,7 @@
 					
 					strDBQuery = "SELECT name FROM Brokers WHERE broker_id = @BrokerID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
+					cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
 					
 					lblAGBTitle.Text = cmdDBQuery.ExecuteScalar()
 					lbAGViewBroker.CommandArgument = strBrokerID
@@ -330,8 +330,8 @@
 			Else
 				strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT broker_id FROM Brokers WHERE name = @Name AND NOT broker_id = @BrokerID);"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Name", txtEditBrokerName.Text)
-				cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
+				cmdDBQuery.Parameters.AddWithValue("@Name", txtEditBrokerName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
 				
 				If cmdDBQuery.ExecuteScalar() = "true" Then
 					lblErrorOnEditBrokerMsg.Text = "Error Updating Broker: The specified name is already in use.  Please select another."
@@ -377,16 +377,16 @@
 			'update non-class assignment broker information
 			strDBQuery = "UPDATE Brokers SET name = @Name, description = @Desc, notify_location = @WSURL, contact_first_name = @CFName, contact_last_name = @CLName, contact_email = @CEmail, broker_server_id = @BAuthID, server_passkey = @LSPasskey, is_active = @Status, date_modified = GETDATE() WHERE broker_id = @BrokerID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtEditBrokerName.Text)
-			cmdDBQuery.Parameters.Add("@Desc", txtEditBrokerDesc.Text)
-			cmdDBQuery.Parameters.Add("@WSURL", txtEditBrokerWSLoc.Text)
-			cmdDBQuery.Parameters.Add("@CFName", txtEditBrokerCFName.Text)
-			cmdDBQuery.Parameters.Add("@CLName", txtEditBrokerCLName.Text)
-			cmdDBQuery.Parameters.Add("@CEmail", txtEditBrokerCEmail.Text)
-			cmdDBQuery.Parameters.Add("@BAuthID", txtEditBrokerID.Text)
-			cmdDBQuery.Parameters.Add("@LSPasskey", txtEditBrokerLSPassKey.Text)
-			cmdDBQuery.Parameters.Add("@Status", ddlEditBrokerStatus.SelectedItem.Value)
-			cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtEditBrokerName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Desc", txtEditBrokerDesc.Text)
+			cmdDBQuery.Parameters.AddWithValue("@WSURL", txtEditBrokerWSLoc.Text)
+			cmdDBQuery.Parameters.AddWithValue("@CFName", txtEditBrokerCFName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@CLName", txtEditBrokerCLName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@CEmail", txtEditBrokerCEmail.Text)
+			cmdDBQuery.Parameters.AddWithValue("@BAuthID", txtEditBrokerID.Text)
+			cmdDBQuery.Parameters.AddWithValue("@LSPasskey", txtEditBrokerLSPassKey.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Status", ddlEditBrokerStatus.SelectedItem.Value)
+			cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
 			
 			Try
 				cmdDBQuery.ExecuteNonQuery()
@@ -497,8 +497,8 @@
 			Else
 				strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT group_id FROM Groups WHERE name = @Name AND NOT group_id = @GroupID);"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Name", txtEGName.Text)
-				cmdDBQuery.Parameters.Add("@GroupID", strGroupID)
+				cmdDBQuery.Parameters.AddWithValue("@Name", txtEGName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@GroupID", strGroupID)
 				
 				If cmdDBQuery.ExecuteScalar() = "true" Then
 					lblErrorOnEGMsg.Text = "Error Updating Broker Group: The specified name is already in use.  Please select another."
@@ -514,10 +514,10 @@
 			'update non-class assignment information
 			strDBQuery = "UPDATE Groups SET name = @Name, description = @Desc, is_active = @Status, date_modified = GETDATE() WHERE group_id = @GroupID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtEGName.Text)
-			cmdDBQuery.Parameters.Add("@Desc", txtEGDesc.Text)
-			cmdDBQuery.Parameters.Add("@Status", ddlEGStatus.SelectedItem.Value)
-			cmdDBQuery.Parameters.Add("@GroupID", strGroupID)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtEGName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Desc", txtEGDesc.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Status", ddlEGStatus.SelectedItem.Value)
+			cmdDBQuery.Parameters.AddWithValue("@GroupID", strGroupID)
 			
 			Try
 				cmdDBQuery.ExecuteNonQuery()
@@ -628,8 +628,8 @@
 			
 			strDBQuery = "SELECT group_id FROM Groups WHERE owner_id = @BrokerID AND name = @Name;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@BrokerID", strBrokerID)
-			cmdDBQuery.Parameters.Add("@Name", txtAGName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@BrokerID", strBrokerID)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtAGName.Text)
 			
 			strGroupID = cmdDBQuery.ExecuteScalar()
 			strPageState = "EDITGROUP"

@@ -1,10 +1,10 @@
 <%@ Page Language="VBScript" ValidateRequest="False" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -79,8 +79,8 @@
 		
 		strDBQuery = "EXEC rm_ReturnLoginLogSubset @StartIdx, @Interval;"
 		cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-		cmdDBQuery.Parameters.Add("@StartIdx", intStartIdx)
-		cmdDBQuery.Parameters.Add("@Interval", intInterval)
+		cmdDBQuery.Parameters.AddWithValue("@StartIdx", intStartIdx)
+		cmdDBQuery.Parameters.AddWithValue("@Interval", intInterval)
 		
 		Return cmdDBQuery.ExecuteReader()	
 	End Function

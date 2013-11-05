@@ -1,11 +1,11 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers.WebLabDataManagers" %>
+<%@ Import Namespace="WebLabDataManagers" %>
 
 <script Runat="Server">
 
-	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+	Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 	Dim strDBQuery As String
 	Dim cmdDBQuery As SqlCommand
 	Dim dtrDBQuery As SqlDataReader
@@ -63,7 +63,7 @@
 					
 					strDBQuery = "SELECT class_id, name, description, date_created, date_modified FROM UsageClasses WHERE class_id = @ClassID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
@@ -97,7 +97,7 @@
 					End If
 				
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					rptClassPerms.DataSource = cmdDBQuery.ExecuteReader()
 					rptClassPerms.DataBind()
@@ -105,7 +105,7 @@
 				Case "EDITMEMB"
 					strDBQuery = "SELECT name, amt_member_brokers FROM UsageClasses WHERE class_id = @ClassID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
@@ -130,14 +130,14 @@
 					dstClasses = New DataSet()
 					strDBQuery = "SELECT 0 As class_id, 'Select Class' As name UNION SELECT 0 As class_id, '-----' As name UNION SELECT class_id, name FROM UsageClasses WHERE NOT class_id = @ClassID ORDER BY class_id, name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dadClasses = New SqlDataAdapter(cmdDBQuery)
 					dadClasses.Fill(dstClasses, "Classes")
 					
 					dstNewMembers = New DataSet()
 					strDBQuery = "SELECT 0 As broker_id, 'Select Service Broker' As name UNION SELECT 0 As class_id, '-----' As name UNION SELECT broker_id, name FROM Brokers WHERE NOT class_id = @ClassID ORDER BY broker_id, name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dadNewMembers = New SqlDataAdapter(cmdDBQuery)
 					dadNewMembers.Fill(dstNewMembers, "NewMembers")
 					
@@ -148,7 +148,7 @@
 					
 					strDBQuery = "SELECT broker_id, name, contact_first_name, contact_last_name, contact_email, is_active FROM Brokers WHERE class_id = @ClassID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					rptBMembers.DataSource = cmdDBQuery.ExecuteReader()
 					rptBMembers.DataBind()
@@ -156,7 +156,7 @@
 				Case "EDITMEMG"
 					strDBQuery = "SELECT name, amt_member_groups FROM UsageClasses WHERE class_id = @ClassID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
@@ -181,14 +181,14 @@
 					dstClasses = New DataSet()
 					strDBQuery = "SELECT 0 As class_id, 'Select Class' As name UNION SELECT 0 As class_id, '-----' As name UNION SELECT class_id, name FROM UsageClasses WHERE NOT class_id = @ClassID ORDER BY class_id, name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dadClasses = New SqlDataAdapter(cmdDBQuery)
 					dadClasses.Fill(dstClasses, "Classes")
 					
 					dstNewMembers = New DataSet()
 					strDBQuery = "SELECT 0 As group_id, 'Select Broker Group' As group_name UNION SELECT 0 As group_id, '-----' As group_name UNION SELECT g.group_id, g.name + ' (' + b.name + ')' AS group_name FROM Groups g JOIN Brokers b ON g.owner_id = b.broker_id WHERE NOT g.class_id = @ClassID ORDER BY group_id, group_name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dadNewMembers = New SqlDataAdapter(cmdDBQuery)
 					dadNewMembers.Fill(dstNewMembers, "NewMembers")
 					
@@ -199,7 +199,7 @@
 					
 					strDBQuery = "SELECT g.group_id, g.name AS group_name, g.owner_id AS broker_id, b.name AS broker_name, g.is_active FROM Groups g JOIN Brokers b ON g.owner_id = b.broker_id WHERE g.class_id = @ClassID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					rptGMembers.DataSource = cmdDBQuery.ExecuteReader()
 					rptGMembers.DataBind()
@@ -207,7 +207,7 @@
 				Case "EDITMEMU"
 					strDBQuery = "SELECT name, amt_member_susers FROM UsageClasses WHERE class_id = @ClassID;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					dtrDBQuery = cmdDBQuery.ExecuteReader()
 					
@@ -232,14 +232,14 @@
 					dstClasses = New DataSet()
 					strDBQuery = "SELECT 0 As class_id, 'Select Class' As name UNION SELECT 0 As class_id, '-----' As name UNION SELECT class_id, name FROM UsageClasses WHERE NOT class_id = @ClassID ORDER BY class_id, name DESC;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dadClasses = New SqlDataAdapter(cmdDBQuery)
 					dadClasses.Fill(dstClasses, "Classes")
 					
 					dstNewMembers = New DataSet()
 					strDBQuery = "SELECT 0 As user_id, 'Select Site User' As name, '-01' AS last_name UNION SELECT 0 As user_id, '-----' As name, '-02' AS last_name UNION SELECT user_id, first_name + ' ' + last_name, last_name AS name FROM SiteUsers WHERE NOT class_id = @ClassID ORDER BY last_name;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					dadNewMembers = New SqlDataAdapter(cmdDBQuery)
 					dadNewMembers.Fill(dstNewMembers, "NewMembers")
 					
@@ -250,7 +250,7 @@
 					
 					strDBQuery = "SELECT user_id, username, first_name, last_name, is_active FROM SiteUsers WHERE class_id = @ClassID ORDER BY last_name;"
 					cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-					cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+					cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 					
 					rptUMembers.DataSource = cmdDBQuery.ExecuteReader()
 					rptUMembers.DataBind()
@@ -428,8 +428,8 @@
 			Else
 				strDBQuery = "SELECT 'true' WHERE EXISTS(SELECT class_id FROM UsageClasses WHERE name = @Name AND NOT class_id = @ClassID);"
 				cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-				cmdDBQuery.Parameters.Add("@Name", txtEditPermName.Text)
-				cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+				cmdDBQuery.Parameters.AddWithValue("@Name", txtEditPermName.Text)
+				cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 				
 				If cmdDBQuery.ExecuteScalar() = "true" Then
 					lblErrorOnEditPermMsg.Text = "Error Updating Class: The specified Class name is in use, please select another."
@@ -445,9 +445,9 @@
 			'inputs verified, updating
 			strDBQuery = "UPDATE UsageClasses SET name = @Name, description = @Desc, date_modified = GETDATE() WHERE class_id = @ClassID;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtEditPermName.Text)
-			cmdDBQuery.Parameters.Add("@Desc", txtEditPermDesc.Text)
-			cmdDBQuery.Parameters.Add("@ClassID", strClassID)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtEditPermName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Desc", txtEditPermDesc.Text)
+			cmdDBQuery.Parameters.AddWithValue("@ClassID", strClassID)
 			
 			cmdDBQuery.ExecuteNonQuery()
 			
@@ -853,7 +853,7 @@
 			'class created, get new ID and add user supplied permissions 
 			strDBQuery = "SELECT class_id FROM UsageClasses WHERE name = @Name;"
 			cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-			cmdDBQuery.Parameters.Add("@Name", txtAddName.Text)
+			cmdDBQuery.Parameters.AddWithValue("@Name", txtAddName.Text)
 			
 			strClassID = cmdDBQuery.ExecuteScalar()
 			strPageState = "EDITPERM"
