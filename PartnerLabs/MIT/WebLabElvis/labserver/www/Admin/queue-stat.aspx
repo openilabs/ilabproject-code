@@ -1,6 +1,6 @@
 <%@ Page Language="VBScript" ValidateRequest="False" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="WebLab.DataManagers" %>
 
 <script Runat="Server">
 

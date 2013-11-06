@@ -3,8 +3,8 @@
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Xml" %>
 <%@ Import Namespace="System.Diagnostics" %>
-<%@ Import Namespace="validation_engine.WebLabSystemComponents" %>
-<%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="WebLab.Elvis" %>
+<%@ Import Namespace="WebLab.DataManagers" %>
 
 <script Runat="server">
 Dim strPageState, strValidateResponse as String

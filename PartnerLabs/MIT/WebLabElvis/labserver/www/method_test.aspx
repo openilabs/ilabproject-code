@@ -1,7 +1,7 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System" %>
-<%@ Import Namespace="WebLabCustomDataTypes" %>
-<%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="WebLab.DataTypes" %>
+<%@ Import Namespace="WebLab.DataManagers" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>

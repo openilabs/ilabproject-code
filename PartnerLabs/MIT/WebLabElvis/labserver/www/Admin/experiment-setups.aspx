@@ -1,7 +1,7 @@
 <%@ Page Language="VBScript" %>
 <%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="WebLab.DataManagers" %>
 
 <script Runat="Server">
 

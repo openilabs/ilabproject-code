@@ -2,8 +2,8 @@
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="System.Collections" %>
-<%@ Import Namespace="WebLabDataManagers" %>
-<%@ Import Namespace="WebLabCustomDataTypes" %>
+<%@ Import Namespace="WebLab.DataManagers" %>
+<%@ Import Namespace="WebLab.DataTypes" %>
 
 <script Runat="Server">
 

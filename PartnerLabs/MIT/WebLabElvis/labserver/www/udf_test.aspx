@@ -4,7 +4,7 @@
 <%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="System.Threading" %>
 <%@ Import Namespace="System.Diagnostics" %>
-<%@ Import Namespace="validation_engine.WebLabSystemComponents" %>
+<%@ Import Namespace="WebLab.Elvis" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
   <head>

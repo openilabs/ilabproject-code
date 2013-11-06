@@ -2,13 +2,10 @@
 <%@ Import Namespace="System" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
 <%@ Import Namespace="ILab.ILabStandardTypes" %>
-<%@ Import Namespace="LabServer" %>
-<%@ Import Namespace="SiteComponents" %>
-
+<%@ Import Namespace="WebLab.LabServer" %>
+<%@ Import Namespace="WebLab" %>
 
 <script Runat="server">
-
-
 
 Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 Dim strDBQuery, strPageState, strResponse, strExpSpec, strGroup, strBrokerId, strBrokerPasskey As String

@@ -2,7 +2,7 @@
 <%@ Import Namespace="System" %>
 <%@ Import Namespace="System.Data" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="WebLabDataManagers" %>
+<%@ Import Namespace="WebLab.DataManagers" %>
 <%@ Import Namespace="iLabs.Proxies.BatchSB" %>
 
 <!--
