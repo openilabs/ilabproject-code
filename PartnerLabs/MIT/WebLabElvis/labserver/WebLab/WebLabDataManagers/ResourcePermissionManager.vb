@@ -1,8 +1,10 @@
 Imports System
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports System.IO
 Imports System.Net
 Imports Microsoft.VisualBasic
+
 Imports WebLabCustomDataTypes
 
 
@@ -42,7 +44,7 @@ Namespace WebLabDataManagers
 
     Public Class ResourcePermissionManager
 
-        Dim conWebLabLS As SqlConnection = New SqlConnection("Database=ELVIS_LS;Server=localhost;Integrated Security=true")
+        Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 
         Public Function AddBroker(ByVal strName As String, ByVal strBrokerServerId As String, ByVal strBrokerPassKey As String, ByVal strServerPassKey As String, ByVal intClassID As Integer, ByVal strDesc As String, ByVal strFirstName As String, ByVal strLastName As String, ByVal strEmail As String, ByVal strNotifyLoc As String, ByVal blnIsActive As Boolean) As NewBrokerConf
             'This method creates a new Service Broker record on the Lab Server.  The inputs comprise the information needed to create a new 
@@ -59,17 +61,17 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_AddBroker @name, @broker_server_id, @broker_passkey, @server_passkey, @classID, @desc, @firstname, @lastname, @email, @notifyloc, @isactive"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@name", strName)
-            cmdDBQuery.Parameters.Add("@broker_server_id", strBrokerServerId)
-            cmdDBQuery.Parameters.Add("@broker_passkey", strBrokerPassKey)
-            cmdDBQuery.Parameters.Add("@server_passkey", strServerPassKey)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@desc", strDesc)
-            cmdDBQuery.Parameters.Add("@firstname", strFirstName)
-            cmdDBQuery.Parameters.Add("@lastname", strLastName)
-            cmdDBQuery.Parameters.Add("@email", strEmail)
-            cmdDBQuery.Parameters.Add("@notifyloc", strNotifyLoc)
-            cmdDBQuery.Parameters.Add("@isactive", blnIsActive)
+            cmdDBQuery.Parameters.AddWithValue("@name", strName)
+            cmdDBQuery.Parameters.AddWithValue("@broker_server_id", strBrokerServerId)
+            cmdDBQuery.Parameters.AddWithValue("@broker_passkey", strBrokerPassKey)
+            cmdDBQuery.Parameters.AddWithValue("@server_passkey", strServerPassKey)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@desc", strDesc)
+            cmdDBQuery.Parameters.AddWithValue("@firstname", strFirstName)
+            cmdDBQuery.Parameters.AddWithValue("@lastname", strLastName)
+            cmdDBQuery.Parameters.AddWithValue("@email", strEmail)
+            cmdDBQuery.Parameters.AddWithValue("@notifyloc", strNotifyLoc)
+            cmdDBQuery.Parameters.AddWithValue("@isactive", blnIsActive)
 
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
@@ -94,8 +96,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_ActivateBroker @brokerID, @activateGroups"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@activateGroups", blnActivateGroups)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@activateGroups", blnActivateGroups)
 
             output = cmdDBQuery.ExecuteScalar()
 
@@ -113,7 +115,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_DeactivateBroker @brokerID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
 
             output = cmdDBQuery.ExecuteScalar()
 
@@ -131,7 +133,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveBroker @brokerID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
 
             output = cmdDBQuery.ExecuteScalar()
 
@@ -148,9 +150,9 @@ Namespace WebLabDataManagers
             Dim dtrDBQuery As SqlDataReader
             Dim cObject As ClassObject
 
-            Dim strDBQuery = "SELECT ClassID, ClassName FROM dbo.rpm_BrokerIsMemberOf(@brokerID)"
+            Dim strDBQuery As String = "SELECT ClassID, ClassName FROM dbo.rpm_BrokerIsMemberOf(@brokerID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
             dtrDBQuery.Read()
 
@@ -184,7 +186,7 @@ Namespace WebLabDataManagers
             End Select
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -203,11 +205,11 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_AddGroup @ownerID, @classID, @name, @desc, @isactive"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ownerID", intOwnerID)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@name", strName)
-            cmdDBQuery.Parameters.Add("@desc", strDesc)
-            cmdDBQuery.Parameters.Add("@isactive", blnIsActive)
+            cmdDBQuery.Parameters.AddWithValue("@ownerID", intOwnerID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@name", strName)
+            cmdDBQuery.Parameters.AddWithValue("@desc", strDesc)
+            cmdDBQuery.Parameters.AddWithValue("@isactive", blnIsActive)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -224,7 +226,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_ActivateGroup @groupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -241,7 +243,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_DeactivateGroup @groupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -258,7 +260,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveGroup @groupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -276,13 +278,13 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_AddSiteUser @first_name, @last_name, @email, @username, @password, @classID,	@is_active;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@first_name", strFirstName)
-            cmdDBQuery.Parameters.Add("@last_name", strLastName)
-            cmdDBQuery.Parameters.Add("@email", strEmail)
-            cmdDBQuery.Parameters.Add("@username", strUserName)
-            cmdDBQuery.Parameters.Add("@password", strPassword)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@is_active", blnIsActive)
+            cmdDBQuery.Parameters.AddWithValue("@first_name", strFirstName)
+            cmdDBQuery.Parameters.AddWithValue("@last_name", strLastName)
+            cmdDBQuery.Parameters.AddWithValue("@email", strEmail)
+            cmdDBQuery.Parameters.AddWithValue("@username", strUserName)
+            cmdDBQuery.Parameters.AddWithValue("@password", strPassword)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@is_active", blnIsActive)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
 
@@ -300,7 +302,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_ActivateSiteUser @userID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
 
             Output = cmdDBQuery.ExecuteScalar()
 
@@ -317,7 +319,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_DeactivateSiteUser @userID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
 
             Output = cmdDBQuery.ExecuteScalar()
 
@@ -335,7 +337,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveSiteUser @userID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
 
             Output = cmdDBQuery.ExecuteScalar()
 
@@ -352,8 +354,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_AddClass @name, @desc"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@name", strName)
-            cmdDBQuery.Parameters.Add("@desc", strDesc)
+            cmdDBQuery.Parameters.AddWithValue("@name", strName)
+            cmdDBQuery.Parameters.AddWithValue("@desc", strDesc)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -370,7 +372,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveClass @classID, ''"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -387,8 +389,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveClass @classID, @newClassID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@newClassID", intNewClassID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@newClassID", intNewClassID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -406,8 +408,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_MapBrokerToClass @brokerID, @classID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -425,8 +427,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_MapGroupToClass @groupID, @classID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
 
             Dim output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -444,8 +446,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_MapSiteUserToClass @userID, @classID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
 
             Output = cmdDBQuery.ExecuteScalar()
 
@@ -462,9 +464,9 @@ Namespace WebLabDataManagers
             Dim dtrDBQuery As SqlDataReader
             Dim cObject As ClassObject
 
-            Dim strDBQuery = "SELECT ClassID, ClassName FROM dbo.rpm_GroupIsMemberOf(@groupID)"
+            Dim strDBQuery As String = "SELECT ClassID, ClassName FROM dbo.rpm_GroupIsMemberOf(@groupID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
             dtrDBQuery.Read()
 
@@ -497,7 +499,7 @@ Namespace WebLabDataManagers
             End Select
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -514,10 +516,10 @@ Namespace WebLabDataManagers
             Dim dtrDbQuery As SqlDataReader
             Dim pmObject As PermissionMappingObject
 
-            Dim strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetClassResourcePermission(@classID, @resourceID)"
+            Dim strDBQuery As String = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetClassResourcePermission(@classID, @resourceID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             dtrDbQuery = cmdDBQuery.ExecuteReader()
 
 
@@ -547,7 +549,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -557,8 +559,8 @@ Namespace WebLabDataManagers
             Else
                 strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetClassResourcePermission(@classID, @resourceID)"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@classID", intClassID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
                 dtrDBQuery = cmdDBQuery.ExecuteReader()
                 dtrDBQuery.Read()
 
@@ -606,8 +608,8 @@ Namespace WebLabDataManagers
             End Select
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -643,7 +645,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -665,8 +667,8 @@ Namespace WebLabDataManagers
                 End Select
 
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@classID", intClassID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
 
                 objTemp = cmdDBQuery.ExecuteScalar()
 
@@ -697,8 +699,8 @@ Namespace WebLabDataManagers
             strDBQuery = "SELECT Priority FROM dbo.rpm_GetClassResourcePermission(@classID, @resourceID)"
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -720,10 +722,10 @@ Namespace WebLabDataManagers
             Dim dtrDbQuery As SqlDataReader
             Dim pmObject As PermissionMappingObject
 
-            Dim strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetBrokerResourcePermission(@brokerID, @resourceID)"
+            Dim strDBQuery As String = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetBrokerResourcePermission(@brokerID, @resourceID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@resourceId", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceId", intResourceID)
             dtrDbQuery = cmdDBQuery.ExecuteReader()
 
             If dtrDbQuery.Read() Then
@@ -753,7 +755,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -763,8 +765,8 @@ Namespace WebLabDataManagers
             Else
                 strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetBrokerResourcePermission(@brokerID, @resourceID)"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
                 dtrDBQuery = cmdDBQuery.ExecuteReader()
                 dtrDBQuery.Read()
 
@@ -812,8 +814,8 @@ Namespace WebLabDataManagers
             End Select
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -849,7 +851,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -871,8 +873,8 @@ Namespace WebLabDataManagers
                 End Select
 
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
 
                 objTemp = cmdDBQuery.ExecuteScalar()
 
@@ -902,8 +904,8 @@ Namespace WebLabDataManagers
             strDBQuery = "SELECT Priority FROM dbo.rpm_GetBrokerResourcePermission(@brokerID, @resourceID)"
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -927,8 +929,8 @@ Namespace WebLabDataManagers
 
             Dim strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetGroupResourcePermission(@groupID, @resourceID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
-            cmdDBQuery.Parameters.Add("@resourceId", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceId", intResourceID)
             dtrDbQuery = cmdDBQuery.ExecuteReader()
 
             If dtrDbQuery.Read() Then
@@ -958,7 +960,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -968,8 +970,8 @@ Namespace WebLabDataManagers
             Else
                 strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetGroupResourcePermission(@groupID, @resourceID)"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@groupID", intGroupID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
                 dtrDBQuery = cmdDBQuery.ExecuteReader()
                 dtrDBQuery.Read()
 
@@ -1017,8 +1019,8 @@ Namespace WebLabDataManagers
             End Select
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -1055,7 +1057,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -1078,8 +1080,8 @@ Namespace WebLabDataManagers
 
 
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@groupID", intGroupID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
 
                 objTemp = cmdDBQuery.ExecuteScalar()
 
@@ -1109,8 +1111,8 @@ Namespace WebLabDataManagers
             strDBQuery = "SELECT Priority FROM dbo.rpm_GetGroupResourcePermission(@groupID, @resourceID)"
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -1132,10 +1134,10 @@ Namespace WebLabDataManagers
             Dim dtrDbQuery As SqlDataReader
             Dim pmObject As PermissionMappingObject
 
-            Dim strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetUserResourcePermission(@userID, @resourceID)"
+            Dim strDBQuery As String = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetUserResourcePermission(@userID, @resourceID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
-            cmdDBQuery.Parameters.Add("@resourceId", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceId", intResourceID)
             dtrDbQuery = cmdDBQuery.ExecuteReader()
 
             If dtrDbQuery.Read() Then
@@ -1164,7 +1166,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -1174,8 +1176,8 @@ Namespace WebLabDataManagers
             Else
                 strDBQuery = "SELECT MappingId, CanView, CanEdit, CanGrant, CanDelete, Priority FROM dbo.rpm_GetUserResourcePermission(@userID, @resourceID)"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@userID", intUserID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
                 dtrDBQuery = cmdDBQuery.ExecuteReader()
                 dtrDBQuery.Read()
 
@@ -1223,8 +1225,8 @@ Namespace WebLabDataManagers
             End Select
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -1260,7 +1262,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT resource_id FROM Resources WHERE name = @Name;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Name", strResourceName)
+            cmdDBQuery.Parameters.AddWithValue("@Name", strResourceName)
 
             objResourceID = cmdDBQuery.ExecuteScalar()
 
@@ -1282,8 +1284,8 @@ Namespace WebLabDataManagers
                 End Select
 
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@userID", intUserID)
-                cmdDBQuery.Parameters.Add("@resourceID", CInt(objResourceID))
+                cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
+                cmdDBQuery.Parameters.AddWithValue("@resourceID", CInt(objResourceID))
 
                 objTemp = cmdDBQuery.ExecuteScalar()
 
@@ -1313,8 +1315,8 @@ Namespace WebLabDataManagers
             strDBQuery = "SELECT Priority FROM dbo.rpm_GetUserResourcePermission(@userID, @resourceID)"
 
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@userID", intUserID)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@userID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
             objOutput = cmdDBQuery.ExecuteScalar()
 
             conWebLabLS.Close()
@@ -1337,10 +1339,10 @@ Namespace WebLabDataManagers
             Dim cmdDBQuery As SqlCommand
             strDBQuery = "EXEC rpm_AddResource @name, @type, @category, @desc"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@name", strName)
-            cmdDBQuery.Parameters.Add("@type", strType)
-            cmdDBQuery.Parameters.Add("@category", strCategory)
-            cmdDBQuery.Parameters.Add("@desc", strDesc)
+            cmdDBQuery.Parameters.AddWithValue("@name", strName)
+            cmdDBQuery.Parameters.AddWithValue("@type", strType)
+            cmdDBQuery.Parameters.AddWithValue("@category", strCategory)
+            cmdDBQuery.Parameters.AddWithValue("@desc", strDesc)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1358,7 +1360,7 @@ Namespace WebLabDataManagers
             Dim cmdDBQuery As SqlCommand
             strDBQuery = "EXEC rpm_RemoveResource @resourceID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1377,10 +1379,10 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_AddSetup @name, @iconPath, @category, @description"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@name", strName)
-            cmdDBQuery.Parameters.Add("@iconPath", strIconPath)
-            cmdDBQuery.Parameters.Add("@category", strCategory)
-            cmdDBQuery.Parameters.Add("@description", strDesc)
+            cmdDBQuery.Parameters.AddWithValue("@name", strName)
+            cmdDBQuery.Parameters.AddWithValue("@iconPath", strIconPath)
+            cmdDBQuery.Parameters.AddWithValue("@category", strCategory)
+            cmdDBQuery.Parameters.AddWithValue("@description", strDesc)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1400,18 +1402,18 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_AddSetupTerminal @setupID, @name, @xPixelLoc, @yPixelLoc, @max_amplitude, @max_offset, @max_current, @max_frequency, @max_sampling_rate, @max_sampling_time, @max_points, @instrument"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
-            cmdDBQuery.Parameters.Add("@name", strName)
-            cmdDBQuery.Parameters.Add("@xPixelLoc", intXPixelLoc)
-            cmdDBQuery.Parameters.Add("@yPixelLoc", intYPixelLoc)
-            cmdDBQuery.Parameters.Add("@max_amplitude", dblMaxAmplitude)
-            cmdDBQuery.Parameters.Add("@max_offset", dblMaxOffset)
-            cmdDBQuery.Parameters.Add("@max_current", dblMaxCurrent)
-            cmdDBQuery.Parameters.Add("@max_frequency", dblMaxFrequency)
-            cmdDBQuery.Parameters.Add("@max_sampling_rate", dblMaxSamplingRate)
-            cmdDBQuery.Parameters.Add("@max_sampling_time", dblMaxSamplingTime)
-            cmdDBQuery.Parameters.Add("@max_points", dblMaxPoints)
-            cmdDBQuery.Parameters.Add("@instrument", strInstrument)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@name", strName)
+            cmdDBQuery.Parameters.AddWithValue("@xPixelLoc", intXPixelLoc)
+            cmdDBQuery.Parameters.AddWithValue("@yPixelLoc", intYPixelLoc)
+            cmdDBQuery.Parameters.AddWithValue("@max_amplitude", dblMaxAmplitude)
+            cmdDBQuery.Parameters.AddWithValue("@max_offset", dblMaxOffset)
+            cmdDBQuery.Parameters.AddWithValue("@max_current", dblMaxCurrent)
+            cmdDBQuery.Parameters.AddWithValue("@max_frequency", dblMaxFrequency)
+            cmdDBQuery.Parameters.AddWithValue("@max_sampling_rate", dblMaxSamplingRate)
+            cmdDBQuery.Parameters.AddWithValue("@max_sampling_time", dblMaxSamplingTime)
+            cmdDBQuery.Parameters.AddWithValue("@max_points", dblMaxPoints)
+            cmdDBQuery.Parameters.AddWithValue("@instrument", strInstrument)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1431,7 +1433,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveSetupTerminal @setupTermID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@setupTermID", intSetupTerminalID)
+            cmdDBQuery.Parameters.AddWithValue("@setupTermID", intSetupTerminalID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1449,7 +1451,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveSetup @setupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@SetupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@SetupID", intSetupID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1467,8 +1469,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_CopySetup @setupID, @newName"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
-            cmdDBQuery.Parameters.Add("@newName", strName)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@newName", strName)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1485,8 +1487,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_SetActiveSetup @isActive, @setupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@isActive", blnIsActive)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@isActive", blnIsActive)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1505,9 +1507,9 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_SetActiveDevice @activeID, @isActive, @setupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@activeID", intActivePosID)
-            cmdDBQuery.Parameters.Add("@isActive", blnIsActive)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@activeID", intActivePosID)
+            cmdDBQuery.Parameters.AddWithValue("@isActive", blnIsActive)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1528,12 +1530,12 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_MapClassToResource @resourceID, @classID, @canView, @canEdit, @canGrant, @canDelete, '0'"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@canView", blnCanView)
-            cmdDBQuery.Parameters.Add("@canEdit", blnCanEdit)
-            cmdDBQuery.Parameters.Add("@canGrant", blnCanGrant)
-            cmdDBQuery.Parameters.Add("@canDelete", blnCanDelete)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@canView", blnCanView)
+            cmdDBQuery.Parameters.AddWithValue("@canEdit", blnCanEdit)
+            cmdDBQuery.Parameters.AddWithValue("@canGrant", blnCanGrant)
+            cmdDBQuery.Parameters.AddWithValue("@canDelete", blnCanDelete)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1555,13 +1557,13 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_MapClassToResource @resourceID, @classID, @canView, @canEdit, @canGrant, @canDelete, @priority"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@resourceID", intResourceID)
-            cmdDBQuery.Parameters.Add("@classID", intClassID)
-            cmdDBQuery.Parameters.Add("@canView", blnCanView)
-            cmdDBQuery.Parameters.Add("@canEdit", blnCanEdit)
-            cmdDBQuery.Parameters.Add("@canGrant", blnCanGrant)
-            cmdDBQuery.Parameters.Add("@canDelete", blnCanDelete)
-            cmdDBQuery.Parameters.Add("@priority", intPriority)
+            cmdDBQuery.Parameters.AddWithValue("@resourceID", intResourceID)
+            cmdDBQuery.Parameters.AddWithValue("@classID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@canView", blnCanView)
+            cmdDBQuery.Parameters.AddWithValue("@canEdit", blnCanEdit)
+            cmdDBQuery.Parameters.AddWithValue("@canGrant", blnCanGrant)
+            cmdDBQuery.Parameters.AddWithValue("@canDelete", blnCanDelete)
+            cmdDBQuery.Parameters.AddWithValue("@priority", intPriority)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1579,7 +1581,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_RemoveresourceMapping @mappingID"
             cmdDBquery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBquery.Parameters.Add("@mappingID", intMappingID)
+            cmdDBquery.Parameters.AddWithValue("@mappingID", intMappingID)
 
             Dim Output As String = cmdDBquery.ExecuteScalar()
             conWebLabLS.Close()
@@ -1597,11 +1599,11 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_EditResourceMapping @MappingID, @canView, @canEdit, @canGrant, @canDelete, NULL"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@MappingID", intMappingID)
-            cmdDBQuery.Parameters.Add("@canView", blnCanView)
-            cmdDBQuery.Parameters.Add("@canEdit", blnCanEdit)
-            cmdDBQuery.Parameters.Add("@canGrant", blnCanGrant)
-            cmdDBQuery.Parameters.Add("@canDelete", blnCanDelete)
+            cmdDBQuery.Parameters.AddWithValue("@MappingID", intMappingID)
+            cmdDBQuery.Parameters.AddWithValue("@canView", blnCanView)
+            cmdDBQuery.Parameters.AddWithValue("@canEdit", blnCanEdit)
+            cmdDBQuery.Parameters.AddWithValue("@canGrant", blnCanGrant)
+            cmdDBQuery.Parameters.AddWithValue("@canDelete", blnCanDelete)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
 
@@ -1621,12 +1623,12 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rpm_EditResourceMapping @MappingID, @canView, @canEdit, @canGrant, @canDelete, @priority"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@MappingID", intMappingID)
-            cmdDBQuery.Parameters.Add("@canView", blnCanView)
-            cmdDBQuery.Parameters.Add("@canEdit", blnCanEdit)
-            cmdDBQuery.Parameters.Add("@canGrant", blnCanGrant)
-            cmdDBQuery.Parameters.Add("@canDelete", blnCanDelete)
-            cmdDBQuery.Parameters.Add("@priority", intPriority)
+            cmdDBQuery.Parameters.AddWithValue("@MappingID", intMappingID)
+            cmdDBQuery.Parameters.AddWithValue("@canView", blnCanView)
+            cmdDBQuery.Parameters.AddWithValue("@canEdit", blnCanEdit)
+            cmdDBQuery.Parameters.AddWithValue("@canGrant", blnCanGrant)
+            cmdDBQuery.Parameters.AddWithValue("@canDelete", blnCanDelete)
+            cmdDBQuery.Parameters.AddWithValue("@priority", intPriority)
 
             Dim Output As String = cmdDBQuery.ExecuteScalar()
 
@@ -1646,8 +1648,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT dbo.rpm_GetGroupID(@BrokerID, @GroupName);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@GroupName", strGroupName)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@GroupName", strGroupName)
             intGroupID = CInt(cmdDBQuery.ExecuteScalar())
 
             conWebLabLS.Close()
@@ -1664,7 +1666,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT AVG(Priority) FROM dbo.rpm_ListBrokerPermissions(@BrokerID) WHERE ResourceType = 'SETUP';"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
             strOutput = cmdDBQuery.ExecuteScalar()
 
             If IsNumeric(strOutput) Then
@@ -1684,7 +1686,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT AVG(Priority) FROM dbo.rpm_ListGroupPermissions(@GroupID) WHERE ResourceType = 'SETUP';"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@GroupID", intGroupID)
+            cmdDBQuery.Parameters.AddWithValue("@GroupID", intGroupID)
             strOutput = cmdDBQuery.ExecuteScalar()
 
             If IsNumeric(strOutput) Then
@@ -1704,7 +1706,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT AVG(Priority) FROM dbo.rpm_ListClassPermissions(@ClassID) WHERE ResourceType = 'SETUP';"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ClassID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@ClassID", intClassID)
             strOutput = cmdDBQuery.ExecuteScalar()
 
             If IsNumeric(strOutput) Then
@@ -1717,7 +1719,7 @@ Namespace WebLabDataManagers
         Public Function GetLabConfig(ByVal intClassID As Integer) As String
             'This method finds the active setups that the specified class has access to and generates an XML labConfig document based on the 
             'results
-            Dim conWebLabLS2 As SqlConnection = New SqlConnection("Database=ELVIS_LS;Server=localhost;Integrated Security=true")
+            Dim conWebLabLS2 As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
             Dim strDBQuery, strXMLOutput, strImgFile As String
             Dim loopIdx As Integer
             Dim cmdDBQuery As SqlCommand
@@ -1731,7 +1733,7 @@ Namespace WebLabDataManagers
             'get available setup list
             strDBQuery = "SELECT setupID, setupName, setupDesc, setupImageLoc FROM dbo.rpm_GetActiveSetupList(@ClassID) ORDER BY setupID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ClassID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@ClassID", intClassID)
             dtrSetupList = cmdDBQuery.ExecuteReader()
 
             While dtrSetupList.Read()
@@ -1745,7 +1747,7 @@ Namespace WebLabDataManagers
                 'get setup terminal information
                 strDBQuery = "SELECT termInstrument, termNumber, termName, termXLoc, termYLoc FROM dbo.rpm_GetSetupTerminalInfo(@SetupID) ORDER BY termNumber;"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS2)
-                cmdDBQuery.Parameters.Add("@SetupID", dtrSetupList("setupID"))
+                cmdDBQuery.Parameters.AddWithValue("@SetupID", dtrSetupList("setupID"))
                 dtrTermList = cmdDBQuery.ExecuteReader()
 
                 While dtrTermList.Read()
@@ -1764,7 +1766,7 @@ Namespace WebLabDataManagers
             'get list of distinct setups used (for image file data inclusion)
             strDBQuery = "SELECT DISTINCT setupImageLoc FROM dbo.rpm_GetActiveSetupList(@ClassID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ClassID", intClassID)
+            cmdDBQuery.Parameters.AddWithValue("@ClassID", intClassID)
             dtrImageList = cmdDBQuery.ExecuteReader()
 
             While dtrImageList.Read()
@@ -1853,7 +1855,7 @@ Namespace WebLabDataManagers
 
                 strDBQuery = "UPDATE LSSystemConfig SET lab_server_id = @newID WHERE SetupID = '1';"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@newID", strOutput)
+                cmdDBQuery.Parameters.AddWithValue("@newID", strOutput)
                 cmdDBQuery.ExecuteNonQuery()
 
             End If
@@ -1886,7 +1888,7 @@ Namespace WebLabDataManagers
             Return CStr(lngPasskey)
         End Function
 
-        Public Function RegisterServerPasskey(ByVal intBrokerID As Integer, ByVal strPasskey As String)
+        Public Sub RegisterServerPasskey(ByVal intBrokerID As Integer, ByVal strPasskey As String)
             'This method registers a service broker supplied passkey with the lab server.  Specifically, 
             'this takes as input a passkey generated by a given service broker and the local identifier
             'for that service broker.  This method records that passkey in the appropriate broker record as
@@ -1899,12 +1901,12 @@ Namespace WebLabDataManagers
 
             strDBQuery = "UPDATE Brokers SET server_passkey = @Passkey, date_modified = GETDATE() WHERE broker_id = @BrokerID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Passkey", strPasskey)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@Passkey", strPasskey)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
             cmdDBQuery.ExecuteNonQuery()
 
             conWebLabLS.Close()
-        End Function
+        End Sub
 
 
         Public Function AuthenticateBroker(ByVal strIdentifier As String, ByVal strPassKey As String) As Integer
@@ -1920,8 +1922,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT dbo.rpm_AuthenticateBrokerCredentials(@Identifier, @PassKey);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Identifier", strIdentifier)
-            cmdDBQuery.Parameters.Add("@PassKey", strPassKey)
+            cmdDBQuery.Parameters.AddWithValue("@Identifier", strIdentifier)
+            cmdDBQuery.Parameters.AddWithValue("@PassKey", strPassKey)
 
             intOutput = CInt(cmdDBQuery.ExecuteScalar())
             conWebLabLS.Close()

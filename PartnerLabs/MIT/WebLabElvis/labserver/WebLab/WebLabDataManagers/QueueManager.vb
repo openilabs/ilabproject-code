@@ -1,4 +1,5 @@
 Imports System
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports WebLabCustomDataTypes
 
@@ -25,7 +26,7 @@ Namespace WebLabDataManagers
 
     Public Class QueueManager
 
-        Dim conWebLabLS As SqlConnection = New SqlConnection("Database=ELVIS_LS;Server=localhost;Integrated Security=true")
+        Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 
         Public Function ExperimentStatus(ByVal intBrokerID As Integer, ByVal intBrokerExpID As Integer) As ExpStatusObject
 
@@ -43,8 +44,8 @@ Namespace WebLabDataManagers
             'retrieve experiment info
             strDBQuery = "SELECT queuePosition, estTimetoRun, estExecTime FROM dbo.qm_ExperimentStatusByRemoteID(@BrokerID, @ExpID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@ExpID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@ExpID", intBrokerExpID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -70,7 +71,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT queuePosition, estTimetoRun, estExecTime FROM dbo.qm_ExperimentStatusByLocalID(@ExpID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ExpID", intLocalExpID)
+            cmdDBQuery.Parameters.AddWithValue("@ExpID", intLocalExpID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -96,7 +97,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT queueLength, estTimeToRun FROM dbo.qm_QueueLength(@Priority);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Priority", intPriority)
+            cmdDBQuery.Parameters.AddWithValue("@Priority", intPriority)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -119,7 +120,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC qm_CancelByLocalID @ExpID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ExpID", intLocalExpID)
+            cmdDBQuery.Parameters.AddWithValue("@ExpID", intLocalExpID)
 
             If cmdDBQuery.ExecuteScalar() = "TRUE" Then
                 conWebLabLS.Close()
@@ -141,8 +142,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC qm_CancelByRemoteID @BrokerID, @ExpID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@ExpID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@ExpID", intBrokerExpID)
 
             If cmdDBQuery.ExecuteScalar() = "TRUE" Then
                 conWebLabLS.Close()
@@ -165,14 +166,14 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC qm_Enqueue @ExpSpec, @Priority, @Groups, @BrokerID, @RemoteExpID, @EstExecTime, @Points, @SetupID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ExpSpec", strXMLExpSpec)
-            cmdDBQuery.Parameters.Add("@Priority", intPriority)
-            cmdDBQuery.Parameters.Add("@Groups", strGroups)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@RemoteExpID", intBrokerExpID)
-            cmdDBQuery.Parameters.Add("@EstExecTime", intEstExecTime)
-            cmdDBQuery.Parameters.Add("@Points", intDataPoints)
-            cmdDBQuery.Parameters.Add("@SetupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@ExpSpec", strXMLExpSpec)
+            cmdDBQuery.Parameters.AddWithValue("@Priority", intPriority)
+            cmdDBQuery.Parameters.AddWithValue("@Groups", strGroups)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@RemoteExpID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@EstExecTime", intEstExecTime)
+            cmdDBQuery.Parameters.AddWithValue("@Points", intDataPoints)
+            cmdDBQuery.Parameters.AddWithValue("@SetupID", intSetupID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -203,8 +204,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT dbo.qm_GetExpStatusCodeByRemoteID(@brokerID, @expID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@expID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@expID", intBrokerExpID)
             intOutput = CInt(cmdDBQuery.ExecuteScalar())
 
             conWebLabLS.Close()
@@ -229,7 +230,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT dbo.qm_GetExpStatusCodeByLocalID(@expID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@expID", intLocalExpID)
+            cmdDBQuery.Parameters.AddWithValue("@expID", intLocalExpID)
             intOutput = CInt(cmdDBQuery.ExecuteScalar())
 
             conWebLabLS.Close()

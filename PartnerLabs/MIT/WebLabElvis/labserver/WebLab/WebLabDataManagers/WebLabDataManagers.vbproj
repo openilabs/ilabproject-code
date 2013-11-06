@@ -90,6 +90,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
@@ -146,9 +147,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebLabCustomDataTypes\WebLabCustomDataTypes.vbproj">
+    <ProjectReference Include="..\WebLabDataTypes.vbproj">
       <Project>{B95DAD56-BC54-4E3A-BACD-2471B3832C44}</Project>
-      <Name>WebLabCustomDataTypes</Name>
+      <Name>WebLabDataTypes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

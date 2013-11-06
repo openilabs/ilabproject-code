@@ -30,7 +30,7 @@ Namespace WebLabDataManagers
 
     Public Class RecordManager
 
-        Dim conWebLabLS As SqlConnection = New SqlConnection("Database=ELVIS_LS;Server=localhost;Integrated Security=true")
+        Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 
         Public Function RetrieveResult(ByVal intBrokerID As Integer, ByVal intBrokerExpID As Integer) As ResultObject
             'This method retrieves the result information associated with the job specified by the Broker ID, Broker Generated Experiment ID pair.
@@ -52,8 +52,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rm_RetrieveResultByRemoteID @BrokerID, @ExpID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@ExpID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@ExpID", intBrokerExpID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -87,7 +87,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rm_RetrieveResultByLocalID @ExpID;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@ExpID", intLocaLExpId)
+            cmdDBQuery.Parameters.AddWithValue("@ExpID", intLocaLExpId)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -115,8 +115,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT dbo.rm_ExpRuntimeEstimate(@Points, @SetupID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@Points", intDataPoints)
-            cmdDBQuery.Parameters.Add("@SetupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@Points", intDataPoints)
+            cmdDBQuery.Parameters.AddWithValue("@SetupID", intSetupID)
 
             intOutput = cmdDBQuery.ExecuteScalar()
 
@@ -138,8 +138,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT user_group, submit_time, exec_time, end_time, exec_elapsed, job_elapsed, setup_name FROM dbo.rm_ExpRecordInfoByRemoteID(@BrokerID, @expID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@expID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@expID", intBrokerExpID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -171,7 +171,7 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT user_group, submit_time, exec_time, end_time, exec_elapsed, job_elapsed, setup_name FROM dbo.rm_ExpRecordInfoByLocalID(@expID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@expID", intLocalExpID)
+            cmdDBQuery.Parameters.AddWithValue("@expID", intLocalExpID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -201,8 +201,8 @@ Namespace WebLabDataManagers
 
             strDBQuery = "SELECT dbo.rm_ExpIdLookup(@BrokerID, @brokerExpID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@brokerExpID", intBrokerExpID)
+            cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@brokerExpID", intBrokerExpID)
 
             intOutput = cmdDBQuery.ExecuteScalar()
 
@@ -212,7 +212,7 @@ Namespace WebLabDataManagers
         End Function
 
 
-        Public Function LogSiteLogon(ByVal intUserID As Integer, ByVal strRemoteIP As String, ByVal strUserAgent As String, ByVal blnIsNewLogon As Boolean)
+        Public Sub LogSiteLogon(ByVal intUserID As Integer, ByVal strRemoteIP As String, ByVal strUserAgent As String, ByVal blnIsNewLogon As Boolean)
             'This method provides the Lab Server Administration site with a well defined and encapsulated way of logging 
             'site logon events.  intUserID refers to the internal user id associated with the login.  strRemoteIP and 
             'strUserAgent refer to the requestor's IP address and platform signature, respectively.  Finally, blnIsNewLogon
@@ -230,18 +230,18 @@ Namespace WebLabDataManagers
 
             strDBQuery = "INSERT INTO LoginRecord (login_type, user_id, remote_ip, user_agent) VALUES (@LoginType, @UserID, @RemoteIP, @UserAgent);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@LoginType", strLoginType)
-            cmdDBQuery.Parameters.Add("@UserID", intUserID)
-            cmdDBQuery.Parameters.Add("@RemoteIP", strRemoteIP)
-            cmdDBQuery.Parameters.Add("@UserAgent", strUserAgent)
+            cmdDBQuery.Parameters.AddWithValue("@LoginType", strLoginType)
+            cmdDBQuery.Parameters.AddWithValue("@UserID", intUserID)
+            cmdDBQuery.Parameters.AddWithValue("@RemoteIP", strRemoteIP)
+            cmdDBQuery.Parameters.AddWithValue("@UserAgent", strUserAgent)
 
             cmdDBQuery.ExecuteNonQuery()
 
             conWebLabLS.Close()
-        End Function
+        End Sub
 
 
-        Public Function LogIncomingWebRequest(ByVal intBrokerID As Integer, ByVal strMethodName As String, ByVal blnHasPermission As Boolean, ByVal blnSuccessful As Boolean, ByVal strCompletionStatus As String)
+        Public Sub LogIncomingWebRequest(ByVal intBrokerID As Integer, ByVal strMethodName As String, ByVal blnHasPermission As Boolean, ByVal blnSuccessful As Boolean, ByVal strCompletionStatus As String)
             'This method is a logging mechanism used to trace incoming traffic through the Lab Server Web Service Channel.  The input is the 
             'broker ID used for the method call, the name of the method being called, whether the caller had permission to make the call 
             '(termination based on code completion/error or lack of permission) and a string describing the state of the method at termination.  
@@ -251,17 +251,17 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rm_LogIncomingWebRequest @brokerID, @method, @hasPermission, @success, @status;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@method", strMethodName)
-            cmdDBQuery.Parameters.Add("@hasPermission", blnHasPermission)
-            cmdDBQuery.Parameters.Add("@success", blnSuccessful)
-            cmdDBQuery.Parameters.Add("@status", strCompletionStatus)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@method", strMethodName)
+            cmdDBQuery.Parameters.AddWithValue("@hasPermission", blnHasPermission)
+            cmdDBQuery.Parameters.AddWithValue("@success", blnSuccessful)
+            cmdDBQuery.Parameters.AddWithValue("@status", strCompletionStatus)
 
             cmdDBQuery.ExecuteNonQuery()
             conWebLabLS.Close()
-        End Function
+        End Sub
 
-        Public Function LogOutgoingWebRequest(ByVal intBrokerID As Integer, ByVal strMethodName As String, ByVal strDestURL As String, ByVal blnSuccess As Boolean, ByVal strCompletionStatus As String)
+        Public Sub LogOutgoingWebRequest(ByVal intBrokerID As Integer, ByVal strMethodName As String, ByVal strDestURL As String, ByVal blnSuccess As Boolean, ByVal strCompletionStatus As String)
             'This method is a logging mechanism used to trace outgoing traffic through the Lab Server Web Service Channel.  The input is the 
             'broker ID of the machine where the method is being called from, the name of the method being called, the URL of that web method 
             'and a string describing the state of the request at termination.  
@@ -271,15 +271,15 @@ Namespace WebLabDataManagers
 
             strDBQuery = "EXEC rm_LogOutgoingWebRequest @brokerID, @method, @destURL, @success, @status;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
-            cmdDBQuery.Parameters.Add("@method", strMethodName)
-            cmdDBQuery.Parameters.Add("@destURL", strDestURL)
-            cmdDBQuery.Parameters.Add("@success", blnSuccess)
-            cmdDBQuery.Parameters.Add("@status", strCompletionStatus)
+            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.AddWithValue("@method", strMethodName)
+            cmdDBQuery.Parameters.AddWithValue("@destURL", strDestURL)
+            cmdDBQuery.Parameters.AddWithValue("@success", blnSuccess)
+            cmdDBQuery.Parameters.AddWithValue("@status", strCompletionStatus)
 
             cmdDBQuery.ExecuteNonQuery()
             conWebLabLS.Close()
-        End Function
+        End Sub
 
     End Class
 
