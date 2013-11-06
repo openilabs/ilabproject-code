@@ -1,7 +1,8 @@
 <%@ Page validateRequest="false" Strict="false" %>
 <%@ Import Namespace="System" %>
 <%@ Import Namespace="System.Data.SqlClient" %>
-<%@ Import Namespace="ILab.LabServerAPI" %>
+<%@ Import Namespace="ILab.ILabStandardTypes" %>
+<%@ Import Namespace="LabServer" %>
 <%@ Import Namespace="SiteComponents" %>
 
 
@@ -9,7 +10,7 @@
 
 
 
-Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationSettings.AppSettings("conString"))
+Dim conWebLabLS As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
 Dim strDBQuery, strPageState, strResponse, strExpSpec, strGroup, strBrokerId, strBrokerPasskey As String
 Dim intExpID, intPriorityHint As Integer
 Dim cmdDBQuery As SQLCommand
@@ -26,7 +27,7 @@ Sub Page_Load
 	
 	System.Net.ServicePointManager.CertificatePolicy = New WebLabCertPolicy()
 	
-	LSAPI.URL = "https://weblab2.mit.edu/services/WebLabService.asmx"
+        LSAPI.Site = "https://eeilabs.mit.edu/elvis5/services/WebLabService.asmx"
 	
 	strDBQuery = "SELECT TOP 1 broker_assigned_id FROM JobRecord WHERE provider_id = 2 ORDER BY submit_time DESC;"
 	cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
@@ -80,7 +81,7 @@ Sub btnSubmit_Click(s As Object, e As EventArgs)
 		AuthHeader.identifier = strBrokerId
 		AuthHeader.passkey = strBrokerPasskey 
 		
-		LSAPI.AuthHeaderValue = AuthHeader
+            LSAPI.BrokerCred = AuthHeader
 		
 		SubmitReport = LSAPI.Submit(intExpID, strExpSpec, strGroup, intPriorityHint)
 		ValidReport = SubmitReport.vReport
@@ -123,7 +124,7 @@ Sub btnReSubmit_Click(s As Object, e As EventArgs)
 		AuthHeader.identifier = strBrokerId 
 		AuthHeader.passkey = strBrokerPasskey 
 		
-		LSAPI.AuthHeaderValue = AuthHeader
+            LSAPI.BrokerCred = AuthHeader
 		
 		SubmitReport = LSAPI.Submit(intExpID, strExpSpec, strGroup, intPriorityHint)
 		ValidReport = SubmitReport.vReport
