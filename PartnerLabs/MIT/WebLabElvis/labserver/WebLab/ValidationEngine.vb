@@ -1,12 +1,13 @@
-Imports System
+Imports System.Configuration
 Imports System.Data.SqlClient
 Imports System.Xml
 Imports System.IO
 Imports System.Threading
 Imports Microsoft.VisualBasic
-Imports WebLabDataManagers.WebLabDataManagers
 
-Namespace WebLabSystemComponents
+Imports WebLab.DataManagers
+
+Namespace WebLab.Elvis
 
     'Author(s): James Hardison (hardison@alum.mit.edu)
     'Date: 6/6/2003
@@ -45,16 +46,16 @@ Namespace WebLabSystemComponents
 
         Dim FGEN_record As Integer = -1 '-1 is default, unassigned value, dependency: parseXMLSpec
         Dim SCOPE_record As Integer = -1
-        
+
         'terminal info fields
         Const TERM_INSTRUMENT As Integer = 0
         Const TERM_VNAME As Integer = 1
         Const TERM_FUNCTION_TYPE As Integer = 2
-        
+
         'instrument labels for function info
         Const FGEN_FUNCT As Integer = 0
         Const SCOPE_FUNCT As Integer = 1
-        
+
         'function information fields
         Const FUNCT_OFFSET As Integer = 0
         Const FUNCT_WAVEFORMTYPE As Integer = 1
@@ -93,7 +94,7 @@ Namespace WebLabSystemComponents
             'validation error message is returned.
             Dim strAccessOut, strValidateOut As String
             'Debug.AutoFlush = True
-            conWebLabLS = New SqlConnection("Database=ELVIS_LS;Server=localhost;Integrated Security=true")
+            conWebLabLS = New SqlConnection(ConfigurationManager.AppSettings("conString"))
             conWebLabLS.Open()
 
             'first, parse the incoming XML spec and load into memory.  Use try-catch here to handle parsing/validation errors.
@@ -133,7 +134,7 @@ Namespace WebLabSystemComponents
             'are called in the appropriate order by this method.  Upon completion, an indication of success or a 
             'validation error message is returned.
             Dim strAccessOut, strValidateOut As String
-            conWebLabLS = New SqlConnection("Database=ELVIS_LS;Server=localhost;Integrated Security=true")
+            conWebLabLS = New SqlConnection(ConfigurationManager.AppSettings("conString"))
             conWebLabLS.Open()
 
             'first, parse the incoming XML spec and load into memory.  Use try-catch here to handle parsing/validation errors.
@@ -170,7 +171,7 @@ Namespace WebLabSystemComponents
             Return "SUCCESS"
         End Function
 
-        Private Function parseXMLSpec(ByVal strExpSpec As String)
+        Private Sub parseXMLSpec(ByVal strExpSpec As String)
             'This method parses the supplied XML Experiment Specification.  The parsed data elements are loaded into class variables for 
             'processing by other private, internal methods.
             Dim tempXPath, udfXPath, termXPath, instrumentType, termName, udfName As String
@@ -361,7 +362,7 @@ Namespace WebLabSystemComponents
                 udfInfoTable(loopIdx, UDF_BODY) = Trim(tempNode.InnerXml())
                 Debug.WriteLine("udf body=" & Trim(tempNode.InnerXml()))
             Next
-        End Function
+        End Sub
 
         Private Function brokerHasSetupPermission(ByVal intBrokerID As Integer, ByVal intSetupID As Integer) As String
             'this method checks if the specified broker has read access to the experiment setup referenced by intSetupID.  
@@ -373,7 +374,7 @@ Namespace WebLabSystemComponents
 
             strDBQuery = "SELECT p.resource_id FROM ActiveSetups a JOIN Setups p ON a.setup_id = p.setup_id WHERE a.setup_id = @setupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -401,7 +402,7 @@ Namespace WebLabSystemComponents
 
             strDBQuery = "SELECT p.resource_id FROM ActiveSetups a JOIN Setups p ON a.setup_id = p.setup_id WHERE a.setup_id = @setupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
             dtrDBQuery = cmdDBQuery.ExecuteReader()
 
             dtrDBQuery.Read()
@@ -439,7 +440,7 @@ Namespace WebLabSystemComponents
             'first, make sure the same number of terminals are specified
             strDBQuery = "SELECT terminals_used FROM Setups WHERE setup_id = @setupID"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.Add("@setupID", intSetupID)
+            cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
             intTerminalsUsed = cmdDBQuery.ExecuteScalar()
 
             If Not intTerminalsUsed = termNodeListLength Then
@@ -451,8 +452,8 @@ Namespace WebLabSystemComponents
             For loopIdx = 0 To termNodeListLength - 1
                 strDBQuery = "SELECT 'error' WHERE NOT EXISTS(SELECT setupterm_id FROM SetupTerminalConfig WHERE setup_id = @setupID AND instrument = @instrument)"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@setupID", intSetupID)
-                cmdDBQuery.Parameters.Add("@instrument", termInfoTable(loopIdx, TERM_INSTRUMENT))
+                cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
+                cmdDBQuery.Parameters.AddWithValue("@instrument", termInfoTable(loopIdx, TERM_INSTRUMENT))
 
                 If cmdDBQuery.ExecuteScalar() = "error" Then
                     Return "Error - Experiment Specification does not match setup, terminal type mismatch."
@@ -541,7 +542,7 @@ Namespace WebLabSystemComponents
                 End If
 
                 'Check for the current name when we start measuring currents
-                
+
             Next
 
             'checks User Defined Function names if appropriate
@@ -620,7 +621,7 @@ Namespace WebLabSystemComponents
             'get max datapoints value
             'strDBQuery = "SELECT max_points FROM Setups WHERE setup_id = @setupID;"
             'cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            'cmdDBQuery.Parameters.Add("@setupID", intSetupID)
+            'cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
 
             'intPointLimit = CInt(cmdDBQuery.ExecuteScalar())
 
@@ -628,8 +629,8 @@ Namespace WebLabSystemComponents
             For loopIdx = 0 To termNodeListLength - 1
                 strDBQuery = "SELECT max_amplitude, max_offset, max_current,max_frequency, max_sampling_rate, max_sampling_time, max_points FROM SetupTerminalConfig WHERE setup_id = @setupID AND instrument = @instrument"
                 cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-                cmdDBQuery.Parameters.Add("@setupID", intSetupID)
-                cmdDBQuery.Parameters.Add("@instrument", UCase(termInfoTable(loopIdx, TERM_INSTRUMENT)))
+                cmdDBQuery.Parameters.AddWithValue("@setupID", intSetupID)
+                cmdDBQuery.Parameters.AddWithValue("@instrument", UCase(termInfoTable(loopIdx, TERM_INSTRUMENT)))
                 dtrDBQuery = cmdDBQuery.ExecuteReader()
 
                 While dtrDBQuery.Read()

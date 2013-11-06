@@ -5,7 +5,7 @@ Imports System.IO
 Imports System.Net
 Imports Microsoft.VisualBasic
 
-Imports WebLabCustomDataTypes
+Imports WebLab.DataTypes
 
 
 'Author(s): James Hardison (hardison@alum.mit.edu)
@@ -40,7 +40,7 @@ Imports WebLabCustomDataTypes
 'Uses:
 '   WebLab Custom Data Types (/controls/WebLabCustomDataTypes/WebLabCustomDataTypes.vb, /bin/WebLabCustomDataTypes.dll)
 
-Namespace WebLabDataManagers
+Namespace WebLab.DataManagers
 
     Public Class ResourcePermissionManager
 

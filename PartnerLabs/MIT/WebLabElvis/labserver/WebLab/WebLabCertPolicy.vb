@@ -3,7 +3,7 @@ Imports System.Net
 Imports System.Security.Cryptography.x509Certificates
 
 
-Namespace SiteComponents
+Namespace WebLab
 
     'Author(s): James Hardison (hardison@alum.mit.edu)
     'Date: 1/22/2004
@@ -13,22 +13,22 @@ Namespace SiteComponents
     'Web Service interface.  When applying to a client module, this policy should be set in place of the default policy 
     'at System.Net.ServicePointManager.CertificatePolicy
 
-Public Class WebLabCertPolicy 
-    Implements ICertificatePolicy
+    Public Class WebLabCertPolicy
+        Implements ICertificatePolicy
 
-	Public Function CheckValidationResult(ByVal srvPoint As ServicePoint, ByVal certificate As X509Certificate, ByVal request As Webrequest, ByVal certificateProblem As Integer) As Boolean Implements ICertificatePolicy.CheckValidationResult
-        Dim strIssuer, strSubject As String
+        Public Function CheckValidationResult(ByVal srvPoint As ServicePoint, ByVal certificate As X509Certificate, ByVal request As WebRequest, ByVal certificateProblem As Integer) As Boolean Implements ICertificatePolicy.CheckValidationResult
+            Dim strIssuer, strSubject As String
 
-        strIssuer = certificate.GetIssuerName()
-        strSubject = certificate.GetName()
+            strIssuer = certificate.Issuer
+            strSubject = certificate.Subject
 
-        If strIssuer = "C=US, S=Massachusetts, O=Massachusetts Institute of Technology, OU=MIT Certification Authority" And strSubject = "C=US, S=Massachusetts, L=Cambridge, O=Massachusetts Institute of Technology, OU=Microsystems Technology Labs, CN=weblab2.mit.edu" Then
-            Return True
-        Else
-            Return False    
-        End If
-	End Function
+            If strIssuer = "C=US, S=Massachusetts, O=Massachusetts Institute of Technology, OU=MIT Certification Authority" And strSubject = "C=US, S=Massachusetts, L=Cambridge, O=Massachusetts Institute of Technology, OU=Microsystems Technology Labs, CN=weblab2.mit.edu" Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
 
-End Class
+    End Class
 
 End Namespace

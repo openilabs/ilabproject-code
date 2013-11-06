@@ -6,7 +6,7 @@ Imports System.IO
 Imports System.Threading
 
 Imports OpAmpInverter.InstrumentDriverInterop.Ivi
-Imports iLab.Util
+Imports WebLab.Util
 
 'Author(s): James Hardison (hardison@alum.mit.edu)
 'Date: 5/5/2003

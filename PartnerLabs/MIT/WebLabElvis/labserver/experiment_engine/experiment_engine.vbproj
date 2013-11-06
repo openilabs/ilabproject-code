@@ -145,12 +145,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebLab\iLabUtil\iLabUtil.csproj">
-      <Project>{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}</Project>
-      <Name>iLabUtil</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="My Project\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

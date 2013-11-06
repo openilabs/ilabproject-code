@@ -19,7 +19,7 @@ Imports System
 'Uses:
 '   None
 
-Namespace WebLabCustomDataTypes
+Namespace WebLab.DataTypes
 
     Public Class NewBrokerConf
         'The New Broker COnfirmation Object contains the database record ID of a newly created broker and any comments generated during 
