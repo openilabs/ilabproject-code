@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "TestWrappers", "TestWrappers.vbproj", "{349F269B-ECC2-40A2-9786-5EB70009072B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{349F269B-ECC2-40A2-9786-5EB70009072B}.Debug.ActiveCfg = Debug|.NET
+		{349F269B-ECC2-40A2-9786-5EB70009072B}.Debug.Build.0 = Debug|.NET
+		{349F269B-ECC2-40A2-9786-5EB70009072B}.Release.ActiveCfg = Release|.NET
+		{349F269B-ECC2-40A2-9786-5EB70009072B}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
