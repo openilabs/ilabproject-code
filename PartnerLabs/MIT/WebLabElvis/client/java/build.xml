@@ -109,6 +109,32 @@ build: ${BUILD_STAMP}
   </target>
 
 
+
+  <target name="signedjar" depends="jar" description="signs the jar with the key from a previously generated keystore">
+    <signjar jar="${unsigned.jar.name}"
+             signedjar="${signed.jar.name}"
+             keystore="${keystore.location}"
+             alias="${keystore.alias}"
+             storepass="${keystore.password}" />
+  </target>
+
+
+  <target name="keystore" description="generates the keystore and key needed for signing jars">
+    <genkey keystore="${keystore.location}"
+            alias="${keystore.alias}"
+            storepass="${keystore.password}"
+            validity="3650"
+            keyalg="RSA">
+      <dname>
+        <param name="CN" value="MIT Microelectronics Weblab Team" />
+        <param name="O" value="Massachusetts Institute of Technology" />
+        <param name="L" value="Cambridge" />
+        <param name="ST" value="MA" />
+        <param name="C" value="US" />
+      </dname>
+    </genkey>
+  </target>
+
   <!-- this is not currently used, and may not be correct anyway -->
 
   <target name="sign" depends="jar" description="signs the jar with a pre-built keystore">
