@@ -17,11 +17,6 @@
 		</webServices>
 		<xhtmlConformance mode="Transitional"/>
 	<pages>
-	<namespaces>
-		<add namespace="Microsoft.VisualBasic"/>
-		<add namespace="System.Data"/>
-		<add namespace="System.Drawing"/>
-	</namespaces>
 	</pages>
 	</system.web>
 	<appSettings>

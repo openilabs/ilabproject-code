@@ -1,12 +1,17 @@
+Imports System
 Imports System.Configuration
+Imports System.Data
 Imports System.Data.SqlClient
+Imports System.Diagnostics
 Imports System.Xml
 Imports System.Net
 Imports System.IO
+Imports System.Text
 Imports System.Threading
+Imports Microsoft.VisualBasic
 
-Imports OpAmpInverter.InstrumentDriverInterop.Ivi
 Imports WebLab.Util
+Imports OpAmpInverter.InstrumentDriverInterop.Ivi
 
 'Author(s): James Hardison (hardison@alum.mit.edu)
 'Date: 5/5/2003
@@ -25,11 +30,12 @@ Imports WebLab.Util
 'work properly.
 '    2.the local database must have a properly permissioned user account with the 
 'information set in line 82 of this file.
+
 Module ExperimentEngine
-    Dim conWebLabLS As SqlConnection
-    Dim strConnectionString As String = "Database=ELVIS_LS;Server=localhost;Integrated Security=true"
+ Dim strConnectionString As String = "Database=ELVIS_LS;Server=localhost;Integrated Security=true"
     Dim strLabServerUrl As String = "http://localhost"
-    Dim strExpID, strExpSpec, strWarningMsg, listItem, listUnits As String
+    Dim conWebLabLS As SqlConnection
+    Dim strExpID, strExpSpec, strWarningMsg, strDevName, strHostname, listItem, listUnits As String
     Dim intSetupID As Integer
     Dim termInfoTable(,), udfInfoTable(,), functInfoTable(,) As String
     Dim expEngIsActive As Boolean
@@ -63,18 +69,18 @@ Module ExperimentEngine
     Const UDF_NAME As Integer = 0
     Const UDF_UNITS As Integer = 1
     Const UDF_BODY As Integer = 2
-
-    Sub Main(ByVal cmdArgs() As String)
+    Sub Main()
         Dim strDBQuery As String
         Dim cmdDBQuery As SqlCommand
         Dim dtrOutput As SqlDataReader
-        Debug.WriteLine("Working Directory: " & Directory.GetCurrentDirectory())
+       Debug.WriteLine("Working Directory: " & Directory.GetCurrentDirectory())
         Dim configInfo As IniFile = New IniFile(Directory.GetCurrentDirectory() & "\experiment_engine.ini")
         
         strConnectionString = configInfo.IniReadValue("Configuration", "connectionString")
         strLabServerUrl = configInfo.IniReadValue("Configuration", "LabServerURL")
 
         conWebLabLS = New SqlConnection(strConnectionString)
+        
         conWebLabLS.Open()
 
         Debug.WriteLine("MAIN SUB STARTED")
@@ -107,7 +113,7 @@ Module ExperimentEngine
                     'if experiment engine is set to active
                     'dequeue, load and parse an experiment
                     LoadJob(strExpID, strExpSpec)
-
+                    
                     Debug.WriteLine("job Loaded: ID=" & strExpID)
 
                     ParseExperimentSpec(strExpSpec)
@@ -115,7 +121,7 @@ Module ExperimentEngine
                     'configure lab hardware and execute experiment
 
                     'if present sets the switching matrix to proper channel
-
+                    
                     'clear old warning messages
                     strWarningMsg = ""
 
@@ -151,7 +157,7 @@ Module ExperimentEngine
         Dim dtrOutput As SqlDataReader
 
         'retrieves and sets lab system variables
-        strDBQuery = "SELECT exp_eng_is_active  FROM LSSystemConfig WHERE SetupID = '1';"
+        strDBQuery = "SELECT exp_eng_is_active, homepage, elvis_dev_name  FROM LSSystemConfig WHERE SetupID = '1';"
         cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
         dtrOutput = cmdDBQuery.ExecuteReader(CommandBehavior.SingleRow)
 
@@ -161,7 +167,25 @@ Module ExperimentEngine
             Else
                 expEngIsActive = False
             End If
+
+            If dtrOutput("homepage") Is DBNull.Value Or Trim(dtrOutput("homepage")) = "" Then
+                strHostname = "http://localhost" 'this should not happen in any normal case.
+            Else
+                strHostname = dtrOutput("homepage")
+                'make sure any trailing slashes are removed so we don't duplicate later.
+                If Right(strHostname, 1) = "/" Then
+                    strHostname = Left(strHostname, Len(strHostname) - 1)
+                End If
+
+            End If
+
+            If dtrOutput("elvis_dev_name") Is DBNull.Value Then
+                strDevName = "" 'this should not happen in any normal case
+            Else
+                strDevName = dtrOutput("elvis_dev_name")
+            End If
         End If
+
         dtrOutput.Close()
 
     End Sub
@@ -176,7 +200,7 @@ Module ExperimentEngine
         Dim ELVIS_Session As Inverter
         ' Restart the inverter
         Debug.WriteLine("Restarting the ELVIS session")
-
+        
         ELVIS_Session = New Inverter
         ' get the parameters that were read on from the xml specs
 
@@ -219,7 +243,7 @@ Module ExperimentEngine
         Dim samplingTime As Double = functInfoTable(SCOPE_FUNCT, FUNCT_SAMPLINGTIME)
 
 
-        dblResult = ELVIS_Session.RunExperiment(frequency, amplitude, offset, waveformType, samplingRate, samplingTime)
+        dblResult = ELVIS_Session.RunExperiment(strDevName, frequency, amplitude, offset, waveformType, samplingRate, samplingTime)
         'dispose the inverter
         ELVIS_Session.Dispose()
         ELVIS_Session = Nothing
@@ -250,10 +274,10 @@ Module ExperimentEngine
 
         strDBQuery = "EXEC qm_FinishJob @expID, @expResult, @errorMsg, @errorBit"
         cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-        cmdDBQuery.Parameters.AddWithValue("@expID", strExpID)
-        cmdDBQuery.Parameters.AddWithValue("@expResult", strXMLExpResult)
-        cmdDBQuery.Parameters.AddWithValue("@errorMsg", strWarningMsg)
-        cmdDBQuery.Parameters.AddWithValue("@errorBit", "0")
+        cmdDBQuery.Parameters.Add("@expID", strExpID)
+        cmdDBQuery.Parameters.Add("@expResult", strXMLExpResult)
+        cmdDBQuery.Parameters.Add("@errorMsg", strWarningMsg)
+        cmdDBQuery.Parameters.Add("@errorBit", "0")
         cmdDBQuery.ExecuteNonQuery()
         Debug.WriteLine("job finished")
         'informs WebLab Lab Server of job completion
@@ -267,7 +291,8 @@ Module ExperimentEngine
         Dim strResponse As String
 
         Try
-            objRequest = CType(WebRequest.Create(strLabServerUrl & "/notify.aspx?expID=" & strExpID), HttpWebRequest)
+            Debug.WriteLine("attempting to call notify.aspx on " & strHostname)
+            objRequest = CType(WebRequest.Create(strHostname & "/notify.aspx?expID=" & strExpID), HttpWebRequest)
             objRequest.Method = "GET"
 
             objResponse = objRequest.GetResponse()
@@ -508,8 +533,8 @@ Module ExperimentEngine
         'determine if broker id or group affiliate should be used for lab config creation
         strDBQuery = "SELECT dbo.rpm_GetGroupID(@BrokerID, @GroupName);"
         cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-        cmdDBQuery.Parameters.AddWithValue("@BrokerID", intBrokerID)
-        cmdDBQuery.Parameters.AddWithValue("@GroupName", strGroup)
+        cmdDBQuery.Parameters.Add("@BrokerID", intBrokerID)
+        cmdDBQuery.Parameters.Add("@GroupName", strGroup)
 
         intGroupID = CInt(cmdDBQuery.ExecuteScalar())
 
@@ -517,14 +542,14 @@ Module ExperimentEngine
             'use group id
             strDBQuery = "SELECT ClassID FROM dbo.rpm_GroupIsMemberOf(@groupID);"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.AddWithValue("@groupID", intGroupID)
+            cmdDBQuery.Parameters.Add("@groupID", intGroupID)
 
             intClassID = CInt(cmdDBQuery.ExecuteScalar())
         Else
             'use broker id
             strDBQuery = "SELECT ClassID FROM dbo.rpm_BrokerIsMemberOf(@brokerID)"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-            cmdDBQuery.Parameters.AddWithValue("@brokerID", intBrokerID)
+            cmdDBQuery.Parameters.Add("@brokerID", intBrokerID)
 
             intClassID = CInt(cmdDBQuery.ExecuteScalar())
         End If
@@ -538,7 +563,7 @@ Module ExperimentEngine
         'get available setup list
         strDBQuery = "SELECT setupID, setupName, setupDesc, setupImageLoc FROM dbo.rpm_GetActiveSetupList(@ClassID) ORDER BY setupID;"
         cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-        cmdDBQuery.Parameters.AddWithValue("@ClassID", intClassID)
+        cmdDBQuery.Parameters.Add("@ClassID", intClassID)
         dtrSetupList = cmdDBQuery.ExecuteReader()
 
         While dtrSetupList.Read()
@@ -552,7 +577,7 @@ Module ExperimentEngine
             'get setup terminal information
             strDBQuery = "SELECT termInstrument, termNumber, termName, termXLoc, termYLoc FROM dbo.rpm_GetSetupTerminalInfo(@SetupID) ORDER BY termNumber;"
             cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS2)
-            cmdDBQuery.Parameters.AddWithValue("@SetupID", dtrSetupList("setupID"))
+            cmdDBQuery.Parameters.Add("@SetupID", dtrSetupList("setupID"))
             dtrTermList = cmdDBQuery.ExecuteReader()
 
             While dtrTermList.Read()
@@ -576,8 +601,8 @@ Module ExperimentEngine
 
         strDBQuery = "EXEC qm_LogConfigAtExec @expID, @labConfig;"
         cmdDBQuery = New SqlCommand(strDBQuery, conWebLabLS)
-        cmdDBQuery.Parameters.AddWithValue("@expID", strExpID)
-        cmdDBQuery.Parameters.AddWithValue("@labConfig", strXMLOutput)
+        cmdDBQuery.Parameters.Add("@expID", strExpID)
+        cmdDBQuery.Parameters.Add("@labConfig", strXMLOutput)
 
         cmdDBQuery.ExecuteNonQuery()
     End Sub
@@ -588,10 +613,10 @@ Module ExperimentEngine
 
         strFinishJob = "EXEC qm_FinishJob @expID, @expResults, @errorMsg, @errorBit"
         cmdFinishJob = New SqlCommand(strFinishJob, conWebLabLS)
-        cmdFinishJob.Parameters.AddWithValue("@expID", strExpID)
-        cmdFinishJob.Parameters.AddWithValue("@expResults", "")
-        cmdFinishJob.Parameters.AddWithValue("@errorMsg", strErrMsg)
-        cmdFinishJob.Parameters.AddWithValue("@errorBit", "1")
+        cmdFinishJob.Parameters.Add("@expID", strExpID)
+        cmdFinishJob.Parameters.Add("@expResults", "")
+        cmdFinishJob.Parameters.Add("@errorMsg", strErrMsg)
+        cmdFinishJob.Parameters.Add("@errorBit", "1")
         cmdFinishJob.ExecuteNonQuery()
         Debug.WriteLine("Job Error: " & strErrMsg)
     End Sub

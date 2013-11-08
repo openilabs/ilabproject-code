@@ -81,7 +81,7 @@ Namespace InstrumentDriverInterop.Ivi
             'Specify "Dev1" as DeviceName
             'Dim DeviceName As String = "Dev1"
 
-            PInvoke.runExperiment(DeviceName, SCOPETriggerSlope_POSITIVE, SCOPETriggerType_Analog, SCOPETriggerSource_CH_A, SCOPEChannelSource_FGEN_FUNC_OUT, 10, 0, SCOPEChannelCoupling_DC, SCOPEChannelSource_ACH0, 10, 0, SCOPEChannelCoupling_DC, recordLength, SamplingRate, SCOPEAcquireMode_N_Samples, waveformType, frequencyHz, DCOffsetV, peakAmplitudeV, waveform(0), len)
+            WrapPInvoke.runExperiment(DeviceName, SCOPETriggerSlope_POSITIVE, SCOPETriggerType_Analog, SCOPETriggerSource_CH_A, SCOPEChannelSource_FGEN_FUNC_OUT, 10, 0, SCOPEChannelCoupling_DC, SCOPEChannelSource_ACH0, 10, 0, SCOPEChannelCoupling_DC, recordLength, SamplingRate, SCOPEAcquireMode_N_Samples, waveformType, frequencyHz, DCOffsetV, peakAmplitudeV, waveform(0), len)
             '"Dev1", True,                                                                                   
             'parse the file and return an array with the values
             'Console.WriteLine("The error values are: status -> {0} Code -> {1} Source -> {2}", Me.errorVal.status, Me.errorVal.code, Me.errorVal.source)
@@ -129,16 +129,7 @@ Namespace InstrumentDriverInterop.Ivi
             Me._disposed = True
         End Sub
 #End Region
-        '<DllImport("C:\\dev\\ELVIS-iLab\\labserver\\ExperimentSetups\\instruments\\FGEN-SCOPE\\build\\elvisv1_2.dll", CallingConvention:=CallingConvention.StdCall)> _
-        Private Class PInvoke
-
-            <DllImport("elvisv1_2.dll", CallingConvention:=CallingConvention.StdCall)> _
-            Public Shared Function runExperiment(ByVal DeviceName As String, ByVal SCOPET_Slope As Integer, ByVal SCOPET_TriggerType As Integer, ByVal SCOPET_TriggerSource As Integer, ByVal SCOPEChA_Source As Integer, ByVal SCOPEChA_Range As Double, ByVal SCOPEChA_Offset As Double, ByVal SCOPEChA_Coupling As Integer, ByVal SCOPEChB_Source As Integer, ByVal SCOPEChB_Range As Double, ByVal SCOPEChB_Offset As Double, ByVal SCOPEChB_Coupling As Integer, ByVal SCOPEH_RecordLength As Integer, ByVal SCOPEH_SampleRateHz As Double, ByVal SCOPEH_Acquire As Integer, ByVal FGEN_WaveformType As Integer, ByVal FGEN_Frequency As Double, ByVal FGEN_DCOffset As Double, ByVal FGEN_Amplitude As Double, ByRef interleavedArray As Double, ByVal len As Integer) As Integer
-                ''ByVal ELVIS_DeviceName As String, ByVal SCOPET_OnFGENOffset As Boolean, ByVal SCOPET_Level As Double,   
-            End Function
-
-
-        End Class
+       
         ''' <summary>
         ''' This struct stores the error messages returned by a DLL
         ''' </summary>
@@ -183,4 +174,16 @@ Namespace InstrumentDriverInterop.Ivi
 
         End Structure
     End Class
+
+    '<DllImport("elvisv1_2.dll", CallingConvention:=CallingConvention.StdCall)> _
+    Public Module WrapPInvoke
+
+        <DllImport("elvisv1_2.dll")> _
+        Public Function runExperiment(ByVal DeviceName As String, ByVal SCOPET_Slope As Integer, ByVal SCOPET_TriggerType As Integer, ByVal SCOPET_TriggerSource As Integer, ByVal SCOPEChA_Source As Integer, ByVal SCOPEChA_Range As Double, ByVal SCOPEChA_Offset As Double, ByVal SCOPEChA_Coupling As Integer, ByVal SCOPEChB_Source As Integer, ByVal SCOPEChB_Range As Double, ByVal SCOPEChB_Offset As Double, ByVal SCOPEChB_Coupling As Integer, ByVal SCOPEH_RecordLength As Integer, ByVal SCOPEH_SampleRateHz As Double, ByVal SCOPEH_Acquire As Integer, ByVal FGEN_WaveformType As Integer, ByVal FGEN_Frequency As Double, ByVal FGEN_DCOffset As Double, ByVal FGEN_Amplitude As Double, ByRef interleavedArray As Double, ByVal len As Integer) As Integer
+            ''ByVal ELVIS_DeviceName As String, ByVal SCOPET_OnFGENOffset As Boolean, ByVal SCOPET_Level As Double,   
+        End Function
+
+
+    End Module
+
 End Namespace
