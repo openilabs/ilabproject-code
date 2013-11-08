@@ -2,24 +2,19 @@
 #define _platdefines_H
 /*
 	NI CONFIDENTIAL
-	© Copyright 1990-2006 by National Instruments Corp.
+	(c) Copyright 1990-2010 by National Instruments Corp.
 	All rights reserved.
 
-	Owners: brian.powell, greg.richardson, paul.austin
 
 	platdefines.h - Defines that describe various platforms.
 
 	The 5 main defines set up in this file are OpSystem, WindowSystem,
-	Compiler, ProcessorType and BigEndian. The other platform defines are derived
+	Compiler, ProcessorType and NI_BIG_ENDIAN. The other platform defines are derived
 	from these main defines and provide convenience for common tests.
 
 	This file should not contain anything but #defines and no // comments.
 	This is because it is used to preprocess many kinds of files.
 */
-
-#ifdef DefineHeaderRCSId
-#define rcsid_platdefines "$Id$"
-#endif
 
 /*
 LabVIEW system options: don't uncomment, the compiler defines these automatically
@@ -43,6 +38,7 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define kMacOSX		3
 	#define kMSWin31	10		// OBSOLETE
 	#define kMSWin32	11
+	#define kMSWin64	12
 	#define kLinux		20
 	#define kSunOS		21		// OBSOLETE
 	#define kSolaris	22		// OBSOLETE
@@ -54,6 +50,8 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define kOSF1		28		// OBSOLETE
 	#define kVxWorks	29
 	#define kPalmOS	    30
+	#define kLinux64	31
+	#define kVdk		32
 
 /* Possible values for WindowSystem */
 	#define kMacWM		1
@@ -93,17 +91,18 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define kPIC		8
 	#define kARM		9
 	#define kX64		10
-	
+
 /* Possible values for Runtime (Mac only)*/
-	#define kMachO		1 
+	#define kMachO		1
 	#define kCFM		2
 
-/* Possible values for the Pointer size */
-	#define k32bitPointer	1
-	#define k64bitPointer	2
-
 #if defined(_WIN32) || defined(WIN32) || defined(__WIN32__) || defined(_WIN32_WCE)
-	#define OpSystem		kMSWin32
+	/* _WIN32 is defined even if _WIN64 is also defined */
+	#ifdef _WIN64
+		#define OpSystem		kMSWin64
+	#else
+		#define OpSystem		kMSWin32
+	#endif
 	#define WindowSystem	kMSWin32WM
 	#if defined(__MWERKS__)
 		#define Compiler		kMetroWerks
@@ -127,33 +126,27 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#elif Compiler == kBorlandC
 		#define ProcessorType	kX86
 	#elif defined(_ARM_)
-		#define ProcessorType 	kARM	
+		#define ProcessorType 	kARM
 	#else
 		#error "We don't know the ProcessorType architecture"
 	#endif
-	#define BigEndian		0
-	#ifdef _WIN64
-		#define PointerSize		k64bitPointer
-	#else
-		#define PointerSize		k32bitPointer
-	#endif
+	#define NI_BIG_ENDIAN		0
 #elif defined( __PALMOS_H__ )
 	#define OpSystem		kPalmOS
 	#define WindowSystem	kPalmWM
 	#define Compiler		kMetroWerks
 	#define ProcessorType		kM68000
-	#define BigEndian		1
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		1
 #elif defined(macintosh) || defined(__PPCC__) || defined(THINK_C) || defined(__SC__) || defined(__MWERKS__) || defined(__APPLE_CC__)
 	#define OpSystem		kMacOSX
 	#define WindowSystem	kMacWM
 	#define OLDROUTINENAMES 0
-	#define OLDROUTINELOCATIONS 0 
+	#define OLDROUTINELOCATIONS 0
 	#if defined(__MACH__)
 		#define Runtime kMachO
 	#else
 		#define Runtime kCFM
-	#endif 
+	#endif
 	#if defined(__MOTO__)
 		#define Compiler	kMotorolaCC
 	#elif defined(__MWERKS__)
@@ -169,24 +162,22 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#elif defined(__APPLE_CC__)
 		#define Compiler kGCC
 	#endif
-	#if defined(__powerc) || defined(__ppc__)   
+	#if defined(__powerc) || defined(__ppc__)
 		#define ProcessorType	kPPC
-		#define BigEndian 1
+		#define NI_BIG_ENDIAN 1
 	#elif defined(__i386__)
 		#define ProcessorType kX86
-		#define BigEndian 0
+		#define NI_BIG_ENDIAN 0
 	#else
-		#define BigEndian 1
+		#define NI_BIG_ENDIAN 1
 		#define ProcessorType	kM68000
 	#endif
-	#define PointerSize		k32bitPointer
 #elif defined(__WATCOMC__)
 	#define OpSystem		kMSWin31
 	#define WindowSystem	kMSWin31WM
 	#define Compiler		kWatcom
 	#define ProcessorType	kX86
-	#define BigEndian		0
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		0
 #elif defined(linux)
 	#define WindowSystem	kXWindows
 	#define OpSystem		kLinux
@@ -199,26 +190,28 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#endif
 	#if defined(i386)
 		#define ProcessorType	kX86
-		#define BigEndian		0
+		#define NI_BIG_ENDIAN		0
 	#elif defined(__alpha)
 		#define ProcessorType	kDECAlpha
-		#define BigEndian		0
+		#define NI_BIG_ENDIAN		0
 	#elif defined(powerpc)
 		#define ProcessorType	kPPC
-		#define BigEndian		1
+		#define NI_BIG_ENDIAN		1
 	#elif defined(sparc)
 		#define ProcessorType	kSparc
-		#define BigEndian		1
+		#define NI_BIG_ENDIAN		1
 	#elif defined(mips)
 		#define ProcessorType	kMIPS
-		#define BigEndian		1
+		#define NI_BIG_ENDIAN		1
 	#elif defined(arm) || defined(__arm__)
 		#define ProcessorType	kARM
-		#define BigEndian		0
+		#define NI_BIG_ENDIAN		0
+	#elif defined(__x86_64__)
+		#define ProcessorType	kX64
+		#define NI_BIG_ENDIAN		0
 	#else
 		#error "Unknown Linux platform"
 	#endif
-	#define PointerSize		k32bitPointer
 #elif (defined(__i386) || defined(__i486)) && defined(__svr4__)
 	#define WindowSystem	kXWindows
 	#define ProcessorType	kX86
@@ -228,8 +221,7 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#else
 		#define Compiler	kUnbundledC
 	#endif
-	#define BigEndian		0
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		0
 #elif sparc || __sparc
 	#define WindowSystem	kXWindows
 	#define ProcessorType	kSparc
@@ -243,11 +235,10 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#else
 		#define Compiler	kUnbundledC
 	#endif
-	#define BigEndian		1
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		1
 #elif defined(__alpha)
 	#define ProcessorType	kDECAlpha
-	#define BigEndian		0
+	#define NI_BIG_ENDIAN		0
 	#if defined(__osf__)
 		#define WindowSystem	kXWindows
 		#define OpSystem	kOSF1
@@ -260,7 +251,6 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 		#define WindowSystem	kXWindows
 		#define Compiler	kGCC
 	#endif
-	#define PointerSize		k32bitPointer
 #elif defined(__hpux)
 	#define WindowSystem	kXWindows
 	#define ProcessorType	kPARISC
@@ -270,46 +260,47 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#else
 		#define Compiler	kUnbundledC
 	#endif
-	#define BigEndian		1
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		1
 #elif defined(__HC__)
 	#define OpSystem		kPowerUnix
 	#define WindowSystem	kXWindows
 	#define Compiler		kUnbundledC
 	#define ProcessorType	kPPC
-	#define BigEndian		1
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		1
 #elif defined(__sgi)
 	#define OpSystem		kIrix
 	#define WindowSystem	kXWindows
 	#define Compiler		kSGIC
 	#define ProcessorType	kMIPS
-	#define BigEndian		1
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		1
 #elif defined(_AIX)
 	#define OpSystem		kAIX
 	#define WindowSystem	kXWindows
 	#define Compiler		kAIXC
 	#define ProcessorType	kPPC
-	#define BigEndian		1
-	#define PointerSize		k32bitPointer
+	#define NI_BIG_ENDIAN		1
 #elif defined(VXWORKS_PPC)
 	#define OpSystem		kVxWorks
 	#define WindowSystem	kNoWS
 	#define ProcessorType	kPPC
-	#define BigEndian		1
+	#define NI_BIG_ENDIAN		1
 #if defined(__GNUC__)
 	#define Compiler		kGCC
 #else
 	#define Compiler        kDiabC // until I find a good constant to check rdt
 #endif
-	#define PointerSize		k32bitPointer
 #elif defined(VXWORKS_X86)
 	#define OpSystem		kVxWorks
 	#define WindowSystem	kNoWS
 	#define ProcessorType	kX86
-	#define BigEndian		0
+	#define NI_BIG_ENDIAN		0
 	#define Compiler		kGCC
+#elif defined(__vdk)
+	#define OpSystem		kVdk
+	#define WindowSystem	kNoWS
+	#define Compiler		kUnbundledC
+	#define ProcessorType	kX86
+	#define BigEndian		0
 	#define PointerSize		k32bitPointer
 #endif
 
@@ -320,7 +311,7 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 /* Other defines for convenience. */
 
 #define Unix			(((OpSystem>=kLinux) && (OpSystem<=kVxWorks)))
-#define MSWin			((OpSystem>=kMSWin31) && (OpSystem<=kMSWin32))
+#define MSWin			((OpSystem>=kMSWin31) && (OpSystem<=kMSWin64))
 #define Mac				(OpSystem==kMacOS || OpSystem==kMacOSX)
 #define MacOSX			(OpSystem==kMacOSX)
 #define MacOSXCFM		(OpSystem==kMacOSX && Runtime==kCFM)
@@ -330,10 +321,11 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 #define Palm		 	(Compiler==kMetroWerks && OpSystem==kPalmOS)
 #define MWerksPPC		(Compiler==kMetroWerks && ProcessorType==kPPC)
 #define Sparc			(ProcessorType==kSparc)
-#define Linux			(OpSystem==kLinux)
+#define Linux			(OpSystem==kLinux || OpSystem==kLinux64)
 #define PowerPC			(ProcessorType==kPPC)
 #define SVR4			(OpSystem==kSolaris)
 #define VxWorks			(OpSystem==kVxWorks)
+#define Vdk			    (OpSystem==kVdk)
 #define NoWS			(WindowSystem==kNoWS)
 
 // defines for what type of threading is available
@@ -342,7 +334,7 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 #define kUIThreads		 2
 #define kPosixThreads	 3
 #define kVxWorksThreads	 4
-#define kMacMPThreads	 5
+#define kVdkThreads	 	 6
 
 #if MSWin
 	#define ThreadKind kMSWin32Threads
@@ -352,9 +344,13 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define ThreadKind kVxWorksThreads
 #elif Mac
 	#define ThreadKind kPosixThreads
+#elif OpSystem==kVdk
+	#define ThreadKind kVdkThreads
 #else
 	#define ThreadKind kNoThreads
 #endif
+
+#define IsOpSystem64Bit ((OpSystem==kMSWin64) || (OpSystem==kLinux64))
 
 #if defined(_WIN32_WCE)
 	#define WinCE 1
@@ -363,11 +359,10 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 #endif
 
 /* This should move to a LabVIEW header GR 1-13-00 ??? */
-#if (ProcessorType==kX86)
+#if (ProcessorType==kX86 || ProcessorType==kX64)
 	#define FPUASM 1
 #else
 	#define FPUASM 0
 #endif
-
 
 #endif /* _platdefines_H */

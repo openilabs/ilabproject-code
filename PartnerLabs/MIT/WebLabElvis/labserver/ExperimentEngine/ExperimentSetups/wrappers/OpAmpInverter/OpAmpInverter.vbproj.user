@@ -53,6 +53,6 @@
     </StartURL>
     <StartWorkingDirectory>
     </StartWorkingDirectory>
-    <StartWithIE>false</StartWithIE>
+    <StartWithIE>true</StartWithIE>
   </PropertyGroup>
 </Project>

@@ -1,20 +1,22 @@
 #ifndef _cvilvsb_H
 #define _cvilvsb_H
 /*
-	© Copyright 1997-2001 by National Instruments Corp.
-	All rights reserved.
+	© Copyright 1997 by National Instruments Corp.
+	All rights reserved
 
 	$Id$
+
 */
 
 extern void __stdcall GetLVSBHeader (void);
 
 /*
-The following describes how to make a LabVIEW CIN in LabWindows/CVI.
+The following describes how to make a LabVIEW CIN in CVI 4.0.1 on
+Windows 95 or NT.
 
 1.	Create a CVI project
 
-	  Note: Currently LabVIEW only supplies library and object files for
+	  Note: Currently LabView only supplies library and object files for
 			MSVC and Symantec compatibility modes, so WATCOM or Borland
 			cannot be used.
 
@@ -22,15 +24,15 @@ The following describes how to make a LabVIEW CIN in LabWindows/CVI.
 		- The source file(s) for your CIN
 		- cvilvsb.h
 
-	  If Using MSVC compatibility mode, add:
-		- lvsb.lib	   (from the LabVIEW cintools directory)
-		- labview.lib  (from the LabVIEW cintools directory)
-		- cin.obj	   (from the LabVIEW cintools directory)
+	  If Using MSVC compatibility Mode in CVI, add:
+		- lvsb.lib	   (from the LabVIEW CINTOOLS\WIN32 directory)
+		- labview.lib  (from the LabVIEW CINTOOLS\WIN32 directory)
+		- getcin.obj   (from the LabVIEW CINTOOLS\WIN32 directory)
 
-	  If Using Symantec compatibility mode, add:
-		- lvsb.sym.lib	   (from the LabVIEW cintools directory)
-		- labview.sym.lib  (from the LabVIEW cintools directory)
-		- cin.sym.obj	   (from the LabVIEW cintools directory)
+	  If Using Symantec compatibility Mode in CVI, add:
+		- lvsb.sym.lib	   (from the LabVIEW CINTOOLS\WIN32 directory)
+		- labview.sym.lib  (from the LabVIEW CINTOOLS\WIN32 directory)
+		- getcin.sym.obj   (from the LabVIEW CINTOOLS\WIN32 directory)
 
 	Save the project.
 
@@ -52,7 +54,7 @@ The following describes how to make a LabVIEW CIN in LabWindows/CVI.
 	to Dynamic Link Library.
 
 5.	Select the Include Paths command in the Options menu of the
-	Project window.	 Add the cintools directory to the
+	Project window.	 Add the CINTOOLS directory to the
 	project include paths.
 
 6.	Select the Create Dynamic Link Library command in the Build menu
@@ -71,7 +73,7 @@ The following describes how to make a LabVIEW CIN in LabWindows/CVI.
 
 	a. Change directory to the location of your built DLL.
 
-	b. Run the following command "c:\labview\cintools\lvsbutil mydll",
+	b. Run the following command "c:\labview\cintools\win32\lvsbutil mydll",
 		where c:\labview is the directory where LabVIEW was installed and
 		mydll is the name of your DLL without the .DLL extension.
 
