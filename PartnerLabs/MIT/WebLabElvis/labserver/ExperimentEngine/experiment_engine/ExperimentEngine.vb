@@ -68,10 +68,9 @@ Module ExperimentEngine
         Dim strDBQuery As String
         Dim cmdDBQuery As SqlCommand
         Dim dtrOutput As SqlDataReader
-
+        Debug.WriteLine("Working Directory: " & Directory.GetCurrentDirectory())
         Dim configInfo As IniFile = New IniFile(Directory.GetCurrentDirectory() & "\experiment_engine.ini")
-        configInfo.IniWriteValue("Configuration", "connectionString", "Database=ELVIS_LS5;Server=localhost;Integrated Security=true")
-        configInfo.IniWriteValue("Configuration", "LabServerURL", "http://localhost/elvis5")
+        
         strConnectionString = configInfo.IniReadValue("Configuration", "connectionString")
         strLabServerUrl = configInfo.IniReadValue("Configuration", "LabServerURL")
 
@@ -490,7 +489,7 @@ Module ExperimentEngine
         Dim cmdLoadJob, cmdLogConfig, cmdDBQuery As SqlCommand
         Dim dtrLoadJob, dtrSetupList, dtrTermList As SqlDataReader
         Dim intBrokerID, intGroupID, intClassID As Integer
-        Dim conWebLabLS2 As SqlConnection = New SqlConnection(ConfigurationManager.AppSettings("conString"))
+        Dim conWebLabLS2 As SqlConnection = New SqlConnection(strConnectionString)
 
         'Load job
         strLoadJob = "EXEC qm_LoadJob;"
