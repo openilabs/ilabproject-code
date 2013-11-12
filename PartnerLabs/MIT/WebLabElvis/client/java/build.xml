@@ -69,6 +69,7 @@ Note: always run "ant clean" before rebuilding with a different set of options (
         excludes="${build-excludes}"
         destdir="${classdir}"
         includeAntRuntime="no"
+	deprecation="yes"
         debug="${weblab-debug}"
         source="1.4" target="1.4">
      <!-- not currently needed -->
@@ -98,6 +99,11 @@ build: ${BUILD_STAMP}
          duplicate="fail">
       <fileset dir="." includes="img/*.gif" />
       <fileset dir="." includes="build-version.txt" />
+      <manifest>
+        <attribute name="Application-Name" value="MIT NI-ELVIS Weblab Client" />
+        <attribute name="Main-Class" value="weblab.client.graphicalUI.GraphicalApplet"/>
+       
+      </manifest>
     </jar>
   </target>
 
