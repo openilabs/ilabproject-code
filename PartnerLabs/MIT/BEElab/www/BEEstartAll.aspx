@@ -32,12 +32,13 @@ Please see license.txt in top level directory for full license.
   <script type="text/javascript" src="scripts/vendor/highstock.theme.grid.js"></script>
   <script type="text/javascript" src="scripts/bee_start.js"></script>
   <script type="text/javascript" src="scripts/chart.js"></script>
+  <script type="text/javascript" src="scripts/sunChart.js"></script>
   <script type="text/javascript" src="scripts/launching.js?v=565757"></script>
-<link rel="stylesheet" type="text/css" href="dhtmlxSlider/codebase/dhtmlxslider.css">
-<script src="dhtmlxSlider/codebase/dhtmlxcommon.js"></script>
-<script src="dhtmlxSlider/codebase/dhtmlxslider.js"></script>
+  <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxcommon.js"></script>
+<script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxslider.js"></script>
+<link rel="stylesheet" type="text/css" href="scripts/dhtmlxSlider/codebase/dhtmlxslider.css"/>
 <style type="text/css">@import url(css/main.css );</style>
-<script>
+<script type="text/javascript">
 //this should eventually take in the number of hours from input.
 var sunHours = 0;
 var sld = null;
@@ -77,8 +78,8 @@ $(function() {
 });
 
  //initialize the slider.  may not want 1500px size, need to test and see.
- sld = new dhtmlxSlider("slider", 1500, "arrow", false, 0, 24-sunHours, 0, 1);
- sld.setImagePath("dhtmlxSlider/codebase/imgs/");
+ sld = new dhtmlxSlider("slider", 300, "arrow", false, 0, 24-sunHours, 0, 1);
+ sld.setImagePath("scripts/dhtmlxSlider/codebase/imgs/");
  sld.attachEvent("onChange", shiftSunGraph);
  sld.init();
 
@@ -222,21 +223,22 @@ $(function() {
   <div id='holder'>
     <div id="chart-container"></div>
   </div>
-<nav>
-  <ul class="navigation">
-    <li id='load-label'>
-      <strong>Please select a load to manage:</strong>
-    </li>
-      <li><input type='radio' class='js-add-load button' name='js-active-load' style='background-color:#A84B3A'  title="Load 1" value='0' id='load-1'></li>
-    <li><input type='radio' class='js-add-load button' name='js-active-load'  style='background-color:#FF9F67'  title="Load 2" value='1' id='load-2'></li>
-    <li><input type='radio' class='js-add-load button' name='js-active-load' style='background-color:#323138'  title="Load 3" value='2' id='load-3'></li>
-    <li><input type='radio' class='js-add-load button' name='js-active-load' style='background-color:#4C646B'  title="Load 4" value='3' id='load-4'></li>
-  </ul>
-</nav>
-  <div class='legend'></div>
-<div id="slider" align="center"></div>
-Select how many hours per day the sun lamp should be on:
 
+  <table>
+  <tr>
+  <td style="width: 320px" >Please select a load to manage:</td><td style="width: 320px">Select how many hours per day<br />the sun lamp should be on:</td><td style="width: 320px">Please select a profile<br />and cycles to run</td>
+  </tr>
+   <tr>
+   <td style="width: 320px">
+   <ul>
+      <li><input type='radio' class='js-add-load button' name='js-active-load' style="background-color:#A84B3A; width: 50px; height: 24px;"  visible="true" title="Load 1" value='0' id='load-1'/></li>
+       <li><input type='radio' class='js-add-load button' name='js-active-load' style="background-color:#FF9F67; width: 50px; height: 24px;"  visible="true" title="Load 2" value='1' id='load-2'/></li>
+       <li><input type='radio' class='js-add-load button' name='js-active-load' style="background-color:#323138; width: 50px; height: 24px;"  visible="true" title="Load 3" value='2' id='load-3'/></li>
+       <li><input type='radio' class='js-add-load button' name='js-active-load' style='background-color:#4C646B; width: 50px; height: 24px;'  visible="true" title="Load 4" value='3' id='load-4'/></li>
+    </ul>
+    </td>
+    <td style="width: 320px">
+    <div id="slider" align="center"></div>
 <select name="Select number of hours" id="sun_hours_select">
   <option value="0">0 (off)</option>
   <option value="4">4 hours</option>
@@ -252,22 +254,18 @@ Select how many hours per day the sun lamp should be on:
   <option value="14">14 hours</option>
   <option value="15">15 hours</option>
 </select>
-<nav>
-  <ul class="navigation">
-   <li id='profile-label'>
-      <strong>Please select profile and cycles to run:</strong>
-    </li>
-    <li id = 'profiles' >
-	    <select id = "profile-list">
-				   <option value = "0">Profiles</option>
+</td>
+    <td style="width: 337px">
+     <select id = "profile-list">
+				   <option value = "0">No Climate Profile</option>
 	               <option value = "1">Phoenix</option>
 	               <option value = "2">Atlanta</option>
 	               <option value = "3">Custom 1</option>
 	               <option value = "4">Custom 2</option>
 	    </select>
-    </li> 
-  </ul>
-</nav>
+</td>
+  </tr>
+</table>
 </div>
 <a class="button" id="js-launch-experiment" href="#">
   Start Experiment
