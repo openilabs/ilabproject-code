@@ -27,7 +27,7 @@ Please see license.txt in top level directory for full license.
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
   <script type="text/javascript" src="scripts/vendor/highcharts.js"></script>
-<script type="text/javascript" src="../www/scripts/vendor/underscore.js"></script>
+<script type="text/javascript" src="scripts/vendor/underscore.js"></script>
   <script type="text/javascript" src="scripts/vendor/exporting.src.js"></script>
   <script type="text/javascript" src="scripts/vendor/highstock.theme.grid.js"></script>
   <script type="text/javascript" src="scripts/bee_start.js"></script>
@@ -40,7 +40,7 @@ Please see license.txt in top level directory for full license.
 <style type="text/css">@import url(css/main.css );</style>
 <script type="text/javascript">
 //this should eventually take in the number of hours from input.
-var sunHours = 0;
+var sunHours = 24;
 var sld = null;
 
 sunData = new Array();
@@ -239,30 +239,24 @@ $(function() {
       <label for='load-1' style='background-color:#A84B3A' class='button'>Load 1</label>
       <input type='radio' class='js-add-load button'  name='js-active-load' value='0' id='load-1'/>
     </li>
-
     <li>
       <label for='load-2' style='background-color:#FF9F67' class='button'>Load 2</label>
       <input type='radio' class='js-add-load button' name='js-active-load' value='1' id='load-2'/>
     </li>
-
     <li>
       <label for='load-3' style='background-color:#323138' class='button'>Load 3</label>
       <input type='radio' class='js-add-load button' name='js-active-load' value='2' id='load-3'/>
     </li>
-
     <li>
       <label for='load-4' style='background-color:#4C646B' class='button'>Load 4</label>
       <input type='radio' class='js-add-load button' name='js-active-load' value='3' id='load-4'/>
     </li>
-  
-	
     <li id='profile-label'>
-      <strong>Please select profile and cycles to run:</strong>
+      <strong>Please select climate profile and cycles to run:</strong>
     </li>
-    
     <li id = 'profiles' >
 	    <select id = "profile-list">
-				   <option value = "0">Profiles</option>
+				   <option value = "0">No Climate Profile</option>
 	               <option value = "1">Phoenix</option>
 	               <option value = "2">Atlanta</option>
 	     <!--          <option value = "3">Custom 1</option>
@@ -270,11 +264,28 @@ $(function() {
 	    </select>
     </li> 
     
-  </ul>
+ 
+<li><div id="slider" align="center"></div></li>
+<li><strong>Select how many hours per day the sun lamp should be on:</strong></li>
+
+<li><select name="Select number of hours" id="sun_hours_select">
+  <option value="0">0 (off)</option>
+  <option value="4">4 hours</option>
+  <option value="5">5 hours</option>
+  <option value="6">6 hours</option>
+  <option value="7">7 hours</option>
+  <option value="8">8 hours</option>
+  <option value="9">9 hours</option>
+  <option value="10">10 hours</option>
+  <option value="11">11 hours</option>
+  <option value="12">12 hours</option>
+  <option value="13">13 hours</option>
+  <option value="14">14 hours</option>
+  <option value="15">15 hours</option>
+</select></li>
+ </ul>
 </nav>
-
 </div>
-
 <a class='button' id='js-launch-experiment' href='#'>
   Start Experiment
 </a>
