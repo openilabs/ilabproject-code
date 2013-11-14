@@ -218,63 +218,68 @@ $(function() {
   For each load, you can choose when it will be turned on. You can manage them
   by clicking the buttons for each specific wattage.
 </div>
-<div class='main'>
-  <h2 class='chart-title'>Load Profiles</h2>
-  <div id='holder'>
-    <div id="chart-container"></div>
-  </div>
+<br></br>
 
-  <table>
-  <tr>
-  <td style="width: 320px" >Please select a load to manage:</td><td style="width: 320px">Select how many hours per day<br />the sun lamp should be on:</td><td style="width: 320px">Please select a profile<br />and cycles to run</td>
-  </tr>
-   <tr>
-   <td style="width: 320px">
-   <ul>
-      <li><input type='radio' class='js-add-load button' name='js-active-load' style="background-color:#A84B3A; width: 50px; height: 24px;"  visible="true" title="Load 1" value='0' id='load-1'/></li>
-       <li><input type='radio' class='js-add-load button' name='js-active-load' style="background-color:#FF9F67; width: 50px; height: 24px;"  visible="true" title="Load 2" value='1' id='load-2'/></li>
-       <li><input type='radio' class='js-add-load button' name='js-active-load' style="background-color:#323138; width: 50px; height: 24px;"  visible="true" title="Load 3" value='2' id='load-3'/></li>
-       <li><input type='radio' class='js-add-load button' name='js-active-load' style='background-color:#4C646B; width: 50px; height: 24px;'  visible="true" title="Load 4" value='3' id='load-4'/></li>
-    </ul>
-    </td>
-    <td style="width: 320px">
-    <div id="slider" align="center"></div>
-<select name="Select number of hours" id="sun_hours_select">
-  <option value="0">0 (off)</option>
-  <option value="4">4 hours</option>
-  <option value="5">5 hours</option>
-  <option value="6">6 hours</option>
-  <option value="7">7 hours</option>
-  <option value="8">8 hours</option>
-  <option value="9">9 hours</option>
-  <option value="10">10 hours</option>
-  <option value="11">11 hours</option>
-  <option value="12">12 hours</option>
-  <option value="13">13 hours</option>
-  <option value="14">14 hours</option>
-  <option value="15">15 hours</option>
-</select>
-</td>
-    <td style="width: 337px">
-     <select id = "profile-list">
-				   <option value = "0">No Climate Profile</option>
+<div class='main'>
+  <h1 class='chart-title'>Load Profiles</h1>
+  <div id='holder'>
+    <div id="chart-container"></div>	
+  </div>
+  <div id='holder1'>
+    <div id="profile-container"></div>	
+  </div>
+  <!-- <div class='legend'></div> -->
+
+<nav>
+  <ul class="navigation">
+    <li id='load-label'>
+      <strong>Please select a load to manage:</strong>
+    </li>
+    <li>
+      <label for='load-1' style='background-color:#A84B3A' class='button'>Load 1</label>
+      <input type='radio' class='js-add-load button'  name='js-active-load' value='0' id='load-1'/>
+    </li>
+
+    <li>
+      <label for='load-2' style='background-color:#FF9F67' class='button'>Load 2</label>
+      <input type='radio' class='js-add-load button' name='js-active-load' value='1' id='load-2'/>
+    </li>
+
+    <li>
+      <label for='load-3' style='background-color:#323138' class='button'>Load 3</label>
+      <input type='radio' class='js-add-load button' name='js-active-load' value='2' id='load-3'/>
+    </li>
+
+    <li>
+      <label for='load-4' style='background-color:#4C646B' class='button'>Load 4</label>
+      <input type='radio' class='js-add-load button' name='js-active-load' value='3' id='load-4'/>
+    </li>
+  
+	
+    <li id='profile-label'>
+      <strong>Please select profile and cycles to run:</strong>
+    </li>
+    
+    <li id = 'profiles' >
+	    <select id = "profile-list">
+				   <option value = "0">Profiles</option>
 	               <option value = "1">Phoenix</option>
 	               <option value = "2">Atlanta</option>
-	               <option value = "3">Custom 1</option>
-	               <option value = "4">Custom 2</option>
+	     <!--          <option value = "3">Custom 1</option>
+	               <option value = "4">Custom 2</option> -->
 	    </select>
-</td>
-  </tr>
-</table>
+    </li> 
+    
+  </ul>
+</nav>
+
 </div>
-<a class="button" id="js-launch-experiment" href="#">
+
+<a class='button' id='js-launch-experiment' href='#'>
   Start Experiment
 </a>
-<asp:button runat="server" cssClass="button" id="btnGo" Text="Run Experiment" Visible="true" onCLick="goButton_Click"/>
 
-<div id="js-load-schedule"></div>
-
-
+<!-- <a class='js-add-load button' href='#' value='2'>Load 3</a> -->
 <!-- <a class='js-add-load button' href='#' value='2'>Load 3</a> -->   
 					</div><!-- end pagecontent div -->
 					<br clear="all" />
