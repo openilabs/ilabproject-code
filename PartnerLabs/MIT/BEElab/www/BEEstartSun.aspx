@@ -44,9 +44,9 @@ Please see license.txt in top level directory for full license.
   <script type="text/javascript" src="scripts/chart.js"></script>
 
   <script type="text/javascript" src="scripts/launching.js?v=565757"></script>
-<link rel="stylesheet" type="text/css" href="dhtmlxSlider/codebase/dhtmlxslider.css">
-<script src="dhtmlxSlider/codebase/dhtmlxcommon.js"></script>
-<script src="dhtmlxSlider/codebase/dhtmlxslider.js"></script>
+<link rel="stylesheet" type="text/css" href="scripts/dhtmlxSlider/codebase/dhtmlxslider.css">
+<script src="scripts/dhtmlxSlider/codebase/dhtmlxcommon.js"></script>
+<script src="scripts/dhtmlxSlider/codebase/dhtmlxslider.js"></script>
 <style type="text/css">@import url(css/main.css );</style>
 <script>
 //this should eventually take in the number of hours from input.
@@ -89,7 +89,7 @@ $(function() {
 
  //initialize the slider.  may not want 1500px size, need to test and see.
  sld = new dhtmlxSlider("slider", 1500, "arrow", false, 0, 24-sunHours, 0, 1);
- sld.setImagePath("dhtmlxSlider/codebase/imgs/");
+ sld.setImagePath("scripts/dhtmlxSlider/codebase/imgs/");
  sld.attachEvent("onChange", shiftSunGraph);
  sld.init();
 

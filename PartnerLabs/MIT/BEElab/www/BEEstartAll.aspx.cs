@@ -130,6 +130,8 @@ namespace iLabs.LabServer.BEE
                     {
                         Session["userTZ"] = tzStr;
                     }
+                    
+
 
                 }
             }

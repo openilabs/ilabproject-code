@@ -30,175 +30,16 @@ Please see license.txt in top level directory for full license.
 <script type="text/javascript" src="scripts/vendor/underscore.js"></script>
   <script type="text/javascript" src="scripts/vendor/exporting.src.js"></script>
   <script type="text/javascript" src="scripts/vendor/highstock.theme.grid.js"></script>
-  <script type="text/javascript" src="scripts/bee_start.js"></script>
-  <script type="text/javascript" src="scripts/chart.js"></script>
-  <script type="text/javascript" src="scripts/sunChart.js"></script>
-  <script type="text/javascript" src="scripts/launching.js?v=565757"></script>
   <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxcommon.js"></script>
 <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxslider.js"></script>
+<script type="text/javascript" src="scripts/dhtmlxSlider/codebase/ext/dhtmlxslider_start.js"></script>
+<script type="text/javascript" src="scripts/chartAll.js"></script>
+<script type="text/javascript" src="scripts/sunChart.js"></script>
+<script type="text/javascript" src="scripts/launching.js?v=565757"></script>
+<script type="text/javascript" src="scripts/bee_all.js"></script>
 <link rel="stylesheet" type="text/css" href="scripts/dhtmlxSlider/codebase/dhtmlxslider.css"/>
 <style type="text/css">@import url(css/main.css );</style>
-<script type="text/javascript">
-//this should eventually take in the number of hours from input.
-var sunHours = 24;
-var sld = null;
 
-sunData = new Array();
- for (var i = 0; i < sunHours; i++) {
-    sunData.push(1);
- }
- for (var i = 0; i < 24-sunHours; i++) {
-    sunData.push(0);
- }
-
-var shiftSunGraph = function (sliderValue, sliderObj) {
-    newData = new Array();
-    for (var i = 0; i < sliderValue; i++) {
-        newData.push(0);
-    }
-    for (var i = 0; i < sunHours; i++) {
-        newData.push(1);
-    }
-    for (var i = 0; i < 24-sunHours-sliderValue; i++) {
-        newData.push(0);
-    }
-    sunData = newData;
-    //this updates the chart with the new start position of the sun
-    //chart.series[0].update({data: sunData}, true);
-    chart.series[0].setData(newData);
-    return null;
- }
-
-$(function() {
-    $("#sun_hours_select").change(function () {
-        sunHours = parseInt($("#sun_hours_select").val());
-        shiftSunGraph(0, null);
-        sld.setMax(24-sunHours);
-    })
-});
-
- //initialize the slider.  may not want 1500px size, need to test and see.
- sld = new dhtmlxSlider("slider", 300, "arrow", false, 0, 24-sunHours, 0, 1);
- sld.setImagePath("scripts/dhtmlxSlider/codebase/imgs/");
- sld.attachEvent("onChange", shiftSunGraph);
- sld.init();
-
-
- // create initial data with lamp starting at hour 0.
- var colors = Highcharts.getOptions().colors;
-
- chart = new Highcharts.Chart({
-    chart: {
-        renderTo: 'container',
-        type: 'column'
-
-    },
-    
-    xAxis: {
-        min:0,
-        max:23,
-        id:"my xaxis",
-        tickInterval: 1,
-        title: {
-            enabled: true,
-            margin: 15
-        },
-        title: {
-            text: 'time'
-        },
-        labels: {
-            enabled: true,
-            x: -35
-        },
-        tickmarkPlacement: 'on',
-        showFirstLabel: false,
-        tickLength: 0
-    },
-    
-    yAxis: {
-        gridLineWidth: 0,
-        minorGridLineWidth: 0,
-        lineColor: 'transparent',        
-        labels: {
-            formatter: function() {
-                if (this.value == 1) {
-                  return "On";
-                }
-                else if (this.value == 0) {
-                    return "Off";
-                }
-                return "";
-            },
-            step: 1
-        },
-        minorTickLength: 0,
-        tickLength: 0,
-        title: {
-            text: 'Sun Lamp'
-        },
-        max: 1,
-        min: 0,
-        stackLabels: {
-            enabled: true,
-            style: {
-                fontWeight: 'bold',
-                color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-            }
-        }
-    },
-    legend: {
-        enabled: false
-    },
-    title: {
-            text: "Sun Lamp"
-    },
-    tooltip: {
-        formatter: function () {
-            return '<b>' + this.x + '</b><br/>' + this.series.name + ': ' + this.y + '<br/>'; //+
-            //'Total: '+ this.point.stackTotal;
-        }
-    },
-    plotOptions: {
-        column: {
-            stacking: 'normal',
-            point: {
-                events: {
-                    click: function () {
-                        console.log('this.x,y=' + this.x + "," + this.y + " category=" + this.category);
-
-                    }
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
-            }
-        }
-    },
-    
-    plotOptions: {
-        series: {
-            marker: {
-                enabled: false,
-                id: "my scrollbar"
-            }
-        },
-        column: {
-            pointPlacement: "between",
-            pointStart: 0,
-            pointPadding: -(1.0/3),
-            borderWidth: 0
-        }
-    },
-    
-    series: [{
-        data: sunData
-        }]
-    
-    
- });
- chart.series[0].setData(sunData);
-</script>	
 	</head>
 	<body>
 		<form method="post" runat="server">
@@ -218,23 +59,29 @@ $(function() {
   For each load, you can choose when it will be turned on. You can manage them
   by clicking the buttons for each specific wattage.
 </div>
-<br></br>
+<br />
 
 <div class='main'>
   <h1 class='chart-title'>Load Profiles</h1>
-  <div id='holder'>
+  <div id='holder'> 
+    <div id="sun-container"></div>
+    <div id="sunslider-container"></div>	
     <div id="chart-container"></div>	
   </div>
-  <div id='holder1'>
-    <div id="profile-container"></div>	
-  </div>
+ 
   <!-- <div class='legend'></div> -->
 
 <nav>
   <ul class="navigation">
     <li id='load-label'>
-      <strong>Please select a load to manage:</strong>
+      <strong>Select a heat source to manage:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>
     </li>
+    <li id='profile-label'>
+      <strong>Select a climate profile and cycles to run:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>
+    </li>
+    <li><strong>Select how many hours per day the sun lamp should be on:</strong></li>
+  </ul>
+   <ul class="navigation">
     <li>
       <label for='load-1' style='background-color:#A84B3A' class='button'>Load 1</label>
       <input type='radio' class='js-add-load button'  name='js-active-load' value='0' id='load-1'/>
@@ -251,23 +98,15 @@ $(function() {
       <label for='load-4' style='background-color:#4C646B' class='button'>Load 4</label>
       <input type='radio' class='js-add-load button' name='js-active-load' value='3' id='load-4'/>
     </li>
-    <li id='profile-label'>
-      <strong>Please select climate profile and cycles to run:</strong>
-    </li>
     <li id = 'profiles' >
 	    <select id = "profile-list">
-				   <option value = "0">No Climate Profile</option>
-	               <option value = "1">Phoenix</option>
-	               <option value = "2">Atlanta</option>
-	     <!--          <option value = "3">Custom 1</option>
+				   <option value = "0" selected="selected">No Climate Profile</option>
+				    <option value = "1">Phoenix</option>
+				    <option value = "2">Atlanta</option>
+	     <!--          <option value = "3">Singapore</option>
 	               <option value = "4">Custom 2</option> -->
 	    </select>
     </li> 
-    
- 
-<li><div id="slider" align="center"></div></li>
-<li><strong>Select how many hours per day the sun lamp should be on:</strong></li>
-
 <li><select name="Select number of hours" id="sun_hours_select">
   <option value="0">0 (off)</option>
   <option value="4">4 hours</option>
@@ -276,13 +115,14 @@ $(function() {
   <option value="7">7 hours</option>
   <option value="8">8 hours</option>
   <option value="9">9 hours</option>
-  <option value="10">10 hours</option>
+  <option value="10" selected="selected">10 hours</option>
   <option value="11">11 hours</option>
   <option value="12">12 hours</option>
   <option value="13">13 hours</option>
   <option value="14">14 hours</option>
   <option value="15">15 hours</option>
 </select></li>
+<li><div  id="divSunSlider" align="center"></div></li>
  </ul>
 </nav>
 </div>
