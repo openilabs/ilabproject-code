@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.schneider-electric.com/common/dataexchange/2011/05" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:flt="http://www.schneider-electric.com/common/dataexchange/2011/05/DataExchangeInterface/Fault" xmlns:wsa="http://www.w3.org/2006/05/addressing/wsdl" targetNamespace="http://www.schneider-electric.com/common/dataexchange/2011/05" name="DataExchangeServiceV1_1">
+  <wsdl:documentation>EcoStruxure Web Services V1.1</wsdl:documentation>
+	<wsdl:types>
+		<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.schneider-electric.com/common/dataexchange/2011/05">
+			<!-- Complex Type Definitions-->
+			<xsd:complexType name="ResultType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Success" type="xsd:boolean"/>
+					<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ErrorResultType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Message" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ContainerItemSimpleType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Name" type="xsd:string"/>
+					<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="Type" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ContainerItemType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Name" type="xsd:string"/>
+					<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Items">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="ContainerItems" type="tns:ArrayOfContainerItemSimpleType" minOccurs="0"/>
+								<xsd:element name="ValueItems" type="tns:ArrayOfValueItemTypeBase" minOccurs="0"/>
+								<xsd:element name="HistoryItems" type="tns:ArrayOfHistoryItemType" minOccurs="0"/>
+								<xsd:element name="AlarmItems" type="tns:ArrayOfAlarmItemType" minOccurs="0"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ValueItemType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Name" type="xsd:string"/>
+					<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Value" type="xsd:string"/>
+					<xsd:element name="Unit" type="xsd:string"/>
+					<xsd:element name="Writeable" type="xsd:integer" minOccurs="0"/>
+					<xsd:element name="State" type="xsd:integer" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ValueItemTypeBase">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Name" type="xsd:string"/>
+					<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Unit" type="xsd:string"/>
+					<xsd:element name="Writeable" type="xsd:integer" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ValueTypeStateful">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="State" type="xsd:integer" minOccurs="0"/>
+					<xsd:element name="Value" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ValueTypeStateless">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Value" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="HistoryItemType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Name" type="xsd:string"/>
+					<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Unit" type="xsd:string"/>
+					<xsd:element name="ValueItemId" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="HistoryRecordType">
+				<xsd:sequence>
+					<xsd:element name="Value" type="xsd:string"/>
+					<xsd:element name="State" type="xsd:integer" minOccurs="0"/>
+					<xsd:element name="TimeStamp" type="xsd:dateTime"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="HistoryResponseStatusType">
+				<xsd:sequence>
+					<xsd:element name="MoreDataAvailable" type="xsd:boolean"/>
+					<xsd:element name="MoreDataRef" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="TimeFrom" type="xsd:dateTime"/>
+					<xsd:element name="TimeTo" type="xsd:dateTime"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="HistoryRecordsType">
+				<xsd:sequence>
+					<xsd:element name="ValueItemId" type="xsd:string"/>
+					<xsd:element name="Unit" type="xsd:string"/>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="List">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="HistoryRecord" type="tns:HistoryRecordType" minOccurs="0" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="AlarmItemType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string"/>
+					<xsd:element name="Name" type="xsd:string"/>
+					<xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="State" type="xsd:integer"/>
+					<xsd:element name="ValueItemId" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="AlarmResponseStatusType">
+				<xsd:sequence>
+					<xsd:element name="MoreDataAvailable" type="xsd:boolean"/>
+					<xsd:element name="MoreDataRef" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="LastUpdate" type="xsd:string"/>
+					<xsd:element name="NeedsRefresh" type="xsd:boolean"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="AlarmEventsType">
+				<xsd:sequence>
+					<xsd:element name="ID" type="xsd:string"/>
+					<xsd:element name="SourceID" type="xsd:string"/>
+					<xsd:element name="SourceName" type="xsd:string"/>
+					<xsd:element name="Acknowledgeable" type="xsd:integer"/>
+					<xsd:element name="TimeStampOccurrence" type="xsd:dateTime"/>
+					<xsd:element name="TimeStampTransition" type="xsd:dateTime"/>
+					<xsd:element name="Priority" type="xsd:integer"/>
+					<xsd:element name="State" type="xsd:integer"/>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Message" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- End Of Complex Type Definitions-->
+			<!-- Array Defintions-->
+			<xsd:complexType name="ArrayOfIdType">
+				<xsd:sequence>
+					<xsd:element name="Id" type="xsd:string" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfResultType">
+				<xsd:sequence>
+					<xsd:element name="Result" type="tns:ResultType" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfErrorResultType">
+				<xsd:sequence>
+					<xsd:element name="ErrorResult" type="tns:ErrorResultType" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfType">
+				<xsd:sequence>
+					<xsd:element name="Type" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfContainerItemType">
+				<xsd:sequence>
+					<xsd:element name="ContainerItem" type="tns:ContainerItemType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfContainerItemSimpleType">
+				<xsd:sequence>
+					<xsd:element name="ContainerItem" type="tns:ContainerItemSimpleType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfValueItemType">
+				<xsd:sequence>
+					<xsd:element name="ValueItem" type="tns:ValueItemType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfValueItemTypeBase">
+				<xsd:sequence>
+					<xsd:element name="ValueItem" type="tns:ValueItemTypeBase" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfItemType">
+				<xsd:sequence>
+					<xsd:element name="ValueItems" type="tns:ArrayOfValueItemType" minOccurs="0"/>
+					<xsd:element name="HistoryItems" type="tns:ArrayOfHistoryItemType" minOccurs="0"/>
+					<xsd:element name="AlarmItems" type="tns:ArrayOfAlarmItemType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfValueTypeStateful">
+				<xsd:sequence>
+					<xsd:element name="ValueItem" type="tns:ValueTypeStateful" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfValueTypeStateless">
+				<xsd:sequence>
+					<xsd:element name="ValueItem" type="tns:ValueTypeStateless" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfHistoryItemType">
+				<xsd:sequence>
+					<xsd:element name="HistoryItem" type="tns:HistoryItemType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfHistoryType">
+				<xsd:sequence>
+					<xsd:element name="HistoryRecords" type="tns:HistoryRecordsType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfAlarmItemType">
+				<xsd:sequence>
+					<xsd:element name="AlarmItem" type="tns:AlarmItemType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="ArrayOfAlarmEventType">
+				<xsd:sequence>
+					<xsd:element name="AlarmEvent" type="tns:AlarmEventsType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<!-- End of Array Definitions -->
+			<!-- Message Types -->
+			<!-- GetWebServiceInformation operation messages -->
+			<xsd:element name="GetWebServiceInformationRequest">
+				<xsd:complexType>
+					<xsd:sequence/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetWebServiceInformationResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetWebServiceInformationVersion">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="MajorVersion" type="xsd:integer"/>
+									<xsd:element name="MinorVersion" type="xsd:string"/>
+									<xsd:element name="UsedNameSpace" type="xsd:string"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="GetWebServiceInformationSupportedOperations">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="Operation" type="xsd:string" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetContainerItems operation messages -->
+			<xsd:element name="GetContainerItemsRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetContainerItemsIds" type="tns:ArrayOfIdType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetContainerItemsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetContainerItemsItems" type="tns:ArrayOfContainerItemType"/>
+						<xsd:element name="GetContainerItemsErrorResults" type="tns:ArrayOfErrorResultType" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetItems operation messages -->
+			<xsd:element name="GetItemsRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetItemsIds" type="tns:ArrayOfIdType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetItemsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetItemsItems" type="tns:ArrayOfItemType"/>
+						<xsd:element name="GetItemsErrorResults" type="tns:ArrayOfErrorResultType" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetValues operation messages -->
+			<xsd:element name="GetValuesRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetValuesIds" type="tns:ArrayOfIdType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetValuesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetValuesItems" type="tns:ArrayOfValueTypeStateful"/>
+						<xsd:element name="GetValuesErrorResults" type="tns:ArrayOfErrorResultType" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- SetValues operation messages -->
+			<xsd:element name="SetValuesRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="SetValuesItems" type="tns:ArrayOfValueTypeStateless"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="SetValuesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="SetValuesResults" type="tns:ArrayOfResultType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetHistory operation messages -->
+			<xsd:element name="GetHistoryRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetHistoryParameter">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="Id" type="xsd:string"/>
+									<xsd:element name="MoreDataRef" type="xsd:string" minOccurs="0"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="GetHistoryFilter">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="TimeFrom" type="xsd:dateTime" minOccurs="0"/>
+									<xsd:element name="TimeTo" type="xsd:dateTime" minOccurs="0"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetHistoryResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetHistoryResponseStatus" type="tns:HistoryResponseStatusType"/>
+						<xsd:element name="GetHistoryHistoryRecords" type="tns:HistoryRecordsType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetAlarmEvents operation messages -->
+			<xsd:element name="GetAlarmEventsRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetAlarmEventsParameter">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="MoreDataRef" type="xsd:string" minOccurs="0"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="GetAlarmEventsFilter">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="PriorityFrom" type="xsd:integer" minOccurs="0"/>
+									<xsd:element name="PriorityTo" type="xsd:integer" minOccurs="0"/>
+									<xsd:element name="Types" type="tns:ArrayOfType" minOccurs="0"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetAlarmEventsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetAlarmEventsResponseStatus" type="tns:AlarmResponseStatusType"/>
+						<xsd:element name="GetAlarmEventsAlarmEvents" type="tns:ArrayOfAlarmEventType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetUpdatedAlarmEvents operation messages -->
+			<xsd:element name="GetUpdatedAlarmEventsRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetUpdatedAlarmEventsParameter">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="LastUpdate" type="xsd:string"/>
+									<xsd:element name="MoreDataRef" type="xsd:string" minOccurs="0"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="GetUpdatedAlarmEventsFilter">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="PriorityFrom" type="xsd:integer" minOccurs="0"/>
+									<xsd:element name="PriorityTo" type="xsd:integer" minOccurs="0"/>
+									<xsd:element name="Types" type="tns:ArrayOfType" minOccurs="0"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetUpdatedAlarmEventsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetUpdatedAlarmEventsResponseStatus" type="tns:AlarmResponseStatusType"/>
+						<xsd:element name="GetUpdatedAlarmEventsAlarmEvents" type="tns:ArrayOfAlarmEventType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- AcknowledgeAlarmEvents operation messages -->
+			<xsd:element name="AcknowledgeAlarmEventsRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="AcknowledgeAlarmEventsIds" type="tns:ArrayOfIdType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="AcknowledgeAlarmEventsResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="AcknowledgeAlarmEventsResults" type="tns:ArrayOfResultType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- GetAlarmEventTypes operation messages -->
+			<xsd:element name="GetAlarmEventTypesRequest">
+				<xsd:complexType>
+					<xsd:sequence/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GetAlarmEventTypesResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="GetAlarmEventTypesTypes" type="tns:ArrayOfType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+		<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.schneider-electric.com/common/dataexchange/2011/05/DataExchangeInterface/Fault">
+			<xsd:element name="Fault_Invalid_Id" type="xsd:string"/>
+			<xsd:element name="Fault_Invalid_Priority" type="xsd:string"/>
+			<xsd:element name="Fault_Invalid_Reference" type="xsd:string"/>
+			<xsd:element name="Fault_Invalid_Time" type="xsd:string"/>
+			<xsd:element name="Fault_Invalid_Type" type="xsd:string"/>
+			<xsd:element name="Fault_Missing_Id_List" type="xsd:string"/>
+			<xsd:element name="Fault_Missing_Value_List" type="xsd:string"/>
+			<xsd:element name="Fault_Operation_Not_Supported" type="xsd:string"/>
+			<xsd:element name="Fault_Permission_Denied" type="xsd:string"/>
+			<xsd:element name="Fault_TimeOut" type="xsd:string"/>
+			<xsd:element name="Fault_Unequal_Lists" type="xsd:string"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="GetWebServiceInformation_InputMessage">
+		<wsdl:part name="Body" element="tns:GetWebServiceInformationRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetWebServiceInformation_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetWebServiceInformationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetContainerItems_InputMessage">
+		<wsdl:part name="Body" element="tns:GetContainerItemsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetContainerItems_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetContainerItemsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetItems_InputMessage">
+		<wsdl:part name="Body" element="tns:GetItemsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetItems_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetItemsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetValues_InputMessage">
+		<wsdl:part name="Body" element="tns:GetValuesRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetValues_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetValuesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetValues_InputMessage">
+		<wsdl:part name="Body" element="tns:SetValuesRequest"/>
+	</wsdl:message>
+	<wsdl:message name="SetValues_OutputMessage">
+		<wsdl:part name="Body" element="tns:SetValuesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetHistory_InputMessage">
+		<wsdl:part name="Body" element="tns:GetHistoryRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetHistory_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetHistoryResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAlarmEvents_InputMessage">
+		<wsdl:part name="Body" element="tns:GetAlarmEventsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetAlarmEvents_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetAlarmEventsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetUpdatedAlarmEvents_InputMessage">
+		<wsdl:part name="Body" element="tns:GetUpdatedAlarmEventsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetUpdatedAlarmEvents_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetUpdatedAlarmEventsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="AcknowledgeAlarmEvents_InputMessage">
+		<wsdl:part name="Body" element="tns:AcknowledgeAlarmEventsRequest"/>
+	</wsdl:message>
+	<wsdl:message name="AcknowledgeAlarmEvents_OutputMessage">
+		<wsdl:part name="Body" element="tns:AcknowledgeAlarmEventsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetAlarmEventTypes_InputMessage">
+		<wsdl:part name="Body" element="tns:GetAlarmEventTypesRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetAlarmEventTypes_OutputMessage">
+		<wsdl:part name="Body" element="tns:GetAlarmEventTypesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Invalid_Id">
+		<wsdl:part name="Body" element="flt:Fault_Invalid_Id"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Invalid_Priority">
+		<wsdl:part name="Body" element="flt:Fault_Invalid_Priority"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Invalid_Reference">
+		<wsdl:part name="Body" element="flt:Fault_Invalid_Reference"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Invalid_Time">
+		<wsdl:part name="Body" element="flt:Fault_Invalid_Time"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Invalid_Type">
+		<wsdl:part name="Body" element="flt:Fault_Invalid_Type"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Missing_Id_List">
+		<wsdl:part name="Body" element="flt:Fault_Missing_Id_List"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Missing_Value_List">
+		<wsdl:part name="Body" element="flt:Fault_Missing_Value_List"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Operation_Not_Supported">
+		<wsdl:part name="Body" element="flt:Fault_Operation_Not_Supported"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Permission_Denied">
+		<wsdl:part name="Body" element="flt:Fault_Permission_Denied"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_TimeOut">
+		<wsdl:part name="Body" element="flt:Fault_TimeOut"/>
+	</wsdl:message>
+	<wsdl:message name="Fault_Unequal_Lists">
+		<wsdl:part name="Body" element="flt:Fault_Unequal_Lists"/>
+	</wsdl:message>
+	<wsdl:portType name="DataExchangeInterface">
+		<wsdl:operation name="GetWebServiceInformation">
+			<wsdl:input message="tns:GetWebServiceInformation_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetWebServiceInformationIn"/>
+			<wsdl:output message="tns:GetWebServiceInformation_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetWebServiceInformationOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetWebServiceInformationFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetWebServiceInformationFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetWebServiceInformationFault_TimeOut"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetContainerItems">
+			<wsdl:input message="tns:GetContainerItems_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsIn"/>
+			<wsdl:output message="tns:GetContainerItems_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST" message="tns:Fault_Missing_Id_List" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsFault_Missing_Id_List"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsFault_TimeOut"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetItems">
+			<wsdl:input message="tns:GetItems_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsIn"/>
+			<wsdl:output message="tns:GetItems_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST" message="tns:Fault_Missing_Id_List" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsFault_Missing_Id_List"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsFault_TimeOut"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetValues">
+			<wsdl:input message="tns:GetValues_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesIn"/>
+			<wsdl:output message="tns:GetValues_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST" message="tns:Fault_Missing_Id_List" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesFault_Missing_Id_List"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesFault_TimeOut"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetValues">
+			<wsdl:input message="tns:SetValues_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesIn"/>
+			<wsdl:output message="tns:SetValues_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST" message="tns:Fault_Missing_Id_List" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesFault_Missing_Id_List"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesFault_TimeOut"/>
+			<wsdl:fault name="Server.SCWS.MISSING_VALUE_LIST" message="tns:Fault_Missing_Value_List" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesFault_Missing_Value_List"/>
+			<wsdl:fault name="Server.SCWS.UNEQUAL_LISTS" message="tns:Fault_Unequal_Lists" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesFault_Unequal_Lists"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetHistory">
+			<wsdl:input message="tns:GetHistory_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryIn"/>
+			<wsdl:output message="tns:GetHistory_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.INVALID_REFERENCE" message="tns:Fault_Invalid_Reference" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryFault_Invalid_Reference"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryFault_TimeOut"/>
+			<wsdl:fault name="Server.SCWS.INVALID_ID" message="tns:Fault_Invalid_Id" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryFault_Invalid_Id"/>
+			<wsdl:fault name="Server.SCWS.INVALID_TIME" message="tns:Fault_Invalid_Time" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryFault_Invalid_Time"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAlarmEvents">
+			<wsdl:input message="tns:GetAlarmEvents_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsIn"/>
+			<wsdl:output message="tns:GetAlarmEvents_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.INVALID_REFERENCE" message="tns:Fault_Invalid_Reference" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsFault_Invalid_Reference"/>
+			<wsdl:fault name="Server.SCWS.INVALID_PRIORITY" message="tns:Fault_Invalid_Priority" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsFault_Invalid_Priority"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsFault_TimeOut"/>
+			<wsdl:fault name="Server.SCWS.INVALID_TYPE" message="tns:Fault_Invalid_Type" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsFault_Invalid_Type"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetUpdatedAlarmEvents">
+			<wsdl:input message="tns:GetUpdatedAlarmEvents_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsIn"/>
+			<wsdl:output message="tns:GetUpdatedAlarmEvents_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.INVALID_REFERENCE" message="tns:Fault_Invalid_Reference" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_Invalid_Reference"/>
+			<wsdl:fault name="Server.SCWS.INVALID_PRIORITY" message="tns:Fault_Invalid_Priority" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_Invalid_Priority"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_TimeOut"/>
+			<wsdl:fault name="Server.SCWS.INVALID_TYPE" message="tns:Fault_Invalid_Type" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_Invalid_Type"/>
+			<wsdl:fault name="Server.SCWS.INVALID_TIME" message="tns:Fault_Invalid_Time" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsFault_Invalid_Time"/>
+		</wsdl:operation>
+		<wsdl:operation name="AcknowledgeAlarmEvents">
+			<wsdl:input message="tns:AcknowledgeAlarmEvents_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsIn"/>
+			<wsdl:output message="tns:AcknowledgeAlarmEvents_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST" message="tns:Fault_Missing_Id_List" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsFault_Missing_Id_List"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsFault_TimeOut"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAlarmEventTypes">
+			<wsdl:input message="tns:GetAlarmEventTypes_InputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventTypesIn"/>
+			<wsdl:output message="tns:GetAlarmEventTypes_OutputMessage" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventTypesOut"/>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" message="tns:Fault_Operation_Not_Supported" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventTypesFault_Operation_Not_Supported"/>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED" message="tns:Fault_Permission_Denied" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventTypesFault_Permission_Denied"/>
+			<wsdl:fault name="Server.SCWS.TIMEOUT" message="tns:Fault_TimeOut" wsa:Action="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventTypesFault_TimeOut"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="DataExchange_BP11Binding" type="tns:DataExchangeInterface">
+		<soap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+		<wsdl:operation name="GetWebServiceInformation">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetWebServiceInformationIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetContainerItems">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetContainerItemsIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST">
+				<soap12:fault name="Server.SCWS.MISSING_ID_LIST" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetItems">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetItemsIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST">
+				<soap12:fault name="Server.SCWS.MISSING_ID_LIST" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetValues">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetValuesIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST">
+				<soap12:fault name="Server.SCWS.MISSING_ID_LIST" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="SetValues">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/SetValuesIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST">
+				<soap12:fault name="Server.SCWS.MISSING_ID_LIST" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.MISSING_VALUE_LIST">
+				<soap12:fault name="Server.SCWS.MISSING_VALUE_LIST" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.UNEQUAL_LISTS">
+				<soap12:fault name="Server.SCWS.UNEQUAL_LISTS" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetHistory">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetHistoryIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_ID">
+				<soap12:fault name="Server.SCWS.INVALID_ID" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_TIME">
+				<soap12:fault name="Server.SCWS.INVALID_TIME" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_REFERENCE">
+				<soap12:fault name="Server.SCWS.INVALID_REFERENCE" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetAlarmEvents">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventsIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_PRIORITY">
+				<soap12:fault name="Server.SCWS.INVALID_PRIORITY" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_TYPE">
+				<soap12:fault name="Server.SCWS.INVALID_TYPE" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_REFERENCE">
+				<soap12:fault name="Server.SCWS.INVALID_REFERENCE" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetUpdatedAlarmEvents">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetUpdatedAlarmEventsIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_PRIORITY">
+				<soap12:fault name="Server.SCWS.INVALID_PRIORITY" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_TIME">
+				<soap12:fault name="Server.SCWS.INVALID_TIME" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_TYPE">
+				<soap12:fault name="Server.SCWS.INVALID_TYPE" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.INVALID_REFERENCE">
+				<soap12:fault name="Server.SCWS.INVALID_REFERENCE" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="AcknowledgeAlarmEvents">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/AcknowledgeAlarmEventsIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.MISSING_ID_LIST">
+				<soap12:fault name="Server.SCWS.MISSING_ID_LIST" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="GetAlarmEventTypes">
+			<soap12:operation soapAction="http://www.schneider-electric.com/common/dataexchange/2011/05/GetAlarmEventTypesIn" style="document"/>
+			<wsdl:input>
+				<soap12:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap12:body use="literal"/>
+			</wsdl:output>
+			<wsdl:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED">
+				<soap12:fault name="Server.SCWS.OPERATION_NOT_SUPPORTED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.PERMISSION_DENIED">
+				<soap12:fault name="Server.SCWS.PERMISSION_DENIED" use="literal"/>
+			</wsdl:fault>
+			<wsdl:fault name="Server.SCWS.TIMEOUT">
+				<soap12:fault name="Server.SCWS.TIMEOUT" use="literal"/>
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="DataExchangeService">
+		<wsdl:port name="DataExchange_BP11Endpoint" binding="tns:DataExchange_BP11Binding">
+			<soap12:address location="http://localhost:8082/DataExchange"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
