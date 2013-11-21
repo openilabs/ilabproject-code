@@ -102,6 +102,8 @@ build: ${BUILD_STAMP}
       <manifest>
         <attribute name="Application-Name" value="MIT NI-ELVIS Weblab Client" />
         <attribute name="Main-Class" value="weblab.client.graphicalUI.GraphicalApplet"/>
+ 	<attribute name="Codebase" value="*.mit.edu" />
+        <attribute name="Permissions" value="sandbox" />
        
       </manifest>
     </jar>
@@ -116,7 +118,7 @@ build: ${BUILD_STAMP}
 
 
 
-  <target name="signedjar" depends="jar" description="signs the jar with the key from a previously generated keystore">
+  <target name="sign" depends="jar" description="signs the jar with the key from a previously generated keystore">
     <signjar jar="${unsigned.jar.name}"
              signedjar="${signed.jar.name}"
              keystore="${keystore.location}"
@@ -141,15 +143,6 @@ build: ${BUILD_STAMP}
     </genkey>
   </target>
 
-  <!-- this is not currently used, and may not be correct anyway -->
-
-  <target name="sign" depends="jar" description="signs the jar with a pre-built keystore">
-    <signjar jar="${unsigned.jar.name}"
-      alias="${alias}"
-      storepass="${keystore.pwd}"
-      keystore="${keystore.loc}"
-      signedjar="${signed.jar.name}" />
-  </target>
 
 
 </project>

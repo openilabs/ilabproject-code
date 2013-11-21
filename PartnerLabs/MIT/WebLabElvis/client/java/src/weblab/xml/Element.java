@@ -76,10 +76,10 @@ public class Element
   public Enumeration getChildren(String name)
   {
     Vector r = new Vector();
-    Enumeration enum = children.elements();
-    while(enum.hasMoreElements())
+    Enumeration enumChildren = children.elements();
+    while(enumChildren.hasMoreElements())
     {
-      Element e = (Element) enum.nextElement();
+      Element e = (Element) enumChildren.nextElement();
       if (e.getName().equals(name))
       {
 	r.addElement(e);
@@ -96,10 +96,10 @@ public class Element
    */
   public Element getChild(String name)
   {
-    Enumeration enum = this.getChildren(name);
-    if (! enum.hasMoreElements())
+    Enumeration enumChildren = this.getChildren(name);
+    if (! enumChildren.hasMoreElements())
       return null;
-    return (Element) enum.nextElement();
+    return (Element) enumChildren.nextElement();
   }
 
 

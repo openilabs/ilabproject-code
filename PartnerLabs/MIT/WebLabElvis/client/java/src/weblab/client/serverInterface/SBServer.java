@@ -410,16 +410,16 @@ public class SBServer implements Server
       SOAPRequest request = new SOAPRequest(serviceNamespace,
 					    "ListAllClientItems");
 
-      Enumeration enum = request.invoke(serviceURL)
+      Enumeration enumSaved = request.invoke(serviceURL)
       							.getChild("ListAllClientItemsResponse")
       							.getChild("ListAllClientItemsResult")
       							.getChildren("string");
 
       Vector setups = new Vector();
 
-      while (enum.hasMoreElements())
+      while (enumSaved.hasMoreElements())
       {
-	String next = ((Element) enum.nextElement()).getData();
+	String next = ((Element) enumSaved.nextElement()).getData();
 	if (next.startsWith("savedSetup_"))
 	  setups.addElement(next.substring(11));
       }
