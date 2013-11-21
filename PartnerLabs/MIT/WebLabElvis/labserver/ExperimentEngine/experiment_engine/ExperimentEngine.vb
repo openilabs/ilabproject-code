@@ -319,7 +319,7 @@ Module ExperimentEngine
 
         Debug.WriteLine("begin parsing Exp Spec")
 
-        xmlExpSpec = New XmlDocument
+        xmlExpSpec = New XmlDocument()
         xmlExpSpec.LoadXml(strExpSpec)
 
         'loads terminal nodes 
