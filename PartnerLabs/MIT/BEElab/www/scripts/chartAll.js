@@ -13,6 +13,71 @@
       return chart1.series[seriesIndex].setData(newData, true);
     };
 
+    var copyArray = function (array, x) {
+      newArray = new Array();
+      for (var i = 0; i < x; i++){
+        newArray = newArray.concat(array);
+      }
+      return newArray;
+    }
+
+    var sunHours = 10;
+    var sld = null;
+    var sunChart = null;
+
+    sunData = new Array();
+     for (var i = 0; i < sunHours; i++) {
+        sunData.push(100);
+     }
+     for (var i = 0; i < 24-sunHours; i++) {
+        sunData.push(0);
+     }
+     sunData = copyArray(sunData, this.lab.length);
+
+    var shiftSunGraph = function (sliderValue, sliderObj) {
+        newData = new Array();
+        for (var i = 0; i < sliderValue; i++) {
+            newData.push(0);
+        }
+        for (var i = 0; i < sunHours; i++) {
+            newData.push(100);
+        }
+        for (var i = 0; i < 24-sunHours-sliderValue; i++) {
+            newData.push(0);
+        }
+        sunData = newData;
+        //this updates the chart with the new start position of the sun
+        //chart.series[0].update({data: sunData}, true);
+        for (var i=0; i < chart1.series.length; i++){
+          if (chart1.series[i].name === 'sunChart') {
+            chart1.series[i].setData(copyArray(newData, this.lab.lenght/24));
+          }
+        }
+        sunChart.series[0].setData(newData);
+        return null;
+     }
+     var generateInvisibleSeries = function () {
+      var invisSeries = new Array();
+      for (var i=0; i < this.lab.lenght) {
+        invisSeries.push(400);
+      }
+      return invisSeries;
+     }
+
+    $(function() {
+        $("#sun_hours_select").change(function () {
+            sunHours = parseInt($("#sun_hours_select").val());
+            shiftSunGraph(0, null);
+            sld.setMax(24-sunHours);
+        })
+    });
+
+     //initialize the slider.  may not want 1500px size, need to test and see.
+     sld = new dhtmlxSlider("sunslider-container", 1200, "arrow", false, 0, 24-sunHours, 0, 1);
+     sld.setImagePath("scripts/dhtmlxSlider/codebase/imgs/");
+     sld.attachEvent("onChange", shiftSunGraph);
+     sld.init();
+
     LoadProfile.prototype.addToCurrentLoad = function(xPosition) {
     	console.log("LoadProfile.prototype.addToCurrentLoad called");
       var currentLoad;
@@ -87,7 +152,7 @@
         yAxis: [{
           max: 500,
           title: {
-            text: 'Total Wattz'
+            text: 'Total Watts'
           },
           tickInterval: 100,
           showLastLabel: true,
@@ -169,6 +234,51 @@
           });
           
         }
+        // invisible series to raise sun series to top
+        _results.push({
+          name: 'invisibleSeries',
+          data: generateInvisibleSeries(),
+          cursor: null,
+          visible: false,
+          point: {
+            events: {
+              click: function(event) {
+                return null;
+              }
+            }
+          },
+          column: {
+            borderWidth: 2,
+            pointPadding: 0,
+            groupPadding: 0,
+            stacking: 'sunStack',
+            dataLabels: {
+              enabled: false
+            }
+          }
+        })
+        // sunchart series
+        _results.push({
+          name: 'sunchart',
+          data: copyArray(sunData, this.lab.lenght/24),
+          cursor: null,
+          point: {
+            events: {
+              click: function(event) {
+                return null;
+              }
+            }
+          },
+          column: {
+            borderWidth: 2,
+            pointPadding: 0,
+            groupPadding: 0,
+            stacking: 'sunStack',
+            dataLabels: {
+              enabled: false
+            }
+          }
+        })
         console.log("In for loop  after _results.push");
         return _results;
       }).call(this);
