@@ -27,7 +27,7 @@ using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.BatchTypes;
 
 /// <summary>
-/// The interface definition for an InteractiveLabServer. Currently only one method, 
+/// The interface definition for a Batch LabServer. Currently only one method, 
 /// additional methods will be added as needed.
 /// </summary>
 /// [System.Diagnostics.DebuggerStepThroughAttribute()]
