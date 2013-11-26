@@ -52,6 +52,31 @@ namespace iLabs.ServiceBroker.Authorization
             superuserID = Administration.AdministrativeAPI.GetUserID("superUser",0);
         }
 
+        
+
+        public static bool IsSuperuserGroup(int groupID)
+        {
+            return (superuserGroupID == groupID);
+        }
+
+        public static bool IsSuperuser(int userID)
+        {
+            return (superuserID == userID);
+        }
+
+        public bool IsSuperuserGroup()
+        {
+            int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
+            return IsSuperuserGroup(sessionGroupID);
+        }
+
+        public bool IsSuperuser()
+        {
+            int sessionUserID = Convert.ToInt32(Session["UserID"]);
+            return IsSuperuser(sessionUserID);
+        }
+
+
 		private void Page_Load(object sender, System.EventArgs e)
 		{
 			// Put user code to initialize the page here
@@ -88,18 +113,7 @@ namespace iLabs.ServiceBroker.Authorization
 			}
 		}
 
-        public bool IsSuperuserGroup()
-        {
-            int sessionGroupID = Convert.ToInt32(Session["GroupID"]);
-            return IsSuperuserGroup(sessionGroupID);
-        }
-
-        private bool IsSuperuserGroup(int groupID)
-        {
-            return (superuserGroupID == groupID);
-        }
-
-
+     
 
 
 
