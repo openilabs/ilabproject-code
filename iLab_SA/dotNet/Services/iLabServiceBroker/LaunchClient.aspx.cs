@@ -77,7 +77,7 @@ namespace iLabs.ServiceBroker.iLabSB
                         }
                         if (String.IsNullOrEmpty(ssChk) || passChk.CompareTo(authStr) != 0)
                         {
-                            buf.AppendLine("sskey Error");
+                            buf.AppendLine("ss_key Error");
                             processError(buf);
                         }
                         clientGuid = xDoc.Query("LaunchClient/clientGuid");

@@ -372,7 +372,11 @@ namespace iLabs.ServiceBroker.admin
                         //Logic for this is as follows - if user get email address, otherwise get email addresses of all users in a group (GetUserIDsRecursively call?)
                       
                         //if it has removed all the members
-                       
+                        if (AuthorizationWrapperClass.IsSuperuser(memberID) && AuthorizationWrapperClass.IsSuperuserGroup(parentID))
+                        {
+                            msg.Append("Warning: you may not remove the Superuser from the Superuser group!");
+                        }
+                        else{
                         status =AdministrativeAPI.RemoveUserFromGroup(memberID,parentID);
                         if (status)
                         {
@@ -382,6 +386,7 @@ namespace iLabs.ServiceBroker.admin
                            //     parentIDs.Add(parentID);
                             lblResponse.Visible = true;
                             msg.Append("'" + memberName + "' was successfully removed from '" + parentName + "'.<br />");
+                        }
                         }
                     }
                     catch (Exception removeEx)
@@ -393,10 +398,13 @@ namespace iLabs.ServiceBroker.admin
 
             foreach (int id in users)
             {
-                int[] parents = wrapper.ListGroupsForUserWrapper(id);
-                if ((parents == null) || (parents.Length == 0))
+                if (!AuthorizationWrapperClass.IsSuperuser(id))
                 {
-                   AdministrativeAPI.AddUserToGroup(id, InternalAdminDB.SelectGroupID(Group.ORPHANEDGROUP));
+                    int[] parents = wrapper.ListGroupsForUserWrapper(id);
+                    if ((parents == null) || (parents.Length == 0))
+                    {
+                        AdministrativeAPI.AddUserToGroup(id, InternalAdminDB.SelectGroupID(Group.ORPHANEDGROUP));
+                    }
                 }
             }
             return msg.ToString();
@@ -425,7 +433,8 @@ namespace iLabs.ServiceBroker.admin
                 bool isUser = (agentNode.ImageUrl.CompareTo(userImage) == 0);
                 //Now get the ID of the Parent group
                 TreeNode parentNode = (TreeNode)agentNode.Parent;
-                Group parentGroup = wrapper.GetGroupsWrapper(new int[] { Convert.ToInt32(parentNode.Value) })[0];
+                int parentGroupID = Convert.ToInt32(parentNode.Value);
+                Group parentGroup = wrapper.GetGroupsWrapper(new int[] { parentGroupID })[0];
 
                 foreach (TreeNode groupNode in groupNodes)
                 {
@@ -440,7 +449,8 @@ namespace iLabs.ServiceBroker.admin
                        || ( !isUser && agentID == destinationID)
                        || agentName.Equals(Group.NEWUSERGROUP)
                        || agentName.Equals(Group.ORPHANEDGROUP)
-                       || agentName.Equals(Group.SUPERUSER))
+                       || agentName.Equals(Group.SUPERUSER)
+                       || (isUser && AuthorizationWrapperClass.IsSuperuser(agentID)))
                     {
                         msg.Append("'ERROR: You may not copy/move " + agentName + "' to '" + destinationName + "'<br />");
                     }
