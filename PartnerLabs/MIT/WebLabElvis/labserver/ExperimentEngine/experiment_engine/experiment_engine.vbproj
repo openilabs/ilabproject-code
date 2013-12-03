@@ -32,7 +32,11 @@
     </UpgradeBackupLocation>
     <OldToolsVersion>0.0</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <ManifestCertificateThumbprint>77DB8F3C82187220C1CB4E7BA1D3974FDEFBF9F2</ManifestCertificateThumbprint>
+    <ManifestKeyFile>experiment_engine_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>true</GenerateManifests>
+    <SignManifests>true</SignManifests>
+    <PublishUrl>D:\devl\WebLabElvis\labserver\deploy\www\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -45,6 +49,7 @@
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -172,6 +177,9 @@
       <Project>{20AD5AA1-F7E9-4EDA-9C89-5F5F0E32B7DA}</Project>
       <Name>WebLabUtil</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="experiment_engine_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="My Project\" />
