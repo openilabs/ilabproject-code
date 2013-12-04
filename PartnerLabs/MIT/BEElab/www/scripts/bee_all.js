@@ -2,6 +2,9 @@
  var AtlantaData = [71.96, 71.06, 73.04, 71.96, 71.06, 71.06, 71.96, 73.04, 77, 80.96, 82.94, 86, 87.08, 77, 82.94, 73.94, 75.92, 84.02, 82.94, 80.96, 78.08, 75.92, 75.02, 75.02, 75.02, 73.04, 73.04, 71.96, 71.06, 69.98, 69.98, 73.04, 75.92, 78.98, 82.94, 84.92, 87.08, 86, 87.08, 82.94, 82.94, 82.94, 80.96, 78.98, 78.08, 73.94, 73.04, 71.96, 71.96, 69.08, 69.98, 66.92, 69.08, 66.92, 62.96, 66.02, 73.04, 75.92, 78.98, 80.06, 82.04, 84.02, 84.92, 87.08, 87.08, 87.08, 84.92, 84.02, 80.96, 77, 73.94, 73.04, 73.04, 71.06, 71.06, 68, 66.02, 66.92, 66.92, 71.06, 73.04, 77, 82.04, 84.02, 87.08, 84.92, 87.08, 89.96, 87.98, 87.98, 87.98, 84.92, 82.94, 78.08, 77, 73.94, 73.04, 71.96, 71.06, 69.08, 69.98, 69.08, 69.08, 69.98, 71.06, 75.92, 78.98, 82.94, 84.92, 87.98, 87.98, 84.92, 84.92, 77, 75.02, 80.06, 75.92, 73.04, 73.04, 73.04, 71.06, 71.06, 69.98, 71.06, 71.06, 69.98, 69.98, 71.06, 73.94, 77, 77, 77, 78.08, 80.06, 84.02, 84.92, 86, 86, 86, 84.02, 78.98, 75.92, 75.02, 71.06, 69.98, 69.98, 69.08, 69.08, 69.08, 69.08, 69.08, 69.98, 71.06, 71.96, 71.96, 73.04, 75.92, 77, 75.02, 75.92, 73.04, 75.92, 73.94, 73.94, 71.96, 71.96, 71.06, 69.98];
  var SeriesToBeDisplayed = [];
  var dummyProfile = [];
+
+ // THIS NEEDS TO BE CHANGED!!!!!
+ current_temperature = 70
  
  //this should eventually take in the number of hours from input.
 //var sunHours = 12;
@@ -241,6 +244,20 @@
 
 }).call(this);
 
+setUpTimeAlert = function (profile) {
+  if (profile === null || profile.length === 0) {
+    return
+  }
+  hours_it_takes = Math.abs(current_temperature-SeriesToBeDisplayed)/5
+  minutes_it_takes = Math.round((Math.abs(current_temperature-SeriesToBeDisplayed)/5.0 - hours_it_takes)*60)
+  if (minutes_it_takes === 0) {
+    alert("The current temperature is "+current_temperature+", so it will take approximately "+hours_it_takes+" hours to start the lab.");
+  }
+  else {
+    alert("The current temperature is "+current_temperature+", so it will take approximately "+hours_it_takes+" hours and "+minutes_it_takes+" minutes to start the lab.");
+  }
+}
+
 function drawGraphWithProfile(profileSelected) {
   
   console.log("_drawGraphWithProfile: is called");
@@ -260,15 +277,15 @@ function drawGraphWithProfile(profileSelected) {
   else{
     alert('Profile data is not set')
     SeriesToBeDisplayed = dummyProfile;
-  }	 
-  
+  }
+  setUpTimeAlert(SeriesToBeDisplayed);
   redrawChart();
 }
 
 
 function redrawChart() {
   
-  if (chart1.series.length < 7) {    
+  if (chart1.series.length < 7) {  
     chart1.addSeries({
         data: SeriesToBeDisplayed,
         name: 'Temperature',
