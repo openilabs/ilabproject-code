@@ -32,7 +32,7 @@
      for (var i = 0; i < 24-sunHours; i++) {
         sunData.push(0);
      }
-     sunData = copyArray(sunData, this.lab.length);
+     sunData = copyArray(sunData, this.lab.length/24);
 
     var shiftSunGraph = function (sliderValue, sliderObj) {
         newData = new Array();
@@ -45,21 +45,20 @@
         for (var i = 0; i < 24-sunHours-sliderValue; i++) {
             newData.push(0);
         }
-        sunData = newData;
+        sunData = copyArray(newData, this.lab.length/24);
         //this updates the chart with the new start position of the sun
         //chart.series[0].update({data: sunData}, true);
         for (var i=0; i < chart1.series.length; i++){
-          if (chart1.series[i].name === 'sunChart') {
-            chart1.series[i].setData(copyArray(newData, this.lab.lenght/24));
+          if (chart1.series[i].name === 'sunchart') {
+            chart1.series[i].setData(sunData);
           }
         }
-        sunChart.series[0].setData(newData);
         return null;
      }
      var generateInvisibleSeries = function () {
       var invisSeries = new Array();
-      for (var i=0; i < this.lab.lenght) {
-        invisSeries.push(400);
+      for (var i=0; i < this.lab.length, i++) {
+        invisSeries.push(402);
       }
       return invisSeries;
      }
@@ -85,8 +84,8 @@
       if (xPosition < 0) {
         xPosition = 0;
       }
-      if (xPosition >= this.lab.lenght) {
-        xPosition = this.lab.lenght - 1;
+      if (xPosition >= this.lab.length) {
+        xPosition = this.lab.length - 1;
       }
       currentLoad = BEE.activeLoad;
       if (currentLoad >= 0) {
@@ -121,6 +120,10 @@
         rangeSelector:{
     			enabled:false
 				},
+
+        legend: {
+          enabled: false
+        },
         
         title: {
           text: '  '
@@ -224,6 +227,59 @@
         _ref = this.lab.getSeries();
         
         _results = [];
+        // sunchart series
+        _results.push({
+            name: 'sunchart',
+            data: copyArray(sunData, this.lab.length/24),
+            cursor: null,
+            visible: true,
+            point: {
+              events: {
+                click: function(event) {
+                  return null;
+                }
+              }
+            },
+            column: {
+              showCheckBox: false,
+              showInLegend: false,
+              borderWidth: 2,
+              pointPadding: 0,
+              groupPadding: 0,
+              stacking: 'sunStack',
+              dataLabels: {
+                enabled: false
+              }
+            }
+          });
+
+        // invisible series to raise sun series to top
+        _results.push({
+            name: 'invisibleSeries',
+            color: 'rgba(0,0,0,0)',
+            data: generateInvisibleSeries(),
+            cursor: null,
+            point: {
+              events: {
+                click: function(event) {
+                  return null;
+                }
+              }
+            },
+            column: {
+              showCheckBox: false,
+              showInLegend: false,
+              borderWidth: -1,
+              borderColor: 'rgba(0,0,0,0)',
+              pointPadding: -1,
+              groupPadding: 0,
+              stacking: 'sunStack',
+              dataLabels: {
+                enabled: false
+              }
+            }
+          });
+
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           serie = _ref[_i];
           _results.push({
@@ -231,54 +287,9 @@
             data: this.lab.getSerieValues({
               'name': serie
             })
-          });
-          
+          }); 
         }
-        // invisible series to raise sun series to top
-        _results.push({
-          name: 'invisibleSeries',
-          data: generateInvisibleSeries(),
-          cursor: null,
-          visible: false,
-          point: {
-            events: {
-              click: function(event) {
-                return null;
-              }
-            }
-          },
-          column: {
-            borderWidth: 2,
-            pointPadding: 0,
-            groupPadding: 0,
-            stacking: 'sunStack',
-            dataLabels: {
-              enabled: false
-            }
-          }
-        })
-        // sunchart series
-        _results.push({
-          name: 'sunchart',
-          data: copyArray(sunData, this.lab.lenght/24),
-          cursor: null,
-          point: {
-            events: {
-              click: function(event) {
-                return null;
-              }
-            }
-          },
-          column: {
-            borderWidth: 2,
-            pointPadding: 0,
-            groupPadding: 0,
-            stacking: 'sunStack',
-            dataLabels: {
-              enabled: false
-            }
-          }
-        })
+        
         console.log("In for loop  after _results.push");
         return _results;
       }).call(this);
