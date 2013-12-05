@@ -15,9 +15,9 @@
   <property name="signed.jar.name" value="${dist.dir}/signed_ELVIS-client.jar" />
 
   <!-- SIGNING JAR -->
-  <property name="keystore.loc" location=".keystore" />
+  <property name="keystore.location" location=".keystore" />
   <property name="keystore.pwd" value="changeme" />
-  <property name="alias" value="weblab" />
+  <property name="keystore.alias" value="weblab" />
 
   <!-- debug mode defaults to false -->
   <property name="weblab-debug" value="false" />
@@ -100,11 +100,12 @@ build: ${BUILD_STAMP}
       <fileset dir="." includes="img/*.gif" />
       <fileset dir="." includes="build-version.txt" />
       <manifest>
+ 	<attribute name="Specification-Vendor" value="Massachusetts Institute of Technology"/>
+ 	<attribute name="Implementation-Vendor" value="Center for Educational Initiatives"/>
         <attribute name="Application-Name" value="MIT NI-ELVIS Weblab Client" />
         <attribute name="Main-Class" value="weblab.client.graphicalUI.GraphicalApplet"/>
  	<attribute name="Codebase" value="*.mit.edu" />
-        <attribute name="Permissions" value="sandbox" />
-       
+        <attribute name="Trusted-Library" value="true" />
       </manifest>
     </jar>
   </target>
@@ -118,7 +119,7 @@ build: ${BUILD_STAMP}
 
 
 
-  <target name="sign" depends="jar" description="signs the jar with the key from a previously generated keystore">
+  <target name="sign" depends="clean, jar" description="signs the jar with the key from a previously generated keystore">
     <signjar jar="${unsigned.jar.name}"
              signedjar="${signed.jar.name}"
              keystore="${keystore.location}"
