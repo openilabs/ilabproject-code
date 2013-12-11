@@ -1,0 +1,167 @@
+'CR1000 Series Datalogger
+'program author: MIT CECI - NHI
+
+'Dependencies: 
+'   experimentLength => Int for the total hours the experiment will run
+'   profile => String with the profile
+'   totalLoads => The total loads that we will control. Up to 16.
+'   timeUnit => The time unit we'll use. 60 for seconds (change every minute). 1 for minutes (change every hour).
+'   sampleRate => The number of SECONDS of between each scan.
+
+
+Const ExperimentLength = 24
+Const TotalLoads = 4
+Const SampleEverySecs = 30
+Const InString = "120,0,2,3,6,6,6"
+Const SunString = "1,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+
+' If each block on the profile graph represents an HOUR, use 60
+' If each block on the profile grap represents a MINUTE, use 1
+'
+' This is the number of seconds that each unit block represents. So, if I get 60 on the
+' profile and I need that to represent an hour. I need to multiply it by 60.
+'Const TimeUnitRate = ${timeUnit}$
+Const TimeUnitRate = 60
+
+Const ipause = 2000
+Const pulseLength =2000
+
+Public timeInBlockInSeconds as Float
+Public totalTimeBlockCount As Long
+
+'Public Channels(${TotalLoads}$)
+Public Channels(4)
+Public Source(16)
+Public InputLoads(ExperimentLength * (TotalLoads + 1))
+Public sunLoads(ExperimentLength + 1)
+Public group ' The block I'm currently processing
+Public StartGroupIndex ' Where does this block start in the InputLoads array
+Public intervalTimeInSeconds As Long ' How long should I stay on this block
+Public i, channel ' For loops vars
+
+Sub setUpLoads
+  SplitStr (sunLoads, SunString,"",ExperimentLength, 0)
+  SplitStr (InputLoads(1),InString,",",(1 + TotalLoads) * ExperimentLength,0)
+  For i = 1 To ExperimentLength * (TotalLoads + 1)
+    If FIX(InputLoads(i)) = NAN
+      If (i MOD (TotalLoads + 1)) = 1
+        InputLoads(i) = 60
+      Else
+        InputLoads(i) = 0
+      EndIf
+    Endif
+  Next
+EndSub
+
+'Subroutine turn all the loads off
+Sub turnLoadsOff (Source(16))
+  For i = 1 To 16
+    Source(i) = 0
+  Next
+  SDMCD16AC (Source,1,0) ' Send loads
+EndSub
+
+' Map from index to channel number
+Sub setUpChannels
+  Channels(1) = 1
+  Channels(2) = 3
+  Channels(3) = 5
+  Channels(4) = 11
+EndSub
+
+' For each channel that we are using, setup the `source(channel)` value to send it
+' to the switch and turn the channel on/off.
+'
+' Remember that the profile has the DURATION on the first position. So a profile like
+' 120 1 0 0 0 means that for 120 units of time the first load will be on.
+'
+' To change the units of time, change the `TimeMeasurement` constant.
+Sub sendLoads
+  For channel = 1 To TotalLoads
+    Source( Channels(channel) ) = InputLoads(StartGroupIndex + channel)
+  Next
+  Source(16 ) = 1 ' SunLamp Channel always on
+  SDMCD16AC (Source,1,0) ' Send loads
+EndSub
+
+Sub configSunLamp
+PortsConfig (&B11000000,&B11000000)
+WriteIO (&B11000000,&B01000000)
+EndSub
+
+Sub setSunLamp( idx As Long)
+  If sunLoads(idx)
+    Call turnOnSunLamp
+  Else
+     Call turnOffSunLamp
+  EndIf 
+EndSub
+
+' Toggle Digital port 7 for 50 milliseconds
+Sub turnOffSunLamp
+  PulsePort (7 ,pulseLength) ' StopLamp
+EndSub
+
+' Toggle Digital port 8 for 50 milliseconds
+Sub turnOnSunLamp
+   PulsePort (8 ,pulseLength) ' StartLamp
+EndSub
+
+' Not sure if this the right way of doing this but could not
+' find another function. See Const iport
+Sub PauseMS 
+   Scan(ipause, 1, 1, 1)
+   NextScan
+EndSub
+  
+'Main Program
+BeginProg
+  Call setUpChannels
+  Call configSunLamp
+  Call setUpLoads  'We do not need RS232 connection anymore :D!
+  Call turnLoadsOff(Source)
+  StartGroupIndex = 1
+  totalTimeBlockCount = 0
+  timeInBlockInSeconds = -SampleEverySecs ' Start on negative so the first time on the loop will get to 0
+  group = 0 ' The next index we will look for
+  Call sendLoads
+  Call PauseMS ' Pause for 500 milliseconds to let light power suply settle
+  Call  turnOffSunLamp
+   Call PauseMS
+  Call turnOffSunLamp
+   Call PauseMS
+  Call turnOffSunLamp
+   Call PauseMS
+  Call turnOffSunLamp
+
+  intervalTimeInSeconds = InputLoads(1) * TimeUnitRate
+
+  Scan(SampleEverySecs, Sec, 1, 0)
+	  totalTimeBlockCount = totalTimeBlockCount + 1
+    timeInBlockInSeconds  = timeInBlockInSeconds + SampleEverySecs
+    intervalTimeInSeconds = InputLoads(StartGroupIndex) * TimeUnitRate
+    
+	  'Call setSunLamp(totalTimeBlockCount)
+	
+    If timeInBlockInSeconds >= intervalTimeInSeconds
+      group = group + 1
+
+      If group >= ExperimentLength
+        ExitScan
+      EndIf
+
+      ' The first index of the group. Remember that each group will have totalLoads + 1
+      ' elements in it  (the time that group is active). This "time" value is the first
+      ' value of the group.
+      StartGroupIndex = group * (TotalLoads + 1) + 1
+      intervalTimeInSeconds = InputLoads(StartGroupIndex) * TimeUnitRate
+
+      Call sendLoads
+      timeInBlockInSeconds = 0 'I just changed the lights. New block comming up.
+     EndIf
+  NextScan
+  
+  Call turnOffSunLamp
+  Call PauseMS
+  Call turnLoadsOff(Source)
+EndProg
