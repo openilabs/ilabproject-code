@@ -109,13 +109,79 @@ namespace iLabs.ServiceBroker.iLabSB
 						lblResponse.Text = Utilities.FormatErrorMessage("Please use the user name AND email you were registered with.");
 						lblResponse.Visible = true;
 					}
+                    else if (lostPassUser.lockAccount)
+                    {
+                        // email does not match email record in our database
+                        lblResponse.Text = Utilities.FormatErrorMessage("The user account is locked out! Please send a help message to resolve this issue.");
+                        lblResponse.Visible = true;
+                    }
+                    else if (lostPassUser.userName.ToLower().CompareTo("superuser") ==0)
+                    {
+                        // email does not match email record in our database
+                        lblResponse.Text = Utilities.FormatErrorMessage("Password reset is not supported for this user. Please use the help system to contact a system administrator.");
+                        lblResponse.Visible = true;
+
+                        MailMessage mail = new MailMessage();
+                        mail.From = registrationMailAddress;
+                        // bugReportMailAddress
+                        mail.To = ConfigurationManager.AppSettings["bugReportMailAddress"]; ;
+
+                        mail.Subject = "[iLab] Attempt to reset password failed";
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine("An attempt was made to change the password for the following user!\n\r");
+                        sb.AppendLine("Username: " + lostPassUser.userName);
+                        sb.AppendLine("Email:  " + lostPassUser.email);
+                        sb.Append("Site URL: " + ProcessAgentDB.ServiceAgent.codeBaseUrl + "\n\r");
+                        sb.Append("Site GUID: " + ProcessAgentDB.ServiceAgent.agentGuid + "\n\r");
+                        sb.Append("\n\r\n\r");
+                        sb.Append("Additional Information:\n\r");
+                        sb.Append("User Host Name: " + Request.UserHostName + "\n\r");
+                        sb.Append("User Host Address: " + Request.UserHostAddress + "\n\r");
+                        sb.Append("User Browser: " + Request.Browser.Type + "\n\r");
+                        sb.Append("User Browser Agent: " + Request.UserAgent + "\n\r");
+                        sb.Append("User Platform: " + Request.Browser.Platform + "\n\r");
+                        sb.Append("URL used to access page: " + Request.Url + "\n\r");
+                        sb.Append("URL Referrer: " + Request.UrlReferrer + "\n\r");
+                        sb.Append("Machine Name: " + Server.MachineName + "\n\r");
+                        sb.Append("Server Type: " + Server.GetType() + "\n\r");
+                        sb.Append("iLab Release: " + iLabGlobal.Release + "\n\r");
+                        mail.Body = sb.ToString();
+
+                        SmtpMail.SmtpServer = "127.0.0.1";
+                        try
+                        {
+                            SmtpMail.Send(mail);
+
+                            // email sent message
+                            lblResponse.Text = Utilities.FormatConfirmationMessage("Your request has been submitted. A new password has been created and emailed to the email address you entered below.");
+                            lblResponse.Visible = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            // trouble sending request for password
+                            // Report detailed SMTP Errors
+                            string smtpErrorMsg;
+                            smtpErrorMsg = "Exception: " + ex.Message;
+                            //check the InnerException
+                            if (ex.InnerException != null)
+                                smtpErrorMsg += "<br>Inner Exceptions:";
+                            while (ex.InnerException != null)
+                            {
+                                smtpErrorMsg += "<br>" + ex.InnerException.Message;
+                                ex = ex.InnerException;
+                            }
+
+                            lblResponse.Text = Utilities.FormatErrorMessage("Trouble sending email. Your request could not be submitted - please inform an administrator.<br>" + smtpErrorMsg);
+                            lblResponse.Visible = true;
+                        }
+                    }
                     else // send password to requestor's email address
 					{
 						MailMessage mail = new MailMessage();
 						mail.From = registrationMailAddress;
                         mail.To = lostPassUser.email;
                        
-						mail.Subject = "[iLabs] Service Broker Password Reminder" ;
+						mail.Subject = "[iLabs] Service Broker Password Reset" ;
                         StringBuilder buf = new StringBuilder();
                         buf.AppendLine("Username: " + userName);
 						buf.AppendLine("Email:  " + email);
