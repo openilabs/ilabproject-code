@@ -22,7 +22,7 @@ namespace iLabs.LabServer.Interactive
     /// <summary>
     /// Summary description for LabTaskFactory
     /// </summary>
-    public class LabTaskFactory
+    public class LabTaskFactory : I_TaskFactory
     {
         public LabTaskFactory()
         {
@@ -142,13 +142,14 @@ namespace iLabs.LabServer.Interactive
             Logger.WriteLine("Experiment: " + experimentID + " Start: " + DateUtil.ToUtcString(startTime) + " \tduration: " + duration);
             long statusSpan = DateUtil.SecondsRemaining(startTime, duration);
             //launchClient(experimentID, essService, appInfo);
-            string taskData = null;
-            taskData = LabTask.constructTaskXml(appInfo.appID, fullName, appInfo.rev, statusName, essService);
+           
 
             // Create  & store the labTask in database and return an LabTask object;
             labTask = dbManager.InsertTask(appInfo.appID, experimentID,
                         groupName, startTime, duration, LabTask.eStatus.Scheduled,
-                        expTicket.couponId, expTicket.issuerGuid, essService, taskData);
+                        expTicket.couponId, expTicket.issuerGuid, essService,null);
+            labTask.data = labTask.constructTaskXml(appInfo.appID, fullName, appInfo.rev, statusName, essService);
+            dbManager.SetTaskData(labTask.taskID, labTask.data);
             return labTask;
         }
      

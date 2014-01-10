@@ -711,6 +711,50 @@ namespace iLabs.LabServer.Interactive
             return task;
 		}
 
+        public long InsertTaskLong(LabTask task)
+        {
+         
+
+            DbConnection connection = FactoryDB.GetConnection();
+            DbCommand cmd = FactoryDB.CreateCommand("InsertTask", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // populate parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@appid", task.labAppID, DbType.Int32));
+            if (task.experimentID < 1)
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@expid", null, DbType.Int64));
+            else
+                cmd.Parameters.Add(FactoryDB.CreateParameter("@expid", task.experimentID, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@groupName", task.groupName, DbType.String, 256));
+            // This must be in UTC
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", task.startTime, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", task.endTime, DbType.DateTime));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@status", task.Status, DbType.Int32));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@couponID", task.couponID, DbType.Int64));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@issuerGUID", task.issuerGUID, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@storage", task.storage, DbType.String, 512));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@data", task.data, DbType.AnsiString, 2048));
+
+            // id of created task
+            long itemID = -1;
+
+            try
+            {
+                connection.Open();
+                itemID = Convert.ToInt64(cmd.ExecuteScalar());
+            }
+            catch (DbException e)
+            {
+                writeEx(e);
+                throw e;
+            }
+            finally
+            {
+                connection.Close();
+            }
+            return itemID;
+        }
+
         public int UpdateTask(long taskID, int app_id, long exp_id, string groupName, DateTime startTime, long duration, LabTask.eStatus status,
             long coupon_ID, string issuerGuidStr, string storage, string data)
         {
