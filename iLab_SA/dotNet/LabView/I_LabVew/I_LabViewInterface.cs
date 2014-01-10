@@ -26,6 +26,7 @@ namespace iLabs.LabView
     /// </summary>
     public interface I_LabViewInterface
     {
+     
         /// <summary>
         /// Sends messages to the status and remaining time fields of the named VI, 
         /// it must be in memory and publish the controls as connectors.
@@ -75,7 +76,9 @@ namespace iLabs.LabView
         /// </summary>
         /// <param name="viName">Library:viName.vi format or just the viName.vi format.</param>
         /// <returns>-10 on error, -1 not in memory, or executionState</returns>
-        int GetVIStatus(String viName);
+        LabViewTypes.eExecState GetVIStatus(String viName);
+
+        LabViewTypes.eFPState GetFPStatus(String viName);
 
         /// <summary>
         /// 
@@ -106,15 +109,18 @@ namespace iLabs.LabView
         /// <param name="viName"></param>
         /// <returns>The in memeory name, may include 'Library:' if LabView 8.0 or greater.</returns>
         string LoadVI(string path, string viName);
-        /*
+        
         /// <summary>
         /// Loads the specified VI and opens the front panel, if the 
         /// panel is already in memory it is not reloaded.
         /// </summary>
-        /// <param name="viName"></param>
-        /// <returns></returns>
-        int LoadVI(string viName);
-        */
+        /// <param name="viName">The qualifiedName</param>
+        /// <returns>the qualifiedName or null if not found</returns>
+        string LoadVI(string viName);
+        
+
+        int OpenFrontPanel(string viName, bool activate, LabViewTypes.eFPState state);
+
         /// <summary>
         /// Attempt to reset all default values.
         /// </summary>
@@ -133,6 +139,12 @@ namespace iLabs.LabView
         /// </summary>
         /// <param name="viName">Library:viName.vi format or just the viName.vi format.</param>
         int RunVI(string viName);
+
+        object GetControlValue(string viName, string controlName);
+
+        int SetControlValue(string viName, string controlName, object value);
+
+        int SetControlValues(string viName, string[] controlNames, object[] values);
 
         /// <summary>
         /// Stops the running of the VI by trying to set the value of an internal contol 

@@ -145,6 +145,24 @@ namespace iLabs.LabView.LV82
             return message.ToString();
         }
 
+    
+       
+
+        //TODO: Fix missing Interface method
+        public int OpenFrontPanel(string viName, bool activate, LabViewTypes.eFPState state)
+        {
+            int status = -1;
+            VirtualInstrument vi = GetVI(viName);
+            if (vi != null)
+            {
+                vi.OpenFrontPanel(activate, (FPStateEnum)(int)state);
+                status = (int) vi.FPState;
+            }
+            return 0;
+        }
+
+     
+
         protected string stripName(string name)
         {
             string viname = null;
@@ -202,7 +220,7 @@ namespace iLabs.LabView.LV82
             return qName;
         }
 
-        public virtual int GetVIStatus(String viName)
+        public virtual LabViewTypes.eExecState GetVIStatus(String viName)
         {
             int status = -10;
             if (IsLoaded(viName))
@@ -210,14 +228,15 @@ namespace iLabs.LabView.LV82
                 VirtualInstrument vi = GetVI(viName);
                 status = (int)GetVIStatus(vi);
                 vi = null;
+                
             }
             else
             {
                 status = -1;
             }
-            return status;
+            return (LabViewTypes.eExecState)status;
         }
-        public int GetVIStatus(VirtualInstrument vi)
+        public LabViewTypes.eExecState GetVIStatus(VirtualInstrument vi)
         {
             // Not loaded == -1
             int status = -1;
@@ -227,18 +246,36 @@ namespace iLabs.LabView.LV82
                 ExecStateEnum state = vi.ExecState;
                 status = (int)state;
             }
-            return status;
+            return (LabViewTypes.eExecState)status;
         }
 
-        public int GetFPState(VirtualInstrument vi)
+        public virtual LabViewTypes.eFPState GetFPStatus(String viName)
+        {
+            int status = -1;
+            if (IsLoaded(viName))
+            {
+                VirtualInstrument vi = GetVI(viName);
+                status = (int)GetFPState(vi);
+                vi = null;
+
+            }
+            else
+            {
+                status = -1;
+            }
+            return (LabViewTypes.eFPState)status;
+        }
+
+        public LabViewTypes.eFPState GetFPState(VirtualInstrument vi)
         {
             int status = -1;
             if (vi != null)
             {
+                
                 FPStateEnum state = vi.FPState;
                 status = (int)state;
             }
-            return status;
+            return (LabViewTypes.eFPState)status;
         }
 
 
@@ -335,6 +372,13 @@ namespace iLabs.LabView.LV82
             return status;
         }
 
+        public object GetControlValue(string viName, string controlName)
+        { 
+            VirtualInstrument vi = null;
+            vi = GetVI(viName);
+            return  GetControlValue(vi, controlName);
+        }
+
         public object GetControlValue(VirtualInstrument vi, string name)
         {
             object value = null;
@@ -354,6 +398,16 @@ namespace iLabs.LabView.LV82
             }
             return value;
         }
+
+
+        //TODO: Fix missing Interface method
+        public int SetControlValue(string viName, string controlName, object value)
+        {
+            VirtualInstrument vi = null;
+            vi = GetVI(viName);
+            return SetControlValue(vi, controlName, value);
+        }
+
         public int SetControlValue(VirtualInstrument vi, string name, object value)
         {
             int status = -1;
@@ -382,6 +436,14 @@ namespace iLabs.LabView.LV82
             }
             return status;
         }
+
+
+        //TODO: Fix missing Interface method
+        public int SetControlValues(string viName, string[] controlNames, object[] values)
+        {
+            return 0;
+        }
+
 
         public int SetControlValues(VirtualInstrument vi, string[] names, object[] values)
         {
@@ -720,6 +782,12 @@ namespace iLabs.LabView.LV82
         public string LoadVI(string path, string name)
         {
             VirtualInstrument vi = loadVI(path, name);
+            return qualifiedName(vi);
+        }
+
+        public string LoadVI( string name)
+        {
+            VirtualInstrument vi = loadVI(null, name);
             return qualifiedName(vi);
         }
 
@@ -1188,7 +1256,53 @@ namespace iLabs.LabView.LV82
             return vi;
         }
 
+        public LabViewTypes.eExecState ToExecState(ExecStateEnum state)
+        {
+            LabViewTypes.eExecState value = LabViewTypes.eExecState.eBad;
+            switch (state)
+            {
+                case ExecStateEnum.eBad:
+                    value = LabViewTypes.eExecState.eBad;
+                    break;
+                case ExecStateEnum.eIdle:
+                    value = LabViewTypes.eExecState.eIdle;
+                    break;
+                case ExecStateEnum.eRunning:
+                    value = LabViewTypes.eExecState.eRunning;
+                    break;
+                case ExecStateEnum.eRunTopLevel:
+                    value = LabViewTypes.eExecState.eRunningTopLevel;
+                    break;
+            }
+            return value;
+        }
 
+        public LabViewTypes.eFPState ToFPState(FPStateEnum state)
+        {
+            LabViewTypes.eFPState value = LabViewTypes.eFPState.eInvalid;
+            switch (state)
+            {
+                case FPStateEnum.eClosed:
+                    value = LabViewTypes.eFPState.eClosed;
+                    break;
+                case FPStateEnum.eHidden:
+                    value = LabViewTypes.eFPState.eHidden;
+                    break;
+                case FPStateEnum.eInvalidFPState:
+                    value = LabViewTypes.eFPState.eInvalid;
+                    break;
+                case FPStateEnum.eMaximized:
+                    value = LabViewTypes.eFPState.eMaximized;
+                    break;
+                case FPStateEnum.eMinimized:
+                    value = LabViewTypes.eFPState.eMinimized;
+                    break;
+                case FPStateEnum.eVisible:
+                    value = LabViewTypes.eFPState.eVisible;
+                    break;
+            }
+            return value;
+        }
 
 
         /****************************************************************

@@ -28,19 +28,42 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Interop.CWDataServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Interop.CWDataServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.CWDSLib, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\Interop.CWDSLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="I_LabViewInterface.cs" />
     <Compile Include="LabViewInterface_W.cs" />
+    <Compile Include="LabViewTypes.cs" />
+    <Compile Include="LVDataSocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\DataTypes\iLabsDataTypes.csproj">
+      <Project>{ADDE40F3-E299-400B-A842-15ACD58BBF19}</Project>
+      <Name>iLabsDataTypes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\InteractiveLabServerLibrary\InteractiveLabServerLibrary.csproj">
+      <Project>{482C3D3E-9596-4AB0-BD61-E3E427995AC4}</Project>
+      <Name>InteractiveLabServerLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\UtilLibrary\UtilLibrary.csproj">
       <Project>{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}</Project>
       <Name>UtilLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\ExperimentStorageProxy\ExperimentStorageProxy.csproj">
+      <Project>{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}</Project>
+      <Name>ExperimentStorageProxy</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

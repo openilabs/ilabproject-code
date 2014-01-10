@@ -39,6 +39,61 @@ namespace iLabs.LabView
         protected string appDir = null;
         protected string viPath = @"\user.lib\iLabs";
 
+        /// <summary>
+        /// The path to the location of the iLab User.lib VI's
+        /// Default is \user.lib\iLabs
+        /// </summary>
+        public string iLabViPath
+        {
+            get
+            {
+                return viPath;
+            }
+            set
+            {
+                viPath = value;
+            }
+        }
+
+        /// <summary>
+        /// The base URL for the LabVIEWapplication server, includes a trailing '/'.
+        /// Default is http://localhost:8080/Ilab_WebService/
+        /// </summary>
+        public string UrlBase
+        {
+            get
+            {
+                return url_base;
+            }
+            set
+            {
+                url_base = value;
+            }
+        }
+        //TODO: Fix missing Interface method
+        public object GetControlValue(string viName, string controlName)
+        {
+            return null;
+        }
+
+        //TODO: Fix missing Interface method
+        public int SetControlValue(string viName, string controlName, object value)
+        {
+            return 0;
+        }
+        
+        //TODO: Fix missing Interface method
+        public int SetControlValues(string viName, string[] controlNames, object[] values)
+        {
+            return 0;
+        }
+
+        //TODO: Fix missing Interface method
+        public int OpenFrontPanel(string viName, bool activate, LabViewTypes.eFPState state)
+        {
+            return 0;
+        }
+
         public void DisplayStatus(string viName, string message, string time)
         {
             viName = StripName(viName);
@@ -138,8 +193,13 @@ namespace iLabs.LabView
             string response = GetXML(output, "status");
             return response.Contains("true");
         }
+        //TODO: Fix missing Interface method
+        public LabViewTypes.eFPState GetFPStatus(string viName)
+        {
+            return LabViewTypes.eFPState.eInvalid;
+        }
 
-        public int GetVIStatus(string viName)
+        public LabViewTypes.eExecState GetVIStatus(string viName)
         {
             viName = StripName(viName);
             if (IsLoaded(viName))
@@ -147,16 +207,19 @@ namespace iLabs.LabView
                 string response = GetSubmitAction("statusvi", viName, "status");
                 try
                 {
-                    return System.Convert.ToInt32(response);
+                    int value = System.Convert.ToInt32(response);
+                    return (LabViewTypes.eExecState)value;
+                    //LabViewTypes.eExecState status = LabViewTypes.eExecState.eUndefined;
+                    //switch
                 }
                 catch (Exception e)
                 {
-                    return -10;
+                    return LabViewTypes.eExecState.eUndefined;
                 }
             }
             else
             {
-                return -1;
+                return LabViewTypes.eExecState.eNotInMemory;
             }
         }
 
@@ -211,6 +274,14 @@ namespace iLabs.LabView
         }
 
         public string LoadVI(string viPath, string viName)
+        {
+            if (IsLoaded(viName))
+                return viName;
+            string output = GetSubmitAction("loadvi", viName, "vi_name");
+            return output;
+        }
+
+        public string LoadVI(string viName)
         {
             if (IsLoaded(viName))
                 return viName;
