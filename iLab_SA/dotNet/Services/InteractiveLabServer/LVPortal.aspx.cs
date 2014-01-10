@@ -69,7 +69,7 @@ namespace iLabs.LabServer.LabView
             // issuer and store in database.
             //This ticket should include group, experiment id and be valid for this moment in time??
             Ticket expTicket = dbManager.RetrieveAndVerify(expCoupon, TicketTypes.EXECUTE_EXPERIMENT);
-
+            
             if (expTicket != null)
             {
                 if (expTicket.IsExpired())
@@ -107,8 +107,8 @@ namespace iLabs.LabServer.LabView
                 }
 
                 // Use taskFactory to create a new task, return an existing reentrant task or null if there is an error
-                LabViewTaskFactory factory = new LabViewTaskFactory();
-                task = factory.CreateLabTask(appInfo, expCoupon, expTicket);
+                //LabViewFactory factory = new LabViewFactory();
+                task = LabViewFactory.CreateLabTask(appInfo, expCoupon, expTicket);
 
                 if (task != null)
                 {
@@ -120,7 +120,7 @@ namespace iLabs.LabServer.LabView
 
                     //Construct the information to be passed to the target page
                     TimeSpan taskDur = task.endTime - task.startTime;
-                    string vipayload = LabTask.constructSessionPayload(appInfo,
+                    string vipayload = task.constructSessionPayload(appInfo,
                         task.startTime, taskDur.Ticks / TimeSpan.TicksPerSecond, task.taskID,
                         returnTarget, null, null);
 

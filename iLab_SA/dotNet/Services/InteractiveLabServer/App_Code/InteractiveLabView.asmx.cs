@@ -95,7 +95,7 @@ namespace iLabs.LabServer.LabView
         SoapDocumentMethod(Binding = "LabViewLS")]
         public string SubmitCommand(string actionStr, string dataStr)
         {
-            return LabViewTaskFactory.GetLabViewInterface().SubmitAction(actionStr, dataStr);
+            return LabViewFactory.GetLabViewInterface().SubmitAction(actionStr, dataStr);
         }
         /*
                 /// <summary>
@@ -119,7 +119,7 @@ namespace iLabs.LabServer.LabView
         SoapDocumentMethod(Binding = "LabViewLS")]
         public string GetLabViewStatus()
         {
-            return LabViewTaskFactory.GetLabViewInterface().GetViServerStatus();
+            return LabViewFactory.GetLabViewInterface().GetViServerStatus();
 
         }
 
@@ -167,7 +167,7 @@ namespace iLabs.LabServer.LabView
 SoapDocumentMethod(Binding = "LabViewLS")]
         public int GetLockState(string viName)
         {
-            I_LabViewInterface lvi = LabViewTaskFactory.GetLabViewInterface();
+            I_LabViewInterface lvi = LabViewFactory.GetLabViewInterface();
             return lvi.GetLockState(viName);
 
         }
@@ -176,7 +176,7 @@ SoapDocumentMethod(Binding = "LabViewLS")]
       SoapDocumentMethod(Binding = "LabViewLS")]
         public int SetLockState(string viName, bool state)
         {
-            I_LabViewInterface lvi = LabViewTaskFactory.GetLabViewInterface();
+            I_LabViewInterface lvi = LabViewFactory.GetLabViewInterface();
             return lvi.SetLockState(viName, state);
 
         }
