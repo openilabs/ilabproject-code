@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="I_LabViewInterface.cs" />
-    <Compile Include="LabViewFactory.cs" />
     <Compile Include="LabViewInterface_W.cs" />
     <Compile Include="LabViewTask.cs" />
     <Compile Include="LabViewTypes.cs" />
