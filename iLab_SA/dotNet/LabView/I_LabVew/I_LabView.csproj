@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="I_LabViewInterface.cs" />
     <Compile Include="LabViewInterface_W.cs" />
+    <Compile Include="LabViewTask.cs" />
     <Compile Include="LabViewTypes.cs" />
     <Compile Include="LVDataSocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

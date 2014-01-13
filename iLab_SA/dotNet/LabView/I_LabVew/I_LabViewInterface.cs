@@ -26,7 +26,10 @@ namespace iLabs.LabView
     /// </summary>
     public interface I_LabViewInterface
     {
-     
+
+        public LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
+
+
         /// <summary>
         /// Sends messages to the status and remaining time fields of the named VI, 
         /// it must be in memory and publish the controls as connectors.
