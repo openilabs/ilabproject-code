@@ -93,7 +93,11 @@ namespace iLabs.LabServer.LabView
             {
                 task.experimentID = Convert.ToInt64(expIDstr);
             }
-
+            if ((groupName != null) && (groupName.Length > 0))
+            {
+                task.groupName = groupName;
+            }
+           
 
             if (appInfo.extraInfo != null && appInfo.extraInfo.Length > 0)
             {
@@ -129,7 +133,8 @@ namespace iLabs.LabServer.LabView
             }
             if (!lvi.IsLoaded(appInfo.application))
             {
-                viStr = lvi.LoadVI(appInfo.path, appInfo.application);
+                // Use the full path as the Load argument 
+                viStr = lvi.LoadVI(appInfo.path + appInfo.application);
                 if (false) // Check for controls first
                 {
                     string[] names = new string[4];
@@ -153,7 +158,7 @@ namespace iLabs.LabServer.LabView
             if (viStr == null)
             {
                 status = LabViewTypes.eExecState.eNotInMemory;
-                string err = "Unable to Find: " + appInfo.path + @"\" + appInfo.application;
+                string err = "Unable to Load: " + appInfo.path + @"\" + appInfo.application;
                 Logger.WriteLine(err);
                 throw new Exception(err);
             }
