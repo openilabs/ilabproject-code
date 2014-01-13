@@ -15,11 +15,16 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
+using iLabs.DataTypes;
+using iLabs.DataTypes.ProcessAgentTypes;
+using iLabs.DataTypes.TicketingTypes;
+using iLabs.LabServer.Interactive;
+
 namespace iLabs.LabView
 {
 
     /// <summary>
-    /// Summary description for I_LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
+    /// Summary description f;or I_LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
     /// As the Application will require the automatic loading of several VI's this implementation should be 
     /// somewhat faster and simpler than using the standard LabVIEW exe. Also hope to make the Interface 
     /// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
@@ -27,7 +32,7 @@ namespace iLabs.LabView
     public interface I_LabViewInterface
     {
 
-        public LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
+        LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
 
 
         /// <summary>
@@ -120,6 +125,8 @@ namespace iLabs.LabView
         /// <param name="viName">The qualifiedName</param>
         /// <returns>the qualifiedName or null if not found</returns>
         string LoadVI(string viName);
+
+        string LoadVI(string viName, bool reserveForCall, int options);
         
 
         int OpenFrontPanel(string viName, bool activate, LabViewTypes.eFPState state);
@@ -129,6 +136,13 @@ namespace iLabs.LabView
         /// </summary>
         /// <param name="viName"></param>
         int ResetVI(string viName);
+
+        /// <summary>
+        /// Locks, Stops and Closes the VI. This should replace the individual calls if possible.
+        /// </summary>
+        /// <param name="viName"></param>
+        /// <returns></returns>
+        int ReleaseVI(string viName);
 
         /// <summary>
         /// Attempt to close all references to vi causing it to go out of memory.

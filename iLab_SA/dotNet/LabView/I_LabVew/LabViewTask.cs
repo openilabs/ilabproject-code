@@ -17,12 +17,13 @@ using System.Web;
 //using System.Web.UI.HtmlControls;
 
 using iLabs.Core;
+using iLabs.DataTypes;
 using iLabs.DataTypes.ProcessAgentTypes;
 using iLabs.DataTypes.TicketingTypes;
 using iLabs.DataTypes.StorageTypes;
 using iLabs.DataTypes.SoapHeaderTypes;
 using iLabs.Proxies.ESS;
-using iLabs.Proxies.ISB;
+//using iLabs.Proxies.ISB;
 using iLabs.Proxies.Ticketing;
 using iLabs.Ticketing;
 using iLabs.UtilLib;
@@ -348,19 +349,20 @@ namespace iLabs.LabView
 
 
                     //Get the VI and send version specfic call to get control of the VI
+                    lvi.ReleaseVI(viName);
                     //TODO: FIx LoadVI Issue
                     //string viStr = lvi.LoadVI(viName);
 
                     // LV 8.2.1
                     //Server takes control of RemotePanel, connection not broken
-                    
+
                     //lvi.SubmitAction("lockvi", lvi.qualifiedName(viName));
                     lvi.SubmitAction("lockvi", viName);
                     int stopStatus = lvi.StopVI(viName);
                     if (stopStatus != 0)
                     { //VI found but no stop control
                         lvi.AbortVI(viName);
-                       Logger.WriteLine("Expire: AbortVI() called because no stop control");
+                        Logger.WriteLine("Expire: AbortVI() called because no stop control");
                     }
 
                     // Also required for LV 8.2.0 and 7.1, force disconnection of RemotePanel

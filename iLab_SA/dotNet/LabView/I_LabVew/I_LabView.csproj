@@ -18,6 +18,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -26,6 +27,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Interop.CWDataServer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -43,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="I_LabViewInterface.cs" />
+    <Compile Include="LabViewFactory.cs" />
     <Compile Include="LabViewInterface_W.cs" />
     <Compile Include="LabViewTask.cs" />
     <Compile Include="LabViewTypes.cs" />
@@ -58,13 +61,25 @@
       <Project>{482C3D3E-9596-4AB0-BD61-E3E427995AC4}</Project>
       <Name>InteractiveLabServerLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\ProcessAgentLibrary\ProcessAgentLibrary.csproj">
+      <Project>{1138C760-3D21-4592-BCF0-00C38449F4CC}</Project>
+      <Name>ProcessAgentLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\UtilLibrary\UtilLibrary.csproj">
       <Project>{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}</Project>
       <Name>UtilLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\BatchLSProxy\BatchLSProxy.csproj">
+      <Project>{0FCD1E67-C460-4854-9707-61A0F00C75C8}</Project>
+      <Name>BatchLSProxy</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Proxies\ExperimentStorageProxy\ExperimentStorageProxy.csproj">
       <Project>{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}</Project>
       <Name>ExperimentStorageProxy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Proxies\TicketIssuerProxy\TicketIssuerProxy.csproj">
+      <Project>{9A2772DF-71D6-44E1-BAA9-87669A9FA942}</Project>
+      <Name>TicketIssuerProxy</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
