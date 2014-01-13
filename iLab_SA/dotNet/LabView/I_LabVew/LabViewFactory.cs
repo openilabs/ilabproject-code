@@ -31,7 +31,7 @@ using iLabs.LabView.LV2010;
 using iLabs.LabView.LV2011;
 using iLabs.LabView.LV2012;
 
-namespace iLabs.LabServer.LabView
+namespace iLabs.LabView
 {
 
     /// <summary>
