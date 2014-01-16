@@ -45,6 +45,9 @@ namespace SimpleClient
             
         }
 
+public foat currentClimateTempurature(){
+}
+
         /// <summary>
         /// Connect to StruxureWare Enterprise server 
         /// </summary>
@@ -246,7 +249,34 @@ namespace SimpleClient
         } 
 
 
+ 	/// <summary>
+        /// getClimateChmTemp
+        /// </summary>       
+        private float getClimateChmTemp()
 
+        {
+            string prefix = "Value:";
+            float climateChamberTemp = 0.0F;
+            List<string> collection = new List<string>();
+            List<ValueTypeStateful> values = new List<ValueTypeStateful>();
+            List<ErrorResultType> errors = new List<ErrorResultType>();
+            collection.Add("1&/MITBT/Servers/MITBTAS01/Climate Chamber/Experiments/Variables/Current Temperature");             	   _clientCom.GetValues(connectRef, collection, out values, out errors);
+
+            foreach (var item in values)
+            {
+                climateChamberTemp = float.Parse(item.Value);
+                // Converting to Fahrenheit
+                climateChamberTemp = (9F*climateChamberTemp) / 5F + 32;
+                Console.WriteLine("Current Climate chabmer temperature is " + climateChamberTemp);
+
+            }
+            prefix = "getClimateChmTemp Errors:";
+            foreach (var item in errors)
+            {
+                Console.WriteLine("{0} Id:[{1}] Msg:[{2}] ", prefix, item.Id, item.Message);
+            }
+            return climateChamberTemp;
+        }
 
         /// <summary>
         /// Reports the exception caught as well as the inner exception when set.
