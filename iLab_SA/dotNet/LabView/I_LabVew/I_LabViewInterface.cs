@@ -15,26 +15,17 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
-using iLabs.DataTypes;
-using iLabs.DataTypes.ProcessAgentTypes;
-using iLabs.DataTypes.TicketingTypes;
-using iLabs.LabServer.Interactive;
-
 namespace iLabs.LabView
 {
 
     /// <summary>
-    /// Summary description f;or I_LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
+    /// Summary description for I_LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
     /// As the Application will require the automatic loading of several VI's this implementation should be 
     /// somewhat faster and simpler than using the standard LabVIEW exe. Also hope to make the Interface 
     /// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
     /// </summary>
-    public interface I_LabViewInterface : I_TaskFactory
+    public interface I_LabViewInterface
     {
-        // From I_TaskFactory
-        //LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
-
-
         /// <summary>
         /// Sends messages to the status and remaining time fields of the named VI, 
         /// it must be in memory and publish the controls as connectors.
@@ -84,9 +75,7 @@ namespace iLabs.LabView
         /// </summary>
         /// <param name="viName">Library:viName.vi format or just the viName.vi format.</param>
         /// <returns>-10 on error, -1 not in memory, or executionState</returns>
-        LabViewTypes.eExecState GetVIStatus(String viName);
-
-        LabViewTypes.eFPState GetFPStatus(String viName);
+        int GetVIStatus(String viName);
 
         /// <summary>
         /// 
@@ -117,32 +106,20 @@ namespace iLabs.LabView
         /// <param name="viName"></param>
         /// <returns>The in memeory name, may include 'Library:' if LabView 8.0 or greater.</returns>
         string LoadVI(string path, string viName);
-        
+        /*
         /// <summary>
         /// Loads the specified VI and opens the front panel, if the 
         /// panel is already in memory it is not reloaded.
         /// </summary>
-        /// <param name="viName">The qualifiedName</param>
-        /// <returns>the qualifiedName or null if not found</returns>
-        string LoadVI(string viName);
-
-        string LoadVI(string viName, bool reserveForCall, int options);
-        
-
-        int OpenFrontPanel(string viName, bool activate, LabViewTypes.eFPState state);
-
+        /// <param name="viName"></param>
+        /// <returns></returns>
+        int LoadVI(string viName);
+        */
         /// <summary>
         /// Attempt to reset all default values.
         /// </summary>
         /// <param name="viName"></param>
         int ResetVI(string viName);
-
-        /// <summary>
-        /// Locks, Stops and Closes the VI. This should replace the individual calls if possible.
-        /// </summary>
-        /// <param name="viName"></param>
-        /// <returns></returns>
-        int ReleaseVI(string viName);
 
         /// <summary>
         /// Attempt to close all references to vi causing it to go out of memory.
@@ -156,12 +133,6 @@ namespace iLabs.LabView
         /// </summary>
         /// <param name="viName">Library:viName.vi format or just the viName.vi format.</param>
         int RunVI(string viName);
-
-        object GetControlValue(string viName, string controlName);
-
-        int SetControlValue(string viName, string controlName, object value);
-
-        int SetControlValues(string viName, string[] controlNames, object[] values);
 
         /// <summary>
         /// Stops the running of the VI by trying to set the value of an internal contol 
