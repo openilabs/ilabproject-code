@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -175,8 +176,12 @@ namespace iLabs.Scheduling.LabSide
             LSResource[] resources = dbManager.GetLSResources(Session["labServerGuid"].ToString());
             if (resources != null && resources.Length > 0)
             {
-                int[] recurrenceIDs = dbManager.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, resources[0].resourceID);
-                Recurrence[] recurs = dbManager.GetRecurrences(recurrenceIDs);
+                List<int> recurrenceIDs = new List<int>();
+                foreach (LSResource r in resources)
+                {
+                    recurrenceIDs.AddRange(dbManager.ListRecurrenceIDsByResourceID(DateTime.UtcNow, DateTime.MaxValue, r.resourceID));
+                }
+                Recurrence[] recurs = dbManager.GetRecurrences(recurrenceIDs.ToArray());
                 //if related recurrence have been found
                 if (recurs.Length > 0)
                 {
@@ -211,12 +216,13 @@ namespace iLabs.Scheduling.LabSide
 			btnEdit.Visible = false;
 			foreach (Recurrence recur in recurs) 
 			{
+                LSResource resource = dbManager.GetLSResource(recur.resourceId);
                 buf = new StringBuilder();
                 //buf.Append("<pre>");
 				ListItem recurItem = new ListItem();
 				//string ussName = dbManager.GetUSSInfos(new int[]{dbManager.ListUSSInfoID(cs.ussGuid)})[0].ussName;
                // string labServerName = dbManager.RetrieveLabServerName(recur.labServerGuid);
-                buf.Append(String.Format("{0,-30}",Session["labServerName"].ToString() + ": "));
+                buf.Append(String.Format("{0,-30}",resource.labServerName + ": "));
                
                 buf.Append(String.Format("{0,-10}",DateUtil.ToUserTime(recur.startDate, culture, localTzOffset)));
                 buf.Append(" -- " );

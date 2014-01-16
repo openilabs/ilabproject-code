@@ -264,6 +264,10 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Resource_I
 drop procedure [dbo].[Resource_Insert]
 GO
 
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Resource_Modify]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+drop procedure [dbo].[Resource_Modify]
+GO
+
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Resource_SetDescription]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
 drop procedure [dbo].[Resource_SetDescription]
 GO
@@ -1652,6 +1656,7 @@ GO
 
 /****** Object:  Stored Procedure dbo.AddReservationInfo    Script Date: 4/11/2006 6:19:42 PM ******/
 CREATE PROCEDURE ReservationInfo_Add
+@resourceID int,
 @serviceBrokerGUID varchar(50),
 @groupName nvarchar(256),
 @ussGUID varchar(50),
@@ -1661,15 +1666,12 @@ CREATE PROCEDURE ReservationInfo_Add
 @endTime datetime,
 @status int
 
-
 AS
 declare 
-@resourceID int,
 @credentialSetID int,
 @experimentInfoID int,
 @ussId int
 
-select @resourceID=(select resource_id from LS_Resources where Lab_Server_Guid = @labServerGuid)
 select @credentialSetID=(select Credential_Set_ID from Credential_Sets where Service_Broker_GUID=@serviceBrokerGUID and Group_Name=@groupName)
 select @experimentInfoID = (select Experiment_Info_ID from Experiment_Info where Lab_Client_Guid = @clientGuid and Lab_Server_Guid = @labServerGuid)
 if @ussGuid Is Null
@@ -2003,14 +2005,15 @@ GO
 
 CREATE PROCEDURE Resource_AddGetID
 @guid varchar (50),
-@name nvarchar (256)
+@name nvarchar (256),
+@description nvarchar(2048) = NULL
 AS
 if( select count(resource_ID) from LS_Resources where Lab_Server_Guid = @guid) >0
 select resource_id from LS_Resources where Lab_Server_Guid = @guid
 else
 BEGIN
-insert into LS_Resources (Lab_Server_Guid, Lab_Server_Name)
-values (@guid,@name)
+insert into LS_Resources (Lab_Server_Guid, Lab_Server_Name,description)
+values (@guid,@name,@description)
 select ident_current('LSS_Resources')
 END
 
@@ -2047,7 +2050,7 @@ GO
 CREATE PROCEDURE Resource_Get
 @id int
 AS
-SELECT resource_id,Lab_Server_Guid,Lab_Server_Name,description 
+SELECT resource_id,Lab_Server_Guid,Lab_Server_Name, description 
 from LS_resources where resource_id = @id
 
 GO
@@ -2065,7 +2068,7 @@ GO
 CREATE PROCEDURE Resource_GetByGuid
 @guid varchar(50)
 AS
-SELECT resource_id,Lab_Server_Guid,Lab_Server_Name,description 
+SELECT resource_id,Lab_Server_Guid,Lab_Server_Name,  description 
 from LS_resources where Lab_Server_Guid = @guid
 
 GO
@@ -2122,9 +2125,28 @@ CREATE PROCEDURE Resource_Insert
 @name nvarchar (256),
 @description nvarchar (2048)
 AS
-insert into LS_Resources (Lab_Server_Guid, Lab_Server_Name,description)
+insert into LS_Resources (Lab_Server_Guid, Lab_Server_Name, description)
 values (@guid,@name,@description)
 select ident_current('LSS_Resources')
+
+GO
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS ON 
+GO
+
+SET QUOTED_IDENTIFIER OFF 
+GO
+SET ANSI_NULLS OFF 
+GO
+
+CREATE PROCEDURE Resource_Modify
+@rid int,
+@name nvarchar (256),
+@description nvarchar (2048)
+AS
+update LS_Resources set Lab_Server_Name=@name, description=@description
+where Resource_ID = @rid
 
 GO
 SET QUOTED_IDENTIFIER OFF 

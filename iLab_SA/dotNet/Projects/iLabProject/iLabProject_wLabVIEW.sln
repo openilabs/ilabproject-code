@@ -154,7 +154,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/TimeOfDay/
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "http://localhost/iLabServiceBroker/", "http://localhost/iLabServiceBroker", "{5947A0A6-FD73-4D90-82C4-61B5E90F5FCB}"
 	ProjectSection(WebsiteProperties) = preProject
-		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{06EF99E2-DB59-4139-AF0C-EC9B339DD460}|UserSchedulingProxy.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{8C295C05-959B-483C-9F31-62E45FE46543}|iLabsArchitecture.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{BF60ADC0-5696-45D3-8B3E-986E88C565F0}|LabSchedulingProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{0FCD1E67-C460-4854-9707-61A0F00C75C8}|BatchLabSeverProxy.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;"
+		ProjectReferences = "{ADDE40F3-E299-400B-A842-15ACD58BBF19}|ilabdatatypes.dll;{1138C760-3D21-4592-BCF0-00C38449F4CC}|ProcessAgentLibrary.dll;{2FED805D-4A8C-4D9B-8339-266CF16394C8}|TicketIssuerLibrary.dll;{06EF99E2-DB59-4139-AF0C-EC9B339DD460}|UserSchedulingProxy.dll;{01C9488D-E7DB-43FD-9C7F-CE3D0206C5B0}|UtilLibrary.dll;{8C295C05-959B-483C-9F31-62E45FE46543}|iLabsArchitecture.dll;{34C8F4C5-900D-4221-B833-94D01F7E93B7}|ProcessAgentProxy.dll;{BF60ADC0-5696-45D3-8B3E-986E88C565F0}|LabSchedulingProxy.dll;{9A2772DF-71D6-44E1-BAA9-87669A9FA942}|TicketIssuerProxy.dll;{C90A23DC-8AED-40DD-B9B5-AC30C0871E18}|InteractiveSBProxy.dll;{0FCD1E67-C460-4854-9707-61A0F00C75C8}|BatchLabSeverProxy.dll;{457B5797-FBF2-4AF5-89F9-F26F32FA8E7B}|iLabControls.dll;{4EEA84C9-137C-4D50-B0A2-8C7B1A900716}|InteractiveLabServerProxy.dll;{B38F998B-CBC3-44F7-AD6F-92CAF022A65C}|ExperimentStorageProxy.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/iLabServiceBroker"
 		Debug.AspNetCompiler.PhysicalPath = "..\..\Services\iLabServiceBroker\"
 		Debug.AspNetCompiler.TargetPath = "..\..\Builds\iLabServiceBroker\"
@@ -323,6 +323,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabViewInterface2012", "..\
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{4648EBF7-A038-4591-A347-C59B91A5C59B}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabViewInterface_WS", "..\..\LabView\LabViewInterface\LabViewInterface_WS.csproj", "{C4A40224-BCDC-4FE8-8284-226D8103787D}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LabViewFactory", "..\..\LabView\LabViewFactory\LabViewFactory.csproj", "{127677AD-9AA3-4A4A-98E7-40E57A5E859B}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
@@ -686,6 +698,26 @@ Global
 		{0B57F561-A7ED-47AF-B346-EE4AB9435B37}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0B57F561-A7ED-47AF-B346-EE4AB9435B37}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{0B57F561-A7ED-47AF-B346-EE4AB9435B37}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Release|.NET.ActiveCfg = Release|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C4A40224-BCDC-4FE8-8284-226D8103787D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Release|.NET.ActiveCfg = Release|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -724,5 +756,7 @@ Global
 		{30144572-B5C6-4EBD-9AF5-242F7C08D5DB} = {D31320EA-8703-4B89-9D07-087F82928956}
 		{0B57F561-A7ED-47AF-B346-EE4AB9435B37} = {D31320EA-8703-4B89-9D07-087F82928956}
 		{4648EBF7-A038-4591-A347-C59B91A5C59B} = {D31320EA-8703-4B89-9D07-087F82928956}
+		{C4A40224-BCDC-4FE8-8284-226D8103787D} = {D31320EA-8703-4B89-9D07-087F82928956}
+		{127677AD-9AA3-4A4A-98E7-40E57A5E859B} = {D31320EA-8703-4B89-9D07-087F82928956}
 	EndGlobalSection
 EndGlobal

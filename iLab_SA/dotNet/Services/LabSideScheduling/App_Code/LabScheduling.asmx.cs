@@ -489,6 +489,7 @@ namespace iLabs.Scheduling.LabSide
                     id = dbManager.AddExperimentInfo(labServerGuid, labServerName, clientGuid, clientName,
                         clientVersion, providerName, null, 0, 0, 1, 0);
                     int ok = dbManager.CheckForLSResource(labServerGuid, labServerName);
+                    
                 }
                 else
                 {

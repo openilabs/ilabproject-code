@@ -1309,7 +1309,7 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add permitted experiment", ex);
+                throw new Exception("Exception thrown in CheckForLSResource", ex);
             }
             finally
             {
@@ -1351,7 +1351,7 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add permitted experiment", ex);
+                throw new Exception("Exception thrown in GetLSResources", ex);
             }
             finally
             {
@@ -1391,7 +1391,7 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add permitted experiment", ex);
+                throw new Exception("Exception thrown in GetLSResource", ex);
             }
             finally
             {
@@ -1433,7 +1433,7 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add permitted experiment", ex);
+                throw new Exception("Exception thrown in GetLSResources", ex);
             }
             finally
             {
@@ -1503,7 +1503,7 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add permitted experiment", ex);
+                throw new Exception("Exception thrown in GetLSResourceTags", ex);
             }
             finally
             {
@@ -1512,15 +1512,16 @@ namespace iLabs.Scheduling.LabSide
             return tags.ToArray();
         }
 
-        public int InsertLSResource(string guid,string name,string description)
+        public int ModifyLSResource(int id, string name,string description)
         {
             //create a connection
             DbConnection connection = FactoryDB.GetConnection();
             //create a command
-            DbCommand cmd = FactoryDB.CreateCommand("Resource_Insert", connection);
+            DbCommand cmd = FactoryDB.CreateCommand("Resource_Modify", connection);
             cmd.CommandType = CommandType.StoredProcedure;
             //populate the parameters
-            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@rid", id, DbType.Int32));
+            //cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@name", name, DbType.String, 256));
             cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 2048));
             
@@ -1534,13 +1535,44 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add InsertResource", ex);
+                throw new Exception("Exception thrown in ModifyResource", ex);
             }
             finally
             {
                 connection.Close();
             }
            
+        }
+
+        public int InsertLSResource(string guid, string name, string description)
+        {
+            //create a connection
+            DbConnection connection = FactoryDB.GetConnection();
+            //create a command
+            DbCommand cmd = FactoryDB.CreateCommand("Resource_Insert", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //populate the parameters
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@guid", guid, DbType.AnsiString, 50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@name", name, DbType.String, 256));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@description", description, DbType.String, 2048));
+
+            // execute the command
+            try
+            {
+                connection.Open();
+                DbDataReader dataReader = null;
+                return Convert.ToInt32(cmd.ExecuteScalar());
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception thrown in add InsertResource", ex);
+            }
+            finally
+            {
+                connection.Close();
+            }
+
         }
 
         public int SetLSResourceDescription(int id, string description)
@@ -1563,7 +1595,7 @@ namespace iLabs.Scheduling.LabSide
             }
             catch (Exception ex)
             {
-                throw new Exception("Exception thrown in add InsertResource", ex);
+                throw new Exception("Exception thrown in add SetResourceDescription", ex);
             }
             finally
             {
@@ -2298,7 +2330,7 @@ namespace iLabs.Scheduling.LabSide
         /// <param name="statusCode"></param>
 		/// <returns></returns>the unique ID identifying the reservation information added, >0 successfully added, -1 otherwise
 		public int AddReservationInfo(string serviceBrokerGuid, string groupName, string ussGuid,
-            string labServerGuid, string clientGuid, DateTime startTime, DateTime endTime, int statusCode)
+            string labServerGuid, string clientGuid, int resourceID, DateTime startTime, DateTime endTime, int statusCode)
 		{
             int status = -1;
 			//create a connection
@@ -2319,6 +2351,7 @@ namespace iLabs.Scheduling.LabSide
 			cmd.Parameters.Add(ussParam);
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@clientGuid", clientGuid,DbType.AnsiString,50));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@labServerGuid", labServerGuid, DbType.AnsiString,50));
+            cmd.Parameters.Add(FactoryDB.CreateParameter("@resourceID", resourceID, DbType.Int32));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@startTime", startTime, DbType.DateTime));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@endTime", endTime, DbType.DateTime));
 			cmd.Parameters.Add(FactoryDB.CreateParameter("@status", statusCode, DbType.Int32));
@@ -2541,7 +2574,7 @@ namespace iLabs.Scheduling.LabSide
                     return 0;
                 }
                 //add the reservation to to reservationInfo table
-                status = AddReservationInfo(serviceBrokerGuid, groupName, ussGuid, labServerGuid, clientGuid, startTime.ToUniversalTime(), endTime.ToUniversalTime(), 0);
+                status = AddReservationInfo(serviceBrokerGuid, groupName, ussGuid, labServerGuid, clientGuid, recurrences[0].resourceId,startTime.ToUniversalTime(), endTime.ToUniversalTime(), 0);
             }
             return status;
         }

@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 
 using iLabs.Core;
+using iLabs.DataTypes;
 using iLabs.DataTypes.SchedulingTypes;
 using iLabs.Ticketing;
 using iLabs.DataTypes.TicketingTypes;
@@ -118,6 +119,7 @@ namespace iLabs.Scheduling.LabSide
                    // lblLabServerName.Text = labServerName;
 
                     BuildExperimentInfoListBox();
+                    BuildResourceListBox(Session["labServerGuid"].ToString());
                 }
             }
 
@@ -185,6 +187,20 @@ namespace iLabs.Scheduling.LabSide
                 lbxSelectExperiment.Items.Add(experimentInfoItem);
             }
         }
+
+        private void BuildResourceListBox(string lsGuid)
+        {
+            lbxResource.Items.Clear();
+                IntTag[] resources = dbManager.GetLSResourceTags( Session["labServerGuid"].ToString());
+            foreach (IntTag tag in resources)
+            {
+                ListItem resourceItem = new ListItem();
+                resourceItem.Text = tag.tag;
+                resourceItem.Value = tag.id.ToString();
+                lbxResource.Items.Add(resourceItem);
+            }
+        }
+
         private void ResetState()
         {
             txtLabClientName.Text = "";
@@ -256,8 +272,13 @@ namespace iLabs.Scheduling.LabSide
             }
         }
 
+        protected void lbxResources_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+        }
 
-
+        protected void btnNewResource_Click(object sender, System.EventArgs e)
+        {
+        }
 
         protected void btnSave_Click(object sender, System.EventArgs e)
         {

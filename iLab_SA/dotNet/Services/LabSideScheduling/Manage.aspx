@@ -12,7 +12,6 @@
 		<meta content="C#" name="CODE_LANGUAGE" />
 		<meta content="JavaScript" name="vs_defaultClientScript" />
 		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema" />
-		
 		<style type="text/css">@import url( css/main.css ); 
 		</style>
 	</head>
@@ -21,31 +20,34 @@
 	<div id="outerwrapper">
 		<uc1:Banner id="Banner1" runat="server"></uc1:Banner>
 		<uc1:NavBar id="NavBar1" runat="server"></uc1:NavBar>
-		<br clear="all">
+		<br clear="all"/>
 		<div id="innerwrapper">
 		<div id="pageintro">
 		    <!-- Administer Groups Error message here: <div class="errormessage"><p>Error message here.</p></div> End error message -->
 			<p><asp:label id="lblErrorMessage" Runat="server" EnableViewState="False" Visible="False"></asp:label></p>
 			<h1>Manage Experiment Information</h1>
+			<asp:Label ID="lblLabServerName" runat="Server" /><br />
+			<asp:Label ID="lblLabServerUrl" runat="server" /><br /><br />
 			<p>Add, remove, or edit a Experiment below.</p>		
 		</div>
 		<div id="pagecontent">
-						<div id="itemdisplay">
+						<div id="itemdisplay" style="width: 38%">
 							<h4>Selected Experiment</h4>
 							<div class="simpleform">
 								<table>
 									<tr>
 										<th>
-											<label for="labClientName">Lab Client Name</label></th>
-										<td style="width: 232px"><asp:textbox id="txtLabClientName" Width="100%" Runat="server"></asp:textbox></td>
+											<label for="labClientName">Lab Client Name</label>
+										</th>
+										<td style="width: 232px; font-size: 12pt;"><asp:textbox id="txtLabClientName" Width="100%" Runat="server"></asp:textbox></td>
 									</tr>
-									<tr>
+									<tr style="font-size: 12pt">
 										<th>
 											<label for="labClientVersion">Lab Client Version </label>
 										</th>
 										<td style="width: 232px"><asp:textbox id="txtLabClientVersion"  Width="100%" Runat="server"></asp:textbox></td>
 									</tr>
-									<tr>
+									<tr style="font-size: 12pt">
 										<th>
 											<label for="labClientGuid">Lab Client GUID </label>
 										</th>
@@ -54,14 +56,14 @@
 									<tr>
 										<th>
 											<label for="providerName">Provider Name</label></th>
-										<td style="width: 232px"><asp:textbox id="txtProviderName" Width="100%" Runat="server"></asp:textbox></td>
+										<td style="width: 232px; font-size: 12pt;"><asp:textbox id="txtProviderName" Width="100%" Runat="server"></asp:textbox></td>
 									</tr>
-									<tr>
+									<tr style="font-size: 12pt">
 										<th>
 											<label for="contactEmail">Contact Email</label></th>
 										<td style="width: 232px"><asp:textbox id="txtContactEmail" Width="100%" Runat="server"></asp:textbox></td>
 									</tr>
-									<tr>
+									<tr style="font-size: 12pt">
 										<th>
 											<label for="minimumTime">Minimum Time(min)</label>
 										</th>
@@ -88,13 +90,20 @@
 										<td style="width: 232px"><asp:textbox id="txtEarlyArriveTime"  Width="100%" Runat="server" ></asp:textbox></td>
 									</tr>
 									<tr>
-										<th colSpan="2">
-											<asp:button id="btnSave"  CssClass="button" Runat="server" Text="Save Changes" onclick="btnSave_Click"></asp:button><asp:button id="btnRemove" Runat="server" Text="Remove" CssClass="button" onclick="btnRemove_Click"></asp:button><asp:button id="btnNew" Runat="server" Text="New" CssClass="button" onclick="btnNew_Click"></asp:button></th></tr>
+										<th colspan="2">
+											<asp:button id="btnSave"  CssClass="button" Runat="server" Text="Save Changes" onclick="btnSave_Click"></asp:button>&nbsp;&nbsp;<asp:button id="btnRemove" Runat="server" Text="Remove" CssClass="button" onclick="btnRemove_Click"></asp:button>&nbsp;&nbsp;<asp:button id="btnNew" Runat="server" Text="New" CssClass="button" onclick="btnNew_Click"></asp:button></th></tr>
 								</table>
 							</div>
 						</div>
-						<div class="simpleform"><label for="selectexperiment">Select an experiment</label><br>
-							<asp:listbox cssClass="i18n" id="lbxSelectExperiment" Runat="server" Width="360px" AutoPostBack="True" Rows="15" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged"></asp:listbox></div>
+						<div class="simpleform"><label for="selectexperiment">Select an experiment</label><br />
+							<asp:listbox cssClass="i18n" id="lbxSelectExperiment" Runat="server" Width="360px" AutoPostBack="True" Rows="10" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged"></asp:listbox>
+						</div>
+						<br />
+						<div class="simpleform"><label for="labResources">Lab Server Resources</label><br />
+						
+						<asp:listbox cssClass="i18n" id="lbxResource" Runat="server" Width="360px" AutoPostBack="True" Rows="5" onselectedindexchanged="lbxResources_SelectedIndexChanged"></asp:listbox>
+						<br />&nbsp;&nbsp;<asp:button id="btnNewResource"  CssClass="button" Runat="server" Text="New Resource" onclick="btnNewResource_Click"></asp:button>
+						</div>
 					</div>
 					</div>
 	<uc1:footer id="Footer1" runat="server"></uc1:footer>

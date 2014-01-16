@@ -78,7 +78,7 @@ Please see license.txt in top level directory for full license.
 												<th>
 													<label for="applicationPath">Path</label></th>
 												<td><asp:textbox id="txtApplicationPath" Runat="server" Width="480px" 
-												ToolTip="The absolute path to the application directory, without a trailing seperator"></asp:textbox></td>
+												ToolTip="The absolute path to the application directory, with a trailing seperator. This may also be used to specify the project"></asp:textbox></td>
 											</tr>
 											<tr>
 												<th>

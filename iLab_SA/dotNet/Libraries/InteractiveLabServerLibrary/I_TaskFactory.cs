@@ -6,7 +6,7 @@ using iLabs.DataTypes.TicketingTypes;
 
 namespace iLabs.LabServer.Interactive
 {
-    interface I_TaskFactory
+    public interface I_TaskFactory
     {
          /// <summary>
         /// Parses the appInfo and experiment ticket, inserts the task into the database and

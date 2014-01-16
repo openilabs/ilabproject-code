@@ -136,7 +136,7 @@ namespace iLabs.Scheduling.LabSide
     public class LSResource{
         public int resourceID;
         public string labServerGuid;
-        public string labServerName;
+        public string labServerName; // Note: this is the resource name, by default it is the serverName
         public string description;
     }
     /// <summary>
