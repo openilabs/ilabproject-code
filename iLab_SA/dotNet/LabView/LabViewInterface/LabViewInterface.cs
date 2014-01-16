@@ -61,7 +61,7 @@ namespace iLabs.LabView.LV82
     /// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
     /// <br />Note: many changes have been required to support the addition of Libary Name to the GetVIReference calling parameter.
     /// </summary>
-    public class LabViewInterface : I_LabViewInterface
+    public class LabViewInterface : I_LabViewInterface, I_TaskFactory
     {
         protected string lvVersion = null;
         protected _Application viServer;
@@ -162,7 +162,6 @@ namespace iLabs.LabView.LV82
             string qualName = null;
             string fullName = null;  // set defaults
 
-            //LabTask labTask = null;
             LabViewTask task = null;
             VirtualInstrument vi = null;
 
