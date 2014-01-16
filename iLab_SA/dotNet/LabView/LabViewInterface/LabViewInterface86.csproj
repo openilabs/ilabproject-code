@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="LabViewInterface.cs" />
     <Compile Include="LabViewRemote.cs" />
+    <Compile Include="LabViewTask.cs" />
+    <Compile Include="LVDataSocket.cs" />
     <Compile Include="Properties\AssemblyInfo_86.cs" />
   </ItemGroup>
   <ItemGroup>

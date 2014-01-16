@@ -16,10 +16,9 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
-using iLabs.DataTypes;
 //using iLabs.DataTypes.SoapHeaderTypes;
-using iLabs.DataTypes.TicketingTypes;
-using iLabs.LabServer.Interactive;
+//using iLabs.DataTypes.TicketingTypes;
+//using iLabs.Services;
 using iLabs.UtilLib;
 
 // Specify the LabView application version and application via these resources
@@ -61,7 +60,7 @@ namespace iLabs.LabView.LV82
     /// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
     /// <br />Note: many changes have been required to support the addition of Libary Name to the GetVIReference calling parameter.
     /// </summary>
-    public class LabViewInterface : I_LabViewInterface, I_TaskFactory
+    public class LabViewInterface : I_LabViewInterface
     {
         protected string lvVersion = null;
         protected _Application viServer;
@@ -146,247 +145,6 @@ namespace iLabs.LabView.LV82
             return message.ToString();
         }
 
-
-        public LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket)
-        {
-            // set defaults
-            DateTime startTime = DateTime.UtcNow;
-            long duration = -1L;
-            long experimentID = 0;
-            int status = -1;
-
-            string statusViName = null;
-            string statusTemplate = null;
-            string templatePath = null;
-            LabDB dbManager = new LabDB();
-            string qualName = null;
-            string fullName = null;  // set defaults
-
-            LabViewTask task = null;
-            VirtualInstrument vi = null;
-
-            string viName = null;
-
-            //CHeck that a labVIEW interface revision is set
-            //if (appInfo.rev == null || appInfo.rev.Length < 2)
-            //{
-            //    appInfo.rev = ConfigurationManager.AppSettings["LabViewVersion"];
-            //}
-
-            ////Parse experiment payload, only get what is needed 	
-            string payload = expTicket.payload;
-            XmlQueryDoc expDoc = new XmlQueryDoc(payload);
-            string essService = expDoc.Query("ExecuteExperimentPayload/essWebAddress");
-            string startStr = expDoc.Query("ExecuteExperimentPayload/startExecution");
-            string durationStr = expDoc.Query("ExecuteExperimentPayload/duration");
-            string groupName = expDoc.Query("ExecuteExperimentPayload/groupName");
-            string userName = expDoc.Query("ExecuteExperimentPayload/userName");
-            string expIDstr = expDoc.Query("ExecuteExperimentPayload/experimentID");
-
-            if ((startStr != null) && (startStr.Length > 0))
-            {
-                startTime = DateUtil.ParseUtc(startStr);
-            }
-            if ((durationStr != null) && (durationStr.Length > 0) && !(durationStr.CompareTo("-1") == 0))
-            {
-                duration = Convert.ToInt64(durationStr);
-            }
-            if ((expIDstr != null) && (expIDstr.Length > 0))
-            {
-                experimentID = Convert.ToInt64(expIDstr);
-            }
-
-
-            if (appInfo.extraInfo != null && appInfo.extraInfo.Length > 0)
-            {
-                // Note should have either statusVI or template pair
-                // Add Option for VNCserver access
-                try
-                {
-                    XmlQueryDoc viDoc = new XmlQueryDoc(appInfo.extraInfo);
-                    statusViName = viDoc.Query("extra/status");
-                    statusTemplate = viDoc.Query("extra/statusTemplate");
-                    templatePath = viDoc.Query("extra/templatePath");
-                }
-                catch (Exception e)
-                {
-                    string err = e.Message;
-                }
-            }
-
-            // log the experiment for debugging
-
-            Logger.WriteLine("Experiment: " + experimentID + " Start: " + DateUtil.ToUtcString(startTime) + " \tduration: " + duration);
-            long statusSpan = DateUtil.SecondsRemaining(startTime, duration);
-
-            if (!IsLoaded(appInfo.application))
-            {
-                vi = LoadVI(appInfo.path, appInfo.application);
-                if (false) // Check for controls first
-                {
-                    string[] names = new string[4];
-                    object[] values = new object[4];
-                    names[0] = "CouponId";
-                    values[0] = expCoupon.couponId;
-                    names[1] = "Passcode";
-                    values[1] = expCoupon.passkey;
-                    names[2] = "IssuerGuid";
-                    values[2] = expCoupon.issuerGuid;
-                    names[3] = "ExperimentId";
-                    values[3] = experimentID;
-                    SetControlValues(vi, names, values);
-                }
-                OpenFrontPanel(vi, true, LabViewTypes.eFPState.eVisible);
-            }
-            else
-            {
-                vi = GetVI(appInfo.path, appInfo.application);
-            }
-            if (vi == null)
-            {
-                status = -1;
-                string err = "Unable to Find: " + appInfo.path + @"\" + appInfo.application;
-                Logger.WriteLine(err);
-                throw new Exception(err);
-            }
-            // Get qualifiedName
-            qualName = qualifiedName(viName);
-            fullName = appInfo.path + @"\" + appInfo.application;
-
-
-            status = GetVIStatus(viName);
-
-            Logger.WriteLine("CreateLabTask - " + qualName + ": VIstatus: " + status);
-            switch (status)
-            {
-                case -10:
-                    throw new Exception("Error GetVIStatus: " + status);
-                    break;
-                case -1:
-                    // VI not in memory
-                    throw new Exception("Error GetVIStatus: " + status);
-
-                    break;
-                case 0: // eBad == 0
-                    break;
-                case 1: // eIdle == 1 vi in memory but not running 
-                    LabViewTypes.eFPState fpState = GetFPStatus(viName);
-                    if (fpState != LabViewTypes.eFPState.eVisible)
-                    {
-                        OpenFrontPanel(viName, true, LabViewTypes.eFPState.eVisible);
-                    }
-                    ResetVI(viName);
-                    break;
-                case 2: // eRunTopLevel: this should be the LabVIEW application
-                    break;
-                case 3: // eRunning
-                    //Unless the Experiment is reentrant it should be stopped and be reset.
-                    if (!appInfo.reentrant)
-                    {
-                        int stopStatus = StopVI(viName);
-                        if (stopStatus != 0)
-                        {
-                            AbortVI(viName);
-                        }
-                        ResetVI(viName);
-                    }
-                    break;
-                default:
-                    throw new Exception("Error GetVIStatus: unknown status: " + status);
-                    break;
-            }
-            try
-            {
-                SetBounds(viName, 0, 0, appInfo.width, appInfo.height);
-                Logger.WriteLine("SetBounds: " + appInfo.application);
-            }
-            catch (Exception sbe)
-            {
-                Logger.WriteLine("SetBounds exception: " + Utilities.DumpException(sbe));
-            }
-            SubmitAction("unlockvi", qualifiedName(viName));
-            Logger.WriteLine("unlockvi Called: ");
-
-
-
-
-            // Create the labTask & store in database;
-            labTask = dbManager.InsertTask(appInfo.appID, experimentID,
-           groupName, startTime, duration,
-           LabTask.eStatus.Scheduled, expTicket.couponId, expTicket.issuerGuid, essService, null);
-            if (labTask != null)
-            {
-                //Convert the generic LabTask to a LabViewTask
-                task = new LabViewTask(labTask);
-            }
-            if ((statusTemplate != null) && (statusTemplate.Length > 0))
-            {
-                statusViName = CreateFromTemplate(templatePath, statusTemplate, task.taskID.ToString());
-            }
-
-
-            if (((essService != null) && (essService.Length > 0)))
-            {
-                // Create DataSourceManager to manage dataSocket connections
-                DataSourceManager dsManager = new DataSourceManager();
-
-                // set up an experiment storage handler
-                ExperimentStorageProxy ess = new ExperimentStorageProxy();
-                ess.OperationAuthHeaderValue = new OperationAuthHeader();
-                ess.OperationAuthHeaderValue.coupon = expCoupon;
-                ess.Url = essService;
-                dsManager.essProxy = ess;
-                dsManager.ExperimentID = experimentID;
-                dsManager.AppKey = qualName;
-                // Note these dataSources are written to by the application and sent to the ESS
-                if ((appInfo.dataSources != null) && (appInfo.dataSources.Length > 0))
-                {
-                    string[] sockets = appInfo.dataSources.Split(',');
-                    // Use the experimentID as the storage parameter
-                    foreach (string s in sockets)
-                    {
-                        LVDataSocket reader = new LVDataSocket();
-                        dsManager.AddDataSource(reader);
-                        if (s.Contains("="))
-                        {
-                            string[] nv = s.Split('=');
-                            reader.Type = nv[1];
-                            reader.Connect(nv[0], LabDataSource.READ_AUTOUPDATE);
-
-                        }
-                        else
-                        {
-                            reader.Connect(s, LabDataSource.READ_AUTOUPDATE);
-                        }
-                    }
-                }
-                TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
-            }
-            string taskData = null;
-            taskData = LabTask.constructTaskXml(appInfo.appID, fullName, appInfo.rev, statusViName, essService);
-            dbManager.SetTaskData(task.taskID, taskData);
-            task.data = taskData;
-            TaskProcessor.Instance.Add(task);
-            return task;
-        }
-
-       
-
-        //TODO: Fix missing Interface method
-        public int OpenFrontPanel(string viName, bool activate, LabViewTypes.eFPState state)
-        {
-            int status = -1;
-            VirtualInstrument vi = GetVI(viName);
-            if (vi != null)
-            {
-                vi.OpenFrontPanel(activate, (FPStateEnum)(int)state);
-                status = (int) vi.FPState;
-            }
-            return 0;
-        }
-
-     
-
         protected string stripName(string name)
         {
             string viname = null;
@@ -407,7 +165,6 @@ namespace iLabs.LabView.LV82
 
         public string qualifiedName(VirtualInstrument vi)
         {
-            bool hasLibrary = false;
             string qName = null;
             if (vi != null)
             {
@@ -421,7 +178,6 @@ namespace iLabs.LabView.LV82
                     {
                         libraryName = lib.Name;
                         proj = lib.Project;
-                        hasLibrary = true;
                         if (proj != null)
                         {
                             if ((proj.Name != null) && (proj.Name.Length > 0))
@@ -433,24 +189,20 @@ namespace iLabs.LabView.LV82
                         {
                             buf.Append(libraryName + ":");
                         }
-                        buf.Append(vi.Name);
-                        qName = buf.ToString();
                     }
-                   
                 }
                 catch (InvalidCastException ivcEx)
                 {
                     Logger.WriteLine("Library error: " + ivcEx.Message);
                 }
-                if (!hasLibrary)
-                {
-                    qName = vi.Path;
-                }
+                buf.Append(vi.Name);
+                qName = buf.ToString();
+
             }
             return qName;
         }
 
-        public virtual LabViewTypes.eExecState GetVIStatus(String viName)
+        public virtual int GetVIStatus(String viName)
         {
             int status = -10;
             if (IsLoaded(viName))
@@ -458,15 +210,14 @@ namespace iLabs.LabView.LV82
                 VirtualInstrument vi = GetVI(viName);
                 status = (int)GetVIStatus(vi);
                 vi = null;
-                
             }
             else
             {
                 status = -1;
             }
-            return (LabViewTypes.eExecState)status;
+            return status;
         }
-        public LabViewTypes.eExecState GetVIStatus(VirtualInstrument vi)
+        public int GetVIStatus(VirtualInstrument vi)
         {
             // Not loaded == -1
             int status = -1;
@@ -476,36 +227,18 @@ namespace iLabs.LabView.LV82
                 ExecStateEnum state = vi.ExecState;
                 status = (int)state;
             }
-            return (LabViewTypes.eExecState)status;
+            return status;
         }
 
-        public virtual LabViewTypes.eFPState GetFPStatus(String viName)
-        {
-            int status = -1;
-            if (IsLoaded(viName))
-            {
-                VirtualInstrument vi = GetVI(viName);
-                status = (int)GetFPState(vi);
-                vi = null;
-
-            }
-            else
-            {
-                status = -1;
-            }
-            return (LabViewTypes.eFPState)status;
-        }
-
-        public LabViewTypes.eFPState GetFPState(VirtualInstrument vi)
+        public int GetFPState(VirtualInstrument vi)
         {
             int status = -1;
             if (vi != null)
             {
-                
                 FPStateEnum state = vi.FPState;
                 status = (int)state;
             }
-            return (LabViewTypes.eFPState)status;
+            return status;
         }
 
 
@@ -602,13 +335,6 @@ namespace iLabs.LabView.LV82
             return status;
         }
 
-        public object GetControlValue(string viName, string controlName)
-        { 
-            VirtualInstrument vi = null;
-            vi = GetVI(viName);
-            return  GetControlValue(vi, controlName);
-        }
-
         public object GetControlValue(VirtualInstrument vi, string name)
         {
             object value = null;
@@ -628,16 +354,6 @@ namespace iLabs.LabView.LV82
             }
             return value;
         }
-
-
-        //TODO: Fix missing Interface method
-        public int SetControlValue(string viName, string controlName, object value)
-        {
-            VirtualInstrument vi = null;
-            vi = GetVI(viName);
-            return SetControlValue(vi, controlName, value);
-        }
-
         public int SetControlValue(VirtualInstrument vi, string name, object value)
         {
             int status = -1;
@@ -666,14 +382,6 @@ namespace iLabs.LabView.LV82
             }
             return status;
         }
-
-
-        //TODO: Fix missing Interface method
-        public int SetControlValues(string viName, string[] controlNames, object[] values)
-        {
-            return 0;
-        }
-
 
         public int SetControlValues(VirtualInstrument vi, string[] names, object[] values)
         {
@@ -709,39 +417,6 @@ namespace iLabs.LabView.LV82
             }
             return status;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="viName"></param>
-        /// <returns></returns>
-        public int ReleaseVI(string viName)
-        {
-            int status = -1;
-            if (IsLoaded(viName))
-            {
-                VirtualInstrument vi = GetVI(viName);
-                if (vi != null)
-                {
-                    // LV 8.2.1
-                    //Server takes control of RemotePanel, connection not broken
-
-                    //lvi.SubmitAction("lockvi", lvi.qualifiedName(viName));
-                    SubmitAction("lockvi", viName);
-                    int stopStatus = lvi.StopVI(viName);
-                    if (stopStatus != 0)
-                    { //VI found but no stop control
-                        lvi.AbortVI(viName);
-                        Logger.WriteLine("Expire: AbortVI() called because no stop control");
-                    }
-
-                    // Also required for LV 8.2.0 and 7.1, force disconnection of RemotePanel
-#if LabVIEW_82
-                    lvi.SubmitAction("closevi", lvi.qualifiedName(vi));              
-#endif
-                }
-            }
-        }
-
 
         public int ResetVI(string viName)
         {
@@ -915,9 +590,9 @@ namespace iLabs.LabView.LV82
 
         public virtual bool IsLoaded(string name)
         {
-           
             bool status = false;
             string viname = stripName(name);
+
             object obj = viServer.ExportedVIs;
             string[] vis = (string[])obj;
             for (int i = 0; i < vis.Length; i++)
@@ -962,7 +637,16 @@ namespace iLabs.LabView.LV82
         public VirtualInstrument GetVI(string path, string name)
         {
             VirtualInstrument vi = null;
-            vi = GetVI(path + name, false, 0);
+            try
+            {
+                vi = GetVI(path + @"\" + name);
+            }
+            catch (Exception e)
+            {
+                Exception notFound = new Exception("VI NotFound: " + path + @"\" + name, e);
+                Logger.WriteLine("VI not Found: " + " Path: " + path + " Name: " + name + " Exception: " + e.Message);
+                throw notFound;
+            }
             return vi;
         }
 
@@ -1035,22 +719,47 @@ namespace iLabs.LabView.LV82
 
         public string LoadVI(string path, string name)
         {
-            VirtualInstrument vi = GetVI(path + name);
+            VirtualInstrument vi = loadVI(path, name);
             return qualifiedName(vi);
         }
 
-        public string LoadVI( string name)
+        public VirtualInstrument loadVI(string path, string name)
         {
-            VirtualInstrument vi = GetVI(name);
-            return qualifiedName(vi);
+            return loadVI(path, name, false, 0);
         }
 
-        public string LoadVI(string path, bool resvForCall, int options)
+        public VirtualInstrument loadVI(string path, string name, bool resvForCall, int options)
         {
-            VirtualInstrument vi = GetVI(path, resvForCall, options);
-            return qualifiedName(vi);
+            VirtualInstrument vi = null;
+            try
+            {
+                if (!IsLoaded(name))
+                {
+                    vi = (VirtualInstrument)viServer.GetVIReference(path + @"\" + name, "", resvForCall, options);
+                    //vi.OpenFrontPanel(true, FPStateEnum.eVisible);
+                }
+            }
+            catch (Exception e)
+            {
+                Exception notFound = new Exception("loadVI FileStyleUriParser notFound: " + path + @"\" + name, e);
+                throw notFound;
+            }
+            return vi;
         }
 
+        /*
+        public int LoadVI(string name)
+        {
+            int status = -10;
+            VirtualInstrument vi = null;
+            vi = GetVI(name);
+            if (vi == null)
+                status = -1;
+            else
+                status = (int)vi.ExecState;
+            return status;
+        }
+	*/
         public int AbortVI(string viName)
         {
             int status = -1;
@@ -1479,53 +1188,7 @@ namespace iLabs.LabView.LV82
             return vi;
         }
 
-        public LabViewTypes.eExecState ToExecState(ExecStateEnum state)
-        {
-            LabViewTypes.eExecState value = LabViewTypes.eExecState.eBad;
-            switch (state)
-            {
-                case ExecStateEnum.eBad:
-                    value = LabViewTypes.eExecState.eBad;
-                    break;
-                case ExecStateEnum.eIdle:
-                    value = LabViewTypes.eExecState.eIdle;
-                    break;
-                case ExecStateEnum.eRunning:
-                    value = LabViewTypes.eExecState.eRunning;
-                    break;
-                case ExecStateEnum.eRunTopLevel:
-                    value = LabViewTypes.eExecState.eRunningTopLevel;
-                    break;
-            }
-            return value;
-        }
 
-        public LabViewTypes.eFPState ToFPState(FPStateEnum state)
-        {
-            LabViewTypes.eFPState value = LabViewTypes.eFPState.eInvalid;
-            switch (state)
-            {
-                case FPStateEnum.eClosed:
-                    value = LabViewTypes.eFPState.eClosed;
-                    break;
-                case FPStateEnum.eHidden:
-                    value = LabViewTypes.eFPState.eHidden;
-                    break;
-                case FPStateEnum.eInvalidFPState:
-                    value = LabViewTypes.eFPState.eInvalid;
-                    break;
-                case FPStateEnum.eMaximized:
-                    value = LabViewTypes.eFPState.eMaximized;
-                    break;
-                case FPStateEnum.eMinimized:
-                    value = LabViewTypes.eFPState.eMinimized;
-                    break;
-                case FPStateEnum.eVisible:
-                    value = LabViewTypes.eFPState.eVisible;
-                    break;
-            }
-            return value;
-        }
 
 
         /****************************************************************

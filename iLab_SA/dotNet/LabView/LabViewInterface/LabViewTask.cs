@@ -288,7 +288,7 @@ namespace iLabs.LabView.LV82
                 TaskProcessor.Instance.AddDataManager(task.taskID, dsManager);
             }
             string taskData = null;
-            taskData = task.constructTaskXml(appInfo.appID, fullName,appInfo.rev, statusViName, essService);
+            taskData = LabTask.constructTaskXml(appInfo.appID, fullName,appInfo.rev, statusViName, essService);
             dbManager.SetTaskData(task.taskID, taskData);
             task.data = taskData;
             TaskProcessor.Instance.Add(task);
