@@ -34,8 +34,7 @@ Please see license.txt in top level directory for full license.
 <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxslider.js"></script>
 <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/ext/dhtmlxslider_start.js"></script>
 <script type="text/javascript" src="scripts/chartAll.js"></script>
-<script type="text/javascript" src="scripts/sunChart.js"></script>
-<script type="text/javascript" src="scripts/launching.js?v=565757"></script>
+<script type="text/javascript" src="scripts/launchAll.js?v=565757"></script>
 <script type="text/javascript" src="scripts/bee_all.js"></script>
 <link rel="stylesheet" type="text/css" href="scripts/dhtmlxSlider/codebase/dhtmlxslider.css"/>
 <style type="text/css">@import url(css/main.css );</style>
@@ -99,7 +98,7 @@ Please see license.txt in top level directory for full license.
       <input type='radio' class='js-add-load button' name='js-active-load' value='3' id='load-4'/>
     </li>
     <li id = 'profiles' >
-	    <select id = "profile-list">
+	    <select id="profile-list">
 				   <option value = "0" selected="selected">No Climate Profile</option>
 				    <option value = "1">Phoenix</option>
 				    <option value = "2">Atlanta</option>
@@ -142,7 +141,9 @@ Please see license.txt in top level directory for full license.
 				<asp:HiddenField ID="hdnAppkey" runat="server" />
 				<asp:HiddenField ID="hdnSbUrl" runat="server" />
 				<asp:HiddenField ID="hdnExpId" runat="server" />
+				<asp:HiddenField ID="hdnClimateProfile" runat="server" />
 				<asp:HiddenField ID="hdnProfile" runat="server" value="120,0,2,3,6,6,6"/>
+				<asp:HiddenField ID="hdnSunLamp" runat="server" />
 				<asp:HiddenField ID="hdnExpLength" runat="server" value="24"/>
 				<asp:HiddenField ID="hdnTimeUnit" runat="server" value="60"/>
 				<asp:HiddenField ID="hdnSampleRate" runat="server" value="30"/>

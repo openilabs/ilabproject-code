@@ -36,6 +36,7 @@ using iLabs.UtilLib;
 using iLabs.LabServer;
 
 using CR1000Connection;
+using SimpleClient;
 
 namespace iLabs.LabServer.BEE
 {
@@ -166,18 +167,6 @@ namespace iLabs.LabServer.BEE
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "labLength", buf.ToString(), false);
         }
 
-        /*
-        protected void clearSessionInfo()
-        {
-            Session.Remove("opCouponID");
-            Session.Remove("opIssuer");
-            Session.Remove("opPasscode");
-        }
-        */
-
-
-
-
         protected void goButton_Click(object sender, System.EventArgs e)
         {
             LabDB labDB = new LabDB();
@@ -192,14 +181,18 @@ namespace iLabs.LabServer.BEE
                essProxy.OperationAuthHeaderValue.coupon = opCoupon;
                essProxy.Url = task.storage;
                essProxy.AddRecord(task.experimentID, "BEElab", "profile", false, hdnProfile.Value, null);
+               essProxy.AddRecord(task.experimentID, "BEElab", "climateProfile", false, hdnClimateProfile.Value, null);
+               essProxy.AddRecord(task.experimentID, "BEElab", "sunLamp", false, hdnSunLamp.Value, null); 
 
-               // send The program
+               // send The CR1000 programs
                sendProfile(ConfigurationManager.AppSettings["climateController"],
-                   hdnProfile.Value, ConfigurationManager.AppSettings["climateServer"]);
+                   hdnProfile.Value, hdnSunProfile, ConfigurationManager.AppSettings["climateServer"]);
                sendFile(ConfigurationManager.AppSettings["chamberController"],
                   ConfigurationManager.AppSettings["chamberFile"], 
                   ConfigurationManager.AppSettings["chamberServer"]);
                 StringBuilder buf = new StringBuilder("BEEgraph.aspx?expid=");
+
+                sendEwsCientProfile(hdnClientProfile.Value,hdnExpLength.Value);
                 buf.Append(task.experimentID);
                 task.Status = LabTask.eStatus.Running;
                 TaskProcessor.Instance.Modify(task);
@@ -221,7 +214,7 @@ namespace iLabs.LabServer.BEE
             cr1000.sendProgramFile(loggerName,filePath);
         }
 
-        private void sendProfile(string loggerName, string profile, string serverName)
+        private void sendProfile(string loggerName, string profile, string sunProfile, string serverName)
         {
             bool status = false;
             
@@ -233,15 +226,22 @@ namespace iLabs.LabServer.BEE
             Hashtable hashtable = new Hashtable();
             hashtable["experimentLength"] = hdnExpLength.Value;
             hashtable["profile"] = profile;
+            hashtable["sunProfile"] = sunProfile;
             hashtable["totalLoads"] = 4;
             hashtable["timeUnit"] = hdnTimeUnit.Value;
             hashtable["sampleRate"] = hdnSampleRate.Value;
             iLabParser parser = new iLabParser();
             parser.SetEndToken("}$");
-            string temp = File.ReadAllText(ConfigurationManager.AppSettings["climateTemplate"]);
+            string temp = File.ReadAllText(ConfigurationManager.AppSettings["climateSunTemplate"]);
             //string temp = ReadUrl(@"programs\basicExperimentTemplate.txt");
             File.WriteAllText(programPath, parser.Parse(temp, hashtable));
             sendFile(loggerName,programPath,serverName);
+        }
+
+        private void sendEwsCientProfile(string clientProfileName, string expLength)
+        {
+            BEELabExpHandler handler = new BEELabExpHandler();
+            handler.startExperiment(clientProfileName, expLength);
         }
 
 		#region Web Form Designer generated code
