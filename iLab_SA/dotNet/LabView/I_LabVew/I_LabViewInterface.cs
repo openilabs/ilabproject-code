@@ -29,10 +29,10 @@ namespace iLabs.LabView
     /// somewhat faster and simpler than using the standard LabVIEW exe. Also hope to make the Interface 
     /// lighter weight as to constructer start-up. long term goal allow for constructer arguments, to access remote systems.
     /// </summary>
-    public interface I_LabViewInterface
+    public interface I_LabViewInterface : I_TaskFactory
     {
-
-        LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
+        // From I_TaskFactory
+        //LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
 
 
         /// <summary>
