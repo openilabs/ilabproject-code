@@ -107,8 +107,8 @@ namespace iLabs.LabServer.LabView
                 }
 
                 // Use taskFactory to create a new task, return an existing reentrant task or null if there is an error
-                //LabViewFactory factory = new LabViewFactory();
-                task = LabViewFactory.CreateLabTask(appInfo, expCoupon, expTicket);
+                LabViewTaskFactory factory = new LabViewTaskFactory();
+                task = factory.CreateLabTask(appInfo, expCoupon, expTicket);
 
                 if (task != null)
                 {
