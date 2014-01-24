@@ -2,7 +2,7 @@
 #define _platdefines_H
 /*
 	NI CONFIDENTIAL
-	(c) Copyright 1990-2010 by National Instruments Corp.
+	(c) Copyright 1990-2012 by National Instruments Corp.
 	All rights reserved.
 
 
@@ -52,6 +52,7 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define kPalmOS	    30
 	#define kLinux64	31
 	#define kVdk		32
+	#define kRtx		33
 
 /* Possible values for WindowSystem */
 	#define kMacWM		1
@@ -179,7 +180,11 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define ProcessorType	kX86
 	#define NI_BIG_ENDIAN		0
 #elif defined(linux)
-	#define WindowSystem	kXWindows
+	#if defined(arm) || defined(__arm__)
+		#define WindowSystem	kNoWS
+	#else
+		#define WindowSystem	kXWindows
+	#endif
 	#define OpSystem		kLinux
 	#if defined(__GNUC__)
 		#define Compiler	kGCC
@@ -302,12 +307,30 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define ProcessorType	kX86
 	#define BigEndian		0
 	#define PointerSize		k32bitPointer
+#elif defined(__RTX)
+	#define OpSystem		kRtx
+	#define WindowSystem	kNoWS
+	#define Compiler		kUnbundledC
+	#define ProcessorType	kARM
+	#define BigEndian		0
+ 	#define PointerSize		k32bitPointer
 #endif
 
 #if !defined(OpSystem) || !defined(WindowSystem) || !defined(Compiler) || !defined(ProcessorType)
 	#error
 #endif
 
+/*
+	This is to fix a problem where Apple headers in xcode3.0 (maybe later)
+	have a parameter to some functions called 'Mac' which gets replaced by
+	the preprocessor because of the below. We include Carbon.h here to get
+	those functions declared before the macro. However, there are some cases
+	where we cannot include Carbon.h, assembly files and nidl files. In those
+	cases, #define _Cannot_Include_Carbon_ 1 before including platdefines.h.
+*/
+#if __APPLE__ && !(_Cannot_Include_Carbon_)
+	#include <Carbon/Carbon.h>
+#endif
 /* Other defines for convenience. */
 
 #define Unix			(((OpSystem>=kLinux) && (OpSystem<=kVxWorks)))
@@ -326,6 +349,7 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 #define SVR4			(OpSystem==kSolaris)
 #define VxWorks			(OpSystem==kVxWorks)
 #define Vdk			    (OpSystem==kVdk)
+#define Rtx				(OpSystem==kRtx)
 #define NoWS			(WindowSystem==kNoWS)
 
 // defines for what type of threading is available
@@ -335,6 +359,8 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 #define kPosixThreads	 3
 #define kVxWorksThreads	 4
 #define kVdkThreads	 	 6
+#define kRtxThreads		 7
+
 
 #if MSWin
 	#define ThreadKind kMSWin32Threads
@@ -346,6 +372,8 @@ LabVIEW system options: don't uncomment, the compiler defines these automaticall
 	#define ThreadKind kPosixThreads
 #elif OpSystem==kVdk
 	#define ThreadKind kVdkThreads
+#elif Rtx
+	#define ThreadKind kRtxThreads
 #else
 	#define ThreadKind kNoThreads
 #endif

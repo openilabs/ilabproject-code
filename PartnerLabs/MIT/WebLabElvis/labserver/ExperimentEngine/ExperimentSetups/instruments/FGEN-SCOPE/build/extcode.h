@@ -1,7 +1,7 @@
 #ifndef _extcode_H
 #define _extcode_H
 /**
-	(c) Copyright 1990-2010 by National Instruments Corp.
+	(c) Copyright 1990-2012 by National Instruments Corp.
 	All rights reserved.
 
 	@author National Instruments Corp.
@@ -62,8 +62,6 @@
 	#define FORCE_INLINE inline
 #endif
 
-
-
 /* Multi-threaded categorization tags. */
 #ifndef TH_REENTRANT
 	/* function is completely reentrant and calls only same */
@@ -91,16 +89,62 @@
 	#define USE_DEPRECATED_EXPORTS 0
 #endif
 
-/*	Debugging ON section Begin	*/
+/* Debugging ON section Begin */
 #ifndef DBG
-#define DBG 1
+	#define DBG 1
 #endif
-/*	Debugging ON section End	*/
+/*	Debugging ON section End */
 
-/*	Debugging OFF section Begin
+/* Debugging OFF section Begin
 #undef DBG
 #define DBG 0
-	Debugging OFF section End	*/
+ * Debugging OFF section End */
+
+#if defined(__cplusplus)
+	#if !defined(NI_STATIC_CAST)
+		/** @brief Peform a C++ static cast.
+			@param T the type to cast to
+			@param v the item to cast
+		*/
+		#define NI_STATIC_CAST(T,v) static_cast<T>(v)
+	#endif /* !defined(NI_STATIC_CAST) */
+	#if !defined(NI_CONST_CAST)
+		/** @brief Peform a C++ const cast.
+			@param T the type to cast to
+			@param v the item to cast
+		*/
+		#define NI_CONST_CAST(T,v) const_cast<T>(v)
+	#endif /* !defined(NI_CONST_CAST) */
+	#if !defined(NI_REINTERPRET_CAST)
+		/** @brief Peform a C++ reinterpret cast.
+			@param T the type to cast to
+			@param v the item to cast
+		*/
+		#define NI_REINTERPRET_CAST(T,v) reinterpret_cast<T>(v)
+	#endif /* !defined(NI_REINTERPRET_CAST) */
+#else /* ! C++ */
+	#if !defined(NI_STATIC_CAST)
+		/** @brief Peform a C static cast.
+			@param T the type to cast to
+			@param v the item to cast
+		*/
+		#define NI_STATIC_CAST(T,v) ((T)(v))
+	#endif /* !defined(NI_STATIC_CAST) */
+	#if !defined(NI_CONST_CAST)
+		/** @brief Peform a C const cast.
+			@param T the type to cast to
+			@param v the item to cast
+		*/
+		#define NI_CONST_CAST(T,v) ((T)(v))
+	#endif /* !defined(NI_CONST_CAST) */
+	#if !defined(NI_REINTERPRET_CAST)
+		/** @brief Peform a C reinterpret cast.
+			@param T the type to cast to
+			@param v the item to cast
+		*/
+	#define NI_REINTERPRET_CAST(T,v) ((T)(v))
+	#endif /* !defined(NI_REINTERPRET_CAST) */
+#endif /* defined(__cplusplus) */
 
 #if Mac
 	/* These must be defined before we start including Mac headers. */
@@ -139,12 +183,7 @@
 typedef const uChar	ConstStr255[256];
 
 /* Using 1 instead of 0 avoids a warning in GCC */
-#ifdef __cplusplus
-	#define __REINTERPRET_CAST(T,V) reinterpret_cast<T>(V)
-#else
-	#define __REINTERPRET_CAST(T,V) ((T)(V))
-#endif
-#define Offset(type, field)		((__REINTERPRET_CAST(size_t,(&__REINTERPRET_CAST(type*,1)->field)))-1)
+#define Offset(type, field)		((NI_REINTERPRET_CAST(size_t,(&NI_REINTERPRET_CAST(type*,1)->field)))-1)
 
 
 /* Various mechanisms to define opaque types. */
@@ -155,31 +194,23 @@ typedef const uChar	ConstStr255[256];
 
 /** Legacy 16-bit Boolean type */
 typedef uInt16 LVBooleanU16;
-#define LVBooleanU16True	((LVBooleanU16)0x8000)
-#define LVBooleanU16False	((LVBooleanU16)0x0000)
+#define LVBooleanU16True	NI_STATIC_CAST(LVBooleanU16,0x8000)
+#define LVBooleanU16False	NI_STATIC_CAST(LVBooleanU16,0x0000)
 
 /** Standard Boolean type */
 typedef uInt8 LVBoolean;
-#define LVBooleanTrue		((LVBoolean)1)
-#define LVBooleanFalse		((LVBoolean)0)
+#define LVBooleanTrue		NI_STATIC_CAST(LVBoolean,1)
+#define LVBooleanFalse		NI_STATIC_CAST(LVBoolean,0)
 #define LVTRUE				LVBooleanTrue			/* for CIN users */
 #define LVFALSE				LVBooleanFalse
 
 /** @brief Opaque type used for various unique identifiers. */
 typedef uInt32 MagicCookie;
-#ifdef __cplusplus
-#define kNotAMagicCookie static_cast<MagicCookie>(0)	/* canonical invalid MagicCookie value */
-#else
-#define kNotAMagicCookie ((MagicCookie)0)	/* canonical invalid MagicCookie value */
-#endif
+#define kNotAMagicCookie NI_STATIC_CAST(MagicCookie,0)	/* canonical invalid MagicCookie value */
 
 /** @brief The opaque type used by the Resource Manager. */
 typedef MagicCookie RsrcFile;
-#ifdef __cplusplus
-#define kNotARsrcFile static_cast<RsrcFile>(kNotAMagicCookie)	/* canonical invalid RsrcFile */
-#else
-#define kNotARsrcFile ((RsrcFile)kNotAMagicCookie)	/* canonical invalid RsrcFile */
-#endif
+#define kNotARsrcFile NI_STATIC_CAST(RsrcFile,kNotAMagicCookie)	/* canonical invalid RsrcFile */
 
 /** @brief Basic unsigned character pointer and handle types. */
 typedef uChar		*UPtr, **UHandle;
@@ -202,7 +233,7 @@ typedef struct {
 	uChar	str[1];		/* cnt bytes of concatenated pascal strings */
 } CPStr, *CPStrPtr, **CPStrHandle;
 
-/* Long Pascal-style string types. */
+/** @brief Long Pascal-style string types. */
 typedef struct {
 	int32	cnt;		/* number of bytes that follow */
 	uChar	str[1];		/* cnt bytes */
@@ -392,7 +423,10 @@ enum {
 	mgErrStringCannotContainNull,	/* An LStr contained a null character in a place that does not support null characters 124 */
 	mgErrStackOverflow,			/* Stack overflow detected 125 */
 
-	mgErrSentinel,	// 126
+	ncSocketQueryFailed, /* 126: Failed to query socket state */
+	ncNotInetSocket, /* 127: Not an IP4 internet socket */
+
+	mgErrSentinel,	// 128
 
 	mgPrivErrBase = 500,	/* Start of Private Errors */
 	mgPrivErrLast = 599,	/* Last allocated in Error DB */
@@ -452,11 +486,7 @@ enum {
 /** @brief These values describe various scalar numeric types. */
 typedef enum {	iB=1, iW, iL, iQ, uB, uW, uL, uQ, fS, fD, fX, cS, cD, cX } NumType;
 
-#if defined(__cplusplus)
-#define _NumericTypeCast_(T,v)	static_cast<T>(v)
-#else
-#define _NumericTypeCast_(T,v)	((T)(v))
-#endif
+#define _NumericTypeCast_(T,v)	NI_STATIC_CAST(T,v)
 #define _NumericTypeCastTwice_(T1,T2,v) _NumericTypeCast_(T1,_NumericTypeCast_(T2,v))
 
 #define HiNibble(x)		_NumericTypeCast_(uInt8,((x)>>4) & 0x0F)
@@ -737,15 +767,17 @@ TH_REENTRANT EXTERNC size_t _FUNCC DSMaxMem(void);
 
 /** @brief Describes memory statistics. */
 typedef struct {
-	int32 totFreeSize;
-	int32 maxFreeSize;
-	int32 nFreeBlocks;
-	size_t totAllocSize;
-	size_t maxAllocSize;
-	int32 nPointers;
-	int32 nUnlockedHdls;
-	int32 nLockedHdls;
-	int32 reserved[4];
+	int32 totFreeSize;    // free physical RAM in bytes (RT only)
+	int32 maxFreeSize;    // largest free contiguous block in bytes (VxWorks/PharLap only)
+	int32 unused1;        // was nFreeBlocks, but this was never filled in
+	size_t totAllocSize;  // memory usage of LabVIEW itself in bytes
+	size_t unused2;       // was maxAllocSize
+	int32 unused3;        // was nPointers
+	int32 unused4;        // was nUnlockedHdls
+	int32 unused5;        // was nLockedHdls
+	uInt64 totPhysSize;   // total physical RAM in bytes (RT only)
+	int32 reserved1;
+	int32 reserved2;
 } MemStatRec;
 
 TH_REENTRANT EXTERNC MgErr _FUNCC DSMemStats(MemStatRec *msrp);
@@ -788,163 +820,619 @@ TH_REENTRANT EXTERNC MgErr _FUNCC AZSetHandleFromPtr(void *ph, const void *psrc,
 
 /*** The File Manager ***/
 
+/** @brief Opaque type used by the File Manager API for a file descriptor. */
+LV_PRIVATE(File);
+
 /** @brief Initial enumeration type for file types.
 	The enumeration is used to increase type safety but does not list all possible values.
 */
-typedef enum _FMFileType {
-	kInvalidType	=0,
-	kUnknownFileType=RTToL('?','?','?','?'),
-	kTextFileType	=RTToL('T','E','X','T'),
-	/** Typical directory types */
-	kHardDiskDirType=RTToL('h','d','s','k'),
-	kFloppyDirType	=RTToL('f','l','p','y'),
-	kNetDriveDirType=RTToL('s','r','v','r')
-}FMFileType;
+typedef enum _FMFileType
+{
+	kInvalidType     = 0, /**< not a valid file type */
+	kUnknownFileType = RTToL('?','?','?','?'), /**< unknown file type */
+	kTextFileType    = RTToL('T','E','X','T'), /**< text file */
+	kHardDiskDirType = RTToL('h','d','s','k'), /**< hard disk directory */
+	kFloppyDirType   = RTToL('f','l','p','y'), /**< floppy drive type */
+	kNetDriveDirType = RTToL('s','r','v','r')  /**< network volume */
+} FMFileType;
 
 /** @brief Type for file creator codes.
 	The enumeration is used to increase type safety but does not list all possible values.*/
-typedef enum  {
-	kInvalidCreator	=0,
-	kUnknownCreator =RTToL('?','?','?','?'),
-	/** LabVIEW creator type */
-	kLVCreatorType	=RTToL('L','B','V','W')
-}FMFileCreator;
+typedef enum _FMFileCreator
+{
+	kInvalidCreator = 0, /**< not a vaild file creator */
+	kUnknownCreator = RTToL('?','?','?','?'), /**< unknown creator */
+	kLVCreatorType  = RTToL('L','B','V','W') /**< LabVIEW creator */
+} FMFileCreator;
 
-/** @brief Opaque type used by the File Manager API. */
-LV_PRIVATE(File);
-
-/** Used with FListDir */
-typedef struct {
-	int32 flags;
-	FMFileType type;
-} FMListDetails;
-
-/** Type Flags used with FMListDetails */
-#define kIsFile				0x01
-#define kRecognizedType		0x02
-#define kIsLink				0x04
-#define kFIsInvisible		0x08
-#define kIsTopLevelVI		0x10	/**< Used only for VIs in archives */
-#define kErrGettingType		0x20	/**< error occurred getting type info */
+/** @brief Flags describing a file used by the FMListDetails data structure. */
+#define kIsFile         0x01 /**< entry refers to a file (as opposed to a directory) */
+#define kRecognizedType 0x02 /**< file's type was recognized (e.g. VI, et. al.) */
+#define kIsLink         0x04 /**< entry refers to a shortcut / alias / link */
+#define kFIsInvisible   0x08 /**< entry refers to a hidden file */
+#define kIsTopLevelVI   0x10 /**< Used only for VIs in archives */
+#define kErrGettingType 0x20 /**< error occurred getting type info */
 #if Mac
-#define kFIsStationery		0x40
+#define kFIsStationery  0x40 /**< file is stationery */
 #endif /* Mac */
 
-typedef CPStr FDirEntRec, *FDirEntPtr, **FDirEntHandle; /**< directory list record */
+/** @brief Data used with FListDir to describe the files listed in a directory. */
+typedef struct _FMListDetails
+{
+	int32 flags; /**< descriptive flags for the file (see kIsFile, et. al. above) */
+	FMFileType type; /**< type of the file */
+} FMListDetails;
+
+/** @brief Data types used to describe a list of entries from a directory. */
+typedef CPStr FDirEntRec, *FDirEntPtr, **FDirEntHandle;
+
+/** @brief UNIX read permission bits (octal). */
+#define fileReadBits	0444L
+
+/** @brief UNIX write permission bits (octal). */
+#define fileWriteBits	0222L
+
+/** @brief UNIX execute permission bits (octal). */
+#define fileExecBits	0111L
+
+/** @brief UNIX read/write access permissions for a file. This is usually the default access to assign newly created files. */
+#define fDefaultAccess (fileReadBits | fileWriteBits)
 
 /** @brief Descriptive information about a file. */
-typedef struct {			/**< file/directory information record */
-	FMFileType type;		/**< system specific file type-- 0 for directories */
-	FMFileCreator creator;	/**< system specific file creator-- 0 for directories */
-	int32	permissions;	/**< system specific file access rights */
-	int32	size;			/**< file size in bytes (data fork on Mac) or entries in folder */
-	int32	rfSize;			/**< resource fork size (on Mac only) */
-	uInt32	cdate;			/**< creation date */
-	uInt32	mdate;			/**< last modification date */
-	Bool32	folder;			/**< indicates whether path refers to a folder */
-	Bool32	isInvisible; /**< indicates whether the file is visible in File Dialog */
+typedef struct {
+	FMFileType type;       /**< system specific file type-- 0 for directories */
+	FMFileCreator creator; /**< system specific file creator-- 0 for directories */
+	int32	permissions;   /**< system specific file access rights */
+	int32	size;          /**< file size in bytes (data fork on Mac) or entries in folder */
+	int32	rfSize;        /**< resource fork size (on Mac only) */
+	uInt32	cdate;         /**< creation date */
+	uInt32	mdate;         /**< last modification date */
+	Bool32	folder;        /**< indicates whether path refers to a folder */
+	Bool32	isInvisible;   /**< indicates whether the file is visible in File Dialog */
 	struct {
-		int16 v;
-		int16 h;
-	} location;			/**< system specific geographical location */
-	Str255	owner;			/**< owner (in pascal string form) of file or folder */
-	Str255	group;			/**< group (in pascal string form) of file or folder */
+		int16 v; /**< vertical coordinate */
+		int16 h; /**< horizontal coordinate */
+	} location;            /**< system specific geographical location (on Mac only) */
+	Str255	owner;         /**< owner (in pascal string form) of file or folder */
+	Str255	group;         /**< group (in pascal string form) of file or folder (Mac, Linux only) */
 } FInfoRec, *FInfoPtr;
 
+/** @brief Retrieve information about a file or directory.
+	@param path absolute path to a file or directory
+	@param infop pointer to a FInfoRec structure which receives information about the file or directory
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to access the file or directory due to permissions in the file system
+	          - fNotFound: the file or directory does not exist at the specified location
+	@note If @p path is a shortcut, it is resolved to the actual path. (Windows only)
+*/
 TH_REENTRANT EXTERNC MgErr _FUNCC FGetInfo(ConstPath path, FInfoPtr infop);
-TH_REENTRANT EXTERNC MgErr _FUNCC FSetInfo(ConstPath path, FInfoPtr infop);
 
-/** @brief Used for FGetInfo, 64-bit version */
-typedef uInt32	FGetInfoWhich;
+/** @brief Modify information about a file or directory.
+	@param path absolute path to a file or directory
+	@param infop pointer to a FInfoRec structure which contains information about the file or directory
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to access the file or directory due to permissions in the file system
+	          - fNotFound: the file or directory does not exist at the specified location
+	@note If @p path is a shortcut, it is resolved to the actual path. (Windows only)
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FSetInfo(ConstPath path, const FInfoPtr infop);
+
+/** @brief Used to specify fields of interest in a FInfoRec64 structure. */
+typedef uInt32 FGetInfoWhich;
 enum {
-	kFGetInfoType			= 1L << 0,
-	kFGetInfoCreator		= 1L << 1,
-	kFGetInfoPermissions	= 1L << 2,
-	kFGetInfoSize			= 1L << 3,
-	kFGetInfoRFSize			= 1L << 4,
-	kFGetInfoCDate			= 1L << 5,
-	kFGetInfoMDate			= 1L << 6,
-	kFGetInfoFolder			= 1L << 7,
-	kFGetInfoIsInvisible	= 1L << 8,
-	kFGetInfoLocation		= 1L << 9,
-	kFGetInfoOwner			= 1L << 10,
-	kFGetInfoGroup			= 1L << 11,
-	kFGetInfoAll			= 0xEFFFFFFFL
+	kFGetInfoType        = 1L <<  0, /**< enable the type field */
+	kFGetInfoCreator     = 1L <<  1, /**< enable the creator field */
+	kFGetInfoPermissions = 1L <<  2, /**< enable the permissions field */
+	kFGetInfoSize        = 1L <<  3, /**< enable the size field */
+	kFGetInfoRFSize      = 1L <<  4, /**< enable the rfSize field */
+	kFGetInfoCDate       = 1L <<  5, /**< enable the cdate field */
+	kFGetInfoMDate       = 1L <<  6, /**< enable the mdate field */
+	kFGetInfoFolder      = 1L <<  7, /**< enable the folder field */
+	kFGetInfoIsInvisible = 1L <<  8, /**< enable the isInvisible field */
+	kFGetInfoLocation    = 1L <<  9, /**< enable the location field */
+	kFGetInfoOwner       = 1L << 10, /**< enable the owner field */
+	kFGetInfoGroup       = 1L << 11, /**< enable the group field */
+	kFGetInfoAll         = 0xEFFFFFFFL /**< enable all fields in FInfoRec64 */
 };
 
-typedef struct {			/**< file/directory information record */
-	FMFileType type;		/**< system specific file type-- 0 for directories */
-	FMFileCreator creator;	/**< system specific file creator-- 0 for directories */
-	int32	permissions;	/**< system specific file access rights */
-	int64	size;			/**< file size in bytes (data fork on Mac) or entries in folder */
-	int64	rfSize;			/**< resource fork size (on Mac only) */
-	uInt32	cdate;			/**< creation date */
-	uInt32	mdate;			/**< last modification date */
-	Bool32	folder;			/**< indicates whether path refers to a folder */
-	Bool32	isInvisible; /**< indicates whether the file is visible in File Dialog */
+/** @brief Descriptive information about a file, with large file support. */
+typedef struct {
+	FMFileType type;       /**< system specific file type-- 0 for directories */
+	FMFileCreator creator; /**< system specific file creator-- 0 for directories */
+	int32	permissions;   /**< system specific file access rights */
+	int64	size;          /**< file size in bytes (data fork on Mac) or entries in folder */
+	int64	rfSize;        /**< resource fork size (on Mac only) */
+	uInt32	cdate;         /**< creation date */
+	uInt32	mdate;         /**< last modification date */
+	Bool32	folder;        /**< indicates whether path refers to a folder */
+	Bool32	isInvisible;   /**< indicates whether the file is visible in File Dialog */
 	struct {
-		int16 v;
-		int16 h;
-	} location;			/**< system specific geographical location */
-	Str255	owner;			/**< owner (in pascal string form) of file or folder */
-	Str255	group;			/**< group (in pascal string form) of file or folder */
+		int16 v; /**< vertical coordinate */
+		int16 h; /**< horizontal coordinate */
+	} location;            /**< system specific geographical location (on Mac only) */
+	Str255	owner;         /**< owner (in pascal string form) of file or folder */
+	Str255	group;         /**< group (in pascal string form) of file or folder (Mac, Linux only) */
 } FInfoRec64, *FInfo64Ptr;
 
-TH_REENTRANT EXTERNC MgErr _FUNCC FGetInfo64(ConstPath path, FInfo64Ptr infop, FGetInfoWhich which DEFAULTARG(kFGetInfoAll));
-TH_REENTRANT EXTERNC MgErr _FUNCC FSetInfo64(ConstPath path, FInfo64Ptr infop);
+/** @brief Retrieve information about a file or directory (supports files > 2 GB in size).
+	@param path absolute path to a file or directory
+	@param infop pointer to a FInfoRec64 structure which receives information about the file or directory
+	@param which describes which portions of the FInfoRec64 should be acquired (in C++, this argument defaults to kFGetInfoAll)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to access the file or directory due to permissions in the file system
+	          - fNotFound: the file or directory does not exist at the specified location
+	@note If @p path is a shortcut, it is resolved to the actual path. (Windows only)
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FGetInfo64(ConstPath path, FInfo64Ptr infop, const FGetInfoWhich which DEFAULTARG(kFGetInfoAll));
 
-/** Used with FExists */
+/** @brief Modify information about a file or directory (supports files > 2 GB in size).
+	@param path absolute path to a file or directory
+	@param infop pointer to a FInfoRec64 structure which contains information about the file or directory
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to access the file or directory due to permissions in the file system
+	          - fNotFound: the file or directory does not exist at the specified location
+	@note If @p path is a shortcut, it is resolved to the actual path. (Windows only)
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FSetInfo64(ConstPath path, const FInfo64Ptr infop);
+
+/** @brief Modes available to open a file. */
 enum {
-	kFNotExist = 0L,
-	kFIsFile,
-	kFIsFolder
+	openReadWrite,                  /**< open the file for reading and writing */
+	openReadOnly,                   /**< open the file for reading */
+	openWriteOnly,                  /**< open the file for writing (on Mac, this may enforce exclusive access to the file) */
+	openWriteOnlyTruncate,          /**< open the file for writing, emptying the file on open */
+	openReadWriteUnbuffered,        /**< open the file for reading and writing , disabling system caching (Windows only) */
+	openReadOnlyUnbuffered,         /**< open the file for reading , disabling system caching (Windows only) */
+	openWriteOnlyUnbuffered,        /**< open the file for writing , disabling system caching (Windows only) */
+	openWriteOnlyTruncateUnbuffered /**< open the file for writing, emptying the file on open and disabling system caching (Windows only) */
 };
 
-/** open modes */
-enum { openReadWrite, openReadOnly, openWriteOnly, openWriteOnlyTruncate,
-	   openReadWriteUnbuffered, openReadOnlyUnbuffered, openWriteOnlyUnbuffered, openWriteOnlyTruncateUnbuffered };
-/** deny modes */
-enum { denyReadWrite, denyWriteOnly, denyNeither };
-/** seek modes */
-enum { fStart=1, fEnd, fCurrent };
+/** @brief When opening a file, restrict concurrent access to the file.
+	@note Deny modes are not supported on all operating systems.
+*/
+enum {
+	denyReadWrite, /**< deny others the ability to open a file for reading or writing */
+	denyWriteOnly, /**< deny others the ability to open a file for writing */
+	denyNeither    /**< do not deny others from opening the file for any purpose */
+};
 
-TH_REENTRANT EXTERNC MgErr _FUNCC FCreate(File *fdp, ConstPath path, int32 access, int32 openMode, int32 denyMode, PStr group);
-TH_REENTRANT EXTERNC MgErr _FUNCC FCreateAlways(File *fdp, ConstPath path, int32 access, int32 openMode, int32 denyMode, PStr group);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMOpen(File *fdp, ConstPath path, int32 openMode, int32 denyMode);
+/** @brief Create and open a file in the specified mode, assigning permissions and optionally the group.
+	@param fdp receives a file descriptor; 0 if the operation fails
+	@param path absolute path to the file to create
+	@param permissions file system permissions to assign to the new file
+	@param openMode the file access mode to use when opening the file
+	@param denyMode defines concurrent access policy for the file (not supported on all platforms)
+	@param group the group to assign to the file (Mac, Linux only)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to create the file due to permissions in the file system
+	          - fDupPath: a file already exists at the requested location
+	          - fTMFOpen: unable to open the file because too many files have already been opened
+
+	@note In VxWorks, the @p denyMode parameter has no effect.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FCreate(File *fdp, ConstPath path, const int32 permissions, const int32 openMode, const int32 denyMode, ConstPStr group);
+
+/** @brief Create and open a file in the specified mode, assigning permissions and optionally the group.
+           If the file already exists, truncate it.
+	@param fdp receives a file descriptor; 0 if the operation fails
+	@param path absolute path to the file to create
+	@param permissions file system permissions to assign to the new file
+	@param openMode the file access mode to use when opening the file
+	@param denyMode defines concurrent access policy for the file (not supported on all platforms)
+	@param group the group to assign to the file (Mac, Linux only)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to create the file due to permissions in the file system
+	          - fTMFOpen: unable to open the file because too many files have already been opened
+
+	@note In VxWorks, the @p denyMode parameter has no effect.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FCreateAlways(File *fdp, ConstPath path, const int32 access, const int32 openMode, const int32 denyMode, ConstPStr group);
+
+/** @brief Open an existing file in the specified mode.
+	@param fdp receives a file descriptor; 0 if the operation fails
+	@param path absolute path to the file to create
+	@param openMode the file access mode to use when opening the file
+	@param denyMode defines concurrent access policy for the file (not supported on all platforms)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to open the file due to permissions in the file system
+	          - fTMFOpen: unable to open the file because too many files have already been opened
+
+	@note In VxWorks, the @p denyMode parameter has no effect.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMOpen(File *fdp, ConstPath path, const int32 openMode, const int32 denyMode);
+
+/** @brief Close the file associated with the given file descriptor.
+	@param fd the file descriptor of the file to close
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fNotFound: the file does not exist at the specified location
+	          - fIOErr: a general error occurred
+
+	@note Calling FMClose() with an invalid file descriptor may cause your program to crash in some operating systems.
+*/
 TH_REENTRANT EXTERNC MgErr _FUNCC FMClose(File fd);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMSeek(File fd, int32 ofst, int32 mode);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMSeek64(File fd, int64 ofst, int32 mode);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMTell(File fd, int32 *ofstp);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMTell64(File fd, int64 *ofstp);
-TH_REENTRANT EXTERNC MgErr _FUNCC FGetEOF(File fd, int32 *sizep);
-TH_REENTRANT EXTERNC MgErr _FUNCC FGetEOF64(File fd, int64 *sizep);
-TH_REENTRANT EXTERNC MgErr _FUNCC FSetEOF(File fd, int32 size);
-TH_REENTRANT EXTERNC MgErr _FUNCC FSetEOF64(File fd, int64 size);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMRead(File fd, int32 inCount, int32 *outCountp, UPtr buffer);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMWrite(File fd, int32 inCount, int32 *outCountp, ConstUPtr buffer);
-TH_REENTRANT EXTERNC int32 _FUNCC FPrintf(File, ConstCStr, ...);
-TH_REENTRANT EXTERNC MgErr _FUNCC FPrintfWErr(File fd, ConstCStr fmt, ...);
-TH_REENTRANT EXTERNC MgErr _FUNCC FLockOrUnlockRange(File, int32, int32, int32, Bool32);
-TH_REENTRANT EXTERNC MgErr _FUNCC FFlush(File fd);
-TH_REENTRANT EXTERNC int32 _FUNCC FExists(ConstPath path);
-TH_REENTRANT EXTERNC MgErr _FUNCC FGetAccessRights(ConstPath path, PStr owner, PStr group, int32 *permPtr);
-TH_REENTRANT EXTERNC MgErr _FUNCC FSetAccessRights(ConstPath path, PStr owner, PStr group, int32 *permPtr);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMove(ConstPath oldPath, ConstPath newPath);
-TH_REENTRANT EXTERNC MgErr _FUNCC FCopy(ConstPath oldPath, ConstPath newPath);
-TH_REENTRANT EXTERNC MgErr _FUNCC FRemove(ConstPath path);
-TH_REENTRANT EXTERNC MgErr _FUNCC FRemoveToRecycle(ConstPath path, Bool32 showConfirmDlgs);
-TH_REENTRANT EXTERNC MgErr _FUNCC FNewDir(ConstPath path, int32 permissions);
 
-/** Used for FGetVolInfo */
+/** @brief Seek modes for FMSeek() and FMSeek64(). */
+enum {
+	fStart = 1, /**< move file marker relative to start of file */
+	fEnd,       /**< move file marker relative to end of file */
+	fCurrent    /**< move file marker relative to the current file marker position within the file */
+};
+
+/** @brief Set the position mark for a file to the specified point.
+	@param fd file descriptor of the file whose marker is to be set
+	@param ofst new position for the file marker, intepreted by @p mode
+	@param mode move the file marker relative to the specified location (start, end, or current)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fEOF: attempted to move the file marker past the end of the file, or before the start
+	          - fIOErr: a general error occurred
+
+	When the @p mode is fEnd, the @p ofst value must be <= 0, and when @p mode is
+	fStart, the @p ofst value must be >= 0. Attempts to seek before the start of the
+	file result in the file marker being set to the beginning of the file, while
+	attempting to seek past the end of the file leaves the file marker at the end of the file.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMSeek(File fd, const int32 ofst, const int32 mode);
+
+/** @brief Set the position mark for a file to the specified point (supports files > 2 GB in size).
+	@param fd file descriptor of the file whose marker is to be set
+	@param ofst new position for the file marker, intepreted by @p mode
+	@param mode move the file marker relative to the specified location (start, end, or current)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fEOF: attempted to move the file marker past the end of the file, or before the start
+	          - fIOErr: a general error occurred
+
+	When the @p mode is fEnd, the @p ofst value must be <= 0, and when @p mode is
+	fStart, the @p ofst value must be >= 0. Attempts to seek before the start of the
+	file result in the file marker being set to the beginning of the file, while
+	attempting to seek past the end of the file leaves the file marker at the end of the file.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMSeek64(File fd, const int64 ofst, const int32 mode);
+
+/** @brief Get the current position of the file marker in the file.
+	@param fd file descriptor of the file whose marker position is to be retrieved
+	@param ofstp receives the position (in bytes) of the file marker, relative to the beginning of the file
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMTell(File fd, int32 *ofstp);
+
+/** @brief Get the current position of the file marker in the file (supports files > 2 GB in size).
+	@param fd file descriptor of the file whose marker position is to be retrieved
+	@param ofstp receives the position (in bytes) of the file marker, relative to the beginning of the file
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMTell64(File fd, int64 *ofstp);
+
+/** @brief Get the size of the file in bytes.
+	@param fd file descriptor of the file whose size is to be retrieved
+	@param sizep receives the size of the file (in bytes); if an error occurs, the value is undefined
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FGetEOF(File fd, int32 *sizep);
+
+/** @brief Get the size of the file in bytes (supports files > 2 GB in size).
+	@param fd file descriptor of the file whose size is to be retrieved
+	@param sizep receives the size of the file (in bytes); if an error occurs, the value is undefined
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FGetEOF64(File fd, int64 *sizep);
+
+/** @brief Set the size of a file.
+	@param fd file descriptor of the file whose size is to be changed
+	@param size new size for the file (in bytes)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to create the file due to permissions in the file system
+	          - fDiskFull: not enough disk space
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FSetEOF(File fd, const int32 size);
+
+/** @brief Set the size of a file (supports files > 2 GB in size).
+	@param fd file descriptor of the file whose size is to be changed
+	@param size new size for the file (in bytes)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to modify the file due to permissions in the file system
+	          - fDiskFull: not enough disk space
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FSetEOF64(File fd, const int64 size);
+
+/** @brief Lock or unlock a range within a file, preventing (or allowing) write access.
+	@param fd file descriptor of the file to lock or unlock a range within
+	@param mode lock / unlock range begins at @p offset relative to the specified location (start, end, or current)
+	@param offset position of the first byte to lock / unlock in the file, as determined by @p mode
+	@param count number of bytes to lock or unlock
+	@param lock if TRUE, the specified range is locked, if FALSE, it is unlocked
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to lock the file due to permissions in the file system
+
+	@note In VxWorks, this function has no effect, and this function will never return an error.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FLockOrUnlockRange(File fd, const int32 mode, const int32 offset, const int32 count, const Bool32 lock);
+
+/** @brief Read the requested number of bytes from the given file.
+	@param fd file descriptor of the file to read
+	@param inCount number of bytes to read
+	@param outCountp receives the number of bytes actually read (ignored if NULL)
+	@param buffer receives the data
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fEOF: end of file reached before requested amount of data could be read
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMRead(File fd, const int32 inCount, int32 *outCountp, UPtr buffer);
+
+/** @brief Write the supplied data to the given file.
+	@param fd file descriptor of the file to write to
+	@param inCount number of bytes to write to the file
+	@param outCountp receives number of bytes actually written to the file
+	@param buffer the data to write to the file
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+	          - fNoPerm: unable to write to the file due to permissions in the file system or deny mode during concurrent access
+	          - fDiskFull: not enough disk space
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMWrite(File fd, const int32 inCount, int32 *outCountp, ConstUPtr buffer);
+
+/** @brief Print formatted text to a file.
+	@param fd file descriptor of the file to write to
+	@param fmt format specifier string
+	@param ... arguments that provide data for the format specifier string
+	@return number of bytes written to the file, -1 if an error occurred
+*/
+TH_REENTRANT EXTERNC int32 _FUNCC FPrintf(File, ConstCStr fmt, ...);
+
+/** @brief Write buffered data to disk.
+	@param fd file descriptor of the file to flush to disk
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FFlush(File fd);
+
+/** @brief Values returned from the FExists() function. */
+enum {
+	kFNotExist = 0L, /**< the file or directory does not exist */
+	kFIsFile,        /**< the path refers to a file */
+	kFIsFolder       /**< the path refers to a directory */
+};
+
+/** @brief Determine whether the given path exists, and if it is a file or directory.
+	@param path absolute path to a file or directory to check
+	@return one of the values kFNotExist, kFIsFile, or kFIsFolder
+*/
+TH_REENTRANT EXTERNC int32 _FUNCC FExists(ConstPath path);
+
+/** @brief Determine if the given path refers to a directory.
+	@param p absolute path to check
+	@return TRUE if @p path refers to a folder, otherwise FALSE
+*/
+#define FIsFolder(path) ((Bool32)(FExists((path)) == kFIsFolder))
+
+/** @brief Get file system access rights information for the specified file or directory.
+	@param path absolute path to the file or directory to query
+	@param owner receives name of the owner of the file or directory (may not be NULL)
+	@param group receives name of the group of the file or directory (may not be NULL)
+	@param permPtr receives the UNIX-style file permissions bits of the file or direcotry (may not be NULL)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FGetAccessRights(ConstPath path, PStr owner, PStr group, int32 *permPtr);
+
+/** @brief Set file system access rights information for the specified file or directory.
+	@param path absolute path to the file or direcotry whose access rights are being modified
+	@param owner new owner of the file (ignored if NULL)
+	@param group new group of the file or directory (ignored if NULL)
+	@param permPtr new UNIX-style permissions for the file or directory (ignored if NULL)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to modify the permissions in the file system due to restrictions imposed by the OS or file system
+	          - fIOErr: a general error occurred
+
+	@note If all off @p owner, @p group and @p permPtr are NULL, the function is a no-op and returns mgNoErr.
+
+	@note In VxWorks, this function has no effect, and will never return an error.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FSetAccessRights(ConstPath path, ConstPStr owner, ConstPStr group, const int32 *permPtr);
+
+/** @brief Move or rename a file or directory.
+	@param oldPath absolute path to the file or directory to move
+	@param newPath absolute path to the destination for the file or directory
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - mFullErr: ran out of memory during the operation
+	          - fIsOpen: file is already open and may not be moved
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to move the file or directory due to restrictions imposed by the OS or file system
+	          - fIOErr: a general error occurred
+	          - fDiskFull: not enough disk space
+	          - fDupPath: a directory or file already exists at the destination
+	          - fTMFOpen: unable to open the source file because too many files have already been opened
+	@note In Windows, shortcuts in @p oldPath will be resolved prior to executing the move.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMove(ConstPath oldPath, ConstPath newPath);
+
+/** @brief Copy a file or directory from one location to another, preserving access rights and other information.
+	@param oldPath absolute path to a file or directory to copy
+	@param newPath absolute path for the copy of the file or directory
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - mFullErr: ran out of memory during the operation
+	          - fIsOpen: file is already open and may not be moved
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to move the file or directory due to restrictions imposed by the OS or file system
+	          - fIOErr: a general error occurred
+	          - fDiskFull: not enough disk space
+	          - fDupPath: a directory or file already exists at the destination
+	          - fTMFOpen: unable to open the source file because too many files have already been opened
+	@note In Windows, if @p oldPath is a shortcut, it is resolved prior to executing the copy.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FCopy(ConstPath oldPath, ConstPath newPath);
+
+/** @brief Permanently delete a file or empty directory.
+	@param path absolute path to the file or empty directory to delete
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIsOpen: file is already open and may not be moved
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to move the file or directory due to restrictions imposed by the OS or file system
+	          - fIOErr: a general error occurred
+
+	@note If @p path refers to a shortcut, alias, or symbolic link, the respective shortcut, alias, or
+	      link will be removed, not the target of the shortcut / alias / symbolic link.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FRemove(ConstPath path);
+
+/** @brief Place a file or directory into the system's trash / recycle bin.
+	@param path absolute path to the file or empty directory to delete
+	@param showConfigDlgs if TRUE, the operating system may display a dialog requesting confirmation of the operation
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIsOpen: file is already open and may not be moved
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to move the file or directory due to restrictions imposed by the OS or file system
+	          - fIOErr: a general error occurred
+
+	@note When called on operating systems other than Mac or Windows, this function behaves
+	      as if you called FRemove(), which permanently deletes the file or directory.
+
+	@note In some cases, the operating system may display a progress dialog during the operation,
+	      even if @p showConfigDlgs is FALSE. The dialog will not require user interaction.
+
+	@note If @p path refers to a shortcut, alias, or symbolic link, the respective shortcut, alias, or
+	      link will be removed, not the target of the shortcut / alias / symbolic link.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FRemoveToRecycle(ConstPath path, const Bool32 showConfirmDlgs);
+
+/** @brief Create a directory with the given permissions.
+	@param path the absolute path of the directory to create
+	@param permissions the access rights to assign to the diretory (typically folderDefaultPerm)
+	@return result operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fNotFound: the file or directory does not exist at the specified location
+	          - fNoPerm: unable to create the directory due to permissions in the file system
+	          - fIOErr: a general error occurred
+
+	@note In VxWorks, the @p permissions argument has no effect.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FNewDir(ConstPath path, const int32 permissions);
+
+/** @brief Data structure describing a disk volume. */
 typedef struct {
-	uInt32	size;			/**< size in bytes of a volume */
-	uInt32	used;			/**< number of bytes used on volume */
-	uInt32	free;			/**< number of bytes available for use on volume */
+	uInt32	size; /**< size in bytes of a volume */
+	uInt32	used; /**< number of bytes used on volume */
+	uInt32	free; /**< number of bytes available for use on volume */
 } VInfoRec;
-TH_REENTRANT EXTERNC MgErr _FUNCC FGetVolInfo(Path, VInfoRec*);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMGetVolInfo(ConstPath, float64*, float64*);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMGetVolInfo64(ConstPath, uInt64*, uInt64*, uInt32*);
-TH_REENTRANT EXTERNC MgErr _FUNCC FMGetVolPath(ConstPath, Path*);
+
+/** @brief Get information about the volume containing the specified path, returning base volume path via the provided path.
+	@param path absolute path from which to extract volume information
+	@param vInfo receives information about the volume on which @p path exists
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+
+	@note This function modifies the contents of the @p path argument.
+
+	@note This function has been deprecated. Use FMGetVolInfo() or FMGetVolInfo64() instead.
+	      It is unable to return accurate information for volumes 4 GB in size.
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FGetVolInfo(Path path, VInfoRec *vInfo);
+
+/** @brief Get information about the volume containing the specified path.
+	@param path in: absolute path from which to extract volume information; out: contains the base volume path
+	@param pFreeBytes receives number of free bytes on the volume containing @p path (may be NULL)
+	@param pTotalBytes receives total size in bytes of the volume containing @p path (may be NULL)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMGetVolInfo(ConstPath path, float64 *pFreeBytes, float64 *pTotalBytes);
+
+/** @brief Get information about the volume containing the specified path.
+	@param path absolute path from which to extract volume information
+	@param pFreeBytes receives number of free bytes on the volume containing @p path (may be NULL)
+	@param pTotalBytes receives total size in bytes of the volume containing @p path (may be NULL)
+	@param pSectorSize receives size in bytes of the sectors on the volume containing @p path (may be NULL)
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - fIOErr: a general error occurred
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMGetVolInfo64(ConstPath path, uInt64 *pFreeBytes, uInt64 *pTotalBytes, uInt32 *pSectorSize);
+
+/** @brief Get the path for the root of the volume for a given path.
+	@param path absolute path from which to extract the volume path
+	@param volPath receives the base volume path
+	@return result of the operation:
+	          - mgNoErr: success
+	          - mgArgErr: an invalid argument was passed to the function
+	          - mFullErr: out of memory
+
+	@todo Test this function and verify what happens when *volPath == path (especially on Linux).
+*/
+TH_REENTRANT EXTERNC MgErr _FUNCC FMGetVolPath(ConstPath path, Path *volPath);
 
 TH_REENTRANT EXTERNC MgErr _FUNCC FListDir(ConstPath path, FDirEntHandle list, FMListDetails **);
 
@@ -1035,6 +1523,21 @@ typedef void* InstanceDataPtr;
 TH_REENTRANT EXTERNC MgErr _FUNCC CallChain(UHandle);
 
 TH_REENTRANT EXTERNC MgErr _FUNCC NumericArrayResize(int32, int32, UHandle*, size_t);
+
+/*** Application Builder ***/
+
+/** @brief This function provides the thread specific last error message set during 
+           previous calls to exposed API in LabVIEW built shared library. This function
+		   should be used when error-out clusters are configured to return error-code 
+		   as return value using application builder.		   
+	@param errstr  User allocated buffer to store error message. User must allocate sufficient memory.
+	@param len     Size in bytes of allocated buffer 'errstr'.
+*/
+TH_REENTRANT EXTERNC void _FUNCC LVGetLastErrorMsg(CStr errstr, int32 len);
+
+/** @brief Clears out the previous error message for a current thread.
+*/
+TH_REENTRANT EXTERNC void _FUNCC LVClearLastErrorMsg();
 
 /*** CIN-specific Functions ***/
 TH_REENTRANT  EXTERNC int32 _FUNCC SetCINArraySize(uChar **elmtH, int32 elmtNum, int32 newNumElmts);

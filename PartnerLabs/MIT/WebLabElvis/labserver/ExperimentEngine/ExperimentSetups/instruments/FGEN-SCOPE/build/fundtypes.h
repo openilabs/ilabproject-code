@@ -2,7 +2,7 @@
 #define _fundtypes_H
 /*
 	NI CONFIDENTIAL
-	(c) Copyright 1990-2010 by National Instruments Corp.
+	(c) Copyright 1990-2012 by National Instruments Corp.
 	All rights reserved.
 
 
@@ -136,6 +136,9 @@
             } floatExt;
 #       endif
 #       define CompilerSupportsExt 0
+#   elif ProcessorType == kARM
+        typedef double          floatExt;
+#       define CompilerSupportsExt 1
 #   else
         typedef long double     floatExt;
 #       define CompilerSupportsExt 1
@@ -223,6 +226,24 @@
         typedef long long int64;
         typedef unsigned long long uInt64;
 #   endif /* USE_C99_TYPES */
+
+#elif Rtx /*##########################################################*/
+
+	typedef signed char			int8;
+	typedef unsigned char		uInt8;
+	typedef uInt8				uChar;
+	typedef short int			int16;
+	typedef unsigned short int	uInt16;
+	typedef int					int32;
+	typedef unsigned int		uInt32;
+	typedef float				float32;
+	typedef double				float64;
+
+	typedef double              floatExt;
+
+	#define CompilerSupportsInt64 1	
+	typedef long long int64;
+	typedef unsigned long long uInt64;
 
 #endif
 
@@ -454,7 +475,7 @@ see http://www.codeguru.com/forum/showthread.php?t=323835 */
 #endif /* !VxWorks */
 			return (f1 <= f2) && (f1 >= f2); /* f1 == f2; */
 		}
-		template <class T>
+		template <typename T>
 		inline bool Equal(const T &v1, const T &v2, FloatComparisonMethod /* method */ = FloatComparisonExact) {
 			return (v1 <= v2) && (v1 >= v2); /* v1 == v2; */
 		}

@@ -2,7 +2,7 @@
 #define _hosttype_H
 /**
 	NI CONFIDENTIAL
-	(c) Copyright 1990-2010 by National Instruments Corp.
+	(c) Copyright 1990-2012 by National Instruments Corp.
 	All rights reserved.
 
 	@file
@@ -38,15 +38,40 @@ struct Pattern;
 #ifdef FALSE
 #undef FALSE
 #endif
-#if _MSC_VER <= 1499 // MSVC 8.0 or earlier
-#define _WIN32_WINNT 0x0400
+
+#ifndef _WIN32_WINNT
+	#if _MSC_VER <= 1499 // MSVC 8.0 or earlier
+		#define _WIN32_WINNT 0x0400
+	#else
+		#if (OpSystem==kMSWin32)
+			#define _WIN32_WINNT 0x0501
+		#else
+			#define _WIN32_WINNT 0x0600
+		#endif // (OpSystem==kMSWin32)
+	#endif
 #else
-#if (OpSystem==kMSWin32)
-#define _WIN32_WINNT 0x0500
-#else
-#define _WIN32_WINNT 0x0600
-#endif
-#endif
+	#ifndef MSWin_DISABLE_MIN_WINVER_CHECK
+		#if _MSC_VER <= 1499 // MSVC 8.0 or earlier
+			#if (_WIN32_WINNT < 0x0400)
+				#error _WIN32_WINNT must be >= 0x0400.
+			#endif // (_WIN32_WINNT < 0x0400)
+		#else
+			/* Ensure that the _WIN32_WINNT version is adequate. */
+			#if (OpSystem==kMSWin32)
+				#if (_WIN32_WINNT < 0x0501)
+					#undef _WIN32_WINNT
+					#define _WIN32_WINNT 0x0501
+				#endif // (_WIN32_WINNT < 0x0501)
+			#else
+				#if (_WIN32_WINNT < 0x0600)
+					#undef _WIN32_WINNT
+					#define _WIN32_WINNT 0x0600
+				#endif // (_WIN32_WINNT < 0x0600)
+			#endif // (OpSystem==kMSWin32)
+		#endif
+	#endif /* MSWin_DISABLE_MIN_WINVER_CHECK */
+#endif /* #ifndef _WIN32_WINNT */
+
 #pragma warning (push)
 #pragma warning (disable : 4701) /* local variable 'XXX' may be used without having been initialized */
 #include <windows.h>
