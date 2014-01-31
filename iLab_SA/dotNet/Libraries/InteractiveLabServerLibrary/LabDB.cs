@@ -758,7 +758,7 @@ namespace iLabs.LabServer.Interactive
         public int UpdateTask(long taskID, int app_id, long exp_id, string groupName, DateTime startTime, long duration, LabTask.eStatus status,
             long coupon_ID, string issuerGuidStr, string storage, string data)
         {
-            LabTask task = new LabTask();
+            //LabTask task = new LabTask();
 
             DbConnection connection = FactoryDB.GetConnection();
             DbCommand cmd = FactoryDB.CreateCommand("UpdateTask", connection);
@@ -834,7 +834,7 @@ namespace iLabs.LabServer.Interactive
         }
 
 
-		public LabTask GetTask(long task_id)
+		public virtual LabTask GetTask(long task_id)
 		{
 			DbConnection connection =  FactoryDB.GetConnection();
 			// create sql command
@@ -870,7 +870,7 @@ namespace iLabs.LabServer.Interactive
 			return taskInfo;
 		}
 
-        public LabTask GetTask(long experiment_id, string sbGUID)
+        public virtual LabTask GetTask(long experiment_id, string sbGUID)
         {
             DbConnection connection = FactoryDB.GetConnection();
             // create sql command
@@ -912,7 +912,7 @@ CREATE PROCEDURE GetActiveTasks
 AS
 select taskID,Status 
 */
-		public LabTask [] GetActiveTasks()
+		public virtual LabTask [] GetActiveTasks()
 		{
             List<LabTask> list = new List<LabTask>();
 			DbConnection connection =  FactoryDB.GetConnection();
@@ -950,7 +950,7 @@ CREATE PROCEDURE GetExpiredTasks
 AS
 select taskID,VIID,GroupID,StartTime,endTime,Status,CouponID,IssuerID,Data 
 */
-		public LabTask [] GetExpiredTasks(DateTime targetTime)
+		public virtual LabTask [] GetExpiredTasks(DateTime targetTime)
 		{
             List<LabTask> list = new List<LabTask>();
 			DbConnection connection =  FactoryDB.GetConnection();

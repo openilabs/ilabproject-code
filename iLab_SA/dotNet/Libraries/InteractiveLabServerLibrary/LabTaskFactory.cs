@@ -29,6 +29,12 @@ namespace iLabs.LabServer.Interactive
             //
             // TODO: Add constructor logic here
             //
+           
+        }
+
+        public virtual LabTask CreateLabTask()
+        {
+            return new LabTask();
         }
         
         /// <summary>
@@ -142,14 +148,25 @@ namespace iLabs.LabServer.Interactive
             Logger.WriteLine("Experiment: " + experimentID + " Start: " + DateUtil.ToUtcString(startTime) + " \tduration: " + duration);
             long statusSpan = DateUtil.SecondsRemaining(startTime, duration);
             //launchClient(experimentID, essService, appInfo);
-           
 
-            // Create  & store the labTask in database and return an LabTask object;
-            labTask = dbManager.InsertTask(appInfo.appID, experimentID,
-                        groupName, startTime, duration, LabTask.eStatus.Scheduled,
-                        expTicket.couponId, expTicket.issuerGuid, essService,null);
+            //factory constructs the correct LabTask object Type
+            labTask = CreateLabTask();
+           
+            labTask.labAppID = appInfo.appID;
+            labTask.experimentID = experimentID;
+            labTask.groupName = groupName;
+            labTask.startTime = startTime;
+            if (duration > 0)
+                labTask.endTime =  startTime.AddTicks(duration * TimeSpan.TicksPerSecond);
+            else
+                labTask.endTime = DateTime.MinValue;
+            labTask.couponID = expTicket.couponId;
+            labTask.issuerGUID = expTicket.issuerGuid;
+            labTask.storage = essService;
             labTask.data = labTask.constructTaskXml(appInfo.appID, fullName, appInfo.rev, statusName, essService);
-            dbManager.SetTaskData(labTask.taskID, labTask.data);
+            // Create  & store the labTask in database and return an LabTask object;
+            long taskID = dbManager.InsertTaskLong(labTask);
+            labTask.taskID = taskID;
             return labTask;
         }
      

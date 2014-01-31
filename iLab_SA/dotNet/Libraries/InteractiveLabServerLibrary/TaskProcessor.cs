@@ -133,13 +133,10 @@ namespace iLabs.LabServer.Interactive
         }
         public LabTask GetTask(long taskID)
         {
-            LabTask task = new LabTask();
-            bool status = tasks.TryGetValue(taskID, out task);
-            if (status)
-                return task;
+            if (tasks.ContainsKey(taskID))
+                return tasks[taskID];
             else
                 return null;
-
         }
 
         public LabTask GetTask(long experimentID,string issuer)

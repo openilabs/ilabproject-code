@@ -8,6 +8,12 @@ namespace iLabs.LabServer.Interactive
 {
     public interface I_TaskFactory
     {
+        /// <summary>
+        /// Creates a new LabTask, this may be a derived type
+        /// </summary>
+        /// <returns></returns>
+        LabTask CreateLabTask();
+
          /// <summary>
         /// Parses the appInfo and experiment ticket, inserts the task into the database and
         /// creates a dataManager and dataSources defined in the appInfo.
