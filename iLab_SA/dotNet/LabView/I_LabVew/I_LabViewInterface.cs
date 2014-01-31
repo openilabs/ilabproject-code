@@ -15,9 +15,12 @@ using System.Web;
 
 using System.Runtime.InteropServices;
 
+using iLabs.DataTypes.TicketingTypes;
+using iLabs.LabServer.Interactive;
+
 namespace iLabs.LabView
 {
-
+  
     /// <summary>
     /// Summary description for I_LabViewInterface. This version is an attempt to use a stand-alone LabView Application/Service.
     /// As the Application will require the automatic loading of several VI's this implementation should be 
@@ -26,6 +29,9 @@ namespace iLabs.LabView
     /// </summary>
     public interface I_LabViewInterface
     {
+        LabTask CreateLabTask(LabAppInfo appInfo, Coupon expCoupon, Ticket expTicket);
+
+
         /// <summary>
         /// Sends messages to the status and remaining time fields of the named VI, 
         /// it must be in memory and publish the controls as connectors.
@@ -121,6 +127,8 @@ namespace iLabs.LabView
         /// <param name="viName"></param>
         int ResetVI(string viName);
 
+        int ReleaseVI(string viName);
+
         /// <summary>
         /// Attempt to close all references to vi causing it to go out of memory.
         /// </summary>
@@ -141,6 +149,8 @@ namespace iLabs.LabView
         /// <param name="viName">Library:viName.vi format or just the viName.vi format.</param>
         int StopVI(string viName);
 
+       int SetControlValues(string viName,string[] names,object[] values);
+        
         /// <summary>
         /// Set the VI's displayed rectangle.
         /// </summary>
@@ -167,5 +177,6 @@ namespace iLabs.LabView
         int SetLockState(string viName, Boolean state);
        
       
+        int OpenFrontPanel(string viName, bool reserveForCall, LabViewTypes.eFPState state);
     }
 }
