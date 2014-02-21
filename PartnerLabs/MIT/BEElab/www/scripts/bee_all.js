@@ -4,13 +4,13 @@
  var dummyProfile = [];
 
  // THIS NEEDS TO BE CHANGED!!!!!
- current_temperature = 70
+ var current_temperature = 70;
  
  //this should eventually take in the number of hours from input.
-//var sunHours = 12;
-//var sunChart = null;
-//var sunSlider = null;
-//var sunData = null;
+var sunHours = 12;
+var sunChart = null;
+var sunSlider = null;
+var sunData = null;
 
 (function() {
 	console.log("In bee_all.js");
@@ -217,10 +217,10 @@
       if (window.chart != null) {
         window.chart = null;
       }
-      console.log("_drawGraph: is called before load");
+      console.log("_drawGraph: before LoadProfile constructor");
       load = new LoadProfile(this.lab);
-      console.log("_drawGraph: is called after load");
-      return window.chart = LoadProfile;
+      console.log("_drawGraph: after LoadProfile constructor");
+      return window.chart = load //LoadProfile;
     }, 
     
     _setupListeners: function() {
@@ -284,7 +284,7 @@ function drawGraphWithProfile(profileSelected) {
 
 
 function redrawChart() {
-  
+   console.log("redrawChart: is called");
   if (chart1.series.length < 7) {  
     chart1.addSeries({
         data: SeriesToBeDisplayed,

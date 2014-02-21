@@ -57,7 +57,7 @@
      }
      var generateInvisibleSeries = function () {
       var invisSeries = new Array();
-      for (var i=0; i < this.lab.length, i++) {
+      for (var i=0; i < this.lab.length; i++) {
         invisSeries.push(402);
       }
       return invisSeries;
