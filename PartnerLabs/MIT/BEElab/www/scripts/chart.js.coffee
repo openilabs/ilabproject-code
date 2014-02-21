@@ -40,7 +40,7 @@ window.LoadProfile = class LoadProfile
       yAxis:
         max: 500
         title:
-          text: 'Total Wattz'
+          text: 'Total Watts'
         stackedLabels:
           enabled: true
       plotOptions:

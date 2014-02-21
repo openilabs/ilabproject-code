@@ -31,8 +31,8 @@ class Lab
   #
   # Examples:
   #
-  # getSeriesValues({'name': '100 Wattz'})
-  #   => returns an array with the values for the 100 Wattz series
+  # getSeriesValues({'name': '100 Watts'})
+  #   => returns an array with the values for the 100 Watts series
   #
   # getSeriesValues({'index': 0})
   #   => returns an array with the values for the serie at index 0
