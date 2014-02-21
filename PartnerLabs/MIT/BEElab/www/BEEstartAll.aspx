@@ -33,9 +33,9 @@ Please see license.txt in top level directory for full license.
   <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxcommon.js"></script>
 <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/dhtmlxslider.js"></script>
 <script type="text/javascript" src="scripts/dhtmlxSlider/codebase/ext/dhtmlxslider_start.js"></script>
-<script type="text/javascript" src="scripts/chartAll.js"></script>
+<script type="text/javascript" src="scripts/beeStartClimate.js"></script>
+<script type="text/javascript" src="scripts/chartClimate.js"></script>
 <script type="text/javascript" src="scripts/launchAll.js?v=565757"></script>
-<script type="text/javascript" src="scripts/bee_all.js"></script>
 <link rel="stylesheet" type="text/css" href="scripts/dhtmlxSlider/codebase/dhtmlxslider.css"/>
 <style type="text/css">@import url(css/main.css );</style>
 
@@ -62,9 +62,9 @@ Please see license.txt in top level directory for full license.
 
 <div class='main'>
   <h1 class='chart-title'>Load Profiles</h1>
-  <div id='holder'> 
-    <div id="sun-container"></div>
-    <div id="sunslider-container"></div>	
+<div id='holder'>
+     <div id="sun-container"></div>
+    <div id="sunslider-container"></div>
     <div id="chart-container"></div>	
   </div>
  

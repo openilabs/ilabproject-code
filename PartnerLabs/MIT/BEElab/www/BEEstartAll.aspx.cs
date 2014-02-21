@@ -93,7 +93,7 @@ namespace iLabs.LabServer.BEE
                     && Session["opCouponID"] != null && Session["opCouponID"] != ""
                     && Session["opIssuer"] != null && Session["opIssuer"] != ""))
                 {
-                    Logger.WriteLine("BEEstart: " + "AccessDenied missing credentials");
+                    Logger.WriteLine("BEEstartAll: " + "AccessDenied missing credentials");
                     Response.Redirect("AccessDenied.aspx?text=missing+credentials.", true);
                 }
 
