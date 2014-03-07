@@ -573,10 +573,8 @@ namespace iLabs.ServiceBroker.iLabSB
         /////////////////////////////////////
 
         /// <summary>
-        /// Attempts to add a ticket of the requested type
-        /// to the existing coupon, fails if permissions 
-        /// are not available, or the coupon was not issued 
-        /// by this serviceBroker.
+        /// Attempts to add a ticket of the requested type to the existing coupon, fails if permissions 
+        /// are not available, or the coupon was not issued by this serviceBroker.
         /// </summary>
         /// <param> name="coupon"></param>
         /// <param name="redeemer_gid"></param>
@@ -586,7 +584,8 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="sponsor_gid"></param>
         /// <param name="identCoupon"></param>
         /// <returns>the created Ticket or null if creation fails</returns>
-        [WebMethod,
+        [WebMethod(Description = "Attempts to add a ticket of the requested type to the existing coupon, fails if permissions" 
+        + " are not available, or the coupon was not issued by this serviceBroker."),
         SoapDocumentMethod(Binding = "ITicketIssuer"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public Ticket AddTicket(Coupon coupon, string type, string redeemerGuid,
@@ -616,7 +615,11 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="payload"></param>
         /// used to Identify the requester</param>
         /// <returns>Coupon on success, null if Ticket creation is refused</returns>
-        [WebMethod,
+        [WebMethod(Description="Request the creation of a ticket of the specified type,"
+        + "  by the Ticketing service. If the credentials pass a" 
+        + " ticket will be created and accessable by the returned coupon."
+        + " Sponsor will be requesting agent ( derive from authHeader the" 
+        + " agent that was issued the idCoupon )."),
         SoapDocumentMethod(Binding = "ITicketIssuer"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public Coupon CreateTicket(string type, string redeemerGuid,
@@ -694,7 +697,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="redeemer_guid"></param>
         /// <param name="type"></param>
         /// <returns>True if the ticket has been cancelled successfully.</returns>
-        [WebMethod,
+        [WebMethod(Description="Request The cancellation of an individual ticket, if the coupon was not issued by this serviceBroker it will be forwarded, if the issuer is known."),
         SoapDocumentMethod(Binding = "ITicketIssuer"),
         SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         public bool RequestTicketCancellation(Coupon coupon,
@@ -740,7 +743,7 @@ namespace iLabs.ServiceBroker.iLabSB
         //////////////////////////////////////////////////////
         ///// BATCH SERVICE BROKER TO LAB SERVER API     /////
         //////////////////////////////////////////////////////
-
+                // See file iLabServiceBroker.asmx
 
         //////////////////////////////////////////////////////
         ///// INTERACTIVE SERVICE BROKER API               /////
@@ -755,7 +758,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="name">The name of the client item whose value is to be saved.</param>
         /// <param name="itemValue">The value that is to be saved with name.</param>
         /// <remarks>Web Method</remarks>
-        [WebMethod(Description = "Sets a client item value in the user's opaque data store", EnableSession = true)]
+        [WebMethod(Description = "[INTERACTIVE] Sets a client item value in the user's opaque data store", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]        
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/SaveClientItem",Binding = "IServiceBroker")]      
         public void SaveClientData(string name, string itemValue)
@@ -780,7 +783,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="name">The name of the client item whose value is to be returned.</param>
         /// <returns>The value of a client item in the user's opaque data store.</returns>
         /// <remarks>Web Method</remarks>
-        [WebMethod(Description = "Returns the value of an client item in the user's opaque data store", EnableSession = true)]
+        [WebMethod(Description = "[INTERACTIVE] Returns the value of an client item in the user's opaque data store", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/LoadClientItem", Binding = "IServiceBroker")]
         public string LoadClientData(string name)
@@ -803,8 +806,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// </summary>
         /// <param name="name">The name of the client item to be removed.</param>
         /// <remarks>Web Method</remarks>
-        [WebMethod(Description = "Removes an client item from the user's opaque data store", EnableSession = true)]
-      
+        [WebMethod(Description = "[INTERACTIVE] Removes an client item from the user's opaque data store", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/DeleteClientItem", Binding = "IServiceBroker")]
         public void DeleteClientData(string name)
@@ -846,12 +848,13 @@ namespace iLabs.ServiceBroker.iLabSB
         ///////////////////////
 
         /// <summary>
-        /// An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM.
+        /// An authority requests the 'completeness' status of a user. This will most likely only be supported for 
+        /// requests from a SCORM or other LMS Learning Object.
         /// </summary>
         /// <param name="userName"></param>
         /// <param name="authorityKey">May be a URL or GUID, not sure what it will actually be</param>
         /// <returns>An IntTag, depending on the id the tag maybe used differently.</returns>
-        [WebMethod(Description = "An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+        [WebMethod(Description = "An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM or other LMS Learning Object.", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/GetUserStatus", Binding = "IServiceBroker")]
         public IntTag GetUserStatus(string userName, string authorityKey)
@@ -894,18 +897,18 @@ namespace iLabs.ServiceBroker.iLabSB
         }
 
         /// <summary>
-        /// An authority updates a user. This will most likely only be supported for requests from a SCORM.
+        /// An authority updates a user. This will most likely only be supported for requests from a SCORM or other LMS Learning Object.
         /// </summary>
         /// <param name="userName">>A string token reperesenting the user, this may be a user name, or an anonymous unique 
         /// id that the authority will always use to identify this user</param>
-        /// <param name="authorityKey">May be a URL or GUID, not sure what it will actually be</param>
+        /// <param name="authorityKey">The GUID established with the serviceBroker for the requesting Authority</param>
         /// <param name="firstName"></param>
         /// <param name="lastName"></param>
         /// <param name="email"></param>
         /// <param name="affiliation"></param>
         /// <param name="autoCreate">create the user if it does not exist & is true</param>
         /// <returns></returns>
-        [WebMethod(Description = "An authority updates a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+        [WebMethod(Description = "An authority updates a user. This will most likely only be supported for requests from a SCORM or other LMS Learning Object.", EnableSession = true)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
         [SoapDocumentMethod("http://ilab.mit.edu/iLabs/Type/ModifyUser", Binding = "IServiceBroker")]
         public IntTag ModifyUser(string userName, string authorityKey, string firstName, string lastName,
@@ -976,7 +979,7 @@ namespace iLabs.ServiceBroker.iLabSB
         /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
         /// <param name="userName">A string token reperesenting the user, this may be a user name, or an anonymous unique 
         /// id that the authority will always use to identify this user</param>
-        /// <param name="authorityKey">A key that uniquely identifies the authority this does need to match the information in the database</param>
+        /// <param name="authorityKey">A GUID that uniquely identifies the authority this does need to match the information in the database</param>
         /// <param name="start"> An optional suggested start time in UTC</param>
         /// <param name="duration">An optional duration in seconds</param>
         /// <returns>an IntTag with a status code in the interger depending on the code there is an error 
@@ -1082,32 +1085,11 @@ namespace iLabs.ServiceBroker.iLabSB
                                 Ticket tt = brokerDB.AddTicket(coupon, TicketTypes.LAUNCH_CLIENT, ProcessAgentDB.ServiceGuid, ProcessAgentDB.ServiceGuid, 600L, payload);
                                 StringBuilder urlbuf = new StringBuilder();
                                 urlbuf.Append(ProcessAgentDB.ServiceAgent.codeBaseUrl);
-                                //urlbuf.Append("/default.aspx?sso=t");
-                                //urlbuf.Append("&usr=" + userName + "&cid=" + clientGuid);
-                                //urlbuf.Append("&grp=" + groupName);
-                                //urlbuf.Append("&auth=" + authority.authGuid);
-                                //urlbuf.Append("&key=" + coupon.passkey);
-                                //if (autoStart > 0)
-                                //    urlbuf.Append("&auto=t");
-                                //urlbuf.Append("/ClientLauncher.ashx?cid=" + coupon.couponId);
-                                //urlbuf.Append("&key=" + coupon.passkey);
-
                                 urlbuf.Append("/LaunchClient.aspx?cid=" + coupon.couponId);
                                 urlbuf.Append("&ss=" + ss);
                                 result.id = 1;
                                 result.tag = urlbuf.ToString();
-                                //
-                                //
-                                //if (test.id > 0)
-                                //{
-                                //    string requestGuid = Utilities.MakeGuid("N");
-                                //    
-
-                                //}
-                                //else
-                                //{
-                                //    tag.tag = "Access Denied";
-                                //}
+                               
                              }
                         }
                     }
@@ -1148,11 +1130,23 @@ namespace iLabs.ServiceBroker.iLabSB
         /// local account in future, may in the future support validation from the service making the request, may be null</param>
         /// <param name="groupName">group name on this ServiceBroker, may in the future support validation 
         /// from the service making the request, may be null/param>
-        /// <param name="authtority">The authority string that validates the specified user. 
+        /// <param name="authtority">The authority GUID string that validates the specified user. 
         /// This assumes that the requesting service has authenticated the user. May be null</param>
         /// <param name="clientGuid">May be null</param>
         /// <returns>An operationCoupon or null</returns>
-        [WebMethod(Description = "Request authorization for the specified types of access, for the specified user, group, authority and  client.")]
+        [WebMethod(Description = "Request authorization for the specified types of access, for the specified group and"
+        + " optional user. At this time remote SB's are not supported."
+         + " This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header," 
+        + " at least one must be used. If an AgentAuthHeader is used & the agent is a known service it is assummed that" 
+         + " the user name is authenticated,"
+         + " the additional parameters refine the options the user has, and a REDEEM_SESSION ticket is created."
+         + " If an OperationHeader is used a REDEEM_SESSION ticket has already been created, supplied" 
+         + " arguments are tested against the session's user"
+         + " and if the requested resources are available to the user."
+         + " Depending on the header, session information and supplied arguments the requested tickets will be created."
+         + " Currently you must specify the user and client and only scheduling tickets are supported."
+         + " Support for AUTHORIZE CLIENT will be added for requesting all the permissions needed to launch a client."
+         + " This method may change in the next release.")]
         [SoapDocumentMethod(Binding = "IServiceBroker")]
         [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
         [SoapHeader("opHeader", Direction = SoapHeaderDirection.In)]

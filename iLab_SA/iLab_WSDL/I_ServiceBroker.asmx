@@ -90,13 +90,14 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
     ///////////////////////
 
     /// <summary>
-    /// An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM.
+    /// An authority requests the 'completeness' status of a user. This will most likely only be supported for 
+    /// requests from a SCORM or other LMS Learning Object.
     /// </summary>
     /// <param name="userName">>A string token reperesenting the user, this may be a user name, or an anonymous unique 
     /// id that the authority will always use to identify this user</param>
     /// <param name="authorityKey">May be a URL or GUID, not sure what it will actually be</param>
     /// <returns>An IntTag, depending on the id the tag maybe used differently.</returns>
-    [WebMethod(Description = "An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+    [WebMethod(Description = "An authority requests the 'completeness' status of a user. This will most likely only be supported for requests from a SCORM  or other LMS Learning Object.", EnableSession = true)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract IntTag GetUserStatus(string userName, string authorityKey);
@@ -113,14 +114,15 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
     /// <param name="affiliation"></param>
     /// <param name="autoCreate">create the user if it does not exist & is true</param>
     /// <returns></returns>
-    [WebMethod(Description = "An authority updates a user. This will most likely only be supported for requests from a SCORM.", EnableSession = true)]
+    [WebMethod(Description = "An authority updates a user. This will most likely only be supported for requests from a SCORM or other LMS Learning Object.", EnableSession = true)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = false)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     public abstract IntTag ModifyUser(string userName, string authorityKey, string firstName, string lastName,
         string email, string affiliation, bool autoCreate);
 
     /// <summary>
-    /// An authority requests the launching of a specific client for a user.
+    /// An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM or other LMS Learning Object."
+    /// The operationHeader coupon will be defined within the SCO and refer to a TicketCollection that includes an Authenticate_Client ticket.
     /// </summary>
     /// <param name="clientGuid">The GUID of the client, this client must be registered on the serviceBroker.</param>  
     /// <param name="groupName">For now this should be a group that exisits on the serviceBroker, it may be null</param>
@@ -131,7 +133,7 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
     /// <param name="duration"></param>
    
     /// <returns>an IntTag with a status code in the interger and a URLto be used by the authority to redirect the request.</returns>
-    [WebMethod(Description = "An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM."
+    [WebMethod(Description = "An authority requests the launching of a specific client for a user. This will most likely only be supported for requests from a SCORM or other LMS Learning Object."
             + " The operationHeader coupon will be defined within the SCO and refer to a TicketCollection that includes an Authenticate_Client ticket.", EnableSession = true)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
@@ -153,7 +155,10 @@ public abstract class I_ServiceBroker : System.Web.Services.WebService
     /// <param name="serviceGuid">TThe lab server or other service that authorization is being requested for. May be null</param>
     /// <param name="clientGuid">May be null</param>
     /// <returns>An operationCoupon or null</returns>
-    [WebMethod(Description = "Request authorization for the specified types of access, for the specified group, user, service and  client. Currently support for Scheduling tickets only.")]
+    [WebMethod(Description = "Request authorization for the specified types of access, for the specified group and optional user."
+    + " While several fields may be null, enough imformation must be supplied by a combination of the headers"
+    + " and the fields to authenticate & authorize the requested actions."
+    + " This method supports both an AgentAuthHeader and an OperationHeader in the SOAP header, at least one must be used.")]
     [SoapDocumentMethod(Binding = "IServiceBroker")]
     [SoapHeader("agentAuthHeader", Direction = SoapHeaderDirection.In)]
     [SoapHeader("opHeader", Direction = SoapHeaderDirection.In, Required = true)]

@@ -419,19 +419,6 @@ CREATE TABLE [dbo].[AdminURLs] (
 ) ON [PRIMARY]
 GO
 
-
-
-/****** Object:  Table [dbo].[Agents]    Script Date: 8/30/2005 4:07:55 PM ****/
---CREATE TABLE [dbo].[Agents] (
---	[Agent_ID] [int] IDENTITY (2, 1) NOT NULL,
---	[Is_Group] [bit] NOT NULL,
---	[Date_Created] [datetime] NOT NULL DEFAULT GETUTCDATE(),
---	[Agent_Name] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
---	
---) ON [PRIMARY]
---GO
-
-
 /****** Object:  Table [dbo].[Authentication_Types]    Script Date: 8/30/2005 4:07:55 PM ******/
 CREATE TABLE [dbo].[Authentication_Types] (
 	[Auth_Type_ID] [int] IDENTITY (1, 1) NOT NULL ,
@@ -484,9 +471,10 @@ GO
 CREATE TABLE [dbo].[Client_Metadata] (
 	[Client_MD_ID] [int] IDENTITY (1, 1) NOT NULL ,
 	[Client_ID] [int] NOT NULL,
+	[Group_ID] [int] NULL,
 	[Auth_Coupon_ID] [bigint] NOT NULL,
 	[Modification_Time] [datetime] NOT NULL ,
-	[SCO_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL, 
+	[SCO_Guid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL, 
 	[Metadata] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[SCO] [ntext] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 	[Metadata_Format] [nvarchar] (256) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
@@ -500,7 +488,6 @@ CREATE TABLE [dbo].[Client_Types] (
 	[Description] [varchar] (128) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL 
 ) ON [PRIMARY]
 GO
-
 
 /****** Object:  Table [dbo].[Experiments]    Script Date: 8/30/2005 4:07:56 PM ******/
 
