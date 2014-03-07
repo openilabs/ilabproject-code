@@ -99,10 +99,7 @@
 							<asp:listbox cssClass="i18n" id="lbxSelectExperiment" Runat="server" Width="360px" AutoPostBack="True" Rows="10" onselectedindexchanged="lbxSelectExperiment_SelectedIndexChanged"></asp:listbox>
 						</div>
 						<br />
-						<div class="simpleform"><label for="labResources">Lab Server Resources</label><br />		
-						    <asp:listbox cssClass="i18n" id="lbxResource" Runat="server" Width="360px" AutoPostBack="True" Rows="5" onselectedindexchanged="lbxResources_SelectedIndexChanged"></asp:listbox>
-						    <br />&nbsp;&nbsp;<asp:button id="btnNewResource"  CssClass="button" Runat="server" Text="New Resource" onclick="btnNewResource_Click"></asp:button>
-						</div>
+				
 					</div>
 					</div>
 	<uc1:footer id="Footer1" runat="server"></uc1:footer>

@@ -86,12 +86,14 @@ namespace iLabs.Scheduling.LabSide
                     lsTags = dbManager.GetLSResourceTags(Session["labServerGuid"].ToString());
                 else
                     lsTags = dbManager.GetLSResourceTags();
+                //if(lsTags.Length > 1)
                     ddlLabServers.Items.Add(new ListItem(" ---------- select Lab Server Resource ---------- "));
                 foreach (IntTag tag in lsTags)
                 {
                     ddlLabServers.Items.Add(new ListItem(tag.tag,tag.id.ToString()));
                 }
-                
+                //if (lsTags.Length == 1)
+                //    ddlLabServers.SelectedIndex = 0;
             }
             catch (Exception ex)
             {

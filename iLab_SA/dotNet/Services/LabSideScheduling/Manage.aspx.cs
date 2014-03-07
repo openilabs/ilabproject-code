@@ -119,7 +119,7 @@ namespace iLabs.Scheduling.LabSide
                    // lblLabServerName.Text = labServerName;
 
                     BuildExperimentInfoListBox();
-                    BuildResourceListBox(Session["labServerGuid"].ToString());
+                    //BuildResourceListBox(Session["labServerGuid"].ToString());
                 }
             }
 
@@ -188,18 +188,29 @@ namespace iLabs.Scheduling.LabSide
             }
         }
 
-        private void BuildResourceListBox(string lsGuid)
-        {
-            lbxResource.Items.Clear();
-                IntTag[] resources = dbManager.GetLSResourceTags( Session["labServerGuid"].ToString());
-            foreach (IntTag tag in resources)
-            {
-                ListItem resourceItem = new ListItem();
-                resourceItem.Text = tag.tag;
-                resourceItem.Value = tag.id.ToString();
-                lbxResource.Items.Add(resourceItem);
-            }
-        }
+        /**** 
+         * Commented out as there is no registration support for multiple resources
+                private void BuildResourceListBox(string lsGuid)
+                {
+                    lbxResource.Items.Clear();
+                        IntTag[] resources = dbManager.GetLSResourceTags( Session["labServerGuid"].ToString());
+                    foreach (IntTag tag in resources)
+                    {
+                        ListItem resourceItem = new ListItem();
+                        resourceItem.Text = tag.tag;
+                        resourceItem.Value = tag.id.ToString();
+                        lbxResource.Items.Add(resourceItem);
+                    }
+                }
+          protected void lbxResources_SelectedIndexChanged(object sender, System.EventArgs e)
+                {
+                }
+
+                protected void btnNewResource_Click(object sender, System.EventArgs e)
+                {
+                }
+        ****/
+
 
         private void ResetState()
         {
@@ -272,13 +283,7 @@ namespace iLabs.Scheduling.LabSide
             }
         }
 
-        protected void lbxResources_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-        }
-
-        protected void btnNewResource_Click(object sender, System.EventArgs e)
-        {
-        }
+       
 
         protected void btnSave_Click(object sender, System.EventArgs e)
         {
